@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **Flat-footed ends when a character acts.** It used to clear only when the character was hit, so anyone who had
+  already acted was still attacked at their flat-footed Defense for the rest of the round. It now also clears as the
+  combatant's turn begins (p.342), except in a surprise round their side did not win.
+- **CQB damage reuses the attack's distance.** Rolling damage from an attack card no longer asks again for the target
+  distance that card already recorded. When a distance really is missing and is left blank, the roll now says so on
+  screen instead of quietly posting nothing.
+- **Melee attacks check Reach on the map.** With one token targeted, a melee attack on a target beyond the weapon's
+  Reach (p.327) is stopped for players, with a note to move closer or ask the GC. The GC is asked to confirm before
+  going ahead.
+- **Delay no longer skips anyone.** When the acting character delays, the turn now passes to whoever is next, so the
+  characters between the old and new Count still act (p.356).
+
 - **Critical hits on damage cards, follow-up fixes.** A Table of Ouch critical on a special NPC now rolls and reports
   the injury on the spot instead of leaving an ordinary hit. A player whose agent was hit by someone else's attack can
   now roll the Ouch injury from the row they already use to take the damage, and applying a critical Burst or Autofire

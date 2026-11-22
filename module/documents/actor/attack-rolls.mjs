@@ -21,7 +21,7 @@ import {
   observedAttackTargetChoices
 } from "../../apps/character-target.mjs";
 import { validateFinalRoundReservation } from "../../rules/final-round.mjs";
-import { cqbRangePlan } from "../../rules/cqb.mjs";
+import { cqbRangePlan, recordedAttackDistance } from "../../rules/cqb.mjs";
 import { damageTargetChoices, resolveDamageTarget, sneakAttackTargetSnapshot } from "../../apps/damage-target.mjs";
 import { unnervingGrade, unnervingEligible, unnervingPlan } from "../../rules/unnerving.mjs";
 import { hasSneakAttackSource, sneakAttackDamagePlan } from "../../rules/sneak-attack.mjs";
@@ -32,7 +32,8 @@ import { specialistApplies } from "../../rules/weapon-specialist.mjs";
 import { weaponDamage, cleanAndPolishedApplies } from "../../rules/gear.mjs";
 import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";
 import { choiceKey, rememberChoices, restoreChoices } from "../../apps/remembered-choices.mjs";
-import { measureInto } from "../../apps/map.mjs";
+import { measureInto, meleeReach } from "../../apps/map.mjs";
+import { esc } from "../../html.mjs";
 import { coverFire, suppressiveFire } from "../../apps/combat-actions.mjs";
 import { characterReminders } from "../../rules/feat-reminders.mjs";
 import { opportunistDamageSource, halvedFormula } from "../../rules/opportunist.mjs";
@@ -178,6 +179,27 @@ export const ActorAttackRolls = Base =>
         ? { ...atk.sideStance, attemptId: foundry.utils.randomID() }
         : atk.sideStance;
       if (atk.blocked) return refuse(atk.reason);
+      // A melee attack only reaches an opponent within Reach (p.327). The map says when the target is further away:
+      // a player is stopped, and the GC may go ahead after confirming.
+      if (!atk.ranged && w.isMelee && !options.freeFinalAttack) {
+        let extraReach = 0;
+        try {
+          extraReach = reachIncreaseFeet(w.qualities ?? "");
+        } catch {
+          /* a Reach quality that needs review adds nothing here */
+        }
+        const reach = meleeReach(this, 5 + extraReach + (options.duelingReach === true ? 5 : 0));
+        if (reach && !reach.within) {
+          const text = loc`${reach.targetName} is ${reach.distanceFeet} ft. away, beyond the ${reach.reachFeet} ft. Reach of ${item.name} (p.327).`;
+          if (!game.user?.isGM) return refuse(loc`${text} Move closer first, or ask the GC.`);
+          const go = await systemDialog.confirm({
+            window: { title: loc`Target beyond Reach` },
+            rejectClose: false,
+            content: `<p>${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`
+          });
+          if (!go) return null;
+        }
+      }
       const shotsFired = ammunition ? (atk.fireAction?.shots ?? 1) : 0;
       if (shotsFired > (ammunition?.loaded ?? 0))
         return refuse(
@@ -582,13 +604,22 @@ export const ActorAttackRolls = Base =>
           includeSneakAttack: !!input.includeSneakAttack
         };
       }
+      // The attack card already recorded how far away the target was; the damage roll reuses that distance.
+      if (options.distanceFeet === undefined || options.distanceFeet === null || options.distanceFeet === "") {
+        const recorded = recordedAttackDistance(
+          options.sourceAttack?.uuid ? fromUuidSync(options.sourceAttack.uuid)?.flags?.spycraft2 : null
+        );
+        if (recorded !== null) options = { ...options, distanceFeet: recorded };
+      }
       const cqbPreview = cqbRangePlan(this.system, item.system, options, "damage");
       if (cqbPreview.active && cqbPreview.basics && !cqbPreview.known) {
         const input = await askFollowUp(systemDialog, "cqbDamageDistance", { actor: this, item, options });
         if (!input) return null;
         const n = input.distanceFeet;
         if (!Number.isFinite(n) || n < 0)
-          throw new Error(loc`Enter the actual finite nonnegative CQB damage distance.`);
+          return refuse(
+            loc`No damage rolled: enter the target's distance in feet for CQB Basics, then roll damage again.`
+          );
         options = { ...options, distanceFeet: n };
       }
       if (

@@ -15,7 +15,8 @@ import {
   coverPoints,
   distanceFeet,
   flanking,
-  tokenBox
+  tokenBox,
+  withinReach
 } from "../rules/map.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { loc } from "../i18n.mjs";
@@ -147,6 +148,26 @@ export function measureAttack(actor) {
     cover,
     coverId: COVER[cover].id,
     inLine: between.map(row => row.name)
+  };
+}
+
+/**
+ * How far the targeted token stands from this character's token, against the Reach of a melee attack (p.327).
+ * Null when the scene cannot say: no map, no token, or not exactly one other token targeted.
+ * @param {Actor} actor
+ * @param {number} reachFeet  the attack's Reach in feet (5 for a Medium character, more with RCH or Dueling Basics)
+ */
+export function meleeReach(actor, reachFeet = 5) {
+  const attacker = actorToken(actor),
+    target = targetedToken();
+  if (!attacker || !target || attacker === target) return null;
+  const a = boxOf(attacker),
+    t = boxOf(target);
+  return {
+    targetName: target.name,
+    distanceFeet: distanceFeet(a, t, { square: gridFacts().distance, diagonal: diagonalRule() }),
+    reachFeet,
+    within: withinReach(a, t, reachFeet)
   };
 }
 

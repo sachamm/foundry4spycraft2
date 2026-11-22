@@ -151,7 +151,8 @@ test("damage asks for missing CQB distance, applies one bonus inside range and n
   for (const distanceFeet of ["", false, -1, Infinity]) {
     a = actor();
     response = { distanceFeet };
-    await assert.rejects(a.rollDamage(a.items[0], { includeSneakAttack: false }));
+    // Refused on screen, with nothing posted.
+    assert.equal(await a.rollDamage(a.items[0], { includeSneakAttack: false }), false);
   }
 });
 test("source, weapon and prepared CQB-range changes during RNG reject stale attack and damage benefits before posting", async () => {
