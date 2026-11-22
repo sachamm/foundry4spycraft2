@@ -113,8 +113,17 @@ export function applyDefaultOwnership(actor, _data, options = {}, userId) {
   actor.updateSource({ "ownership.default": level });
 }
 
-/** Ask the GC about each proposal; apply ticked rows and remember unticked ones. Returns what was applied. */
-export async function reviewOwnership(proposals) {
+/** The proposal an agent needs now, from the current users and setting. */
+const currentProposal = actor =>
+  ownershipProposal(globalThis.game?.actors?.get?.(actor.id) ?? actor, [...(globalThis.game?.users ?? [])], {
+    defaultLevel: defaultCharacterOwnership()
+  });
+
+/**
+ * Ask the GC about each proposal; apply ticked rows and remember unticked ones. A row whose agent or players changed
+ * while the dialog was open is neither applied nor remembered; it is offered again in a fresh review.
+ */
+export async function reviewOwnership(proposals, { recheck = currentProposal } = {}) {
   if (!proposals.length) return { applied: 0 };
   const esc = foundry.utils.escapeHTML;
   const rows = proposals
@@ -133,16 +142,23 @@ export async function reviewOwnership(proposals) {
   if (!input) return { applied: 0 };
   const dismissed = { ...(setting(DISMISSED_SETTING, {}) ?? {}) };
   let applied = 0;
+  const changed = [];
   for (const proposal of proposals) {
+    const now = recheck(proposal.actor);
+    if (now?.signature !== proposal.signature) {
+      changed.push(proposal.actor);
+      continue;
+    }
     if (input[`apply-${proposal.actor.id}`]) {
-      await proposal.actor.update({ ownership: proposal.changes });
+      await (now.actor ?? proposal.actor).update({ ownership: proposal.changes });
       delete dismissed[proposal.actor.id];
       applied++;
     } else dismissed[proposal.actor.id] = proposal.signature;
   }
   await game.settings.set(SYSTEM, DISMISSED_SETTING, dismissed);
   if (applied) ui.notifications?.info(loc`Updated ownership on ${applied} character(s).`);
-  return { applied };
+  if (changed.length) queueOwnershipReview(changed);
+  return { applied, changed: changed.length };
 }
 
 let queued = null;

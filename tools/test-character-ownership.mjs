@@ -7,7 +7,8 @@ import {
   ownershipProposal,
   pendingProposals,
   describeProposal,
-  applyDefaultOwnership
+  applyDefaultOwnership,
+  reviewOwnership
 } from "../module/apps/character-ownership.mjs";
 
 const gm = { id: "gm", name: "Game Control", isGM: true };
@@ -119,4 +120,32 @@ test("the ranged attack dialog defaults to a Standard Attack", async () => {
     preview: { range: 30, firearm: true, modes: ["single"], fireMode: "single" }
   });
   assert.match(html, /<select name="attackAction"><option value="standard" selected>/);
+});
+
+test("a row that changed while the review was open is not applied or remembered", async () => {
+  const saved = {};
+  globalThis.game = {
+    user: { id: "gm", isGM: true },
+    users: Object.assign([gm, sacha, robin], { activeGM: null }),
+    settings: { get: () => ({}), set: async (_s, key, value) => (saved[key] = value) }
+  };
+  globalThis.ui = { notifications: { info() {} } };
+  globalThis.foundry = {
+    utils: { escapeHTML: s => String(s) },
+    applications: { api: { DialogV2: { input: async () => ({ "apply-a": true, "apply-b": true }) } } }
+  };
+  const updates = [];
+  const make = (id, name, ownership) => ({ ...agent(name, ownership), id, update: async d => updates.push([id, d]) });
+  const stale = make("a", "Breakwater (Sacha)", { default: 0 });
+  const kept = make("b", "Nobody", { default: 0 });
+  const proposals = pendingProposals([stale, kept], users);
+  // While the dialog was open, Robin was given Owner on the first agent.
+  const recheck = actor =>
+    ownershipProposal(actor.id === "a" ? { ...actor, ownership: { default: 0, u2: 3 } } : actor, users);
+  const result = await reviewOwnership(proposals, { recheck });
+  assert.deepEqual(result, { applied: 1, changed: 1 });
+  assert.deepEqual(updates, [["b", { ownership: { default: OWNERSHIP.OBSERVER } }]]);
+  assert.deepEqual(saved.ownershipReviewDismissed, {});
+  delete globalThis.game;
+  delete globalThis.ui;
 });
