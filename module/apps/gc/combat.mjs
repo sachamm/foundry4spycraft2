@@ -101,7 +101,16 @@ export async function recordFluidEvent(combatant, id, input = {}) {
       initiativeBonus: bonusOf(combatant),
       usedThisRound: state.delayed
     });
+    const wasActing = combat?.started && combat.combatant?.id === combatant.id,
+      turnBefore = combat?.turn;
     await combatant.update({ initiative: result.count, "flags.spycraft2.fluid": { ...state, delayed: result.used } });
+    // The delaying character steps down the order; the turn goes to whoever now stands in that place, so the
+    // characters between the old and the new Count still act this round (p.356).
+    if (wasActing && Number.isInteger(turnBefore)) {
+      combat.setupTurns?.();
+      const now = combat.turns?.findIndex?.(c => c.id === combatant.id) ?? -1;
+      if (now > turnBefore) await combat.update({ turn: turnBefore });
+    }
     return { count: result.count };
   }
   if (id === "press") {
@@ -366,11 +375,51 @@ let endOfRoundPass = Promise.resolve();
 /** Resolves once fluid initiative has finished reordering the combat for the latest round change. */
 export const fluidRoundSettled = () => endOfRoundPass;
 
+/**
+ * Whether a combatant's flat-footedness ends as its turn begins: it is about to act (p.342). Not in a surprise round
+ * the combatant's side did not win, since it takes no action then.
+ * @param {{round:number, surprise?:{winners:string[], round:number}|null}} combat
+ * @param {{playerSide:boolean}} combatant
+ */
+export function flatFootedEndsOnTurn(combat, { playerSide }) {
+  const surprise = combat?.surprise;
+  if (surprise && surprise.round === combat.round)
+    return (surprise.winners ?? []).includes(playerSide ? "players" : "opponents");
+  return true;
+}
+
+// The flat-footed marking at the start of the latest combat; the first turn waits for it before clearing.
+let startPass = Promise.resolve();
+
 export function installFluidInitiativeHooks() {
   // Everyone starts a fight flat-footed unless he joins it deliberately after it begins (p.323).
-  Hooks.on("combatStart", async combat => {
+  Hooks.on("combatStart", combat => {
     if (!isLeadGM() || !setting("startFlatFooted")) return;
-    for (const combatant of combat.combatants) await condition(combatant.actor, "flat-footed", "Flat-footed");
+    startPass = (async () => {
+      for (const combatant of combat.combatants) await condition(combatant.actor, "flat-footed", "Flat-footed");
+    })();
+    return startPass;
+  });
+  // Flat-footedness ends when the character acts (p.342): clear it as the combatant's turn begins.
+  Hooks.on("updateCombat", async (combat, changed, options) => {
+    if (!isLeadGM() || !combat?.started) return;
+    if (!Object.hasOwn(changed, "turn") && !Object.hasOwn(changed, "round")) return;
+    if (options?.direction < 0) return;
+    await startPass;
+    if (Object.hasOwn(changed, "round")) {
+      await null;
+      await fluidRoundSettled();
+    }
+    const combatant = combat.combatant,
+      actor = combatant?.actor;
+    if (!actor?.statuses?.has?.("flat-footed")) return;
+    const facts = { round: combat.round, surprise: combat.flags?.spycraft2?.surprise ?? null };
+    if (!flatFootedEndsOnTurn(facts, { playerSide: actor.hasPlayerOwner === true })) return;
+    try {
+      await setConditionStatus(actor, "flat-footed", false, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
+    } catch {
+      /* supplied by another source: left for the GC */
+    }
   });
   Hooks.on("updateCombat", async (combat, changed, options) => {
     if (!isLeadGM() || !Object.hasOwn(changed, "round") || !setting("fluidInitiative")) return;

@@ -393,7 +393,7 @@ const makeCombat = list => {
       return [...combatants.values()].sort((a, b) => (b.initiative ?? -99) - (a.initiative ?? -99));
     },
     get combatant() {
-      return this.turns[0];
+      return this.turns[this.turn ?? 0];
     },
     async update(change) {
       for (const [path, value] of Object.entries(change)) {
@@ -447,6 +447,23 @@ test("fluid initiative: record events, immediate actions, end-of-round applicati
   assert.match(lastMessage(), /reeling and flat-footed/);
   assert.deepEqual(hero.flags.spycraft2.fluid.modifiers, []);
   assert.equal((await combat.applyEndOfRound(fight, 1)).length, 0, "nothing is applied twice");
+});
+
+test("delaying on your own turn hands the turn to whoever is next, so nobody is skipped (p.356)", async () => {
+  const fight = makeCombat([
+    ["c-a1", actors.get("a1"), 22, true],
+    ["c-guard", guard, 20, false],
+    ["c-boss", boss, 18, false]
+  ]);
+  const hero = fight.combatants.get("c-a1");
+  assert.equal(fight.combatant, hero);
+  assert.equal((await combat.recordFluidEvent(hero, "delay", { times: 3 })).count, 19);
+  assert.equal(fight.combatant.id, "c-guard", "the guard at 20 acts next; the hero acts again at 19");
+  // Someone who is not acting can delay without moving the turn.
+  const boss2 = fight.combatants.get("c-boss");
+  fight.turn = 0;
+  await combat.recordFluidEvent(boss2, "delay", { times: 1 });
+  assert.equal(fight.turn, 0);
 });
 
 test("group initiative makes one roll per NPC type; tie-breaks are stored", async () => {

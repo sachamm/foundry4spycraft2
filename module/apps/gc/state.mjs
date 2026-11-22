@@ -40,7 +40,7 @@ export function registerGCSettings() {
   });
   game.settings.register(SYSTEM, "startFlatFooted", {
     name: loc`Start combat flat-footed`,
-    hint: loc`Mark every combatant flat-footed when a combat begins (p.323). Clear it as each character acts or is hit.`,
+    hint: loc`Mark every combatant flat-footed when a combat begins (p.323). It clears by itself as each character’s turn begins or when the character is hit.`,
     scope: "world",
     config: true,
     type: Boolean,

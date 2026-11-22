@@ -130,6 +130,19 @@ rollPipeline.register({
   }
 });
 
+/**
+ * The target distance an attack card recorded (the attack's measured or entered range, or its CQB record), so a
+ * damage roll from that card need not ask again. Null when the card holds no usable distance.
+ * @param {object|null} flags  the attack message's `flags.spycraft2`
+ */
+export function recordedAttackDistance(flags) {
+  for (const value of [flags?.attackContext?.distanceFeet, flags?.cqbRange?.distanceFeet]) {
+    const n = typeof value === "string" && value.trim() ? Number(value) : value;
+    if (typeof n === "number" && Number.isFinite(n) && n >= 0) return n;
+  }
+  return null;
+}
+
 /** A distance typed into a form, as a number; NaN when nothing usable was entered. */
 export function enteredDistance(value) {
   return typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
