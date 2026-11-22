@@ -235,3 +235,28 @@ test("buttons expose one hover tooltip and one accessible name", async ({ page }
   await expect(button).not.toHaveAttribute("title");
   await expect(button).not.toHaveAttribute("aria-description");
 });
+
+test("Tab walks a sheet past its tabs and stays inside a dialog, whatever Foundry binds to Tab", async ({ page }) => {
+  await page.setContent(`<div class="application spycraft2" id="sheet">
+      <nav class="sheet-tabs"><a data-action="tab" data-tab="play" data-group="primary" class="active">Play</a><a data-action="tab" data-tab="gear" data-group="primary">Gear</a></nav>
+      <section class="tab" data-tab="play" data-group="primary"><button id="attack">Attack</button><button id="damage">Damage</button></section>
+    </div>
+    <dialog class="application dialog" id="dialog" open><div class="spycraft2-roll-options"><label>Target <input id="target" /></label><label>Range <input id="range" /></label></div><button id="roll">Roll attack</button></dialog>`);
+  await page.evaluate(async moduleUrl => {
+    // Stand-in for Foundry's window-level Tab keybinding (cycle views), which takes Tab away from the page.
+    window.addEventListener("keydown", event => event.key === "Tab" && event.preventDefault());
+    const tooltips = await import(moduleUrl);
+    tooltips.enhanceTooltips(document.querySelector("#sheet"));
+    tooltips.enhanceTooltips(document.querySelector("#dialog .spycraft2-roll-options"));
+  }, url);
+  await page.locator('[data-tab="play"]').first().focus();
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#attack")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#damage")).toBeFocused();
+  await page.locator("#roll").focus();
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#target")).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.locator("#roll")).toBeFocused();
+});

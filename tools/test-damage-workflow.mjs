@@ -557,7 +557,7 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     [
       // The viewer can read this Defense, so the button already says how the roll stands against it.
       ["Resolve vs Defense 15: hit", "primary"],
-      ["Other target or Defense…", undefined]
+      ["Cover, other target or Defense…", undefined]
     ]
   );
   // The short face leaves the target's name and the full wording to the tooltip.
@@ -565,11 +565,23 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     resolve.map(c => c.hint),
     [
       "Resolve this attack against Guard, Defense 15: hit",
-      "Resolve this attack against another target, or against a Defense you enter"
+      "Resolve this attack with cover, against another target, or against a Defense you enter"
     ]
   );
   await resolve[0].run();
   assert.equal(attack.flags.spycraft2.attackResolution.hit, true);
+  // One primary: rolling damage is the next step, resolving again is a quiet correction.
+  const emphasis = () =>
+    Object.fromEntries(
+      controls(attack)
+        .filter(c => c.id === "attackResolutionControl")
+        .map(c => [c.label, c.emphasis])
+    );
+  const weapon = document({ uuid: "Item.Tonfa", name: "Tonfa", type: "weapon", system: {} });
+  registry.set(weapon.uuid, weapon);
+  attack.flags.spycraft2.weaponUuid = weapon.uuid;
+  assert.equal(attack.flags.spycraft2.successConfirmed, true);
+  assert.equal(emphasis()["Roll damage"], "primary");
   // The damage card names the hit's target: one click applies the rolled damage to it.
   const damage = card("q2", {
     actorUuid: attacker.uuid,
@@ -577,6 +589,13 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     effectiveTotal: 7,
     sourceAttack: { uuid: attack.uuid, targetUuid: guard.uuid }
   });
+  const { damageCardsFor } = await import("../module/apps/damage-application.mjs");
+  assert.equal(damageCardsFor(attack, [damage]), 1);
+  assert.equal(damageCardsFor(attack, []), 0);
+  game.messages.push(damage);
+  assert.equal(emphasis()["Roll damage"], undefined, "no longer primary once damage is rolled");
+  game.messages.pop();
+  delete attack.flags.spycraft2.weaponUuid;
   const apply = controls(damage).filter(c => c.id === "applyDamageControl");
   assert.equal(apply[0].label, "Apply 7 to Guard (not on the scene)");
   assert.equal(apply[0].emphasis, "primary");

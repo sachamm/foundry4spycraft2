@@ -223,9 +223,9 @@
 }
 
 /* Autosave feedback remains visible while the sheet body scrolls. */
-.spycraft2 .window-header .sc2-save-status { margin-left: auto; padding: 2px 8px; font: 600 13px/1.35 var(--font-primary, sans-serif); color: var(--sc2-ink-muted); white-space: normal; }
-.spycraft2 .sc2-save-status[data-state="saved"] { color: var(--sc2-action); }
-.spycraft2 .sc2-save-status[data-state="error"], .spycraft2 .sc2-save-status[data-state="dirty"] { color: var(--sc2-bad); }
+.spycraft2 .window-header .sc2-save-status { margin-left: auto; padding: 2px 8px; font: 600 13px/1.35 var(--font-primary, sans-serif); color: var(--sc2-on-bar-muted); white-space: normal; }
+.spycraft2 .window-header .sc2-save-status[data-state="saved"] { color: var(--sc2-on-bar-good); }
+.spycraft2 .window-header .sc2-save-status:is([data-state="error"], [data-state="dirty"]) { color: var(--sc2-on-bar-danger); }
 .spycraft2 .sc2-attack-quick { display: grid; gap: 10px; }
 .spycraft2 .sc2-attack-quick .hint { margin: 0; line-height: 1.45; color: var(--sc2-ink-muted); }
 .spycraft2 .sc2-attack-circumstances { margin-top: 12px; border-top: 1px solid var(--sc2-rule); padding-top: 8px; }

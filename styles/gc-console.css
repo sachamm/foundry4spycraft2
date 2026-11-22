@@ -66,6 +66,7 @@
 /* Section headings are bars, as on the sheets. */
 .gc-console-body details.gc-section { border-bottom: 0; margin-bottom: 4px; }
 .gc-console-body details.gc-section > summary { align-items: center; padding: 4px 8px; color: var(--sc2-on-bar); background: var(--sc2-bar); border-radius: var(--sc2-radius); }
+.gc-console-body details.gc-section > summary :is(.muted, .tag.muted) { opacity: 1; color: var(--sc2-on-bar-muted); }
 .gc-console-body details.gc-section > summary .gc-section-title { font: 400 12px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
 .gc-console-body details.gc-section > summary .gc-note { font-family: var(--sc2-num); opacity: 1; }
 

@@ -15,6 +15,8 @@
   --sc2-on-bar: #f6f2e7;
   --sc2-on-bar-good: #9fe0b5;
   --sc2-on-bar-danger: #ffb3b8;
+  /* Secondary text on the always-dark bars (window header, section bars); at least 4.5:1 in both schemes. */
+  --sc2-on-bar-muted: #b9c2bd;
   --sc2-action: #1d5c5e;
   --sc2-action-strong: #143f41;
   --sc2-on-action: #fbf9f3;

@@ -59,7 +59,9 @@ export function attackResolutionNote(check) {
     if (!r.hit) return loc`Against ${who}: a miss.`;
     return r.hits > 1 ? loc`Against ${who}: a hit; ${r.hits} shots hit.` : loc`Against ${who}: a hit.`;
   }
-  const against = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
+  const base = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
+  const against = r.cover ? loc`${base} (with ${r.cover.label} cover, +${r.cover.bonus})` : base;
+  if (!r.hit && r.hitsCover) return loc`Against ${against}: a miss by ${-r.margin}. The shot hits the cover.`;
   if (!r.hit) return loc`Against ${against}: a miss by ${-r.margin}.`;
   return r.hits > 1
     ? loc`Against ${against}: a hit by ${r.margin}; ${r.hits} shots hit.`

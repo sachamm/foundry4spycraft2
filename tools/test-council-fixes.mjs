@@ -8,6 +8,8 @@ import { prerequisitesUseSkills } from "../module/rules/prerequisites.mjs";
 import { orderSkillChecks, needsGear } from "../module/rules/skill-check-order.mjs";
 import { combatMovementPlan } from "../module/rules/combat-movement.mjs";
 import { quickAttackHasTarget } from "../module/apps/remembered-choices.mjs";
+import { attackResolutionNote } from "../module/rules/damage-application.mjs";
+import { rememberedPlacement, rememberSheetPlacement } from "../module/sheets/sheet-placement.mjs";
 
 test("a damage roll reuses the distance its attack card recorded", () => {
   assert.equal(recordedAttackDistance({ attackContext: { distanceFeet: 25 } }), 25);
@@ -272,4 +274,93 @@ test("Begin combat names whoever has no Initiative and can roll for NPCs first",
   assert.deepEqual(whispers[0].whisper, ["u1"]);
   pc.initiative = 15;
   assert.equal(await confirmInitiativeBeforeStart(combat), true, "nothing to ask once everyone has rolled");
+});
+
+test("cover chosen at Resolve raises the Defense and a miss it alone caused hits the cover", async () => {
+  const { coverOnResolution } = await import("../module/apps/damage-application.mjs");
+  assert.equal(coverOnResolution("0"), null);
+  assert.deepEqual(coverOnResolution("2"), { grade: 2, label: "One-half (1/2)", bonus: 4 });
+  assert.equal(coverOnResolution("4"), null, "total cover is not an attackable Defense");
+  const note = attackResolutionNote({
+    attackResolution: {
+      targetName: "Anton",
+      defense: 17,
+      hit: false,
+      margin: -2,
+      cover: { grade: 2, label: "One-half (1/2)", bonus: 4 },
+      hitsCover: true
+    }
+  });
+  assert.match(note, /Defense 17 \(with One-half \(1\/2\) cover, \+4\)/);
+  assert.match(note, /hits the cover/);
+});
+
+test("a sheet opens where this user last left one, fitted to the window", () => {
+  const room = { width: 1600, height: 900, open: 0 };
+  assert.deepEqual(rememberedPlacement({ left: 700, top: 40, width: 860, height: 760 }, room), {
+    left: 700,
+    top: 40,
+    width: 860,
+    height: 760
+  });
+  // A place kept on a bigger screen is pulled back inside this one.
+  const small = rememberedPlacement({ left: 1500, top: 600, width: 860, height: 760 }, { width: 1280, height: 720 });
+  assert.ok(small.left + small.width <= 1280 && small.top + small.height <= 720);
+  assert.equal(rememberedPlacement(null, room), null);
+  assert.equal(rememberedPlacement({ left: "x" }, room), null);
+  const store = new Map();
+  const storage = { setItem: (k, v) => store.set(k, v) };
+  rememberSheetPlacement("agent", { left: 10, top: 20, width: 700, height: 500 }, storage);
+  assert.deepEqual(JSON.parse(store.get("spycraft2.sheetPlacement.agent")), {
+    left: 10,
+    top: 20,
+    width: 700,
+    height: 500
+  });
+});
+
+test("Add NPC lists world NPCs before compendium ones, reuses an imported copy and centres the token", async () => {
+  globalThis.foundry = { ...globalThis.foundry, utils: { ...globalThis.foundry?.utils, escapeHTML: String } };
+  const { npcChoices, importedCopy, viewCentreCorner } = await import("../module/apps/gc/add-npc.mjs");
+  const actors = [
+    { uuid: "Actor.b", name: "Thug", type: "npc" },
+    {
+      uuid: "Actor.a",
+      name: "Anton",
+      type: "npc",
+      _stats: { compendiumSource: "Compendium.spycraft2.core-npcs.Actor.x" }
+    },
+    { uuid: "Actor.c", name: "Vector", type: "agent" }
+  ];
+  const packs = [
+    { documentName: "Item" },
+    {
+      documentName: "Actor",
+      collection: "spycraft2.core-npcs",
+      title: "Core NPCs",
+      getIndex: async () => [
+        { _id: "y", name: "Soldier", type: "npc" },
+        { _id: "x", name: "Guard", type: "npc" },
+        { _id: "z", name: "Sample", type: "agent" }
+      ]
+    }
+  ];
+  const choices = await npcChoices({ actors, packs });
+  assert.deepEqual(
+    choices.map(c => [c.name, c.source]),
+    [
+      ["Anton", "World"],
+      ["Thug", "World"],
+      ["Guard", "Core NPCs"],
+      ["Soldier", "Core NPCs"]
+    ]
+  );
+  assert.equal(choices[2].uuid, "Compendium.spycraft2.core-npcs.Actor.x");
+  assert.equal(importedCopy("Compendium.spycraft2.core-npcs.Actor.x", actors).name, "Anton");
+  assert.equal(importedCopy("Compendium.spycraft2.core-npcs.Actor.y", actors), null);
+  assert.deepEqual(viewCentreCorner({ centre: { x: 1000, y: 800 }, gridSize: 100 }), { x: 950, y: 750 });
+  assert.deepEqual(viewCentreCorner({ centre: { x: 1000, y: 800 }, gridSize: 100, width: 2, height: 2 }), {
+    x: 900,
+    y: 700
+  });
 });

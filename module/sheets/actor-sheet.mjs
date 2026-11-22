@@ -1,5 +1,5 @@
 import { refuse } from "../error-notices.mjs";
-import { placeSheet } from "./sheet-placement.mjs";
+import { placeSheet, rememberSheetPlacement } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
@@ -203,9 +203,15 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   _skillSearch = "";
   _trainedOnly = false;
 
-  /** Open against the left edge, clear of the map's centre and the chat. */
+  /** Open where this user last left a agent sheet, or against the left edge, clear of the map's centre and the chat. */
   _initializeApplicationOptions(options) {
-    return placeSheet(super._initializeApplicationOptions(options), options);
+    return placeSheet(super._initializeApplicationOptions(options), options, "agent");
+  }
+
+  /** Remember where the sheet was, so the next one opens there. */
+  _onClose(options) {
+    super._onClose(options);
+    rememberSheetPlacement("agent", this.position);
   }
 
   static DEFAULT_OPTIONS = {
@@ -1857,9 +1863,15 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
   /** A local view preference. Null until first render, when an NPC with nothing built yet opens in setup. */
   _editMode = null;
 
-  /** Open against the left edge, clear of the map's centre and the chat. */
+  /** Open where this user last left a npc sheet, or against the left edge, clear of the map's centre and the chat. */
   _initializeApplicationOptions(options) {
-    return placeSheet(super._initializeApplicationOptions(options), options);
+    return placeSheet(super._initializeApplicationOptions(options), options, "npc");
+  }
+
+  /** Remember where the sheet was, so the next one opens there. */
+  _onClose(options) {
+    super._onClose(options);
+    rememberSheetPlacement("npc", this.position);
   }
 
   static DEFAULT_OPTIONS = {

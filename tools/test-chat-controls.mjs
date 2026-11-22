@@ -356,3 +356,14 @@ test("a check posted in another language has its notes written again for the vie
   assert.equal(viewerFlavor(check, "en"), checkFlavor(check));
   assert.match(viewerFlavor(check, "en"), /^Escalade<br>.*Succeeded\./);
 });
+
+test("a damage card stops offering boosts once its damage is applied", () => {
+  actor = makeActor();
+  const before = labels(message({ checkKind: "damage" }));
+  assert.ok(before.some(label => label.includes("Boost before outcome")));
+  const after = labels(message({ checkKind: "damage", damageApplied: [{ targetUuid: "Actor.t" }] }));
+  assert.equal(
+    after.some(label => /Boost|Spend 1 action die|Generous/.test(label)),
+    false
+  );
+});

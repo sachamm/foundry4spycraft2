@@ -20,10 +20,13 @@ import { loc } from "../i18n.mjs";
 import { renderCheckGuidance } from "./chat-guidance.mjs";
 import { runChatAction } from "../apps/chat-action-feedback.mjs";
 import { targetResponseControls } from "../apps/target-response.mjs";
+import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
 /** The viewer rolled this check (or is the GC) and it carries a result. */
 const ownsResult = ({ message, check, user }) => Number.isFinite(check.rawTotal) && (message.isAuthor || user.isGM);
-const open = ctx => ownsResult(ctx) && !ctx.check.resolved;
+/** Damage that has been applied is settled: boosting or confirming it any further would change nothing. */
+const settledDamage = check => check.checkKind === "damage" && appliedDamageEntries(check).length > 0;
+const open = ctx => ownsResult(ctx) && !ctx.check.resolved && !settledDamage(ctx.check);
 const resolved = ctx => ownsResult(ctx) && !!ctx.check.resolved;
 const card = (label, run, emphasis) => [{ label, run, placement: "card", ...(emphasis ? { emphasis } : {}) }];
 const content = (label, run) => [{ label, run, placement: "content" }];
