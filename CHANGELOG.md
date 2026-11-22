@@ -169,6 +169,8 @@
   the card, and a miss could still say the shot hit the cover.
 - **Add NPC to scene:** when a search finds no NPCs, nothing stays selected. Before, the NPC selected earlier could
   still be placed.
+- **The one-click boost button** now shows the right dice when a class ability doubles them in the opening round.
+- **Browser search:** pressing Enter straight after typing now applies the new search before adding an entry.
 
 ## 0.6.0 — 2026-11-20
 

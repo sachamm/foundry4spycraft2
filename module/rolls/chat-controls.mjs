@@ -60,24 +60,22 @@ export function quickBoost(actor, check) {
     return null;
   }
   if (shaken.extraDice || shaken.needsReview || shaken.spendingForbidden) return null;
-  // Some abilities roll two dice for one spent (Accurate, for one): the button names the dice actually rolled.
+  const input = {
+    count: 1,
+    bonusPoolId: "",
+    openingRound: openingRound(),
+    calculating: (system.coreClassIds ?? []).includes("schemer")
+  };
+  // Some abilities roll two dice for one spent (Accurate, for one): the button names the dice actually rolled,
+  // planned with the same options the boost itself uses.
   let rolls = 1;
   try {
-    const plan = actionDieBoostPlan(actor.actionDiceFundingSystem ?? system, check, { count: 1 });
+    const plan = actionDieBoostPlan(actor.actionDiceFundingSystem ?? system, check, input);
     if (!plan.blocked && Number.isSafeInteger(plan.rolls) && plan.rolls > 0) rolls = plan.rolls;
   } catch {
     /* the dialog route still works it out */
   }
-  return {
-    die: system.actionDice?.die ?? 4,
-    rolls,
-    input: {
-      count: 1,
-      bonusPoolId: "",
-      openingRound: openingRound(),
-      calculating: (system.coreClassIds ?? []).includes("schemer")
-    }
-  };
+  return { die: system.actionDice?.die ?? 4, rolls, input };
 }
 
 const core = (id, order, chatControls) => rollPipeline.register({ id, order, chatControls });

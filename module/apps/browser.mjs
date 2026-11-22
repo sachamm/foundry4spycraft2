@@ -305,9 +305,16 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
   _onRender(context, options) {
     super._onRender(context, options);
     const html = this.element;
+    // Typing filters after a short pause; Enter applies a search still waiting on that pause before adding.
+    const applySearch = async input => {
+      if (this.filters.search === input.value) return;
+      this.filters.search = input.value;
+      await this.render();
+    };
     html.querySelector("[name=search]")?.addEventListener(
       "input",
       foundry.utils.debounce(ev => {
+        if (this.filters.search === ev.target.value) return;
         const focused = this.element.ownerDocument.activeElement;
         const selectedUuid = this.element.contains(focused)
           ? focused.closest(".browser-list [data-uuid]")?.dataset.uuid
@@ -324,9 +331,10 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       }, 250)
     );
     // Enter in the search adds the selected entry, or the only one left, without reaching for the mouse.
-    html.querySelector("[name=search]")?.addEventListener("keydown", ev => {
+    html.querySelector("[name=search]")?.addEventListener("keydown", async ev => {
       if (ev.key !== "Enter" || !this.actor) return;
       ev.preventDefault();
+      await applySearch(ev.target);
       const rows = [...this.element.querySelectorAll(".browser-list [data-uuid]")];
       const row = rows.find(r => r.dataset.uuid === this.selected) ?? (rows.length === 1 ? rows[0] : null);
       const add = row?.querySelector('[data-action="add"]:not([disabled])');
