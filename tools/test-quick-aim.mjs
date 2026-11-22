@@ -4,12 +4,13 @@ import {
   quickRangedAimContent as content,
   quickRangedAimInput as input
 } from "../module/apps/standard-attack-context.mjs";
-test("quick ranged Aim/action controls preserve explicit choices, use one field each and keep the legacy Other default", () => {
+test("quick ranged Aim/action controls preserve explicit choices, use one field each and default to a Standard Attack", () => {
   const plain = content(),
     selected = content({ attackAction: "standard", aimed: true });
   assert.equal((plain.match(/name="aimed"/g) ?? []).length, 1);
   assert.equal((plain.match(/name="attackAction"/g) ?? []).length, 1);
-  assert.match(plain, /value="other" selected/);
+  assert.match(plain, /value="standard" selected/);
+  assert.match(content({ attackAction: "other" }), /value="other" selected/);
   assert.match(selected, /value="standard" selected/);
   assert.match(selected, /name="aimed" type="checkbox" checked/);
   assert.match(selected, /already taken separately/);

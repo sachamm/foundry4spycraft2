@@ -327,11 +327,12 @@ test("separate legal misses in the same round can each supply their own follow-u
   assert.equal(a.system.resourceUses.missTrick.used, 2);
   assert.equal(a.system.resourceUses.finalAttackRound.used, 2);
 });
-test("melee quick action controls preserve legacy Other and explicit Standard choices without accepting ranged or fabricated actions", async () => {
+test("melee quick action controls default to Standard and preserve an explicit Other choice without accepting ranged or fabricated actions", async () => {
   const { quickAttackActionContent: content, quickAttackActionInput: parse } =
     await import("../module/apps/standard-attack-context.mjs");
-  assert.match(content(), /value="other" selected/);
+  assert.match(content(), /value="standard" selected/);
   assert.match(content({ attackAction: "standard" }), /value="standard" selected/);
+  assert.match(content({ attackAction: "other" }), /value="other" selected/);
   assert.deepEqual(parse({}), {});
   assert.deepEqual(parse({ attackAction: "standard", aimed: true, bonus: 99 }), { attackAction: "standard" });
   for (const value of ["autofire", "", null, true, 1]) assert.throws(() => parse({ attackAction: value }));
