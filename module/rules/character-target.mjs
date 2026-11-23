@@ -8,7 +8,7 @@ export function characterTargetPlan(target, { targetCharacterType = "", targetNa
     typeof targetName !== "string" ||
     targetName.length > 200
   )
-    throw new Error(loc`Choose the GC-confirmed character type and keep the target name within200 characters.`);
+    throw new Error(loc`Choose the GC-confirmed character type and keep the target name within 200 characters.`);
   if (!target) {
     if (!targetCharacterType || !targetName.trim()) {
       const error = new Error(

@@ -17,7 +17,7 @@ const memory = new Map();
 
 /** Fields that describe one particular roll and are never carried over to the next. */
 export const NEVER_REMEMBERED =
-  /^(characterTarget|distanceFeet|reachAdjacency|reachAdjacent|aimed|braced|secret|modifier)$|^target|Confirmed$|Uuid$|Name$/;
+  /^(characterTarget|distanceFeet|reachAdjacency|reachAdjacent|aimed|braced|secret|modifier|situationalModifier)$|^target|Confirmed$|Uuid$|Name$/;
 
 /** The key a weapon's or skill's choices are kept under. */
 export const choiceKey = (kind, actor, id) => `${kind}:${actor?.uuid ?? ""}:${id ?? ""}`;

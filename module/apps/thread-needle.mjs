@@ -303,7 +303,7 @@ export async function manageThreadNeedle(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        `</select></label><label>${loc`Operation`} <select name="operation"><option value="apply">${loc`Apply / recover original hold`}</option><option value="escape">${loc`Record target’s completed escape and required move`}</option><option value="release">${loc`I released this target`}</option><option value="movedBeyond">${loc`Holder moved farther than5ft from this target`}</option>` +
+        `</select></label><label>${loc`Operation`} <select name="operation"><option value="apply">${loc`Apply / recover original hold`}</option><option value="escape">${loc`Record target’s completed escape and required move`}</option><option value="release">${loc`I released this target`}</option><option value="movedBeyond">${loc`Holder moved farther than 5 ft. from this target`}</option>` +
         (game.user.isGM
           ? `<option value="reviewPending">${loc`GC: interrupted hold still needs application`}</option><option value="reviewEnded">${loc`GC: original hold already ended`}</option>`
           : "") +

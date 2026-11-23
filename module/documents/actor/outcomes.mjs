@@ -563,7 +563,7 @@ export const ActorOutcomes = Base =>
         const input = await systemDialog.input({
           window: { title: loc`Confirm the check's outcome` },
           rejectClose: false,
-          content: `${message.flags.spycraft2.damageSave ? `<p>${loc`Recorded damage-event save DC${Number(message.flags.spycraft2.damageSave.dc)}; final result ${Number(message.flags.spycraft2.effectiveTotal)}.`}</p>` : ""}<label>${loc`GC-confirmed result`} <select name="outcome" required><option value="">${loc`Choose…`}</option><option value="success">${loc`Succeeded`}</option><option value="failure">${loc`Failed`}</option></select></label>${automaticSkillSuccessSources(this.system, message.flags.spycraft2).length > 0 ? `<label>${loc`GC-confirmed DC / final opposing result (required for a class automatic-success fallback)`} <input type="number" name="difficultyClass" step="1" /></label>` : ""}<p>${loc`A natural range is not an automatic success or failure. Negative skill, Knowledge and attack results operate like errors (pp.96–97,330).`}</p>`
+          content: `${message.flags.spycraft2.damageSave ? `<p>${loc`Recorded damage-event save DC ${Number(message.flags.spycraft2.damageSave.dc)}; final result ${Number(message.flags.spycraft2.effectiveTotal)}.`}</p>` : ""}<label>${loc`GC-confirmed result`} <select name="outcome" required><option value="">${loc`Choose…`}</option><option value="success">${loc`Succeeded`}</option><option value="failure">${loc`Failed`}</option></select></label>${automaticSkillSuccessSources(this.system, message.flags.spycraft2).length > 0 ? `<label>${loc`GC-confirmed DC / final opposing result (required for a class automatic-success fallback)`} <input type="number" name="difficultyClass" step="1" /></label>` : ""}<p>${loc`A natural range is not an automatic success or failure. Negative skill, Knowledge and attack results operate like errors (pp.96–97,330).`}</p>`
         });
         if (!input) return null;
         if (!["success", "failure"].includes(input.outcome)) {
@@ -685,7 +685,7 @@ export const ActorOutcomes = Base =>
           },
           content: `<div class="spycraft2-roll-options">
         <p class="hint">${loc`Action dice left: ${this.system.actionDice?.value ?? 0}. Choose the effect; who pays and from where are under the headings below.`}</p>
-        <label>${loc`Result`} <select name="kind">${check.threatConfirmed ? `<option value="success">${loc`Own critical success / hit`}</option>` : ""}${check.errorConfirmed ? `<option value="failure"${errorOnly ? " selected" : ""}>${loc`Opponent activates critical failure / miss`}</option>` : ""}</select></label>
+        <label>${loc`Result`} <select name="kind">${check.threatConfirmed ? `<option value="success">${check.checkKind === "attack" ? loc`Critical hit (you pay)` : loc`Critical success (you pay)`}</option>` : ""}${check.errorConfirmed ? `<option value="failure"${errorOnly ? " selected" : ""}>${check.checkKind === "attack" ? loc`Critical miss (an opponent pays)` : loc`Critical failure (an opponent pays)`}</option>` : ""}</select></label>
         ${message.flags.spycraft2.checkKind === "attack" && typeof message.flags.spycraft2.attackContext?.vehicleMounted !== "boolean" && (this.system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Most Lethal") ? `<label><input type="checkbox" name="vehicleMountedConfirmed" /> ${loc`Unrecorded attack platform: confirm this weapon was vehicle-mounted when the attack was rolled (Most Lethal)`}</label>` : ""}
         ${cleaveLegacyTargetEligible(this.system, check) ? `<label><input type="checkbox" name="legacyStandardTargetConfirmed" /> ${loc`Unrecorded original target: the GC confirms this melee attack was against a standard character (Cleave Supremacy)`}</label>` : ""}
         ${criticalPresetContent(check)}
@@ -693,14 +693,14 @@ export const ActorOutcomes = Base =>
         <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
         <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
         ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage"${damageRolled ? "" : " checked"} /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
-        <details${errorOnly ? " open" : ""}><summary>${loc`Who pays for a critical failure`}</summary>
-        <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc"${defaultGC ? " selected" : ""}>${loc`GC action-die pool`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
+        <details${errorOnly ? " open" : ""}><summary>${check.checkKind === "attack" ? loc`Who pays for a critical miss` : loc`Who pays for a critical failure`}</summary>
+        <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc"${defaultGC ? " selected" : ""}>${loc`GC action dice`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
         <label><input type="checkbox" name="opponent"${defaultGC ? " checked" : ""} /> ${loc`Failure payer is an opponent`}</label>
         <label><input type="checkbox" name="lineOfSight"${defaultGC ? " checked" : ""} /> ${loc`Failure payer has line of sight to the acting character`}</label>
-        <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1cost, minimum0; one Chance-based session use)`}</label>
+        <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1 cost, minimum 0; one Chance-based session use)`}</label>
         </details>
         <details><summary>${loc`Pay from bonus dice or several wallets`}</summary>
-        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC pool`}</option>${poolOptions}</select></label>
+        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC action dice`}</option>${poolOptions}</select></label>
         <label>${loc`Shaken surcharge funding`} <select name="feeFunding"><option value="same">${loc`Same source as the base cost`}</option><option value="">${loc`Paying character's ordinary dice`}</option>${poolOptions}</select></label>
         <p>${loc`If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.`}</p>${fundingActors
           .map(
@@ -717,7 +717,7 @@ export const ActorOutcomes = Base =>
                 .join("")}`
           )
           .join("")}</details>
-        <details><summary>${loc`How the cost is worked out`}</summary><p>${loc`Your feats and class abilities that change a critical's cost are applied automatically. Jinx lowers the paying opponent's cost by 1 (minimum 0) and uses their own session allowance. A Shaken payer adds the surcharge after that, even if the cost reaches 0; surcharge dice are not rolled. The GC can pay from other players' characters or from the session pool. Apply the recorded effect at the table.`}</p></details></div>`
+        <details><summary>${loc`How the cost is worked out`}</summary><p>${loc`Your feats and class abilities that change a critical's cost are applied automatically. Jinx lowers the paying opponent's cost by 1 (minimum 0) and uses their own session allowance. A Shaken payer adds the surcharge after that, even if the cost reaches 0; surcharge dice are not rolled. The GC can pay from other players' characters or from the GC action dice. Apply the recorded effect at the table.`}</p></details></div>`
         });
         if (!input) return null;
         input.splitFunding = fundingActors
@@ -739,7 +739,7 @@ export const ActorOutcomes = Base =>
         return refuse(error.message);
       }
       const useGC = input.kind === "failure" && (input.payerId === "gc" || input.payer === "gc");
-      if (useGC && !game.user?.isGM) return refuse(loc`Only the GC can spend the GC pool.`);
+      if (useGC && !game.user?.isGM) return refuse(loc`Only the GC can spend GC action dice.`);
       const controller = useGC ? gcDiceController({ required: false }) : null;
       const payer = useGC ? null : input.kind === "failure" ? (input.payer ?? game.actors?.get(input.payerId)) : this;
       if (!useGC && (payer?.type !== "agent" || !payer.isOwner))
@@ -751,7 +751,7 @@ export const ActorOutcomes = Base =>
           return refuse(loc`Choose a bonus pool belonging to the paying character.`);
         bonusPoolId = id;
       }
-      if (useGC && bonusPoolId) return refuse(loc`The GC pool cannot spend a character bonus grant.`);
+      if (useGC && bonusPoolId) return refuse(loc`GC action dice cannot be paid with a character bonus grant.`);
       let surchargeBonusPoolId = input.surchargeBonusPoolId ?? "same";
       if (input.feeFunding !== undefined && input.feeFunding !== "same") {
         if (input.feeFunding === "") surchargeBonusPoolId = "";
@@ -769,7 +769,7 @@ export const ActorOutcomes = Base =>
       const allocations = input.splitFunding?.length
         ? input.splitFunding.map(({ bonusPoolId, count }) => ({ bonusPoolId, count }))
         : input.paymentAllocations;
-      if (useGC && allocations?.length) return refuse(loc`The GC pool uses one GC payment, not character wallets.`);
+      if (useGC && allocations?.length) return refuse(loc`GC action dice use one GC payment, not character wallets.`);
       const expectedShaken = useGC ? null : JSON.stringify(shakenRules(payer.actionDiceFundingSystem));
       const work = async () => {
         if (getActionDieSettlementReview(this).needsReview)

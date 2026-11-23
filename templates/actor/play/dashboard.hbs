@@ -11,19 +11,46 @@
     </div>
     <div class="dashboard-weapons">      <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
       <ul class="item-list compact">
-        {{#each weapons}}
-          <li class="sc2-weapon" data-item-id="{{item.id}}">
-            <button type="button" data-action="itemEdit" class="name sc2-action" aria-label="{{localize 'SPYCRAFT.Action.OpenNamed' name=item.name}}">{{item.name}}</button>
-            <button type="button" data-action="rollAttack" class="sc2-primary-action {{#unless attack.trained}}untrained{{/unless}} sc2-action" aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith' name=item.name}}">{{localize "SPYCRAFT.Attack"}} {{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</button>
-            <button type="button" data-action="rollDamage" class="sc2-roll sc2-action" aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}}">{{item.system.damage}}</button>
-            {{#if shots}}<span class="ammo {{#if shots.empty}}bad{{else}}muted{{/if}}">{{shots.loaded}}/{{shots.capacity}}</span><button type="button" class="sc2-action" data-action="reloadWeapon" data-sc2-display="icon" aria-label="{{@root.playLabels.reload}} {{item.name}}">{{@root.playLabels.reload}}</button>{{/if}}
-          </li>
+        {{#each weapons}}{{> "systems/spycraft2/templates/actor/parts/weapon-row.hbs"}}
         {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
       </ul>
 </div>
-    {{#if limitedUses.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.UsesLeft'}}">
-      <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.UsesLeft"}}</h3>
-      <ul class="plain uses-strip">{{#each limitedUses}}<li><b class="sc2-uses{{#unless remaining}} spent{{/unless}}">{{remaining}}/{{limit}}</b> {{name}} <small class="muted">{{period}}</small>{{#if (sc2eq workflow "manual")}} <button type="button" data-action="useLimitedAbility" data-resource="{{id}}" data-name="{{name}}"{{#unless remaining}} disabled{{/unless}}>{{localize "SPYCRAFT.Template.ActorAgentClasses.Use"}}</button>{{/if}}</li>{{/each}}</ul>
+    <div class="dashboard-skills">
+      <h3>{{localize "SPYCRAFT.Play.TrainedSkills"}}</h3>
+      {{#if playSkills.length}}<div
+        class="tool-actions">{{#each playSkills}}<button type="button"
+        class="sc2-roll sc2-action"
+        data-action="rollSkill"
+        data-skill="{{key}}"
+        aria-label="{{rollLabel}}">{{name}} <b>{{totalsLabel}}</b></button>{{/each}}</div>{{else}}<p
+        class="sc2-empty muted">{{localize "SPYCRAFT.Play.NoTrainedSkills"}}</p>{{/if}}
+    </div>
+    {{#if limitedUses.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Play.AbilitiesInPlay'}}">
+      <h3>{{localize "SPYCRAFT.Play.AbilitiesInPlay"}}</h3>
+      <ul
+        class="plain uses-strip">{{#each limitedUses}}<li>{{> "systems/spycraft2/templates/actor/parts/use-counter.hbs"}}{{#if (sc2eq workflow "manual")}} <button type="button"
+        class="sc2-action"
+        data-action="useLimitedAbility"
+        data-resource="{{id}}"
+        data-name="{{name}}"{{#unless remaining}} disabled
+        data-tooltip="{{localize 'SPYCRAFT.Uses.Spent' period=period}}"{{/unless}}>{{localize "SPYCRAFT.Template.ActorAgentClasses.Use"}}</button>{{/if}}</li>{{/each}}</ul>
     </div>{{/if}}
-    <div class="quick-actions" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CommonActions'}}">      <p><button type="button" class="sc2-action" data-action="checkNumericalAdvantage">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckNumericalAdvantage"}}</button> <button type="button" class="sc2-action" data-action="checkCombatMovement">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckCombatMovement"}}</button> <button type="button" class="sc2-action" data-action="takeTotalDefense">{{localize "SPYCRAFT.Template.ActorAgentMain.TakeTotalDefense"}}</button>{{#if system.totalDefenseState.active}} <span class="sc2-chip">{{localize "SPYCRAFT.Template.ActorAgentMain.Dodge"}}{{system.totalDefenseState.bonus}}{{#if system.totalDefenseState.equilibrium}} {{localize "SPYCRAFT.Template.ActorAgentMain.EquilibriumBasics"}}{{system.totalDefenseState.equilibrium.bonus}} {{localize "SPYCRAFT.Template.ActorAgentMain.Included"}}{{/if}} {{localize "SPYCRAFT.Template.ActorAgentMain.UntilOwnCountInRound"}} {{system.totalDefenseState.dueRound}}</span>{{/if}}</p></div>
+    <div class="quick-actions" role="group" aria-label="{{localize 'SPYCRAFT.Play.YourTurn'}}">
+      <h3>{{localize "SPYCRAFT.Play.YourTurn"}}</h3>
+      <p
+        class="tool-actions"><button type="button"
+        class="sc2-action"
+        data-action="takeTotalDefense">{{localize "SPYCRAFT.Template.ActorAgentMain.TakeTotalDefense"}}</button> <button type="button"
+        class="sc2-action"
+        data-action="checkCombatMovement">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckCombatMovement"}}</button> <button type="button"
+        class="sc2-action"
+        data-action="checkNumericalAdvantage">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckNumericalAdvantage"}}</button>{{#if startedCharacterCombat}} <button type="button"
+        class="{{#if ownTurn}}sc2-primary-action {{/if}}sc2-action"
+        data-action="endTurn"{{#unless ownTurn}} disabled
+        data-tooltip="{{localize 'SPYCRAFT.Play.EndTurnNotYours'}}"{{/unless}}>{{localize "SPYCRAFT.Play.EndTurn"}}</button>{{/if}}</p>
+      {{#if activeEffects.length}}<ul
+        class="plain sc2-active-effects"
+        aria-label="{{localize 'SPYCRAFT.Play.ActiveEffects'}}">{{#each activeEffects}}<li
+        class="sc2-chip">{{this}}</li>{{/each}}</ul>{{/if}}
+    </div>
   </div>

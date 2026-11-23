@@ -55,7 +55,7 @@ test("the paying opponent discount follows all acting-character critical cost mo
             assert.equal(after.jinx.costBefore, before.cost);
             assert.equal(after.jinx.costAfter, after.cost);
             assert.deepEqual(before, snapshot);
-            assert.equal(after.sources.at(-1), "Jinx –1 (minimum0)");
+            assert.equal(after.sources.at(-1), "Jinx –1 (minimum 0)");
           }
 });
 test("Jinx never changes own successes, an already free or blocked activation, self payment, or a GC-pool payment", () => {

@@ -35,6 +35,8 @@ import {
 import { loc, locKey } from "../../i18n.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
+import { woundState } from "../../rules/damage-application.mjs";
+import { npcIsSpecial } from "./npc-play.mjs";
 
 const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -516,18 +518,27 @@ export function installFluidInitiativeHooks() {
     if (changed.flags?.spycraft2?.actions && combatant.actor?.sheet?.rendered) combatant.actor.sheet.render();
     if (Object.hasOwn(changed, "initiative") && isLeadGM()) rollTiebreaks(combatant.parent).catch(() => {});
   });
-  // Show what is left of the acting combatant's turn beside its name.
+  // Beside each name: what is left of the acting combatant's turn, and the states that change how it is attacked.
   Hooks.on("renderCombatTracker", (_app, html) => {
     const root = html instanceof HTMLElement ? html : html?.[0];
-    const combatant = game.combat?.combatant;
-    const row = combatant && root?.querySelector?.(`[data-combatant-id="${combatant.id}"]`);
-    const name = row?.querySelector?.(".token-name .name, .token-name");
-    if (!name || name.querySelector(".spycraft2-actions-left")) return;
-    const left = HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
-    const badge = document.createElement("span");
-    badge.className = "spycraft2-actions-left";
-    badge.textContent = ` (${loc`${left} half action(s) left`})`;
-    name.append(badge);
+    const combat = game.combat;
+    for (const combatant of combat?.combatants ?? []) {
+      const row = root?.querySelector?.(`[data-combatant-id="${combatant.id}"]`);
+      const name = row?.querySelector?.(".token-name .name, .token-name");
+      if (!name || name.querySelector(".spycraft2-row-state")) continue;
+      const notes = [];
+      if (combatant.id === combat.combatant?.id) {
+        const left = HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
+        notes.push(left === 1 ? loc`1 half action left` : loc`${left} half actions left`);
+      }
+      // Health is shown only to someone who may open the sheet; a flat-footed character is plain to all.
+      notes.push(...trackerRowStates(combatant.actor, { health: combatant.actor?.isOwner === true }));
+      if (!notes.length) continue;
+      const badge = document.createElement("span");
+      badge.className = "spycraft2-actions-left spycraft2-row-state";
+      badge.textContent = ` (${notes.join(", ")})`;
+      name.append(badge);
+    }
   });
   // Combat tracker entries: record an event for one combatant.
   Hooks.on("getCombatantContextOptions", (_app, entries) => {
@@ -552,6 +563,24 @@ export function installFluidInitiativeHooks() {
       }
     });
   });
+}
+
+/** The short state words a tracker row shows for an actor: flat-footed, and the wound state when it may be seen. */
+export function trackerRowStates(actor, { health = false } = {}) {
+  const states = [];
+  if (!actor) return states;
+  if (actor.statuses?.has?.("flat-footed")) states.push(loc`flat-footed`);
+  if (health && actor.system?.wounds && (actor.type !== "npc" || npcIsSpecial(actor))) {
+    const state = woundState(Number(actor.system.wounds.value), actor.system.deathThreshold);
+    const word = {
+      unconscious: loc`unconscious`,
+      dying: loc`dying`,
+      dead: loc`dead`,
+      destroyed: loc`destroyed`
+    }[state];
+    if (word) states.push(word);
+  }
+  return states;
 }
 
 /* -------------------------------------------- */

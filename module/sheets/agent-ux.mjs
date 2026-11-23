@@ -211,6 +211,89 @@ export function activeConditionLabels(system = {}) {
   return [...labels];
 }
 
+// What each condition changes, in our own words. Only effects this system applies itself are stated.
+const CONDITION_NOTES = {
+  "flat-footed": () => loc`Caught before acting: no Dexterity or dodge bonus to Defense until you act or are hit.`,
+  vulnerable: () => loc`Defense loses its Dexterity and dodge bonuses while this lasts.`,
+  helpless: () => loc`Cannot defend: Defense loses its Dexterity and dodge bonuses while this lasts.`,
+  shaken: () => loc`Spending action dice costs extra while Shaken; a higher grade costs more.`,
+  sickened: () => loc`A penalty on your rolls while this lasts; the roll's breakdown shows it.`
+};
+const CONDITION_KINDS = {
+  "Flat Footed": "flat-footed",
+  Vulnerable: "vulnerable",
+  Blinded: "vulnerable",
+  Stunned: "vulnerable",
+  Sprawled: "vulnerable",
+  Held: "vulnerable",
+  Pinned: "vulnerable",
+  Helpless: "helpless",
+  Unconscious: "helpless",
+  Paralyzed: "helpless",
+  Sleeping: "helpless",
+  Bound: "helpless",
+  Sickened: "sickened"
+};
+
+/**
+ * The rail's condition stamps: the name as the table says it, and a tooltip with what it changes on this sheet.
+ * A condition this system only records gets its name alone.
+ */
+export function conditionStamps(system = {}) {
+  return activeConditionLabels(system).map(raw => {
+    const label = raw === "Flat Footed" ? "Flat-footed" : raw;
+    const kind = raw.startsWith("Shaken") ? "shaken" : CONDITION_KINDS[raw];
+    return { label, tip: kind ? CONDITION_NOTES[kind]() : "" };
+  });
+}
+
+/**
+ * Defense against an attack that catches the character flat-footed: positive Dexterity and dodge bonuses are lost
+ * (module/rules/attributes.mjs). Uncanny Dodge keeps Dexterity at grade 1 and everything at grade 5.
+ */
+export function flatFootedDefense(system = {}) {
+  const defense = system.defense ?? {};
+  const total = Number(defense.total) || 0;
+  const grade = system.uncannyDodge?.grade ?? 0;
+  if (grade >= 5) return total;
+  const dodgeStillCounted = Math.max(0, (defense.dodgeBonuses ?? 0) - (defense.dodgeLost ?? 0));
+  const dexterity = grade < 1 ? Math.max(0, defense.dexterity ?? 0) : 0;
+  return total - dodgeStillCounted - dexterity;
+}
+
+/** Effects the character has running, each as one line with when it ends, for the Play tab's strip. */
+export function activeEffectLines(system = {}) {
+  const lines = [];
+  const until = state => loc`until your Count in round ${state.dueRound}`;
+  const total = system.totalDefenseState;
+  if (total?.active) lines.push(loc`Total Defense: dodge +${total.bonus}, ${until(total)}`);
+  const defensive = system.fightDefensivelyState;
+  if (defensive?.active)
+    lines.push(
+      loc`Fight Defensively: attacks and skills −${defensive.penalty}, dodge +${defensive.dodgeBonus}, ${until(defensive)}`
+    );
+  const expertise = system.combatExpertiseState;
+  if (expertise?.active)
+    lines.push(
+      loc`Combat Expertise: attacks and skills −${expertise.penalty}, dodge +${expertise.dodgeBonus}, ${until(expertise)}`
+    );
+  const cover = system.superiorCoverState;
+  if (cover?.active) lines.push(loc`Superior Cover: DR ${cover.dr}, ${until(cover)}`);
+  const boost = system.actionDieDefense;
+  if (boost) lines.push(loc`Action die: Defense +${boost.bonus} through round ${boost.lastRound}`);
+  return lines;
+}
+
+/** Whether the Boost Defense button can be used now, and what to tell the player if not. */
+export function defenseBoostState(system = {}, combat = null, combatant = false) {
+  const active = system.actionDieDefense;
+  if (active) return { available: true, active: loc`Defense +${active.bonus} through round ${active.lastRound}` };
+  if (!combat?.started || !combatant)
+    return { available: false, reason: loc`Not now: a Defense boost is declared at the start of a combat round.` };
+  if ((system.actionDice?.value ?? 0) < 1) return { available: false, reason: loc`Not now: no action dice left.` };
+  return { available: true };
+}
+
 /** Apply view behavior after each complete or partial sheet render. */
 export function enhanceAgentSheet(element, context, state) {
   element.classList.toggle("play-mode", !context.editMode);

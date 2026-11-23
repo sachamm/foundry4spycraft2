@@ -117,7 +117,7 @@ export function fendRows(actor) {
       m.movementCompleted !== true ||
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid))
     )
-      throw Error(loc`Review the saved Fend source,5ft movement and completed round total.`);
+      throw Error(loc`Review the saved Fend source,5 ft. movement and completed round total.`);
     roots.add(p.rootAttackUuid);
   }
   return rows;

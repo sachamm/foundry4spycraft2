@@ -233,7 +233,7 @@ export function enhanceDamageDialog(_event, dialog) {
   };
   details.open = configuredOptions(details) > 0;
   details.addEventListener("input", update);
-  installResolutionGuide(root, "damage");
+  installResolutionGuide(root, "damage", { append: true });
   details.addEventListener("change", update);
   update();
 }

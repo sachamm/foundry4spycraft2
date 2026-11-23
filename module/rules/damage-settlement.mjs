@@ -27,7 +27,7 @@ export function damageSettlementPlan(record, message, { confirmed, selfInflicted
         check.forcedThreat === true
       ))
   )
-    throw new Error(loc`Review the unsupported critical result on this saving throw (p.347).`);
+    throw new Error(loc`Review the unsupported critical result on this save (p.347).`);
   const succeeded = check.successConfirmed,
     expected = check.effectiveTotal >= record.save.dc;
   if (succeeded !== expected)

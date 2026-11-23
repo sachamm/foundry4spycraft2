@@ -272,6 +272,7 @@ export class RollPipeline {
           run: control.run,
           placement: control.placement ?? "plain",
           ...(typeof control.hint === "string" && control.hint ? { hint: control.hint } : {}),
+          ...(typeof control.key === "string" && control.key ? { key: control.key } : {}),
           ...(["primary", "quiet"].includes(control.emphasis) ? { emphasis: control.emphasis } : {})
         });
       }

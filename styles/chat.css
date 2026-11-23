@@ -79,16 +79,18 @@
   background: var(--sc2-action-strong);
   border-color: var(--sc2-action-strong);
 }
+/* Closing the outcome is a real, readable secondary button. */
 .spycraft2.roll-controls button.sc2-quiet-action {
   width: auto;
   justify-self: end;
-  min-height: 0;
-  padding: 0 4px;
+  min-height: 28px;
+  padding: 2px 8px;
   font-size: var(--sc2-text-s);
-  color: var(--sc2-ink-muted);
+  color: var(--sc2-action);
   background: transparent;
-  border: 0;
-  text-decoration: underline;
+  border: 1px solid var(--sc2-rule);
+  border-radius: var(--sc2-radius);
+  text-decoration: none;
   box-shadow: none;
 }
 
@@ -99,10 +101,38 @@
   background: var(--sc2-paper-raised);
   color: var(--sc2-ink);
 }
-.spycraft2.sc2-result-guide h4 {
+.spycraft2.sc2-result-guide .sc2-guide-title {
   margin: 0 0 4px;
   font-size: 15px;
   font-weight: 700;
+}
+.spycraft2.sc2-result-guide .sc2-guide-change {
+  margin-left: var(--sc2-space-1);
+  font-family: var(--sc2-num);
+  font-weight: 400;
+  color: var(--sc2-ink-muted);
+}
+/* The outcome is told by the word and its icon; the edge colour only repeats it. */
+.spycraft2.sc2-result-guide.sc2-outcome-good {
+  border-left-color: var(--sc2-good);
+}
+.spycraft2.sc2-result-guide.sc2-outcome-bad {
+  border-left-color: var(--sc2-danger);
+}
+.spycraft2.sc2-result-guide.sc2-outcome-good .sc2-guide-title > i {
+  color: var(--sc2-good);
+}
+.spycraft2.sc2-result-guide.sc2-outcome-bad .sc2-guide-title > i {
+  color: var(--sc2-danger);
+}
+/* The one-click spend and its options button read as one control. */
+.spycraft2.roll-controls button.sc2-split-more {
+  flex: 0 0 auto;
+  min-width: 32px;
+  margin-left: calc(-1 * var(--sc2-space-1));
+  justify-content: center;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 .spycraft2.sc2-result-guide p {
   margin: 0;
@@ -154,16 +184,6 @@
   color: var(--sc2-action);
   background: var(--sc2-surface-raised);
   border: 1px solid var(--sc2-rule);
-}
-/* Closing the outcome is a real, readable secondary button. */
-.spycraft2.roll-controls button.sc2-quiet-action {
-  min-height: 28px;
-  padding: 2px 8px;
-  font-size: var(--sc2-text-s);
-  color: var(--sc2-action);
-  border: 1px solid var(--sc2-rule);
-  border-radius: var(--sc2-radius);
-  text-decoration: none;
 }
 .spycraft2.roll-controls button.sc2-quiet-action:hover {
   color: var(--sc2-ink-strong);

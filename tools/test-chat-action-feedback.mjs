@@ -42,12 +42,12 @@ function card() {
 test("a chat-card action reports finished, refused or cancelled, and nothing else", async () => {
   let button = card();
   await runChatAction(button, async () => ({ done: true }));
-  assert.match(button.status.textContent, /^Action finished/);
+  assert.match(button.status.textContent, /^Done\./);
   assert.equal(button.disabled, false);
 
   button = card();
   await runChatAction(button, async () => undefined);
-  assert.match(button.status.textContent, /^Action finished/);
+  assert.match(button.status.textContent, /^Done\./);
 
   // A refusal names its reason beside the button, whatever the handler went on to return.
   for (const refusal of [() => refuse("Roll the save first."), () => refuseStep("Roll the save first.")]) {

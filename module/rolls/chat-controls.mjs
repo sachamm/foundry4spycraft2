@@ -143,7 +143,15 @@ core("criticalControl", 9130, ctx => {
   if (check.criticalSuccess || check.criticalFailure) return null;
   // An NPC's own threat is paid from the GC pool by its own button (module/apps/gc/npc-card-dice.mjs).
   if (actor.type === "npc" && !check.errorConfirmed) return null;
-  return card("Activate critical", () => actor.activateCritical(message));
+  // The label names what is being activated; the dialog works out the cost from the chosen effect.
+  const label = check.threatConfirmed
+    ? check.checkKind === "attack"
+      ? loc`Activate critical hit…`
+      : loc`Activate critical success…`
+    : check.checkKind === "attack"
+      ? loc`Activate critical miss… (an opponent pays)`
+      : loc`Activate critical failure… (an opponent pays)`;
+  return card(label, () => actor.activateCritical(message));
 });
 
 /** Only agents carry action dice: an NPC's card has no boost of its own (the GC's dice are spent from the GC tools). */
@@ -162,7 +170,18 @@ core("quickBoostControl", 9135, ctx => {
 core("boostControl", 9140, ctx => {
   const { message, actor } = ctx;
   if (!open(ctx) || !spendsActionDice(ctx)) return null;
-  return card("Boost before outcome", () => actor.boostCheck(message));
+  // With a one-click spend beside it, the full dialog is that button's "more" half; alone, it is the spend button.
+  if (quickBoost(actor, ctx.check))
+    return [
+      {
+        label: "▾",
+        hint: loc`More ways to spend action dice on this roll`,
+        run: () => actor.boostCheck(message),
+        placement: "card",
+        split: true
+      }
+    ];
+  return card(loc`Spend action dice…`, () => actor.boostCheck(message));
 });
 
 core("generousControl", 9150, ctx => {
@@ -205,7 +224,7 @@ export const awaitingAttackResolution = check =>
 
 core("finishControl", 9180, ctx => {
   if (!open(ctx) || awaitingAttackResolution(ctx.check)) return null;
-  return card("Outcome resolved", () => ctx.actor.finishCheck(ctx.message), "quiet");
+  return card("Finish", () => ctx.actor.finishCheck(ctx.message), "quiet");
 });
 
 /* ---- The chat hook ---- */
@@ -221,12 +240,14 @@ function button(control) {
   element.type = "button";
   if (control.emphasis === "primary") element.className = "sc2-primary-action";
   else if (control.emphasis === "quiet") element.className = "sc2-quiet-action";
+  if (control.split) element.classList.add("sc2-split-more");
   element.textContent = localizedLabel(control);
   // The face stays short enough for the chat column; the full wording is the name and the tooltip.
   const full = control.hint || element.textContent;
   element.setAttribute("aria-label", full);
   element.setAttribute("data-tooltip", full);
   element.dataset.rollControl = control.id;
+  if (control.key) element.dataset.rollKey = control.key;
   element.addEventListener("click", () => runChatAction(element, () => control.run()));
   return element;
 }

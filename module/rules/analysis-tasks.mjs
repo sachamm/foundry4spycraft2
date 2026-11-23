@@ -145,10 +145,10 @@ export function createAnalysisTaskPlan(
   if (typeof id !== "string" || !/^task_[A-Za-z0-9]+$/.test(id) || system.analysisTasks?.[id])
     throw new Error(loc`Choose a new task identifier.`);
   if (typeof title !== "string" || !title.trim() || title.trim().length > 160)
-    throw new Error(loc`Enter a task name of1–160characters.`);
+    throw new Error(loc`Enter a task name of 1–160 characters.`);
   if (!Number.isSafeInteger(baseChallenges) || baseChallenges < 2)
     throw new Error(
-      loc`Enter a whole unmodified Challenge count of at least2(pp.99–100); apply feat reductions afterward.`
+      loc`Enter a whole unmodified Challenge count of at least 2 (pp.99–100); apply feat reductions afterward.`
     );
   const forensicGenius = forensicTaskSource(system),
     counts = analysisChallengeCount(system, baseChallenges, { forensics: forensicsOnlyConfirmed });

@@ -8,6 +8,7 @@ import { cooperativeNotes } from "./cooperative.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { describeModifiers } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { formatRange, outcomeLabel } from "./outcome-labels.mjs";
 import { checkCandidates, errorDecisionPending, triumphCheck } from "./check-candidates.mjs";
 export { checkCandidates, errorDecisionPending };
 export function adjudicateCheck(check, succeeded) {
@@ -85,7 +86,9 @@ export function checkFlavor(check) {
   if (attackResolutionNote(check)) notes.push(esc(attackResolutionNote(check)));
   if (opposedNote(check)) notes.push(esc(opposedNote(check)));
   if ((check.checkMethod ?? "roll") === "roll" && (check.threat > 0 || check.error > 0))
-    notes.push(loc`Error ${check.error ?? 0}; threat ${check.threat ?? 0}.`);
+    notes.push(
+      loc`Error range ${formatRange("error", check.error)}; threat range ${formatRange("threat", check.threat)}.`
+    );
   if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);
   if (check.cunningPlan)
     notes.push(
@@ -108,17 +111,17 @@ export function checkFlavor(check) {
           "&gt;"
         )}: automatic success at the lowest positive grade against DC/opposing result ${automatic.difficultyClass} (class level +20 = ${automatic.threshold}). The rolled result is retained.`
     );
-  if (check.criticalFailure) notes.push(`<strong>${loc`Critical failure.`}</strong>`);
+  if (check.criticalFailure) notes.push(`<strong>${outcomeLabel(check, "criticalFailure")}.</strong>`);
   else if (check.errorConfirmed) {
     notes.push(`<span class="spycraft2-error">${loc`Error.`}</span>`);
     if (check.criticalFailureCostIncrease)
       notes.push(loc`Critical-failure activation costs +${check.criticalFailureCostIncrease} action dice.`);
   } else if (!known && candidates.error)
-    notes.push(`<span class="spycraft2-error">${loc`Potential error; confirm the result.`}</span>`);
-  if (check.criticalSuccess) notes.push(`<strong>${loc`Critical success.`}</strong>`);
+    notes.push(`<span class="spycraft2-error">${`${outcomeLabel(check, "error")}.`}</span>`);
+  if (check.criticalSuccess) notes.push(`<strong>${outcomeLabel(check, "criticalSuccess")}.</strong>`);
   else if (check.threatConfirmed) notes.push(`<span class="spycraft2-threat">${loc`Threat.`}</span>`);
   else if (!known && candidates.threat)
-    notes.push(`<span class="spycraft2-threat">${loc`Potential threat; success is still required.`}</span>`);
+    notes.push(`<span class="spycraft2-threat">${`${outcomeLabel(check, "threat")}.`}</span>`);
   if (check.triumphed) {
     notes.push(`<strong>${loc`Triumph.`}</strong>`);
     if (check.checkKind === "attack")
@@ -140,7 +143,7 @@ export function checkFlavor(check) {
       .replaceAll('"', "&quot;");
     notes.push(escaped);
     notes.push(
-      loc`Activation cost ${activation.cost} action dice${activation.sources?.length ? ` (${activation.sources.map(esc).join("; ")})` : ""}.`
+      loc`Activation cost: ${activation.cost} action ${activation.cost === 1 ? "die" : "dice"}${activation.sources?.length ? ` (${activation.sources.map(esc).join("; ")})` : ""}.`
     );
   }
   for (const payment of [check.preRollFunding, check.rerollFunding])

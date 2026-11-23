@@ -4,7 +4,12 @@
     <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
     {{#if editable}}<button type="button" class="mode-toggle" data-sc2-display="both" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}{{localize "SPYCRAFT.Rail.Done"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.EditCharacter"}}{{/if}}</button>{{/if}}
     {{#if editMode}}<input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" aria-label="{{localize 'Name'}}" />
-    <input class="codename" name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}" aria-label="{{localize 'SPYCRAFT.Codename'}}" />{{else}}<strong class="agent-name" title="{{actor.name}}">{{actor.name}}</strong>{{#if system.codename}}<span class="sc2-stamp agent-codename">{{system.codename}}</span>{{/if}}{{/if}}
+    <input
+      class="codename"
+      name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}"
+      aria-label="{{localize 'SPYCRAFT.Codename'}}" />{{else}}<strong
+      class="agent-name">{{actor.name}}</strong>{{#if system.codename}}<span
+      class="sc2-stamp agent-codename">{{system.codename}}</span>{{/if}}{{/if}}
     <div class="summary">
       <span class="level sc2-chip"><b>{{localize "SPYCRAFT.CareerLevel"}} {{system.level}}</b></span>
       <label class="edit-only">{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" />{{#if xpNext}}<span class="muted"> / {{xpNext}}</span>{{/if}}</label>
@@ -25,7 +30,12 @@
     {{#with setupGuide.next}}<button type="button" class="sc2-primary-action{{#if error}} sc2-over{{/if}}" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{/with}}
   </div>{{/if}}{{/if}}
 
-  {{#if activeConditions.length}}<div class="rail-conditions" role="status" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CurrentConditions'}}">{{#each activeConditions}}<span class="sc2-stamp">{{this}}</span>{{/each}}</div>{{/if}}
+  {{#if activeConditions.length}}<div
+    class="rail-conditions"
+    role="status"
+    aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CurrentConditions'}}">{{#each conditionStamps}}<span
+    class="sc2-stamp"{{#if tip}}
+    data-tooltip="{{tip}}" tabindex="0"{{/if}}>{{label}}</span>{{/each}}</div>{{/if}}
 
   <div class="rail-block resources">
     <label class="res sc2-meter vitality"><span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.VitalityWhat'}}">{{localize "SPYCRAFT.Vitality"}} <i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>
@@ -38,31 +48,77 @@
   </div>
 
   <div class="rail-block rail-fields">
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value" {{sc2tip tips.defense}}>{{system.defense.total}}</b></div>
+    <button type="button"
+      class="sc2-field stat sc2-stat-action"
+      data-action="checkIncomingDefense"
+      aria-label="{{localize 'SPYCRAFT.Rail.CheckDefense'}}"><span
+      class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b
+      class="sc2-value" {{sc2tip tips.defense}}>{{system.defense.total}}</b></button>
     <button type="button" class="sc2-field stat sc2-stat-action" data-action="rollInitiative" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.RollInitiative'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value" {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b></button>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Speed"}}</span><b class="sc2-value" {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}?{{else}}{{system.speed}}{{/if}}</b></div>
+    <p
+      class="rail-defense-note"
+     
+        data-tooltip="{{localize 'SPYCRAFT.Rail.DefenseNote'}}">{{localize "SPYCRAFT.Rail.FlatFooted" value=flatFootedDefense}} · {{localize "SPYCRAFT.Rail.DamageReduction" melee=system.dr.melee other=system.dr.other}}</p>
     {{#each saves}}<button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}"><span class="sc2-caption">{{label}}</span><b class="sc2-value" {{sc2tip tip}}>{{signed total}}</b></button>{{/each}}
   </div>
 
   <div class="rail-block action-dice" data-sc2-display="both">
     <span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.ActionDice.What'}}">{{localize "SPYCRAFT.ActionDice.Label"}} <i class="fa-solid fa-circle-question" aria-hidden="true"></i> <span class="die" {{sc2tip tips.actionDice}}>d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}}</span></span>
     <div class="dice-line">
-      <input type="number" name="system.actionDice.value" aria-label="{{localize 'SPYCRAFT.ActionDice.Label'}}" value="{{system.actionDice.value}}" />
+      <b class="sc2-value play-only">{{system.actionDice.value}}</b>
+      <input class="edit-only" type="number" name="system.actionDice.value" aria-label="{{localize 'SPYCRAFT.ActionDice.Label'}}" value="{{system.actionDice.value}}" />
       <span class="sc2-pips" aria-hidden="true">{{#each actionDicePips}}<i class="{{#if this}}on{{/if}}"></i>{{/each}}</span>
+      {{#if editable}}<button type="button"
+        class="sc2-action play-only"
+        data-sc2-display="icon"
+        data-action="adjustActionDice"
+        aria-label="{{localize 'SPYCRAFT.ActionDice.Adjust'}}"
+        data-tooltip="{{localize 'SPYCRAFT.ActionDice.AdjustHint'}}"><i
+        class="fa-solid fa-pen"
+        aria-hidden="true"></i></button>{{/if}}
     </div>
     <div class="res-actions">
-      {{#unless startingDiceEntry.blocked}}<button type="button" class="sc2-action" data-sc2-display="both" data-action="initializeStartingDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginPlayOnceWithThisCharacter'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.BeginPlay"}}</button>{{/unless}}
-      <button type="button" class="sc2-action" data-action="spendActionDie" data-tooltip="{{localize 'SPYCRAFT.ActionDice.Spend'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Spend"}}</button>
-      <button type="button" class="sc2-action" data-action="healActionDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.HealOutsideCombatWithActionDice'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Heal"}}</button>
-      <button type="button" class="sc2-action" data-action="refreshAction" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginOrCompleteAFullRound'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Refresh"}}</button>
-      <button type="button" class="sc2-action" data-action="boostDefense" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BoostDefenseWithAnActionDie'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Defense"}}</button>
+      {{#unless startingDiceEntry.blocked}}<button type="button"
+        class="sc2-primary-action sc2-action"
+        data-sc2-display="both"
+        data-action="initializeStartingDice"
+        data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginPlayOnceWithThisCharacter'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.BeginPlay"}}</button>{{/unless}}
+      <button type="button"
+        class="sc2-action"
+        data-sc2-display="both"
+        data-action="boostDefense" {{#unless defenseBoost.available}}disabled{{/unless}}
+       
+          data-tooltip="{{#if defenseBoost.reason}}{{defenseBoost.reason}}{{else}}{{localize 'SPYCRAFT.Template.ActorAgentHeader.BoostDefenseWithAnActionDie'}}{{/if}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Defense"}}</button>
+      {{#if defenseBoost.active}}<span class="sc2-chip" role="status">{{defenseBoost.active}}</span>{{/if}}
       {{#if dying}}<button type="button" data-sc2-display="both" data-action="rollDying" class="bad sc2-action">{{playLabels.dying}}</button>{{/if}}
+      <details class="rail-more" data-key="railMore"><summary>{{localize "SPYCRAFT.Rail.More"}}</summary>
+        <button type="button"
+          class="sc2-action"
+          data-sc2-display="both"
+          data-action="spendActionDie"
+          data-tooltip="{{localize 'SPYCRAFT.ActionDice.Spend'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Spend"}}</button>
+        <button type="button"
+          class="sc2-action"
+          data-sc2-display="both"
+          data-action="healActionDice"
+          data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.HealOutsideCombatWithActionDice'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Heal"}}</button>
+        <button type="button"
+          class="sc2-action"
+          data-sc2-display="both"
+          data-action="refreshAction"
+          data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginOrCompleteAFullRound'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Refresh"}}</button>
+      </details>
     </div>
   </div>
 
+{{#if setupGuide.next}}{{#if editable}}<button type="button"
+  class="sc2-chip setup-chip play-only"
+  data-action="toggleEditMode"
+  data-tooltip="{{localize 'SPYCRAFT.Rail.SetupLeftHint'}}">{{localize "SPYCRAFT.Rail.SetupLeft" count=setupGuide.count}}</button>{{/if}}{{/if}}
 {{#if setupGuide.next}}
-<details class="todo" data-key="todo" {{#if open.todo}}open{{/if}}>
-  <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.SetupChecklist"}} {{setupGuide.count}} {{localize "SPYCRAFT.Template.ActorAgentHeader.Reminders"}}</summary>
+<details class="todo edit-only" data-key="todo" {{#if open.todo}}open{{/if}}>
+  <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> {{localize "SPYCRAFT.Rail.SetupChecklist" count=setupGuide.count}}</summary>
   <ol class="setup-steps" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemainingCharacterSetup'}}">
     {{#each setupGuide.steps}}<li><details data-key="setup-{{tab}}">
       <summary>{{label}} <span class="setup-count">{{count}}</span></summary>
@@ -74,7 +130,11 @@
 <p class="setup-clear edit-only">{{localize "SPYCRAFT.Template.ActorAgentHeader.NoSetupRemindersCheckAnyCharacter"}}</p>
 {{/if}}
 {{#if warnings.length}}
-<details class="warnings" data-key="warnings" {{#if open.warnings}}open{{/if}}>
+<button type="button"
+  class="sc2-chip setup-chip play-only"
+  data-action="toggleEditMode"
+  data-tooltip="{{localize 'SPYCRAFT.Rail.WarningsHint'}}">{{localize "SPYCRAFT.Rail.WarningsLeft" count=warnings.length}}</button>
+<details class="warnings edit-only" data-key="warnings" {{#if open.warnings}}open{{/if}}>
   <summary><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> {{localize "SPYCRAFT.Warnings" count=warnings.length}} ({{warnings.length}})</summary>
   <ul>{{#each warnings}}<li>{{this}}</li>{{/each}}</ul>
 </details>

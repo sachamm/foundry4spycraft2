@@ -85,7 +85,7 @@ export async function checkReflexDamage(actor) {
   await foundry.applications.api.DialogV2.input({
     window: { title: loc`Reflex save — damage result` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p><b>${loc`Damage after the saving throw and Evasion: ${plan.total}`}</b></p><p>${loc`Source damage ${plan.damage}; ordinary successful-save damage ${plan.normalSuccessDamage}; save ${plan.succeeded ? "succeeded" : "failed"}.`}</p><p>${loc`Recorded Evasion grade ${plan.context.grade}; flat-footed ${plan.context.flatFooted ? "yes" : "no"}; save can reduce damage ${plan.context.reflexReducesDamage ? "yes" : "no"}.`}</p><p>${plan.evaded ? loc`Evasion: no damage with the successful save.` : plan.halved ? loc`Evasion II: failed-save damage halved, rounded down.` : loc`No Evasion damage adjustment applies.`}</p><p>${loc`Apply other mitigation and health settlement separately. No health or action dice were changed.`}</p></div>`
+    content: `<div class="spycraft2-roll-options"><p><b>${loc`Damage after the save and Evasion: ${plan.total}`}</b></p><p>${loc`Source damage ${plan.damage}; ordinary successful-save damage ${plan.normalSuccessDamage}; save ${plan.succeeded ? "succeeded" : "failed"}.`}</p><p>${loc`Recorded Evasion grade ${plan.context.grade}; flat-footed ${plan.context.flatFooted ? "yes" : "no"}; save can reduce damage ${plan.context.reflexReducesDamage ? "yes" : "no"}.`}</p><p>${plan.evaded ? loc`Evasion: no damage with the successful save.` : plan.halved ? loc`Evasion II: failed-save damage halved, rounded down.` : loc`No Evasion damage adjustment applies.`}</p><p>${loc`Apply other mitigation and health settlement separately. No health or action dice were changed.`}</p></div>`
   });
   return plan;
 }

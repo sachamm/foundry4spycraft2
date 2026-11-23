@@ -161,7 +161,7 @@ export async function manageCheapShots(actor) {
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Cheap Shot outcomes and recovery` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`First confirm and resolve the attack or Fortitude save in chat. Apply a hit to the recorded target, or flat-footed to the attacker on a miss. Recovery saves are available once per minute starting immediately at DC20; finish boosting and resolve the save before applying its result. Recovery does not restore scene eligibility.`}</p><label>${loc`Operation`} <select name="operation"><option value="">${loc`Choose…`}</option>${pending.map(m => `<option value="apply|${esc(m.uuid)}">${loc`Apply resolved Cheap Shot: ${esc(m.flags.spycraft2.attackContext.cheapShot.targetName)}`}</option>`).join("")}${effects.map(r => `<option value="save|${esc(r.sourceMessage)}">${loc`Roll recovery: ${esc(r.choice)}`}</option>`).join("")}${
+    content: `<div class="spycraft2-roll-options"><p>${loc`First confirm and resolve the attack or Fortitude save in chat. Apply a hit to the recorded target, or flat-footed to the attacker on a miss. Recovery saves are available once per minute starting immediately at DC 20; finish boosting and resolve the save before applying its result. Recovery does not restore scene eligibility.`}</p><label>${loc`Operation`} <select name="operation"><option value="">${loc`Choose…`}</option>${pending.map(m => `<option value="apply|${esc(m.uuid)}">${loc`Apply resolved Cheap Shot: ${esc(m.flags.spycraft2.attackContext.cheapShot.targetName)}`}</option>`).join("")}${effects.map(r => `<option value="save|${esc(r.sourceMessage)}">${loc`Roll recovery: ${esc(r.choice)}`}</option>`).join("")}${
       game.user.isGM
         ? effects
             .filter(r => r.attemptId && r.attemptResolved !== true)
@@ -171,7 +171,7 @@ export async function manageCheapShots(actor) {
             )
             .join("")
         : ""
-    }${saves.map(m => `<option value="settle|${esc(m.uuid)}">${loc`Apply resolved recovery DC${esc(m.flags.spycraft2.cheapShotRecovery.dc)}`}</option>`).join("")}</select></label></div>`
+    }${saves.map(m => `<option value="settle|${esc(m.uuid)}">${loc`Apply resolved recovery DC ${esc(m.flags.spycraft2.cheapShotRecovery.dc)}`}</option>`).join("")}</select></label></div>`
   });
   if (!input?.operation) return null;
   const [kind, id] = input.operation.split("|");

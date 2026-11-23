@@ -50,7 +50,7 @@ const COUNTER_LABELS = {
     return loc`Lift`;
   },
   get traction() {
-    return loc`Punctured tyres`;
+    return loc`Punctured tires`;
   }
 };
 const hours = n => (Math.round(n * 10) / 10).toLocaleString("en-US");

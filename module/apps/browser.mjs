@@ -113,7 +113,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     super(options);
     this.actor = actor;
     this.itemType = itemType;
-    this.filters = { search: "", group: originType ?? "", qualifiedOnly: false, acquisitionSource: "" };
+    // With a character open, start with what that character may take; the box is one click from the full list.
+    this.filters = { search: "", group: originType ?? "", qualifiedOnly: !!actor, acquisitionSource: "" };
     /** The entry shown in the preview pane. */
     this.selected = null;
     /** Plain-text descriptions by uuid: parsing each one is the costly part of building the list. */

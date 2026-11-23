@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+- **Style-guide audit, rules and results.** The Dying button follows the character's size instead of a fixed
+  −1 to −9 band. A standard NPC built by hand no longer shows vitality and wounds boxes it does not use. Attack
+  cards say "Critical hit" and "Critical miss"; other checks keep "Critical success" and "Critical failure". Threat
+  and error ranges print as die faces ("threat range 19–20", "error range 1"). An unconfirmed result reads "Threat,
+  if it succeeds" or "Error, if it fails".
+- **Chat cards use one set of state words.** The guide at the top of a card reads Pending, Hit, Miss, Success,
+  Failure, Damage rolled, Damage applied or Finished, with an icon and an edge colour for the outcome and "16 → 25"
+  when action dice changed the total. The closing button is "Finish". The critical button names what it activates,
+  and the full action-dice dialog is a ▾ beside the one-click spend.
+- **Agent sheet in play.** Conditions on the rail carry a one-line reminder of what they change. The Defense tile
+  opens the incoming-attack check and shows the flat-footed value. Action dice are read-only with a pencil for
+  corrections; rarer rail actions sit under "More". Weapon rows show threat range, error range and range as one line,
+  and untrained weapons say so in words. The Play tab lists trained skills, abilities with limited uses, active
+  effects, and a "Your turn" strip with End turn.
+- **NPC sheet reads as a stat block.** Health and conditions are in the header, the Damage save is one primary
+  button with the track beside it, and editing controls appear only in Edit mode. The NPC window opens at 480px
+  and can be narrowed to 420px. Skill rolls made openly no longer print the bonus breakdown to players.
+- **Dialogs.** Attack dialogs have a Situational modifier field. Named skill checks list names only and show the
+  selected check's detail under the list. Attack, skill and damage dialogs end with "What the system does for you".
+  The critical dialog names the result it activates. A GC opening a dialog finds the GC confirmations ticked, with a
+  note saying how many. Footer buttons use sentence case.
+- **Items and vehicles.** Feat confirmation boxes and prerequisite data are shown to the GC only. The vehicle
+  thresholds line is one sentence. "Tyre" is spelled "tire". The item browser opened without a character no longer
+  hides unqualified entries. Numbers glued to words in about sixty messages have their spaces back.
+- **Combat tracker and keyboard.** The token HUD lists this system's conditions only, by their sheet names, plus the
+  few core entries Foundry itself reads. Tracker rows say "flat-footed" and, for characters you may open, the wound
+  state; the half-action count uses a proper plural. Six rebindable shortcuts are registered: next and previous
+  turn, the GC Console, the acting character's sheet, the main button of the newest card, and GC boost
+  (see `docs/gc-tools.md`).
+- **GC Console.** Combat moves to the top while a combat exists and has one primary button. Mission, XP and GC
+  action dice read as labelled values instead of one glued line. Rare mission buttons sit under "More mission
+  tools". Row buttons are verbs ("Mark complete", "Mark faced", "Remove"), and empty lists say what to press.
+  Section titles are 13px sentence case.
+- **One name for the GC's dice.** Messages say "GC action dice" where they said "GC pool" or "session pool";
+  "AD", "HP", "saving throw" and "next GM launch" are written out in the table's own terms.
+- **Docs.** `docs/gc-quickstart.md` walks a new GC from an empty world to the first combat; `docs/gc-tools.md`
+  gains "Running a combat turn" and a keyboard table.
 - **Chat-card buttons tell the truth.** The line under a chat-card button said "Action finished" when the action had
   been refused, when the character was busy and when the dialog was closed. It now says "Not done" with the reason
   for a refusal, shows nothing after a closed dialog, and says "Action finished" only when the action ran. A refused

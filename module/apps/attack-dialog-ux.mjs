@@ -15,7 +15,14 @@ export function enhanceAttackDialog(_event, dialog) {
   const summary = doc.createElement("summary");
   advanced.append(summary);
   const keep = new Set();
-  for (const name of ["targetActorUuid", "attackAction", "distanceFeet", "targetOpponentConfirmed", "reachAdjacency"]) {
+  for (const name of [
+    "targetActorUuid",
+    "attackAction",
+    "distanceFeet",
+    "targetOpponentConfirmed",
+    "reachAdjacency",
+    "situationalModifier"
+  ]) {
     const control = root.querySelector(`[name="${name}"]`);
     if (!control) continue;
     const group =
@@ -85,5 +92,5 @@ export function enhanceAttackDialog(_event, dialog) {
     true
   );
   update();
-  installResolutionGuide(root, "attack");
+  installResolutionGuide(root, "attack", { append: true });
 }

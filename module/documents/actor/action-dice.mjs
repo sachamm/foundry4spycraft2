@@ -903,7 +903,7 @@ export const ActorActionDice = Base =>
         await this.update(this.actorRecordRestorePatch("flags.spycraft2.actionDieAwardReview", review));
       } catch {}
       ui.notifications.warn(
-        loc`The award needs GC review before awarding or spending more dice. Check player dice, the award ledger and the GC pool.`
+        loc`The award needs GC review before awarding or spending more dice. Check player dice, the award ledger and the GC action dice.`
       );
       return review;
     }
@@ -987,7 +987,7 @@ export const ActorActionDice = Base =>
             try {
               await ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor: this }),
-                content: loc`${foundry.utils.escapeHTML(this.name)} receives ${plan.units} d${plan.die} action dice from ${plan.count} GC awards; GC pool +${plan.gcGain}. ${foundry.utils.escapeHTML(String(input.reason).trim())} Award count recorded for mission XP settlement.`,
+                content: loc`${foundry.utils.escapeHTML(this.name)} receives ${plan.units} d${plan.die} action dice from ${plan.count} GC awards; GC action dice +${plan.gcGain}. ${foundry.utils.escapeHTML(String(input.reason).trim())} Award count recorded for mission XP settlement.`,
                 flags: {
                   spycraft2: {
                     actorUuid: this.uuid,
@@ -1082,7 +1082,7 @@ export const ActorActionDice = Base =>
         input = await systemDialog.input({
           window: { title: loc`Review interrupted award` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>${loc`Review the actual player dice, recorded award, GC pool and any posted receipt. Initialize this session’s GC pool first if the session changed.`}</p><label>${loc`Award`} <select name="retainAward"><option value="retain">${loc`Retain this award in the mission XP ledger`}</option><option value="cancel">${loc`Cancel this award in the mission XP ledger`}</option></select></label><label>${loc`Confirmed player dice`} <input name="playerBalance" type="number" min="0" step="1" value="${current.player}" /></label><label>${loc`Confirmed GC dice`} <input name="gcBalance" type="number" min="0" step="1" value="${current.gc?.value ?? 0}" /></label><label>${loc`Resolution`} <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC reviewed the award, actual balances and receipt`}</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>${loc`Review the actual player dice, recorded award, GC action dice and any posted receipt. Initialize this session’s GC action dice first if the session changed.`}</p><label>${loc`Award`} <select name="retainAward"><option value="retain">${loc`Retain this award in the mission XP ledger`}</option><option value="cancel">${loc`Cancel this award in the mission XP ledger`}</option></select></label><label>${loc`Confirmed player dice`} <input name="playerBalance" type="number" min="0" step="1" value="${current.player}" /></label><label>${loc`Confirmed GC dice`} <input name="gcBalance" type="number" min="0" step="1" value="${current.gc?.value ?? 0}" /></label><label>${loc`Resolution`} <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC reviewed the award, actual balances and receipt`}</label></div>`
         });
         if (!input) return null;
         input = {

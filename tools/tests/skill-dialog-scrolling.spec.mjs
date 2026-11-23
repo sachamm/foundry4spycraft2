@@ -554,7 +554,7 @@ test("Forensics task scope remains explicit beside the pressure and deadline cho
   await page.locator("[name=baseChallenges]").fill("6");
   await page.locator("[name=unpressuredConfirmed]").check();
   await expect(page.locator("body")).toContainText("every recorded Challenge uses Forensics");
-  await expect(page.locator("body")).toContainText("Apply both reductions before the minimum1");
+  await expect(page.locator("body")).toContainText("Apply both reductions before the minimum 1");
   await page.locator("#confirm").scrollIntoViewIfNeeded();
   const b = await page.locator("#confirm").boundingBox();
   expect(b.y).toBeGreaterThanOrEqual(0);
@@ -2632,7 +2632,7 @@ test("actual Takedown declaration keeps applied-damage, wound-loss and GC target
       await page.locator("[name=" + key + "]").scrollIntoViewIfNeeded();
       await page.locator("[name=" + key + "]").check();
     }
-    await expect(page.locator("body")).toContainText("plus10");
+    await expect(page.locator("body")).toContainText("plus 10");
     await expect(page.locator("[name=attackUuid]")).not.toContainText(attack.uuid);
     await page.locator("#confirm").scrollIntoViewIfNeeded();
     const r = await page.locator("#confirm").boundingBox();
@@ -2694,8 +2694,8 @@ test("Takedown interrupted save and outcome reviews use readable labels with con
     globalThis.game = { ...oldGame, user: { isGM: true }, actors: [], messages: [save] };
     await a.manageTakedown();
     await render(page, 768);
-    await expect(page.locator("[name=operation]")).toContainText("GC review interrupted takedown save DC16");
-    await expect(page.locator("[name=operation]")).toContainText("GC review interrupted takedown outcome DC16");
+    await expect(page.locator("[name=operation]")).toContainText("GC review interrupted takedown save DC 16");
+    await expect(page.locator("[name=operation]")).toContainText("GC review interrupted takedown outcome DC 16");
     await expect(page.locator("[name=operation]")).not.toContainText("event1");
     await page.locator("[name=operation]").selectOption("outcome|" + save.uuid);
     await page.locator("[name=resolution]").selectOption("alreadyApplied");

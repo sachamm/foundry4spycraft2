@@ -167,7 +167,7 @@ export function tripDefensePlan(
     ],
     sizeBonus,
     notes: [
-      loc`Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +${sizeBonus}.`,
+      loc`Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier +1; larger participant +4 per Size category (pp.352,361). Your Size bonus +${sizeBonus}.`,
       ...(mastery
         ? [
             loc`Equilibrium Mastery: ${normalDodge} current Covert feats; dodge bonus +${dodgeBonus}${vulnerable ? loc` (lost while vulnerable, p.328)` : ""}. Dodge bonuses stack; this is not a general Defense bonus (p.194).`

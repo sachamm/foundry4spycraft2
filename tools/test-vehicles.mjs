@@ -474,7 +474,7 @@ test("a critical hit on a vehicle rolls a Vehicle Damage result once per failed 
   nextRoll = 16;
   posts.length = 0; // location 16 on SGV = Traction: no counter until the tyre fails its own save
   await rollVehicleDamageResult(car, { failed: 1, damage: 40 });
-  assert.match(posts[0].flavor, /tyre must make its own Damage save against 40 damage \(bonus \+2\)/);
+  assert.match(posts[0].flavor, /tire must make its own Damage save against 40 damage \(bonus \+2\)/);
   assert.equal(car.system.damage.traction, undefined);
   nextRoll = 3;
   await rollTyreSave(car, { damage: 40 }); // 5 vs DC 30

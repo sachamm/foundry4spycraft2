@@ -5,6 +5,9 @@ import { classAbilityControl } from "./class-ability-controls.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
+import { formDialog } from "../apps/dialog-kit.mjs";
+import { weaponFacts } from "./play-rows.mjs";
+import { formatRange } from "../rules/outcome-labels.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
 import { KeepPlace } from "./keep-place.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
@@ -14,6 +17,10 @@ import {
   combatToolVisibility,
   focusSetupTask,
   activeConditionLabels,
+  conditionStamps,
+  activeEffectLines,
+  defenseBoostState,
+  flatFootedDefense,
   enhanceAgentSheet,
   buildCreationTrack
 } from "./agent-ux.mjs";
@@ -105,6 +112,7 @@ import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
 import { ACTION_COSTS, attackActionCost } from "../rules/combat-actions.mjs";
 import { nonLethalTotals, resolveQuickAttack } from "../apps/damage-application.mjs";
+import { woundState } from "../rules/damage-application.mjs";
 import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
 import { ammunitionLabel } from "../rules/ammunition-use.mjs";
 import { planAmmunitionStockpile } from "../apps/ammunition-planner.mjs";
@@ -615,6 +623,25 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       boostDefense() {
         return this.actor.boostDefenseWithActionDie();
       },
+      async endTurn() {
+        const combat = this.actor.participatingCombat;
+        if (!combat?.started) return refuse(loc`${this.actor.name} is not in a running combat.`);
+        if (combat.combatant?.actor?.uuid !== this.actor.uuid)
+          return refuse(loc`It is not ${this.actor.name}'s turn, so there is no turn to end.`);
+        return combat.nextTurn();
+      },
+      async adjustActionDice() {
+        if (!this.isEditable) return null;
+        const held = this.actor.system.actionDice?.value ?? 0;
+        const input = await formDialog({
+          title: loc`Adjust action dice`,
+          intro: loc`${this.actor.name} holds ${held} action dice. Use this to correct the count; spending and awards change it for you.`,
+          fields: [{ number: "value", label: loc`Action dice held`, min: 0, step: 1, value: held, required: true }]
+        });
+        const value = Math.trunc(Number(input?.value));
+        if (!input || !Number.isSafeInteger(value) || value < 0 || value === held) return null;
+        return this.actor.update({ "system.actionDice.value": value });
+      },
       async initializeStartingDice() {
         // Beginning play is once only, so an unfinished build asks first instead of starting silently.
         const open = buildSetupGuide(this.actor.system.todo).count;
@@ -667,7 +694,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
           "round-counter",
           "gc-review"
         ].map(name => `${TPL}/play/${name}.hbs`),
-        `${TPL}/parts/hazards.hbs`
+        `${TPL}/parts/hazards.hbs`,
+        `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/use-counter.hbs`
       ],
       scrollable: [""]
     },
@@ -679,7 +708,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     },
     abilities: {
       template: `${TPL}/agent-abilities.hbs`,
-      templates: [`${TPL}/agent-feats.hbs`, `${TPL}/agent-classes.hbs`, `${TPL}/play/gc-review.hbs`],
+      templates: [
+        `${TPL}/agent-feats.hbs`,
+        `${TPL}/agent-classes.hbs`,
+        `${TPL}/play/gc-review.hbs`,
+        `${TPL}/parts/use-counter.hbs`
+      ],
       scrollable: [""]
     },
     dossier: {
@@ -776,6 +810,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       open: this._open,
       editMode: this.isEditable && this._editMode,
       activeConditions: activeConditionLabels(sys),
+      conditionStamps: conditionStamps(sys),
+      flatFootedDefense: flatFootedDefense(sys),
+      defenseBoost: defenseBoostState(
+        sys,
+        actor.participatingCombat,
+        actor.participatingCombat?.combatants?.some(member => member.actor?.uuid === actor.uuid) ?? false
+      ),
       nonLethalMeters: nonLethalMeters(sys),
       showAllTools: game.user.isGM && this._showAllTools,
       combatTools: combatToolVisibility(sys, COMBAT_STANCES, { showAll: game.user.isGM && this._showAllTools })
@@ -1107,6 +1148,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       totalsLabel: s.totals.map(t => `${t.total >= 0 ? "+" : ""}${t.total}`).join(" / "),
       bonusTip: tip([[miscLabel, s.misc]], `skills.${s.key}.misc`),
       threatTip: tip([], `skills.${s.key}.threat`),
+      threatLabel: formatRange("threat", s.threat),
       capTip: tip([], `skills.${s.key}.cap`),
       totals: s.totals.map(t => ({
         ...t,
@@ -1245,6 +1287,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       shots: weaponShots(w),
       caliber: cfg.calibers[w.system.caliber]
     }));
+    for (const row of context.weapons) {
+      row.untrained = row.attack?.trained === false;
+      row.facts = weaponFacts(row.attack);
+      row.threatLabel = formatRange("threat", row.attack?.threat);
+      row.errorLabel = formatRange("error", row.attack?.error);
+    }
+    // Play: the skills the character is trained in, one click from a roll.
+    context.miscLabels = miscModifierLabels(cfg);
+    context.playSkills = context.skills.filter(skill => skill.ranks > 0);
+    context.activeEffects = activeEffectLines(sys);
+    context.ownTurn =
+      actor.participatingCombat?.started === true && actor.participatingCombat.combatant?.actor?.uuid === actor.uuid;
     context.playLabels = playLabels();
     // One pip per action die the agent could hold; filled pips are dice in hand.
     const diceHeld = Math.max(0, Number(sys.actionDice?.value) || 0);
@@ -1255,7 +1309,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       index,
       spent: index < halfSpent
     }));
-    context.dying = sys.wounds?.value <= -1 && sys.wounds?.value >= -9;
+    context.dying = woundState(Number(sys.wounds?.value), sys.deathThreshold) === "dying";
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
     context.safeHouseSource = safeHouseSource(sys);
     context.safeHouses = safeHouseRows(sys, cfg);
@@ -1625,6 +1679,40 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
   }
 }
 
+/** Readable names for the manual modifier fields, which are stored under short keys. */
+function miscModifierLabels(cfg) {
+  const named = key => game.i18n.localize(key);
+  const gear = letter => loc`Gear picks: ${cfg.gearPicks?.[letter] ?? letter}`;
+  return {
+    bab: named("SPYCRAFT.BAB"),
+    fort: loc`Fortitude save`,
+    ref: loc`Reflex save`,
+    will: loc`Will save`,
+    defense: named("SPYCRAFT.Defense"),
+    initiative: named("SPYCRAFT.Initiative"),
+    wealth: loc`Wealth`,
+    vitality: named("SPYCRAFT.Vitality"),
+    wounds: named("SPYCRAFT.Wounds"),
+    speed: named("SPYCRAFT.Speed"),
+    actionDice: named("SPYCRAFT.ActionDice.Label"),
+    knowledge: named("SPYCRAFT.Knowledge"),
+    request: named("SPYCRAFT.Request"),
+    gearCheck: named("SPYCRAFT.GearCheck"),
+    gearR: gear("R"),
+    gearT: gear("T"),
+    gearV: gear("V"),
+    gearS: gear("S"),
+    gearG: gear("G"),
+    gearW: gear("W"),
+    gearE: gear("E")
+  };
+}
+
+/** A standard NPC's Damage save track state, as a word for the sheet. */
+const damageStateLabel = state =>
+  ({ active: loc`Up`, unconscious: loc`Unconscious`, dead: loc`Dead`, destroyed: loc`Destroyed` })[state] ??
+  String(state ?? "");
+
 /* -------------------------------------------------------------------------- */
 /*  NPC sheet (simple stat block)                                             */
 /* -------------------------------------------------------------------------- */
@@ -1651,7 +1739,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "npc"],
-    position: { width: 800, height: 800 },
+    position: { width: 480, height: 640 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
@@ -1755,6 +1843,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       template: `${TPL}/npc-sheet.hbs`,
       templates: [
         `${TPL}/parts/hazards.hbs`,
+        `${TPL}/parts/weapon-row.hbs`,
         `${TPL}/npc-graded-play.hbs`,
         `${TPL}/npc-builder.hbs`,
         "systems/spycraft2/templates/parts/editor.hbs"
@@ -1795,12 +1884,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
           canPlanAmmunition: compatibleAmmunition(w.system, CONFIG.SPYCRAFT.tables?.ammunitionCatalog ?? []).length > 0,
           attack: this.actor.weaponAttack(w),
           shots: weaponShots(w)
-        })),
+        }))
+        .map(row => ({ ...row, facts: weaponFacts(row.attack) })),
       playLabels: playLabels(),
       featPlay: npcFeatPlay(sys.featEffects),
       hazards: hazardsView(this.actor),
       nonLethal: nonLethalTotals(this.actor),
-      dying: this.actor.system.wounds?.value <= -1 && this.actor.system.wounds?.value >= -9,
+      dying: woundState(Number(this.actor.system.wounds?.value), this.actor.system.deathThreshold) === "dying",
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),
       npcTypes: {
         standard: loc`Standard`,
@@ -1819,8 +1909,16 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         : null,
       npc: this._npcContext(),
       manualRoles: { "": loc`None`, minion: loc`Minion`, henchman: loc`Henchman`, mastermind: loc`Mastermind` },
+      healthChip: npcIsSpecial(this.actor)
+        ? loc`vitality ${sys.vitality?.value ?? 0}/${sys.vitality?.max ?? 0} · wounds ${sys.wounds?.value ?? 0}/${sys.wounds?.max ?? 0}`
+        : loc`Damage save: ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
+      // The conditions set on the token or the actor, by their Spycraft names.
+      conditionStamps: [...(this.actor.statuses ?? [])]
+        .map(id => CONFIG.statusEffects?.find(effect => effect.id === id)?.name)
+        .filter(Boolean)
+        .map(name => game.i18n.localize(name)),
       gcPlay: {
-        damage: damageSaveState(this.actor),
+        damage: (state => ({ ...state, stateLabel: damageStateLabel(state.track.state) }))(damageSaveState(this.actor)),
         special: npcIsSpecial(this.actor),
         dispositions: dispositionRows(this.actor),
         baseDisposition: sys.disposition?.base ?? "neutral"

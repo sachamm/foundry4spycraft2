@@ -66,7 +66,7 @@ export function appearanceCheckPlan(system, key, check, { manhuntPrey = false } 
       ...(ugly ? [loc`Too Ugly to Die: synergy penalty −4 with all Blend/Networking checks (p.205).`] : []),
       ...(appearanceApplicable
         ? [
-            `${source}: ${synergy ? `synergy ${synergy > 0 ? "+" : ""}${synergy}` : loc`appearance +1 included in skill bonus`}${errorIncrease ? loc`; error range +1` : ""}${irresistible ? loc`; replaces The Look skill modifiers` : look && gorgeous ? loc`; replaces Gorgeous skill modifiers` : ""}${criticalFailureDiscount ? loc`; opponent error activation cost −1 (minimum1)` : ""} (p.${irresistible ? 205 : 203}).`
+            `${source}: ${synergy ? `synergy ${synergy > 0 ? "+" : ""}${synergy}` : loc`appearance +1 included in skill bonus`}${errorIncrease ? loc`; error range +1` : ""}${irresistible ? loc`; replaces The Look skill modifiers` : look && gorgeous ? loc`; replaces Gorgeous skill modifiers` : ""}${criticalFailureDiscount ? loc`; opponent error activation cost −1 (minimum 1)` : ""} (p.${irresistible ? 205 : 203}).`
           ]
         : [])
     ]

@@ -69,7 +69,7 @@ test("activated critical results replace threat/error labels and escape the reco
     criticalSuccess: true,
     criticalActivation: { cost: 1, effect: "<img src=x onerror=bad()>", sources: [] }
   });
-  assert.match(text, /Critical success/);
+  assert.match(text, /Critical hit/);
   assert.doesNotMatch(text, /<img/);
   assert.match(text, /&lt;img/);
   assert.doesNotMatch(text, />Threat\./);

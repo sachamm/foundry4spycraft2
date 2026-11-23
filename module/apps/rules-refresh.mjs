@@ -71,7 +71,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
     window: { title: restore ? loc`Review previous rules refresh rollback` : loc`Review catalog rules updates` },
     rejectClose: false,
     content: `
-  <p>${loc`Select the changes to apply. Build choices, quantities, equipped state, current HP, XP and earned resources are preserved. Grant synchronization may add or remove rule-granted feats. A full character JSON backup downloads before applying changes, and a backup of selected fields is stored on the character for quick rollback.`}</p>
+  <p>${loc`Select the changes to apply. Build choices, quantities, equipped state, current vitality and wounds, XP and earned resources are preserved. Grant synchronization may add or remove rule-granted feats. A full character JSON backup downloads before applying changes, and a backup of selected fields is stored on the character for quick rollback.`}</p>
   <div class="sc2-scroll-list">${rows}</div>${unmatched.length ? `<p>${unmatched.map(esc).join("<br>")}</p>` : ""}`
   });
   if (!input) return null;

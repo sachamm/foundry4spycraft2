@@ -24,6 +24,8 @@ export function themeSystemDialog(dialog) {
     return;
   element.classList.add("spycraft2", "sc2-dialog");
   if (tableTrusted()) trustConfirmations(element);
+  // The GC is the one these boxes ask: they open ticked for the GC, who unticks any that do not hold.
+  else if (globalThis.game?.user?.isGM) trustConfirmations(element, { asGC: true });
 }
 
 /** The world setting that lets players' declarations stand without ticking each GC confirmation. */
@@ -33,9 +35,10 @@ export function tableTrusted() {
 
 /**
  * Tick every unticked confirmation box ("…Confirmed") in a dialog and say so at the top, so the declarations still
- * show and any that do not hold can be unticked. Returns how many were ticked.
+ * show and any that do not hold can be unticked. Returns how many were ticked. `asGC` words the note for the GC,
+ * whose own dialogs open ticked whatever the setting says.
  */
-export function trustConfirmations(element) {
+export function trustConfirmations(element, { asGC = false } = {}) {
   const boxes = [...(element.querySelectorAll?.('input[type="checkbox"][name$="Confirmed"]') ?? [])].filter(
     box => !box.checked && !box.disabled
   );
@@ -48,7 +51,9 @@ export function trustConfirmations(element) {
     const holder = element.querySelector(".spycraft2-roll-options") ?? element.querySelector("form") ?? element;
     const note = document.createElement("p");
     note.className = "hint sc2-trusted-note";
-    note.textContent = loc`Trusting the table: ${boxes.length} confirmation(s) ticked for you. Untick any that do not hold.`;
+    note.textContent = asGC
+      ? loc`You are the GC: ${boxes.length} confirmation(s) ticked for you. Untick any that do not hold.`
+      : loc`Trusting the table: ${boxes.length} confirmation(s) ticked for you. Untick any that do not hold.`;
     holder.prepend?.(note);
   }
   return boxes.length;

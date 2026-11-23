@@ -5,13 +5,22 @@
     <li class="inventory-weapon" data-item-id="{{item.id}}">
       <div class="inventory-title"><button type="button" data-action="itemEdit" class="inventory-name sc2-action" aria-label="{{localize 'SPYCRAFT.Action.OpenNamed' name=item.name}}">{{item.name}}</button><span class="equipment-state">{{#if item.system.equipped}}{{localize "SPYCRAFT.Template.ActorAgentGear.Equipped"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentGear.NotEquipped"}}{{/if}}</span></div>
       <div class="inventory-rolls">
-        <button type="button" data-action="rollAttack" class="sc2-primary-action {{#unless attack.trained}}bad{{/unless}} sc2-action" aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith' name=item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.Attack"}} {{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</button>
+        <button type="button"
+          data-action="rollAttack"
+          class="sc2-primary-action sc2-action"
+          aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith'
+          name=item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.Attack"}} {{signed attack.total}}</button>
+        {{#if untrained}}<span
+          class="sc2-untrained"
+          data-tooltip="{{localize 'SPYCRAFT.Weapon.UntrainedHint'}}"><i
+          class="fa-solid fa-triangle-exclamation"
+          aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}
         <button type="button" class="sc2-action" data-action="rollDamage" aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}}">{{item.system.damage}}</button>
         {{#if attack.range}}<button type="button" class="sc2-action" data-action="rollRangedAttack" aria-label="{{localize 'SPYCRAFT.Action.MeasuredAttackWith' name=item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.MeasuredAttack"}}</button>{{/if}}
       </div>
       <dl class="inventory-stats">
         {{#if attack.firearm}}<div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.FireMode"}}</dt><dd>{{attack.fireModeLabel}}</dd></div>{{/if}}
-        <div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.Error"}}</dt><dd>{{attack.error}}</dd></div><div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.Threat"}}</dt><dd>{{attack.threat}}</dd></div>
+        <div><dt>{{localize "SPYCRAFT.Weapon.ErrorRange"}}</dt><dd>{{errorLabel}}</dd></div><div><dt>{{localize "SPYCRAFT.Weapon.ThreatRange"}}</dt><dd>{{threatLabel}}</dd></div>
         {{#if attack.range}}<div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.RangeIncrement"}}</dt><dd>{{attack.range}} {{localize "SPYCRAFT.Template.ActorAgentGear.Ft"}}</dd></div>{{/if}}
       </dl>
       {{#if shots}}<p class="inventory-ammunition{{#if shots.empty}} inventory-warning{{/if}}">{{shots.label}} <button type="button" class="sc2-action" data-action="reloadWeapon">{{@root.playLabels.reload}}</button>{{#if shots.counted}} <button type="button" class="sc2-action" data-action="resupplyWeapon">{{@root.playLabels.resupply}}</button>{{/if}}</p>{{/if}}

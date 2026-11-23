@@ -34,11 +34,13 @@
 .gc-console-body details.gc-section[open] > summary::before {
   transform: rotate(90deg);
 }
+/* Section headings use the same face as the sheets' bars, in sentence case. */
 .gc-console-body details.gc-section > summary .gc-section-title {
   flex: 1 1 auto;
   margin: 0;
   border: 0;
-  font-size: 1.1em;
+  font: 700 var(--sc2-text-s)/1.4 var(--font-primary, sans-serif);
+  color: inherit;
 }
 .gc-console-body details.gc-section > summary .gc-note {
   flex: 0 0 auto;
@@ -88,7 +90,6 @@
 }
 .gc-console-body .tag {
   font-size: var(--sc2-text-s);
-  text-transform: uppercase;
   border: 1px solid currentColor;
   border-radius: 3px;
   padding: 0 0.4em;
@@ -312,12 +313,6 @@
   opacity: 1;
   color: var(--sc2-on-bar-muted);
 }
-.gc-console-body details.gc-section > summary .gc-section-title {
-  font: 400 var(--sc2-text-s)/1.4 var(--sc2-bar-font);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: inherit;
-}
 .gc-console-body details.gc-section > summary .gc-note {
   font-family: var(--sc2-num);
   opacity: 1;
@@ -343,11 +338,6 @@
 .gc-console-body details.gc-section > summary .gc-note {
   color: inherit;
 }
-/* Section headings use the same face as the sheets' bars; the display face is kept for the dossier label only. */
-.gc-console-body details.gc-section > summary .gc-section-title {
-  font: 700 var(--sc2-text-s)/1.4 var(--font-primary, sans-serif);
-  letter-spacing: 0.08em;
-}
 .gc-console-body .gc-current-turn {
   font-weight: 700;
 }
@@ -357,4 +347,31 @@
 .gc-console-body [data-defeated="true"] {
   text-decoration: line-through;
   opacity: 0.7;
+}
+
+/* Label and value pairs for the mission, XP and GC action dice lines. */
+.gc-console-body .gc-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+  gap: 4px 12px;
+  margin: 0.4em 0;
+}
+.gc-console-body .gc-facts .sc2-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.gc-console-body details.gc-more {
+  margin: 0.3em 0;
+}
+.gc-console-body details.gc-more > summary {
+  cursor: pointer;
+  color: var(--sc2-ink-muted);
+}
+.gc-console-body .gc-facts .sc2-value {
+  font: 600 var(--sc2-text-m) / 1.3 var(--font-primary, sans-serif);
+  overflow-wrap: anywhere;
+}
+.gc-console-body .gc-facts .gc-note {
+  font-size: var(--sc2-text-s);
 }

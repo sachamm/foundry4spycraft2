@@ -127,7 +127,7 @@ export function coverPlan({
         : []),
       ...(precisionReduction
         ? [
-            loc`Precision Takedown ${precisionGrade === 2 ? "II" : "I"}: opponent loses ${precisionReduction} cover grade${precisionReduction === 1 ? "" : "s"} against this attack.`
+            loc`Precision Takedown ${precisionGrade === 2 ? "II" : "I"}: opponent loses ${precisionReduction} cover grade ${precisionReduction === 1 ? "" : "s"} against this attack.`
           ]
         : []),
       ...(sharpshooterReduction

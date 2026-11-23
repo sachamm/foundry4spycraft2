@@ -67,7 +67,7 @@ test("guidance respects blind and hidden rolls and avoids duplicate cards", asyn
         isGM: false
       });
   }, url);
-  await expect(page.getByRole("heading", { name: "Result pending" })).toHaveCount(1);
+  await expect(page.locator(".sc2-guide-title", { hasText: "Pending" })).toHaveCount(1);
 });
 
 test("vehicle section choices and active search survive a sheet replacement", async ({ page }) => {

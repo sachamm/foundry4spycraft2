@@ -69,7 +69,7 @@ test("named check changes show relevant circumstances, omit stale inputs and upd
   page
 }) => {
   await page.setContent(`<form><div class="spycraft2-roll-options">
-    <select name="check"><option value="balance">Balance Check (DEX, Active, error 1–1)</option><option value="tumble">Tumble Check (DEX, Active, error 1–1)</option><option value="repair">Repair Check (INT, Active, error 1–1)</option></select>
+    <select name="check"><option value="balance">Balance Check</option><option value="tumble">Tumble Check</option><option value="repair">Repair Check</option></select>
     <select name="ability"><option value="dex">DEX</option><option value="int">INT</option></select>
     <details><summary>Balance</summary><input name="balanceCircumstances" type="checkbox" /><input name="balanceSurface" value="slippery" /></details>
     <details><summary>Tumble</summary><input name="tumbleCircumstances" type="checkbox" /></details>

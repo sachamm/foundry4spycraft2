@@ -18,7 +18,7 @@ export async function grantFortunate(actor, options = {}) {
   if (!FORTUNATE_MATCH.includes(input.match)) throw new Error(loc`Choose who gains the matching die.`);
   const opponentName = typeof input.opponentName === "string" ? input.opponentName.trim().slice(0, 200) : "";
   if (input.match === "gc" && !gcDiceStatus().current)
-    throw new Error(loc`Initialize the GC pool for this session first.`);
+    throw new Error(loc`Set up the GC action dice for this session first.`);
   const blocked = restraintActionBlock(actor.system, { free: true });
   if (blocked) throw new Error(blocked);
   return actor.useLimitedAbility(
@@ -35,7 +35,7 @@ export async function grantFortunate(actor, options = {}) {
         try {
           await adjustGCDice(1, loc`Fortunate: ${actor.name}`);
         } catch (error) {
-          matchNote = loc`The GC’s matching d4 could not be added (${error.message}); add it from the GC dice console.`;
+          matchNote = loc`The GC’s matching d4 could not be added (${error.message}); add it from the GC Console.`;
           ui.notifications.warn(matchNote);
         }
       await ChatMessage.create({

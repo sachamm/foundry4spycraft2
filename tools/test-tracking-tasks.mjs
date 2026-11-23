@@ -462,7 +462,7 @@ test("actual take20 Tracking uses the exception with no errors or dice boosts an
 test("printed minimum two applies before reductions, retains the reduced minimum one and leaves tasks above ten legal", async () => {
   for (const names of [[], ["Forensic Genius"], ["Tracking Mastery"], ["Forensic Genius", "Tracking Mastery"]]) {
     const a = source(actor(), names);
-    await assert.rejects(create(a, { baseChallenges: 1 }), /at least2/);
+    await assert.rejects(create(a, { baseChallenges: 1 }), /at least 2/);
     assert.equal(Object.keys(a.system.analysisTasks ?? {}).length, 0);
     const t = await create(a, { baseChallenges: 2 }),
       expected = names.length ? 1 : 2;

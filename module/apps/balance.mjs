@@ -4,7 +4,7 @@ import { loc } from "../i18n.mjs";
 export function balanceSurfaceContent(key) {
   if (key !== "acrobatics") return "";
   const esc = foundry.utils.escapeHTML;
-  return `<details><summary>${loc`Balance surface and movement`}</summary><p>${loc`For Acrobatics/Balance only. Choose the actual Table2.10 row; the GC resolves the overlapping walkway rows at exactly3inches. Inclines above60° require Climb. Equilibrium’s qualified current benefits apply automatically on the relevant surfaces.`}</p><label><input name="balanceCircumstances" type="checkbox" /> ${loc`Use these GC-confirmed Balance circumstances`}</label><label>${loc`Surface`} <select name="balanceSurface">${Object.entries(
+  return `<details><summary>${loc`Balance surface and movement`}</summary><p>${loc`For Acrobatics/Balance only. Choose the actual Table 2.10 row; the GC resolves the overlapping walkway rows at exactly3inches. Inclines above60° require Climb. Equilibrium’s qualified current benefits apply automatically on the relevant surfaces.`}</p><label><input name="balanceCircumstances" type="checkbox" /> ${loc`Use these GC-confirmed Balance circumstances`}</label><label>${loc`Surface`} <select name="balanceSurface">${Object.entries(
     BALANCE_SURFACES
   )
     .map(([id, row]) => `<option value="${id}">${esc(row.label)}</option>`)

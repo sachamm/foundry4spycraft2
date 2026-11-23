@@ -58,7 +58,13 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
   root.prepend(quick);
   const submit = dialog.element.querySelector('[data-action="ok"]');
   const ability = root.querySelector('[name="ability"]');
+  // One line under the select says what the chosen check uses, so the options themselves stay short names.
+  const detail = doc.createElement("p");
+  detail.className = "hint sc2-check-detail";
+  (check.closest("label") ?? check).after(detail);
   function update() {
+    detail.textContent = check.selectedOptions[0]?.dataset.detail ?? "";
+    detail.hidden = !detail.textContent;
     const selected = checks.find(row => row.id === check.value);
     if (ability && selected) {
       for (const option of ability.options) option.disabled = !selected.attributes.includes(option.value);
@@ -79,7 +85,7 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
       }
       section.classList.toggle("sc2-check-context", !!relevant);
     }
-    const name = check.selectedOptions[0]?.textContent.replace(/ \([^)]*\)$/, "") ?? "check";
+    const name = check.selectedOptions[0]?.textContent.replace(/ · [^·]*$/, "") ?? "check";
     const method = root.querySelector('[name="method"]')?.value ?? "roll";
     if (submit) {
       const label =
@@ -93,5 +99,5 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
   check.addEventListener("change", update);
   root.querySelector('[name="method"]')?.addEventListener("change", update);
   update();
-  installResolutionGuide(root, "skill");
+  installResolutionGuide(root, "skill", { append: true });
 }

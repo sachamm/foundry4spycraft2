@@ -4,7 +4,7 @@ Original artwork and interface details for a restrained 1960s spy-film dossier a
 
 | Asset | Used by |
 | --- | --- |
-| `assets/retro/agency-seal.svg` | Decorative emblem in each dossier band |
+| `assets/retro/agency-seal.svg` | Decorative emblem (not shown in the current skin) |
 
 `system.json` loads `styles/retro.css` after the original sheet CSS. Asset paths are relative to the stylesheet, except the seal's Foundry system URL. Assets ship with the existing release workflow. No external image host or font service is needed. The paper texture, the header band image and the film-strip tab border are no longer used and were removed; the prompts below are kept as a record.
 

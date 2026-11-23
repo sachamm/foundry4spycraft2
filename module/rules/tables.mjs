@@ -12169,7 +12169,7 @@ export const VEHICLE_RULES = {
   ],
   "TRK": [
    "Tracked",
-   "Better in rough terrain; tyre saves are against half damage."
+   "Better in rough terrain; tire saves are against half damage."
   ],
   "TRO": [
    "Trained only",

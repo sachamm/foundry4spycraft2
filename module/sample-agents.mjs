@@ -48,7 +48,9 @@ async function importCompanions(owner) {
     return { created };
   } catch (error) {
     console.error("Spycraft 2.0 | Sample companion import failed", error);
-    ui.notifications.warn(loc`The sample companion could not finish importing. It will retry on the next GM launch.`);
+    ui.notifications.warn(
+      loc`The sample companion could not finish importing. It will retry the next time the GC opens the world.`
+    );
     return { error };
   }
 }

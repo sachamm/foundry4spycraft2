@@ -31,7 +31,7 @@ const FIXTURES = {
       "Control check",
       "Damage save",
       "Vehicle Damage result",
-      "Tyre save",
+      "Tire save",
       "Fuel explosion",
       "Repaired",
       "Jamming on",

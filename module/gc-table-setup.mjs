@@ -67,7 +67,9 @@ async function importMissingTables() {
     return { created };
   } catch (error) {
     console.error("Spycraft 2.0 | GC table setup failed", error);
-    ui.notifications.warn(loc`GC table setup could not finish. Missing tables will retry on the next GM launch.`);
+    ui.notifications.warn(
+      loc`GC table setup could not finish. Missing tables will retry the next time the GC opens the world.`
+    );
     return { error };
   }
 }

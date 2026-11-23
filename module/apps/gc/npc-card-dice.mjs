@@ -88,7 +88,14 @@ rollPipeline.register({
       /* an incomplete NPC profile rolls the basic die */
     }
     const controls = gcBoostable(check)
-      ? [{ label: loc`GC boost (+1d${die})`, placement: "card", run: () => gcBoostCard(message, actor) }]
+      ? [
+          {
+            label: loc`GC boost (+1d${die})`,
+            key: "gcBoost",
+            placement: "card",
+            run: () => gcBoostCard(message, actor)
+          }
+        ]
       : [];
     if (check.threatConfirmed && !check.criticalSuccess && !check.criticalFailure)
       controls.unshift({

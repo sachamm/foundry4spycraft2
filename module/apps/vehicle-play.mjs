@@ -227,7 +227,7 @@ export async function rollVehicleDamageResult(
   else if (location.code === "Tract") {
     const half = hasQuality(actor.system.qualitiesNow, "TRK");
     lines.push(
-      loc`A tyre${half ? loc` (tracks: against half damage)` : ""} must make its own Damage save${damage ? loc` against ${half ? Math.floor(damage / 2) : damage} damage` : ""} (bonus +${tractionSaveBonus(objectSize(actor))}). Use “Tyre save” on the vehicle sheet.`
+      loc`A tire${half ? loc` (tracks: against half damage)` : ""} must make its own Damage save${damage ? loc` against ${half ? Math.floor(damage / 2) : damage} damage` : ""} (bonus +${tractionSaveBonus(objectSize(actor))}). Use “Tire save” on the vehicle sheet.`
     );
   } else if (["Cargo", "W/G", "Occ", "Animal"].includes(location.code)) {
     const amount = passOn(location.code === "Animal" ? 0 : 1);
@@ -309,8 +309,8 @@ export async function rollTyreSave(actor, options = {}) {
   let damage = options.damage;
   if (!Number.isSafeInteger(damage)) {
     const input = await ask(
-      loc`${actor.name}: tyre Damage save`,
-      `<label>${loc`Damage of the attack that hit the tyre`} <input name="damage" type="number" min="1" step="1" required autofocus /></label>`
+      loc`${actor.name}: tire Damage save`,
+      `<label>${loc`Damage of the attack that hit the tire`} <input name="damage" type="number" min="1" step="1" required autofocus /></label>`
     );
     if (!input) return null;
     damage = Number(input.damage);
@@ -326,7 +326,7 @@ export async function rollTyreSave(actor, options = {}) {
     punctured = roll.total < dc;
   const message = await roll.toMessage({
     speaker: speakerFor(actor),
-    flavor: `<strong>${esc(actor.name)}</strong> ${loc`— tyre Damage save, DC ${dc}${tracked ? loc` (tracks: half damage)` : ""} (bonus +${bonus}${houseRule ? loc`, house rule` : ""})`}<br>${punctured ? loc`Punctured: recorded on the vehicle.` : loc`The tyre holds.`}`
+    flavor: `<strong>${esc(actor.name)}</strong> ${loc`— tire Damage save, DC ${dc}${tracked ? loc` (tracks: half damage)` : ""} (bonus +${bonus}${houseRule ? loc`, house rule` : ""})`}<br>${punctured ? loc`Punctured: recorded on the vehicle.` : loc`The tire holds.`}`
   });
   if (punctured && actor.isOwner)
     await actor.update({ "system.damage.traction": (actor.system.damage?.traction ?? 0) + 1 });

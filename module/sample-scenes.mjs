@@ -47,7 +47,7 @@ export async function setupSampleScenes() {
   } catch (error) {
     console.error(loc`Spycraft 2.0 | Sample scene setup failed`, error);
     ui.notifications.warn(
-      loc`Sample scene setup could not finish. It will retry on the next GM launch; you can also import scenes from the Sample Scenes compendium.`
+      loc`Sample scene setup could not finish. It will retry the next time the GC opens the world; you can also import scenes from the Sample Scenes compendium.`
     );
   }
 }

@@ -31,7 +31,7 @@ export function resolutionGuide(kind) {
     default:
       return {
         automatic: loc`Calculates the selected check method and includes supported modifiers from the sheet and selected options.`,
-        manual: loc`Choose the check and circumstances. Compare with the difficulty or opposing result; use Confirm result when offered, then close the outcome. Resolve unlisted effects at the table.`
+        manual: loc`Choose the check and circumstances. Compare with the difficulty or opposing result; use Confirm result when offered, then press Finish. Resolve unlisted effects at the table.`
       };
   }
 }
@@ -43,9 +43,9 @@ export function installResolutionGuide(root, kind, { collapsed = true, append = 
   guide.className = "sc2-resolution-guide";
   if (collapsed) {
     const summary = doc.createElement("summary");
-    summary.textContent = loc`Automatic vs table / GC steps`;
+    summary.textContent = loc`What the system does for you`;
     guide.append(summary);
-  } else guide.setAttribute("aria-label", loc`Automatic vs table / GC steps`);
+  } else guide.setAttribute("aria-label", loc`What the system does for you`);
   const descriptions = resolutionGuide(kind);
   for (const [label, text] of [
     [loc`System:`, descriptions.automatic],
