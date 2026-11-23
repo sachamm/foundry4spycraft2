@@ -20,6 +20,15 @@
 - **Taller roll dialogs.** A dialog's body used to stop at half the screen height (360px at 1280×720). It now uses
   the height left after the header and footer, and scrolls as one box.
 
+- **Text you write looks like text.** A heading in a biography or an item description was drawn as a sheet section
+  bar, tables were centred, and links turned red on hover. Rich text now keeps plain headings, left-aligned tables
+  and the normal link colour.
+- **Lighter icon artwork.** The painted icon sheets went from 18.5 MB to 1.3 MB with no change at the sizes they
+  are drawn. Four images nothing used were removed.
+- **Renamed or translated feats keep their buttons.** Feat buttons on the Feats tab, the focus a named skill check
+  falls under, and the Size modifier on Hide were chosen from displayed English names. They now use the rule name
+  and the check's id, so a translation cannot switch them off.
+
 - **The browser keeps the search box while you type.** Typing in a browser's search or changing a filter redrew the
   whole window, filters included. Only the result list is redrawn now, and each entry's summary is worked out once
   per open window. Prerequisites are still checked on every draw.

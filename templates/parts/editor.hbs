@@ -1,2 +1,2 @@
 {{!-- Rich text: an editor for whoever may edit the document, the enriched text for everyone else. Hash: field, value, enriched. --}}
-{{#if editable}}<prose-mirror toggled name="{{field}}" value="{{value}}">{{{enriched}}}</prose-mirror>{{else}}{{{enriched}}}{{/if}}
+{{#if editable}}<prose-mirror toggled name="{{field}}" value="{{value}}">{{{enriched}}}</prose-mirror>{{else}}<div class="sc2-prose">{{{enriched}}}</div>{{/if}}

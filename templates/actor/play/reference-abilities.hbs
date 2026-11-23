@@ -33,7 +33,7 @@
       <div class="edit-only">{{#each fields}}
         <label>{{label}} {{#if text}}<input type="text" name="originChoice.{{../id}}.{{key}}" value="{{value}}" />{{else}}<select name="originChoice.{{../id}}.{{key}}">{{selectOptions options selected=value blank="—"}}</select>{{/if}}</label>
       {{/each}}</div>
-      <div>{{{description}}}</div>
+      <div class="sc2-prose">{{{description}}}</div>
     </details>
   {{/each}}
 

@@ -14,6 +14,7 @@
  * does not fit the card (the requester did not roll it, the amount was raised); any concern puts the request on an
  * Allow card even when the world applies requests without asking.
  */
+import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { loc, locKey } from "../i18n.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
@@ -33,11 +34,7 @@ export function registerRelay(action, handler) {
 }
 
 const autoApprove = () => {
-  try {
-    return game.settings.get("spycraft2", "relayAutoApprove") === true;
-  } catch {
-    return false;
-  }
+  return readSetting("relayAutoApprove", false) === true;
 };
 
 /** The GC's side: check the request, ask if needed, do it. Always answers with { value } or { error }. */

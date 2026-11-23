@@ -13,6 +13,7 @@
  * The rules are in module/rules/damage-application.mjs. Whoever applies damage must own the target: the GC, or the
  * target's own player.
  */
+import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { enhanceDamageDialog } from "./dialog-sections.mjs";
@@ -122,11 +123,7 @@ function readableTarget(actor) {
 
 /** Players see an opponent's listed Defense when resolving (a world setting, on unless the GC turns it off). */
 export function defenseVisibleToPlayers() {
-  try {
-    return game.settings.get("spycraft2", "showDefenseToPlayers") !== false;
-  } catch {
-    return true;
-  }
+  return readSetting("showDefenseToPlayers", true) !== false;
 }
 
 /** A target's label in a picker: its token's name when it differs, and a mark for an actor not on the scene. */

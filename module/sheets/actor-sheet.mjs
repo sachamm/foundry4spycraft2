@@ -133,6 +133,7 @@ import {
 } from "../apps/gc/npc-play.mjs";
 import { costsAction } from "../apps/gc/combat.mjs";
 import { loc } from "../i18n.mjs";
+import { featActions } from "./feat-actions.mjs";
 import { esc } from "../html.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
@@ -1124,12 +1125,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
 
     // Feats
     context.feats = byType("feat")
-      .map(f => ({
-        item: f,
-        treeLabel: cfg.featTrees[f.system.tree] ?? f.system.tree,
-        status: sys.featStatus?.[f.id] ?? { ok: true, unmet: [] },
-        prereqText: describePrereq(f.system.prerequisites)
-      }))
+      .map(f => {
+        const status = sys.featStatus?.[f.id] ?? { ok: true, unmet: [] };
+        return {
+          item: f,
+          treeLabel: cfg.featTrees[f.system.tree] ?? f.system.tree,
+          status,
+          actions: featActions(f, { qualified: status.ok, isGM: game.user.isGM }),
+          prereqText: describePrereq(f.system.prerequisites)
+        };
+      })
       .sort((a, b) => a.treeLabel.localeCompare(b.treeLabel) || a.item.name.localeCompare(b.item.name));
     context.featTrees = Object.entries(sys.feats?.trees ?? {})
       .filter(([, v]) => v.slots || v.spent || v.owned)

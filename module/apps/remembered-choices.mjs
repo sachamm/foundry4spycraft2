@@ -9,6 +9,7 @@
  *
  * Nothing here is stored on the actor: a remembered choice is a convenience for the person rolling.
  */
+import { readSetting } from "../settings.mjs";
 import { loc, locKey } from "../i18n.mjs";
 import { measureAttack, mapAvailable } from "./map.mjs";
 
@@ -100,12 +101,7 @@ export function registerFastPathSetting() {
 
 /** Whether this click should roll straight away. */
 export function skipDialog(event) {
-  let swapped = false;
-  try {
-    swapped = game.settings.get("spycraft2", "skipRollDialogs") === true;
-  } catch {
-    /* not registered (tests) */
-  }
+  const swapped = readSetting("skipRollDialogs", false) === true;
   return (event?.shiftKey === true) !== swapped;
 }
 

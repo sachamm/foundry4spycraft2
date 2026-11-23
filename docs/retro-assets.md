@@ -4,12 +4,9 @@ Original artwork and interface details for a restrained 1960s spy-film dossier a
 
 | Asset | Used by |
 | --- | --- |
-| `assets/retro/dossier-paper.webp` | Agent, NPC, item, and browser window backgrounds |
-| `assets/retro/surveillance-header.webp` | Decorative dossier bands on all four surfaces |
 | `assets/retro/agency-seal.svg` | Decorative emblem in each dossier band |
-| `assets/retro/microfilm.svg` | Character sheet tab navigation border |
 
-`system.json` loads `styles/retro.css` after the original sheet CSS. Asset paths are relative to the stylesheet, except the seal's Foundry system URL. Assets ship with the existing release workflow. No external image host or font service is needed. The two WebP images total approximately 65 KB.
+`system.json` loads `styles/retro.css` after the original sheet CSS. Asset paths are relative to the stylesheet, except the seal's Foundry system URL. Assets ship with the existing release workflow. No external image host or font service is needed. The paper texture, the header band image and the film-strip tab border are no longer used and were removed; the prompts below are kept as a record.
 
 The ivory sheet palette is intentionally consistent in light and dark Foundry surroundings. Keyboard focus uses an explicit burgundy outline. Decorative header content is hidden from assistive technology. Increased-contrast preferences remove the paper texture. Existing portrait selection, roll actions, fields, and tab identifiers are preserved.
 

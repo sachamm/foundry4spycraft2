@@ -2,6 +2,7 @@
  * Tell a player when the combat reaches a character they control, so nobody has to watch the tracker.
  * A client setting turns it off.
  */
+import { readSetting } from "../settings.mjs";
 import { loc, locKey } from "../i18n.mjs";
 
 /** Whether this user should hear that the acting combatant is theirs. */
@@ -14,12 +15,7 @@ export function isMyTurn(combat, user = game.user) {
 
 export function announceTurn(combat, changed) {
   if (!("turn" in (changed ?? {})) && !("round" in (changed ?? {}))) return false;
-  let enabled = true;
-  try {
-    enabled = game.settings.get("spycraft2", "turnNotice") !== false;
-  } catch {
-    /* not registered */
-  }
+  const enabled = readSetting("turnNotice", true) !== false;
   if (!enabled || !isMyTurn(combat)) return false;
   ui.notifications.info(loc`Your turn: ${combat.combatant.name}.`);
   combat.combatant.actor?.sheet?.element?.querySelector?.(".round-tracker")?.classList.add("sc2-your-turn");

@@ -3,6 +3,7 @@
  * flat-footed at the start, tie-breaking by Initiative bonus, fluid initiative at the end of each
  * round, Delay / Press / Ready, group initiative for NPCs and surprise rounds.
  */
+import { readSetting } from "../../settings.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
@@ -43,11 +44,7 @@ const options = (rows, selected) =>
     )
     .join("");
 const setting = key => {
-  try {
-    return game.settings.get("spycraft2", key);
-  } catch {
-    return false;
-  }
+  return readSetting(key, false);
 };
 const fluid = combatant =>
   combatant.flags?.spycraft2?.fluid ?? { round: null, modifiers: [], delayed: 0, pressed: false };
@@ -183,12 +180,7 @@ export async function recordFluidEvent(combatant, id, input = {}) {
  * nothing was recorded (no combat, not a combatant, not allowed, or already recorded this round).
  */
 export async function recordAutomaticFluidEvent(actor, id) {
-  let enabled = true;
-  try {
-    enabled = game.settings.get("spycraft2", "autoFluidEvents") !== false;
-  } catch {
-    /* not registered */
-  }
+  const enabled = readSetting("autoFluidEvents", true) !== false;
   const combat = game.combat;
   if (!enabled || !combat?.started || !actor) return null;
   const combatant = [...combat.combatants].find(

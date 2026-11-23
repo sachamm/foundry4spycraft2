@@ -209,14 +209,14 @@
   background-position: var(--sc2-icon-x) var(--sc2-icon-y);
   background-repeat: no-repeat;
 }
-.sc2-icon-button[data-sc2-sheet="0"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-0.png"); }
-.sc2-icon-button[data-sc2-sheet="1"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-1.png"); }
-.sc2-icon-button[data-sc2-sheet="2"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-2.png"); }
-.sc2-icon-button[data-sc2-sheet="3"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-3.png"); }
-.sc2-icon-button[data-sc2-sheet="4"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-4.png"); }
-.sc2-icon-button[data-sc2-sheet="5"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-5.png"); }
-.sc2-icon-button[data-sc2-sheet="6"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-6.png"); }
-.sc2-icon-button[data-sc2-sheet="time"] > .sc2-button-icon { background-image: url("../assets/ui/functions/time.png"); }
+.sc2-icon-button[data-sc2-sheet="0"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-0.webp"); }
+.sc2-icon-button[data-sc2-sheet="1"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-1.webp"); }
+.sc2-icon-button[data-sc2-sheet="2"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-2.webp"); }
+.sc2-icon-button[data-sc2-sheet="3"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-3.webp"); }
+.sc2-icon-button[data-sc2-sheet="4"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-4.webp"); }
+.sc2-icon-button[data-sc2-sheet="5"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-5.webp"); }
+.sc2-icon-button[data-sc2-sheet="6"] > .sc2-button-icon { background-image: url("../assets/ui/functions/functions-6.webp"); }
+.sc2-icon-button[data-sc2-sheet="time"] > .sc2-button-icon { background-image: url("../assets/ui/functions/time.webp"); }
 .sc2-icon-button[data-sc2-mode="icon"] {
   flex: 0 0 auto; width: 32px; min-width: 32px; height: 32px; min-height: 32px; padding: 2px; line-height: 1;
 }

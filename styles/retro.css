@@ -117,8 +117,6 @@
   flex-wrap: wrap;
   padding: 9px 0 6px;
   margin: 8px 0 4px;
-  border-top: 6px solid transparent;
-  border-image: url('../assets/retro/microfilm.svg') 6 repeat;
 }
 .spycraft2.application .sheet-tabs a { padding: 5px 8px; border: 1px solid var(--sc2-rule); text-shadow: none; }
 .spycraft2.application .sheet-tabs a.active { color: var(--sc2-on-action); background: var(--sc2-action); border-color: var(--sc2-action); }
@@ -269,8 +267,8 @@
 .spycraft2.sheet.agent .inventory-empty { padding:12px; line-height:1.5; color:var(--sc2-ink-muted); text-align:left; }
 .spycraft2.sheet.agent .inventory-table-wrap { max-width:100%; overflow-x:auto; margin:8px 0 16px; }
 .spycraft2.sheet.agent .inventory-table { min-width:620px; }
-.spycraft2.sheet.agent .inventory-table[aria-label="Gear"] { min-width:560px; }
-.spycraft2.sheet.agent .inventory-table[aria-label="Vehicles"] { min-width:700px; }
+.spycraft2.sheet.agent .inventory-table[data-kind="gear"] { min-width:560px; }
+.spycraft2.sheet.agent .inventory-table[data-kind="vehicles"] { min-width:700px; }
 .spycraft2.sheet.agent .inventory-table :is(th,td) { padding:7px 8px; vertical-align:top; }
 .spycraft2.sheet.agent .inventory-table td:first-child { min-width:160px; overflow-wrap:anywhere; }
 .spycraft2.sheet.agent .inventory-table abbr { text-decoration:none; cursor:help; }

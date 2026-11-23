@@ -17,7 +17,7 @@
     <header class="preview-head">{{#if preview.img}}<img src="{{preview.img}}" alt="" />{{/if}}<div><strong class="preview-name">{{preview.name}}</strong><span class="muted">{{preview.groupLabel}}{{#if preview.extra}} · {{preview.extra}}{{/if}}</span></div></header>
     {{#unless preview.qualified}}<p><span class="sc2-stamp">{{localize "SPYCRAFT.Browser.NotQualified"}}</span></p>{{/unless}}
     {{#if preview.prereq}}<p class="prereq {{#unless preview.qualified}}bad{{/unless}}">{{preview.prereq}}</p>{{/if}}
-    <div class="preview-text">{{{preview.description}}}</div>
+    <div class="preview-text sc2-prose">{{{preview.description}}}</div>
     <p class="preview-actions">
       {{#if actor}}<button type="button" class="sc2-primary-action" data-sc2-display="text" data-action="add" {{#if preview.locked}}disabled data-tooltip="{{localize 'SPYCRAFT.Browser.OwnedHint'}}"{{/if}}>{{localize 'SPYCRAFT.Browser.AddEntry' name=preview.name}}</button>{{/if}}
       <button type="button" data-action="open">{{localize "SPYCRAFT.Browser.OpenSheet"}}</button>

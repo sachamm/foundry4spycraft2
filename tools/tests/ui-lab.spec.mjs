@@ -123,3 +123,30 @@ for (const theme of ["light", "dark"])
     expect(contrast(colours.headRule, colours.surface), JSON.stringify(colours)).toBeGreaterThanOrEqual(3);
     expect(contrast(colours.tabMark, colours.surface), JSON.stringify(colours)).toBeGreaterThanOrEqual(3);
   });
+
+test("rich text keeps document styling: a heading is not a section bar and a table is not centred", async ({
+  page
+}) => {
+  await openLab(page);
+  const styles = await page.evaluate(() => {
+    const app = document.querySelector(".lab-app");
+    const box = document.createElement("div");
+    box.innerHTML = `<h3 id="bar">Section</h3><div class="sc2-prose"><h3 id="prose">Heading</h3><table><thead><tr><th>A</th><th id="head">B</th></tr></thead><tbody><tr><td>1</td><td id="cell">2</td></tr></tbody></table><details><summary id="sum">More</summary></details></div>`;
+    app.append(box);
+    const style = id => getComputedStyle(document.getElementById(id));
+    return {
+      bar: style("bar").backgroundColor,
+      prose: style("prose").backgroundColor,
+      proseDisplay: style("prose").display,
+      cell: style("cell").textAlign,
+      head: style("head").textAlign,
+      summary: style("sum").minHeight
+    };
+  });
+  expect(styles.bar).not.toBe("rgba(0, 0, 0, 0)");
+  expect(styles.prose).toBe("rgba(0, 0, 0, 0)");
+  expect(styles.proseDisplay).toBe("block");
+  expect(styles.cell).toBe("left");
+  expect(styles.head).toBe("left");
+  expect(styles.summary).toBe("0px");
+});
