@@ -110,6 +110,24 @@ test("item creation records current acquisition eligibility and updates invalida
   assert.equal(changed["system.historicalPrerequisitesConfirmed"], false);
 });
 
+test("a feat moved from a token's own copy to its character keeps its saved acquisition check", async () => {
+  const parent = {
+    type: "agent",
+    system: { level: 3 },
+    items: [],
+    checkPrerequisites: () => ({ ok: false, unmet: ["missing prerequisite"] })
+  };
+  const saved = { level: 3, ok: true };
+  const item = new SpycraftItem(
+    { id: "moved", type: "feat", system: feat({ acquiredAtLevel: 3, acquisitionCheck: saved }).system },
+    parent
+  );
+  item.changes = undefined;
+  await item._preCreate({}, { spycraft2TokenLink: true });
+  assert.equal(item.changes, undefined);
+  assert.deepEqual(item.system.acquisitionCheck, saved);
+});
+
 test("snapshot qualification excludes the candidate feat’s own bonuses", () => {
   const actor = new SpycraftActor(),
     item = feat({ granted: true, prerequisites: null, bonuses: [{ target: "abilities.str", value: "5" }] });

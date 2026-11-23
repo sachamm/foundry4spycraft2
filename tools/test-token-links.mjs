@@ -113,7 +113,8 @@ test("a token's own changes become an update of its character", () => {
       { _id: RESOURCE_LOCK_ID, name: "lock", type: "gear", flags: { spycraft2: { resourceLock: { token: "x" } } } }
     ],
     effects: [{ _id: "e1", name: "Shaken", changes: [] }],
-    ownership: { default: 0, u1: 3, u2: 3 }
+    // u3 has no entry on the character, so the character's default (Observer) is what they have.
+    ownership: { default: 0, u1: 3, u2: 3, u3: 1 }
   };
   const changes = deltaChanges(delta, baseSource());
   assert.deepEqual(changes.actor, {

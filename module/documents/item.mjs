@@ -36,6 +36,9 @@ export class SpycraftItem extends Item {
   async _preCreate(data, options, user) {
     if ((await super._preCreate(data, options, user)) === false) return false;
     options.spycraft2Client = CLIENT_ID;
+    // An item moved from a token's own copy to its character (module/apps/token-links.mjs) is the same item, not a new
+    // pick: it keeps its equipped state and the acquisition check saved when it was first taken.
+    if (options.spycraft2TokenLink) return;
     // Only one weapon of a batch is equipped: the options object is shared by every document the call creates.
     if (
       this.parent?.type === "agent" &&

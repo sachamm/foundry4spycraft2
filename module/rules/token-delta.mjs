@@ -60,8 +60,9 @@ export function deltaChanges(delta, baseSource = {}) {
     const raised = {};
     for (const [user, level] of Object.entries(delta.ownership)) {
       if (!Number.isFinite(level)) continue;
-      const current = baseSource?.ownership?.[user] ?? (user === "default" ? 0 : null);
-      if (current === null || level > current) raised[user] = level;
+      // A user without an entry of their own has the character's default level.
+      const current = baseSource?.ownership?.[user] ?? baseSource?.ownership?.default ?? 0;
+      if (level > current) raised[user] = level;
     }
     if (Object.keys(raised).length) actor.ownership = raised;
   }
