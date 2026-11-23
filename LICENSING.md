@@ -1,8 +1,10 @@
 # Licensing and provenance
 
-This file records existing license notices and known content sources. It does
-not apply a new umbrella license to this repository or grant rights in material
-owned by someone else. Public availability and the project's unofficial status
+This file records existing license notices and known content sources. The
+rules data identified below is Open Game Content under the Open Game License
+1.0a; see [that section](#open-game-license-for-this-projects-rules-data).
+No umbrella license applies to the rest of the repository, and nothing here
+grants rights in material owned by someone else. Public availability and the project's unofficial status
 do not by themselves establish permission for every component.
 
 ## Files with an existing MPL 2.0 notice
@@ -34,9 +36,9 @@ links [spycraft2generator.zip](https://www.erikdewey.com/spycraft2generator.zip)
 and labels it last updated 5/9/07. The retrieved archive contains one file,
 `spycraft generator3.xls`, and no separate license or readme. The archive's SHA-256 is
 `ddae94ecd09acf6f85a652399a1c644b30c4249ffbc6033fc093f51449602fc7`.
-No adaptation or redistribution grant has yet been established for that import;
-crediting the spreadsheet author does not establish rights in the underlying
-published game or in all imported material.
+No adaptation or redistribution grant has been established for the
+spreadsheet itself. The game mechanics taken from it are used as the book's
+Open Game Content; see the OGL section below.
 
 The repository's requirements for original summaries remain in
 [AGENTS.md](AGENTS.md). Those requirements and the presence of page references
@@ -114,32 +116,77 @@ The printed list does not include an entry for the *Spycraft 2.0 Rulebook*
 itself. A work that reuses the book's Open Game Content would add one, using
 the notice the book requests.
 
-## This project's position under the OGL
+## Open Game License for this project's rules data
 
-This project does not currently distribute anything under the OGL. No OGL text,
-section 15 notice or Open Game Content designation is applied to the
-repository, and no publisher permission is asserted. The game data instead
-records names, numbers and table values as bare labels with original summaries,
-as [AGENTS.md](AGENTS.md) requires.
+This project uses the rulebook's Open Game Content under the Open Game License
+version 1.0a.
 
-Adopting the OGL for the rules data would require, at a minimum:
+**Notice (OGL section 2).** The Open Game Content identified below may only be
+Used under and in terms of the Open Game License version 1.0a. A copy of the
+licence, with this project's section 15 COPYRIGHT NOTICE, is in
+[LICENSES/OGL-1.0a.txt](LICENSES/OGL-1.0a.txt) and ships in every release
+archive (section 10).
 
-1. A copy of the OGL 1.0a with every distributed copy (section 10), in
-   `LICENSES/` and therefore in each release archive.
-2. A section 15 that reproduces the book's list above exactly, then adds the
-   book's own notice and this project's title, date and copyright holder
-   (section 6).
-3. A clear statement of which files are Open Game Content (section 8), for
-   example the mechanical data in `src/data/` and the compendium packs built
-   from it.
-4. Removing or replacing any Product Identity (section 7), and not indicating
-   compatibility with any Trademark, including the Spycraft name, without a
-   separate agreement with its owner.
+**Section 15 (OGL section 6).** That notice reproduces the book's list exactly,
+then adds the notice the book asks reusers of its own content to carry and this
+project's own title, date and copyright holder. The game rules in this project
+come from the *Spycraft 2.0 Rulebook*, as the book asks reusers to credit.
 
-Item 4 conflicts with the system's current title, "Spycraft 2.0", and with the
-README and manifest that describe it as a Spycraft system. Using the OGL
-therefore means either renaming the system or obtaining a separate trademark
-agreement, which is why it has not been applied here.
+**Designation of Open Game Content (OGL section 8).** The following are Open
+Game Content:
+
+- The game mechanics recorded in these files under `src/data/`: `ammunition`,
+  `campaign-qualities`, `classes`, `conflicts`, `contagions`, `core`,
+  `equipment`, `feat-reminders`, `feats`, `gc-core`, `gc-tables`, `gear`,
+  `gear-summaries`, `kits`, `npc-common-items`, `npc-packages`,
+  `npc-templates`, `npcs`, `origins`, `rollable-tables`, `summaries`,
+  `upgrades` and `vehicles` (each `.json`), including the original rules
+  summaries in them, and the compendium entries built from those files.
+- The game statistics (abilities, classes, levels, skills, feats, gear,
+  grades and qualities) of the sample agents, sample NPCs and the sample
+  adventure in `sample-agents.json`, `sample-npcs.json` and `glass-wake.json`.
+- Rule names and rule summaries in `lang/en.json`.
+
+**Not Open Game Content.** Everything else is not Open Game Content. That
+includes all source code, templates and styles; the names, codenames,
+backgrounds, descriptions, stories and dialogue of the sample agents, sample
+NPCs and the sample adventure; all artwork, icons, maps, textures and the
+soundtrack; and the documentation. Code under MPL 2.0 remains under that
+licence only.
+
+**The rulebook's Product Identity (OGL section 7).** This project does not
+claim any right to the rulebook's Product Identity and aims not to use it.
+The rules data keeps to game mechanics. The sample agents, NPCs, organization
+and adventure are original to this project and do not use the book's setting
+characters, organizations or stories. Rule terms that the book also uses as
+mechanics, such as class, feat, gear and gadget names, are treated as part of
+its designated Open Game Content. The remaining exceptions are listed below.
+
+### Outstanding exceptions
+
+These points cannot be settled with what the project has now:
+
+1. **The Spycraft name.** OGL section 7 forbids indicating compatibility with
+   another party's Trademark, or using its Product Identity, without a
+   separate agreement. The system's display title ("Spycraft 2.0"), manifest
+   description, README, system id (`spycraft2`), repository name and some
+   in-game text use the Spycraft name. Complying requires either renaming the
+   system's public title and descriptions or a written agreement with the
+   trademark owner. The system id is stored in every world that uses it, so a
+   rename would need a migration plan.
+2. **Erik Dewey's spreadsheet.** The data values imported from it are the
+   book's game mechanics, which this project now uses as Open Game Content
+   from the book itself. The spreadsheet carries no licence, so any of its own
+   wording or structure that remains is not covered; it has not been audited
+   line by line.
+3. **Borderline Product Identity terms.** The book's Product Identity list
+   includes "capitalized names" and gadgets from its setting, while also
+   opening its classes and gear. Capitalized rule names such as gadget
+   modifications are treated here as Open Game Content; the book does not
+   settle this, and only the owner can.
+4. **Who owns the line today.** The OGL notices name Alderac Entertainment
+   Group. This document has not verified who now holds the Spycraft trademark
+   and copyright.
 
 ## Artwork and sample content
 

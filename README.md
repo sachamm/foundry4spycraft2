@@ -152,10 +152,14 @@ used for the initial data import. Its source archive is
 
 Spycraft is a trademark of Crafty Games. This project is unofficial and not affiliated with or endorsed by Crafty Games.
 
+This project contains Open Game Content, used under the
+[Open Game License 1.0a](LICENSES/OGL-1.0a.txt). [LICENSING.md](LICENSING.md)
+identifies which parts are Open Game Content.
+
 See [Licensing and provenance](LICENSING.md) for existing file-level licenses,
 asset sources, soundtrack provenance, and unresolved permission questions.
 
-The rulebook's protected text must not be copied into this repository. Contributions must use bare labels and original summaries as required by [AGENTS.md](AGENTS.md). Legacy imported material still needs clearance or replacement; see [LICENSING.md](LICENSING.md). You need the rulebook to play.
+The rulebook's protected text must not be copied into this repository. Contributions must use bare labels and original summaries as required by [AGENTS.md](AGENTS.md). Outstanding licensing exceptions, including use of the Spycraft name, are listed in [LICENSING.md](LICENSING.md). You need the rulebook to play.
 
 ## Installing in Foundry
 
