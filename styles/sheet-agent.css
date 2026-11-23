@@ -70,7 +70,7 @@
 .spycraft2.sheet.agent.play-mode .main-reference { flex-direction: column; gap: 0; }
 .spycraft2.sheet.agent.play-mode .main-reference > .col:first-child { order: 2; }
 .spycraft2.sheet.agent.play-mode .main-reference .stat-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
-.spycraft2.sheet.agent .stat > button[data-action] { min-height: 0; padding: 0; font: 700 var(--sc2-value-size)/1.1 var(--sc2-num); color: var(--sc2-action); background: transparent; border: 0; }
+.spycraft2.sheet.agent .stat > button[data-action] { min-height: 28px; padding: 0; font: 700 var(--sc2-value-size)/1.1 var(--sc2-num); color: var(--sc2-action); background: transparent; border: 0; }
 .spycraft2.sheet.agent .main-reference p { margin: 6px 0; }
 
 /* Reference text reads as a list of short entries, one per line. */
