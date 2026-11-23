@@ -50,7 +50,7 @@
   flex: 0 0 auto;
 }
 .spycraft2 .dossier-band .file-label {
-  font: bold 12px/1.4 var(--sc2-num);
+  font: bold var(--sc2-text-s)/1.4 var(--sc2-num);
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
@@ -60,7 +60,7 @@
   border: 1px solid var(--sc2-rule);
   color: var(--sc2-on-bar);
   background: var(--sc2-bar);
-  font: bold 12px/1.3 var(--sc2-num);
+  font: bold var(--sc2-text-s)/1.3 var(--sc2-num);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -131,7 +131,8 @@
   border-radius: var(--sc2-radius);
 }
 .spycraft2.application a:hover {
-  color: var(--sc2-danger);
+  color: var(--sc2-action);
+  text-decoration: underline;
   text-shadow: none;
 }
 .spycraft2.application h3 {
@@ -240,7 +241,7 @@
   padding: 4px 10px;
 }
 .spycraft2 .mode-label {
-  font: bold 12px/1.4 var(--sc2-num);
+  font: bold var(--sc2-text-s)/1.4 var(--sc2-num);
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }

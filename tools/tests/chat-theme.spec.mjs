@@ -66,3 +66,28 @@ test("system sheets still follow the application theme, not the interface theme"
   expect(await ink(page, "sheet")).toBe(DARK_INK);
   expect(await ink(page, "inner")).toBe(DARK_INK);
 });
+
+test("a card's primary action takes a full row and its secondary actions share a wrapping row", async ({ page }) => {
+  await page.setViewportSize({ width: 600, height: 700 });
+  await page.setContent(
+    `<style>${css}</style><ol id="chat-log" style="width:300px;list-style:none;padding:0"><li class="chat-message sc2-card"><div class="message-content"><div class="spycraft2 roll-controls"><p id="next">The GC rolls damage next.</p><button type="button" class="sc2-primary-action" id="primary">Roll damage</button><button type="button" id="a">Spend die</button><button type="button" id="b">Reroll</button><button type="button" class="sc2-quiet-action" id="c">Close</button></div></div></li></ol>`
+  );
+  const box = async id => page.locator(`#${id}`).boundingBox();
+  const [row, next, primary, a, b, c] = await Promise.all(
+    ["next", "next", "primary", "a", "b", "c"].map((id, i) =>
+      i === 0 ? page.locator(".roll-controls").boundingBox() : box(id)
+    )
+  );
+  // The sentence and the primary button each fill the row.
+  expect(next.width).toBeGreaterThan(row.width - 2);
+  expect(primary.width).toBeGreaterThan(row.width - 2);
+  // The secondaries sit side by side below it, each as wide as its label needs and at least 28px tall.
+  expect(a.y).toBeGreaterThanOrEqual(primary.y + primary.height);
+  expect(b.y).toBe(a.y);
+  expect(c.y).toBe(a.y);
+  expect(a.x + a.width).toBeLessThanOrEqual(b.x);
+  expect(a.width).toBeLessThan(row.width / 2);
+  for (const button of [a, b, c]) expect(button.height).toBeGreaterThanOrEqual(28);
+  // Nothing spills out of the card.
+  expect(c.x + c.width).toBeLessThanOrEqual(row.x + row.width + 0.5);
+});

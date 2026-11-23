@@ -20,6 +20,13 @@
 - **Taller roll dialogs.** A dialog's body used to stop at half the screen height (360px at 1280×720). It now uses
   the height left after the header and footer, and scrolls as one box.
 
+- **Shorter chat cards.** A card's main button still fills the row; its other buttons now share one wrapping row
+  instead of taking a row each.
+- **Hover is not a warning.** Links and text buttons turned red on hover, the colour kept for harm. They now take the
+  action colour and an underline. The over-budget badge on the creation track is readable in the dark theme, and
+  the GC Console's section arrow no longer animates for people who ask for reduced motion. Twenty labels set at
+  12px (chat search results, console and builder captions) are now 13px, the smallest size the style guide allows.
+
 - **Under the hood: tooling.** Layout tests now load the same stylesheets, in the same order, as a world does, and
   check the agent sheet at the sizes it opens at on 1280×720 and 1366×768 screens. Lint fails if the number of
   warnings grows, and a test stops template lines from getting longer. `npm run check:schemas` no longer exits
