@@ -52,6 +52,8 @@ export async function createCompanion(owner, feat) {
           name: loc`${owner.name}’s animal partner`,
           type: "npc",
           ownership,
+          // One particular animal: its token is linked, so changes made through it reach this actor.
+          prototypeToken: { actorLink: true },
           system: {
             companionOf,
             npcType: "animal",

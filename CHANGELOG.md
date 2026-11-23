@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Agent tokens are the agent.** A player who opened an agent from its token on a scene could edit a copy that
+  belonged to that token alone, so the character in the Actors list never got the changes. Agents and animal
+  partners are now always placed with linked tokens. On the first load, existing agents and companions are switched
+  to linked tokens, and so are placed tokens with no changes of their own. Any placed token that does hold changes
+  is listed for the GC: a ticked row copies the token's changes to the character, then links the token.
 - **Style-guide audit, rules and results.** The Dying button follows the character's size instead of a fixed
   −1 to −9 band. A standard NPC built by hand no longer shows vitality and wounds boxes it does not use. Attack
   cards say "Critical hit" and "Critical miss"; other checks keep "Critical success" and "Critical failure". Threat

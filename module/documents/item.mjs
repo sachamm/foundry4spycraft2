@@ -36,6 +36,9 @@ export class SpycraftItem extends Item {
   async _preCreate(data, options, user) {
     if ((await super._preCreate(data, options, user)) === false) return false;
     options.spycraft2Client = CLIENT_ID;
+    // An item moved from a token's own copy to its character (module/apps/token-links.mjs) is the same item, not a new
+    // pick: it keeps its equipped state and the acquisition check saved when it was first taken.
+    if (options.spycraft2TokenLink) return;
     // Only one weapon of a batch is equipped: the options object is shared by every document the call creates.
     if (
       this.parent?.type === "agent" &&
@@ -90,7 +93,11 @@ export class SpycraftItem extends Item {
   async _preUpdate(changed, options, user) {
     if ((await super._preUpdate(changed, options, user)) === false) return false;
     options.spycraft2Client = CLIENT_ID;
+    // A feat copied from a token's own copy to its character (module/apps/token-links.mjs) brings its state as it was:
+    // its GC approvals and acquisition check are kept, not reset as they would be for an edit.
+    const moved = options.spycraft2TokenLink === true;
     if (
+      !moved &&
       this.type === "feat" &&
       (changed.name ?? this.name) === "Candidate" &&
       this.parent?.type === "agent" &&
@@ -106,6 +113,7 @@ export class SpycraftItem extends Item {
       removeOldObjectKeys(changed, "system.candidateBasis", this.system.candidateBasis, basis);
     }
     if (
+      !moved &&
       this.type === "feat" &&
       (Object.hasOwn(CONTACT_FEATS, this.name) || Object.hasOwn(CONTACT_FEATS, changed.name ?? ""))
     ) {
@@ -120,7 +128,7 @@ export class SpycraftItem extends Item {
         changed["system.contactThemeConfirmed"] = false;
       }
     }
-    if (this.type === "feat" && this.parent?.type === "agent") {
+    if (!moved && this.type === "feat" && this.parent?.type === "agent") {
       const keys = [
         "acquiredAtLevel",
         "acquisitionSource",
@@ -201,6 +209,8 @@ export class SpycraftItem extends Item {
   /** @override */
   _onCreate(data, options, userId) {
     super._onCreate(data, options, userId);
+    // A copy from a token's own changes reconciles granted feats once, after every item is in place.
+    if (options?.spycraft2TokenLink) return;
     if (!SpycraftItem.#isOrigin(options, userId) || this.parent?.type !== "agent") return;
     if (this.type === "origin") this.parent.syncGrantedFeats();
   }
@@ -208,6 +218,8 @@ export class SpycraftItem extends Item {
   /** @override */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
+    // A copy from a token's own changes reconciles granted feats once, after every item is in place.
+    if (options?.spycraft2TokenLink) return;
     if (!SpycraftItem.#isOrigin(options, userId) || this.parent?.type !== "agent") return;
     if (this.type === "origin" || this.type === "class") this.parent.syncGrantedFeats();
   }
@@ -215,6 +227,8 @@ export class SpycraftItem extends Item {
   /** @override */
   _onDelete(options, userId) {
     super._onDelete(options, userId);
+    // A copy from a token's own changes reconciles granted feats once, after every item is in place.
+    if (options?.spycraft2TokenLink) return;
     const actor = this.parent;
     if (!SpycraftItem.#isOrigin(options, userId) || actor?.type !== "agent") return;
     if (this.type === "origin") actor.syncGrantedFeats();

@@ -35,9 +35,15 @@ test("version 3 switches token vision on for agents and their placed tokens, and
       this.changes.push(update);
     }
   });
-  const agent = doc({ type: "agent", name: "A", system: {}, prototypeToken: { sight: { enabled: false } } }),
+  // Already linked, so the later link migration (version 5) has nothing to add here.
+  const agent = doc({
+      type: "agent",
+      name: "A",
+      system: {},
+      prototypeToken: { sight: { enabled: false }, actorLink: true }
+    }),
     guard = doc({ type: "npc", name: "G", system: {}, prototypeToken: { sight: { enabled: false } } });
-  const agentToken = { ...doc({ sight: { enabled: false } }), actor: agent },
+  const agentToken = { ...doc({ sight: { enabled: false }, actorLink: true }), actor: agent },
     guardToken = { ...doc({ sight: { enabled: false } }), actor: guard };
   const world = {
     version: 2,
