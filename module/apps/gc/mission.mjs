@@ -1,6 +1,6 @@
 /** Mission record dialogs (pp.423–440): Threat Level, Caliber, objectives, complications, antagonists, exposure and rewards. */
 import { esc } from "../../html.mjs";
-import { refuse } from "../../error-notices.mjs";
+import { refuse, decline } from "../../error-notices.mjs";
 import {
   threatLevel,
   threatBonusActionDice,
@@ -395,8 +395,7 @@ export async function applySessionDiceAdjustments() {
   const session = String(game.settings.get("spycraft2", "usagePeriods")?.session ?? "initial");
   const bonus = mission.active && mission.threatLevel ? threatBonusActionDice(mission.threatLevel, levels) : 0,
     delta = bonus + (effects.startingActionDice ?? 0);
-  if (!delta)
-    return ui.notifications.info(loc`No Threat Level or campaign-quality change to starting action dice applies.`);
+  if (!delta) return decline(loc`No Threat Level or campaign-quality change to starting action dice applies.`);
   const lines = [];
   for (const actor of teamActors(mission)) {
     if (actor.flags?.spycraft2?.sessionDiceAdjusted === session) {

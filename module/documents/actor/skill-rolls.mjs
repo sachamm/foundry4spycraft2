@@ -1,5 +1,5 @@
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
-import { refuse } from "../../error-notices.mjs";
+import { refuse, refuseStep } from "../../error-notices.mjs";
 import { orderSkillChecks, needsGear } from "../../rules/skill-check-order.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
@@ -614,7 +614,7 @@ export const ActorSkillRolls = Base =>
             this.usagePeriods,
             this.system.actionDice?.value ?? 0
           );
-          if (use.blocked) return ui.notifications.warn(use.reason);
+          if (use.blocked) return refuseStep(use.reason);
           updates["system.resourceUses.finalDeduction"] = use.record;
         } else {
           const status = resourceStatus(spec, this.system.resourceUses, this.usagePeriods);

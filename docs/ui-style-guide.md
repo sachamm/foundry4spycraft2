@@ -446,7 +446,7 @@ This holds for attributes, saves, skills, attacks, damage, initiative and knowle
 7. Footer: one primary that names the result ("Roll attack: Beretta 92"), and Cancel. Enter submits; Esc cancels.
 
 - Dropdown options are names; mechanics for the selected option appear as one line under the select.
-- Width 560px for ordinary dialogs, 720px for tables (rosters, references). Height capped by `.sc2-dialog .dialog-content` (50dvh); the footer stays visible.
+- Width 560px for ordinary dialogs, 720px for tables (rosters, references). Height capped by `.sc2-dialog .dialog-content` (the screen height less 200px for header, footer and margins); the footer stays visible and the body is the only scrolling box.
 - Remember last choices per dialog and offer "Reset" (`module/apps/remembered-choices.mjs`).
 
 ### 7.5 Chat cards

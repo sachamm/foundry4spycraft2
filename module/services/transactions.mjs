@@ -9,6 +9,7 @@ import {
   RESOURCE_LOCK_ID,
   RULE_RESOURCE_LOCK_ID
 } from "../rules/resource-locks.mjs";
+import { Refusal, decline, refuseStep } from "../error-notices.mjs";
 export { GC_RESOURCE_LOCK_ID, isResourceLock, RESOURCE_LOCK_ID, RULE_RESOURCE_LOCK_ID };
 /** v14 native embedded-document uniqueness serializes resource transactions across clients.
  * Uses the authenticated document API and existing ownership, without a privileged socket relay.
@@ -16,7 +17,7 @@ export { GC_RESOURCE_LOCK_ID, isResourceLock, RESOURCE_LOCK_ID, RULE_RESOURCE_LO
 const scopeQueues = new Map();
 const lockKey = (actor, scope) => `${actor.uuid}:${scope}`;
 const held = new Map();
-export class ResourceBusyError extends Error {}
+export class ResourceBusyError extends Refusal {}
 /** Another transaction holds this character's lock right now. It clears by itself when that one finishes. */
 export class ResourceLockedError extends ResourceBusyError {}
 const BACKGROUND_RETRIES = 6;
@@ -64,7 +65,7 @@ export function queueResources(actors, work, { messages = [], allowPeriodReview 
       if (error instanceof ResourceBusyError) {
         if (background && error instanceof ResourceLockedError)
           console.debug("Spycraft 2.0 | Background bookkeeping skipped: the character stayed busy.", error.message);
-        else globalThis.ui?.notifications?.warn(error.message);
+        else refuseStep(error.message);
         return null;
       }
       throw error;
@@ -339,12 +340,12 @@ export async function recoverResourceTransaction(actor, { confirmed = false, sco
       }));
     if (!agreed) return null;
     lockTable.clear(lockKey(actor, scope));
-    return ui.notifications.info(loc`The interrupted resource transaction was cleared.`);
+    ui.notifications.info(loc`The interrupted resource transaction was cleared.`);
+    return true;
   }
   const fresh = await readActor(actor),
     lock = fresh.items.get(scope);
-  if (!isResourceLock(lock))
-    return ui.notifications.info(loc`There is no interrupted resource transaction to recover.`);
+  if (!isResourceLock(lock)) return decline(loc`There is no interrupted resource transaction to recover.`);
   if (!confirmed) {
     const user = game.users.get(lock.flags.spycraft2.resourceLock.userId),
       input = await systemDialog.input({

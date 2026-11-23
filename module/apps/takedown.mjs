@@ -13,6 +13,7 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   key = (a, id) => a.uuid + ":" + id;
@@ -368,7 +369,7 @@ export async function manageTakedown(actor, input = {}) {
         });
     }
     if (!attacks.length && !entries.length)
-      return ui.notifications.info(loc`No finished takedown attack or pending takedown save is available.`);
+      return decline(loc`No finished takedown attack or pending takedown save is available.`);
     const esc = foundry.utils.escapeHTML,
       options = rows =>
         rows.map((m, i) => '<option value="' + esc(m.uuid) + '">' + esc(label(m, i)) + "</option>").join("");

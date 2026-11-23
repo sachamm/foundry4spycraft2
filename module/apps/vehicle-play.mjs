@@ -36,7 +36,7 @@ import {
   crashOccupantNote
 } from "../rules/collision.mjs";
 import { loc } from "../i18n.mjs";
-import { refuse } from "../error-notices.mjs";
+import { refuse, decline } from "../error-notices.mjs";
 
 const speakerFor = doc => ChatMessage.getSpeaker({ actor: doc.documentName === "Actor" ? doc : doc.parent });
 const isVehicleActor = doc => doc?.documentName === "Actor" && doc.type === "vehicle";
@@ -390,7 +390,7 @@ export async function boardVehicle(actor, character, { role = null } = {}) {
   if (!character?.uuid || character.type === "vehicle") return null;
   const s = actor.system,
     aboard = s.occupants.some(o => o.uuid === character.uuid) || s.driver === character.uuid;
-  if (aboard) return ui.notifications.info(loc`${character.name} is already aboard.`);
+  if (aboard) return decline(loc`${character.name} is already aboard.`);
   // A mount whose statistics say "NPC" takes the dropped NPC as its animal when none is linked yet.
   if (!role && character.type === "npc" && s.vehicleClass === "M/AD" && !s.mountNpc && s.defenseSave === "NPC")
     return actor.update({ "system.mountNpc": character.uuid });

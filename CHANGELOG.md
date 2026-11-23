@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **Chat-card buttons tell the truth.** The line under a chat-card button said "Action finished" when the action had
+  been refused, when the character was busy and when the dialog was closed. It now says "Not done" with the reason
+  for a refusal, shows nothing after a closed dialog, and says "Action finished" only when the action ran. A refused
+  step inside a limited-use ability now hands the use back.
+- **Hover help written for a button is shown.** A pass that runs after each draw replaced the help written for a
+  button with a short label, often the button's own text. Written help now stays, in full; the short label is used
+  only where no help was written.
+- **Buttons answer the pointer.** Secondary buttons in sheets and dialogs had lost their hover colours to an older
+  style rule.
+- **Dark theme: tabs and section bars are visible.** The bar colour was almost the same as the dark background. The
+  rule under the tabs and table heads, the edge of section bars and portraits, and a mark on the current tab now use
+  colours that stand out. The light theme is unchanged.
+- **Typing is not lost to a redraw.** When a sheet redraws while a field is being typed in, the unsaved text and the
+  caret are kept. A button pressed with the keyboard keeps focus after the redraw. Adding or removing a row waits for
+  the save already under way, so text typed just before the click is kept.
+- **Taller roll dialogs.** A dialog's body used to stop at half the screen height (360px at 1280×720). It now uses
+  the height left after the header and footer, and scrolls as one box.
+
 - **Attack dialogs open on a Standard Attack.** The ranged attack dialog, and the quick melee and CQB attack
   controls, used to start on "Other attack", so Aim, Burst and miss tricks were refused until the action was changed.
   They now start on Standard Attack; Other is still one click away and a remembered choice is kept.

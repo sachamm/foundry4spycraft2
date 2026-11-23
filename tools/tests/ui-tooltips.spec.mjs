@@ -260,3 +260,22 @@ test("Tab walks a sheet past its tabs and stays inside a dialog, whatever Foundr
   await page.keyboard.press("Shift+Tab");
   await expect(page.locator("#roll")).toBeFocused();
 });
+
+test("help written in a template survives the render pass and later hover passes, unshortened", async ({ page }) => {
+  await page.evaluate(() => {
+    document.querySelector("main").insertAdjacentHTML(
+      "beforeend",
+      `<button data-action="itemDelete" id="authored" data-tooltip="Use this once the round has ended.">Remove</button>
+         <button data-action="itemDelete" id="generated">Remove</button>`
+    );
+    window.tooltipHooks.get("renderApplicationV2")({ element: document.querySelector("main") });
+  });
+  const authored = page.locator("#authored");
+  await expect(authored).toHaveAttribute("data-tooltip", "Use this once the round has ended.");
+  await authored.hover();
+  await authored.focus();
+  await expect(authored).toHaveAttribute("data-tooltip", "Use this once the round has ended.");
+  // Where a template wrote nothing, the catalogue still answers, on every pass.
+  await page.locator("#generated").hover();
+  await expect(page.locator("#generated")).toHaveAttribute("data-tooltip", "Remove item");
+});

@@ -1,6 +1,7 @@
 import { refuse } from "../error-notices.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
+import { KeepPlace } from "./keep-place.mjs";
 import { enrich } from "./enrich.mjs";
 import { installToolSearch } from "../apps/tool-search.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
@@ -81,7 +82,7 @@ const SENSOR_LABELS = {
 const share = ([n, d]) => `${n}/${d}`;
 
 /** Sheet for a vehicle placed on a scene: its table statistics, current condition, people aboard and play actions. */
-export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
+export class SpycraftVehicleSheet extends KeepPlace(HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2))) {
   _vehicleToolsState = {};
 
   _onRender(context, options) {

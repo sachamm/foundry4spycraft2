@@ -103,6 +103,8 @@ const actions = () => ({
 
 const CONTROL =
   '[title], [data-tooltip], button, a[href], a[data-action], a[data-tab], a[data-roll-control], input:not([type="hidden"]), select, textarea, prose-mirror, summary, [role="button"], [role="tab"], [data-edit]';
+/** Marks hover help this pass wrote, as opposed to help a template or a rule breakdown supplied. */
+const GENERATED = "data-sc2-tip-generated";
 const SCOPE = ".spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]";
 const clean = text =>
   String(text ?? "")
@@ -425,19 +427,25 @@ export function enhanceTooltips(root) {
     )
       control.setAttribute("aria-label", label);
     enhanceButtonIcon(control, label);
+    // Help written in a template is the source of truth. The catalogue fills in only where none was written, and
+    // only text this pass produced is shortened or replaced on a later pass.
+    const authored =
+      (control.hasAttribute("data-tooltip") || control.hasAttribute("title")) && !control.hasAttribute(GENERATED);
     if (
+      !authored &&
       control.matches('button, a[data-action], a[data-roll-control], [role="button"]') &&
       !control.hasAttribute("data-tooltip-html")
     ) {
       const text = tooltipText({ action: control.dataset.action ?? control.dataset.rollControl ?? "", label });
       if (text) {
         control.setAttribute("data-tooltip", text);
+        control.setAttribute(GENERATED, "");
         control.removeAttribute("title");
         // The button's accessible name already identifies its action.
         control.removeAttribute("aria-description");
       }
     }
-    if (!control.hasAttribute("data-tooltip-html")) {
+    if (!authored && !control.hasAttribute("data-tooltip-html")) {
       for (const attr of ["title", "data-tooltip", "aria-description"]) {
         if (control.hasAttribute(attr)) control.setAttribute(attr, compactTooltip(control.getAttribute(attr)));
       }
@@ -479,6 +487,7 @@ export function enhanceTooltips(root) {
     });
     if (!text) continue;
     control.setAttribute("data-tooltip", text);
+    control.setAttribute(GENERATED, "");
     // Field guidance remains available to assistive technology without a native hover popup.
     if (!control.hasAttribute("aria-description")) control.setAttribute("aria-description", text);
   }
@@ -492,8 +501,8 @@ export function installUITooltipHooks() {
       else element.querySelectorAll(SCOPE).forEach(enhanceTooltips);
     }
   };
+  // Foundry calls the render hook once for each class in an application's chain, so this one also covers dialogs.
   Hooks.on("renderApplicationV2", render);
-  Hooks.on("renderDialogV2", render);
   Hooks.on("renderChatMessageHTML", (message, html) => {
     if (!message.flags?.spycraft2) return;
     html.setAttribute("data-sc2-tooltip-scope", "");

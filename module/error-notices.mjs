@@ -13,8 +13,53 @@ const SYSTEM_PATH = "/systems/spycraft2/";
  * @returns {false}
  */
 export function refuse(message) {
+  refusals++;
+  lastRefusal = message;
   globalThis.ui?.notifications?.warn(message);
   return false;
+}
+
+/**
+ * Show a refusal and return null, for a step whose result can travel back through a limited-use callback: there
+ * null (like a throw) hands the use and its dice back, while false would keep them spent. Callers that need to know
+ * a refusal happened compare refusalCount() before and after.
+ * @param {string} message
+ * @returns {null}
+ */
+export function refuseStep(message) {
+  refuse(message);
+  return null;
+}
+
+/** As refuseStep(), for "there is nothing to do here": an information notice rather than a warning. */
+export function decline(message) {
+  refusals++;
+  lastRefusal = message;
+  globalThis.ui?.notifications?.info(message);
+  return null;
+}
+
+let refusals = 0;
+let lastRefusal = "";
+
+/**
+ * How many steps this client has refused so far. A caller that cannot see a nested step's return value (a chat-card
+ * button whose handler swallows it, or a busy character reported as null) compares the count before and after.
+ */
+export const refusalCount = () => refusals;
+
+/** The text of the most recent refusal, for showing beside the control that was pressed. */
+export const lastRefusalMessage = () => lastRefusal;
+
+/**
+ * A rule said no: "roll the save first", "the character is busy". Throw this rather than a plain Error for a
+ * refusal, so that a fault in the code can be told apart from it.
+ */
+export class Refusal extends Error {
+  constructor(message, options) {
+    super(message, options);
+    this.name = "Refusal";
+  }
 }
 
 /** The message to show for a rejection, or null when it did not come from this system's code. */
@@ -26,9 +71,11 @@ export function systemErrorNotice(reason) {
 
 /**
  * Whether a rejection is a rule refusal rather than a fault. The system throws a plain Error to refuse a step ("roll
- * the save first"); a TypeError, RangeError and the like mean the code itself went wrong.
+ * the save first"), and newer code throws Refusal; a TypeError, RangeError and the like mean the code itself went
+ * wrong. Plain errors stay refusals until every refusing throw has moved to Refusal.
  */
-export const isRefusal = reason => reason instanceof Error && Object.getPrototypeOf(reason) === Error.prototype;
+export const isRefusal = reason =>
+  reason instanceof Refusal || (reason instanceof Error && Object.getPrototypeOf(reason) === Error.prototype);
 
 export function registerErrorNotices(target = globalThis.window) {
   target?.addEventListener?.("unhandledrejection", event => {

@@ -20,7 +20,7 @@
         <thead><tr><th></th><th>{{localize "SPYCRAFT.Proficient"}}</th><th>{{localize "SPYCRAFT.Forte"}}</th></tr></thead>
         <tbody>
         {{#each proficiencies}}
-          <tr><th>{{label}}{{#if hint}} <span class="tag" data-tooltip="SPYCRAFT.ProficiencyHint">x</span>{{/if}}</th>
+          <tr><th>{{label}}{{#if hint}} <span class="tag" data-tooltip="{{localize 'SPYCRAFT.ProficiencyHint'}}">x</span>{{/if}}</th>
             <td><input type="checkbox" name="system.proficiencies.{{key}}.proficient" {{checked proficient}} {{#if granted}}disabled{{/if}} /></td>
             <td><input type="checkbox" name="system.proficiencies.{{key}}.forte" {{checked forte}} {{#if forteGranted}}disabled{{/if}} /></td></tr>
         {{/each}}

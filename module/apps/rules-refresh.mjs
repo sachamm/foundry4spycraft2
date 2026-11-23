@@ -1,4 +1,4 @@
-import { refuse } from "../error-notices.mjs";
+import { refuse, decline } from "../error-notices.mjs";
 import { rulesRefreshChanges, applyRulesRefresh, equivalent } from "../rules/refresh.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
@@ -50,7 +50,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
     unmatched = [];
   if (restore) {
     const backup = actor.getFlag("spycraft2", "rulesRefreshBackup");
-    if (!backup) return ui.notifications.info(loc`No previous rules refresh is available.`);
+    if (!backup) return decline(loc`No previous rules refresh is available.`);
     changes = backup.changes.flatMap(change => {
       const item = actor.items.get(change.itemId);
       if (!item) return [];
@@ -60,7 +60,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
         : [{ ...change, before: structuredClone(current), after: structuredClone(change.before) }];
     });
   } else ({ changes, unmatched } = await actorRulesRefreshPreview(actor));
-  if (!changes.length) return ui.notifications.info(unmatched.join("\n") || loc`No catalog changes to apply.`);
+  if (!changes.length) return decline(unmatched.join("\n") || loc`No catalog changes to apply.`);
   const rows = changes
     .map(
       (change, index) =>

@@ -11,6 +11,7 @@ import {
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   key = (a, id) => a.uuid + ":" + id;
@@ -197,7 +198,7 @@ export async function manageDrivingStance(actor, input = {}) {
       }),
       rows = drivingRows(actor).filter(r => !r.receiptUuid);
     if (!hits.length && !rows.length)
-      return ui.notifications.info(loc`No finished Driving Stance hit or interrupted outcome is available.`);
+      return decline(loc`No finished Driving Stance hit or interrupted outcome is available.`);
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Driving Stance outcome` },

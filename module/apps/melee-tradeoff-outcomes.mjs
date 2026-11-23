@@ -3,6 +3,7 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { attackDamageUseRows, reviewAttackDamageBenefit, attackTradeoffProof } from "./attack-damage-benefits.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const miss = c => {
   const p = attackTradeoffProof(c);
   return (
@@ -68,8 +69,7 @@ export async function manageMeleeTradeoff(actor, input = {}) {
     if (game.user.isGM)
       for (const r of attackDamageUseRows(actor.system).filter(r => !r.receiptUuid))
         entries.push({ value: "damage:" + r.reservationId, label: loc`Review interrupted recorded attack damage` });
-    if (!entries.length)
-      return ui.notifications.info(loc`No recorded attack miss or interrupted damage bonus is awaiting review.`);
+    if (!entries.length) return decline(loc`No recorded attack miss or interrupted damage bonus is awaiting review.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Recorded attack benefits` },
       rejectClose: false,

@@ -3,6 +3,7 @@ import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const active = new Set();
 const stable = v =>
     JSON.stringify(v, (_k, x) =>
@@ -295,7 +296,7 @@ export async function manageThreadNeedle(actor, input = {}) {
           return [];
         }
       });
-    if (!choices.length) return ui.notifications.info(loc`No visible finished Thread the Needle hit is available.`);
+    if (!choices.length) return decline(loc`No visible finished Thread the Needle hit is available.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Thread the Needle — hold outcome` },
       rejectClose: false,

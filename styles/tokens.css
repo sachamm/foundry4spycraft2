@@ -12,6 +12,9 @@
   --sc2-ink-strong: #0f1616;
   --sc2-ink-muted: #56605c;
   --sc2-bar: #1b2323;
+  /* The bar seen against the surface: its edge and the mark on the current tab. Same as the bar in the light theme. */
+  --sc2-bar-edge: #1b2323;
+  --sc2-tab-mark: #1b2323;
   --sc2-on-bar: #f6f2e7;
   --sc2-on-bar-good: #9fe0b5;
   --sc2-on-bar-danger: #ffb3b8;
@@ -96,6 +99,9 @@ body.theme-dark .spycraft2.application:not(.theme-light) :is(.spycraft2, .spycra
   --sc2-ink-strong: #fbf9f3;
   --sc2-ink-muted: #b5bdb7;
   --sc2-bar: #0b0f0f;
+  /* The dark bar is 1.12:1 on the dark surface, so its edge and the current-tab mark use colours that separate. */
+  --sc2-bar-edge: #6e7876;
+  --sc2-tab-mark: #58b3b0;
   --sc2-on-bar: #e8e4d8;
   --sc2-action: #58b3b0;
   --sc2-action-strong: #7fcac7;

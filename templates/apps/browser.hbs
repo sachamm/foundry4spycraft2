@@ -21,7 +21,7 @@
           <span class="muted">{{groupLabel}}{{#if extra}} · {{extra}}{{/if}}</span>
           {{#if prereq}}<div class="prereq {{#unless qualified}}bad{{/unless}}" data-tooltip="{{unmet}}">{{prereq}}{{#if notChecked}} <span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}</div>{{/if}}
         </div>
-        {{#if ../actor}}<button type="button" data-sc2-display="icon" data-action="add" aria-label="{{localize 'SPYCRAFT.Browser.AddEntry' name=name}}" {{#if owned}}class="owned"{{/if}} {{#if locked}}disabled data-tooltip="SPYCRAFT.Browser.OwnedHint"{{/if}}>{{#if owned}}<i class="fa-solid fa-check" aria-hidden="true"></i>{{else}}<i class="fa-solid fa-plus" aria-hidden="true"></i>{{/if}}</button>{{/if}}
+        {{#if ../actor}}<button type="button" data-sc2-display="icon" data-action="add" aria-label="{{localize 'SPYCRAFT.Browser.AddEntry' name=name}}" {{#if owned}}class="owned"{{/if}} {{#if locked}}disabled data-tooltip="{{localize 'SPYCRAFT.Browser.OwnedHint'}}"{{/if}}>{{#if owned}}<i class="fa-solid fa-check" aria-hidden="true"></i>{{else}}<i class="fa-solid fa-plus" aria-hidden="true"></i>{{/if}}</button>{{/if}}
       </li>
     {{else}}<li class="muted">{{localize "SPYCRAFT.Browser.Empty"}}</li>{{/each}}
   </ul>
@@ -32,7 +32,7 @@
       {{#if preview.prereq}}<p class="prereq {{#unless preview.qualified}}bad{{/unless}}">{{preview.prereq}}</p>{{/if}}
       <div class="preview-text">{{{preview.description}}}</div>
       <p class="preview-actions">
-        {{#if actor}}<button type="button" class="sc2-primary-action" data-sc2-display="text" data-action="add" {{#if preview.locked}}disabled data-tooltip="SPYCRAFT.Browser.OwnedHint"{{/if}}>{{localize 'SPYCRAFT.Browser.AddEntry' name=preview.name}}</button>{{/if}}
+        {{#if actor}}<button type="button" class="sc2-primary-action" data-sc2-display="text" data-action="add" {{#if preview.locked}}disabled data-tooltip="{{localize 'SPYCRAFT.Browser.OwnedHint'}}"{{/if}}>{{localize 'SPYCRAFT.Browser.AddEntry' name=preview.name}}</button>{{/if}}
         <button type="button" data-action="open">{{localize "SPYCRAFT.Browser.OpenSheet"}}</button>
       </p>
     {{else}}<p class="sc2-empty">{{localize "SPYCRAFT.Browser.PreviewHint"}}</p>{{/if}}
