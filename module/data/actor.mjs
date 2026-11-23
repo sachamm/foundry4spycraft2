@@ -464,6 +464,11 @@ export class AgentData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
+    // The fight this character is in is the same for the whole pass, so it is looked up once (each lookup scans
+    // every combat) and only if something below asks.
+    let foundCombat;
+    const participatingCombat = () =>
+      foundCombat === undefined ? (foundCombat = this.parent.participatingCombat ?? null) : foundCombat;
     this.actorUuid = this.parent.uuid;
     this.shakenState = shakenStateFromActor(this.parent);
     this.restraintReleaseReview = getRestraintReleaseReview(this.parent);
@@ -479,7 +484,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     this.combatContext = combat ? { id: combat.id, round: combat.round, started: combat.started } : null;
     const dartingCombat = this.dartingStyle?.combatId
       ? globalThis.game?.combats?.get?.(this.dartingStyle.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const dartingOwn = dartingCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -497,7 +502,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     const twoWeaponCombat = this.twoWeaponStyle?.combatId
       ? globalThis.game?.combats?.get?.(this.twoWeaponStyle.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const twoWeaponOwn = twoWeaponCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -515,7 +520,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     const totalDefenseCombat = this.totalDefense?.combatId
       ? globalThis.game?.combats?.get?.(this.totalDefense.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const totalDefenseOwn = totalDefenseCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -524,7 +529,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     // Dueling Basics' declaration is timed like Total Defense, from the character's own Count.
     const duelingCombat = this.duelingBasics?.combatId
       ? globalThis.game?.combats?.get?.(this.duelingBasics.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const duelingOwn = duelingCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -541,7 +546,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         }
       : null;
     this.underminedCombatContext = underminedCombatContext(this);
-    this.currentCombatId = this.parent.participatingCombat?.id ?? null;
+    this.currentCombatId = participatingCombat()?.id ?? null;
     // Personal Lieutenant (p.204): the owner's career level and feats, for the lieutenant's limits.
     const lieutenantOwner =
       this.companionOf?.feat === PERSONAL_LIEUTENANT
@@ -560,7 +565,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     // Fight Defensively lasts 1 full round from the character's own Count.
     const fightCombat = this.fightDefensively?.combatId
       ? globalThis.game?.combats?.get?.(this.fightDefensively.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const fightOwn = fightCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -568,7 +573,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     );
     const intenseCombat = this.intenseStance?.combatId
       ? globalThis.game?.combats?.get?.(this.intenseStance.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const intenseOwn = intenseCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -606,7 +611,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     const superiorCombat = this.superiorCover?.combatId
       ? globalThis.game?.combats?.get?.(this.superiorCover.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const superiorOwn = superiorCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -624,7 +629,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     const expertiseCombat = this.combatExpertise?.combatId
       ? globalThis.game?.combats?.get?.(this.combatExpertise.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const expertiseOwn = expertiseCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid &&
@@ -642,7 +647,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     const warCombat = this.fortunesOfWarBoost?.combatId
       ? globalThis.game?.combats?.get?.(this.fortunesOfWarBoost.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const own = warCombat?.turns?.find(c =>
       this.fortunesOfWarBoost?.combatantId
         ? c.id === this.fortunesOfWarBoost.combatantId
@@ -660,7 +665,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     const fearCombat = this.noFearBoost?.combatId
       ? globalThis.game?.combats?.get?.(this.noFearBoost.combatId)
-      : this.parent.participatingCombat;
+      : participatingCombat();
     const fearOwn = fearCombat?.turns?.find(
       c =>
         c.actor?.uuid === this.parent.uuid && (!this.noFearBoost?.combatantId || c.id === this.noFearBoost.combatantId)

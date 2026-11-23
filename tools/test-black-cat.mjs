@@ -126,5 +126,5 @@ test("a marked character's attack posts with the wider error range, and a reroll
 test("the Main tab shows the GC's control", async () => {
   const html = inlinedSource("systems/spycraft2/templates/actor/agent-main.hbs");
   assert.match(html, /data-action="applyBlackCat"/);
-  assert.match(html, /data-resource="blackCat"/);
+  assert.match(html, /gc-review\.hbs" resource="blackCat"/);
 });

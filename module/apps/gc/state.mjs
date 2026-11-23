@@ -1,4 +1,5 @@
 /** World state for the Game Control tools: the mission record, campaign qualities, scene state and Dramatic Conflicts. */
+import { renderOpenSheet } from "../../services/refresh.mjs";
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
 import { missionCatalog } from "./mission-defaults.mjs";
@@ -8,18 +9,31 @@ const SYSTEM = "spycraft2";
 const refresh = () => {
   for (const actor of globalThis.game?.actors ?? []) {
     actor.reset();
-    actor.sheet?.render(false);
+    renderOpenSheet(actor);
   }
   for (const token of globalThis.canvas?.tokens?.placeables ?? []) if (token.actor?.isToken) token.actor.reset();
   globalThis.game?.spycraft2?.gc?.console?.render(false);
 };
 
+/** Scene state and conflicts are shown only in the GC Console; no sheet and no derived number reads them. */
+const refreshConsole = () => globalThis.game?.spycraft2?.gc?.console?.render(false);
+
 export function registerGCSettings() {
-  const hidden = initial => ({ scope: "world", config: false, type: Object, default: initial, onChange: refresh });
+  const hidden = (initial, onChange = refresh) => ({
+    scope: "world",
+    config: false,
+    type: Object,
+    default: initial,
+    onChange
+  });
   game.settings.register(SYSTEM, "mission", hidden(defaultMission()));
   game.settings.register(SYSTEM, "campaign", hidden({ qualities: [] }));
-  game.settings.register(SYSTEM, "sceneState", hidden({ scene: null, dramatic: false, source: null, dcBoosts: 0 }));
-  game.settings.register(SYSTEM, "conflicts", hidden({}));
+  game.settings.register(
+    SYSTEM,
+    "sceneState",
+    hidden({ scene: null, dramatic: false, source: null, dcBoosts: 0 }, refreshConsole)
+  );
+  game.settings.register(SYSTEM, "conflicts", hidden({}, refreshConsole));
   // Which console sections this GC has opened or closed, kept in the browser rather than the world.
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   game.settings.register(SYSTEM, "fluidInitiative", {

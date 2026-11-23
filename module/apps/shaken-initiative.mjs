@@ -1,3 +1,4 @@
+import { renderOpenSheet } from "../services/refresh.mjs";
 import { worldMigrating } from "../migrations/index.mjs";
 import { primaryWriterFor } from "../writers.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
@@ -135,7 +136,7 @@ export function reconcileShakenInitiative(actor) {
           throw error;
         }
       }
-      actor.sheet?.render(false);
+      renderOpenSheet(actor);
     },
     // Runs from a hook after any change to the character, often while its player's own action holds the lock.
     { allowPeriodReview: true, background: true }
@@ -195,7 +196,7 @@ export async function reviewShakenInitiative(actor, combatId, combatantId, optio
         }
       };
       const result = await writePlan(c, plan, expected);
-      actor.sheet?.render(false);
+      renderOpenSheet(actor);
       return result;
     },
     { allowPeriodReview: true }

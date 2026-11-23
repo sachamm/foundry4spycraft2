@@ -664,7 +664,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
           "combat-outcomes",
           "combat-conditions",
           "combat-review",
-          "round-counter"
+          "round-counter",
+          "gc-review"
         ].map(name => `${TPL}/play/${name}.hbs`),
         `${TPL}/parts/hazards.hbs`
       ],
@@ -678,7 +679,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     },
     abilities: {
       template: `${TPL}/agent-abilities.hbs`,
-      templates: [`${TPL}/agent-feats.hbs`, `${TPL}/agent-classes.hbs`],
+      templates: [`${TPL}/agent-feats.hbs`, `${TPL}/agent-classes.hbs`, `${TPL}/play/gc-review.hbs`],
       scrollable: [""]
     },
     dossier: {

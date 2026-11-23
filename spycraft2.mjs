@@ -1,3 +1,4 @@
+import { renderOpenSheet } from "./module/services/refresh.mjs";
 import { installUITooltipHooks } from "./module/apps/ui-tooltips.mjs";
 import { installSampleAgentHooks } from "./module/sample-agents.mjs";
 import { registerGCTableSetup, setupGCTables, inputRollTableClass } from "./module/gc-table-setup.mjs";
@@ -180,7 +181,7 @@ Hooks.once("init", () => {
     type: Object,
     default: {},
     onChange() {
-      for (const actor of game.actors ?? []) actor.sheet?.render(false);
+      for (const actor of game.actors ?? []) renderOpenSheet(actor);
     }
   });
   registerGCSettings();
@@ -318,7 +319,7 @@ function refreshCombatActorData(scope = null) {
       for (const actor of chosen)
         if (actor?.type === "agent") {
           actor.reset();
-          actor.sheet?.render(false);
+          renderOpenSheet(actor);
         }
       game.spycraft2?.gc?.console?.render(false);
     }, 0);
@@ -390,7 +391,7 @@ function refreshFortuneRecipients(source) {
   for (const actor of game.actors ?? [])
     if (actor.type === "agent" && actor.system.fortuneTeammateIds?.includes(source.id)) {
       actor.reset();
-      actor.sheet?.render(false);
+      renderOpenSheet(actor);
     }
 }
 Hooks.on("updateActor", (actor, changed, options) => {

@@ -163,14 +163,35 @@ const LEVEL_ZERO_VITALITY = 6;
 
 /**
  * @param {object} sys     agent system data (mutated)
- * @param {object[]} items { id, name, type, system } for every embedded item
+ * @param {object[]} givenItems { id, name, type, system } for every embedded item
  * @param {object} cfg     CONFIG.SPYCRAFT
  */
-export function computeAgent(sys, items, cfg, options = {}) {
+export function computeAgent(sys, givenItems, cfg, options = {}) {
+  const state = { sys, givenItems, cfg, options };
+  startPass(state);
+  deriveCareerLevels(state);
+  collectBonusSources(state);
+  deriveAttributes(state);
+  deriveSkillRanks(state);
+  deriveFeatList(state);
+  deriveOtherBonuses(state);
+  deriveFinalTotals(state);
+  deriveSkillTotals(state);
+  deriveFeatSlots(state);
+  deriveProficiencies(state);
+  deriveWealthAndGear(state);
+  deriveExperience(state);
+  deriveCoreAbilities(state);
+  return settlePrerequisites(state);
+}
+
+/** Step 1: drop expired items, read conditions and decide which feats may contribute this pass. */
+function startPass(state) {
+  const { sys, givenItems, cfg, options } = state;
   sys.cheapShotActive = cheapShotRecords(sys).filter(r => !r.recovered);
   sys.cheapShotSpeedPenalty = cheapShotSpeedPenalty(sys);
-  const allItems = items.filter(i => !isResourceLock(i));
-  items = allItems.filter(i => !toolShedKitState(sys, i).expired);
+  const allItems = givenItems.filter(i => !isResourceLock(i));
+  const items = allItems.filter(i => !toolShedKitState(sys, i).expired);
   if (sys.shakenState?.sourceKind !== "effects") sys.shakenState = shakenStateFromContext(sys.conditionContext);
   const shaken = shakenRules(sys);
   sys.shakenRules = shaken;
@@ -238,11 +259,15 @@ export function computeAgent(sys, items, cfg, options = {}) {
     ].filter(id => legalFeatIds.has(id))
   );
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
-  let todo = [];
+  const todo = [];
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const levelRow = l => T.levels[clamp(l, 0, 20)];
+  Object.assign(state, { allItems, items, shaken, T, warnings, legalFeatIds, activeFeatIds, todo, plural, levelRow });
+}
 
-  /* ---------------- Classes & career level ---------------- */
+/** Step 2: classes and career level. */
+function deriveCareerLevels(state) {
+  const { sys, cfg, items, warnings, activeFeatIds, todo } = state;
   const classItems = items.filter(i => i.type === "class");
   const classById = new Map(classItems.map(i => [i.system.identifier || i.name, i]));
   const progression = sys.progression ?? [];
@@ -322,8 +347,39 @@ export function computeAgent(sys, items, cfg, options = {}) {
       browse: { type: "class", originType: "" },
       text: loc`Take a first class level.`
     });
+  Object.assign(state, {
+    classItems,
+    classById,
+    progression,
+    level,
+    classLevels,
+    classAtLevel,
+    coreItems,
+    inherited,
+    base,
+    gearBase,
+    classesData
+  });
+}
 
-  /* ---------------- Collect bonus sources ---------------- */
+/** Step 3: collect every bonus source. */
+function collectBonusSources(state) {
+  const {
+    sys,
+    cfg,
+    items,
+    shaken,
+    T,
+    warnings,
+    activeFeatIds,
+    todo,
+    plural,
+    levelRow,
+    classById,
+    level,
+    classLevels,
+    inherited
+  } = state;
   sys.conditionalSkillBonuses = [];
   sys.classOptionSelections = [];
   const sources = [];
@@ -619,8 +675,30 @@ export function computeAgent(sys, items, cfg, options = {}) {
     )
   };
   const lr = levelRow(level);
+  Object.assign(state, { sources, linkedSkillPairs, tb, lr });
+}
 
-  /* ---------------- Phase A: attributes ---------------- */
+/** Step 4 (phase A): attributes, which later bonuses may depend on. */
+function deriveAttributes(state) {
+  const {
+    sys,
+    cfg,
+    items,
+    T,
+    warnings,
+    activeFeatIds,
+    todo,
+    plural,
+    classItems,
+    classById,
+    progression,
+    level,
+    inherited,
+    base,
+    classesData,
+    sources,
+    tb
+  } = state;
   const abilityBonus = new Bonuses(),
     nonCandidateBonus = new Bonuses();
   sys.unrestrictedBonusPools = unrestrictedBonusPools(sys);
@@ -857,7 +935,29 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const bonus = locks.length ? Math.min(...locks) : stageAt(career).bonus(`skills.${key}.maxRanks`);
     return (T.levels[clamp(career, 0, 20)]?.maxRanks ?? 0) + bonus;
   };
-  /* ---------------- Skills: ranks ---------------- */
+  Object.assign(state, { preData, abil, stageAt, targeted, unlocked, maximumRanksAt });
+}
+
+/** Step 5: skill ranks. */
+function deriveSkillRanks(state) {
+  const {
+    sys,
+    cfg,
+    items,
+    warnings,
+    activeFeatIds,
+    todo,
+    levelRow,
+    progression,
+    classAtLevel,
+    sources,
+    linkedSkillPairs,
+    preData,
+    stageAt,
+    targeted,
+    unlocked,
+    maximumRanksAt
+  } = state;
   const skillDefs = Object.values(cfg.skills);
   const talentClassSkill = new Set();
   for (const s of sources)
@@ -1000,8 +1100,20 @@ export function computeAgent(sys, items, cfg, options = {}) {
     });
   });
   for (const k of Object.keys(skillRanks)) skillRanks[k] = Math.floor(skillRanks[k]);
+  Object.assign(state, {
+    skillDefs,
+    talentClassSkill,
+    skillRanks,
+    purchasedRanks,
+    skillPurchaseIssues,
+    purchaseIssue,
+    skillPoints
+  });
+}
 
-  /* ---------------- Feats ---------------- */
+/** Step 6: the feat list. */
+function deriveFeatList(state) {
+  const { sys, cfg, items, activeFeatIds, classItems, classLevels } = state;
   const featItems = items.filter(i => i.type === "feat");
   const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(ruleName(i))));
   const featTrees = {};
@@ -1025,8 +1137,33 @@ export function computeAgent(sys, items, cfg, options = {}) {
     featTrees[f.system.tree] = (featTrees[f.system.tree] ?? 0) + 1;
     if (activeFeatIds.has(f.id)) activeFeatTrees[f.system.tree] = (activeFeatTrees[f.system.tree] ?? 0) + 1;
   }
+  Object.assign(state, { featItems, featNames, featTrees, activeFeatTrees });
+}
 
-  /* ---------------- Phase B: all other bonuses ---------------- */
+/** Step 7 (phase B): every other bonus. */
+function deriveOtherBonuses(state) {
+  const {
+    sys,
+    cfg,
+    items,
+    T,
+    warnings,
+    activeFeatIds,
+    classItems,
+    classById,
+    level,
+    classLevels,
+    classAtLevel,
+    base,
+    classesData,
+    sources,
+    tb,
+    lr,
+    abil,
+    skillDefs,
+    skillRanks,
+    activeFeatTrees
+  } = state;
   for (const source of sources)
     for (const bonus of source.bonuses) {
       const key = bonus.target?.match(/^baseSave\.(fort|ref|will)$/)?.[1];
@@ -1179,8 +1316,50 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const armorCheck = Math.min(0, sys.armor?.check ?? 0, sys.encumbrance.check);
   const armorSpeed = sys.armor?.speed ?? 0;
   if (sys.encumbrance.condition) warnings.push(loc`${sys.encumbrance.load} load: ${sys.encumbrance.condition}.`);
+  Object.assign(state, {
+    rd,
+    fortuneBold,
+    B,
+    fleetIndependentBonuses,
+    misc,
+    small,
+    large,
+    armorDef,
+    armorCheck,
+    armorSpeed
+  });
+}
 
-  /* ---------------- Final totals ---------------- */
+/** Step 8: final totals. */
+function deriveFinalTotals(state) {
+  const {
+    sys,
+    cfg,
+    items,
+    T,
+    warnings,
+    activeFeatIds,
+    todo,
+    classItems,
+    progression,
+    level,
+    classLevels,
+    classAtLevel,
+    inherited,
+    base,
+    lr,
+    abil,
+    featItems,
+    fortuneBold,
+    B,
+    fleetIndependentBonuses,
+    misc,
+    small,
+    large,
+    armorDef,
+    armorCheck,
+    armorSpeed
+  } = state;
   sys.size = large ? "Large (1×1)" : small ? "Small" : "Medium";
   sys.deathThreshold = deathThreshold(sys.size);
   sys.attributeCollapse = attributeCollapsePlan(sys);
@@ -1542,8 +1721,36 @@ export function computeAgent(sys, items, cfg, options = {}) {
     ? sys.actionDice.die - 1
     : sys.actionDice.die;
   sys.actionDice.bonus = B.get("actionDice.bonus");
+}
 
-  /* ---------------- Skills: totals ---------------- */
+/** Step 9: skill totals. */
+function deriveSkillTotals(state) {
+  const {
+    sys,
+    cfg,
+    T,
+    warnings,
+    todo,
+    plural,
+    classItems,
+    progression,
+    level,
+    classLevels,
+    classAtLevel,
+    lr,
+    abil,
+    stageAt,
+    targeted,
+    maximumRanksAt,
+    skillDefs,
+    talentClassSkill,
+    skillRanks,
+    purchasedRanks,
+    skillPurchaseIssues,
+    purchaseIssue,
+    skillPoints,
+    B
+  } = state;
   const maxRanks = lr?.maxRanks ?? 0;
   sys.maxRanks = maxRanks;
   const anyClass = new Set(
@@ -1687,8 +1894,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
       text: loc`Skill points unspent: ${spLeft.map(sp => `level ${sp.level} (${sp.remaining})`).join(", ")}.`
     });
   }
+}
 
-  /* ---------------- Feat slots ---------------- */
+/** Step 10: feat slots. */
+function deriveFeatSlots(state) {
+  const { sys, cfg, items, warnings, todo, plural, classItems, classLevels, inherited, lr, featItems, featTrees, B } =
+    state;
   const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") };
   for (const t of Object.keys(cfg.featTrees)) slots[t] = B.get(`featSlots.${t}`);
   const classGrantCounts = new Map();
@@ -1751,8 +1962,27 @@ export function computeAgent(sys, items, cfg, options = {}) {
       weight: Object.values(trees).reduce((sum, v) => sum + Math.max(0, v.slots - v.spent), 0),
       text: loc`Bonus feat slots open: ${unusedTree.join(", ")}.`
     });
+}
 
-  /* ---------------- Proficiencies, focuses, interests, contacts ---------------- */
+/** Step 11: proficiencies, focuses, interests and contacts. */
+function deriveProficiencies(state) {
+  const {
+    sys,
+    cfg,
+    items,
+    warnings,
+    activeFeatIds,
+    todo,
+    plural,
+    progression,
+    level,
+    classAtLevel,
+    tb,
+    lr,
+    stageAt,
+    purchasedRanks,
+    B
+  } = state;
   const firstClass = classAtLevel[0];
   const { available: profAvail, used: profUsed } = sys.proficiencyPicks;
   if (profUsed > profAvail)
@@ -1862,8 +2092,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
     warnings.push(
       loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`
     );
+}
 
-  /* ---------------- Wealth & mission gear ---------------- */
+/** Step 12: wealth and mission gear. */
+function deriveWealthAndGear(state) {
+  const { sys, allItems, items, T, warnings, todo, plural, base, gearBase, abil, B, misc } = state;
   const wealthTotal = base.wealth + B.get("wealth") + Math.max(0, abil.cha.mod) + (misc.wealth ?? 0);
   const alloc = sys.wealthAllocation ?? {};
   const allocated = (alloc.lifestyle ?? 0) + (alloc.possessions ?? 0) + (alloc.spendingCash ?? 0);
@@ -2022,8 +2255,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
       warnings.push(loc`${item.name}: non-portable kit cannot be carried; use it at its recorded location.`);
   }
   sys.commonItems = { count: sys.abilities.wis.value, perMission: Math.max(1, Math.ceil(sys.abilities.wis.value / 3)) };
+}
 
-  /* ---------------- Experience ---------------- */
+/** Step 13: experience. */
+function deriveExperience(state) {
+  const { sys, T, warnings, level } = state;
   sys.xpNext = level < 20 ? (T.levels[level + 1]?.xp ?? null) : null;
   // Career levels follow XP thresholds (Table 1.3, p.27). A first-level character may start below its threshold,
   // so only later levels are checked; this is a reminder, as the GC may grant levels directly.
@@ -2036,16 +2272,41 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.assistantGroupStatuses = (sys.assistantGroups ?? []).map(group => assistantGroupStatus(sys, group));
   sys.recoveryRates = level <= 20 ? recoveryRatePlan(sys) : null;
   if (level > 20) warnings.push(loc`Review Career Level: recovery rates require a RAW level of 20 or lower.`);
+}
 
-  /* ---------------- Core abilities ---------------- */
+/** Step 14: core abilities. */
+function deriveCoreAbilities(state) {
+  const { sys, warnings, classAtLevel, coreItems } = state;
   const firstExpertIdx = classAtLevel.findIndex(c => c?.system.expert);
   sys.coreAbilities = coreItems.map(c => ({ className: c.name, ...c.system.coreAbility }));
 
   const eagle = eagleEyeState(sys);
   sys.eagleEyeActive = eagle.active ? eagle : null;
   if (eagle.review) warnings.push(loc`Review the saved Eagle Eye die result and range modifier.`);
+}
 
-  /* ---------------- Prerequisites ---------------- */
+/** Step 15: check prerequisites; run another pass if the set of qualifying feats changed, otherwise finish. */
+function settlePrerequisites(state) {
+  const {
+    sys,
+    cfg,
+    options,
+    allItems,
+    items,
+    warnings,
+    legalFeatIds,
+    activeFeatIds,
+    todo,
+    classById,
+    progression,
+    level,
+    classLevels,
+    skillRanks,
+    featItems,
+    featNames,
+    activeFeatTrees,
+    rd
+  } = state;
   const ctx = prerequisiteContext(sys, featNames, activeFeatTrees, skillRanks);
   const permanentSystem = featItems.some(f => f.system.featKind === "temporary")
     ? computeAgent(
@@ -2172,8 +2433,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.rollDataExtras = rd;
   sys.warnings = warnings;
   // Before the first class level only the opening steps are worth listing.
-  if (!level) todo = todo.filter(t => t.always);
-  sys.todo = todo.sort((a, b) => a.order - b.order);
+  sys.todo = (level ? todo : todo.filter(t => t.always)).sort((a, b) => a.order - b.order);
   return sys;
 }
 

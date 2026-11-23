@@ -1,3 +1,4 @@
+import { renderOpenSheet } from "./refresh.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { getRestraintReleaseReview, getPendingRestraintMoves } from "../rules/restraints.mjs";
 import { getReserveReview } from "../rules/reserve-transactions.mjs";
@@ -214,7 +215,7 @@ export async function startUsagePeriod(period) {
       }
       for (const actor of actors)
         try {
-          actor.sheet?.render(false);
+          renderOpenSheet(actor);
         } catch {
           ui.notifications.warn(
             loc`The new period is already recorded. Reopen a character sheet if it did not refresh.`
@@ -476,7 +477,7 @@ export function refreshUsagePeriodActors() {
   for (const actor of periodResourceActors())
     try {
       actor.reset?.();
-      actor.sheet?.render(false);
+      renderOpenSheet(actor);
     } catch (error) {
       globalThis.ui?.notifications?.warn(loc`Usage periods changed. Reopen any character sheet that did not refresh.`);
     }
