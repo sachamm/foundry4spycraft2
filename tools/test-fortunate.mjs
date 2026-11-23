@@ -132,5 +132,5 @@ test("the GC grants the requested die once per use, and only the GC can", async 
 test("the Main tab shows the uses and the GC's grant control", async () => {
   const html = inlinedSource("systems/spycraft2/templates/actor/agent-main.hbs");
   assert.match(html, /data-action="grantFortunate"/);
-  assert.match(html, /data-resource="fortunate"/);
+  assert.match(html, /gc-review\.hbs" resource="fortunate"/);
 });

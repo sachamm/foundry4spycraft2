@@ -20,6 +20,12 @@
 - **Taller roll dialogs.** A dialog's body used to stop at half the screen height (360px at 1280×720). It now uses
   the height left after the header and footer, and scrolls as one box.
 
+- **Fewer redraws during a conflict.** A change to scene state or to a Dramatic Conflict used to recalculate every
+  character and redraw every sheet on every client; it now redraws the GC Console only. A mission or campaign change
+  still recalculates everyone, but redraws only the sheets that are open.
+- **Under the hood.** The function that derives an agent's numbers is split into fifteen named steps; a new test
+  fingerprints every derived property of the sixteen sample agents at four levels and fails if any of them moves.
+
 - **Text you write looks like text.** A heading in a biography or an item description was drawn as a sheet section
   bar, tables were centred, and links turned red on hover. Rich text now keeps plain headings, left-aligned tables
   and the normal link colour.
