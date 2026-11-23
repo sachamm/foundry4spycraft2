@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { bookIndex, matchingRuns } from "./check-copied-text.mjs";
 
 // Made-up "book" text for the checker's own tests; none of it comes from the rulebook.
@@ -48,7 +49,7 @@ test("a long label run does not hide a shorter prose run in the same string", ()
 });
 
 test("an explicit rulebook path that does not exist fails instead of skipping", () => {
-  const script = new URL("./check-copied-text.mjs", import.meta.url).pathname;
+  const script = fileURLToPath(new URL("./check-copied-text.mjs", import.meta.url));
   assert.throws(
     () => execFileSync(process.execPath, [script, "/no/such/rulebook.md"], { stdio: "pipe" }),
     error => error.status === 1
