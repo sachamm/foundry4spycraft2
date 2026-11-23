@@ -426,7 +426,7 @@
 }
 .spycraft2.sheet.agent .track-step.over .sc2-uses {
   background: var(--sc2-bad);
-  color: #fff;
+  color: var(--sc2-on-action);
 }
 .spycraft2.sheet.agent .track-start {
   font: 600 12px/1.35 var(--font-primary, sans-serif);

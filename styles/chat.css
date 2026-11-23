@@ -53,18 +53,23 @@
 .chat-message.sc2-card .message-header .spycraft2-error {
   color: var(--sc2-on-bar-danger);
 }
+/* The primary action and anything that is not a button take a full row; other buttons share a wrapping row. */
 .spycraft2.roll-controls {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc2-space-1);
   margin-top: 6px;
 }
+.spycraft2.roll-controls > :not(button, .sc2-icon-button) {
+  flex: 1 1 100%;
+}
 .spycraft2.roll-controls :is(button, .sc2-icon-button) {
-  width: 100%;
   justify-content: flex-start;
   text-align: left;
 }
 /* The card's next step stands out; closing the outcome is a small text button at the end of the row. */
 .spycraft2.roll-controls button.sc2-primary-action {
+  flex: 1 1 100%;
   color: var(--sc2-on-action);
   background: var(--sc2-action);
   border-color: var(--sc2-action);

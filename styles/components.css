@@ -508,6 +508,7 @@
 .spycraft2.application .sheet-tabs a:hover {
   color: var(--sc2-ink-strong);
   background: var(--sc2-action-tint);
+  text-decoration: none;
 }
 .spycraft2.application .sheet-tabs a.active {
   color: var(--sc2-on-bar);
@@ -891,9 +892,9 @@
   cursor: pointer;
 }
 .spycraft2.application button.sc2-text-action:hover {
-  color: var(--sc2-danger);
+  color: var(--sc2-action);
   background: none;
-  text-decoration: none;
+  text-decoration: underline;
   text-shadow: none;
 }
 

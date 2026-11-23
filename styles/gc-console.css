@@ -25,7 +25,11 @@
 .gc-console-body details.gc-section > summary::before {
   content: "\25B8";
   flex: 0 0 auto;
-  transition: transform 0.15s;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gc-console-body details.gc-section > summary::before {
+    transition: transform 0.15s;
+  }
 }
 .gc-console-body details.gc-section[open] > summary::before {
   transform: rotate(90deg);

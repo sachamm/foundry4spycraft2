@@ -131,7 +131,8 @@
   border-radius: var(--sc2-radius);
 }
 .spycraft2.application a:hover {
-  color: var(--sc2-danger);
+  color: var(--sc2-action);
+  text-decoration: underline;
   text-shadow: none;
 }
 .spycraft2.application h3 {
