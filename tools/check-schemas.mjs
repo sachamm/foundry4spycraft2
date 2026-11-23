@@ -3,7 +3,8 @@
  * Validates this system's data models with Foundry's own field classes, outside the browser.
  * It needs a local Foundry installation, so it is a developer check and not part of `npm test`.
  *
- *   npm run check:schemas
+ *   npm run check:schemas                  (exits 2 if Foundry is not found)
+ *   npm run check:schemas -- --allow-skip  (exits 0 if Foundry is not found)
  *   FOUNDRY_APP_PATH=/path/to/resources/app npm run check:schemas
  */
 import { existsSync } from "node:fs";
@@ -17,8 +18,14 @@ const candidates = [
 ].filter(Boolean);
 const app = candidates.find(path => existsSync(`${path}/common/data/fields.mjs`));
 if (!app) {
-  console.log("Foundry's application files were not found; set FOUNDRY_APP_PATH to its resources/app folder. Skipped.");
-  process.exit(0);
+  // A skipped check must not read as a passed one.
+  const allowed = process.argv.includes("--allow-skip");
+  console.log(
+    `Foundry's application files were not found; set FOUNDRY_APP_PATH to its resources/app folder. ${
+      allowed ? "Skipped." : "NOT CHECKED (pass --allow-skip to exit cleanly)."
+    }`
+  );
+  process.exit(allowed ? 0 : 2);
 }
 const load = file => import(pathToFileURL(`${app}/common/${file}`).href);
 await load("primitives/_module.mjs");

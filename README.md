@@ -271,7 +271,11 @@ Use `loc` inside functions. Text built while a module loads is fixed before the 
 write a getter instead (`get label() { return loc`Handgun`; }`). Display names held in the rules data (skills,
 named checks, feat trees) are translated when the language loads, by `module/i18n-data.mjs`.
 
-CI runs `lint`, `format:check`, the build, `npm test`, `npm run test:packs` and `npm run bundle`.
+CI runs `lint`, `format:check`, the build, `npm test`, `npm run test:packs` and `npm run bundle`, and a second job
+runs the Playwright layout tests (`npm run test:layout`). `npm run check:schemas` needs a local Foundry installation and
+is not run in CI; it exits with an error when Foundry is not found, so a skipped check cannot pass for a clean one.
+
+[docs/architecture.md](docs/architecture.md) maps the layers and lists the places to touch when adding an ability.
 
 A release ships the JavaScript as one file: `npm run bundle` (esbuild, not minified, with a source map) writes
 `dist/spycraft2.mjs`, and the release workflow puts it at the manifest's entry path in place of `module/`. Development

@@ -1,12 +1,11 @@
 import { readFileSync } from "node:fs";
+import { systemCss } from "../lib/system-css.mjs";
 import { test, expect } from "@playwright/test";
 
 // Layout regression fixtures for the vehicle actor sheet and the gear and vehicle item templates. They mount each
 // template's real root classes and its section headings inside a Foundry-style fixed-height window, then check that
 // the last control can be scrolled into view. They do not replace live Foundry QA.
-const css = ["spycraft2.css", "retro.css"]
-  .map(file => readFileSync(new URL(`../../styles/${file}`, import.meta.url), "utf8"))
-  .join("\n");
+const css = systemCss();
 // Template text lives in lang/en.json; read each template with its English strings filled back in.
 const strings = (function flatten(node, prefix = "", out = {}) {
   for (const [key, value] of Object.entries(node)) {
@@ -87,7 +86,8 @@ async function mount(page, fixture, height) {
 }
 
 for (const [name, fixture] of Object.entries(FIXTURES)) {
-  for (const height of [520, 780]) {
+  // 648 and 696 are the heights a sheet opens at on 1280x720 and 1366x768 screens.
+  for (const height of [520, 648, 696, 780]) {
     test(`${name}: the last control is reachable in a ${height}px window`, async ({ page }) => {
       await mount(page, fixture, height);
       const body = page.locator(`form > ${fixture.tag}`);

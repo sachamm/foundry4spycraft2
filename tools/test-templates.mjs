@@ -147,3 +147,17 @@ test("every action a template names is registered by a sheet or an application",
   assert.ok(seen > 400, `only ${seen} template actions found`);
   assert.deepEqual(missing, [], "A button names an action no sheet or application registers.");
 });
+
+// Most template lines are far too long to review, and reformatting them all at once would hide real changes. Until a
+// file is reformatted, these limits stop the long lines from growing in number or in length. Lower them as files are
+// reformatted (render the file before and after to prove the markup did not change).
+const LONG_LINE_LIMITS = { over200: 439, over500: 100, over1000: 14, longest: 1542 };
+
+test("template line lengths do not get worse", () => {
+  const lengths = paths.flatMap(path => sourceOf(path).split("\n")).map(line => line.length);
+  const count = limit => lengths.filter(length => length > limit).length;
+  assert.ok(count(200) <= LONG_LINE_LIMITS.over200, `${count(200)} lines over 200 characters`);
+  assert.ok(count(500) <= LONG_LINE_LIMITS.over500, `${count(500)} lines over 500 characters`);
+  assert.ok(count(1000) <= LONG_LINE_LIMITS.over1000, `${count(1000)} lines over 1,000 characters`);
+  assert.ok(Math.max(...lengths) <= LONG_LINE_LIMITS.longest, `longest line is ${Math.max(...lengths)} characters`);
+});

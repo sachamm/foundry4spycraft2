@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 import { test, expect } from "@playwright/test";
+import { systemCss } from "../lib/system-css.mjs";
 import { readFileSync } from "node:fs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 import { createEnvironment } from "../lib/hbs-harness.mjs";
 const sheetUX = readFileSync(new URL("../../module/sheets/agent-ux.mjs", import.meta.url), "utf8");
 const skillUX = readFileSync(new URL("../../module/apps/skill-dialog-ux.mjs", import.meta.url), "utf8");
-const css = ["tokens", "spycraft2", "retro", "components"]
-  .map(name => readFileSync(new URL(`../../styles/${name}.css`, import.meta.url), "utf8"))
-  .join("\n");
+const css = systemCss();
 
 // The modules import the translation tag; a page script cannot resolve that path, so it is inlined.
 const i18n = readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8").replace(/^export /gm, "");

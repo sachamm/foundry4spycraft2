@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
+import { systemCss } from "../lib/system-css.mjs";
+import { sheetPlacement } from "../../module/sheets/sheet-placement.mjs";
 
 const read = name => readFileSync(new URL(`../../styles/${name}.css`, import.meta.url), "utf8");
 const baseCSS = read("spycraft2");
@@ -116,6 +118,43 @@ test("fixture reproduces the inaccessible bottom without the rail layout", async
   });
   await expect(tab.locator(".bottom-control")).not.toBeInViewport();
 });
+
+// The two screens the system is laid out for. The window is the size the sheet opens at on that screen (beside the
+// scene controls and the 348px sidebar), and the styles are the full set a world loads, in the manifest's order.
+for (const [screenWidth, screenHeight] of [
+  [1280, 720],
+  [1366, 768]
+]) {
+  test(`on a ${screenWidth}x${screenHeight} screen the agent sheet keeps its rail, and every tab scrolls to its end`, async ({
+    page
+  }) => {
+    const { width, height } = sheetPlacement(
+      { width: 860, height: 760 },
+      { width: screenWidth, height: screenHeight, sidebar: 348, open: 0 }
+    );
+    await page.setViewportSize({ width: screenWidth, height: screenHeight });
+    await mount(page, { width, height, css: systemCss() });
+    for (const id of tabs) {
+      await page.locator(`nav button[data-tab="${id}"]`).click();
+      const active = page.locator(`section[data-tab="${id}"]`);
+      await active.evaluate(el => {
+        el.scrollTop = el.scrollHeight;
+      });
+      await expect(active.locator(".bottom-control")).toBeInViewport();
+      await expect(page.locator(".sheet-rail")).toBeInViewport();
+      await expect(page.locator("nav")).toBeInViewport();
+    }
+    const [railBox, tabBox, appBox] = await Promise.all([
+      page.locator(".sheet-rail").boundingBox(),
+      page.locator("section.tab.active").boundingBox(),
+      page.locator(".application").boundingBox()
+    ]);
+    // Rail and content sit side by side inside the window, with nothing pushed out of it.
+    expect(railBox.x + railBox.width).toBeLessThanOrEqual(tabBox.x);
+    expect(tabBox.x + tabBox.width).toBeLessThanOrEqual(appBox.x + appBox.width + 0.5);
+    expect(await page.locator(".application").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  });
+}
 
 // The NPC sheet is one part; its root must scroll inside the fixed-height window.
 const npcRoot = /<section class="([^"]+)"/.exec(

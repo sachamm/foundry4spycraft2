@@ -1,9 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { systemCss } from "../lib/system-css.mjs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
-const css = ["tokens", "spycraft2", "retro", "components"]
-  .map(name => readFileSync(new URL(`../../styles/${name}.css`, import.meta.url), "utf8"))
-  .join("\n");
+const css = systemCss();
 
 test("unlabelled numeric table fields get row and column context without overriding authored names", async ({
   page
