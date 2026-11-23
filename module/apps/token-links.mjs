@@ -62,14 +62,33 @@ export async function applyLinkProposal({ token, actor, changes }, options = { s
     if (plan.update.length) await actor.updateEmbeddedDocuments(name, plan.update, options);
     if (plan.create.length) await actor.createEmbeddedDocuments(name, plan.create, { ...options, keepId: true });
   }
-  await token.update({ actorLink: true }, options);
+  // Item hooks skip granted-feat upkeep during the copy; it runs once now that every item is in place.
+  if (changes.items.create.length + changes.items.update.length + changes.items.delete.length)
+    await actor.syncGrantedFeats?.();
+  // Companions made from the token's sheet point at the agent before the token is linked, so a failure here leaves
+  // the token unlinked and still offered for review.
   const sceneId = token.parent?.id;
   for (const { actor: companion, update } of companionRetargets(
     globalThis.game?.actors ?? [],
     (scene, id) => scene === sceneId && id === token.id
   ))
     await companion.update(update, options);
+  await token.update({ actorLink: true }, options);
   if (actor.prototypeToken?.actorLink === false) await actor.update({ "prototypeToken.actorLink": true }, options);
+}
+
+/**
+ * Point any companion still naming a linked token's copy as its owner at the agent itself. Run on each load, so a
+ * repoint that failed earlier is tried again.
+ */
+export async function retargetLinkedCompanions(game = globalThis.game) {
+  const linked = (sceneId, tokenId) => game?.scenes?.get?.(sceneId)?.tokens?.get?.(tokenId)?.actorLink === true;
+  for (const { actor, update } of companionRetargets(game?.actors ?? [], linked))
+    try {
+      await actor.update(update);
+    } catch (error) {
+      console.error(`Spycraft 2.0 | Could not point the companion ${actor.name ?? actor.id} at its agent`, error);
+    }
 }
 
 /** Ask the GC about each unlinked agent or companion token; link ticked rows and remember unticked ones. */
@@ -144,7 +163,10 @@ export function queueTokenLinkReview() {
 export function installTokenLinks() {
   game.settings.register(SYSTEM, DISMISSED_SETTING, { scope: "world", config: false, type: Object, default: {} });
   // After the world migration has linked every token that had no changes of its own.
-  Hooks.once("spycraft2.ready", () => queueTokenLinkReview());
+  Hooks.once("spycraft2.ready", () => {
+    if (isLeadGM()) retargetLinkedCompanions();
+    queueTokenLinkReview();
+  });
   Hooks.on("createToken", token => {
     if (!token.actorLink && isPersonalCharacter(token.baseActor)) queueTokenLinkReview();
   });

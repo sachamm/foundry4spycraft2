@@ -6,6 +6,7 @@ import {
   describeLinkProposal,
   linkProposal,
   pendingLinkProposals,
+  retargetLinkedCompanions,
   reviewTokenLinks
 } from "../module/apps/token-links.mjs";
 import {
@@ -239,14 +240,16 @@ test("linking copies the token's changes to the character first, then links the 
     ]
   };
   const { token, writes, actor } = world({ delta });
+  // Granted feats are reconciled once, after every item has been copied.
+  actor.syncGrantedFeats = async () => writes.push(["syncGrantedFeats"]);
   await applyLinkProposal(linkProposal(token));
   assert.deepEqual(
     writes.map(([what]) => what),
-    ["actor.update", "delete Item", "update Item", "create Item", "token.update", "actor.update"]
+    ["actor.update", "delete Item", "update Item", "create Item", "syncGrantedFeats", "token.update", "actor.update"]
   );
   assert.deepEqual(writes[0][1], { system: { vitality: { value: 12 } } });
   assert.equal(writes[3][2], true, "created items keep their ids");
-  assert.deepEqual(writes[4][1], { actorLink: true });
+  assert.deepEqual(writes[5][1], { actorLink: true });
   assert.equal(actor.prototypeToken.actorLink, true);
 });
 
@@ -332,4 +335,23 @@ test("companions made from an unlinked token's sheet follow the agent once the t
   await applyLinkProposal(linkProposal(token));
   assert.deepEqual(companion.writes.at(-1), { "system.companionOf.ownerUuid": "Actor.inez" });
   delete globalThis.game;
+});
+
+test("a companion repoint that failed is tried again on the next load, for any linked token", async () => {
+  const companion = {
+    name: "Rex",
+    system: { companionOf: { ownerUuid: "Scene.warehouse.Token.t1.Actor.inez" } },
+    writes: [],
+    update: async function (data) {
+      this.writes.push(data);
+    }
+  };
+  const tokens = new Map([["t1", { actorLink: true }]]);
+  await retargetLinkedCompanions({ actors: [companion], scenes: new Map([["warehouse", { tokens }]]) });
+  assert.deepEqual(companion.writes, [{ "system.companionOf.ownerUuid": "Actor.inez" }]);
+  // Still unlinked: left alone.
+  const waiting = { ...companion, writes: [] };
+  tokens.set("t1", { actorLink: false });
+  await retargetLinkedCompanions({ actors: [waiting], scenes: new Map([["warehouse", { tokens }]]) });
+  assert.deepEqual(waiting.writes, []);
 });

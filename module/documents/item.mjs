@@ -209,6 +209,8 @@ export class SpycraftItem extends Item {
   /** @override */
   _onCreate(data, options, userId) {
     super._onCreate(data, options, userId);
+    // A copy from a token's own changes reconciles granted feats once, after every item is in place.
+    if (options?.spycraft2TokenLink) return;
     if (!SpycraftItem.#isOrigin(options, userId) || this.parent?.type !== "agent") return;
     if (this.type === "origin") this.parent.syncGrantedFeats();
   }
@@ -216,6 +218,8 @@ export class SpycraftItem extends Item {
   /** @override */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
+    // A copy from a token's own changes reconciles granted feats once, after every item is in place.
+    if (options?.spycraft2TokenLink) return;
     if (!SpycraftItem.#isOrigin(options, userId) || this.parent?.type !== "agent") return;
     if (this.type === "origin" || this.type === "class") this.parent.syncGrantedFeats();
   }
@@ -223,6 +227,8 @@ export class SpycraftItem extends Item {
   /** @override */
   _onDelete(options, userId) {
     super._onDelete(options, userId);
+    // A copy from a token's own changes reconciles granted feats once, after every item is in place.
+    if (options?.spycraft2TokenLink) return;
     const actor = this.parent;
     if (!SpycraftItem.#isOrigin(options, userId) || actor?.type !== "agent") return;
     if (this.type === "origin") actor.syncGrantedFeats();
