@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   MIGRATIONS,
+  RELEASE_SCHEMAS,
   SCHEMA_VERSION,
   applyUpdate,
   documentUpdate,
@@ -47,6 +49,20 @@ test("the shipped migration list is consistent with the schema version", () => {
     assert.ok(["actor", "item", "token", "world"].some(kind => typeof migration[kind] === "function"));
   }
   assert.deepEqual(pendingMigrations(SCHEMA_VERSION), []);
+});
+
+test("a world from every published release is brought forward by each later migration, in order", () => {
+  const { version } = JSON.parse(readFileSync(new URL("../system.json", import.meta.url), "utf8"));
+  assert.equal(RELEASE_SCHEMAS[version], SCHEMA_VERSION, `add ${version} to RELEASE_SCHEMAS`);
+  for (const [release, schema] of Object.entries(RELEASE_SCHEMAS)) {
+    const expected = [];
+    for (let v = Math.max(schema, 1) + 1; v <= SCHEMA_VERSION; v++) expected.push(v);
+    assert.deepEqual(
+      pendingMigrations(schema).map(m => m.version),
+      expected,
+      `a ${release} world (schema ${schema})`
+    );
+  }
 });
 
 test("version 4 turns on skipping defeated combatants once, keeping the tracker's other settings", async () => {
