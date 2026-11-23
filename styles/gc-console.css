@@ -1,84 +1,356 @@
 /* The Game Control console in the sidebar, and the game clock. */
 /* Game Control console */
-.spycraft2.gc-console .window-content { overflow-y: auto; }
-.gc-console-body h2 { margin: 0.8em 0 0.3em; border-bottom: 1px solid currentColor; }
+.spycraft2.gc-console .window-content {
+  overflow-y: auto;
+}
+.gc-console-body h2 {
+  margin: 0.8em 0 0.3em;
+  border-bottom: 1px solid currentColor;
+}
 /* Collapsible console sections: the heading row is the toggle, with a short status note at its end. */
-.gc-console-body details.gc-section { border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent); }
-.gc-console-body details.gc-section > summary { display: flex; align-items: baseline; gap: 0.5em; padding: 0.45em 0; cursor: pointer; list-style: none; }
-.gc-console-body details.gc-section > summary::-webkit-details-marker { display: none; }
-.gc-console-body details.gc-section > summary::before { content: "\25B8"; flex: 0 0 auto; transition: transform 0.15s; }
-.gc-console-body details.gc-section[open] > summary::before { transform: rotate(90deg); }
-.gc-console-body details.gc-section > summary .gc-section-title { flex: 1 1 auto; margin: 0; border: 0; font-size: 1.1em; }
-.gc-console-body details.gc-section > summary .gc-note { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
-.gc-console-body details.gc-section[open] { padding-bottom: 0.4em; }
-.gc-console-body details.gc-section .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr)); }
-.gc-console-body details.gc-section .controls button { width: 100%; }
-.gc-console-body .controls button.gc-primary { grid-column: 1 / -1; order: -1; font-weight: bold; }
-.gc-console-body h3 { margin: 0.6em 0 0.2em; }
-.gc-console-body h2 button, .gc-console-body h3 button { width: auto; display: inline-block; font-size: 0.75em; line-height: 1.6; padding: 0 0.6em; margin-left: 0.5em; vertical-align: middle; }
-.gc-console-body .controls { display: flex; flex-wrap: wrap; gap: 0.3em; }
-.gc-console-body .controls button { width: auto; flex: 0 0 auto; }
-.gc-console-body ul { margin: 0.2em 0; padding-left: 1.2em; }
-.gc-console-body .tag { font-size: 12px; text-transform: uppercase; border: 1px solid currentColor; border-radius: 3px; padding: 0 0.4em; vertical-align: middle; }
-.gc-console-body .muted { opacity: 0.65; }
+.gc-console-body details.gc-section {
+  border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+}
+.gc-console-body details.gc-section > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0.45em 0;
+  cursor: pointer;
+  list-style: none;
+}
+.gc-console-body details.gc-section > summary::-webkit-details-marker {
+  display: none;
+}
+.gc-console-body details.gc-section > summary::before {
+  content: "\25B8";
+  flex: 0 0 auto;
+  transition: transform 0.15s;
+}
+.gc-console-body details.gc-section[open] > summary::before {
+  transform: rotate(90deg);
+}
+.gc-console-body details.gc-section > summary .gc-section-title {
+  flex: 1 1 auto;
+  margin: 0;
+  border: 0;
+  font-size: 1.1em;
+}
+.gc-console-body details.gc-section > summary .gc-note {
+  flex: 0 0 auto;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+.gc-console-body details.gc-section[open] {
+  padding-bottom: 0.4em;
+}
+.gc-console-body details.gc-section .controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr));
+}
+.gc-console-body details.gc-section .controls button {
+  width: 100%;
+}
+.gc-console-body .controls button.gc-primary {
+  grid-column: 1 / -1;
+  order: -1;
+  font-weight: bold;
+}
+.gc-console-body h3 {
+  margin: 0.6em 0 0.2em;
+}
+.gc-console-body h2 button,
+.gc-console-body h3 button {
+  width: auto;
+  display: inline-block;
+  font-size: 0.75em;
+  line-height: 1.6;
+  padding: 0 0.6em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+.gc-console-body .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em;
+}
+.gc-console-body .controls button {
+  width: auto;
+  flex: 0 0 auto;
+}
+.gc-console-body ul {
+  margin: 0.2em 0;
+  padding-left: 1.2em;
+}
+.gc-console-body .tag {
+  font-size: 12px;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 0 0.4em;
+  vertical-align: middle;
+}
+.gc-console-body .muted {
+  opacity: 0.65;
+}
 /* The sidebar owns the viewport; its console body supplies the scrolling content. */
-.spycraft2.gc-console.sidebar-tab { min-width: 0; min-height: 0; overflow: hidden; }
-.spycraft2.gc-console.sidebar-tab:not(.sidebar-popout) { padding: 0; }
-.spycraft2.gc-console.sidebar-tab.active:not(.sidebar-popout) { display: flex; flex-direction: column; }
-.gc-console-body { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; overflow-wrap: anywhere; padding: 0 0.6rem 0.75rem; }
-.gc-console-body .controls button { max-width: 100%; min-width: 0; height: auto; white-space: normal; line-height: 1.4; padding: 0.35em 0.5em; }
-.gc-console-body h2 { font-size: 1.2em; }
-.gc-console-body h3 { flex-wrap: wrap; }
-.gc-console-body .controls { margin: 0.5em 0; }
+.spycraft2.gc-console.sidebar-tab {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.spycraft2.gc-console.sidebar-tab:not(.sidebar-popout) {
+  padding: 0;
+}
+.spycraft2.gc-console.sidebar-tab.active:not(.sidebar-popout) {
+  display: flex;
+  flex-direction: column;
+}
+.gc-console-body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  padding: 0 0.6rem 0.75rem;
+}
+.gc-console-body .controls button {
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  white-space: normal;
+  line-height: 1.4;
+  padding: 0.35em 0.5em;
+}
+.gc-console-body h2 {
+  font-size: 1.2em;
+}
+.gc-console-body h3 {
+  flex-wrap: wrap;
+}
+.gc-console-body .controls {
+  margin: 0.5em 0;
+}
 
 /* Game clock: the badge above the players list and the Clock window. */
-.sc2-clock-badge { pointer-events: auto; flex: 0 0 auto; width: var(--players-width, 200px); max-width: none; min-height: 26px; height: auto; margin: 0 0 4px; padding: 3px 8px; display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.3; text-align: left; white-space: normal; border: 1px solid var(--color-border-light-primary, #777); border-radius: 4px; background: var(--color-bg-option, rgba(0, 0, 0, 0.6)); color: var(--color-text-primary, #eee); }
-.sc2-clock-badge span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.sc2-game-clock-body { display: flex; flex-direction: column; gap: 6px; }
-.sc2-game-clock-body h3 { margin: 6px 0 0; border-bottom: 1px solid currentColor; font-size: 1.05em; }
-.sc2-game-clock-body .muted { opacity: 0.65; margin: 0; }
-.sc2-clock-now { margin: 0; font-size: 1.25em; font-weight: bold; text-align: center; }
-.sc2-clock-steps { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
-.sc2-clock-steps button { flex: 1 1 auto; width: auto; white-space: nowrap; }
-.sc2-timers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.sc2-timer-line { display: flex; gap: 6px; align-items: baseline; }
-.sc2-timer-left { margin-left: auto; white-space: nowrap; }
-.sc2-timer progress { width: 100%; height: 6px; }
-.sc2-timer.done .sc2-timer-left { font-weight: bold; }
-.sc2-timer-controls { display: flex; gap: 4px; }
-.sc2-timer-controls button { width: auto; flex: 0 0 auto; font-size: 0.85em; line-height: 1.6; min-height: 0; padding: 0 0.6em; }
-.sc2-timer-new { display: grid; grid-template-columns: 1fr 4em 7em; gap: 4px; align-items: center; }
-.sc2-timer-new input[type="text"] { grid-column: 1; min-width: 0; }
-.sc2-timer-new .sc2-timer-holder { grid-column: 1 / 4; }
-.sc2-timer-new .sc2-timer-shared { grid-column: 1 / 3; display: flex; align-items: center; gap: 4px; font-size: 0.9em; }
-.sc2-timer-new button { grid-column: 3; width: auto; }
+.sc2-clock-badge {
+  pointer-events: auto;
+  flex: 0 0 auto;
+  width: var(--players-width, 200px);
+  max-width: none;
+  min-height: 26px;
+  height: auto;
+  margin: 0 0 4px;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  white-space: normal;
+  border: 1px solid var(--color-border-light-primary, #777);
+  border-radius: 4px;
+  background: var(--color-bg-option, rgba(0, 0, 0, 0.6));
+  color: var(--color-text-primary, #eee);
+}
+.sc2-clock-badge span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sc2-game-clock-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sc2-game-clock-body h3 {
+  margin: 6px 0 0;
+  border-bottom: 1px solid currentColor;
+  font-size: 1.05em;
+}
+.sc2-game-clock-body .muted {
+  opacity: 0.65;
+  margin: 0;
+}
+.sc2-clock-now {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: bold;
+  text-align: center;
+}
+.sc2-clock-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+}
+.sc2-clock-steps button {
+  flex: 1 1 auto;
+  width: auto;
+  white-space: nowrap;
+}
+.sc2-timers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sc2-timer-line {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.sc2-timer-left {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.sc2-timer progress {
+  width: 100%;
+  height: 6px;
+}
+.sc2-timer.done .sc2-timer-left {
+  font-weight: bold;
+}
+.sc2-timer-controls {
+  display: flex;
+  gap: 4px;
+}
+.sc2-timer-controls button {
+  width: auto;
+  flex: 0 0 auto;
+  font-size: 0.85em;
+  line-height: 1.6;
+  min-height: 0;
+  padding: 0 0.6em;
+}
+.sc2-timer-new {
+  display: grid;
+  grid-template-columns: 1fr 4em 7em;
+  gap: 4px;
+  align-items: center;
+}
+.sc2-timer-new input[type="text"] {
+  grid-column: 1;
+  min-width: 0;
+}
+.sc2-timer-new .sc2-timer-holder {
+  grid-column: 1 / 4;
+}
+.sc2-timer-new .sc2-timer-shared {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9em;
+}
+.sc2-timer-new button {
+  grid-column: 3;
+  width: auto;
+}
 
 /* ---------- Game Control console ---------- */
-.gc-console-body details.gc-section .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 6px 0; }
-.gc-console-body details.gc-section .controls button { width: 100%; justify-content: flex-start; text-align: left; padding: 3px 8px; font-size: 13px; }
-.gc-console-body .controls button.gc-primary { justify-content: center; }
-.gc-console-body li .sc2-icon-button[data-sc2-mode="icon"] { width: 26px; height: 26px; min-width: 26px; min-height: 26px; --sc2-icon-size: 20px; background: var(--sc2-paper-raised); vertical-align: middle; }
+.gc-console-body details.gc-section .controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 6px 0;
+}
+.gc-console-body details.gc-section .controls button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 3px 8px;
+  font-size: 13px;
+}
+.gc-console-body .controls button.gc-primary {
+  justify-content: center;
+}
+.gc-console-body li .sc2-icon-button[data-sc2-mode="icon"] {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  min-height: 26px;
+  --sc2-icon-size: 20px;
+  background: var(--sc2-paper-raised);
+  vertical-align: middle;
+}
 
 /* What is true right now, before any section is opened. */
-.gc-console-body .gc-now { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 0.6rem 0; }
-.gc-console-body .gc-now .sc2-field { padding: 4px 8px; }
-.gc-console-body .gc-now .sc2-value { font-size: 15px; overflow-wrap: anywhere; }
+.gc-console-body .gc-now {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0.6rem 0;
+}
+.gc-console-body .gc-now .sc2-field {
+  padding: 4px 8px;
+}
+.gc-console-body .gc-now .sc2-value {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
 /* Section headings are bars, as on the sheets. */
-.gc-console-body details.gc-section { border-bottom: 0; margin-bottom: 4px; }
-.gc-console-body details.gc-section > summary { align-items: center; padding: 4px 8px; color: var(--sc2-on-bar); background: var(--sc2-bar); border-radius: var(--sc2-radius); }
-.gc-console-body details.gc-section > summary :is(.muted, .tag.muted) { opacity: 1; color: var(--sc2-on-bar-muted); }
-.gc-console-body details.gc-section > summary .gc-section-title { font: 400 12px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
-.gc-console-body details.gc-section > summary .gc-note { font-family: var(--sc2-num); opacity: 1; }
+.gc-console-body details.gc-section {
+  border-bottom: 0;
+  margin-bottom: 4px;
+}
+.gc-console-body details.gc-section > summary {
+  align-items: center;
+  padding: 4px 8px;
+  color: var(--sc2-on-bar);
+  background: var(--sc2-bar);
+  border-radius: var(--sc2-radius);
+}
+.gc-console-body details.gc-section > summary :is(.muted, .tag.muted) {
+  opacity: 1;
+  color: var(--sc2-on-bar-muted);
+}
+.gc-console-body details.gc-section > summary .gc-section-title {
+  font: 400 12px/1.4 var(--sc2-bar-font);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: inherit;
+}
+.gc-console-body details.gc-section > summary .gc-note {
+  font-family: var(--sc2-num);
+  opacity: 1;
+}
 
 /* The console is one surface in the sheets' own paper and ink. It used to keep the sidebar's background under this
  * system's text colours, which made some lines dark on dark. */
-.spycraft2.gc-console .gc-console-body { color: var(--sc2-ink); background: var(--sc2-surface); }
-.gc-console-body .sc2-resolution-guide { color: var(--sc2-ink); background: var(--sc2-surface-raised); }
-.gc-console-body .sc2-resolution-guide > summary { color: var(--sc2-ink); }
-.gc-console-body :is(.muted, .gc-note) { opacity: 1; color: var(--sc2-ink-muted); }
-.gc-console-body details.gc-section > summary .gc-note { color: inherit; }
+.spycraft2.gc-console .gc-console-body {
+  color: var(--sc2-ink);
+  background: var(--sc2-surface);
+}
+.gc-console-body .sc2-resolution-guide {
+  color: var(--sc2-ink);
+  background: var(--sc2-surface-raised);
+}
+.gc-console-body .sc2-resolution-guide > summary {
+  color: var(--sc2-ink);
+}
+.gc-console-body :is(.muted, .gc-note) {
+  opacity: 1;
+  color: var(--sc2-ink-muted);
+}
+.gc-console-body details.gc-section > summary .gc-note {
+  color: inherit;
+}
 /* Section headings use the same face as the sheets' bars; the display face is kept for the dossier label only. */
-.gc-console-body details.gc-section > summary .gc-section-title { font: 700 12px/1.4 var(--font-primary, sans-serif); letter-spacing: 0.08em; }
-.gc-console-body .gc-current-turn { font-weight: 700; }
-.gc-console-body .gc-current-turn::before { content: "▶ "; }
-.gc-console-body [data-defeated="true"] { text-decoration: line-through; opacity: 0.7; }
+.gc-console-body details.gc-section > summary .gc-section-title {
+  font: 700 12px/1.4 var(--font-primary, sans-serif);
+  letter-spacing: 0.08em;
+}
+.gc-console-body .gc-current-turn {
+  font-weight: 700;
+}
+.gc-console-body .gc-current-turn::before {
+  content: "▶ ";
+}
+.gc-console-body [data-defeated="true"] {
+  text-decoration: line-through;
+  opacity: 0.7;
+}

@@ -1,43 +1,175 @@
 /* NPC and vehicle sheets. */
 /* ---------- NPC ---------- */
-.spycraft2.sheet.npc .npc-action-buttons button { padding: 3px 10px; }
-.spycraft2.npc .abilities-row { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
-.spycraft2.npc .ability { min-width: 0; gap: 2px; padding: 4px 2px; background: color-mix(in srgb, var(--sc2-surface-raised) 70%, transparent); border: 1px solid var(--sc2-rule); border-top: 2px solid var(--sc2-brass); border-radius: 2px; }
-.spycraft2.npc .ability .mod { font-family: var(--sc2-display); font-weight: 700; }
-.spycraft2.sheet.npc .item-list li .name { flex: 1; }
+.spycraft2.sheet.npc .npc-action-buttons button {
+  padding: 3px 10px;
+}
+.spycraft2.npc .abilities-row {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+.spycraft2.npc .ability {
+  min-width: 0;
+  gap: 2px;
+  padding: 4px 2px;
+  background: color-mix(in srgb, var(--sc2-surface-raised) 70%, transparent);
+  border: 1px solid var(--sc2-rule);
+  border-top: 2px solid var(--sc2-brass);
+  border-radius: 2px;
+}
+.spycraft2.npc .ability .mod {
+  font-family: var(--sc2-display);
+  font-weight: 700;
+}
+.spycraft2.sheet.npc .item-list li .name {
+  flex: 1;
+}
 /* NPC attribute names are labels that roll; they keep the body face so long names fit their tile. */
-.spycraft2.application.npc .ability [data-action="rollAbility"] { min-width: 0; max-width: 100%; padding: 0 2px; font-family: inherit; font-size: var(--sc2-text-s); background: transparent; border-color: transparent; }
+.spycraft2.application.npc .ability [data-action="rollAbility"] {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 2px;
+  font-family: inherit;
+  font-size: var(--sc2-text-s);
+  background: transparent;
+  border-color: transparent;
+}
 
-.spycraft2.sheet.vehicle { container-type: inline-size; }
-.spycraft2.sheet.vehicle .spycraft2-sheet > p { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-3); margin: 6px 0; }
-.spycraft2.sheet.vehicle .spycraft2-sheet > p label { display: inline-flex; align-items: center; gap: 6px; }
-.spycraft2.sheet.vehicle .spycraft2-sheet > p select { width: auto; }
+.spycraft2.sheet.vehicle {
+  container-type: inline-size;
+}
+.spycraft2.sheet.vehicle .spycraft2-sheet > p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc2-space-1) var(--sc2-space-3);
+  margin: 6px 0;
+}
+.spycraft2.sheet.vehicle .spycraft2-sheet > p label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.spycraft2.sheet.vehicle .spycraft2-sheet > p select {
+  width: auto;
+}
 
 /* NPC stat block: the figures used in play, read at a glance. */
-.spycraft2.sheet.npc .npc-name { flex: 1; min-width: 0; font: 700 18px/1.2 var(--font-primary, sans-serif); overflow-wrap: anywhere; }
-.spycraft2.sheet.npc .name-row { display: flex; align-items: center; gap: var(--sc2-space-2); }
-.spycraft2.sheet.npc .name-row .mode-toggle { margin-left: auto; }
-.spycraft2.sheet.npc .sheet-header .portrait { width: 64px; height: 64px; border: 1px solid var(--sc2-bar-edge); border-radius: var(--sc2-radius); outline: 0; box-shadow: none; }
-.spycraft2.sheet.npc .npc-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; margin: 6px 0; padding: 0; background: transparent; }
-.spycraft2.sheet.npc .npc-results .npc-note { grid-column: 1 / -1; margin: 0; }
-.spycraft2.sheet.npc .ability { align-items: flex-start; padding: 5px 8px; background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-action); border-top-width: 1px; }
-.spycraft2.sheet.npc .ability small { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); }
-.spycraft2.application.npc .ability [data-action="rollAbility"] { font: 600 var(--sc2-caption-size)/1.35 var(--font-primary, sans-serif); letter-spacing: 0; text-transform: none; color: var(--sc2-ink-muted); min-height: 0; white-space: normal; }
-.spycraft2.sheet.npc .npc-graded-play .resources { display: flex; flex-wrap: wrap; gap: var(--sc2-space-1) var(--sc2-space-4); margin: 6px 0; }
+.spycraft2.sheet.npc .npc-name {
+  flex: 1;
+  min-width: 0;
+  font: 700 18px/1.2 var(--font-primary, sans-serif);
+  overflow-wrap: anywhere;
+}
+.spycraft2.sheet.npc .name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sc2-space-2);
+}
+.spycraft2.sheet.npc .name-row .mode-toggle {
+  margin-left: auto;
+}
+.spycraft2.sheet.npc .sheet-header .portrait {
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--sc2-bar-edge);
+  border-radius: var(--sc2-radius);
+  outline: 0;
+  box-shadow: none;
+}
+.spycraft2.sheet.npc .npc-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 6px;
+  margin: 6px 0;
+  padding: 0;
+  background: transparent;
+}
+.spycraft2.sheet.npc .npc-results .npc-note {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.spycraft2.sheet.npc .ability {
+  align-items: flex-start;
+  padding: 5px 8px;
+  background: var(--sc2-surface-raised);
+  border: 1px solid var(--sc2-rule);
+  border-bottom: 3px solid var(--sc2-action);
+  border-top-width: 1px;
+}
+.spycraft2.sheet.npc .ability small {
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
+}
+.spycraft2.application.npc .ability [data-action="rollAbility"] {
+  font: 600 var(--sc2-caption-size)/1.35 var(--font-primary, sans-serif);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sc2-ink-muted);
+  min-height: 0;
+  white-space: normal;
+}
+.spycraft2.sheet.npc .npc-graded-play .resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc2-space-1) var(--sc2-space-4);
+  margin: 6px 0;
+}
 
 /* Vehicle condition: one box per failed damage save, with the breaking and destroying boxes marked. */
-.spycraft2 .sc2-track { display: flex; flex-wrap: wrap; gap: 3px; margin: 6px 0; }
-.spycraft2 .sc2-track i { width: 16px; height: 16px; border: 1.5px solid var(--sc2-ink); border-radius: 2px; }
-.spycraft2 .sc2-track i.on { background: var(--sc2-ink); }
-.spycraft2 .sc2-track i.mark-broken { border-color: var(--sc2-warn); box-shadow: 0 0 0 1px var(--sc2-warn); }
-.spycraft2 .sc2-track i.mark-destroyed { border-color: var(--sc2-danger); box-shadow: 0 0 0 1px var(--sc2-danger); }
-.spycraft2 .sc2-track i.on:is(.mark-broken, .mark-destroyed) { background: var(--sc2-danger); }
+.spycraft2 .sc2-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 6px 0;
+}
+.spycraft2 .sc2-track i {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--sc2-ink);
+  border-radius: 2px;
+}
+.spycraft2 .sc2-track i.on {
+  background: var(--sc2-ink);
+}
+.spycraft2 .sc2-track i.mark-broken {
+  border-color: var(--sc2-warn);
+  box-shadow: 0 0 0 1px var(--sc2-warn);
+}
+.spycraft2 .sc2-track i.mark-destroyed {
+  border-color: var(--sc2-danger);
+  box-shadow: 0 0 0 1px var(--sc2-danger);
+}
+.spycraft2 .sc2-track i.on:is(.mark-broken, .mark-destroyed) {
+  background: var(--sc2-danger);
+}
 /* Figures first: attributes and statistics sit directly under the name, ahead of the action lists. */
-.spycraft2.sheet.npc .spycraft2-sheet.npc { display: flex; flex-direction: column; }
-.spycraft2.sheet.npc .spycraft2-sheet.npc > * { flex: 0 0 auto; order: 3; }
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .sheet-header { order: 0; }
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .abilities-row { order: 1; }
-.spycraft2.sheet.npc .spycraft2-sheet.npc > :is(.npc-graded-play, .stat-grid) { order: 2; }
-.spycraft2.sheet.npc .npc-results .sc2-caption { letter-spacing: 0.02em; overflow-wrap: normal; }
-.spycraft2.sheet.npc .npc-results { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
-.spycraft2.application.npc .ability [data-action="rollAbility"] { max-width: 100%; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
+.spycraft2.sheet.npc .spycraft2-sheet.npc {
+  display: flex;
+  flex-direction: column;
+}
+.spycraft2.sheet.npc .spycraft2-sheet.npc > * {
+  flex: 0 0 auto;
+  order: 3;
+}
+.spycraft2.sheet.npc .spycraft2-sheet.npc > .sheet-header {
+  order: 0;
+}
+.spycraft2.sheet.npc .spycraft2-sheet.npc > .abilities-row {
+  order: 1;
+}
+.spycraft2.sheet.npc .spycraft2-sheet.npc > :is(.npc-graded-play, .stat-grid) {
+  order: 2;
+}
+.spycraft2.sheet.npc .npc-results .sc2-caption {
+  letter-spacing: 0.02em;
+  overflow-wrap: normal;
+}
+.spycraft2.sheet.npc .npc-results {
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+}
+.spycraft2.application.npc .ability [data-action="rollAbility"] {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0;
+}

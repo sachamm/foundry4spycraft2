@@ -2,7 +2,7 @@
  * Palette stays legible independently of Foundry's surrounding light/dark theme.
  * No animation, external fonts, or decorative layers over interactive controls. */
 .spycraft2.application {
-  --sc2-class: rgba(171, 131, 54, .15);
+  --sc2-class: rgba(171, 131, 54, 0.15);
   --sc2-border: var(--sc2-rule);
   --color-text-primary: var(--sc2-ink);
   --color-text-secondary: var(--sc2-ink-muted);
@@ -22,7 +22,11 @@
   background: var(--sc2-bar);
   border-bottom: 0;
 }
-.spycraft2.application .window-header button { color: var(--sc2-on-bar); background-color: transparent; border-color: transparent; }
+.spycraft2.application .window-header button {
+  color: var(--sc2-on-bar);
+  background-color: transparent;
+  border-color: transparent;
+}
 .spycraft2.application .window-content {
   background: var(--sc2-surface);
   color: var(--sc2-ink);
@@ -39,11 +43,16 @@
   background: var(--sc2-bar);
   border-bottom: 2px solid var(--sc2-rule-strong);
 }
-.spycraft2 .dossier-band .agency-seal { width: 34px; height: 34px; border: 0; flex: 0 0 auto; }
+.spycraft2 .dossier-band .agency-seal {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  flex: 0 0 auto;
+}
 .spycraft2 .dossier-band .file-label {
   font: bold 12px/1.4 var(--sc2-num);
   text-transform: uppercase;
-  letter-spacing: .14em;
+  letter-spacing: 0.14em;
 }
 .spycraft2 .dossier-band .file-stamp {
   margin-left: auto;
@@ -52,7 +61,7 @@
   color: var(--sc2-on-bar);
   background: var(--sc2-bar);
   font: bold 12px/1.3 var(--sc2-num);
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .spycraft2.sheet .sheet-header .portrait {
@@ -61,9 +70,16 @@
   box-shadow: 1px 2px 3px color-mix(in srgb, var(--sc2-ink) 15%, transparent);
   border-radius: 1px;
 }
-.spycraft2 .header-main { min-width: 0; }
-.spycraft2 .name-row { flex-wrap: wrap; }
-.spycraft2 .header-main input.name { font-family: var(--sc2-num); font-weight: bold; }
+.spycraft2 .header-main {
+  min-width: 0;
+}
+.spycraft2 .name-row {
+  flex-wrap: wrap;
+}
+.spycraft2 .header-main input.name {
+  font-family: var(--sc2-num);
+  font-weight: bold;
+}
 /* Field borders use a darker brass than table rules so each control's edge meets 3:1 on the paper. */
 .spycraft2.application :is(input, select, textarea) {
   background: var(--sc2-surface-raised);
@@ -77,7 +93,7 @@
 }
 /* Foundry draws checkboxes as icon glyphs coloured by these properties, so accent-color has no effect.
  * Unchecked: a paper box with a brass edge. Checked: teal with a light tick. */
-.spycraft2.application :is(input[type=checkbox], input[type=radio]) {
+.spycraft2.application :is(input[type="checkbox"], input[type="radio"]) {
   background: transparent;
   border: 0;
   --checkbox-background-color: var(--sc2-surface-raised);
@@ -86,18 +102,27 @@
   --checkbox-disabled-color: var(--sc2-rule);
   --checkbox-font-weight: unset;
 }
-.spycraft2.application :is(input[type=checkbox], input[type=radio]):not(:checked, :indeterminate)::before {
+.spycraft2.application :is(input[type="checkbox"], input[type="radio"]):not(:checked, :indeterminate)::before {
   outline: 1.5px solid var(--sc2-rule-strong);
   outline-offset: -1.5px;
 }
 /* Foundry draws the box in ::before, so the focus ring goes there too, in the shared focus colour. */
-.spycraft2.application :is(input[type=checkbox], input[type=radio]):focus-visible::before {
+.spycraft2.application :is(input[type="checkbox"], input[type="radio"]):focus-visible::before {
   outline: 2px solid var(--sc2-focus-color, var(--sc2-action));
   outline-offset: 1px;
 }
-.spycraft2.application input::placeholder, .spycraft2.application textarea::placeholder { color: var(--sc2-ink-muted); opacity: 1; }
-.spycraft2.application option { color: var(--sc2-ink); background: var(--sc2-surface-raised); }
-.spycraft2.application input[type=checkbox] { accent-color: var(--sc2-action); }
+.spycraft2.application input::placeholder,
+.spycraft2.application textarea::placeholder {
+  color: var(--sc2-ink-muted);
+  opacity: 1;
+}
+.spycraft2.application option {
+  color: var(--sc2-ink);
+  background: var(--sc2-surface-raised);
+}
+.spycraft2.application input[type="checkbox"] {
+  accent-color: var(--sc2-action);
+}
 /* :where() keeps this resting look below the shared hover and state rules in components.css. */
 .spycraft2.application :where(button, .sheet-tabs a) {
   color: var(--sc2-action);
@@ -105,7 +130,10 @@
   border-color: var(--sc2-rule);
   border-radius: var(--sc2-radius);
 }
-.spycraft2.application a:hover { color: var(--sc2-danger); text-shadow: none; }
+.spycraft2.application a:hover {
+  color: var(--sc2-danger);
+  text-shadow: none;
+}
 .spycraft2.application h3 {
   color: var(--sc2-action-strong);
   border-bottom: 2px solid var(--sc2-rule-strong);
@@ -118,183 +146,595 @@
   padding: 9px 0 6px;
   margin: 8px 0 4px;
 }
-.spycraft2.application .sheet-tabs a { padding: 5px 8px; border: 1px solid var(--sc2-rule); text-shadow: none; }
-.spycraft2.application .sheet-tabs a.active { color: var(--sc2-on-action); background: var(--sc2-action); border-color: var(--sc2-action); }
-.spycraft2.application table { background: transparent; color: var(--sc2-ink); border-color: var(--sc2-rule); }
-.spycraft2.application table thead { color: var(--sc2-on-action); background: var(--sc2-action); text-shadow: none; }
-.spycraft2.application table thead th { opacity: 1; }
-.spycraft2.application table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--sc2-action-strong) 3%, transparent); }
-.spycraft2.application .skills-table tr.class-at-level { background: var(--sc2-class); }
-.spycraft2.application :is(.class-block, .slot, .tag, details.todo, details.warnings) { border-radius: 2px; }
-.spycraft2.application details.todo { background: color-mix(in srgb, var(--sc2-action) 3%, transparent); }
-.spycraft2.application details.warnings { background: color-mix(in srgb, var(--sc2-danger) 3%, transparent); }
-.spycraft2.browser .filters { flex-wrap: wrap; }
-.spycraft2.browser .browser-list li { padding: 7px 4px; }
-.spycraft2.browser .browser-list li:nth-child(even) { background: color-mix(in srgb, var(--sc2-action-strong) 3%, transparent); }
+.spycraft2.application .sheet-tabs a {
+  padding: 5px 8px;
+  border: 1px solid var(--sc2-rule);
+  text-shadow: none;
+}
+.spycraft2.application .sheet-tabs a.active {
+  color: var(--sc2-on-action);
+  background: var(--sc2-action);
+  border-color: var(--sc2-action);
+}
+.spycraft2.application table {
+  background: transparent;
+  color: var(--sc2-ink);
+  border-color: var(--sc2-rule);
+}
+.spycraft2.application table thead {
+  color: var(--sc2-on-action);
+  background: var(--sc2-action);
+  text-shadow: none;
+}
+.spycraft2.application table thead th {
+  opacity: 1;
+}
+.spycraft2.application table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--sc2-action-strong) 3%, transparent);
+}
+.spycraft2.application .skills-table tr.class-at-level {
+  background: var(--sc2-class);
+}
+.spycraft2.application :is(.class-block, .slot, .tag, details.todo, details.warnings) {
+  border-radius: 2px;
+}
+.spycraft2.application details.todo {
+  background: color-mix(in srgb, var(--sc2-action) 3%, transparent);
+}
+.spycraft2.application details.warnings {
+  background: color-mix(in srgb, var(--sc2-danger) 3%, transparent);
+}
+.spycraft2.browser .filters {
+  flex-wrap: wrap;
+}
+.spycraft2.browser .browser-list li {
+  padding: 7px 4px;
+}
+.spycraft2.browser .browser-list li:nth-child(even) {
+  background: color-mix(in srgb, var(--sc2-action-strong) 3%, transparent);
+}
 @media (prefers-contrast: more) {
-  .spycraft2.application .window-content { background-image: none; }
-  .spycraft2.application .muted, .spycraft2.application .stat small { opacity: 1; }
+  .spycraft2.application .window-content {
+    background-image: none;
+  }
+  .spycraft2.application .muted,
+  .spycraft2.application .stat small {
+    opacity: 1;
+  }
 }
 @media print {
-  .spycraft2.application .window-content { background: white; color: black; }
-  .spycraft2 .dossier-band { background: var(--sc2-bar); }
+  .spycraft2.application .window-content {
+    background: white;
+    color: black;
+  }
+  .spycraft2 .dossier-band {
+    background: var(--sc2-bar);
+  }
 }
 
 /* Character sheets prioritize the current turn, with build controls in Edit. */
 .spycraft2.sheet:is(.agent, .npc).play-mode .edit-only,
-.spycraft2.sheet:is(.agent, .npc).edit-mode .play-only { display: none !important; }
-.spycraft2.sheet.npc .npc-actions { margin: 6px 0 8px; }
-.spycraft2.sheet.npc .sheet-header .summary select { width: auto; flex: 0 1 auto; }
-.spycraft2.sheet.npc .npc-actions h3 { margin: 0 0 4px; font-size: 1em; }
-.spycraft2.sheet.npc .npc-action-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
-.spycraft2.sheet.npc .npc-action-buttons button { width: auto; flex: 0 0 auto; margin: 0; padding: 4px 10px; }
-.spycraft2 .mode-label { font:bold 12px/1.4 var(--sc2-num); text-transform:uppercase; letter-spacing:.12em; }
-.spycraft2.sheet .name-row { align-items:center; }
-.spycraft2.sheet.agent .agent-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.spycraft2.sheet.agent .agent-codename { white-space:nowrap; }
-.spycraft2 .agent-name { font:bold 20px/1.25 var(--sc2-num); }
-.spycraft2.sheet.agent .sheet-tabs { padding:3px 0; margin:4px 0; gap:4px; border-top-width:3px; }
-.spycraft2.sheet.agent .sheet-tabs a { flex:1; text-align:center; padding:3px 8px; }
-.spycraft2.sheet.agent .stat .sc2-action { border:0; background:transparent; margin:0; }
-.spycraft2.sheet.agent .stat .sc2-action:hover { text-decoration:underline; }
-.spycraft2.sheet.agent .stat b { font-size:1.5em; }
-.spycraft2.sheet.agent .play-dashboard { border-bottom:2px solid var(--sc2-rule-strong); padding-bottom:8px; }
-.spycraft2.sheet.agent .reference-panel { margin:10px 0; padding:6px 8px; border:1px solid var(--sc2-rule); background:color-mix(in srgb, var(--sc2-surface-raised) 30%, transparent); }
-.spycraft2.sheet.agent details > summary { cursor:pointer; font-weight:600; padding:3px 0; }
-.spycraft2.sheet.agent .reference-panel p { margin:8px 0; line-height:1.45; }
-.spycraft2.sheet.agent.play-mode .abilities :is(th,td) { padding:5px; }
-.spycraft2.sheet.agent.play-mode .stat small { display:none; }
-.spycraft2.sheet.agent .skills-table thead { position:sticky; top:0; z-index:1; }
-.spycraft2.sheet.agent .skill-filters { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin:8px 0; }
-.spycraft2.sheet.agent .skill-filters label { display:flex; align-items:center; gap:6px; }
-.spycraft2.sheet.agent .skill-search { width:15em; }
-.spycraft2.sheet.agent .skill-count { margin-left:auto; font-size:.9em; }
-.spycraft2.sheet.agent .skills-table tr[hidden] { display:none; }
-.spycraft2.sheet.agent .skills-table :is(th,td) { padding:5px 4px; }
-.spycraft2.sheet.agent .class-block > label { display:block; margin:10px 0; }
-.spycraft2.sheet.agent .class-choices > label { display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin:12px 0; }
-.spycraft2.sheet.agent .class-choices > label select { width:100%; }
-.spycraft2.sheet.agent .bio-description { display:flex; flex-wrap:wrap; gap:5px 16px; text-transform:capitalize; }
-.spycraft2.sheet.agent .bio-setup { padding:4px 0; }
-.spycraft2.sheet.agent .pane.bio > prose-mirror { flex:1 0 240px; min-height:240px; }
-.spycraft2.sheet.agent .pane.bio > prose-mirror .editor-content { min-height:180px; }
-.spycraft2.sheet.agent .training-summary .tag { display:inline-block; padding:4px 8px; margin:3px; font-size:1em; opacity:1; }
-@container (max-width:640px) {
-  .spycraft2.sheet.agent .main-reference { flex-direction:column; }
+.spycraft2.sheet:is(.agent, .npc).edit-mode .play-only {
+  display: none !important;
 }
-.spycraft2.sheet.agent { container-type:inline-size; }
+.spycraft2.sheet.npc .npc-actions {
+  margin: 6px 0 8px;
+}
+.spycraft2.sheet.npc .sheet-header .summary select {
+  width: auto;
+  flex: 0 1 auto;
+}
+.spycraft2.sheet.npc .npc-actions h3 {
+  margin: 0 0 4px;
+  font-size: 1em;
+}
+.spycraft2.sheet.npc .npc-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.spycraft2.sheet.npc .npc-action-buttons button {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 4px 10px;
+}
+.spycraft2 .mode-label {
+  font: bold 12px/1.4 var(--sc2-num);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.spycraft2.sheet .name-row {
+  align-items: center;
+}
+.spycraft2.sheet.agent .agent-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spycraft2.sheet.agent .agent-codename {
+  white-space: nowrap;
+}
+.spycraft2 .agent-name {
+  font: bold 20px/1.25 var(--sc2-num);
+}
+.spycraft2.sheet.agent .sheet-tabs {
+  padding: 3px 0;
+  margin: 4px 0;
+  gap: 4px;
+  border-top-width: 3px;
+}
+.spycraft2.sheet.agent .sheet-tabs a {
+  flex: 1;
+  text-align: center;
+  padding: 3px 8px;
+}
+.spycraft2.sheet.agent .stat .sc2-action {
+  border: 0;
+  background: transparent;
+  margin: 0;
+}
+.spycraft2.sheet.agent .stat .sc2-action:hover {
+  text-decoration: underline;
+}
+.spycraft2.sheet.agent .stat b {
+  font-size: 1.5em;
+}
+.spycraft2.sheet.agent .play-dashboard {
+  border-bottom: 2px solid var(--sc2-rule-strong);
+  padding-bottom: 8px;
+}
+.spycraft2.sheet.agent .reference-panel {
+  margin: 10px 0;
+  padding: 6px 8px;
+  border: 1px solid var(--sc2-rule);
+  background: color-mix(in srgb, var(--sc2-surface-raised) 30%, transparent);
+}
+.spycraft2.sheet.agent details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 3px 0;
+}
+.spycraft2.sheet.agent .reference-panel p {
+  margin: 8px 0;
+  line-height: 1.45;
+}
+.spycraft2.sheet.agent.play-mode .abilities :is(th, td) {
+  padding: 5px;
+}
+.spycraft2.sheet.agent.play-mode .stat small {
+  display: none;
+}
+.spycraft2.sheet.agent .skills-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.spycraft2.sheet.agent .skill-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 8px 0;
+}
+.spycraft2.sheet.agent .skill-filters label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.spycraft2.sheet.agent .skill-search {
+  width: 15em;
+}
+.spycraft2.sheet.agent .skill-count {
+  margin-left: auto;
+  font-size: 0.9em;
+}
+.spycraft2.sheet.agent .skills-table tr[hidden] {
+  display: none;
+}
+.spycraft2.sheet.agent .skills-table :is(th, td) {
+  padding: 5px 4px;
+}
+.spycraft2.sheet.agent .class-block > label {
+  display: block;
+  margin: 10px 0;
+}
+.spycraft2.sheet.agent .class-choices > label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 12px 0;
+}
+.spycraft2.sheet.agent .class-choices > label select {
+  width: 100%;
+}
+.spycraft2.sheet.agent .bio-description {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 16px;
+  text-transform: capitalize;
+}
+.spycraft2.sheet.agent .bio-setup {
+  padding: 4px 0;
+}
+.spycraft2.sheet.agent .pane.bio > prose-mirror {
+  flex: 1 0 240px;
+  min-height: 240px;
+}
+.spycraft2.sheet.agent .pane.bio > prose-mirror .editor-content {
+  min-height: 180px;
+}
+.spycraft2.sheet.agent .training-summary .tag {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 3px;
+  font-size: 1em;
+  opacity: 1;
+}
+@container (max-width:640px) {
+  .spycraft2.sheet.agent .main-reference {
+    flex-direction: column;
+  }
+}
+.spycraft2.sheet.agent {
+  container-type: inline-size;
+}
 
 /* Distinguish a roll from reference information, and a primary action from tools. */
-.spycraft2.sheet.agent .sheet-tabs a { min-height:32px; display:flex; align-items:center; justify-content:center; }
+.spycraft2.sheet.agent .sheet-tabs a {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* The next choice stays visible; the grouped checklist has its own bounded space. */
 .spycraft2.sheet.agent .setup-next {
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:8px 10px; margin:8px 0; border-left:4px solid var(--sc2-action); background:color-mix(in srgb, var(--sc2-action) 5%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  border-left: 4px solid var(--sc2-action);
+  background: color-mix(in srgb, var(--sc2-action) 5%, transparent);
 }
-.spycraft2.sheet.agent .setup-next > div { min-width:0; }
-.spycraft2.sheet.agent .setup-next p { margin:4px 0 0; line-height:1.4; }
-.spycraft2.sheet.agent .setup-next button { flex:0 0 auto; width:auto; height:auto; margin:0; }
+.spycraft2.sheet.agent .setup-next > div {
+  min-width: 0;
+}
+.spycraft2.sheet.agent .setup-next p {
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+.spycraft2.sheet.agent .setup-next button {
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  margin: 0;
+}
 .spycraft2.sheet.agent .setup-steps {
-  max-height: min(200px, 26vh); overflow-y:auto; scrollbar-gutter:stable;
-  padding:0 8px 0 28px; margin:6px 0;
+  max-height: min(200px, 26vh);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding: 0 8px 0 28px;
+  margin: 6px 0;
 }
-.spycraft2.sheet.agent .setup-steps > li { margin:3px 0; padding-left:3px; }
-.spycraft2.sheet.agent .setup-steps summary { min-height:34px; }
-.spycraft2.sheet.agent .setup-steps ul { padding-left:0; list-style:none; }
+.spycraft2.sheet.agent .setup-steps > li {
+  margin: 3px 0;
+  padding-left: 3px;
+}
+.spycraft2.sheet.agent .setup-steps summary {
+  min-height: 34px;
+}
+.spycraft2.sheet.agent .setup-steps ul {
+  padding-left: 0;
+  list-style: none;
+}
 .spycraft2.sheet.agent .setup-steps button {
-  width:100%; height:auto; min-height:36px; white-space:normal; text-align:left;
-  line-height:1.4; padding:6px 10px; margin:3px 0;
+  width: 100%;
+  height: auto;
+  min-height: 36px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.4;
+  padding: 6px 10px;
+  margin: 3px 0;
 }
-.spycraft2.sheet.agent .setup-count { font-weight:400; margin-left:8px; }
-.spycraft2.sheet.agent .setup-clear { font-size:.9em; margin:6px 0; }
-.spycraft2.sheet.agent.edit-mode .main-reference { flex-direction:column; }
+.spycraft2.sheet.agent .setup-count {
+  font-weight: 400;
+  margin-left: 8px;
+}
+.spycraft2.sheet.agent .setup-clear {
+  font-size: 0.9em;
+  margin: 6px 0;
+}
+.spycraft2.sheet.agent.edit-mode .main-reference {
+  flex-direction: column;
+}
 
 /* Tools are separate disclosures. An open group gets the full sheet width. */
-.spycraft2.sheet.agent .combat-tool-head { display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin:12px 0 6px; }
-.spycraft2.sheet.agent .combat-tool-head h3 { margin:0; flex:1 1 auto; }
-.spycraft2.sheet.agent .combat-tool-search { width:14em; flex:0 1 14em; }
-.spycraft2.sheet.agent .combat-tool-all { display:flex; align-items:center; gap:6px; white-space:nowrap; }
-.spycraft2.sheet.agent .combat-toolbox [hidden] { display:none !important; }
+.spycraft2.sheet.agent .combat-tool-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 12px 0 6px;
+}
+.spycraft2.sheet.agent .combat-tool-head h3 {
+  margin: 0;
+  flex: 1 1 auto;
+}
+.spycraft2.sheet.agent .combat-tool-search {
+  width: 14em;
+  flex: 0 1 14em;
+}
+.spycraft2.sheet.agent .combat-tool-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.spycraft2.sheet.agent .combat-toolbox [hidden] {
+  display: none !important;
+}
 .spycraft2.sheet.agent .combat-tool-groups {
-  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; align-items:start;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  align-items: start;
 }
 .spycraft2.sheet.agent .combat-tool-group {
-  min-width:0; padding:0 10px; border:1px solid var(--sc2-rule); background:color-mix(in srgb, var(--sc2-surface-raised) 40%, transparent);
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid var(--sc2-rule);
+  background: color-mix(in srgb, var(--sc2-surface-raised) 40%, transparent);
 }
 .spycraft2.sheet.agent .combat-tool-group[open],
-.spycraft2.sheet.agent .combat-review-notice { grid-column:1/-1; }
+.spycraft2.sheet.agent .combat-review-notice {
+  grid-column: 1/-1;
+}
 .spycraft2.sheet.agent .combat-tool-group > summary {
-  min-height:52px; padding:8px 0; line-height:1.3;
+  min-height: 52px;
+  padding: 8px 0;
+  line-height: 1.3;
 }
 .spycraft2.sheet.agent .combat-tool-group > summary small {
-  display:block; font-weight:400; padding:3px 0 0 16px; color:var(--sc2-ink-muted);
+  display: block;
+  font-weight: 400;
+  padding: 3px 0 0 16px;
+  color: var(--sc2-ink-muted);
 }
-.spycraft2.sheet.agent .combat-tool-group[open] > summary { border-bottom:1px solid var(--sc2-rule); }
-.spycraft2.sheet.agent .combat-tool-group p { margin:10px 0; line-height:1.5; }
-.spycraft2.sheet.agent .condition-group { margin:8px 0; }
-.spycraft2.sheet.agent .condition-group > summary { min-height:36px; padding:7px 0; }
-.spycraft2.sheet.agent .condition-group[open] { border-bottom:1px solid var(--sc2-rule); }
-.spycraft2.sheet.agent .combat-review-notice { border-left:3px solid var(--sc2-danger); padding:0 10px; }
+.spycraft2.sheet.agent .combat-tool-group[open] > summary {
+  border-bottom: 1px solid var(--sc2-rule);
+}
+.spycraft2.sheet.agent .combat-tool-group p {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.spycraft2.sheet.agent .condition-group {
+  margin: 8px 0;
+}
+.spycraft2.sheet.agent .condition-group > summary {
+  min-height: 36px;
+  padding: 7px 0;
+}
+.spycraft2.sheet.agent .condition-group[open] {
+  border-bottom: 1px solid var(--sc2-rule);
+}
+.spycraft2.sheet.agent .combat-review-notice {
+  border-left: 3px solid var(--sc2-danger);
+  padding: 0 10px;
+}
 @container (max-width:640px) {
-  .spycraft2.sheet.agent .combat-tool-groups { grid-template-columns:minmax(0,1fr); }
-  .spycraft2.sheet.agent .setup-next { flex-wrap:wrap; }
+  .spycraft2.sheet.agent .combat-tool-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .spycraft2.sheet.agent .setup-next {
+    flex-wrap: wrap;
+  }
 }
 
 /* Inventory keeps rolls, quick statistics and equipment management on separate lines. */
-.spycraft2.sheet.agent .inventory-weapons { list-style:none; margin:8px 0 16px; padding:0; }
+.spycraft2.sheet.agent .inventory-weapons {
+  list-style: none;
+  margin: 8px 0 16px;
+  padding: 0;
+}
 .spycraft2.sheet.agent .inventory-weapon {
-  min-width:0; padding:10px 12px; margin:8px 0; border:1px solid var(--sc2-rule);
-  border-left:3px solid var(--sc2-action); background:color-mix(in srgb, var(--sc2-surface-raised) 50%, transparent);
+  min-width: 0;
+  padding: 10px 12px;
+  margin: 8px 0;
+  border: 1px solid var(--sc2-rule);
+  border-left: 3px solid var(--sc2-action);
+  background: color-mix(in srgb, var(--sc2-surface-raised) 50%, transparent);
 }
-.spycraft2.sheet.agent .inventory-title { display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; }
+.spycraft2.sheet.agent .inventory-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
 .spycraft2.sheet.agent .inventory-title .inventory-name {
-  justify-content:flex-start; text-align:left; white-space:normal; overflow-wrap:anywhere;
-  max-width:100%; font-size:1.05em; font-weight:700; background:transparent; border:0; padding:2px 0;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  font-size: 1.05em;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  padding: 2px 0;
 }
-.spycraft2.sheet.agent .equipment-state { margin-left:auto; color:var(--sc2-ink-muted); font-size:.9em; }
-.spycraft2.sheet.agent .inventory-rolls, .spycraft2.sheet.agent .inventory-utilities {
-  display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:6px 0;
+.spycraft2.sheet.agent .equipment-state {
+  margin-left: auto;
+  color: var(--sc2-ink-muted);
+  font-size: 0.9em;
 }
-.spycraft2.sheet.agent .inventory-stats { display:flex; flex-wrap:wrap; gap:6px 24px; margin:10px 0; }
-.spycraft2.sheet.agent .inventory-stats > div { min-width:0; }
-.spycraft2.sheet.agent .inventory-stats dt { color:var(--sc2-ink-muted); font-size:.85em; }
-.spycraft2.sheet.agent .inventory-stats dd { margin:3px 0 0; font-weight:600; overflow-wrap:anywhere; }
-.spycraft2.sheet.agent .inventory-details { border-top:1px solid var(--sc2-rule); margin-top:8px; }
-.spycraft2.sheet.agent .inventory-details > summary { min-height:36px; padding:8px 0 4px; }
-.spycraft2.sheet.agent .inventory-details p { line-height:1.5; margin:8px 0; }
-.spycraft2.sheet.agent .inventory-warning { color:var(--sc2-danger); margin:8px 0; line-height:1.4; }
-.spycraft2.sheet.agent .inventory-empty { padding:12px; line-height:1.5; color:var(--sc2-ink-muted); text-align:left; }
-.spycraft2.sheet.agent .inventory-table-wrap { max-width:100%; overflow-x:auto; margin:8px 0 16px; }
-.spycraft2.sheet.agent .inventory-table { min-width:620px; }
-.spycraft2.sheet.agent .inventory-table[data-kind="gear"] { min-width:560px; }
-.spycraft2.sheet.agent .inventory-table[data-kind="vehicles"] { min-width:700px; }
-.spycraft2.sheet.agent .inventory-table :is(th,td) { padding:7px 8px; vertical-align:top; }
-.spycraft2.sheet.agent .inventory-table td:first-child { min-width:160px; overflow-wrap:anywhere; }
-.spycraft2.sheet.agent .inventory-table abbr { text-decoration:none; cursor:help; }
-.spycraft2.sheet.agent .tool-hint { color:var(--sc2-ink-muted); line-height:1.5; font-size:.95em; }
+.spycraft2.sheet.agent .inventory-rolls,
+.spycraft2.sheet.agent .inventory-utilities {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 6px 0;
+}
+.spycraft2.sheet.agent .inventory-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  margin: 10px 0;
+}
+.spycraft2.sheet.agent .inventory-stats > div {
+  min-width: 0;
+}
+.spycraft2.sheet.agent .inventory-stats dt {
+  color: var(--sc2-ink-muted);
+  font-size: 0.85em;
+}
+.spycraft2.sheet.agent .inventory-stats dd {
+  margin: 3px 0 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.spycraft2.sheet.agent .inventory-details {
+  border-top: 1px solid var(--sc2-rule);
+  margin-top: 8px;
+}
+.spycraft2.sheet.agent .inventory-details > summary {
+  min-height: 36px;
+  padding: 8px 0 4px;
+}
+.spycraft2.sheet.agent .inventory-details p {
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.spycraft2.sheet.agent .inventory-warning {
+  color: var(--sc2-danger);
+  margin: 8px 0;
+  line-height: 1.4;
+}
+.spycraft2.sheet.agent .inventory-empty {
+  padding: 12px;
+  line-height: 1.5;
+  color: var(--sc2-ink-muted);
+  text-align: left;
+}
+.spycraft2.sheet.agent .inventory-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 8px 0 16px;
+}
+.spycraft2.sheet.agent .inventory-table {
+  min-width: 620px;
+}
+.spycraft2.sheet.agent .inventory-table[data-kind="gear"] {
+  min-width: 560px;
+}
+.spycraft2.sheet.agent .inventory-table[data-kind="vehicles"] {
+  min-width: 700px;
+}
+.spycraft2.sheet.agent .inventory-table :is(th, td) {
+  padding: 7px 8px;
+  vertical-align: top;
+}
+.spycraft2.sheet.agent .inventory-table td:first-child {
+  min-width: 160px;
+  overflow-wrap: anywhere;
+}
+.spycraft2.sheet.agent .inventory-table abbr {
+  text-decoration: none;
+  cursor: help;
+}
+.spycraft2.sheet.agent .tool-hint {
+  color: var(--sc2-ink-muted);
+  line-height: 1.5;
+  font-size: 0.95em;
+}
 
 /* Only dialogs explicitly owned by this system receive the dossier skin. */
-.spycraft2.application.sc2-dialog { max-width:calc(100vw - 32px); max-height:calc(100dvh - 32px); }
-.spycraft2.application.sc2-dialog .window-header button { color:var(--sc2-on-bar); background:transparent; border-color:transparent; }
-.spycraft2.application.sc2-dialog .window-content { min-height:0; overflow:hidden; }
-.spycraft2.application.sc2-dialog .dialog-form { display:flex; flex-direction:column; min-height:0; gap:12px; }
-/* The body takes the height the screen has left after the header, footer and margins; the footer stays in view. */
-.spycraft2.application.sc2-dialog .dialog-content { min-height:0; max-height:calc(100dvh - 200px); overflow-y:auto; padding:2px 5px 4px 2px; }
-/* One scrolling box per dialog: inside a themed dialog the body scrolls, not the option list within it. */
-.spycraft2.application.sc2-dialog .dialog-content .spycraft2-roll-options { max-height:none; overflow-y:visible; }
-.spycraft2.application.sc2-dialog .spycraft2-roll-options { max-height:none; overflow:visible; padding-right:0; }
-/* The dialog body scrolls, so its blocks keep their full height instead of shrinking and overlapping. */
-.spycraft2.application.sc2-dialog .dialog-content > * { flex-shrink:0; }
-.spycraft2.application.sc2-dialog :is(input,select,textarea) { max-width:100%; min-width:0; }
-.spycraft2.application.sc2-dialog label { line-height:1.45; }
-.spycraft2.application.sc2-dialog p { line-height:1.5; }
-.spycraft2.application.sc2-dialog fieldset { min-width:0; border:1px solid var(--sc2-rule); }
-.spycraft2.application.sc2-dialog details > summary { min-height:34px; padding:6px 0; cursor:pointer; font-weight:600; }
-.spycraft2.application.sc2-dialog :is(.hint, .notes) { color:var(--sc2-ink-muted); }
-.spycraft2.application.sc2-dialog .form-footer { flex:0 0 auto; border-top:1px solid var(--sc2-rule); padding-top:10px; gap:8px; }
-.spycraft2.application.sc2-dialog .form-footer button { min-height:40px; white-space:normal; line-height:1.4; }
-.spycraft2.application.sc2-dialog .form-footer button:is([data-action="ok"],[data-action="yes"]) {
-  color:var(--sc2-on-action); background:var(--sc2-action); border-color:var(--sc2-action); font-weight:600;
+.spycraft2.application.sc2-dialog {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
 }
-.spycraft2.application.sc2-dialog .form-footer button:is([data-action="ok"],[data-action="yes"]):hover { background:var(--sc2-action-strong); }
+.spycraft2.application.sc2-dialog .window-header button {
+  color: var(--sc2-on-bar);
+  background: transparent;
+  border-color: transparent;
+}
+.spycraft2.application.sc2-dialog .window-content {
+  min-height: 0;
+  overflow: hidden;
+}
+.spycraft2.application.sc2-dialog .dialog-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 12px;
+}
+/* The body takes the height the screen has left after the header, footer and margins; the footer stays in view. */
+.spycraft2.application.sc2-dialog .dialog-content {
+  min-height: 0;
+  max-height: calc(100dvh - 200px);
+  overflow-y: auto;
+  padding: 2px 5px 4px 2px;
+}
+/* One scrolling box per dialog: inside a themed dialog the body scrolls, not the option list within it. */
+.spycraft2.application.sc2-dialog .dialog-content .spycraft2-roll-options {
+  max-height: none;
+  overflow-y: visible;
+}
+.spycraft2.application.sc2-dialog .spycraft2-roll-options {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+/* The dialog body scrolls, so its blocks keep their full height instead of shrinking and overlapping. */
+.spycraft2.application.sc2-dialog .dialog-content > * {
+  flex-shrink: 0;
+}
+.spycraft2.application.sc2-dialog :is(input, select, textarea) {
+  max-width: 100%;
+  min-width: 0;
+}
+.spycraft2.application.sc2-dialog label {
+  line-height: 1.45;
+}
+.spycraft2.application.sc2-dialog p {
+  line-height: 1.5;
+}
+.spycraft2.application.sc2-dialog fieldset {
+  min-width: 0;
+  border: 1px solid var(--sc2-rule);
+}
+.spycraft2.application.sc2-dialog details > summary {
+  min-height: 34px;
+  padding: 6px 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+.spycraft2.application.sc2-dialog :is(.hint, .notes) {
+  color: var(--sc2-ink-muted);
+}
+.spycraft2.application.sc2-dialog .form-footer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--sc2-rule);
+  padding-top: 10px;
+  gap: 8px;
+}
+.spycraft2.application.sc2-dialog .form-footer button {
+  min-height: 40px;
+  white-space: normal;
+  line-height: 1.4;
+}
+.spycraft2.application.sc2-dialog .form-footer button:is([data-action="ok"], [data-action="yes"]) {
+  color: var(--sc2-on-action);
+  background: var(--sc2-action);
+  border-color: var(--sc2-action);
+  font-weight: 600;
+}
+.spycraft2.application.sc2-dialog .form-footer button:is([data-action="ok"], [data-action="yes"]):hover {
+  background: var(--sc2-action-strong);
+}
