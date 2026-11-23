@@ -76,10 +76,6 @@
   background: var(--sc2-teal-dark);
   border-color: var(--sc2-teal-dark);
 }
-.spycraft2.application .sc2-primary-action.untrained {
-  background: var(--sc2-bad);
-  border-color: var(--sc2-bad);
-}
 
 /* Roll chip: a number or dice expression that rolls when chosen. */
 .spycraft2.application

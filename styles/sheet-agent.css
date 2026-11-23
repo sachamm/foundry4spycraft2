@@ -116,6 +116,12 @@
   min-height: 52px;
   padding: 4px 6px;
 }
+.spycraft2.sheet.agent .rail-fields .rail-defense-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
+}
 .spycraft2.sheet.agent .rail-block.action-dice {
   display: grid;
   gap: 6px;
@@ -134,7 +140,30 @@
 .spycraft2.sheet.agent .res-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 2px;
+}
+.spycraft2.sheet.agent .res-actions .rail-more {
+  flex: 1 1 100%;
+}
+.spycraft2.sheet.agent .res-actions .rail-more[open] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.spycraft2.sheet.agent .res-actions .rail-more > summary {
+  flex: 1 1 100%;
+  cursor: pointer;
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
+}
+.spycraft2.sheet.agent .action-dice .dice-line .sc2-value {
+  font: 700 var(--sc2-value-size, 20px) / 1 var(--sc2-num);
+}
+.spycraft2.sheet.agent .sheet-rail button.setup-chip {
+  align-self: flex-start;
+  width: auto;
+  cursor: pointer;
 }
 .spycraft2.sheet.agent .sheet-rail :is(.setup-next, details.todo, details.warnings) {
   margin: 0;
@@ -200,6 +229,37 @@
   font-family: var(--sc2-display);
   font-weight: 700;
   opacity: 1;
+}
+.spycraft2.sheet .sc2-weapon .sc2-weapon-attack {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc2-space-1);
+}
+.spycraft2.sheet .sc2-weapon .sc2-weapon-facts {
+  grid-column: 1 / -1;
+  font-size: var(--sc2-text-s);
+  font-family: var(--sc2-num);
+}
+/* Untrained is said in words with an icon; colour only repeats it. */
+.spycraft2 .sc2-untrained {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--sc2-text-s);
+  font-weight: 700;
+  color: var(--sc2-warn);
+}
+.spycraft2.sheet.agent .dashboard-skills .tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc2-space-1);
+}
+.spycraft2.sheet.agent .quick-actions .sc2-active-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc2-space-1);
+  margin: var(--sc2-space-1) 0 0;
 }
 .spycraft2.sheet.agent .quick-actions p {
   margin: var(--sc2-space-1) 0 0;

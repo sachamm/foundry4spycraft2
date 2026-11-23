@@ -157,3 +157,42 @@ test("feat-specific outcome tools appear only with their feat, unless the GC ask
   const all = combatToolVisibility({}, COMBAT_STANCES, { showAll: true });
   assert.ok(Object.values(all).every(value => value === true));
 });
+
+test("the rail's stamps, flat-footed Defense and Defense boost state follow the character", async () => {
+  const { conditionStamps, flatFootedDefense, defenseBoostState, activeEffectLines } =
+    await import("../module/sheets/agent-ux.mjs");
+  const stamps = conditionStamps({
+    conditionContext: { flatFooted: true, dazed: true },
+    shakenState: { label: "Shaken II" }
+  });
+  assert.deepEqual(
+    stamps.map(stamp => stamp.label),
+    ["Flat-footed", "Dazed", "Shaken II"]
+  );
+  assert.match(stamps[0].tip, /Defense/);
+  assert.equal(stamps[1].tip, "");
+  assert.match(stamps[2].tip, /action dice/);
+  // Positive Dexterity and dodge bonuses are lost; a penalty stays; Uncanny Dodge keeps what it protects.
+  const defense = { total: 18, dexterity: 3, dodgeBonuses: 2, dodgeLost: 0 };
+  assert.equal(flatFootedDefense({ defense }), 13);
+  assert.equal(flatFootedDefense({ defense: { ...defense, dexterity: -1 } }), 16);
+  assert.equal(flatFootedDefense({ defense, uncannyDodge: { grade: 1 } }), 16);
+  assert.equal(flatFootedDefense({ defense, uncannyDodge: { grade: 5 } }), 18);
+  assert.equal(flatFootedDefense({ defense: { total: 13, dexterity: 0, dodgeBonuses: 2, dodgeLost: 2 } }), 13);
+  const dice = { actionDice: { value: 2 } };
+  assert.equal(defenseBoostState(dice, null, false).available, false);
+  assert.match(defenseBoostState(dice, null, false).reason, /start of a combat round/);
+  assert.equal(defenseBoostState(dice, { started: true }, true).available, true);
+  assert.equal(defenseBoostState({ actionDice: { value: 0 } }, { started: true }, true).available, false);
+  assert.match(defenseBoostState({ actionDieDefense: { bonus: 2, lastRound: 4 } }).active, /\+2 through round 4/);
+  assert.deepEqual(activeEffectLines({}), []);
+  assert.deepEqual(activeEffectLines({ totalDefenseState: { active: true, bonus: 4, dueRound: 3 } }), [
+    "Total Defense: dodge +4, until your Count in round 3"
+  ]);
+});
+
+test("a weapon row states its ranges as die faces and its range increment", async () => {
+  const { weaponFacts } = await import("../module/sheets/play-rows.mjs");
+  assert.equal(weaponFacts({ threat: 19, error: 1, range: 25 }), "threat 19–20 · error 1 · range 25 ft.");
+  assert.equal(weaponFacts({ threat: 20, error: 3 }), "threat 20 · error 1–3");
+});

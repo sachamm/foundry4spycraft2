@@ -173,3 +173,13 @@
   text-overflow: ellipsis;
   letter-spacing: 0;
 }
+
+.spycraft2.sheet.npc .npc-damage-save .npc-results {
+  margin-bottom: var(--sc2-space-1);
+}
+.spycraft2.sheet.npc .sheet-header .summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc2-space-1);
+}

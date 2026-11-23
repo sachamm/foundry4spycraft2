@@ -1,5 +1,10 @@
 <section class="tab main play {{tab.cssClass}}" data-tab="play" data-pane="main" data-group="primary">
-{{#each shakenInitiativeReviews}}<p class="bad">{{name}}{{localize "SPYCRAFT.Template.ActorAgentMain.InitiativeCount"}} {{count}} {{localize "SPYCRAFT.Template.ActorAgentMain.NeedsShakenReview"}} {{reason}} {{#if @root.isGM}}<button type="button" class="sc2-action" data-action="reviewShakenInitiative" data-combat-id="{{combatId}}" data-combatant-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewIncludedPenalty"}}</button>{{/if}}</p>{{/each}}
+{{#each shakenInitiativeReviews}}<p
+  class="bad">{{localize "SPYCRAFT.Review.ShakenInitiative" name=name count=count reason=reason}} {{#if @root.isGM}}<button type="button"
+  class="sc2-action"
+  data-action="reviewShakenInitiative"
+  data-combat-id="{{combatId}}"
+  data-combatant-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewIncludedPenalty"}}</button>{{/if}}</p>{{/each}}
 {{> "systems/spycraft2/templates/actor/play/dashboard.hbs"}}
 
   {{> "systems/spycraft2/templates/actor/play/identities.hbs"}}
@@ -42,7 +47,7 @@
     <summary>{{localize "SPYCRAFT.MiscModifiers"}}</summary>
     <div class="misc-grid">
       {{#each system.misc as |v k|}}
-        <label>{{k}} <input type="number" name="system.misc.{{k}}" value="{{v}}" class="w-2" /></label>
+        <label>{{lookup @root.miscLabels k}} <input type="number" name="system.misc.{{k}}" value="{{v}}" class="w-2" /></label>
       {{/each}}
     </div>
   </details>

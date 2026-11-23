@@ -1,0 +1,30 @@
+{{!-- One weapon as a row, on the agent's Play tab and the NPC sheet: name, attack, damage, facts, ammunition. --}}
+<li class="sc2-weapon" data-item-id="{{item.id}}">
+  <button type="button" data-action="itemEdit" class="name sc2-action" aria-label="{{localize 'SPYCRAFT.Action.OpenNamed' name=item.name}}">{{item.name}}</button>
+  <span class="sc2-weapon-attack"><button type="button"
+    data-action="rollAttack"
+    class="sc2-primary-action sc2-action"
+    aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith' name=item.name}}">{{localize "SPYCRAFT.Attack"}} {{signed attack.total}}</button>
+  {{#if untrained}}<span
+    class="sc2-untrained"
+    data-tooltip="{{localize 'SPYCRAFT.Weapon.UntrainedHint'}}"><i
+    class="fa-solid fa-triangle-exclamation"
+    aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}</span>
+  <button type="button" data-action="rollDamage" class="sc2-roll sc2-action" aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}}">{{item.system.damage}}</button>
+  {{#if shots}}<span
+    class="ammo {{#if shots.empty}}bad{{else}}muted{{/if}}">{{shots.loaded}}/{{shots.capacity}}</span><button type="button"
+    class="sc2-action"
+    data-action="reloadWeapon"
+    data-sc2-display="icon"
+    aria-label="{{@root.playLabels.reload}} {{item.name}}">{{@root.playLabels.reload}}</button>{{/if}}
+  {{#if removable}}<span
+    class="controls edit-only"
+    data-sc2-display="icon"><button type="button"
+    class="sc2-action"
+    data-action="itemDelete"
+    aria-label="{{localize 'SPYCRAFT.Action.RemoveNamed' name=item.name}}"
+    data-tooltip="{{localize 'SPYCRAFT.Action.RemoveNamed' name=item.name}}"><i
+    class="fa-solid fa-trash"
+    aria-hidden="true"></i></button></span>{{/if}}
+  {{#if facts}}<small class="sc2-weapon-facts muted">{{facts}}</small>{{/if}}
+</li>

@@ -13,9 +13,14 @@
   <p class="play-only hint">{{localize "SPYCRAFT.Template.ActorAgentSkills.ChooseASkillNameOrBonus"}}</p>
   <table class="skills-table">
     <thead><tr>
-      <th>{{localize "SPYCRAFT.Skill.Label"}}</th><th class="edit-only" data-tooltip="{{localize 'SPYCRAFT.Skill.ClassOverrideHint'}}">{{localize "SPYCRAFT.Template.ActorAgentSkills.GCOverride"}}</th>
+      <th>{{localize "SPYCRAFT.Skill.Label"}}</th><th class="edit-only" data-tooltip="{{localize 'SPYCRAFT.Skill.ClassOverrideHint'}}">{{localize "SPYCRAFT.Skill.ClassManual"}}</th>
       <th class="edit-only">{{localize "SPYCRAFT.Skill.Points"}}</th><th>{{localize "SPYCRAFT.Skill.Ranks"}}</th><th class="edit-only">{{localize "SPYCRAFT.Skill.Bonus"}}</th>
-      <th class="edit-only">{{localize "SPYCRAFT.Skill.Misc"}}</th><th>{{localize "SPYCRAFT.Skill.Total"}}</th><th>{{localize "SPYCRAFT.Skill.Threat"}}</th><th>{{localize "SPYCRAFT.Skill.Cap"}}</th>
+      <th
+        class="edit-only">{{localize "SPYCRAFT.Skill.Misc"}}</th><th>{{localize "SPYCRAFT.Skill.Total"}}</th><th
+        data-tooltip="{{localize 'SPYCRAFT.Skill.ThreatHint'}}">{{localize "SPYCRAFT.Skill.ThreatRange"}}</th><th
+        data-tooltip="{{localize 'SPYCRAFT.Skill.CapHint'}}">{{localize "SPYCRAFT.Skill.Cap"}} <i
+        class="fa-solid fa-circle-question"
+        aria-hidden="true"></i></th>
     </tr></thead>
     <tbody>
     {{#each skills}}
@@ -27,7 +32,7 @@
         <td class="edit-only">{{#if bonus}}<span {{sc2tip bonusTip}}>{{signed bonus}}</span>{{/if}}</td>
         <td class="edit-only"><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" aria-label="{{localize 'SPYCRAFT.Action.MiscModifierOf' name=name}}" /></td>
         <td>{{#each totals}}<button type="button" class="sc2-action" data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" aria-label="{{rollLabel}}" {{sc2tip tip}}>{{signed total}}</button>{{#unless @last}} / {{/unless}}{{/each}}</td>
-        <td><span {{sc2tip threatTip}}>{{#if (sc2lt threat 20)}}{{threat}}-20{{else}}20{{/if}}</span></td>
+        <td><span {{sc2tip threatTip}}>{{threatLabel}}</span></td>
         <td><span {{sc2tip capTip}}>{{cap}}</span></td>
       </tr>
     {{/each}}

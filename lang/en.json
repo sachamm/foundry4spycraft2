@@ -41,7 +41,17 @@
   },
   "Rail": {
    "Done": "Done",
-   "LevelUp": "Level up"
+   "LevelUp": "Level up",
+   "More": "More",
+   "CheckDefense": "Check Defense against an attack",
+   "FlatFooted": "Flat-footed {value}",
+   "DamageReduction": "DR {melee} melee, {other} other",
+   "DefenseNote": "Your Defense while flat-footed, and your damage reduction (DR) against melee attacks and against everything else.",
+   "SetupLeft": "Setup: {count} left",
+   "SetupLeftHint": "Setup reminders are still open. Press to switch to Edit and see them.",
+   "SetupChecklist": "Setup checklist · {count} reminders",
+   "WarningsLeft": "Build warnings: {count}",
+   "WarningsHint": "This character has character-building warnings. Press to switch to Edit and read them."
   },
   "Track": {
    "Title": "Character creation steps",
@@ -57,6 +67,36 @@
    "derived": "Derived",
    "describe": "Describe",
    "gear": "Gear"
+  },
+  "Review": {
+   "Nothing": "Nothing needs review.",
+   "Interrupted": "Review an interrupted action",
+   "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
+  },
+  "Npc": {
+   "DamageSave": "Damage save",
+   "DamageTaken": "Damage taken",
+   "NextDC": "Next DC",
+   "FailedSaves": "Failed saves",
+   "Tough": "Tough used",
+   "State": "State",
+   "RollDamageSave": "Roll Damage save…",
+   "RollDamageSaveHint": "Enter the damage this NPC just took, then roll its Damage save against the next DC.",
+   "ResetTrack": "Reset Damage save track",
+   "ResetTrackHint": "Clears the damage taken and failed saves, and brings the NPC back up."
+  },
+  "Play": {
+   "TrainedSkills": "Trained skills",
+   "NoTrainedSkills": "No trained skills yet. Any skill can be rolled from the Skills tab.",
+   "AbilitiesInPlay": "Abilities in play",
+   "YourTurn": "Your turn",
+   "EndTurn": "End turn",
+   "EndTurnNotYours": "Not now: it is another combatant's turn.",
+   "ActiveEffects": "Active effects"
+  },
+  "Uses": {
+   "Per": "per {period}",
+   "Spent": "No uses left this {period}."
   },
   "Round": {
    "Title": "This round",
@@ -139,7 +179,11 @@
    "Misc": "Misc",
    "Total": "Total",
    "Threat": "Threat",
+   "ThreatRange": "Threat range",
+   "ThreatHint": "The die faces that may become a critical success if the check also succeeds.",
+   "ClassManual": "Class skill (manual)",
    "Cap": "Cap",
+   "CapHint": "Result cap: a check result above this number counts as this number.",
    "SpendAtLevel": "Spend points for level",
    "MaxRanks": "Max ranks",
    "ClassPicks": "Extra class skills",
@@ -189,13 +233,19 @@
   "ActionDice": {
    "Starting": "starting",
    "Label": "Action dice",
-   "Spend": "Roll one action die on its own, outside any roll. To add a die to a roll, press Spend 1 action die on that roll's chat card.",
+   "Spend": "Costs 1 action die. Rolls it on its own, outside any roll. To add a die to a roll, press Spend 1 action die on that roll's chat card.",
+   "Adjust": "Adjust action dice…",
+   "AdjustHint": "Correct the number of action dice held. Spending and awards change it for you.",
    "Refresh": "Refresh to maximum",
    "None": "No action dice left.",
-   "What": "Spend action dice from a roll's chat card: each adds its roll to the result, and they also pay to turn a threat into a critical. You get more at the start of each session and when the GC awards them."
+   "What": "Spend action dice from a roll's chat card: each adds its roll to the result, and they also pay to turn a threat into a critical. They reset to your starting number at the start of each session, and the GC can award more."
   },
   "Weapon": {
    "Untrained": "untrained (penalty applied, error +2)",
+   "UntrainedWord": "untrained",
+   "ErrorRange": "Error range",
+   "ThreatRange": "Threat range",
+   "UntrainedHint": "Not trained with this weapon: the attack total already includes the penalty, and the error range is 2 wider.",
    "NoDamage": "{name} has no rollable damage.",
    "Error": "Error",
    "Threat": "Threat",
@@ -618,7 +668,7 @@
     "RemoveSpecialty": "Remove specialty",
     "BeginPlayOnceWithThisCharacter": "Begin play once: starting action dice, and full vitality and wounds for a new character",
     "BeginPlay": "Begin play",
-    "Spend": "Loose die",
+    "Spend": "Roll action die",
     "HealOutsideCombatWithActionDice": "Heal outside combat with action dice",
     "Heal": "Heal",
     "BeginOrCompleteAFullRound": "Begin or complete a full-round Refresh",
@@ -628,8 +678,6 @@
     "NextSetupChoice": "Next setup choice",
     "Next": "Next:",
     "ContinueSetup": "Continue setup",
-    "SetupChecklist": "Setup checklist ·",
-    "Reminders": "reminders",
     "RemainingCharacterSetup": "Remaining character setup",
     "NoSetupRemindersCheckAnyCharacter": "Ready to play: no setup reminders are left. Check any character-building warnings, then Begin play."
    },
@@ -1667,6 +1715,8 @@
   },
   "Action": {
    "OpenNamed": "Open {name}",
+   "BaseOf": "{name} base",
+   "BonusTo": "{name} bonus",
    "RollNamed": "Roll {name}",
    "RollAttackWith": "Roll attack with {name}",
    "RollDamageFor": "Roll damage for {name}",
