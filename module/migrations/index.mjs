@@ -1,6 +1,6 @@
 import { loc } from "../i18n.mjs";
 import { FEAT_REMINDERS } from "../rules/tables.mjs";
-import { deltaIsEmpty, isPersonalCharacter } from "../rules/token-delta.mjs";
+import { companionRetargets, deltaIsEmpty, isPersonalCharacter } from "../rules/token-delta.mjs";
 /**
  * World data migrations.
  *
@@ -87,6 +87,18 @@ export function agentTokenLinkUpdate(source, actorSource) {
   return { actorLink: true };
 }
 
+/**
+ * Also version 5: a companion created from an unlinked agent token's sheet names that token's copy as its owner. Once
+ * the token is linked the companion is pointed at the agent itself, so it stays on the agent's sheet.
+ * @param {{actors?: Iterable, scenes?: Iterable}} world
+ */
+export async function retargetTokenCompanions(world) {
+  const scenes = new Map([...(world?.scenes ?? [])].map(scene => [scene.id, scene]));
+  const linked = (sceneId, tokenId) => scenes.get(sceneId)?.tokens?.get?.(tokenId)?.actorLink === true;
+  const actors = [...(world?.actors ?? [])].filter(actor => !actor.isToken);
+  for (const { actor, update } of companionRetargets(actors, linked)) await actor.update(update);
+}
+
 /** Ordered migrations. Version 1 is the first versioned schema, so the list starts at 2. */
 export const MIGRATIONS = [
   { version: 2, label: loc`feat reminders`, item: source => featReminderUpdate(source) },
@@ -96,7 +108,8 @@ export const MIGRATIONS = [
     version: 5,
     label: loc`agent tokens linked to their characters`,
     actor: agentLinkUpdate,
-    token: agentTokenLinkUpdate
+    token: agentTokenLinkUpdate,
+    world: retargetTokenCompanions
   }
 ];
 
@@ -326,6 +339,7 @@ export async function runWorldMigrations() {
     actors: [...worldActors(game), ...packed.actors],
     items: [...(game.items ?? []), ...packed.items],
     tokens: [...(game.scenes ?? [])].flatMap(scene => [...(scene.tokens ?? [])]),
+    scenes: game.scenes,
     settings: game.settings,
     setVersion: version => game.settings.set("spycraft2", "schemaVersion", version),
     notify: message => {

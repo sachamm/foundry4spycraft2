@@ -15,7 +15,7 @@
  */
 import { loc } from "../i18n.mjs";
 import { isLeadGM } from "../writers.mjs";
-import { deltaChanges, deltaSource, isPersonalCharacter } from "../rules/token-delta.mjs";
+import { companionRetargets, deltaChanges, deltaSource, isPersonalCharacter } from "../rules/token-delta.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 
 const SYSTEM = "spycraft2";
@@ -63,6 +63,12 @@ export async function applyLinkProposal({ token, actor, changes }, options = { s
     if (plan.create.length) await actor.createEmbeddedDocuments(name, plan.create, { ...options, keepId: true });
   }
   await token.update({ actorLink: true }, options);
+  const sceneId = token.parent?.id;
+  for (const { actor: companion, update } of companionRetargets(
+    globalThis.game?.actors ?? [],
+    (scene, id) => scene === sceneId && id === token.id
+  ))
+    await companion.update(update, options);
   if (actor.prototypeToken?.actorLink === false) await actor.update({ "prototypeToken.actorLink": true }, options);
 }
 

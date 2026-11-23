@@ -93,7 +93,11 @@ export class SpycraftItem extends Item {
   async _preUpdate(changed, options, user) {
     if ((await super._preUpdate(changed, options, user)) === false) return false;
     options.spycraft2Client = CLIENT_ID;
+    // A feat copied from a token's own copy to its character (module/apps/token-links.mjs) brings its state as it was:
+    // its GC approvals and acquisition check are kept, not reset as they would be for an edit.
+    const moved = options.spycraft2TokenLink === true;
     if (
+      !moved &&
       this.type === "feat" &&
       (changed.name ?? this.name) === "Candidate" &&
       this.parent?.type === "agent" &&
@@ -109,6 +113,7 @@ export class SpycraftItem extends Item {
       removeOldObjectKeys(changed, "system.candidateBasis", this.system.candidateBasis, basis);
     }
     if (
+      !moved &&
       this.type === "feat" &&
       (Object.hasOwn(CONTACT_FEATS, this.name) || Object.hasOwn(CONTACT_FEATS, changed.name ?? ""))
     ) {
@@ -123,7 +128,7 @@ export class SpycraftItem extends Item {
         changed["system.contactThemeConfirmed"] = false;
       }
     }
-    if (this.type === "feat" && this.parent?.type === "agent") {
+    if (!moved && this.type === "feat" && this.parent?.type === "agent") {
       const keys = [
         "acquiredAtLevel",
         "acquisitionSource",

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deltaChanges, deltaIsEmpty, deltaSource } from "../module/rules/token-delta.mjs";
+import { companionRetargets, deltaChanges, deltaIsEmpty, deltaSource } from "../module/rules/token-delta.mjs";
 import {
   applyLinkProposal,
   describeLinkProposal,
@@ -14,7 +14,8 @@ import {
   agentLinkUpdate,
   agentTokenLinkUpdate,
   documentUpdate,
-  migrateWorld
+  migrateWorld,
+  retargetTokenCompanions
 } from "../module/migrations/index.mjs";
 import { agentTokenDefaults } from "../module/rules/creation-defaults.mjs";
 import { RESOURCE_LOCK_ID } from "../module/rules/resource-locks.mjs";
@@ -290,4 +291,45 @@ test("the GC review links ticked rows and remembers unticked ones", async () => 
   assert.match(content, /do not reach the character in the Actors list/);
   delete globalThis.game;
   delete globalThis.ui;
+});
+
+test("companions made from an unlinked token's sheet follow the agent once the token is linked", async () => {
+  const fromToken = {
+    system: { companionOf: { ownerUuid: "Scene.warehouse.Token.t1.Actor.inez" } },
+    writes: [],
+    update: async function (data) {
+      this.writes.push(data);
+    }
+  };
+  const fromAgent = { ...fromToken, system: { companionOf: { ownerUuid: "Actor.inez" } }, writes: [] };
+  const otherToken = {
+    ...fromToken,
+    system: { companionOf: { ownerUuid: "Scene.warehouse.Token.t9.Actor.x" } },
+    writes: []
+  };
+  const retargets = companionRetargets(
+    [fromToken, fromAgent, otherToken],
+    (scene, id) => scene === "warehouse" && id === "t1"
+  );
+  assert.deepEqual(
+    retargets.map(r => [r.actor, r.update]),
+    [[fromToken, { "system.companionOf.ownerUuid": "Actor.inez" }]]
+  );
+
+  // The world migration does the same for every token that is linked by then.
+  const tokens = new Map([
+    ["t1", { actorLink: true }],
+    ["t9", { actorLink: false }]
+  ]);
+  await retargetTokenCompanions({ actors: [fromToken, fromAgent, otherToken], scenes: [{ id: "warehouse", tokens }] });
+  assert.deepEqual(fromToken.writes, [{ "system.companionOf.ownerUuid": "Actor.inez" }]);
+  assert.deepEqual([fromAgent.writes, otherToken.writes], [[], []]);
+
+  // And linking a token in the review points its companions at the agent.
+  const { token } = world();
+  const companion = { ...fromToken, writes: [] };
+  globalThis.game = { actors: [companion] };
+  await applyLinkProposal(linkProposal(token));
+  assert.deepEqual(companion.writes.at(-1), { "system.companionOf.ownerUuid": "Actor.inez" });
+  delete globalThis.game;
 });

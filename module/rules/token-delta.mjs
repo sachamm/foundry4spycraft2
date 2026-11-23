@@ -77,3 +77,21 @@ export function deltaChanges(delta, baseSource = {}) {
 export function deltaIsEmpty(delta, baseSource) {
   return deltaChanges(delta, baseSource).count === 0;
 }
+
+const TOKEN_ACTOR_UUID = /^Scene\.([^.]+)\.Token\.([^.]+)\.Actor\.([^.]+)$/;
+
+/**
+ * Companions whose owner is recorded as an unlinked token's own copy of an agent (a companion created from the token's
+ * sheet), where that token is now linked: each is pointed at the agent itself, so it stays on the agent's sheet and
+ * keeps its companion slot. `isLinked(sceneId, tokenId)` says whether a token is linked now.
+ * @returns {{actor: object, update: object}[]}
+ */
+export function companionRetargets(actors, isLinked) {
+  const out = [];
+  for (const actor of actors ?? []) {
+    const match = TOKEN_ACTOR_UUID.exec(actor?.system?.companionOf?.ownerUuid ?? "");
+    if (match && isLinked(match[1], match[2]))
+      out.push({ actor, update: { "system.companionOf.ownerUuid": `Actor.${match[3]}` } });
+  }
+  return out;
+}

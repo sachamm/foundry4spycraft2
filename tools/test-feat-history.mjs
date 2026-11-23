@@ -182,6 +182,13 @@ test("all contact feat bindings clear old GC approval after changed choice, them
   await a._preUpdate(changed, {});
   assert.equal(changed["system.contactThemeConfirmed"], false);
 });
+test("a contact feat copied from a token's own copy keeps the GC's approval", async () => {
+  const a = contactItem(),
+    changed = { system: { choice: "Bob", contactThemeConfirmed: true } };
+  await a._preUpdate(changed, { spycraft2TokenLink: true });
+  assert.equal(changed.system.contactThemeConfirmed, true);
+  assert.equal(Object.hasOwn(changed, "system.contactThemeConfirmed"), false);
+});
 test("unchanged binding fields and a subsequent explicit confirmation preserve contact approval", async () => {
   const a = contactItem(),
     same = {
