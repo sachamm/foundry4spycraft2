@@ -92,7 +92,7 @@ const parts = [
   ],
   [
     140,
-    () => `<label>${loc`Attack action`} <select name="attackAction"><option value="other">${loc`Other attack (resolve its action modifiers at the table)`}</option><option value="standard">${loc`Standard Attack (Single-Shot for firearms)`}</option></select></label>
+    () => `<label>${loc`Attack action`} <select name="attackAction"><option value="standard" selected>${loc`Standard Attack (Single-Shot for firearms)`}</option><option value="other">${loc`Other attack (resolve its action modifiers at the table)`}</option></select></label>
         <label><input type="checkbox" name="aimed" /> ${loc`Aim remains valid for this target; it has not moved more than 5 ft.`}</label>
         `
   ],

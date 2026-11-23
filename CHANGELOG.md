@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Attack dialogs open on a Standard Attack.** The ranged attack dialog, and the quick melee and CQB attack
+  controls, used to start on "Other attack", so Aim, Burst and miss tricks were refused until the action was changed.
+  They now start on Standard Attack; Other is still one click away and a remembered choice is kept.
+- **Players can observe new characters.** A new agent now gives every player Observer access (world setting
+  "Default player access to new characters": None, Limited or Observer).
+- **Character ownership review.** When the world loads, and when an agent is created, renamed or assigned to a
+  player, the GC is offered any missing ownership in one dialog: the default player access, and Owner for the player
+  the agent is assigned to or whose user name appears in its name ("Breakwater (Sacha)"). Nothing changes until the
+  GC applies it; unticked rows are not offered again unless the proposal changes. World setting "Review character
+  ownership" turns it off.
 - **Flat-footed ends when a character acts.** It used to clear only when the character was hit, so anyone who had
   already acted was still attacked at their flat-footed Defense for the rest of the round. It now also clears as the
   combatant's turn begins (p.342), except in a surprise round their side did not win.

@@ -79,6 +79,7 @@ import { registerFastPathSetting } from "./module/apps/remembered-choices.mjs";
 import { registerQuickResolveSetting } from "./module/apps/damage-application.mjs";
 import { installTurnCue } from "./module/apps/turn-cue.mjs";
 import { installHotbar, rollFromMacro } from "./module/apps/hotbar.mjs";
+import { installCharacterOwnership } from "./module/apps/character-ownership.mjs";
 
 /** Conditions this system adds to the token HUD: [id, label, icon]. Labels are read once the language is known. */
 const SYSTEM_STATUSES = [
@@ -200,6 +201,7 @@ Hooks.once("init", () => {
   registerFastPathSetting();
   registerQuickResolveSetting();
   registerTableTrustSetting();
+  installCharacterOwnership();
   installTurnCue();
   installHotbar();
   registerAutomaticFluidSetting();
