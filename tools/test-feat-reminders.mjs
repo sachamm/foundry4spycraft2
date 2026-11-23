@@ -201,9 +201,9 @@ test("version 2 gives feats already in a world their reminder, once, and leaves 
   });
   const name = Object.keys(FEAT_REMINDERS)[0];
   const owned = doc({ type: "feat", name, system: {} });
-  // The agent's token already sees, so the later token-vision migration has nothing to add here.
+  // The agent's token already sees and is linked, so the later token migrations have nothing to add here.
   const actor = {
-    ...doc({ type: "agent", name: "Agent", system: {}, prototypeToken: { sight: { enabled: true } } }),
+    ...doc({ type: "agent", name: "Agent", system: {}, prototypeToken: { sight: { enabled: true }, actorLink: true } }),
     items: [owned]
   };
   const world = { version: 1, actors: [actor], items: [], setVersion: async v => (world.version = v) };

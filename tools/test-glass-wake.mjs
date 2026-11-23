@@ -59,6 +59,8 @@ test("Glass Wake has portable document links, private GM notes and fully linked 
       assert.equal(token.level, scene.initialLevel);
       assert.equal(token.delta, undefined);
       if (token.name.startsWith("Meridian Watch")) assert.equal(token.actorLink, false);
+      // An agent's token is the agent itself, so changes made through it reach the character in the Actors list.
+      if (roots.get("Actor").get(token.actorId).type === "agent") assert.equal(token.actorLink, true);
     }
   }
   assert.equal(adventure.journal[0].ownership.default, 0);
