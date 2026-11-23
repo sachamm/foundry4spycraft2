@@ -387,3 +387,13 @@ test("a damage card stops offering boosts once its damage is applied", () => {
     false
   );
 });
+
+test("a card shortcut presses the newest enabled matching button, skipping cards without one", async () => {
+  const { newestCardButton } = await import("../module/apps/keybindings.mjs");
+  const card = buttons => ({ querySelectorAll: () => buttons });
+  const old = { disabled: false, name: "old" },
+    spent = { disabled: true, name: "spent" };
+  const root = { querySelectorAll: () => [card([old]), card([spent]), card([])] };
+  assert.equal(newestCardButton(root, "button"), old);
+  assert.equal(newestCardButton({ querySelectorAll: () => [] }, "button"), null);
+});

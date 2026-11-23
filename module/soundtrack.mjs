@@ -44,7 +44,7 @@ export async function setupSoundtrack() {
   } catch (error) {
     console.error("Spycraft 2.0 | Soundtrack setup failed", error);
     ui.notifications.warn(
-      loc`Soundtrack setup could not finish. It will retry on the next GM launch; you can also import the album from the Soundtrack compendium.`
+      loc`Soundtrack setup could not finish. It will retry the next time the GC opens the world; you can also import the album from the Soundtrack compendium.`
     );
   }
 }

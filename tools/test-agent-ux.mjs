@@ -196,3 +196,16 @@ test("a weapon row states its ranges as die faces and its range increment", asyn
   assert.equal(weaponFacts({ threat: 19, error: 1, range: 25 }), "threat 19–20 · error 1 · range 25 ft.");
   assert.equal(weaponFacts({ threat: 20, error: 3 }), "threat 20 · error 1–3");
 });
+
+test("tracker rows name flat-footed for all and the wound state only where health may be seen", async () => {
+  const { trackerRowStates } = await import("../module/apps/gc/combat.mjs");
+  const actor = {
+    type: "agent",
+    statuses: new Set(["flat-footed"]),
+    system: { wounds: { value: -3 }, deathThreshold: -10 }
+  };
+  assert.deepEqual(trackerRowStates(actor), ["flat-footed"]);
+  assert.deepEqual(trackerRowStates(actor, { health: true }), ["flat-footed", "dying"]);
+  const mook = { type: "npc", statuses: new Set(), system: { npcType: "standard", wounds: { value: 0 } } };
+  assert.deepEqual(trackerRowStates(mook, { health: true }), []);
+});

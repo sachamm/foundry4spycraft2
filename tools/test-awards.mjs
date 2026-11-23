@@ -231,7 +231,7 @@ test("only the GC may award dice or settle XP, and awards require the session GC
   await assert.rejects(actor.settleMissionXP({}), /Only the GC/);
   game.user.isGM = true;
   settings.usagePeriods.session = "new";
-  await assert.rejects(actor.awardActionDice({ count: 1, reason: "Attempt" }), /Initialize/);
+  await assert.rejects(actor.awardActionDice({ count: 1, reason: "Attempt" }), /Set up the GC action dice/);
   assert.equal(actor.system.actionDice.value, 3);
 });
 

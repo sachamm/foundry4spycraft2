@@ -37,7 +37,7 @@ export function criticalPlan(
     )
   )
     return reject(
-      loc`Saving throws cannot cause threats, errors or critical results, except the explicit One in a Million Fortitude threat (pp.50,347).`
+      loc`Saves cannot cause threats, errors or critical results, except the explicit One in a Million Fortitude threat (pp.50,347).`
     );
   if (!["success", "failure"].includes(kind)) return reject(loc`Choose a critical success or failure.`);
   if (kind === "success" && !check.threatConfirmed)

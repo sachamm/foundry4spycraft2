@@ -247,6 +247,7 @@ function button(control) {
   element.setAttribute("aria-label", full);
   element.setAttribute("data-tooltip", full);
   element.dataset.rollControl = control.id;
+  if (control.key) element.dataset.rollKey = control.key;
   element.addEventListener("click", () => runChatAction(element, () => control.run()));
   return element;
 }

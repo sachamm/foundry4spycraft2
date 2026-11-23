@@ -521,7 +521,7 @@ export const ActorRolls = Base =>
       let input = options;
       if (!CONFIG.SPYCRAFT.saves[key]) return null;
       if (attributeCollapsePlan(this.system).dead || this.system.conditionContext?.dead || this.statuses?.has("dead"))
-        return refuse(loc`A dead character cannot make a saving throw.`);
+        return refuse(loc`A dead character cannot make a save.`);
       const feats = new Set(this.system.activeFeatNames ?? []),
         manualStandingContent = stillStandingSaveContent(this.system, key),
         stillStandingContent =
@@ -554,8 +554,7 @@ export const ActorRolls = Base =>
       const blocked = terms.merge("blocked")[0];
       if (blocked) return refuse(blocked);
       const checkMethod = input.checkMethod ?? "roll";
-      if (shakenRules(this.system).needsReview)
-        return refuse(loc`Review the current Shaken sources before saving throws.`);
+      if (shakenRules(this.system).needsReview) return refuse(loc`Review the current Shaken sources before saves.`);
       if (["take10", "take20"].includes(checkMethod) && shakenRules(this.system).fixedResultsForbidden)
         return refuse(loc`Shaken: taking 10 or 20 is unavailable (p.342).`);
       if (checkMethod !== "roll" && (checkMethod !== "take10" || key !== "ref" || !evasionPlan(this.system).canTake10))

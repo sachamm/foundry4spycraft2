@@ -59,7 +59,12 @@ test("every template renders with every branch taken, and with none", () => {
 });
 
 test("every partial a template calls is preloaded by the sheet part that renders it", () => {
-  const sheets = ["module/sheets/actor-sheet.mjs", "module/sheets/item-sheet.mjs", "module/sheets/vehicle-sheet.mjs"]
+  const sheets = [
+    "module/sheets/actor-sheet.mjs",
+    "module/sheets/item-sheet.mjs",
+    "module/sheets/vehicle-sheet.mjs",
+    "module/apps/gc/console.mjs"
+  ]
     .map(file => readFileSync(join(ROOT, file), "utf8"))
     .join("\n");
   const partials = new Set(paths.flatMap(path => [...templateCalls(sourceOf(path)).partials]));

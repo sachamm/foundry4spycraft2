@@ -26,6 +26,19 @@
 - **Items and vehicles.** Feat confirmation boxes and prerequisite data are shown to the GC only. The vehicle
   thresholds line is one sentence. "Tyre" is spelled "tire". The item browser opened without a character no longer
   hides unqualified entries. Numbers glued to words in about sixty messages have their spaces back.
+- **Combat tracker and keyboard.** The token HUD lists this system's conditions only, by their sheet names, plus the
+  few core entries Foundry itself reads. Tracker rows say "flat-footed" and, for characters you may open, the wound
+  state; the half-action count uses a proper plural. Six rebindable shortcuts are registered: next and previous
+  turn, the GC Console, the acting character's sheet, the main button of the newest card, and GC boost
+  (see `docs/gc-tools.md`).
+- **GC Console.** Combat moves to the top while a combat exists and has one primary button. Mission, XP and GC
+  action dice read as labelled values instead of one glued line. Rare mission buttons sit under "More mission
+  tools". Row buttons are verbs ("Mark complete", "Mark faced", "Remove"), and empty lists say what to press.
+  Section titles are 13px sentence case.
+- **One name for the GC's dice.** Messages say "GC action dice" where they said "GC pool" or "session pool";
+  "AD", "HP", "saving throw" and "next GM launch" are written out in the table's own terms.
+- **Docs.** `docs/gc-quickstart.md` walks a new GC from an empty world to the first combat; `docs/gc-tools.md`
+  gains "Running a combat turn" and a keyboard table.
 - **Chat-card buttons tell the truth.** The line under a chat-card button said "Action finished" when the action had
   been refused, when the character was busy and when the dialog was closed. It now says "Not done" with the reason
   for a refusal, shows nothing after a closed dialog, and says "Action finished" only when the action ran. A refused

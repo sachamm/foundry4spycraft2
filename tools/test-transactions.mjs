@@ -478,7 +478,7 @@ test("a session change on the server expires a stale client’s GC pool before a
     spendGCDice(1, async () => {
       performed = true;
     }),
-    /Initialize/
+    /Set up the GC action dice/
   );
   assert.equal(performed, false);
   assert.equal(gcDiceStatus().current, false);

@@ -700,7 +700,7 @@ export const ActorOutcomes = Base =>
         <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1 cost, minimum 0; one Chance-based session use)`}</label>
         </details>
         <details><summary>${loc`Pay from bonus dice or several wallets`}</summary>
-        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC pool`}</option>${poolOptions}</select></label>
+        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC action dice`}</option>${poolOptions}</select></label>
         <label>${loc`Shaken surcharge funding`} <select name="feeFunding"><option value="same">${loc`Same source as the base cost`}</option><option value="">${loc`Paying character's ordinary dice`}</option>${poolOptions}</select></label>
         <p>${loc`If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.`}</p>${fundingActors
           .map(
@@ -717,7 +717,7 @@ export const ActorOutcomes = Base =>
                 .join("")}`
           )
           .join("")}</details>
-        <details><summary>${loc`How the cost is worked out`}</summary><p>${loc`Your feats and class abilities that change a critical's cost are applied automatically. Jinx lowers the paying opponent's cost by 1 (minimum 0) and uses their own session allowance. A Shaken payer adds the surcharge after that, even if the cost reaches 0; surcharge dice are not rolled. The GC can pay from other players' characters or from the session pool. Apply the recorded effect at the table.`}</p></details></div>`
+        <details><summary>${loc`How the cost is worked out`}</summary><p>${loc`Your feats and class abilities that change a critical's cost are applied automatically. Jinx lowers the paying opponent's cost by 1 (minimum 0) and uses their own session allowance. A Shaken payer adds the surcharge after that, even if the cost reaches 0; surcharge dice are not rolled. The GC can pay from other players' characters or from the GC action dice. Apply the recorded effect at the table.`}</p></details></div>`
         });
         if (!input) return null;
         input.splitFunding = fundingActors
@@ -739,7 +739,7 @@ export const ActorOutcomes = Base =>
         return refuse(error.message);
       }
       const useGC = input.kind === "failure" && (input.payerId === "gc" || input.payer === "gc");
-      if (useGC && !game.user?.isGM) return refuse(loc`Only the GC can spend the GC pool.`);
+      if (useGC && !game.user?.isGM) return refuse(loc`Only the GC can spend GC action dice.`);
       const controller = useGC ? gcDiceController({ required: false }) : null;
       const payer = useGC ? null : input.kind === "failure" ? (input.payer ?? game.actors?.get(input.payerId)) : this;
       if (!useGC && (payer?.type !== "agent" || !payer.isOwner))
@@ -751,7 +751,7 @@ export const ActorOutcomes = Base =>
           return refuse(loc`Choose a bonus pool belonging to the paying character.`);
         bonusPoolId = id;
       }
-      if (useGC && bonusPoolId) return refuse(loc`The GC pool cannot spend a character bonus grant.`);
+      if (useGC && bonusPoolId) return refuse(loc`GC action dice cannot be paid with a character bonus grant.`);
       let surchargeBonusPoolId = input.surchargeBonusPoolId ?? "same";
       if (input.feeFunding !== undefined && input.feeFunding !== "same") {
         if (input.feeFunding === "") surchargeBonusPoolId = "";
@@ -769,7 +769,7 @@ export const ActorOutcomes = Base =>
       const allocations = input.splitFunding?.length
         ? input.splitFunding.map(({ bonusPoolId, count }) => ({ bonusPoolId, count }))
         : input.paymentAllocations;
-      if (useGC && allocations?.length) return refuse(loc`The GC pool uses one GC payment, not character wallets.`);
+      if (useGC && allocations?.length) return refuse(loc`GC action dice use one GC payment, not character wallets.`);
       const expectedShaken = useGC ? null : JSON.stringify(shakenRules(payer.actionDiceFundingSystem));
       const work = async () => {
         if (getActionDieSettlementReview(this).needsReview)

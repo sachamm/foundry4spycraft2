@@ -660,34 +660,21 @@ Line references are to `main` at `c2abca8`. Each item was checked against the tr
 | C10 | `module/apps/damage-application.mjs:692,971,1033,1125`; `module/apps/gc/npc-card-dice.mjs` | No undo for applied damage or GC boosts                                                                         | 8.3      | P1  | Before-image on the card; Undo as the only remaining control             |
 | C11 | `module/apps/gc-relay.mjs:71,115,153`                                                      | Pending requests held in memory (lost on reload); 120 s auto-decline                                            | 8.5      | P1  | Persist on the message; timeout as a world setting; notify on lapse      |
 | C12 | `styles/chat.css:7`; `module/documents/actor/attack-rolls.mjs:825`                         | Header flavor carries up to ~15 rule notes                                                                      | 7.5      | P1  | Header who/whom/what; notes in the Why disclosure                        |
-| C13 | `styles/chat.css:12`                                                                       | Outcome stamps at 12px                                                                                          | 5.4      | P2  | 13px                                                                     |
-| C14 | `styles/chat.css:22` vs `:45`                                                              | Two conflicting rules for `.sc2-quiet-action`                                                                   | 5        | P2  | Keep one                                                                 |
 | C16 | `module/apps/resolution-guide.mjs` on cards (`chat-guidance.mjs:66`)                       | "Automatic vs table / GC steps" on every card guide                                                             | 3.3      | P2  | Client setting to hide after first open                                  |
 
 ### 10.6 Combat tracker and token HUD
 
 | ID  | Where                                      | Divergence                                                                                 | Sec. | P   | Fix                                                                  |
 | --- | ------------------------------------------ | ------------------------------------------------------------------------------------------ | ---- | --- | -------------------------------------------------------------------- |
-| T1  | `spycraft2.mjs:139-144`, `:85-99`          | System conditions appended to core's list (66 entries); ids `blind`/`sleep` vs sheet names | 5.7  | P1  | Replace `CONFIG.statusEffects`; keep ids the code reads; text labels |
 | T2  | `module/apps/gc/combat.mjs:546-567`        | Context menu lacks Delay…, Ready, Readied action triggered                                 | 7.6  | P1  | Add one-step entries that move the turn                              |
-| T3  | `module/` (no `game.keybindings.register`) | No keybindings                                                                             | 9.1  | P1  | Register the 9.1 set                                                 |
-| T4  | `module/apps/gc/combat.mjs:541`            | "(N half action(s) left)"; only the active row gets state                                  | 7.6  | P2  | Proper plural; add flat-footed and wound state to rows               |
 
 ### 10.7 GC Console
 
 | ID  | Where                                                                    | Divergence                                                                         | Sec. | P   | Fix                                                     |
 | --- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ---- | --- | ------------------------------------------------------- |
-| G1  | `templates/apps/gc-console.hbs:63`                                       | Combat is the seventh section; state-driven opening does not move it               | 7.7  | P1  | Combat first while a combat exists; Prep/Play switch    |
 | G2  | `templates/apps/gc-console.hbs:67`; `module/apps/gc/console.mjs:296-315` | Combat list is name, Count and pending only; rows do nothing on click              | 7.7  | P1  | Half actions, Defense, health, conditions; pan and open |
-| G3  | `templates/apps/gc-console.hbs:66,68`                                    | Two primaries in Combat (Next turn, Roll NPC Initiative)                           | 6.1  | P1  | One primary by state                                    |
-| G4  | `templates/apps/gc-console.hbs:18,27,59`; `lang/en.json:1293-1296`       | Mission, XP and pool lines glued from fragments                                    | 4.5  | P1  | Label/value grid with `?` captions                      |
-| G5  | `templates/apps/gc-console.hbs:20-29`                                    | Eleven equal buttons in Mission, rare ones included                                | 3.3  | P1  | "More mission tools" disclosure                         |
 | G6  | `templates/apps/gc-console.hbs:3`                                        | Status strip repeats the clock; no pending count or team dice                      | 7.7  | P2  | Replace Time with Pending N; team row                   |
-| G7  | `templates/apps/gc-console.hbs:36,42,50-54`; `lang/en.json:1310-1320`    | Lower-case verbs after an em dash read as status ("complete", "faced as a threat") | 6.1  | P2  | "Mark complete", "Mark faced", "Remove"                 |
-| G8  | `lang/en.json:1314` ("None yet.")                                        | Empty states without a next step                                                   | 6.10 | P2  | What goes here + the Add button                         |
 | G9  | `templates/apps/gc-console.hbs` (most buttons)                           | Only Begin session, Next scene and Record for XP have tooltips                     | 7.7  | P2  | One-line "what this changes" tooltip                    |
-| G10 | `styles/gc-console.css:70,81`, `:22`                                     | Section title declared twice, 12px upper case; tags 12px                           | 5.4  | P2  | One rule at 13px sentence case                          |
-| G12 | `templates/apps/gc-console.hbs:79`                                       | Authored `title` attribute                                                         | 4.7  | P2  | `data-tooltip`                                          |
 
 ### 10.8 Strings (`lang/en.json` and `loc` sources)
 
@@ -695,19 +682,12 @@ Counts are over the 10,332 string values in `lang/en.json`.
 
 | ID  | Where                                                                                                           | Divergence                                                                        | Sec. | P   | Fix                                                         |
 | --- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---- | --- | ----------------------------------------------------------- |
-| L1  | `lang/en.json:4824, 7454, 7764, 9214`                                                                           | "next GM launch"                                                                  | 4.2  | P1  | "the next time the GC opens the world"                      |
-| L2  | `lang/en.json:904`                                                                                              | "GC refers to your game moderator."                                               | 4.2  | P1  | Delete; rely on the glossary tooltip                        |
-| L3  | "GC pool" (14), "GC dice" (7), "GC action dice" (10), "session pool" (2), "Game Control action dice" (`:4844`)  | Five names for one resource                                                       | 4.2  | P1  | "GC action dice", short "GC dice"                           |
-| L4  | `module/apps/ui-tooltips.mjs:33-34`; strings "Heal with AD…", "Spend AD", "Starting AD", "current HP" (`:7536`) | d20 abbreviations                                                                 | 4.2  | P1  | Write out                                                   |
-| L6  | `lang/en.json:321`                                                                                              | "Threat level" (used in the NPC header)                                           | 4.2  | P2  | "Threat Level"                                              |
-| L7  | `lang/en.json:7469` and 6 others                                                                                | "Saving throw" in labels                                                          | 4.2  | P2  | "Save"                                                      |
 | L9  | ~156 strings start or end with a separator or bracket (e.g. `:1293`, `:1371`)                                   | Fragment keys                                                                     | 4.5  | P2  | Whole-sentence keys                                         |
 | L10 | "actual" (487), "recorded" (335), "receipt" (111), "RAW" (`:149`), "Health" section (7)                         | Internal vocabulary; a "Health" section that does not exist                       | 4.3  | P2  | Plain words; name the real place                            |
 | L11 | 71 strings start "I ", 27 contain "I am"                                                                        | First person in labels                                                            | 4.1  | P2  | "you", or mark as the player's declaration                  |
 | L12 | 46 strings over 300 characters, 335 over 160                                                                    | Walls of text in hints                                                            | 4.1  | P2  | One sentence; rest in docs                                  |
 | L13 | `lang/en.json:7342`                                                                                             | Developer error shown to users                                                    | 4.3  | P2  | `console.warn` only                                         |
 | L14 | `lang/en.json:2925, 2976, 5927, 9553`                                                                           | Refusals without the fix, or in internal language                                 | 4.6  | P2  | What / why / next                                           |
-| L15 | `lang/en.json:347, 349`; `module/apps/gc/console.mjs:59`                                                        | "Game Control's client", "Game Control console": expansion used as a running name | 4.2  | P2  | "GC" in body text; expand once in the console title tooltip |
 
 ### 10.9 Visual system
 
@@ -715,7 +695,6 @@ Counts are over the 10,332 string values in `lang/en.json`.
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---- | --- | --------------------------------- |
 | S1  | `styles/spycraft2.css:7`, `styles/retro.css:108-113`, `styles/components.css:90`, `:142-147`                                                                                     | Section heading styled four times; first three mostly overridden                     | 5    | P2  | One rule in components.css        |
 | S2  | `styles/retro.css:114-123`, `:157-158` vs `styles/components.css:194-204`                                                                                                        | Tabs styled twice; microfilm border-image set then removed                           | 5    | P2  | One rule                          |
-| S5  | `styles/spycraft2.css:225`                                                                                                                                                       | Second focus style (warm ring) on icon buttons                                       | 9.1  | P2  | Delete; use the shared rule       |
 | S6  | `styles/spycraft2.css:3`, `:199`; `styles/chat-search.css:23`                                                                                                                    | Literal colours and stale fallbacks outside tokens                                   | 5.1  | P2  | Tokens (`--sc2-warn` for hazards) |
 | S8  | `styles/tokens.css:104` (dark `--sc2-danger`)                                                                                                                                    | 4.48:1 on `raised`                                                                   | 5.3  | P2  | Lighten slightly; add to ui-lab   |
 | S9  | `styles/retro.css:154-156` vs `styles/sheet-agent.css:17`                                                                                                                        | Agent name rules disagree (nowrap 20px vs wrap 17px); retro.css header comment stale | 5    | P2  | One rule; update comment          |
@@ -725,13 +704,12 @@ Counts are over the 10,332 string values in `lang/en.json`.
 
 | ID  | Where                                      | Divergence                                                                   | P   | Fix                                                         |
 | --- | ------------------------------------------ | ---------------------------------------------------------------------------- | --- | ----------------------------------------------------------- |
-| O1  | `docs/gc-tools.md`                         | No keyboard section; no "running a combat turn" walkthrough; reference-first | P2  | Add both; link from the console `?`                         |
-| O2  | `docs/` (none)                             | No first-session path for a new GC                                           | P1  | `docs/gc-quickstart.md` and a dismissible console checklist |
+| O2  | `docs/gc-quickstart.md`                    | Quickstart page exists; the console has no first-session checklist           | P1  | A dismissible console checklist linking the quickstart      |
 | O3  | `docs/npc-creation.md`, `docs/gc-tools.md` | GC and maintainer content mixed                                              | P2  | Split into GC and maintainer pages                          |
 
 ### 10.11 Counts and what to keep
 
-**Totals:** 5 P0, 52 P1, 63 P2 (120 items).
+**Totals:** 0 P0, 11 P1, 27 P2 (38 items) still open, of the 120 first listed (5 P0, 52 P1, 63 P2). Rows are removed from the tables above as they are fixed.
 
 **Keep — already compliant, do not regress:**
 

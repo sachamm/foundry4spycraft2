@@ -642,10 +642,6 @@
   min-width: 0;
   text-align: left;
 }
-.sc2-icon-button:focus-visible {
-  outline: 2px solid var(--color-warm-1, #b8860b);
-  outline-offset: 2px;
-}
 .sc2-icon-button:disabled > .sc2-button-icon {
   opacity: 0.45;
 }

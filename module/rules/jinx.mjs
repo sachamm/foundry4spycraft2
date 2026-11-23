@@ -42,7 +42,7 @@ export function jinxCostPlan(payerSystem, critical, { jinx = false, payerUuid = 
     !actingActorUuid.startsWith("Actor.") ||
     payerUuid === actingActorUuid
   )
-    throw new Error(loc`Jinx belongs to a distinct paying character, not the acting character or the GC pool.`);
+    throw new Error(loc`Jinx belongs to a distinct paying character, not the acting character or the GC action dice.`);
   return {
     ...structuredClone(critical),
     cost: critical.cost - 1,

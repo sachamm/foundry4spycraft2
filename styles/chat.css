@@ -79,16 +79,18 @@
   background: var(--sc2-action-strong);
   border-color: var(--sc2-action-strong);
 }
+/* Closing the outcome is a real, readable secondary button. */
 .spycraft2.roll-controls button.sc2-quiet-action {
   width: auto;
   justify-self: end;
-  min-height: 0;
-  padding: 0 4px;
+  min-height: 28px;
+  padding: 2px 8px;
   font-size: var(--sc2-text-s);
-  color: var(--sc2-ink-muted);
+  color: var(--sc2-action);
   background: transparent;
-  border: 0;
-  text-decoration: underline;
+  border: 1px solid var(--sc2-rule);
+  border-radius: var(--sc2-radius);
+  text-decoration: none;
   box-shadow: none;
 }
 
@@ -182,16 +184,6 @@
   color: var(--sc2-action);
   background: var(--sc2-surface-raised);
   border: 1px solid var(--sc2-rule);
-}
-/* Closing the outcome is a real, readable secondary button. */
-.spycraft2.roll-controls button.sc2-quiet-action {
-  min-height: 28px;
-  padding: 2px 8px;
-  font-size: var(--sc2-text-s);
-  color: var(--sc2-action);
-  border: 1px solid var(--sc2-rule);
-  border-radius: var(--sc2-radius);
-  text-decoration: none;
 }
 .spycraft2.roll-controls button.sc2-quiet-action:hover {
   color: var(--sc2-ink-strong);

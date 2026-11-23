@@ -46,6 +46,7 @@ import {
   missionXP
 } from "./module/apps/gc/state.mjs";
 import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
+import { registerKeybindings } from "./module/apps/keybindings.mjs";
 import {
   installFluidInitiativeHooks,
   fluidCombatClass,
@@ -137,12 +138,24 @@ Hooks.once("init", () => {
   installDialogThemeHooks();
   installUITooltipHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;
-  CONFIG.statusEffects ??= [];
-  for (const [id, , img] of SYSTEM_STATUSES)
-    if (!CONFIG.statusEffects.some(effect => effect.id === id))
-      CONFIG.statusEffects.push({ id, name: id, img: img ?? "icons/svg/downgrade.svg" });
-  if (!CONFIG.statusEffects.some(effect => effect.id === "bound"))
-    CONFIG.statusEffects.push({ id: "bound", name: "SPYCRAFT.Condition.Bound", img: "icons/svg/net.svg" });
+  registerKeybindings({ openConsole: openGCConsole });
+  // The token HUD lists this system's conditions only. Core entries are kept when Foundry itself reads them
+  // (defeated, invisible and the like) or when they share an id with one of ours, whose icon is then reused.
+  const coreStatuses = CONFIG.statusEffects ?? [];
+  const coreSpecial = new Set(Object.values(CONFIG.specialStatusEffects ?? {}));
+  const ours = [
+    ...SYSTEM_STATUSES.map(([id, , img]) => ({ id, name: id, img })),
+    { id: "bound", img: "icons/svg/net.svg" }
+  ];
+  CONFIG.statusEffects = [
+    ...ours.map(({ id, name, img }) => ({
+      ...coreStatuses.find(effect => effect.id === id),
+      id,
+      name: name ?? "SPYCRAFT.Condition.Bound",
+      img: img ?? coreStatuses.find(effect => effect.id === id)?.img ?? "icons/svg/downgrade.svg"
+    })),
+    ...coreStatuses.filter(effect => coreSpecial.has(effect.id) && !ours.some(entry => entry.id === effect.id))
+  ];
   game.settings.register("spycraft2", "linguistics", {
     name: locKey`Optional Linguistics checks`,
     hint: locKey`Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.`,

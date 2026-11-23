@@ -57,7 +57,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     position: { width: 720, height: 800 },
     window: {
       get title() {
-        return loc`Game Control console`;
+        return loc`GC Console`;
       },
       resizable: true
     },
@@ -122,7 +122,13 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     }
   };
 
-  static PARTS = { main: { template: "systems/spycraft2/templates/apps/gc-console.hbs", scrollable: [""] } };
+  static PARTS = {
+    main: {
+      template: "systems/spycraft2/templates/apps/gc-console.hbs",
+      templates: ["systems/spycraft2/templates/apps/gc-console-combat.hbs"],
+      scrollable: [""]
+    }
+  };
 
   _canRender(options) {
     if (!game.user.isGM) return false;

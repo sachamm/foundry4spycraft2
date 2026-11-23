@@ -2,6 +2,8 @@
 
 Open the **GC Console** from the first sidebar tab, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
 
+New to the console? Start with [gc-quickstart.md](gc-quickstart.md).
+
 Foundry already supplies scenes, tokens, journals, roll tables and the combat tracker. These tools add what is specific to Spycraft 2.0.
 
 ## Running a session
@@ -9,7 +11,7 @@ Foundry already supplies scenes, tokens, journals, roll tables and the combat tr
 - **Begin session** (top of the console) starts the session's usage period, sets up the GC pool from the team and the
   mission's Caliber, and applies each agent's starting-dice adjustments in one step. **Next scene** starts a new scene
   period and counts the scene on the active mission. **Start mission** also starts a mission period.
-- Until the pool is set up the console offers **Set up GC pool**, pre-filled with the players present and the Caliber.
+- Until the GC action dice are set up the console offers **Set up GC action dice**, pre-filled with the players present and the Caliber.
 - On an open NPC card the GC gets **GC boost** and **GC: activate threat**, paid from the GC pool.
 - A player's request to change something they do not own (damage to an NPC, treating a teammate) arrives as a card in
   the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. Unanswered requests are declined
@@ -59,6 +61,31 @@ A **dramatic scene** lasts until the next scene starts. While it lasts, GC dice 
 - **Surprise round** takes each side's opposed result and announces who acts.
 
 Fluid initiative can be turned off in the system settings.
+
+### Running a combat turn
+
+1. The tracker row of the acting combatant shows the half actions it has left; rows also say "flat-footed", and
+   the wound state of characters whose sheet you may open.
+2. Open the acting character's sheet (shortcut below) and roll from its Play tab or stat block. A plain click opens
+   the roll's dialog; a Shift-click rolls at once with the last choices.
+3. Work down the chat card: the guide at the top names the state (Pending, Hit, Miss and so on) and the main
+   button is the next step. Press **Finish** when nothing is left to do on the card.
+4. Record spent actions from the combatant's context menu if the roll did not do so, then press **Next turn**.
+
+### Keyboard
+
+These shortcuts are listed under Configure Controls, where each can be changed or cleared.
+
+| Shortcut  | Action                                             | Who |
+| --------- | -------------------------------------------------- | --- |
+| Alt+N     | Next turn                                          | GC  |
+| Alt+P     | Previous turn                                      | GC  |
+| Alt+G     | Open the GC Console                                | GC  |
+| Alt+S     | Open the sheet of the combatant whose turn it is   | GC  |
+| Alt+Enter | Press the main button on the newest chat card      | All |
+| Alt+B     | GC boost on the newest NPC card that can take one  | GC  |
+
+Every control is also reachable with Tab; Enter submits a dialog and Esc cancels it.
 
 ## Standard NPC damage (pp.331–332, 452)
 
