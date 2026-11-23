@@ -90,7 +90,9 @@ body.theme-dark .spycraft2.application:not(.theme-light),
 .theme-dark .spycraft2.gc-console:not(.theme-light),
 .theme-dark .spycraft2.gc-console:not(.theme-light) :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
 .spycraft2.gc-console.theme-dark,
-body.theme-dark .spycraft2.application:not(.theme-light) :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
+body.theme-dark
+  .spycraft2.application:not(.theme-light)
+  :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
 .spycraft2.application.theme-dark :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]) {
   --sc2-surface: #171c1c;
   --sc2-surface-raised: #212828;

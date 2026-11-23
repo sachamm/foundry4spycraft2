@@ -9,7 +9,6 @@ packs/
 src/data/
 # Not JavaScript
 templates/
-styles/
 lang/
 docs/
 assets/

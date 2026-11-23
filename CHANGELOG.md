@@ -24,7 +24,8 @@
   check the agent sheet at the sizes it opens at on 1280×720 and 1366×768 screens. Lint fails if the number of
   warnings grows, and a test stops template lines from getting longer. `npm run check:schemas` no longer exits
   cleanly when it could not find Foundry. Dependabot watches npm and the CI actions. `docs/architecture.md` maps the
-  layers and lists what to touch when adding an ability. Seven style rules that matched nothing were removed.
+  layers and lists what to touch when adding an ability. Seven style rules that matched nothing were removed. The stylesheets are now formatted by
+  Prettier and checked by stylelint; the reformat changes no rule.
 
 - **Fewer redraws during a conflict.** A change to scene state or to a Dramatic Conflict used to recalculate every
   character and redraw every sheet on every client; it now redraws the GC Console only. A mission or campaign change

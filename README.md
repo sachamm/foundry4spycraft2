@@ -245,8 +245,8 @@ them with `planTerms`.
 ## Code style and checks
 
 ```bash
-npm run format        # Prettier over every .mjs file
-npm run lint          # ESLint
+npm run format        # Prettier over every .mjs and .css file
+npm run lint          # ESLint, then stylelint over styles/ (npm run lint:css)
 npm run strings       # collect the loc`…` text in the source into lang/en.json
 npm run check:schemas # validate the data models with a local Foundry installation's field classes
 ```
