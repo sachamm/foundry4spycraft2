@@ -183,7 +183,7 @@ export function criticalPlan(
     if (appearance?.criticalFailureDiscount) {
       adjustment--;
       minimum = Math.max(minimum, 1);
-      sources.push("Simply Irresistible –1 (minimum1)");
+      sources.push("Simply Irresistible –1 (minimum 1)");
     }
     if (
       system.coreClassIds?.includes("wheelman") &&

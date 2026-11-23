@@ -324,13 +324,15 @@ export const ActorAttackRolls = Base =>
       const cunning = millionDollar && options.cunningPlan ? cunningPlanEffect(this.system, atk.error) : null;
 
       const tripPenalty = options.finalAttack?.source === "trip" ? 4 : 0;
+      // A modifier the GC calls for that no rule on the sheet covers, typed into the attack dialog.
+      const situational = Math.trunc(Number(options.situationalModifier)) || 0;
       const message = await this.rollCheck(
         "1d20 + @total",
-        { total: atk.total - tripPenalty },
+        { total: atk.total - tripPenalty + situational },
         {
           planModifiers: atk.planModifiers,
           featReminders: options.featReminders,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,

@@ -1,4 +1,5 @@
 import { ruleName } from "../rules/rule-name.mjs";
+import { formatRange } from "../rules/outcome-labels.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
 import { KeepPlace } from "./keep-place.mjs";
 import { enrich } from "./enrich.mjs";
@@ -131,9 +132,9 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
       {
         weapon: [
           [label("SPYCRAFT.Damage"), sys.damage],
-          [label("SPYCRAFT.Weapon.Error"), sys.error],
-          [label("SPYCRAFT.Weapon.Threat"), sys.threat],
-          [label("SPYCRAFT.Range"), sys.range ? `${sys.range} ft` : ""],
+          [label("SPYCRAFT.Weapon.ErrorRange"), formatRange("error", sys.error)],
+          [label("SPYCRAFT.Weapon.ThreatRange"), formatRange("threat", sys.threat)],
+          [label("SPYCRAFT.Range"), sys.range ? `${sys.range} ft.` : ""],
           [label("SPYCRAFT.Weapon.Ammo"), sys.ammo],
           [label("SPYCRAFT.Caliber"), cfg.calibers?.[sys.caliber]]
         ],
@@ -160,6 +161,7 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
       }[item.type] ?? [];
     Object.assign(context, {
       item,
+      isGM: game.user?.isGM === true,
       // Prefix for element ids, so two open sheets never share one.
       appId: this.id,
       system: sys,

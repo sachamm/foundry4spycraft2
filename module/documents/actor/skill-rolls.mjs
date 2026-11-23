@@ -1,5 +1,6 @@
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
 import { checkFocus } from "../../rules/check-identity.mjs";
+import { formatRange } from "../../rules/outcome-labels.mjs";
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { orderSkillChecks, needsGear } from "../../rules/skill-check-order.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
@@ -177,7 +178,8 @@ export const ActorSkillRolls = Base =>
         const choices = checks
           .map(
             check =>
-              `<option value="${check.id}"${options.initialCheck === check.id ? " selected" : ""}>${loc`${esc(check.name)} (${check.attributes.join("/").toUpperCase()}, ${esc(check.mode)}, error 1–${check.error})`}${needsGear(check) ? ` · ${loc`needs gear`}` : ""}</option>`
+              // The option is the check's name; its mechanics show under the select for whichever one is chosen.
+              `<option value="${check.id}" data-detail="${esc(loc`${check.attributes.join("/").toUpperCase()} · ${check.mode} · error range ${formatRange("error", check.error)}`)}"${options.initialCheck === check.id ? " selected" : ""}>${esc(check.name)}${needsGear(check) ? ` · ${loc`needs gear`}` : ""}</option>`
           )
           .join("");
         const abilities = skill.totals

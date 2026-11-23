@@ -42,7 +42,7 @@ export function fallDistancePlan(
     reductionFeet,
     damageDistanceFeet,
     notes: [
-      loc`Falling damage distance: ${fallDistanceFeet} ft. minus ${reductionFeet} ft. = ${damageDistanceFeet} ft. (minimum0; pp.194,336).`,
+      loc`Falling damage distance: ${fallDistanceFeet} ft. minus ${reductionFeet} ft. = ${damageDistanceFeet} ft. (minimum 0; pp.194,336).`,
       ...(spider ? [loc`Spider Mastery: each falling damage die is 1 lower (minimum 1 per die) (p.196).`] : []),
       ...(fallGuy ? [loc`Fall Guy: each falling damage die is 2 lower (minimum 1 per die).`] : []),
       loc`This is the distance used for falling damage. It does not shorten the physical fall, move the character, establish a landing/check outcome or settle damage, armor piercing, stress, diving or fall duration.`

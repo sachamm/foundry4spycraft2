@@ -353,7 +353,7 @@ export async function manageTakedown(actor, input = {}) {
     for (const r of takedownRows(actor)) {
       const save = currentTakedownSave(actor, r);
       if (!r.saveUuid && !r.settlement && game.user.isGM)
-        entries.push({ value: "recover|" + r.id, label: loc`GC review interrupted takedown save DC${r.proof.dc}` });
+        entries.push({ value: "recover|" + r.id, label: loc`GC review interrupted takedown save DC ${r.proof.dc}` });
       if (r.saveUuid && !r.settlement)
         entries.push({
           value: (save?.flags.spycraft2.resolved ? "settle|" : "existing|") + (save?.uuid ?? ""),
@@ -365,7 +365,7 @@ export async function manageTakedown(actor, input = {}) {
       if (r.settlement?.state === "prepared" && game.user.isGM)
         entries.push({
           value: "outcome|" + r.settlement.saveUuid,
-          label: loc`GC review interrupted takedown outcome DC${r.proof.dc}`
+          label: loc`GC review interrupted takedown outcome DC ${r.proof.dc}`
         });
     }
     if (!attacks.length && !entries.length)
@@ -377,7 +377,7 @@ export async function manageTakedown(actor, input = {}) {
       window: { title: loc`Takedown saves and outcomes` },
       rejectClose: false,
       content:
-        `<div class="spycraft2-roll-options"><p>${loc`Finish the actual attack and damage results in chat first. Apply health damage separately, then confirm what this character actually suffered. Takedown uses pre-DR damage as its Fortitude DC, plus10 if this attack lost at least one wound point. Failure causes sprawled.`}</p><label>${loc`Operation`} <select name="operation">` +
+        `<div class="spycraft2-roll-options"><p>${loc`Finish the actual attack and damage results in chat first. Apply health damage separately, then confirm what this character actually suffered. Takedown uses pre-DR damage as its Fortitude DC, plus 10 if this attack lost at least one wound point. Failure causes sprawled.`}</p><label>${loc`Operation`} <select name="operation">` +
         (attacks.length && damages.length
           ? `<option value="new">${loc`New save for a reviewed damage event`}</option>`
           : "") +

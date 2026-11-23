@@ -167,7 +167,7 @@ export function balanceSurfacePlan(
     errorIncrease,
     errorReduction,
     notes: [
-      loc`Balance: ${row.label}; DC${dc}, error +${errorIncrease}${mastery ? loc`, Equilibrium Mastery error −1 and Vision tag ignored` : ""}; ${requiredChecks} check(s) for this movement (pp.106,194).`,
+      loc`Balance: ${row.label}; DC ${dc}, error +${errorIncrease}${mastery ? loc`, Equilibrium Mastery error −1 and Vision tag ignored` : ""}; ${requiredChecks} check(s) for this movement (pp.106,194).`,
       ...(basic
         ? [
             loc`Equilibrium Basics replaces the ordinary two movement checks with one; it does not waive the check or expand permitted movement.`

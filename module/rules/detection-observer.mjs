@@ -69,7 +69,7 @@ export function detectionObserverPlan(
     errorIncrease,
     blockedReason: "",
     notes: [
-      loc`Character-detection distraction (${severity}) against ${actorName.trim()}: check ${row.penalty}, error range +${errorIncrease} before ordinary reductions${sources.length ? loc`; Ghost Mastery additional check −4` : ""}. Total distraction check modifier ${penalty} (Table2.25, p.119; p.195).`
+      loc`Character-detection distraction (${severity}) against ${actorName.trim()}: check ${row.penalty}, error range +${errorIncrease} before ordinary reductions${sources.length ? loc`; Ghost Mastery additional check −4` : ""}. Total distraction check modifier ${penalty} (Table 2.25, p.119; p.195).`
     ]
   };
 }

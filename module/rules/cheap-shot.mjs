@@ -96,7 +96,7 @@ export function cheapShotPlan(
       ...(flailBasics
         ? [loc`Flail Basics: +2 gear with this melee Cheap Shot attack while holding a reviewed readied flail (p.178).`]
         : []),
-      loc`On a miss, the attacker becomes flat-footed. On a hit, apply −2 to attack/skill checks keyed to the chosen attribute or −10 ft. Speed. The effect ends with the scene or a successful Fortitude save (DC20 −2 per minute since this attack; at most one attempt per minute). Only one successful Cheap Shot may affect a combatant per scene.`
+      loc`On a miss, the attacker becomes flat-footed. On a hit, apply −2 to attack/skill checks keyed to the chosen attribute or −10 ft. Speed. The effect ends with the scene or a successful Fortitude save (DC 20 −2 per minute since this attack; at most one attempt per minute). Only one successful Cheap Shot may affect a combatant per scene.`
     ]
   };
 }

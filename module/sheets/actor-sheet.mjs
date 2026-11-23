@@ -1739,7 +1739,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "npc"],
-    position: { width: 800, height: 800 },
+    position: { width: 480, height: 640 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {

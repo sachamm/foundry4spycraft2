@@ -68,7 +68,7 @@ const parts = [
     120,
     ({ actor, key }) =>
       key === "analysis" && actor.system.activeFeatNames?.some(n => ["Forensic Genius", "Tracking Mastery"].includes(n))
-        ? `<fieldset><legend>${loc`Complex Analysis challenge count`}</legend><label><input type="checkbox" name="complexAnalysisTask" /> ${loc`Declare an unrecorded Complex Analysis Task`}</label><label>${loc`GC’s unmodified number of Challenges`} <input name="analysisBaseChallenges" type="number" min="2" step="1" /></label><p>${loc`Forensic Genius reduces the required count by2; Tracking Mastery reduces an Analysis/Forensics task by1(minimum1 after all reductions). A selected recorded task supplies its own count; use this declaration only for an unrecorded task (pp.207,209).`}</p></fieldset>`
+        ? `<fieldset><legend>${loc`Complex Analysis challenge count`}</legend><label><input type="checkbox" name="complexAnalysisTask" /> ${loc`Declare an unrecorded Complex Analysis Task`}</label><label>${loc`GC’s unmodified number of Challenges`} <input name="analysisBaseChallenges" type="number" min="2" step="1" /></label><p>${loc`Forensic Genius reduces the required count by 2; Tracking Mastery reduces an Analysis/Forensics task by 1(minimum 1 after all reductions). A selected recorded task supplies its own count; use this declaration only for an unrecorded task (pp.207,209).`}</p></fieldset>`
         : ""
   ],
   [

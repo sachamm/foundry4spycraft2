@@ -86,7 +86,7 @@ export function bullRushDefensePlan(
     sizeBonus,
     bonuses: stillStanding.bonus ? [{ source: "Still Standing", type: "", value: stillStanding.bonus }] : [],
     notes: [
-      loc`Resist Bull Rush: opposed Athletics(STR), Armor Check Penalty, action error modifier+0; larger participant +4 per Size category. Your Size bonus +${sizeBonus} (pp.352,354).`,
+      loc`Resist Bull Rush: opposed Athletics(STR), Armor Check Penalty, action error modifier +0; larger participant +4 per Size category. Your Size bonus +${sizeBonus} (pp.352,354).`,
       ...(stillStanding.source
         ? [
             loc`Still Standing: +4 unnamed bonus to this skill check resisting Bull Rush (p.66); this is not a dodge bonus.`

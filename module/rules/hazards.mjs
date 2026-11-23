@@ -349,7 +349,7 @@ rollPipeline.register({
         ...(Number(save.bonus) ? [[String(save.bonusLabel ?? loc`Hazard modifier`), Number(save.bonus)]] : [])
       ],
       flavorAt: 45,
-      flavor: loc` — ${esc(save.label)} DC${Number(save.dc)}`,
+      flavor: loc` — ${esc(save.label)} DC ${Number(save.dc)}`,
       options: { hazardSave: save }
     };
   }

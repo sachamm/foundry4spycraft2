@@ -43,9 +43,9 @@ export function installResolutionGuide(root, kind, { collapsed = true, append = 
   guide.className = "sc2-resolution-guide";
   if (collapsed) {
     const summary = doc.createElement("summary");
-    summary.textContent = loc`Automatic vs table / GC steps`;
+    summary.textContent = loc`What the system does for you`;
     guide.append(summary);
-  } else guide.setAttribute("aria-label", loc`Automatic vs table / GC steps`);
+  } else guide.setAttribute("aria-label", loc`What the system does for you`);
   const descriptions = resolutionGuide(kind);
   for (const [label, text] of [
     [loc`System:`, descriptions.automatic],

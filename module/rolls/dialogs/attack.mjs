@@ -57,6 +57,11 @@ const parts = [
           ? `<label>${loc`Target distance in feet (optional; leave empty for a quick roll without a range modifier)`} <input name="distanceFeet" type="number" min="0" step="any" value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label>`
           : ""
   ],
+  [
+    66,
+    ({ options }) =>
+      `<label>${loc`Situational modifier`} <input name="situationalModifier" type="number" step="1" value="${Number(options.situationalModifier) || 0}" /></label>`
+  ],
   [70, () => `</div>`]
 ];
 
@@ -82,6 +87,7 @@ rollPipeline.register({
           characterTarget: undefined
         }
       : {}),
+    situationalModifier: Math.trunc(Number(entered.situationalModifier)) || 0,
     firingOutOfMelee: entered.firingOutOfMelee === true,
     firingIntoMelee: entered.firingIntoMelee === true,
     askContext: false,

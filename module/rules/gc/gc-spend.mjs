@@ -54,7 +54,7 @@ export function planSpend(id, context = {}) {
       const limit = dramatic ? G.dramaticDcBoostLimit : G.dcBoostLimit;
       if ((context.alreadyBoostedDC ?? 0) >= limit)
         throw new Error(
-          loc`Only ${limit} action di${limit === 1 ? "e" : "ce"} may boost one DC${dramatic ? loc` in a dramatic scene` : ""}.`
+          loc`Only ${limit} action di${limit === 1 ? "e" : "ce"} may boost one DC ${dramatic ? loc` in a dramatic scene` : ""}.`
         );
       break;
     }

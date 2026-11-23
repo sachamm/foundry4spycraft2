@@ -382,3 +382,12 @@ test("Add NPC lists world NPCs before compendium ones, reuses an imported copy a
     y: 700
   });
 });
+
+test("an NPC sheet may be narrower than an agent sheet", async () => {
+  const { sheetPlacement } = await import("../module/sheets/sheet-placement.mjs");
+  const room = { width: 1280, height: 720, sidebar: 348, open: 0 };
+  assert.equal(sheetPlacement({ width: 480, height: 640 }, room, "npc").width, 480);
+  assert.equal(sheetPlacement({ width: 860, height: 760 }, { ...room, width: 1000 }, "agent").width, 640);
+  assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "npc").width, 420);
+  assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "agent").width, 640);
+});

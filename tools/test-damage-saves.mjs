@@ -137,7 +137,7 @@ test("the actual Actor save retains the frozen event DC, uses its normal modifie
   assert.equal(m.flags.spycraft2.checkId, "will");
   assert.equal(m.flags.spycraft2.rawTotal, 9);
   assert.equal(m.flags.spycraft2.damageSave.dc, 12);
-  assert.match(m.flavor, /Damage event DC12/);
+  assert.match(m.flavor, /Damage event DC 12/);
   assert.equal(a.flags.spycraft2.damageEvents.event1.saveMessageId, m.id);
   assert.deepEqual(a.system.accumulatedDamage, before);
   assert.equal(a.system.actionDice.value, 2);

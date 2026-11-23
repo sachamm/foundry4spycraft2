@@ -32,7 +32,7 @@ export async function settlePendingDamageSave(actor, options = {}) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Settle next damage save` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}. Confirm and finish this save in chat before continuing.`}</p>${
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC ${record.save.dc}. Confirm and finish this save in chat before continuing.`}</p>${
         record.kind === "stress"
           ? `<label><input name="selfInflicted" type="checkbox"${record.settlement?.selfInflicted ? " checked" : ""} /> ${loc`This stress source was caused by the character's own action`}</label>`
           : ""

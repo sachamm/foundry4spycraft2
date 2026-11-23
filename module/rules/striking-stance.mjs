@@ -49,7 +49,7 @@ export function strikingTriggerPlan(
   const movement = stanceMovementState(system, combat);
   if (movement.feet > 5)
     throw Error(
-      loc`Striking Stance permits no more than5ft movement during any round. Review all completed movement before reacting.`
+      loc`Striking Stance permits no more than 5 ft. movement during any round. Review all completed movement before reacting.`
     );
   return {
     version: 1,

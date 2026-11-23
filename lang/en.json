@@ -68,6 +68,9 @@
    "describe": "Describe",
    "gear": "Gear"
   },
+  "VehicleSheet": {
+   "Thresholds": "(broken at {broken}, destroyed at {destroyed})"
+  },
   "Review": {
    "Nothing": "Nothing needs review.",
    "Interrupted": "Review an interrupted action",
@@ -203,7 +206,7 @@
    "Ranks": "Times taken",
    "Prerequisites": "Prerequisites",
    "NotChecked": "partly unchecked",
-   "EditPrereqs": "Edit prerequisites (JSON)",
+   "EditPrereqs": "Technical detail: prerequisites as data (GC)",
    "BadPrereqJSON": "Prerequisites must be valid JSON."
   },
   "Browser": {
@@ -1255,7 +1258,7 @@
     "ControlCheck": "Control check",
     "DamageSave2": "Damage save",
     "VehicleDamageResult": "Vehicle Damage result",
-    "TyreSave": "Tyre save",
+    "TyreSave": "Tire save",
     "FuelExplosion": "Fuel explosion",
     "Repaired": "Repaired",
     "Surroundings": "Surroundings",

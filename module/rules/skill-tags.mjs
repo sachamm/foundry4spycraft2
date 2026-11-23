@@ -48,7 +48,7 @@ export function skillTagPlan(
   if (capAdjustment)
     notes.push(
       silverTongueLanguage
-        ? loc`Silver Tongue: no shared language reduces the Impress/Persuasion result cap by5instead of20(p.205).`
+        ? loc`Silver Tongue: no shared language reduces the Impress/Persuasion result cap by 5 instead of 20 (p.205).`
         : loc`No shared language or relevant local tongue: Language-tag result cap −20 (p.101).`
     );
   return {

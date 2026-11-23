@@ -9,17 +9,21 @@
 const CONTROLS = 110; // room kept clear for the scene controls on the left
 const GAP = 12;
 const MIN_WIDTH = 640;
+// A stat block is read at a glance beside the map, so an NPC sheet may be much narrower than an agent sheet.
+const MIN_WIDTHS = { npc: 420 };
+const minWidthOf = kind => MIN_WIDTHS[kind] ?? MIN_WIDTH;
 
 /**
  * @param {{width: number, height: number}} wanted  the sheet's preferred size
  * @param {{width: number, height: number, sidebar: number, open: number}} room  the browser window, the sidebar's
  *        width and how many sheets are already open (each new one steps down and right so titles stay reachable)
+ * @param {string} [kind]  the sheet kind, for its minimum width
  * @returns {{left: number, top: number, width: number, height: number}}
  */
-export function sheetPlacement(wanted, room) {
+export function sheetPlacement(wanted, room, kind = "") {
   const step = 24 * ((room.open ?? 0) % 5);
   const available = room.width - room.sidebar - CONTROLS - GAP;
-  const width = Math.round(Math.max(Math.min(MIN_WIDTH, wanted.width), Math.min(wanted.width, available)));
+  const width = Math.round(Math.max(Math.min(minWidthOf(kind), wanted.width), Math.min(wanted.width, available)));
   const top = 60 + step;
   const height = Math.round(Math.max(360, Math.min(wanted.height, room.height - top - GAP)));
   return { left: CONTROLS + step, top, width, height };
@@ -45,10 +49,10 @@ const STORE = kind => `spycraft2.sheetPlacement.${kind}`;
  * @param {{left: number, top: number, width: number, height: number}|null} kept
  * @param {{width: number, height: number, open: number}} room
  */
-export function rememberedPlacement(kept, room) {
+export function rememberedPlacement(kept, room, kind = "") {
   if (!kept || ![kept.left, kept.top, kept.width, kept.height].every(Number.isFinite)) return null;
   const step = 24 * ((room.open ?? 0) % 5);
-  const width = Math.round(Math.max(MIN_WIDTH, Math.min(kept.width, room.width - GAP * 2)));
+  const width = Math.round(Math.max(minWidthOf(kind), Math.min(kept.width, room.width - GAP * 2)));
   const height = Math.round(Math.max(360, Math.min(kept.height, room.height - GAP * 2)));
   const left = Math.round(Math.min(Math.max(0, kept.left + step), Math.max(0, room.width - width)));
   const top = Math.round(Math.min(Math.max(0, kept.top + step), Math.max(0, room.height - height)));
@@ -83,7 +87,8 @@ export function placeSheet(applied, requested = {}, kind = "") {
   if (requested.position?.left !== undefined || requested.position?.top !== undefined) return applied;
   try {
     const room = currentRoom();
-    const place = (kind && rememberedPlacement(keptPlacement(kind), room)) || sheetPlacement(applied.position, room);
+    const place =
+      (kind && rememberedPlacement(keptPlacement(kind), room, kind)) || sheetPlacement(applied.position, room, kind);
     applied.position = { ...applied.position, ...place };
   } catch {
     /* no browser window to measure: Foundry's own placement stands */

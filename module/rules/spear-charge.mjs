@@ -31,7 +31,7 @@ export function spearChargeMovementPlan(
     towardFeet > distanceFeet
   )
     throw Error(
-      loc`Confirm the completed legal route immediately before this attack: at least10 ft. toward this target, total counted distance no farther than current Speed.`
+      loc`Confirm the completed legal route immediately before this attack: at least 10 ft. toward this target, total counted distance no farther than current Speed.`
     );
   const round = stanceMovementState(system, combat);
   if (round.feet < distanceFeet || (round.cappedActive && round.feet > round.limitFeet))

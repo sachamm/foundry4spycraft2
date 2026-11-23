@@ -1,6 +1,5 @@
 <section class="spycraft2-sheet vehicle">
   <div class="dossier-band" aria-hidden="true">
-    <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
     <span class="file-label">{{localize "SPYCRAFT.Retro.EquipmentFile"}}</span>
     <span class="file-stamp">{{localize "SPYCRAFT.Retro.Classified"}}</span>
   </div>
@@ -23,7 +22,7 @@
   <p>
     <strong class="{{#unless (sc2eq system.breakState.state 'intact')}}bad{{/unless}}">{{system.breakState.state}}</strong>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.FailedDamageSaves"}} <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" aria-label="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.FailedDamageSaves'}}" />
-    {{localize "SPYCRAFT.Template.ActorVehicleSheet.BrokenAt"}} {{system.breakState.brokenAt}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.DestroyedAt"}} {{system.breakState.destroyedAt}})
+    {{localize "SPYCRAFT.VehicleSheet.Thresholds" broken=system.breakState.brokenAt destroyed=system.breakState.destroyedAt}}
     {{#if system.condition.immobilized}}· <strong class="bad">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Immobilized"}}</strong>{{/if}}
   </p>
   <p>

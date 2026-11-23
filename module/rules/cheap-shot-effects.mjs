@@ -102,7 +102,7 @@ export function cheapShotRecoveryPlan(system, { sourceMessage, now } = {}) {
   if (r.attemptId && r.attemptResolved !== true)
     throw Error(loc`Resolve or review the previous reserved recovery attempt first.`);
   if (!Number.isFinite(now) || now < r.madeAt || (r.lastSaveAt !== null && now < r.lastSaveAt + 60))
-    throw Error(loc`A Cheap Shot recovery save is available once per minute, available immediately at DC20.`);
+    throw Error(loc`A Cheap Shot recovery save is available once per minute, available immediately at DC 20.`);
   return {
     version: 1,
     sourceMessage,

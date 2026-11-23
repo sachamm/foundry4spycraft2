@@ -51,7 +51,7 @@ export async function takeCombatInstincts(actor, options = {}) {
         .join("");
     input = await formDialog({
       title: loc`Combat Instincts immediate final attack`,
-      intro: loc`Once per round, immediately attack the adjacent opponent who just missed you by at least5 while you were not flat-footed. First resolve that actual attack as a miss in chat. The GC confirms the victim, adjacency and timing; this does not infer token geometry.`,
+      intro: loc`Once per round, immediately attack the adjacent opponent who just missed you by at least 5 while you were not flat-footed. First resolve that actual attack as a miss in chat. The GC confirms the victim, adjacency and timing; this does not infer token geometry.`,
       fields: [
         {
           select: "messageId",
@@ -93,7 +93,7 @@ export async function takeCombatInstincts(actor, options = {}) {
           ? Number(input.defenseTotal)
           : NaN,
     timing = game.user.isGM && typeof input.gcTimingResolution === "string" ? input.gcTimingResolution.trim() : "";
-  if (timing.length > 500) throw new Error(loc`Keep the GC timing resolution within500 characters.`);
+  if (timing.length > 500) throw new Error(loc`Keep the GC timing resolution within 500 characters.`);
   const event = () => {
     const message = game.messages.get(input.messageId),
       check = message?.flags?.spycraft2,

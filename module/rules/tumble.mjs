@@ -88,7 +88,7 @@ export function tumblePathPlan(
     dc,
     errorIncrease,
     notes: [
-      loc`Tumble: ${tumbleDistanceFeet}/${normalMaximumFeet} counted ft.; DC${dc} (${baseDC} base +${adjacentDC} additional adjacent squares +${occupiedDC} additional occupied path squares); separate error +${errorIncrease} (Table2.13, p.109).`,
+      loc`Tumble: ${tumbleDistanceFeet}/${normalMaximumFeet} counted ft.; DC ${dc} (${baseDC} base +${adjacentDC} additional adjacent squares +${occupiedDC} additional occupied path squares); separate error +${errorIncrease} (Table 2.13, p.109).`,
       ...(sources.length ? [loc`Equilibrium Mastery permits full current Speed instead of Speed−10 (p.194).`] : []),
       loc`Threat/critical movement allowances are ${threatMaximumFeet}/${criticalMaximumFeet} ft. only after their actual outcomes are resolved. Count enemy-occupied squares, not repeated adjacent path segments; enemy suppressive-fire squares count as occupied. The GC resolves token movement, outcomes and any lost Dexterity/sprawled/final attacks separately.`
     ]

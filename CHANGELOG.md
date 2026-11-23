@@ -11,6 +11,21 @@
   Failure, Damage rolled, Damage applied or Finished, with an icon and an edge colour for the outcome and "16 → 25"
   when action dice changed the total. The closing button is "Finish". The critical button names what it activates,
   and the full action-dice dialog is a ▾ beside the one-click spend.
+- **Agent sheet in play.** Conditions on the rail carry a one-line reminder of what they change. The Defense tile
+  opens the incoming-attack check and shows the flat-footed value. Action dice are read-only with a pencil for
+  corrections; rarer rail actions sit under "More". Weapon rows show threat range, error range and range as one line,
+  and untrained weapons say so in words. The Play tab lists trained skills, abilities with limited uses, active
+  effects, and a "Your turn" strip with End turn.
+- **NPC sheet reads as a stat block.** Health and conditions are in the header, the Damage save is one primary
+  button with the track beside it, and editing controls appear only in Edit mode. The NPC window opens at 480px
+  and can be narrowed to 420px. Skill rolls made openly no longer print the bonus breakdown to players.
+- **Dialogs.** Attack dialogs have a Situational modifier field. Named skill checks list names only and show the
+  selected check's detail under the list. Attack, skill and damage dialogs end with "What the system does for you".
+  The critical dialog names the result it activates. A GC opening a dialog finds the GC confirmations ticked, with a
+  note saying how many. Footer buttons use sentence case.
+- **Items and vehicles.** Feat confirmation boxes and prerequisite data are shown to the GC only. The vehicle
+  thresholds line is one sentence. "Tyre" is spelled "tire". The item browser opened without a character no longer
+  hides unqualified entries. Numbers glued to words in about sixty messages have their spaces back.
 - **Chat-card buttons tell the truth.** The line under a chat-card button said "Action finished" when the action had
   been refused, when the character was busy and when the dialog was closed. It now says "Not done" with the reason
   for a refusal, shows nothing after a closed dialog, and says "Action finished" only when the action ran. A refused

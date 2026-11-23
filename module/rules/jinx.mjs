@@ -46,7 +46,7 @@ export function jinxCostPlan(payerSystem, critical, { jinx = false, payerUuid = 
   return {
     ...structuredClone(critical),
     cost: critical.cost - 1,
-    sources: [...critical.sources, "Jinx –1 (minimum0)"],
+    sources: [...critical.sources, "Jinx –1 (minimum 0)"],
     jinx: {
       version: 1,
       payerUuid,

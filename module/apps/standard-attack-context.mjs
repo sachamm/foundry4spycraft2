@@ -195,7 +195,7 @@ export function allOutAttackInput(input = {}) {
   const out = { allOutPenalty: n };
   if (Object.hasOwn(input, "allOutTargetName")) {
     if (typeof input.allOutTargetName !== "string" || input.allOutTargetName.length > 200)
-      throw Error(loc`Keep the unrecorded target name within200 characters.`);
+      throw Error(loc`Keep the unrecorded target name within 200 characters.`);
     out.allOutTargetName = input.allOutTargetName.trim();
   }
   if (Object.hasOwn(input, "allOutTargetConfirmed")) {
@@ -224,7 +224,7 @@ export function bullseyeInput(input = {}) {
     }
   if (Object.hasOwn(input, "bullseyeTargetName")) {
     if (typeof input.bullseyeTargetName !== "string" || input.bullseyeTargetName.length > 200)
-      throw Error(loc`Keep the unrecorded target name within200 characters.`);
+      throw Error(loc`Keep the unrecorded target name within 200 characters.`);
     out.bullseyeTargetName = input.bullseyeTargetName.trim();
   }
   return out;
@@ -249,7 +249,7 @@ export function meleeTrickInput(input = {}) {
             ? Number(input[key])
             : NaN;
       if (!Number.isFinite(value) || value < 10)
-        throw Error(loc`Enter finite Spear Charge distances of at least10 ft.`);
+        throw Error(loc`Enter finite Spear Charge distances of at least 10 ft.`);
       out[key] = value;
     }
   for (const key of [
@@ -265,7 +265,7 @@ export function meleeTrickInput(input = {}) {
     }
   if (Object.hasOwn(input, "meleeTrickTargetName")) {
     if (typeof input.meleeTrickTargetName !== "string" || input.meleeTrickTargetName.length > 200)
-      throw Error(loc`Keep the unrecorded melee trick target within200 characters.`);
+      throw Error(loc`Keep the unrecorded melee trick target within 200 characters.`);
     out.meleeTrickTargetName = input.meleeTrickTargetName.trim();
   }
   return out;

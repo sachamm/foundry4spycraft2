@@ -23,7 +23,7 @@ export async function rollPendingDamageSave(actor, options = {}) {
       await foundry.applications.api.DialogV2.input({
         window: { title: loc`Pending damage save` },
         rejectClose: false,
-        content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}.`}</p><p>${loc`Current recorded result ${esc(c.effectiveTotal ?? c.rawTotal ?? "unavailable")}. Outcome: ${typeof c.successConfirmed === "boolean" ? (c.successConfirmed ? "success" : "failure") : loc`not confirmed`}.`}</p><p>${loc`This event already has a save. Use its chat result for eligible boosts, rerolls and outcome confirmation. Damage settlement remains separate.`}</p></div>`
+        content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC ${record.save.dc}.`}</p><p>${loc`Current recorded result ${esc(c.effectiveTotal ?? c.rawTotal ?? "unavailable")}. Outcome: ${typeof c.successConfirmed === "boolean" ? (c.successConfirmed ? "success" : "failure") : loc`not confirmed`}.`}</p><p>${loc`This event already has a save. Use its chat result for eligible boosts, rerolls and outcome confirmation. Damage settlement remains separate.`}</p></div>`
       });
     }
     return existing;
@@ -34,7 +34,7 @@ export async function rollPendingDamageSave(actor, options = {}) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Resolve next damage save` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}.`}</p><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this save is being resolved in its correct damage-event context, including earlier pending results; the current save modifiers and conditions apply`}</label><p>${loc`The recorded DC remains fixed. The actual save keeps its normal eligible options. This rolls the save without settling its outcome or applying conditions.`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC ${record.save.dc}.`}</p><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this save is being resolved in its correct damage-event context, including earlier pending results; the current save modifiers and conditions apply`}</label><p>${loc`The recorded DC remains fixed. The actual save keeps its normal eligible options. This rolls the save without settling its outcome or applying conditions.`}</p></div>`
     });
     if (!input) return null;
   }

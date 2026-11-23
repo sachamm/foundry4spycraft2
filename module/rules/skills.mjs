@@ -886,13 +886,13 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [
       280,
       contactFeat.evidence
-        ? loc`Contact ${contactFeat.evidence.contact.name}: DC${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table2.35, p.144; response/outcomes resolved separately). `
+        ? loc`Contact ${contactFeat.evidence.contact.name}: DC ${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table 2.35, p.144; response/outcomes resolved separately). `
         : ""
     ],
     [
       290,
       contactFeat.evidence?.source
-        ? loc`${contactFeat.evidence.source}: primary contact ${contactFeat.evidence.contact.name}; error range −${contactFeat.errorReduction} (minimum0), optional half time rounded down. `
+        ? loc`${contactFeat.evidence.source}: primary contact ${contactFeat.evidence.contact.name}; error range −${contactFeat.errorReduction} (minimum 0), optional half time rounded down. `
         : ""
     ],
     [

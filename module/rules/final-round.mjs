@@ -29,7 +29,7 @@ export function finalAttackRoundSpec(system) {
       stored.used >= 0;
   return {
     id: "finalAttackRound",
-    name: loc`All final attacks this round` + (nauseated ? " (Nauseated maximum1)" : ""),
+    name: loc`All final attacks this round` + (nauseated ? " (Nauseated maximum 1)" : ""),
     cost: 0,
     period: "round",
     limit: nauseated ? 1 : Number.MAX_SAFE_INTEGER,

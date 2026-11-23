@@ -262,7 +262,7 @@ test("a save against a hazard carries the hazard's DC, dose penalty and suit bon
     ["Extra doses", -2],
     ["Sealed suit", 10]
   ]);
-  assert.equal(term.flavor, " — E coli DC12");
+  assert.equal(term.flavor, " — E coli DC 12");
   assert.equal(
     planTerms("save", {
       actor: { mentalLeapCombatContext: () => null, flags: {} },

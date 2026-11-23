@@ -45,7 +45,7 @@ export function threadNeedleEndPlan(input = {}) {
       input.separationFeet <= 5
     )
       throw Error(
-        loc`Confirm the holder actually moved farther than5ft from this target, using their resulting separation.`
+        loc`Confirm the holder actually moved farther than 5 ft. from this target, using their resulting separation.`
       );
     return { reason: "movedBeyond", separationFeet: input.separationFeet, holderMovedConfirmed: true };
   }

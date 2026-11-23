@@ -584,8 +584,8 @@ export const ActorRolls = Base =>
             .merge("flavor", [
               [10, game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label)],
               [20, checkMethod === "take10" ? loc` — Evasion III: take 10` : ""],
-              [30, options.takedown ? loc` — Takedown DC${Number(options.takedown.dc)}` : ""],
-              [40, options.damageSave ? loc` — Damage event DC${Number(options.damageSave.dc)}` : ""]
+              [30, options.takedown ? loc` — Takedown DC ${Number(options.takedown.dc)}` : ""],
+              [40, options.damageSave ? loc` — Damage event DC ${Number(options.damageSave.dc)}` : ""]
             ])
             .join(""),
           takedown: options.takedown ?? null,

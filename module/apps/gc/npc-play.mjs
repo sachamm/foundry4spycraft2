@@ -161,9 +161,12 @@ export async function rollNpcSkill(actor, input = null) {
     "1d20 + @total",
     { total },
     {
+      // Players see the card too: the NPC's bonus, cap and modifiers are printed only on a roll kept to the GC.
       flavor:
-        loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}` +
-        (quality.rows.length || quality.errorIncrease
+        (input.secret
+          ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`
+          : loc`${skill.name} (${ability.toUpperCase()})`) +
+        (input.secret && (quality.rows.length || quality.errorIncrease)
           ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
           : ""),
       ability,
