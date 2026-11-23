@@ -112,8 +112,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     ...readdirSync(join(root, "src/data"))
       .filter(f => f.endsWith(".json"))
       .map(f => join(root, "src/data", f)),
-    join(root, "lang/en.json")
-  ];
+    join(root, "lang/en.json"),
+    // The text written in the JavaScript, as collected by `npm run strings`.
+    join(root, "lang/text-template.json")
+  ].filter(existsSync);
   const hits = [];
   for (const file of files) {
     const data = JSON.parse(readFileSync(file, "utf8"));

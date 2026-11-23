@@ -1,14 +1,5 @@
 import { readiedMeleeWeapons } from "./readied-weapons.mjs";
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
+import { stable } from "./equal.mjs";
 /** A legal replacement can undo only destruction caused by its original error.
  * Normalize a local view for source checks; never repair inventory before settlement.
  */

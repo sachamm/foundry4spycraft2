@@ -1,5 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "./equal.mjs";
 /** Attribute damage and mission-end recovery, p.17. Current scores may be negative. */
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const clean = () => ({ version: 1, events: [], recoveries: [] });
@@ -7,7 +8,6 @@ const text = v => typeof v === "string" && v.trim() === v && v.length > 0 && v.l
 const nonnegative = v => Number.isSafeInteger(v) && v >= 0;
 const time = v => Number.isFinite(v) && v >= 0;
 const total = () => Object.fromEntries(ABILITIES.map(k => [k, { temporary: 0, permanent: 0, total: 0 }]));
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 function validApplication(e) {
   return (
     e &&

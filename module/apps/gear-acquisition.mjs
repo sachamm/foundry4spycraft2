@@ -28,6 +28,8 @@ import {
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "../rules/equal.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
 const queued = (actor, work, options) => queueResources([actor], work, options);
 const crossQueued = (actor, actors, work) => queueResources([actor, ...actors], work);
 const owned = actor => actor?.type === "agent" && actor.isOwner;
@@ -374,9 +376,7 @@ export async function rollGearAcquisition(actor, options = {}) {
             if (plan.gearAbility && message?.flags?.spycraft2?.gearAttempt?.id !== id)
               throw new Error(loc`The Personal Stash Gear check did not post a receipt.`);
           } catch (error) {
-            const committed = [...(game.messages ?? [])].find(
-              m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.gearAttempt?.id === id
-            );
+            const committed = postedReceipt(actor, "gearAttempt", id);
             if (!committed) throw error;
             message = committed;
           }
@@ -462,7 +462,6 @@ export async function rollGearAcquisition(actor, options = {}) {
     }
   );
 }
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 async function refreshAcquisitionChat(message) {
   try {
     await globalThis.ui?.chat?.updateMessage?.(message, { notify: false });

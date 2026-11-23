@@ -7,8 +7,10 @@ import {
 } from "../rules/safe-house.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "../rules/equal.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 const state = a => ({ ...a.system, usagePeriods: a.usagePeriods }),
-  same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   num = v => (typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v) : NaN);
 const recipients = actor =>
   game.users?.filter?.(u => u.isGM || actor.testUserPermission?.(u, "OWNER")).map(u => u.id) ?? [game.user.id];
@@ -18,10 +20,17 @@ export async function useSafeHouse(actor, options = {}) {
   if (!source) throw new Error(loc`An active Safe House feat and Lifestyle 3+ are required.`);
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Safe House: scene-opening declaration` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label>${loc`Current location`} <input name="currentLocation" maxlength="200" /></label><label>${loc`Current city population (0 outside a city)`} <input name="population" type="number" min="0" step="1" /></label><label><input name="locationConfirmed" type="checkbox" /> ${loc`The GC confirms this location and population`}</label><label><input name="atSceneStartConfirmed" type="checkbox" /> ${loc`This is the declaration at the start of this scene`}</label><p>${loc`In a city of 10,000+, the house is within 10 miles. Otherwise, the GC chooses its exact location in the nearest city of 10,000+. Its home quality is Lifestyle −2; all houses are lost at mission end.`}</p></div>`
+    input = await formDialog({
+      title: loc`Safe House: scene-opening declaration`,
+      fields: [
+        { text: "currentLocation", label: loc`Current location`, maxlength: 200 },
+        { number: "population", label: loc`Current city population (0 outside a city)`, min: "0", step: "1" },
+        { check: "locationConfirmed", label: loc`The GC confirms this location and population` },
+        { check: "atSceneStartConfirmed", label: loc`This is the declaration at the start of this scene` },
+        {
+          note: loc`In a city of 10,000+, the house is within 10 miles. Otherwise, the GC chooses its exact location in the nearest city of 10,000+. Its home quality is Lifestyle −2; all houses are lost at mission end.`
+        }
+      ]
     });
     if (!input) return null;
     input = { ...input, population: num(input.population) };
@@ -69,9 +78,7 @@ export async function useSafeHouse(actor, options = {}) {
         });
         return record;
       } catch (error) {
-        const posted = game.messages?.find?.(
-          m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.safeHouseDeclaration?.id === id
-        );
+        const posted = postedReceipt(actor, "safeHouseDeclaration", id);
         if (posted) return record;
         if (saved || actor.system.safeHouses?.[id]) {
           try {

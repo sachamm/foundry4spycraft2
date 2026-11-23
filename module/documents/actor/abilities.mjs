@@ -79,6 +79,7 @@ import { pointmanLevel } from "../../rules/action-dice.mjs";
 import { computeAgent } from "../../rules/engine.mjs";
 import { LimitedUseCancelled } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
+import { same } from "../../rules/equal.mjs";
 
 export const ActorAbilities = Base =>
   class ActorAbilities extends Base {
@@ -660,8 +661,7 @@ export const ActorAbilities = Base =>
                   : {})
               }
             };
-          const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-            current = () => this.system.eagleEyeBoost ?? null;
+          const current = () => this.system.eagleEyeBoost ?? null;
           let wrote = false;
           try {
             await this.update(this.actorRecordRestorePatch("system.eagleEyeBoost", record));
@@ -1488,8 +1488,7 @@ export const ActorAbilities = Base =>
               }
             ),
             path = "system.bonusActionDice." + id;
-          const present = () => this.system.bonusActionDice?.[id],
-            same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+          const present = () => this.system.bonusActionDice?.[id];
           try {
             try {
               await this.update({ [path]: pool });

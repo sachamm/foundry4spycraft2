@@ -9,7 +9,7 @@
  *
  * Nothing here is stored on the actor: a remembered choice is a convenience for the person rolling.
  */
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 import { measureAttack, mapAvailable } from "./map.mjs";
 
 const memory = new Map();
@@ -89,8 +89,8 @@ export function restoreChoices(key, root) {
 /** Register the player's setting. Call during `init`. */
 export function registerFastPathSetting() {
   game.settings.register("spycraft2", "skipRollDialogs", {
-    name: loc`Roll without the dialog by default`,
-    hint: loc`Off: a click opens the roll dialog and Shift-click rolls straight away with your last choices. On: the other way round.`,
+    name: locKey`Roll without the dialog by default`,
+    hint: locKey`Off: a click opens the roll dialog and Shift-click rolls straight away with your last choices. On: the other way round.`,
     scope: "client",
     config: true,
     type: Boolean,

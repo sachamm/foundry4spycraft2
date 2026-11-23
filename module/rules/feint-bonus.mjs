@@ -1,16 +1,7 @@
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { stable } from "./equal.mjs";
 export function feintBonusRows(system) {
   const rows = system.feintBonuses ?? [];
   if (!Array.isArray(rows)) throw Error(loc`Review the recorded Feint attack bonuses.`);

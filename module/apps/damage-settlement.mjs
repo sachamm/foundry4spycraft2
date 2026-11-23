@@ -7,7 +7,7 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration } from "../rules/timers.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "../rules/equal.mjs";
 async function write(actor, patch, proof) {
   try {
     await actor.update(patch);

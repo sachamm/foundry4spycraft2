@@ -39,13 +39,9 @@ import {
 import { spendFuel } from "../vehicle-play.mjs";
 import { recentResultsHint } from "../opposed-checks.mjs";
 import { loc } from "../../i18n.mjs";
+import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content) =>
-  foundry.applications.api.DialogV2.input({
-    window: { title },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${content}</div>`
-  });
+const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(

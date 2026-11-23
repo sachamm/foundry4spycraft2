@@ -6,8 +6,8 @@ import { queueResources, periodResourceActors } from "./transactions.mjs";
 import { withGCPeriodLock } from "./gc-dice.mjs";
 import { actionDiceGain } from "../rules/action-dice.mjs";
 import { loc } from "../i18n.mjs";
-const clone = structuredClone,
-  same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "../rules/equal.mjs";
+const clone = structuredClone;
 const periodState = () => game.settings.get("spycraft2", "usagePeriods") ?? {};
 export function getUsagePeriodReview() {
   const stored = game.settings.get("spycraft2", "usagePeriodReview");

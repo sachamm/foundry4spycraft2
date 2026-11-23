@@ -6,6 +6,7 @@ import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.m
 import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Ordinary Feint p.357. Alternative skills, free actions and outcomes are separate. */
 /** Fan Service, p.203: Feint may use Impress (Cha) instead of Sleight of Hand. */
 export const feintActingSkill = (key, system) =>
@@ -125,16 +126,6 @@ export function feintCheckPlan(
     ]
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateFeintProof(
   actor,
   proof,

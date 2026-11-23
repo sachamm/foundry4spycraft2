@@ -1,6 +1,7 @@
 import { refuse } from "../error-notices.mjs";
 import { accumulatedDamagePlan } from "../rules/accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 const whole = value => {
   if (typeof value === "number") return value;
   if (typeof value === "string" && /^(0|[1-9]\d*)$/.test(value)) return Number(value);
@@ -8,10 +9,26 @@ const whole = value => {
 };
 export async function checkAccumulatedDamage(actor) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
-  const input = await foundry.applications.api.DialogV2.input({
-    window: { title: loc`Stress/subdual thresholds` },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`Check one new damage event using the GC-confirmed existing total and damage remaining after all defenses. Stress ignores all DR; subdual doubles applicable DR. Apply resistance and other defenses separately before entering damage.`}</p><label>${loc`Type`} <select name="kind"><option value="stress">${loc`Stress (Will)`}</option><option value="subdual">${loc`Subdual (Fortitude)`}</option></select></label><label>${loc`Already accumulated damage`} <input name="currentDamage" type="number" min="0" step="1" required /></label><label>${loc`New damage after defenses`} <input name="newDamage" type="number" min="0" step="1" required /></label><label><input name="criticalHit" type="checkbox" /> ${loc`This event came from a critical hit`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirmed both totals and resolved all defenses`}</label><p>${loc`This checks the calculation. It does not apply damage, roll or settle a save, change conditions or recover damage.`}</p></div>`
+  const input = await formDialog({
+    title: loc`Stress/subdual thresholds`,
+    intro: loc`Check one new damage event using the GC-confirmed existing total and damage remaining after all defenses. Stress ignores all DR; subdual doubles applicable DR. Apply resistance and other defenses separately before entering damage.`,
+    fields: [
+      {
+        select: "kind",
+        label: loc`Type`,
+        options: [
+          ["stress", loc`Stress (Will)`],
+          ["subdual", loc`Subdual (Fortitude)`]
+        ]
+      },
+      { number: "currentDamage", label: loc`Already accumulated damage`, min: "0", step: "1", required: true },
+      { number: "newDamage", label: loc`New damage after defenses`, min: "0", step: "1", required: true },
+      { check: "criticalHit", label: loc`This event came from a critical hit` },
+      { check: "confirmed", label: loc`The GC confirmed both totals and resolved all defenses` },
+      {
+        note: loc`This checks the calculation. It does not apply damage, roll or settle a save, change conditions or recover damage.`
+      }
+    ]
   });
   if (!input) return null;
   let plan;

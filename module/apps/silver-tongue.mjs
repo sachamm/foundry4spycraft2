@@ -6,6 +6,7 @@ import {
 } from "../rules/attribute-damage.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 const actors = () =>
   Array.isArray(game.actors?.contents)
     ? game.actors.contents
@@ -225,10 +226,15 @@ export async function recoverSilverTongueAtMissionEnd(actor, options = {}) {
   let input = options;
   const missionId = state(actor).usagePeriods?.mission ?? "initial";
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`GC: mission-end attribute recovery` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`End-of-mission recovery heals temporary Silver Tongue Wisdom damage (p.17). Permanent damage stays. Resolve pending victories first; this records recovery for the current mission and is separate from starting the next mission.`}</p><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the current mission has ended and outstanding seduction victories have been settled`}</label></div>`
+    input = await formDialog({
+      title: loc`GC: mission-end attribute recovery`,
+      intro: loc`End-of-mission recovery heals temporary Silver Tongue Wisdom damage (p.17). Permanent damage stays. Resolve pending victories first; this records recovery for the current mission and is separate from starting the next mission.`,
+      fields: [
+        {
+          check: "confirmed",
+          label: loc`The GC confirms the current mission has ended and outstanding seduction victories have been settled`
+        }
+      ]
     });
     if (!input) return null;
   }

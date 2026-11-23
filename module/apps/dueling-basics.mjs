@@ -5,6 +5,7 @@ import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 export async function declareDuelingBasics(actor, options = {}) {
   if (!actor.isOwner) return null;
@@ -12,14 +13,18 @@ export async function declareDuelingBasics(actor, options = {}) {
     choices = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid);
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Dueling Basics` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`During your Initiative Count: +2 dodge against one opponent you are aware of, or +1 dodge against all attacks, for 1 full round (p.178).`}</p><label>${loc`Opponent`} <select name="opponentUuid"><option value="">${loc`None: +1 dodge against all attacks`}</option>${choices
-        .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
-        .join(
-          ""
-        )}</select></label><label><input name="confirmed" type="checkbox" /> ${loc`I am aware of the chosen opponent`}</label></div>`
+    input = await formDialog({
+      title: loc`Dueling Basics`,
+      intro: loc`During your Initiative Count: +2 dodge against one opponent you are aware of, or +1 dodge against all attacks, for 1 full round (p.178).`,
+      fields: [
+        {
+          select: "opponentUuid",
+          label: loc`Opponent`,
+          options: [["", loc`None: +1 dodge against all attacks`]],
+          optionsHtml: raw(choices.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join(""))
+        },
+        { check: "confirmed", label: loc`I am aware of the chosen opponent` }
+      ]
     });
     if (!input) return null;
   }

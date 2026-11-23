@@ -1,13 +1,20 @@
 import { wellFundedPlan } from "../rules/well-funded.mjs";
 import { loc } from "../i18n.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 export async function useWellFunded(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Well-Funded: come up with cash` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label>${loc`Home`} <input name="home" maxlength="200" /></label><label><input name="atHome" type="checkbox" /> ${loc`I am at my home`}</label><p>${loc`Once per mission, receive additional cash equal to $200 × your total Wealth. This records cash received; it does not change your Wealth allocation.`}</p></div>`
+    input = await formDialog({
+      title: loc`Well-Funded: come up with cash`,
+      fields: [
+        { text: "home", label: loc`Home`, maxlength: 200 },
+        { check: "atHome", label: loc`I am at my home` },
+        {
+          note: loc`Once per mission, receive additional cash equal to $200 × your total Wealth. This records cash received; it does not change your Wealth allocation.`
+        }
+      ]
     });
     if (!input) return null;
   }
@@ -35,9 +42,7 @@ export async function useWellFunded(actor, options = {}) {
           flags: { spycraft2: { actorUuid: actor.uuid, wellFunded: { id, ...record } } }
         });
       } catch (error) {
-        const posted = game.messages?.find?.(
-          m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.wellFunded?.id === id
-        );
+        const posted = postedReceipt(actor, "wellFunded", id);
         if (posted) return posted;
         if (actor.system.wellFundedGrants?.[id]) {
           try {

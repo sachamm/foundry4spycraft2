@@ -4,6 +4,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 export const COMBAT_STANCES = {
   striking: { name: "Striking Stance", feat: "Polearm Basics", page: 179, movementLimitFeet: 5 },
   whirling: { name: "Whirling Stance", feat: "Staff Basics", page: 179 },
@@ -57,16 +58,6 @@ export function validateCombatStanceProof(actor, proof, { checkKind, attackConte
         globalThis.fromUuidSync?.(rerollOf) ??
         [...(globalThis.game?.messages ?? [])].find(m => m.uuid === rerollOf || m.id === rerollOf),
       c = original?.flags?.spycraft2,
-      stable = v =>
-        JSON.stringify(v, (_k, x) =>
-          x && typeof x === "object" && !Array.isArray(x)
-            ? Object.fromEntries(
-                Object.keys(x)
-                  .sort()
-                  .map(k => [k, x[k]])
-              )
-            : x
-        ),
       s = COMBAT_STANCES[proof.stance?.key];
     if (
       checkKind !== "attack" ||

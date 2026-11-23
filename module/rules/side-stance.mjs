@@ -2,16 +2,7 @@ import { combatStanceState } from "./combat-stance.mjs";
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { feintAttackTarget } from "./feint-bonus.mjs";
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
+import { stable } from "./equal.mjs";
 export function sideStanceRows(system) {
   const rows = system.sideStanceFeints ?? [];
   if (!Array.isArray(rows)) throw Error(loc`Review the recorded Side Stance benefits.`);

@@ -1,5 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "./equal.mjs";
 /** Held/Pinned action restrictions and their Athletics escape exception (p.342). */
 export function restraintState(system) {
   return system.conditionContext?.pinned === true ? "pinned" : system.conditionContext?.held === true ? "held" : "";
@@ -104,8 +105,7 @@ export function restraintReleasePlan(
 ) {
   const check = message.flags?.spycraft2,
     source = check?.restraintEscape?.sourceSnapshot,
-    current = restraintSourceSnapshot(actor),
-    same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    current = restraintSourceSnapshot(actor);
   if (!actor.isOwner || check?.actorUuid !== actor.uuid || (message.blind && !globalThis.game?.user?.isGM))
     throw new Error(loc`Choose an owned recorded grapple result; the GC resolves secret results.`);
   if (

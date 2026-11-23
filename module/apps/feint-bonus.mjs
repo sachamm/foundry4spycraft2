@@ -5,18 +5,10 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { decline } from "../error-notices.mjs";
+import { stable } from "../rules/equal.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 const leases = new WeakMap(),
-  activeAttempts = new Map(),
-  stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
+  activeAttempts = new Map();
 const message = uuid =>
   globalThis.fromUuidSync?.(uuid) ?? [...(globalThis.game?.messages ?? [])].find(m => m.uuid === uuid || m.id === uuid);
 const targetOf = (c, finalAttack) =>
@@ -215,18 +207,28 @@ export async function reviewFeintBonuses(actor, input = {}) {
         )
       ];
     if (!ids.length) return decline(loc`No interrupted Feint benefit is awaiting review.`);
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Review interrupted Feint attack` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`First recover any interrupted resource lock. Check the original Feint and attack receipts. A posted attack keeps its spent bonus. Only a confirmed missing attack releases the unused bonus, retaining its original opponent and expiry.`}</p><label>${loc`Interrupted attempt`} <select name="attemptId">${ids
-        .map(id => {
-          const r = feintBonusRows(actor.system).find(r => r.usedBy === id),
-            name = attackCharacterTargetChoices().find(a => a.uuid === r.targetUuid)?.name ?? "Recorded opponent";
-          return `<option value="${esc(id)}">${loc`${esc(name)} · Feint round ${r.madeRound}`}</option>`;
-        })
-        .join(
-          ""
-        )}</select></label><label><input name="confirmed" type="checkbox" /> ${loc`No client is still executing this attack; I reviewed its receipts and current resources`}</label></div>`
+    input = await formDialog({
+      title: loc`Review interrupted Feint attack`,
+      intro: loc`First recover any interrupted resource lock. Check the original Feint and attack receipts. A posted attack keeps its spent bonus. Only a confirmed missing attack releases the unused bonus, retaining its original opponent and expiry.`,
+      fields: [
+        {
+          select: "attemptId",
+          label: loc`Interrupted attempt`,
+          optionsHtml: raw(
+            ids
+              .map(id => {
+                const r = feintBonusRows(actor.system).find(r => r.usedBy === id),
+                  name = attackCharacterTargetChoices().find(a => a.uuid === r.targetUuid)?.name ?? "Recorded opponent";
+                return `<option value="${esc(id)}">${loc`${esc(name)} · Feint round ${r.madeRound}`}</option>`;
+              })
+              .join("")
+          )
+        },
+        {
+          check: "confirmed",
+          label: loc`No client is still executing this attack; I reviewed its receipts and current resources`
+        }
+      ]
     });
     if (!input) return null;
   }

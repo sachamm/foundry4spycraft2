@@ -1,7 +1,7 @@
 import { validateDamageLedger, accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "./equal.mjs";
 export function pendingDamageSave(actor, eventId, { allowSettling = false } = {}) {
   const ledger = validateDamageLedger(actor.system.accumulatedDamage),
     id = ledger.pending[0];

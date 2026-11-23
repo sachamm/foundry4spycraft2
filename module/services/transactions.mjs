@@ -294,18 +294,27 @@ export async function runNativeResourceTransaction(
       }
       locks.push({ actor, token: await acquire(actor, RESOURCE_LOCK_ID, { background }) });
     }
-    await refreshWorldSetting("spycraft2", "usagePeriods");
-    await refreshWorldSetting("spycraft2", "usagePeriodReview");
-    requireSettledPeriod(allowPeriodReview);
-    for (const actor of actors) await refreshActor(actor);
-    for (const message of [...new Set(messages)]) {
-      const originalActor = message.flags?.spycraft2?.actorUuid,
-        fresh = await readDocument(message);
-      if (fresh.flags?.spycraft2?.actorUuid !== originalActor)
-        throw new Error(loc`The roll’s acting character changed before this transaction.`);
-      message.updateSource(fresh.toObject(), { recursive: false });
-      if (message.blind && !game.user.isGM) throw new Error(loc`The GC resolves secret results.`);
-    }
+    // Everything below is read fresh from the server while the locks are held, before any work. The reads do not
+    // depend on one another, so they go out together: one wait in place of one per setting, actor and message.
+    const periods = Promise.all([
+      refreshWorldSetting("spycraft2", "usagePeriods"),
+      refreshWorldSetting("spycraft2", "usagePeriodReview")
+    ]).then(() => requireSettledPeriod(allowPeriodReview));
+    const refreshed = [
+      periods,
+      ...actors.map(actor => refreshActor(actor)),
+      ...[...new Set(messages)].map(async message => {
+        const originalActor = message.flags?.spycraft2?.actorUuid,
+          fresh = await readDocument(message);
+        if (fresh.flags?.spycraft2?.actorUuid !== originalActor)
+          throw new Error(loc`The roll’s acting character changed before this transaction.`);
+        message.updateSource(fresh.toObject(), { recursive: false });
+        if (message.blind && !game.user.isGM) throw new Error(loc`The GC resolves secret results.`);
+      })
+    ];
+    // Wait for every read to end before reporting a failure, so no refresh is still landing after the locks go.
+    const failed = (await Promise.allSettled(refreshed)).find(outcome => outcome.status === "rejected");
+    if (failed) throw failed.reason;
     result = await work();
   } finally {
     const failures = [];

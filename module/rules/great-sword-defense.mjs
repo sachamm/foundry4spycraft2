@@ -1,5 +1,6 @@
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Great Sword Basics p.179: gear +2 Defense only against melee attacks. */
 export function greatSwordDefensePlan(system, { ranged = false } = {}) {
   if (typeof ranged !== "boolean") throw Error(loc`Declare whether the incoming attack is ranged.`);
@@ -18,16 +19,6 @@ export function greatSwordDefensePlan(system, { ranged = false } = {}) {
     increment: source ? Math.max(0, 2 - existingGearBonus) : 0
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateGreatSwordDefenseProof(system, proof, { ranged = false } = {}) {
   if (!proof) return;
   if (stable(greatSwordDefensePlan(system, { ranged })) !== stable(proof))

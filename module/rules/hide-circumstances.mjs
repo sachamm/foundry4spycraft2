@@ -1,5 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Current Hide circumstances, p.161; Ghost Supremacy's hiding-place exception, p.195. */
 export function hideCircumstancePlan(
   system,
@@ -89,16 +90,6 @@ export function validateHideCircumstanceProof(
       hideCircumstancesConfirmed: proof.confirmed
     }
   );
-  const stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
   const substituted =
     attributeSubstitution?.source === "All According to Plan" &&
     attributeSubstitution.originalAbility === proof.baseAbility &&

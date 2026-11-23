@@ -2,6 +2,7 @@ import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { readiedDisarmWeapons, readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Fencing Basics p.178: current qualified feat plus a readied 1h FIN sword.
  * Shared ready-source proof for melee Disarm and Feint; stance/trick are separate.
  */
@@ -22,16 +23,6 @@ export function fencingDisarmPlan(system, { ranged = false } = {}) {
     throw Error(loc`The Fencing Basics sword is not physically held with this grip.`);
   return { ...source, gearBonus: 2 };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateFencingDisarmProof(actor, disarm, { checkKind, weaponProficiency, rerollOf } = {}) {
   if (!disarm || !Object.hasOwn(disarm, "fencingBasics")) return;
   const items = readiedItemsForCheck(actor, { rerollOf, disarm }),

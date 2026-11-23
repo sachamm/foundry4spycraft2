@@ -1,5 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Equilibrium Basics p.194 and soft/ yielding landing p.336: damage-distance calculation only. */
 export function fallDistancePlan(
   system,
@@ -50,16 +51,6 @@ export function fallDistancePlan(
 }
 export function validateFallDistanceProof(system, proof, { checkKind, skillKey, checkId } = {}) {
   if (proof === null || proof === undefined) return;
-  const stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
   if (checkKind !== undefined && (checkKind !== "skill" || skillKey !== "acrobatics" || checkId !== "falling"))
     throw Error(loc`Falling-distance proof belongs only to Acrobatics/Falling.`);
   if (

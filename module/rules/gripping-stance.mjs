@@ -3,6 +3,7 @@ import { combatStanceState } from "./combat-stance.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Record the physical grip only when the new stance affects this melee attack. */
 export function grippingAttackProof(system, weapon, { ranged = false, hands = weapon.useHands ?? 0 } = {}) {
   const stance = combatStanceState(system),
@@ -22,16 +23,6 @@ export function grippingAttackProof(system, weapon, { ranged = false, hands = we
     attackPenalty: grip.attackPenalty
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateGrippingAttackProof(
   actor,
   proof,

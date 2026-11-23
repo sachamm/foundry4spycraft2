@@ -44,7 +44,7 @@ const foundryGlobals = Object.fromEntries(
 );
 
 export default [
-  { ignores: ["node_modules/", "packs/", "test-results/", "playwright-report/", "module/rules/*tables.mjs"] },
+  { ignores: ["node_modules/", "dist/", "packs/", "test-results/", "playwright-report/", "module/rules/*tables.mjs"] },
   js.configs.recommended,
   {
     files: ["**/*.mjs"],

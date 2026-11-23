@@ -4,6 +4,7 @@ import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { computeNpcProfile } from "../rules/npcs.mjs";
 import { npcPackageBands, recommendedNpcPackage, planNpcPackage, npcPackageStamp } from "../rules/npc-packages.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 let catalogPromise;
 const busy = new WeakSet();
@@ -72,10 +73,19 @@ export async function manageNpcPackages(actor, { editBands = false, data = null 
       stamp = npcPackageStamp(snapshot, tlFor(actor));
     const bands = npcPackageBands(role, snapshot.flags?.spycraft2?.npcPackageBands);
     if (editBands) {
-      const input = await systemDialog.input({
-        window: { title: loc`NPC package TL bands` },
-        rejectClose: false,
-        content: `<div class="spycraft2-roll-options"><p>${loc`Set suggested ranges covering Threat Levels 1–20 without gaps or overlaps. Saving changes suggestions only.`}</p>${bands.map(p => `<fieldset><legend>${esc(p.label)}</legend><label>${loc`Minimum TL`}<input type="number" min="1" max="20" name="${p.id}Min" value="${p.minTL}" required></label><label>${loc`Maximum TL`}<input type="number" min="1" max="20" name="${p.id}Max" value="${p.maxTL}" required></label></fieldset>`).join("")}</div>`
+      const input = await formDialog({
+        title: loc`NPC package TL bands`,
+        intro: loc`Set suggested ranges covering Threat Levels 1–20 without gaps or overlaps. Saving changes suggestions only.`,
+        fields: [
+          raw(
+            bands
+              .map(
+                p =>
+                  `<fieldset><legend>${esc(p.label)}</legend><label>${loc`Minimum TL`}<input type="number" min="1" max="20" name="${p.id}Min" value="${p.minTL}" required></label><label>${loc`Maximum TL`}<input type="number" min="1" max="20" name="${p.id}Max" value="${p.maxTL}" required></label></fieldset>`
+              )
+              .join("")
+          )
+        ]
       });
       if (!input) return null;
       const overrides = Object.fromEntries(

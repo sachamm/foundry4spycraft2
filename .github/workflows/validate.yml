@@ -29,6 +29,8 @@ jobs:
           fi
       - run: npm test
       - run: npm run test:packs
+      - name: The release bundle builds
+        run: npm run bundle
       - name: Verify built output parses
         run: |
           find module tools -name '*.mjs' -type f -exec node --check {} \;

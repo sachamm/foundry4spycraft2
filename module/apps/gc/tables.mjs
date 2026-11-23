@@ -5,14 +5,10 @@ import { SECURITY_DEVICES, resolveDevice, sensorCheck, trapOutcome } from "../..
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { requireGC, getMission } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
+import { formDialog, raw } from "../dialog-kit.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content) =>
-  foundry.applications.api.DialogV2.input({
-    window: { title },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${content}</div>`
-  });
+const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(

@@ -1,6 +1,7 @@
 import { refuse } from "../error-notices.mjs";
 import { compatibleAmmunition, ammunitionStockpilePlan } from "../rules/ammunition.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 /** Read-only source calculation. Actual acquisition/payment is recorded separately. */
 export async function planAmmunitionStockpile(item, options = {}) {
   const catalog = CONFIG.SPYCRAFT.tables.ammunitionCatalog ?? [],
@@ -12,10 +13,31 @@ export async function planAmmunitionStockpile(item, options = {}) {
     );
   let input = options;
   if (!input.ammunitionId) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Stockpile calculation: ${item.name}` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label>${loc`Ammunition`} <select name="ammunitionId">${choices.map(a => `<option value="${esc(a.id)}">${esc(a.name)}${a.firstStockpile ? " (first stockpile permitted)" : ""}</option>`).join("")}</select></label><label>${loc`Stockpiles`} <input name="stockpiles" type="number" min="1" step="1" value="1" /></label>${choices.some(a => a.firstStockpile) ? `<label><input name="initial" type="checkbox" /> ${loc`Calculate the included stockpile for one weapon (including a conversion if needed)`}</label>` : ""}<p>${loc`Use the selected supplied ammunition code on the item. Listed prices are per stockpile; weight is per projectile.`}</p></div>`
+    input = await formDialog({
+      title: loc`Stockpile calculation: ${item.name}`,
+      fields: [
+        {
+          select: "ammunitionId",
+          label: loc`Ammunition`,
+          optionsHtml: raw(
+            choices
+              .map(
+                a =>
+                  `<option value="${esc(a.id)}">${esc(a.name)}${a.firstStockpile ? " (first stockpile permitted)" : ""}</option>`
+              )
+              .join("")
+          )
+        },
+        { number: "stockpiles", label: loc`Stockpiles`, min: "1", step: "1", value: "1" },
+        raw(
+          choices.some(a => a.firstStockpile)
+            ? `<label><input name="initial" type="checkbox" /> ${loc`Calculate the included stockpile for one weapon (including a conversion if needed)`}</label>`
+            : ""
+        ),
+        {
+          note: loc`Use the selected supplied ammunition code on the item. Listed prices are per stockpile; weight is per projectile.`
+        }
+      ]
     });
     if (!input) return null;
     input = { ...input, stockpiles: Number(input.stockpiles), initial: input.initial === true };

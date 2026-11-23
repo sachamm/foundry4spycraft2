@@ -6,6 +6,7 @@ import { reviewFeintBonuses } from "./feint-bonus.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
 import { decline } from "../error-notices.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 export async function reviewFeintBenefits(actor, input = {}) {
   if (!game.user.isGM || !actor.isOwner) throw Error(loc`The GC must review interrupted Feint benefits.`);
   if (!Object.hasOwn(input, "attemptId")) {
@@ -47,10 +48,21 @@ export async function reviewFeintBenefits(actor, input = {}) {
       errors.push(error.message);
     }
     if (!entries.length && !errors.length) return decline(loc`No interrupted Feint benefit is awaiting review.`);
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Review interrupted Feint benefit` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Recover any interrupted resource lock first. Review the source and result receipts. A posted attack or damage roll keeps its spent benefit; a confirmed missing result releases only its unused reservation. Leaving Side Stance still discards an unused die, and critical bonus deadlines remain unchanged.`}</p>${errors.map(e => `<p>${esc(e)}</p>`).join("")}<label>${loc`Interrupted result`} <select name="attemptId">${entries.map(e => `<option value="${esc(e.value)}">${esc(e.label)}</option>`).join("")}</select></label><label><input name="confirmed" type="checkbox" /> ${loc`No client is still executing this result; I reviewed its receipts and current resources`}</label></div>`
+    input = await formDialog({
+      title: loc`Review interrupted Feint benefit`,
+      intro: loc`Recover any interrupted resource lock first. Review the source and result receipts. A posted attack or damage roll keeps its spent benefit; a confirmed missing result releases only its unused reservation. Leaving Side Stance still discards an unused die, and critical bonus deadlines remain unchanged.`,
+      fields: [
+        raw(errors.map(e => `<p>${esc(e)}</p>`).join("")),
+        {
+          select: "attemptId",
+          label: loc`Interrupted result`,
+          optionsHtml: raw(entries.map(e => `<option value="${esc(e.value)}">${esc(e.label)}</option>`).join(""))
+        },
+        {
+          check: "confirmed",
+          label: loc`No client is still executing this result; I reviewed its receipts and current resources`
+        }
+      ]
     });
     if (!input) return null;
   }

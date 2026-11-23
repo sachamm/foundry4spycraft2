@@ -116,6 +116,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     this.filters = { search: "", group: originType ?? "", qualifiedOnly: false, acquisitionSource: "" };
     /** The entry shown in the preview pane. */
     this.selected = null;
+    /** Plain-text descriptions by uuid: parsing each one is the costly part of building the list. */
+    this.summaries = new Map();
   }
 
   static DEFAULT_OPTIONS = {
@@ -126,7 +128,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       select(event, target) {
         const keyboard = event.detail === 0;
         this.selected = target.closest("[data-uuid]")?.dataset.uuid ?? null;
-        return this.render().then(() => {
+        return this.renderResults().then(() => {
           if (keyboard) focusEntry(this.element, this.selected);
         });
       },
@@ -135,12 +137,20 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     }
   };
 
+  // Two parts, so that searching, filtering and choosing a row redraw the results and leave the search box, with
+  // the text and caret in it, alone.
   static PARTS = {
-    main: {
-      template: "systems/spycraft2/templates/apps/browser.hbs",
+    filters: { template: "systems/spycraft2/templates/apps/browser-filters.hbs" },
+    results: {
+      template: "systems/spycraft2/templates/apps/browser-results.hbs",
       scrollable: [".browser-list", ".browser-preview"]
     }
   };
+
+  /** Redraw the list and the preview only. */
+  renderResults() {
+    return this.render({ parts: ["results"] });
+  }
 
   get title() {
     return game.i18n.format("SPYCRAFT.Browser.Title", { type: game.i18n.localize(`TYPES.Item.${this.itemType}`) });
@@ -250,7 +260,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       }
       groups[group] = groupLabel;
       if (this.filters.group && group !== this.filters.group) continue;
-      const summary = plainText(s.description);
+      let summary = this.summaries.get(e.uuid);
+      if (summary === undefined) this.summaries.set(e.uuid, (summary = plainText(s.description)));
       if (search && !e.name.toLowerCase().includes(search) && !summary.toLowerCase().includes(search)) continue;
       const check =
         this.actor && (req || this.filters.acquisitionSource)
@@ -305,13 +316,17 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
   _onRender(context, options) {
     super._onRender(context, options);
     const html = this.element;
+    // The filter controls are drawn once and keep their listeners; only a full draw replaces them.
+    const search = html.querySelector("[name=search]");
+    if (!search || search.dataset.sc2Wired) return;
+    search.dataset.sc2Wired = "true";
     // Typing filters after a short pause; Enter applies a search still waiting on that pause before adding.
     const applySearch = async input => {
       if (this.filters.search === input.value) return;
       this.filters.search = input.value;
-      await this.render();
+      await this.renderResults();
     };
-    html.querySelector("[name=search]")?.addEventListener(
+    search.addEventListener(
       "input",
       foundry.utils.debounce(ev => {
         if (this.filters.search === ev.target.value) return;
@@ -319,19 +334,15 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
         const selectedUuid = this.element.contains(focused)
           ? focused.closest(".browser-list [data-uuid]")?.dataset.uuid
           : null;
-        const restoreSearch = focused === ev.target;
         this.filters.search = ev.target.value;
-        this.render().then(() => {
-          if (selectedUuid) return focusEntry(this.element, selectedUuid);
-          if (!restoreSearch) return;
-          const input = this.element.querySelector("[name=search]");
-          input?.focus();
-          input?.setSelectionRange(input.value.length, input.value.length);
+        // The search box is not redrawn, so only focus that was on a list entry needs putting back.
+        this.renderResults().then(() => {
+          if (selectedUuid) focusEntry(this.element, selectedUuid);
         });
       }, 250)
     );
     // Enter in the search adds the selected entry, or the only one left, without reaching for the mouse.
-    html.querySelector("[name=search]")?.addEventListener("keydown", async ev => {
+    search.addEventListener("keydown", async ev => {
       if (ev.key !== "Enter" || !this.actor) return;
       ev.preventDefault();
       await applySearch(ev.target);
@@ -343,15 +354,15 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     });
     html.querySelector("[name=acquisitionSource]")?.addEventListener("change", ev => {
       this.filters.acquisitionSource = ev.target.value;
-      this.render();
+      this.renderResults();
     });
     html.querySelector("[name=group]")?.addEventListener("change", ev => {
       this.filters.group = ev.target.value;
-      this.render();
+      this.renderResults();
     });
     html.querySelector("[name=qualifiedOnly]")?.addEventListener("change", ev => {
       this.filters.qualifiedOnly = ev.target.checked;
-      this.render();
+      this.renderResults();
     });
   }
 

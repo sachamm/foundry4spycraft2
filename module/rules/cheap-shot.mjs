@@ -7,6 +7,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { cheapShotPenalty } from "./cheap-shot-effects.mjs";
+import { stable } from "./equal.mjs";
 export const CHEAP_SHOT_CHOICES = ["str", "dex", "con", "int", "wis", "cha", "speed"];
 /** p.355 Standard Attack plus a free-action trick, not a separate attack action. */
 export function cheapShotPlan(
@@ -99,16 +100,6 @@ export function cheapShotPlan(
     ]
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateCheapShotProof(
   actor,
   proof,

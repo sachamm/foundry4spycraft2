@@ -8,6 +8,7 @@ import {
 } from "../rules/berserker.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 
 const combatOf = actor => {
   const c = actor.participatingCombat;
@@ -56,10 +57,9 @@ export async function endBerserkerRage(actor, options = {}) {
     state = berserkerRageState(actor.system.berserkerRage, combatOf(actor));
   let input = options;
   if (state.active && tier?.end === "half" && !Object.hasOwn(input, "actionConfirmed")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`End the rage` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label><input name="actionConfirmed" type="checkbox" /> ${loc`I spend a half action to calm down`}</label></div>`
+    input = await formDialog({
+      title: loc`End the rage`,
+      fields: [{ check: "actionConfirmed", label: loc`I spend a half action to calm down` }]
     });
     if (!input) return null;
   }

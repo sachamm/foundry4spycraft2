@@ -2,8 +2,8 @@ import { jinxUseSpec, jinxUseProof } from "../rules/jinx.mjs";
 import { resourceUsePlan } from "../rules/limited-uses.mjs";
 import { getActionDieSettlementReview, setPendingActionDieReview } from "../rules/action-die-payments.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  state = a => ({ ...a.system, usagePeriods: a.usagePeriods });
+import { same } from "../rules/equal.mjs";
+const state = a => ({ ...a.system, usagePeriods: a.usagePeriods });
 /** The critical controller already holds both actor resource locks. Do not nest another queue. */
 export async function withJinxReservation(payer, plan, message, perform, { validateCost = () => {} } = {}) {
   if (getActionDieSettlementReview(payer).needsReview)

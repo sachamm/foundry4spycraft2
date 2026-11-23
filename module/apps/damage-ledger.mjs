@@ -12,7 +12,7 @@ import {
 } from "../rules/accumulated-damage.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "../rules/equal.mjs";
 const whole = value => {
   if (typeof value === "number") return value;
   if (typeof value === "string" && /^(0|[1-9]\d*)$/.test(value)) return Number(value);

@@ -16,8 +16,8 @@ import {
 } from "../rules/analysis-tasks.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  copy = v => structuredClone(v),
+import { same } from "../rules/equal.mjs";
+const copy = v => structuredClone(v),
   esc = v => foundry.utils.escapeHTML(String(v ?? ""));
 const gc = a => {
   if (!game.user?.isGM || !a.isOwner || a.type !== "agent")

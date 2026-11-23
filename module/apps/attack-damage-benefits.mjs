@@ -7,18 +7,10 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { impaleDamageBonus } from "../rules/sword-basics.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "../rules/equal.mjs";
+import { reservedDamageUse } from "./damage-reservation.mjs";
 const leases = new WeakMap(),
   active = new Map(),
-  stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    ),
   values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const message = id =>
   globalThis.fromUuidSync?.(id) ?? values(globalThis.game?.messages).find(m => m.uuid === id || m.id === id);
@@ -341,77 +333,19 @@ export function validateAttackDamageProof(
   )
     throw Error(loc`Reserve this damage bonus through the original hit.`);
 }
-export async function withAttackDamageBenefit(actor, proof, perform) {
-  const lease = {};
-  await queueRuleState(actor, async () => {
-    validateSource(actor, proof);
-    const rows = attackDamageUseRows(actor.system);
-    if (rows.some(r => r.rootAttackUuid === proof.rootAttackUuid))
-      throw Error(
-        loc`This recorded attack bonus attack already has damage, or an interrupted damage use awaiting GC review.`
-      );
-    await actor.update({
-      "system.attackDamageUses": [
-        ...rows,
-        {
-          version: 1,
-          rootAttackUuid: proof.rootAttackUuid,
-          attackUuid: proof.attackUuid,
-          reservationId: proof.reservationId,
-          targetUuid: proof.targetUuid,
-          weaponUuid: proof.weaponUuid,
-          sourceEvidence: proof.sourceEvidence,
-          receiptUuid: null
-        }
-      ]
-    });
-  });
-  leases.set(lease, { actor, reservationId: proof.reservationId });
-  active.set(actor.uuid + ":" + proof.reservationId, lease);
-  const posted = () =>
-      values(game.messages).find(
-        m =>
-          m.flags?.spycraft2?.actorUuid === actor.uuid &&
-          m.flags.spycraft2.checkKind === "damage" &&
-          m.flags.spycraft2.attackDamageBenefit?.reservationId === proof.reservationId
-      ),
-    settle = receipt =>
-      queueRuleState(actor, async () => {
-        const rows = attackDamageUseRows(actor.system),
-          use = rows.find(r => r.rootAttackUuid === proof.rootAttackUuid);
-        if (use?.reservationId !== proof.reservationId)
-          throw Error(loc`The attack damage bonus reservation changed; ask the GC to review it.`);
-        await actor.update({
-          "system.attackDamageUses": receipt
-            ? rows.map(r => (r.rootAttackUuid === proof.rootAttackUuid ? { ...r, receiptUuid: receipt.uuid } : r))
-            : rows.filter(r => r.reservationId !== proof.reservationId)
-        });
-      });
-  try {
-    const result = await perform(lease),
-      receipt =
-        result?.flags?.spycraft2?.attackDamageBenefit?.reservationId === proof.reservationId && result.uuid
-          ? result
-          : posted();
-    await settle(receipt);
-    return receipt ?? result;
-  } catch (error) {
-    const receipt = posted();
-    try {
-      await settle(receipt);
-    } catch (cleanup) {
-      throw new AggregateError(
-        [error, cleanup],
-        loc`The attack damage bonus needs GC review; inspect its receipt before retrying.`
-      );
-    }
-    if (receipt) return receipt;
-    throw error;
-  } finally {
-    leases.delete(lease);
-    active.delete(actor.uuid + ":" + proof.reservationId);
-  }
-}
+export const withAttackDamageBenefit = reservedDamageUse({
+  field: "system.attackDamageUses",
+  flag: "attackDamageBenefit",
+  rows: system => attackDamageUseRows(system),
+  validateSource: (actor, proof) => validateSource(actor, proof),
+  leases,
+  active,
+  messages: () => ({
+    taken: loc`This recorded attack bonus attack already has damage, or an interrupted damage use awaiting GC review.`,
+    changed: loc`The attack damage bonus reservation changed; ask the GC to review it.`,
+    review: loc`The attack damage bonus needs GC review; inspect its receipt before retrying.`
+  })
+});
 export async function reviewAttackDamageBenefit(actor, { reservationId, confirmed = false } = {}) {
   if (!game.user.isGM || !actor.isOwner || confirmed !== true)
     throw Error(loc`The GC must confirm the interrupted attack damage bonus was reviewed.`);

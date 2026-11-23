@@ -8,8 +8,8 @@ import {
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  clone = structuredClone;
+import { same } from "../rules/equal.mjs";
+const clone = structuredClone;
 const effectById = (actor, id) => [...(actor.effects ?? [])].find(e => e.id === id),
   statuses = e => [...(e?.statuses ?? [])].sort();
 const receiptFor = (actor, message) => actor.flags?.spycraft2?.restraintReleases?.[message.id];

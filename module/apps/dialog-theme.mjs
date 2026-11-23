@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 
 /** Keep Foundry's dialog behavior and callbacks; opt system-owned dialogs into the skin. */
 function themedOptions(options = {}) {
@@ -64,8 +64,8 @@ export function installDialogThemeHooks() {
 /** Register the table-trust setting. Call during `init`. */
 export function registerTableTrustSetting() {
   game.settings.register("spycraft2", "trustTheTable", {
-    name: loc`Trust the table`,
-    hint: loc`Dialogs open with every "the GC confirms" box already ticked, so declarations stand unless someone unticks them. Leave off to confirm each one.`,
+    name: locKey`Trust the table`,
+    hint: locKey`Dialogs open with every "the GC confirms" box already ticked, so declarations stand unless someone unticks them. Leave off to confirm each one.`,
     scope: "world",
     config: true,
     type: Boolean,

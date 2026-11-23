@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 /** Preserve Foundry's Roll API while letting Lightning Reflexes choose either complete Initiative roll (p.174). */
 export function preferredInitiativeRoll(first, { validate = () => {}, actorUuid = "", combatantUuid = "" } = {}) {
   let selected = first,
@@ -17,10 +18,23 @@ export function preferredInitiativeRoll(first, { validate = () => {}, actorUuid 
       if (rolls.some(r => !Number.isFinite(r.total))) throw new Error(loc`Review the Initiative roll results.`);
       // The higher result starts selected, and closing the dialog keeps it: a higher Count is almost always wanted.
       const best = rolls[1].total > rolls[0].total ? 1 : 0;
-      const input = await foundry.applications.api.DialogV2.input({
-        window: { title: loc`Lightning Reflexes — Initiative` },
-        rejectClose: false,
-        content: `<div class="spycraft2-roll-options"><p>${loc`Choose your preferred Initiative result. Closing keeps the higher roll.`}</p><label>${loc`Result`} <select name="chosen">${rolls.map((r, i) => `<option value="${i}"${i === best ? " selected" : ""}>${loc`Roll ${i + 1}: ${r.total}`}</option>`).join("")}</select></label></div>`
+      const input = await formDialog({
+        title: loc`Lightning Reflexes — Initiative`,
+        intro: loc`Choose your preferred Initiative result. Closing keeps the higher roll.`,
+        fields: [
+          {
+            select: "chosen",
+            label: loc`Result`,
+            optionsHtml: raw(
+              rolls
+                .map(
+                  (r, i) =>
+                    `<option value="${i}"${i === best ? " selected" : ""}>${loc`Roll ${i + 1}: ${r.total}`}</option>`
+                )
+                .join("")
+            )
+          }
+        ]
       });
       const index =
         input === null || input === undefined

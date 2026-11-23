@@ -7,7 +7,8 @@ import {
 } from "../rules/career-agent.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "../rules/equal.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
 const numberInput = value =>
   typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
 function requireGC(actor) {
@@ -96,9 +97,7 @@ export async function useCareerAgentReward(actor, options = {}) {
         }
       });
     } catch (error) {
-      const posted = game.messages?.find?.(
-        m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.careerAgentReward?.id === record.id
-      );
+      const posted = postedReceipt(actor, "careerAgentReward", record.id);
       if (posted) return posted;
       if (!same(current(), record) || actor.system[field] !== after) return holdReview(actor, transaction, error);
       try {

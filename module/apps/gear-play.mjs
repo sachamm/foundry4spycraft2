@@ -17,6 +17,7 @@ import {
 } from "../rules/gear-play-rules.mjs";
 import { sizeCode } from "../rules/vehicles.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 /**
  * A pick marked "one per team member" (for example tactical radios or bicycles) gives every team member a copy.
@@ -93,12 +94,7 @@ export async function chargeStandingCost(item, { currency = null } = {}) {
   return payment;
 }
 
-const ask = (title, content) =>
-  foundry.applications.api.DialogV2.input({
-    window: { title },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${content}</div>`
-  });
+const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 const speaker = item => ChatMessage.getSpeaker({ actor: item.parent });
 
 /* ---------------------------------------------------------------------- */

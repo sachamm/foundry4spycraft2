@@ -9,9 +9,9 @@ import {
 import { shakenRules } from "./shaken.mjs";
 import { RESOURCE_LOCK_ID } from "./resource-locks.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "./equal.mjs";
 const active = new WeakMap(),
-  local = new WeakMap(),
-  same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  local = new WeakMap();
 export const paymentIdValid = id =>
   typeof id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(id) && !["constructor", "prototype", "__proto__"].includes(id);
 export const paymentLockToken = actor =>

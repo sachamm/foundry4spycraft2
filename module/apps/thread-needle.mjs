@@ -4,18 +4,9 @@ import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
 import { decline } from "../error-notices.mjs";
+import { stable } from "../rules/equal.mjs";
 const active = new Set();
-const stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    ),
-  messages = () => [...(game.messages ?? [])],
+const messages = () => [...(game.messages ?? [])],
   message = id => globalThis.fromUuidSync?.(id) ?? messages().find(m => m.uuid === id),
   visible = m =>
     messages().includes(m) && m.visible !== false && m.isContentVisible !== false && (!m.blind || game.user.isGM),

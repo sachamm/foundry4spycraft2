@@ -3,17 +3,8 @@ import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { loc } from "../i18n.mjs";
 import { decline } from "../error-notices.mjs";
-const jobs = new Map(),
-  stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
+import { stable } from "../rules/equal.mjs";
+const jobs = new Map();
 const messages = () =>
     typeof game.messages?.values === "function" ? [...game.messages.values()] : [...(game.messages ?? [])],
   message = id => globalThis.fromUuidSync?.(id) ?? messages().find(m => m.uuid === id || m.id === id),

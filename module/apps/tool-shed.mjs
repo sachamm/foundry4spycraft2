@@ -2,6 +2,7 @@ import { toolShedSource, toolShedPlan, toolShedKitState } from "../rules/tool-sh
 import { attributeActionBlock } from "../rules/attributes.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 export async function useToolShed(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   const source = toolShedSource({ ...actor.system, usagePeriods: actor.usagePeriods });
@@ -12,10 +13,28 @@ export async function useToolShed(actor, options = {}) {
   if (!Object.keys(input).length) {
     const kits = (await pack.getDocuments()).filter(k => k.type === "gear" && k.system.kitGrade === 3),
       esc = foundry.utils.escapeHTML;
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Tool Shed: find one Grade III kit` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label>${loc`Kit`} <select name="kitId">${kits.map(k => `<option value="${esc(k.id)}">${esc(k.name)}${k.system.kitNonPortable ? " (fixed location)" : ""}</option>`).join("")}</select></label><label>${loc`Home / fixed kit location`} <input name="home" maxlength="200" /></label><label><input name="atHome" type="checkbox" /> ${loc`I am inside my home`}</label><label><input name="hourCompletedConfirmed" type="checkbox" /> ${loc`I have completed the one-hour action to find this one kit`}</label><p>${loc`The kit is found at home and initially left there. It is lost at the end of this mission. No gear pick, Reserve or action die is spent.`}</p></div>`
+    input = await formDialog({
+      title: loc`Tool Shed: find one Grade III kit`,
+      fields: [
+        {
+          select: "kitId",
+          label: loc`Kit`,
+          optionsHtml: raw(
+            kits
+              .map(
+                k =>
+                  `<option value="${esc(k.id)}">${esc(k.name)}${k.system.kitNonPortable ? " (fixed location)" : ""}</option>`
+              )
+              .join("")
+          )
+        },
+        { text: "home", label: loc`Home / fixed kit location`, maxlength: 200 },
+        { check: "atHome", label: loc`I am inside my home` },
+        { check: "hourCompletedConfirmed", label: loc`I have completed the one-hour action to find this one kit` },
+        {
+          note: loc`The kit is found at home and initially left there. It is lost at the end of this mission. No gear pick, Reserve or action die is spent.`
+        }
+      ]
     });
     if (!input) return null;
   }

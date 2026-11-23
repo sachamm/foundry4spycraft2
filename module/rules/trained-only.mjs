@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Trained Only (TRO), p.302: untrained attack checks are impossible.
  * It does not add another penalty or independently prohibit damage calculations.
  */
@@ -17,16 +18,6 @@ export function trainedOnlyAttackPlan(weapon, { trained = false } = {}) {
       : ""
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateTrainedOnlyProof(weapon, proof, { checkKind, trained = false } = {}) {
   if (!proof) return;
   const p = trainedOnlyAttackPlan(weapon, { trained });

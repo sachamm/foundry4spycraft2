@@ -2,6 +2,7 @@ import { accurizedAttackPlan } from "./accurized.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Source identity stays the actual Item even when an operation substitutes proficiency. */
 export function accurizedWeaponPlan(
   weapon,
@@ -12,16 +13,6 @@ export function accurizedWeaponPlan(
     ...weaponSourceIdentity(weapon, { operatingProficiency })
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateAccurizedWeaponProof(actor, proof, context = {}) {
   if (!proof) return;
   const { weapon, operatingProficiency, trained } = ownedWeaponTraining(actor, proof, context),

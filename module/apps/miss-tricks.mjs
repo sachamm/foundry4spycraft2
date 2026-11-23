@@ -9,6 +9,7 @@ import {
 } from "./character-target.mjs";
 import { postFinalAttack, finalWeaponReady, finalAttackOptions } from "./final-attack.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 export async function takeMissTrick(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   if (!validOwnCountClock(actor.mentalLeapCombatContext()))
@@ -35,22 +36,56 @@ export async function takeMissTrick(actor, options = {}) {
           m.flags.spycraft2.rollCombat?.round === clock?.round &&
           !m.flags.spycraft2.missTrickUse
       );
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Immediate miss trick: Double Twirl / Remiss` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`A resolved Standard Attack miss without an error permits one immediate final attack with the same actual weapon against the same opponent. This uses the shared final-attack allowance; it does not spend an action die.`}</p><label>${loc`Recorded miss`} <select name="messageId"><option value="">${loc`Choose actual miss`}</option>${messages.map(m => `<option value="${esc(m.id)}">${esc(m.flags.spycraft2.baseFlavor ?? m.id)}</option>`).join("")}</select></label><label>${loc`Trick`} <select name="trick">${Object.entries(
-        MISS_TRICKS
-      )
-        .filter(([, v]) => actor.system.activeFeatNames?.includes(v.feat))
-        .map(([key, v]) => `<option value="${key}">${v.name} (${v.feat})</option>`)
-        .join(
-          ""
-        )}</select></label><label>${loc`Same actual opponent`} <select name="opponentUuid"><option value="">${loc`Choose opponent`}</option>${attackCharacterTargetChoices()
-        .filter(a => a.uuid !== actor.uuid)
-        .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
-        .join(
-          ""
-        )}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="sameTargetConfirmed" type="checkbox" /> ${loc`The GC confirms this was the original opponent`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This is the immediate reaction to that miss, with no intervening action`}</label><label><input name="attackLegalConfirmed" type="checkbox" /> ${loc`This same-weapon final Standard Attack is legal now, including Reach and line of sight`}</label><label><input name="legacySourceConfirmed" type="checkbox" /> ${loc`Older receipt only: the GC confirms this was a Standard Attack and the feat/exact readied weapon qualified at the original miss`}</label></div>`
+    input = await formDialog({
+      title: loc`Immediate miss trick: Double Twirl / Remiss`,
+      intro: loc`A resolved Standard Attack miss without an error permits one immediate final attack with the same actual weapon against the same opponent. This uses the shared final-attack allowance; it does not spend an action die.`,
+      fields: [
+        {
+          select: "messageId",
+          label: loc`Recorded miss`,
+          options: [["", loc`Choose actual miss`]],
+          optionsHtml: raw(
+            messages
+              .map(m => `<option value="${esc(m.id)}">${esc(m.flags.spycraft2.baseFlavor ?? m.id)}</option>`)
+              .join("")
+          )
+        },
+        {
+          select: "trick",
+          label: loc`Trick`,
+          optionsHtml: raw(
+            Object.entries(MISS_TRICKS)
+              .filter(([, v]) => actor.system.activeFeatNames?.includes(v.feat))
+              .map(([key, v]) => `<option value="${key}">${v.name} (${v.feat})</option>`)
+              .join("")
+          )
+        },
+        {
+          select: "opponentUuid",
+          label: loc`Same actual opponent`,
+          options: [["", loc`Choose opponent`]],
+          optionsHtml: raw(
+            attackCharacterTargetChoices()
+              .filter(a => a.uuid !== actor.uuid)
+              .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
+              .join("")
+          )
+        },
+        raw(standardAttackContextContent(actor, { includeCharacterTarget: false })),
+        { check: "sameTargetConfirmed", label: loc`The GC confirms this was the original opponent` },
+        {
+          check: "immediateConfirmed",
+          label: loc`This is the immediate reaction to that miss, with no intervening action`
+        },
+        {
+          check: "attackLegalConfirmed",
+          label: loc`This same-weapon final Standard Attack is legal now, including Reach and line of sight`
+        },
+        {
+          check: "legacySourceConfirmed",
+          label: loc`Older receipt only: the GC confirms this was a Standard Attack and the feat/exact readied weapon qualified at the original miss`
+        }
+      ]
     });
     if (!input) return null;
   }

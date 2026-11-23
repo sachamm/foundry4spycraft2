@@ -2,6 +2,7 @@
 import { gunslingerReading, gunslingerNote } from "../rules/gunslinger.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 export async function useGunslingersEye(actor, options = {}) {
   if (!actor.isOwner) return null;
@@ -9,12 +10,16 @@ export async function useGunslingersEye(actor, options = {}) {
     choices = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid);
   let input = options;
   if (!Object.hasOwn(input, "targetUuid")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Gunslinger’s Eye` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Free action: size up a character to learn their ranged attack bonus, Initiative bonus and number of Ranged Combat feats. Once per character per mission (p.182).`}</p><label>${loc`Character`} <select name="targetUuid">${choices
-        .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
-        .join("")}</select></label></div>`
+    input = await formDialog({
+      title: loc`Gunslinger’s Eye`,
+      intro: loc`Free action: size up a character to learn their ranged attack bonus, Initiative bonus and number of Ranged Combat feats. Once per character per mission (p.182).`,
+      fields: [
+        {
+          select: "targetUuid",
+          label: loc`Character`,
+          optionsHtml: raw(choices.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join(""))
+        }
+      ]
     });
     if (!input) return null;
   }

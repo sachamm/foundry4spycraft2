@@ -1,0 +1,14 @@
+<div class="browser-filters">
+<div class="dossier-band" aria-hidden="true">
+  <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
+  <span class="file-label">{{localize "SPYCRAFT.Retro.Archive"}}</span>
+  <span class="file-stamp">{{localize "SPYCRAFT.Retro.Classified"}}</span>
+</div>
+  {{#if missingPack}}<p class="bad">{{localize "SPYCRAFT.Browser.MissingPack"}}</p>{{/if}}
+  <div class="filters">
+    <input type="search" name="search" value="{{filters.search}}" placeholder="{{localize 'SPYCRAFT.Browser.Search'}}" aria-label="{{localize 'SPYCRAFT.Action.SearchCatalog'}}" />
+    <select name="group" aria-label="{{localize 'SPYCRAFT.Action.CatalogGroup'}}">{{selectOptions groups selected=filters.group blank=(localize "SPYCRAFT.Browser.All")}}</select>
+    {{#if showAcquisitionSources}}<label>{{localize "SPYCRAFT.Template.AppsBrowser.FeatSource"}} <select name="acquisitionSource">{{selectOptions acquisitionSources selected=filters.acquisitionSource}}</select></label>{{/if}}
+    {{#if hasPrereqs}}<label><input type="checkbox" name="qualifiedOnly" {{checked filters.qualifiedOnly}} /> {{localize "SPYCRAFT.Browser.QualifiedOnly"}}</label>{{/if}}
+  </div>
+</div>

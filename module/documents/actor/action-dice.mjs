@@ -52,6 +52,7 @@ import {
 } from "../../rules/health.mjs";
 import { actionDieAwardPlan, missionXPPlan } from "../../rules/action-dice.mjs";
 import { loc } from "../../i18n.mjs";
+import { same } from "../../rules/equal.mjs";
 
 export const ActorActionDice = Base =>
   class ActorActionDice extends Base {
@@ -600,8 +601,7 @@ export const ActorActionDice = Base =>
             });
             return boost;
           } catch (error) {
-            const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-              current = () => this.system.defenseBoost ?? null,
+            const current = () => this.system.defenseBoost ?? null,
               ourReceipt = () => current()?.actionDiceReceiptId === receiptId,
               posted = [...(game.messages ?? [])].find(
                 m => m.flags?.spycraft2?.actorUuid === this.uuid && m.flags?.spycraft2?.defenseReceiptId === receiptId
@@ -964,7 +964,6 @@ export const ActorActionDice = Base =>
               gcBefore: pool,
               gcAfter: next
             },
-            same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
             ledger = () => this.system.actionDieAwards?.[plan.key] ?? null,
             gc = () => game.settings.get("spycraft2", "gcActionDice");
           try {
@@ -1057,7 +1056,6 @@ export const ActorActionDice = Base =>
       const saved = this.flags?.spycraft2?.actionDieAwardReview;
       if (!saved?.needsReview) return null;
       const tx = saved.transaction,
-        same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
         key = tx && encodeURIComponent(String(tx.mission)).replaceAll(".", "%2E");
       if (
         !tx ||
@@ -1200,7 +1198,6 @@ export const ActorActionDice = Base =>
         const settlementId = foundry.utils.randomID(),
           record = { ...plan.record, settlementId },
           beforeXP = this.system.xp,
-          same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
           current = () => this.system.missionXPRewards?.[plan.key] ?? null,
           transaction = { id: settlementId, key: plan.key, mission: String(mission), beforeXP, record };
         const markReview = async error => {
@@ -1270,8 +1267,7 @@ export const ActorActionDice = Base =>
       const saved = this.flags?.spycraft2?.missionXPReview;
       if (!saved?.needsReview) return null;
       const tx = saved.transaction,
-        key = tx && encodeURIComponent(String(tx.mission)).replaceAll(".", "%2E"),
-        same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        key = tx && encodeURIComponent(String(tx.mission)).replaceAll(".", "%2E");
       if (
         !tx ||
         tx.key !== key ||

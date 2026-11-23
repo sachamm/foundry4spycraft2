@@ -3,8 +3,8 @@ import { taskPressureState, taskPressureUseSpec, taskPressureUseProof } from "./
 import { rollEvidence, errorDecisionPending } from "./outcomes.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  whole = n => Number.isSafeInteger(n) && n >= 0;
+import { same } from "./equal.mjs";
+const whole = n => Number.isSafeInteger(n) && n >= 0;
 export const forensicTaskSource = s => s.activeFeatNames?.includes("Forensic Genius") === true;
 const validTiming = t =>
   t == null ||

@@ -7,6 +7,7 @@ import {
 } from "../rules/critical-injuries.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 const history = a => a.flags?.spycraft2?.criticalInjuryRolls ?? {};
 const saved = (a, id) => history(a)[id];
 const proof = (a, r) => {
@@ -84,10 +85,15 @@ export async function rollCriticalInjury(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   let input = options;
   if (!Object.hasOwn(input, "id")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Roll critical injury — Table of Ouch` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Use only after the GC resolves the actual injury trigger, critical activation or failed Fortitude save. This rolls the injury; it does not apply damage, injury effects or healing.`}</p><label>${loc`Unique injury event reference`} <input name="id" /></label><label>${loc`Source / confirmed trigger`} <input name="source" /></label><label>${loc`Damage actually suffered after defenses`} <input name="damage" type="number" min="0" step="1" /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this event directs the character to the Table of Ouch`}</label></div>`
+    input = await formDialog({
+      title: loc`Roll critical injury — Table of Ouch`,
+      intro: loc`Use only after the GC resolves the actual injury trigger, critical activation or failed Fortitude save. This rolls the injury; it does not apply damage, injury effects or healing.`,
+      fields: [
+        { text: "id", label: loc`Unique injury event reference` },
+        { text: "source", label: loc`Source / confirmed trigger` },
+        { number: "damage", label: loc`Damage actually suffered after defenses`, min: "0", step: "1" },
+        { check: "confirmed", label: loc`The GC confirms this event directs the character to the Table of Ouch` }
+      ]
     });
     if (!input) return null;
   }
