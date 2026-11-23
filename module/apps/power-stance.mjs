@@ -11,6 +11,7 @@ import { assertShakenInitiativeCountReady, changeInitiativeCountPreservingShaken
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { isResourceLock, periodResourceActors } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const localReviews = new WeakMap(),
   jobs = new Map(),
   combatants = actor =>
@@ -263,7 +264,7 @@ export async function managePowerStanceInitiative(actor, input = {}) {
   if (!input.combatant) {
     const pending = powerStanceInitiativeReviews(actor),
       esc = foundry.utils.escapeHTML;
-    if (!pending.length) return ui.notifications.info(loc`No Power Stance Count needs review.`);
+    if (!pending.length) return decline(loc`No Power Stance Count needs review.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Review Power Stance Count` },
       rejectClose: false,

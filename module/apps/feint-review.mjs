@@ -5,6 +5,7 @@ import { reviewSideStanceAttack } from "./side-stance.mjs";
 import { reviewFeintBonuses } from "./feint-bonus.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 export async function reviewFeintBenefits(actor, input = {}) {
   if (!game.user.isGM || !actor.isOwner) throw Error(loc`The GC must review interrupted Feint benefits.`);
   if (!Object.hasOwn(input, "attemptId")) {
@@ -45,8 +46,7 @@ export async function reviewFeintBenefits(actor, input = {}) {
     } catch (error) {
       errors.push(error.message);
     }
-    if (!entries.length && !errors.length)
-      return ui.notifications.info(loc`No interrupted Feint benefit is awaiting review.`);
+    if (!entries.length && !errors.length) return decline(loc`No interrupted Feint benefit is awaiting review.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Review interrupted Feint benefit` },
       rejectClose: false,

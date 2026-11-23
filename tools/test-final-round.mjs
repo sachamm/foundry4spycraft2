@@ -147,7 +147,7 @@ test("shared spec requires actual baseline only for unknown Nauseated history, r
 });
 test("first unknown Nauseated use is held without reserving a source or rolling; GC-confirmed actual zero enables one attack", async () => {
   const a = actor({ nauseated: true });
-  assert.equal(await a.take("dartingFinalAttack"), undefined);
+  assert.equal(await a.take("dartingFinalAttack"), null);
   assert.equal(game.messages.length, 0);
   assert.equal(a.system.resourceUses.dartingFinalAttack, undefined);
   const spec = a.system.limitedUses.find(s => s.id === "finalAttackRound"),
@@ -164,7 +164,7 @@ test("all five implemented final-attack workflows share one Nauseated allowance;
   for (const first of FINAL_ATTACK_WORKFLOWS) {
     const a = actor({ nauseated: true, known: true });
     assert.ok(await a.take(first));
-    for (const second of FINAL_ATTACK_WORKFLOWS) assert.equal(await a.take(second), undefined);
+    for (const second of FINAL_ATTACK_WORKFLOWS) assert.equal(await a.take(second), null);
     assert.equal(game.messages.length, 1);
     assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
     assert.equal(a.system.resourceUses[first].used, 1);
@@ -179,7 +179,7 @@ test("healthy finals are tracked before the condition arrives; removing Nauseate
   assert.equal(a.system.resourceUses.finalAttackRound.used, 2);
   a.system.conditionContext.nauseated = true;
   a.refresh();
-  assert.equal(await a.take("dartingFinalAttack"), undefined);
+  assert.equal(await a.take("dartingFinalAttack"), null);
   assert.equal(game.messages.length, 2);
   a.system.conditionContext.nauseated = false;
   a.refresh();

@@ -228,7 +228,7 @@ test("UI uses recorded hit/hold labels, excludes private and wrong-target source
     assert.match(captured, /usual opposed Athletics/);
     assert.equal(target.effects.length, 0);
     m.visible = false;
-    assert.equal(await manageThreadNeedle(a), undefined);
+    assert.equal(await manageThreadNeedle(a), null);
   } finally {
     foundry.applications.api.DialogV2.input = old;
   }

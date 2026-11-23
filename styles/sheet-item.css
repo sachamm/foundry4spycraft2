@@ -41,7 +41,7 @@
 .spycraft2.browser .browser-list li.selected { background: var(--sc2-action-tint); box-shadow: inset 3px 0 0 var(--sc2-action); }
 .spycraft2.browser .browser-preview { min-height: 0; overflow-y: auto; padding: var(--sc2-space-3); background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); }
 .spycraft2.browser .preview-head { display: flex; gap: var(--sc2-space-2); align-items: center; margin-bottom: var(--sc2-space-2); }
-.spycraft2.browser .preview-head img { width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--sc2-bar); border-radius: var(--sc2-radius); }
+.spycraft2.browser .preview-head img { width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--sc2-bar-edge); border-radius: var(--sc2-radius); }
 .spycraft2.browser .preview-head div { display: flex; flex-direction: column; min-width: 0; }
 .spycraft2.browser .preview-name { font-size: var(--sc2-text-l); line-height: 1.2; }
 .spycraft2.browser .preview-text { line-height: 1.5; }

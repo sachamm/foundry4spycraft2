@@ -1,5 +1,5 @@
 /** Action dice: spending, healing and refresh, awards, mission XP and starting dice. */
-import { refuse } from "../../error-notices.mjs";
+import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { missionSettlementDefaults } from "../../apps/gc/mission-defaults.mjs";
 import {
@@ -354,7 +354,7 @@ export const ActorActionDice = Base =>
       if (["targeted", "cancel"].includes(input.phase)) {
         const work = async () => {
           const record = this.system.refreshAction;
-          if (record?.state !== "waiting") return ui.notifications.warn(loc`There is no pending Refresh.`);
+          if (record?.state !== "waiting") return refuseStep(loc`There is no pending Refresh.`);
           return this.update(
             input.phase === "targeted"
               ? { "system.refreshAction.targeted": true }
@@ -367,7 +367,7 @@ export const ActorActionDice = Base =>
         const work = async () => {
           const now = context(),
             plan = refreshPlan(this.system, now.combat, now.options);
-          if (plan.blocked) return ui.notifications.warn(plan.reason);
+          if (plan.blocked) return refuseStep(plan.reason);
           await this.update({ "system.refreshAction": plan.record });
           return plan.record;
         };
@@ -1379,7 +1379,7 @@ export const ActorActionDice = Base =>
       return queueResources([this], async () => {
         if (!this.isOwner) throw new Error(loc`Choose an owned character.`);
         const plan = this.startingDiceEntry;
-        if (plan.blocked) return ui.notifications.warn(plan.reason);
+        if (plan.blocked) return refuseStep(plan.reason);
         const receiptId = foundry.utils.randomID(),
           record = {
             ...this.flags.spycraft2.startingDiceCreation,

@@ -99,3 +99,27 @@ for (const theme of ["light", "dark"])
       expect(caption.transform).toBe("none");
     }
   });
+
+for (const theme of ["light", "dark"])
+  test(`buttons answer the pointer, and the bar's edge and the current tab separate from the surface in the ${theme} theme`, async ({
+    page
+  }) => {
+    await openLab(page);
+    const app = page.locator(`.lab-app[data-theme="${theme}"]`);
+    const button = app.locator('button.sc2-action[data-action="takeTotalDefense"]').first();
+    const resting = await button.evaluate(el => getComputedStyle(el).backgroundColor);
+    await button.hover();
+    expect(await button.evaluate(el => getComputedStyle(el).backgroundColor)).not.toBe(resting);
+    const colours = await app.evaluate(root => {
+      const style = (selector, property) => getComputedStyle(root.querySelector(selector))[property];
+      return {
+        surface: style(".window-content", "backgroundColor"),
+        tabRule: style(".sheet-tabs", "borderBottomColor"),
+        headRule: style("table thead", "borderBottomColor"),
+        tabMark: style(".sheet-tabs a.active", "boxShadow")
+      };
+    });
+    expect(contrast(colours.tabRule, colours.surface), JSON.stringify(colours)).toBeGreaterThanOrEqual(3);
+    expect(contrast(colours.headRule, colours.surface), JSON.stringify(colours)).toBeGreaterThanOrEqual(3);
+    expect(contrast(colours.tabMark, colours.surface), JSON.stringify(colours)).toBeGreaterThanOrEqual(3);
+  });

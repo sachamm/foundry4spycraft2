@@ -1,5 +1,5 @@
 import { esc } from "../html.mjs";
-import { refuse } from "../error-notices.mjs";
+import { refuse, refuseStep } from "../error-notices.mjs";
 import { requestBenefitContext } from "../rules/requests.mjs";
 import { gearCheckPlan } from "../rules/gear-checks.mjs";
 import { shakenRules } from "../rules/shaken.mjs";
@@ -543,7 +543,7 @@ export function finishGearAcquisition(actor, message) {
       let receipt = check.gearAttempt.settlement;
       if (!receipt) {
         if (check.resolved || attempt.status !== "pending")
-          return ui.notifications.warn(loc`This acquisition has already been resolved.`);
+          return refuseStep(loc`This acquisition has already been resolved.`);
         const result = acquisitionOutcome(attempt, check.effectiveTotal),
           spec = result.success && attempt.kind === "request" ? DELIVERY[attempt.location] : null;
         const roll = spec ? await new Roll(spec.formula).evaluate() : null,

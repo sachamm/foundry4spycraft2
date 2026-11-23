@@ -6,7 +6,7 @@
 .chat-message.sc2-card .message-header .message-sender { font-weight: 700; white-space: normal; overflow-wrap: anywhere; }
 .chat-message.sc2-card .message-header .flavor-text { display: block; margin-top: 2px; font-size: var(--sc2-text-s); line-height: 1.4; opacity: 0.92; }
 .chat-message.sc2-card .dice-formula { font-family: var(--sc2-num); font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); background: transparent; border: 0; box-shadow: none; }
-.chat-message.sc2-card .dice-total { font: 700 28px/1.3 var(--sc2-num); color: var(--sc2-ink-strong); background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-bar); border-radius: var(--sc2-radius); box-shadow: none; }
+.chat-message.sc2-card .dice-total { font: 700 28px/1.3 var(--sc2-num); color: var(--sc2-ink-strong); background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-bar-edge); border-radius: var(--sc2-radius); box-shadow: none; }
 /* Outcomes read as stamps. */
 .chat-message.sc2-card :is(.spycraft2-threat, .spycraft2-error) {
   display: inline-block; padding: 0 6px; font: 700 12px/1.6 var(--sc2-num); letter-spacing: 0.1em; text-transform: uppercase;

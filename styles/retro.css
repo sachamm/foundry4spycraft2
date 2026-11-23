@@ -22,7 +22,7 @@
   background: var(--sc2-bar);
   border-bottom: 0;
 }
-.spycraft2.application .window-header button { color: var(--sc2-on-bar); }
+.spycraft2.application .window-header button { color: var(--sc2-on-bar); background-color: transparent; border-color: transparent; }
 .spycraft2.application .window-content {
   background: var(--sc2-surface);
   color: var(--sc2-ink);
@@ -98,7 +98,8 @@
 .spycraft2.application input::placeholder, .spycraft2.application textarea::placeholder { color: var(--sc2-ink-muted); opacity: 1; }
 .spycraft2.application option { color: var(--sc2-ink); background: var(--sc2-surface-raised); }
 .spycraft2.application input[type=checkbox] { accent-color: var(--sc2-action); }
-.spycraft2.application :is(button, .sheet-tabs a) {
+/* :where() keeps this resting look below the shared hover and state rules in components.css. */
+.spycraft2.application :where(button, .sheet-tabs a) {
   color: var(--sc2-action);
   background-color: var(--sc2-surface-raised);
   border-color: var(--sc2-rule);
@@ -280,7 +281,10 @@
 .spycraft2.application.sc2-dialog .window-header button { color:var(--sc2-on-bar); background:transparent; border-color:transparent; }
 .spycraft2.application.sc2-dialog .window-content { min-height:0; overflow:hidden; }
 .spycraft2.application.sc2-dialog .dialog-form { display:flex; flex-direction:column; min-height:0; gap:12px; }
-.spycraft2.application.sc2-dialog .dialog-content { min-height:0; max-height:50dvh; overflow-y:auto; padding:2px 5px 4px 2px; }
+/* The body takes the height the screen has left after the header, footer and margins; the footer stays in view. */
+.spycraft2.application.sc2-dialog .dialog-content { min-height:0; max-height:calc(100dvh - 200px); overflow-y:auto; padding:2px 5px 4px 2px; }
+/* One scrolling box per dialog: inside a themed dialog the body scrolls, not the option list within it. */
+.spycraft2.application.sc2-dialog .dialog-content .spycraft2-roll-options { max-height:none; overflow-y:visible; }
 .spycraft2.application.sc2-dialog .spycraft2-roll-options { max-height:none; overflow:visible; padding-right:0; }
 /* The dialog body scrolls, so its blocks keep their full height instead of shrinking and overlapping. */
 .spycraft2.application.sc2-dialog .dialog-content > * { flex-shrink:0; }

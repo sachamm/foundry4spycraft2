@@ -17,7 +17,7 @@
 .spycraft2.sheet.npc .npc-name { flex: 1; min-width: 0; font: 700 18px/1.2 var(--font-primary, sans-serif); overflow-wrap: anywhere; }
 .spycraft2.sheet.npc .name-row { display: flex; align-items: center; gap: var(--sc2-space-2); }
 .spycraft2.sheet.npc .name-row .mode-toggle { margin-left: auto; }
-.spycraft2.sheet.npc .sheet-header .portrait { width: 64px; height: 64px; border: 1px solid var(--sc2-bar); border-radius: var(--sc2-radius); outline: 0; box-shadow: none; }
+.spycraft2.sheet.npc .sheet-header .portrait { width: 64px; height: 64px; border: 1px solid var(--sc2-bar-edge); border-radius: var(--sc2-radius); outline: 0; box-shadow: none; }
 .spycraft2.sheet.npc .npc-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; margin: 6px 0; padding: 0; background: transparent; }
 .spycraft2.sheet.npc .npc-results .npc-note { grid-column: 1 / -1; margin: 0; }
 .spycraft2.sheet.npc .ability { align-items: flex-start; padding: 5px 8px; background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-action); border-top-width: 1px; }

@@ -4,6 +4,7 @@ import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const leases = new WeakMap(),
   activeAttempts = new Map(),
   stable = v =>
@@ -213,7 +214,7 @@ export async function reviewFeintBonuses(actor, input = {}) {
             .map(r => r.usedBy)
         )
       ];
-    if (!ids.length) return ui.notifications.info(loc`No interrupted Feint benefit is awaiting review.`);
+    if (!ids.length) return decline(loc`No interrupted Feint benefit is awaiting review.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Review interrupted Feint attack` },
       rejectClose: false,

@@ -64,6 +64,19 @@ export default [
     }
   },
   {
+    files: ["module/**/*.mjs", "spycraft2.mjs"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ReturnStatement > CallExpression[callee.object.property.name='notifications']",
+          message:
+            "A notification is truthy, so the caller reads this as done. Return refuse(…), refuseStep(…) or decline(…) from error-notices.mjs."
+        }
+      ]
+    }
+  },
+  {
     files: ["tools/**/*.mjs", "eslint.config.mjs"],
     languageOptions: { globals: { ...globals.node, ...globals.browser, ...foundryGlobals } },
     rules: { "no-global-assign": "off", "no-import-assign": "off" }

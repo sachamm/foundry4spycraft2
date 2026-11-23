@@ -3,6 +3,7 @@ import { unrestrictedBonusPools } from "../rules/bonus-pools.mjs";
 import { shakenRules } from "../rules/shaken.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { refuseStep } from "../error-notices.mjs";
 export function mixedHealingFundingControl(actor) {
   const esc = foundry.utils.escapeHTML,
     pools = [
@@ -40,7 +41,7 @@ export function healFromMultipleSources(actor, input, expectedShaken) {
     try {
       quote = mixedHealingQuote(actor, input, context());
     } catch (error) {
-      return ui.notifications.warn(error.message);
+      return refuseStep(error.message);
     }
     return actor.payMultipartActionDiceLocked(
       quote.allocations,

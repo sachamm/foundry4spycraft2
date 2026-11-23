@@ -43,11 +43,22 @@ export const SaveFeedback = Base =>
       });
     }
 
+    /**
+     * Resolves once every save already under way has ended, whether it succeeded or not. A button that rewrites a
+     * whole list waits for this, so that it builds on the text the user typed just before pressing it.
+     */
+    async whenSaved() {
+      while (this._saving?.size) await Promise.all([...this._saving]);
+    }
+
     async _processSubmitData(...args) {
       const revision = this._editRevision ?? 0;
       this._pendingSaves = (this._pendingSaves ?? 0) + 1;
       this._saveState = "saving";
       show(this);
+      let settle;
+      const saving = new Promise(resolve => (settle = resolve));
+      (this._saving ??= new Set()).add(saving);
       try {
         const result = await super._processSubmitData(...args);
         this._savedRevision = Math.max(this._savedRevision ?? -1, revision);
@@ -57,6 +68,8 @@ export const SaveFeedback = Base =>
         this._failedRevision = Math.max(this._failedRevision ?? -1, revision);
         throw error;
       } finally {
+        this._saving.delete(saving);
+        settle();
         this._pendingSaves--;
         this._saveState = this._pendingSaves
           ? "saving"

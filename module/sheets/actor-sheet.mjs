@@ -1,4 +1,4 @@
-import { refuse } from "../error-notices.mjs";
+import { refuse, refuseStep } from "../error-notices.mjs";
 import { placeSheet, rememberSheetPlacement } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
@@ -6,6 +6,7 @@ import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs"
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
+import { KeepPlace } from "./keep-place.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
 import { vehicleClass } from "../rules/vehicles.mjs";
 import {
@@ -187,7 +188,7 @@ function quickAttack(event, actor) {
   return false;
 }
 
-export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
+export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2))) {
   /** Career level whose skill points are being edited on the Skills tab. */
   _skillLevel = null;
 
@@ -975,6 +976,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     const context = await super._prepareContext(options);
     const actor = this.actor;
     const sys = actor.system;
+    // The status getter is not cached: it reads a setting, scans the combats and maps every limited-use ability.
+    // Read it once per render.
+    const uses = actor.limitedUseStatus ?? [];
     // A new or unfinished character (setup reminders open and play not yet begun) opens ready for building.
     this._editMode ??=
       this.isEditable &&
@@ -1222,8 +1226,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     // Classes & progression
     const classItems = byType("class");
     const classById = Object.fromEntries(classItems.map(c => [c.system.identifier || c.name, c]));
-    context.finalAttackRound = this.actor.limitedUseStatus?.find(s => s.id === "finalAttackRound");
-    context.dartingFinalAttack = this.actor.limitedUseStatus?.find(s => s.id === "dartingFinalAttack");
+    context.finalAttackRound = uses.find(s => s.id === "finalAttackRound");
+    context.dartingFinalAttack = uses.find(s => s.id === "dartingFinalAttack");
     context.canRecordVitality = this.actor.isOwner === true;
     context.progression = sys.progression.map((p, i) => {
       const ci = classById[p.classId];
@@ -1371,23 +1375,23 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     context.coreAbilities = sys.coreAbilities ?? [];
     context.criticalInjuryReviews = criticalInjuryReviews(this.actor);
     context.startedCharacterCombat = this.actor.participatingCombat?.started === true;
-    context.mobileOffense = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mobileOffense");
-    context.contempt = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contempt");
-    context.contemptRound = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contemptRound");
-    context.combatInstincts = (this.actor.limitedUseStatus ?? []).find(s => s.id === "combatInstincts");
-    context.cleaveBasics = (this.actor.limitedUseStatus ?? []).find(s => s.id === "cleaveBasics");
-    context.snapShot = (this.actor.limitedUseStatus ?? []).find(s => s.id === "snapShot");
-    context.opportunist = (this.actor.limitedUseStatus ?? []).find(s => s.id === "opportunist");
-    context.fortunate = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fortunate");
-    context.blackCat = (this.actor.limitedUseStatus ?? []).find(s => s.id === "blackCat");
-    context.berserker = (this.actor.limitedUseStatus ?? []).find(s => s.id === "berserkerRage");
-    context.gunslinger = (this.actor.limitedUseStatus ?? []).find(s => s.id === "gunslingersEye");
-    context.fireTeamSupremacy = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fireTeamSupremacy");
+    context.mobileOffense = uses.find(s => s.id === "mobileOffense");
+    context.contempt = uses.find(s => s.id === "contempt");
+    context.contemptRound = uses.find(s => s.id === "contemptRound");
+    context.combatInstincts = uses.find(s => s.id === "combatInstincts");
+    context.cleaveBasics = uses.find(s => s.id === "cleaveBasics");
+    context.snapShot = uses.find(s => s.id === "snapShot");
+    context.opportunist = uses.find(s => s.id === "opportunist");
+    context.fortunate = uses.find(s => s.id === "fortunate");
+    context.blackCat = uses.find(s => s.id === "blackCat");
+    context.berserker = uses.find(s => s.id === "berserkerRage");
+    context.gunslinger = uses.find(s => s.id === "gunslingersEye");
+    context.fireTeamSupremacy = uses.find(s => s.id === "fireTeamSupremacy");
     context.companions = this.actor.type === "agent" ? companionsContext(this.actor) : null;
     context.flawlessIdentity = this.actor.system.activeFeatNames?.includes("Flawless Identity") === true;
-    context.twoWeaponFinalAttack = (this.actor.limitedUseStatus ?? []).find(s => s.id === "twoWeaponFinalAttack");
-    context.jinxUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "jinx");
-    context.markUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mark");
+    context.twoWeaponFinalAttack = uses.find(s => s.id === "twoWeaponFinalAttack");
+    context.jinxUse = uses.find(s => s.id === "jinx");
+    context.markUse = uses.find(s => s.id === "mark");
     context.silverVictories = silverVictoryRows(this.actor);
     context.attributeDamageRows = Object.entries(sys.attributeDamageState?.byAbility ?? {})
       .filter(([_k, v]) => v.total > 0)
@@ -1397,10 +1401,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       r => r.kind === "missionEnd" && r.missionId === (this.actor.usagePeriods?.mission ?? "initial")
     );
     context.markObservations = markRows(this.actor.flags.spycraft2?.markObservations, cfg);
-    context.featFreeActions = (this.actor.limitedUseStatus ?? []).filter(spec =>
-      ["featFreeAction", "featFreeActionRound"].includes(spec.workflow)
-    );
-    context.limitedUses = (this.actor.limitedUseStatus ?? [])
+    context.featFreeActions = uses.filter(spec => ["featFreeAction", "featFreeActionRound"].includes(spec.workflow));
+    context.limitedUses = uses
       .filter(spec => !spec.hidden || spec.counterReview)
       .map(spec => ({ ...spec, control: classAbilityControl(spec.workflow) }));
     context.combatReviewNeeded = !!(
@@ -1655,9 +1657,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
         Math.min(0, this.actor.system.focusPicks.generic.unscopedRemaining)
       ) {
         this.render();
-        return ui.notifications.warn(
-          loc`Use each temporary Depth of Study source to spend its reserved focus/forte picks.`
-        );
+        return refuseStep(loc`Use each temporary Depth of Study source to spend its reserved focus/forte picks.`);
       }
     }
     const save = async () => {
@@ -1683,7 +1683,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
         !item.system.repeatable &&
         this.actor.items.some(i => i.type === "feat" && i.name.trim().toLowerCase() === item.name.trim().toLowerCase())
       ) {
-        return ui.notifications.warn(loc`${item.name} may only be selected once.`);
+        return refuseStep(loc`${item.name} may only be selected once.`);
       }
       const data = item.toObject?.() ?? foundry.utils.deepClone(item);
       delete data._id;
@@ -1829,8 +1829,10 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     }
     return this.actor.update({ [`system.focuses.${skill}`]: [...list] });
   }
-  static #onAddRow(event, target) {
+  static async #onAddRow(event, target) {
     const key = target.dataset.list;
+    // Leaving a field to press this button starts a save; build the new list on its result, not on the old rows.
+    await this.whenSaved();
     const row =
       key === "contacts"
         ? { name: "", rank: 1, notes: "" }
@@ -1839,8 +1841,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
           : { name: "", notes: "", complete: false };
     return this.actor.update({ [`system.${key}`]: [...(this.actor.system[key] ?? []).map(r => ({ ...r })), row] });
   }
-  static #onRemoveRow(event, target) {
+  static async #onRemoveRow(event, target) {
     const key = target.dataset.list;
+    await this.whenSaved();
     const rows = this.actor.system[key].map(r => ({ ...r }));
     rows.splice(Number(target.dataset.index), 1);
     return this.actor.update({ [`system.${key}`]: rows });
@@ -1863,7 +1866,7 @@ export function npcNeedsSetup(actor) {
   return !actor.system?.npcProfile?.enabled && !actor.flags?.spycraft2?.npcTemplate && !(actor.items?.size > 0);
 }
 
-export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
+export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2))) {
   /** A local view preference. Null until first render, when an NPC with nothing built yet opens in setup. */
   _editMode = null;
 
@@ -2213,16 +2216,18 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
       ]
     });
   }
-  static #onAddPick(event, target) {
+  static async #onAddPick(event, target) {
     if (!this.isEditable || !NPC_CATEGORIES.includes(target.dataset.category)) return;
+    await this.whenSaved();
     const equipment = structuredClone(this.actor.system.npcProfile.equipment);
     equipment[target.dataset.category].push(1);
     return this.actor.update({ "system.npcProfile.equipment": equipment });
   }
-  static #onRemoveRow(event, target) {
+  static async #onRemoveRow(event, target) {
     if (!this.isEditable) return;
     const { list, index, category } = target.dataset;
     if (!["skills", "qualities", "equipment"].includes(list)) return;
+    await this.whenSaved();
     const rows = structuredClone(this.actor.system.npcProfile[list]);
     const array = list === "equipment" ? rows[category] : rows;
     if (!Array.isArray(array)) return;

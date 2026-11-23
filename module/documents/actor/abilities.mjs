@@ -1,5 +1,5 @@
 /** Limited-use class and feat abilities, analysis tasks, temporary feats and assistants. */
-import { refuse } from "../../error-notices.mjs";
+import { refuse, refuseStep } from "../../error-notices.mjs";
 import { ruleName } from "../../rules/rule-name.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { useMark, discloseMark, correctMark } from "../../apps/mark.mjs";
@@ -466,7 +466,7 @@ export const ActorAbilities = Base =>
               allocations
             });
           } catch (error) {
-            return ui.notifications.warn(error.message);
+            return refuseStep(error.message);
           }
         }
         const split = Array.isArray(allocations) && allocations.length > 0;
@@ -475,12 +475,11 @@ export const ActorAbilities = Base =>
           : cost
             ? actionDiceFundingContext(this.actionDiceFundingSystem, { bonusPoolId, periods: this.usagePeriods })
             : { blocked: false, balance: 0 };
-        if (funding.blocked) return ui.notifications.warn(funding.reason);
+        if (funding.blocked) return refuseStep(funding.reason);
         const plans = specs.map(s => resourceUsePlan(s, this.system.resourceUses, this.usagePeriods, funding.balance));
         const blocked = plans.find(p => p.blocked);
-        if (blocked) return ui.notifications.warn(blocked.reason);
-        if (cost > funding.balance)
-          return ui.notifications.warn(loc`Not enough action dice remain for these abilities.`);
+        if (blocked) return refuseStep(blocked.reason);
+        if (cost > funding.balance) return refuseStep(loc`Not enough action dice remain for these abilities.`);
         const before = specs.map(s => structuredClone(this.system.resourceUses?.[s.id])),
           settlementBefore = JSON.stringify(getActionDieSettlementReview(this));
         let callbackStarted = false;

@@ -1,5 +1,5 @@
 /** Career levels, vitality, granted feats and prerequisite checks. */
-import { refuse } from "../../error-notices.mjs";
+import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollCareerVitality, reviewCareerVitality } from "../../apps/vitality.mjs";
 import { deferredSkillDeadline } from "../../rules/deferred-skills.mjs";
@@ -40,29 +40,27 @@ export const ActorProgression = Base =>
       if (this.type !== "agent") return;
       const sys = this.system;
       if (sys.skillPurchaseIssues?.length)
-        return ui.notifications.warn(
+        return refuseStep(
           loc`Repair invalid skill-purchase history before gaining a level: ${sys.skillPurchaseIssues.map(issue => issue.message).join("; ")}`
         );
       const deferred = deferredSkillDeadline(sys, [...this.items]);
       if (deferred.length)
-        return ui.notifications.warn(
+        return refuseStep(
           loc`Spend all deferred skill points before gaining another level (I Can Swim, p.200): ${deferred.join("; ")}.`
         );
-      if (sys.progression.length >= 20) return ui.notifications.warn(game.i18n.localize("SPYCRAFT.Class.MaxLevel"));
+      if (sys.progression.length >= 20) return refuseStep(game.i18n.localize("SPYCRAFT.Class.MaxLevel"));
       const ident = classData.system?.identifier || classData.name;
       let cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === ident);
       const definition = cls?.system ?? classData.system;
       const firstExpertLevel = definition.expert && !sys.classLevels?.[ident];
       if (firstExpertLevel && sys.level < 4)
-        return ui.notifications.warn(game.i18n.format("SPYCRAFT.Class.ExpertTooEarly", { name: classData.name }));
+        return refuseStep(game.i18n.format("SPYCRAFT.Class.ExpertTooEarly", { name: classData.name }));
       const expertEntry =
         firstExpertLevel && definition.requirements
           ? this.checkPrerequisites(definition.requirements, { classEntry: true })
           : null;
       if (expertEntry && !expertEntry.ok)
-        return ui.notifications.warn(
-          loc`Expert-class entry requirements are not met: ${expertEntry.unmet.join("; ")}.`
-        );
+        return refuseStep(loc`Expert-class entry requirements are not met: ${expertEntry.unmet.join("; ")}.`);
       if (!cls) {
         const data = classData.toObject?.() ?? foundry.utils.deepClone(classData);
         delete data._id;

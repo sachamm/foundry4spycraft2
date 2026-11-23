@@ -1,5 +1,5 @@
 /** What happens to a check after it is posted: boosts, confirmation, criticals, rerolls and resolution. */
-import { refuse } from "../../error-notices.mjs";
+import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { validateAttributeDamageProof } from "../../rules/attribute-damage.mjs";
 import { withJinxReservation } from "../../apps/jinx.mjs";
@@ -69,15 +69,14 @@ export const ActorOutcomes = Base =>
     /** Spend action dice on a recorded result, preserving the original roll and its cap. */
     boostCheck(message, options = {}) {
       const work = async () => {
-        if (!this.isOwner) return ui.notifications.warn(loc`You must own the actor spending action dice.`);
+        if (!this.isOwner) return refuseStep(loc`You must own the actor spending action dice.`);
         let check = message.flags?.spycraft2;
-        if (!check || check.actorUuid !== this.uuid)
-          return ui.notifications.warn(loc`Choose a recorded roll made by this actor.`);
-        if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+        if (!check || check.actorUuid !== this.uuid) return refuseStep(loc`Choose a recorded roll made by this actor.`);
+        if (message.blind && !game.user?.isGM) return refuseStep(loc`The GC resolves secret results.`);
         const expected = rollEvidence(check);
         const currentShaken = shakenRules(this.actionDiceFundingSystem);
         if (currentShaken.needsReview || currentShaken.spendingForbidden)
-          return ui.notifications.warn(
+          return refuseStep(
             currentShaken.needsReview
               ? loc`Review the current Shaken sources before boosting.`
               : loc`Shaken IV: no action dice may be spent at all (p.342).`
@@ -131,7 +130,7 @@ export const ActorOutcomes = Base =>
               periods: this.usagePeriods
             })
           : actionDieBoostPlan(this.system, check, { ...input, count: Number(input.count ?? 1) });
-        if (plan.blocked) return ui.notifications.warn(plan.reason);
+        if (plan.blocked) return refuseStep(plan.reason);
         input = { ...input, ...surchargeFundingInput(input) };
         const boostQuote =
           currentShaken.extraDice || input.surchargeAllocations !== undefined
@@ -329,9 +328,7 @@ export const ActorOutcomes = Base =>
       }
       const work = async () => {
         if (rollEvidence(message.flags.spycraft2) !== expected)
-          return ui.notifications.warn(
-            loc`This result changed while Generous was being prepared. Review the current result.`
-          );
+          return refuseStep(loc`This result changed while Generous was being prepared. Review the current result.`);
         if (
           JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken ||
           paidBoostSurcharge(this, message) !== expectedPaid
@@ -344,7 +341,7 @@ export const ActorOutcomes = Base =>
             surchargeBonusPoolId: input.surchargeBonusPoolId ?? ""
           });
         } catch (error) {
-          return ui.notifications.warn(error.message);
+          return refuseStep(error.message);
         }
         let recipientPayment = null,
           donorCallbackStarted = false;
@@ -353,9 +350,9 @@ export const ActorOutcomes = Base =>
             bonusPoolId,
             periods: donor.usagePeriods
           });
-        if (funding.blocked) return ui.notifications.warn(funding.reason);
+        if (funding.blocked) return refuseStep(funding.reason);
         const plan = generousBoostPlan(funding.system, check, { ...input, sameActor: donor.uuid === this.uuid });
-        if (plan.blocked) return ui.notifications.warn(plan.reason);
+        if (plan.blocked) return refuseStep(plan.reason);
         const donate = async () => {
           const donated = await donor.payActionDiceLocked(
             1,
@@ -577,29 +574,21 @@ export const ActorOutcomes = Base =>
       }
       const work = async () => {
         const check = message.flags?.spycraft2;
-        if (!Number.isFinite(check?.rawTotal)) return ui.notifications.warn(loc`Choose a recorded check result.`);
+        if (!Number.isFinite(check?.rawTotal)) return refuseStep(loc`Choose a recorded check result.`);
         if (check.resolved || check.superseded)
-          return ui.notifications.warn(loc`This check has already been resolved or replaced.`);
+          return refuseStep(loc`This check has already been resolved or replaced.`);
         if (rollEvidence(check) !== expected)
-          return ui.notifications.warn(
-            loc`This roll changed while its outcome was being confirmed. Review the current result.`
-          );
+          return refuseStep(loc`This roll changed while its outcome was being confirmed. Review the current result.`);
         if (check.takedown && succeeded !== check.effectiveTotal >= check.takedown.dc)
-          return ui.notifications.warn(
-            loc`The confirmed takedown outcome must match its final result and fixed Fortitude DC.`
-          );
+          return refuseStep(loc`The confirmed takedown outcome must match its final result and fixed Fortitude DC.`);
         validateDamageSaveRoll(this, check.damageSave, check.checkKind, check.checkId);
         if (
           check.analysisTask?.stage === "pressure" &&
           succeeded !== check.effectiveTotal >= check.analysisTask.challengeDC
         )
-          return ui.notifications.warn(
-            loc`The pressure outcome must match its final result and recorded Challenge DC.`
-          );
+          return refuseStep(loc`The pressure outcome must match its final result and recorded Challenge DC.`);
         if (check.damageSave && succeeded !== check.effectiveTotal >= check.damageSave.dc)
-          return ui.notifications.warn(
-            loc`The confirmed outcome must match this damage save’s final result and recorded DC.`
-          );
+          return refuseStep(loc`The confirmed outcome must match this damage save’s final result and recorded DC.`);
         let next = {
           ...check,
           ...adjudicateCheck(check, succeeded),
@@ -783,18 +772,18 @@ export const ActorOutcomes = Base =>
       const expectedShaken = useGC ? null : JSON.stringify(shakenRules(payer.actionDiceFundingSystem));
       const work = async () => {
         if (getActionDieSettlementReview(this).needsReview)
-          return ui.notifications.warn(
+          return refuseStep(
             loc`Review this character’s interrupted action-die settlement before activating another critical result.`
           );
         if (rollEvidence(message.flags.spycraft2) !== expected)
-          return ui.notifications.warn(
+          return refuseStep(
             loc`This result changed while its critical activation was being prepared. Review the current result.`
           );
         if (useGC) await refreshGCDiceTransaction(controller);
         const check = message.flags.spycraft2,
           base = { ...input, baseCost: Number(input.baseCost ?? 1), samePayer: !useGC && payer.uuid === this.uuid };
         let plan = criticalPlan(this.system, check, { ...base, available: Number.MAX_SAFE_INTEGER });
-        if (plan.blocked) return ui.notifications.warn(plan.reason);
+        if (plan.blocked) return refuseStep(plan.reason);
         const jinxOptions = {
           jinx: input.jinx ?? false,
           payerUuid: useGC ? "GC" : payer.uuid,
@@ -815,13 +804,13 @@ export const ActorOutcomes = Base =>
           const funding = useGC
             ? { blocked: false, balance: gcDiceStatus().value }
             : actionDiceFundingContext(payer.actionDiceFundingSystem, { bonusPoolId, periods: payer.usagePeriods });
-          if (funding.blocked) return ui.notifications.warn(funding.reason);
+          if (funding.blocked) return refuseStep(funding.reason);
           if (plan.jinx) {
             if (plan.cost > funding.balance)
-              return ui.notifications.warn(loc`Not enough action dice remain in the paying character’s pool.`);
+              return refuseStep(loc`Not enough action dice remain in the paying character’s pool.`);
           } else {
             plan = criticalPlan(this.system, check, { ...base, available: funding.balance });
-            if (plan.blocked) return ui.notifications.warn(plan.reason);
+            if (plan.blocked) return refuseStep(plan.reason);
           }
         }
         const paymentReceiptId =
@@ -1050,17 +1039,15 @@ export const ActorOutcomes = Base =>
         async () => {
           const current = message.flags.spycraft2;
           if (current.resolved || current.superseded)
-            return ui.notifications.warn(loc`This result is already resolved or replaced.`);
+            return refuseStep(loc`This result is already resolved or replaced.`);
           if (rollEvidence(current) !== expected)
-            return ui.notifications.warn(
-              loc`This roll changed before resolution. Review and confirm its current result.`
-            );
+            return refuseStep(loc`This roll changed before resolution. Review and confirm its current result.`);
           if (
             current.requiredBonusPoolId &&
             bonusPoolForCheck(this.system, current.requiredBonusPoolId, message, { periods: this.usagePeriods })
               .available
           )
-            return ui.notifications.warn(loc`Spend the required class bonus die before resolving this check.`);
+            return refuseStep(loc`Spend the required class bonus die before resolving this check.`);
           const luck = betterLuckSettlement(this.system, current, { periods: this.usagePeriods });
           const result = await message.update({
             "flags.spycraft2.resolved": true,

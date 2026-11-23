@@ -2,6 +2,7 @@ import { COMBAT_STANCES, stanceDamagePlan } from "../rules/combat-stance.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { loc } from "../i18n.mjs";
+import { decline } from "../error-notices.mjs";
 const jobs = new Map(),
   stable = v =>
     JSON.stringify(v, (_k, x) =>
@@ -339,7 +340,7 @@ export async function manageStanceDamage(actor, input = {}, options = {}) {
       ),
       esc = foundry.utils.escapeHTML;
     if (!eligible.length && !pending.length)
-      return ui.notifications.info(loc`No resolved stance hit or interrupted component is available.`);
+      return decline(loc`No resolved stance hit or interrupted component is available.`);
     const title = options.expectedKey ? COMBAT_STANCES[options.expectedKey].name + " damage" : loc`Stance damage`;
     input = await foundry.applications.api.DialogV2.input({
       window: { title },

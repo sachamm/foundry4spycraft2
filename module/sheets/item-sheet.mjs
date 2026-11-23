@@ -1,5 +1,6 @@
 import { ruleName } from "../rules/rule-name.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
+import { KeepPlace } from "./keep-place.mjs";
 import { enrich } from "./enrich.mjs";
 import { CANDIDATE_CHOICES, candidatePlan } from "../rules/candidate.mjs";
 import { reviewCandidate } from "../apps/candidate.mjs";
@@ -37,7 +38,7 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
 const TPL = "systems/spycraft2/templates/item";
 
-export class SpycraftItemSheet extends HandlebarsApplicationMixin(SaveFeedback(ItemSheetV2)) {
+export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(SaveFeedback(ItemSheetV2))) {
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "item"],
     position: { width: 560, height: 640 },

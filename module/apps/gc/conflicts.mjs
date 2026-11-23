@@ -1,6 +1,6 @@
 /** Dramatic Conflict tracker (pp.363–388): the GC runs each Conflict round through a short series of dialogs. */
 import { esc } from "../../html.mjs";
-import { refuse } from "../../error-notices.mjs";
+import { refuse, decline } from "../../error-notices.mjs";
 import {
   CONFLICT_TYPES,
   startConflict,
@@ -368,7 +368,7 @@ export async function advanceConflict(id) {
       );
       return next;
     }
-    return ui.notifications.info(loc`This conflict is over. Remove it when you no longer need the record.`);
+    return decline(loc`This conflict is over. Remove it when you no longer need the record.`);
   } catch (error) {
     return refuse(error.message);
   }
