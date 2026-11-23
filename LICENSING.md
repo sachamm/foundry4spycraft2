@@ -38,14 +38,108 @@ No adaptation or redistribution grant has yet been established for that import;
 crediting the spreadsheet author does not establish rights in the underlying
 published game or in all imported material.
 
-The project owner reports a rulebook showing 2005 and a PDF filename containing
-"second printing." Its exact legal notices and Open Game Content/Product
-Identity designations still require verification. No OGL license or publisher
-permission is asserted by this document.
-
 The repository's requirements for original summaries remain in
 [AGENTS.md](AGENTS.md). Those requirements and the presence of page references
 are not a substitute for establishing the rights in imported material.
+
+## The rulebook's Open Game License notices
+
+The notices below were checked on 23 November 2026 against the legal page of
+the *Spycraft 2.0 Rulebook*, second printing (page 468; produced by Flaming
+Cobra, an imprint of Mongoose Publishing). They record what the book says. They
+do not by themselves license anything in this repository.
+
+**Licence.** The book is published under the Open Game License version 1.0a
+(OGL), copyright 2000 Wizards of the Coast, Inc. It also states that this
+printing used the draft d20 System Trademark License; this project does not use
+the d20 System trademark or logo.
+
+**Copyright.** The book states that all of its contents, whatever their
+designation, are copyright 2005 Alderac Entertainment Group, Inc. (AEG), and it
+names AEG as the contributor of its Open Game Content. The README's statement
+that Spycraft is now a trademark of Crafty Games reflects the later transfer of
+the line and has not been checked against a trademark register.
+
+**Open Game Content.** Subject to the Product Identity designation, the book
+designates all of its portions as Open Game Content, and states AEG's intent to
+open its classes, skills, feats, gear and NPC statistics. Content that comes
+from the System Reference Document is copyright 1999, 2000 Wizards of the
+Coast, Inc. For the rest, the book asks reusers to carry the notice
+"Spycraft Copyright 2005, Alderac Entertainment Group." and to credit the
+*Spycraft 2.0 Rulebook* as the source.
+
+**Product Identity.** Under OGL section 1(e), the book reserves as Product
+Identity (in summary): Spycraft logos, identifying marks and trade dress; all
+Spycraft product and product line names, including the supplements, season
+books, decade books and website support material; all elements of any Spycraft
+setting, such as capitalized names, organization, faction, project and code
+names, characters, gadgets, historic events and organizations; all stories,
+plots, thematic elements, in-world documents, quotes and dialogue; and all
+artwork, symbols, designs, maps and likenesses. Elements already in the d20
+System Reference Document are excepted. Product Identity is not Open Game
+Content.
+
+**Section 15.** The book's COPYRIGHT NOTICE (section 15) reads, exactly as
+printed:
+
+> Open Game License v1.0a Copyright 2000, Wizards of the Coast, Inc. System
+> Rules Document Copyright 2000, Wizards of the Coast, Inc.; Authors Jonathan
+> Tweet, Monte Cook, Skip Williams, based on original material by E. Gary Gygax
+> and Dave Arneson. Star Wars roleplaying game Copyright 2000, Wizards of the
+> Coast and Lucasfilm Ltd.; Authors Andy Collins, Bill Slavicsek, JD Wiker.
+> Spycraft Espionage Handbook Copyright 2002, Alderac Entertainment Group, Inc.;
+> Authors Patrick Kapera and Kevin Wilson. Spycraft 1960s Decade Book Copyright
+> 2003, Alderac Entertainment Group, Inc.; Authors Robert J. Defendi, B.D.
+> Flory, Scott Gearin, Clayton A. Oliver. Spycraft Agency Copyright 2004,
+> Alderac Entertainment Group, Inc.; Authors Steve Crow, Alexander Flagg, B.D.
+> Flory, Clayton A. Oliver, Steven Peterson. Spycraft Battlegrounds Copyright
+> 2005, Alderac Entertainment Group, Inc.; Authors Andy C. Davis, Alexander
+> Flagg, Clayton A. Oliver, Jason Olsan, Patrick Parrish. Spycraft Mastermind
+> Guide Copyright 2004, Alderac Entertainment Group, Inc.; Authors Steve Crow,
+> Alexander Flagg, B.D. Flory, Clayton A. Oliver. Spycraft U.S. Militaries Guide
+> Copyright 2004, Alderac Entertainment Group, Inc.; Authors Dave McAlister,
+> Clayton A. Oliver, Patrick Kapera. Spycraft World Militaries Guide Copyright
+> 2004, Alderac Entertainment Group, Inc.; Authors Dave McAlister, Clayton A.
+> Oliver, Patrick Kapera. Spycraft Modern Arms Guide Copyright 2002, Alderac
+> Entertainment Group, Inc.; Authors Chad Brunner, Tim D'Allaird, Rob Dake,
+> Michael Fish, Scott Gearin, Owen Hershey, Patrick Kapera, Michael Petrovich,
+> Jim Wardrip, Stephen Wilcoxon. Spycraft Faceman/Snoop Class Guide Copyright
+> 2003, Alderac Entertainment Group, Inc.; Authors Alexander Flagg, Clayton A.
+> Oliver. Spycraft Fixer/Pointman Class Guide Copyright 2003, Alderac
+> Entertainment Group, Inc.; Authors Scott Gearin. Spycraft Soldier/Wheelman
+> Class Guide Copyright 2003, Alderac Entertainment Group, Inc.; Authors Chad
+> Brunner, Shawn Carman, B.D. Flory, Scott Gearin, Patrick Kapera.
+
+The printed list does not include an entry for the *Spycraft 2.0 Rulebook*
+itself. A work that reuses the book's Open Game Content would add one, using
+the notice the book requests.
+
+## This project's position under the OGL
+
+This project does not currently distribute anything under the OGL. No OGL text,
+section 15 notice or Open Game Content designation is applied to the
+repository, and no publisher permission is asserted. The game data instead
+records names, numbers and table values as bare labels with original summaries,
+as [AGENTS.md](AGENTS.md) requires.
+
+Adopting the OGL for the rules data would require, at a minimum:
+
+1. A copy of the OGL 1.0a with every distributed copy (section 10), in
+   `LICENSES/` and therefore in each release archive.
+2. A section 15 that reproduces the book's list above exactly, then adds the
+   book's own notice and this project's title, date and copyright holder
+   (section 6).
+3. A clear statement of which files are Open Game Content (section 8), for
+   example the mechanical data in `src/data/` and the compendium packs built
+   from it.
+4. Removing or replacing any Product Identity (section 7), and not indicating
+   compatibility with any Trademark, including the Spycraft name, without a
+   separate agreement with its owner.
+
+Item 4 conflicts with the system's current title, "Spycraft 2.0", and with the
+README and manifest that describe it as a Spycraft system. Using the OGL
+therefore means either renaming the system or obtaining a separate trademark
+agreement, which is why it has not been applied here.
 
 ## Artwork and sample content
 
