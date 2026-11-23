@@ -5,6 +5,7 @@ import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, finalWeaponReady, postFinalAttack } from "./final-attack.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 const targetData = t => ({ uuid: t.uuid, type: t.type, npcType: t.system.npcType });
 export async function takeContempt(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
@@ -27,10 +28,30 @@ export async function takeContempt(actor, options = {}) {
         .filter(i => i.type === "weapon")
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Contempt final attack` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Once per round, make one free final Standard Attack against a standard character. Your per-combat allowance equals your starting action-die count, including character options; this does not spend your dice. A new round does not refill the combat allowance. Special NPCs and player characters cannot qualify; the GC confirms an animal is standard.`}</p><label>${loc`Actual standard target`} <select name="targetUuid"><option value="">${loc`Choose target`}</option>${targets}</select></label><label>${loc`Your readied weapon`} <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="targetStandardConfirmed" type="checkbox" /> ${loc`The GC confirms this actual target is a standard character (including a standard animal)`}</label><label><input name="attackLegalConfirmed" type="checkbox" /> ${loc`This is a legal final Standard Attack against that target now; action/position/target requirements are satisfied`}</label><p>${loc`Set Single-Shot mode first. No adjustments or other action combinations. For combined class declarations, use their normal controls and ask the GC to record the use in both round and combat counters.`}</p></div>`
+    input = await formDialog({
+      title: loc`Contempt final attack`,
+      intro: loc`Once per round, make one free final Standard Attack against a standard character. Your per-combat allowance equals your starting action-die count, including character options; this does not spend your dice. A new round does not refill the combat allowance. Special NPCs and player characters cannot qualify; the GC confirms an animal is standard.`,
+      fields: [
+        {
+          select: "targetUuid",
+          label: loc`Actual standard target`,
+          options: [["", loc`Choose target`]],
+          optionsHtml: raw(targets)
+        },
+        { select: "weaponId", label: loc`Your readied weapon`, optionsHtml: raw(weapons) },
+        raw(standardAttackContextContent(actor, { includeCharacterTarget: false })),
+        {
+          check: "targetStandardConfirmed",
+          label: loc`The GC confirms this actual target is a standard character (including a standard animal)`
+        },
+        {
+          check: "attackLegalConfirmed",
+          label: loc`This is a legal final Standard Attack against that target now; action/position/target requirements are satisfied`
+        },
+        {
+          note: loc`Set Single-Shot mode first. No adjustments or other action combinations. For combined class declarations, use their normal controls and ask the GC to record the use in both round and combat counters.`
+        }
+      ]
     });
     if (!input) return null;
   }

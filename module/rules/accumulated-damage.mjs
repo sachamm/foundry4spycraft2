@@ -1,6 +1,7 @@
 import { subdualDefensePlan } from "./subdual-defense.mjs";
 import { stressDefensePlan } from "./stress-defense.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "./equal.mjs";
 const bands = [
   { tier: 1, dc: 12, stress: "Shaken I", knockout: "1 round" },
   { tier: 2, dc: 16, stress: "Shaken II", knockout: "1 minute" },
@@ -55,7 +56,6 @@ export function accumulatedDamagePlan(
   };
 }
 
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const whole = n => Number.isSafeInteger(n) && n >= 0;
 const eventId = id =>
   typeof id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(id) && !["constructor", "prototype", "__proto__"].includes(id);

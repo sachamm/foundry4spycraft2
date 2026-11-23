@@ -1,5 +1,5 @@
 /** Brawling Supremacy’s final attack, offered on the second unarmed hit on one opponent in a round. */
-import { postFinalAttack, finalAttackOptions } from "./final-attack.mjs";
+import { finalAttackOptions, limitedFinalAttack } from "./final-attack.mjs";
 import { brawlingFinalEligible, brawlingFinalPlan } from "../rules/brawling-supremacy.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
@@ -15,23 +15,14 @@ export async function takeBrawlingFinal(actor, check) {
     plan = () => brawlingFinalPlan(actor.system, expertiseCombatContext(actor), check),
     original = plan(),
     receipt = { ...original, weaponId: item.id, weaponUuid: item.uuid, id: foundry.utils.randomID() };
-  return actor.useLimitedAbility(
-    "brawlingSupremacy",
-    async status => {
-      const validate = () => {
-        const counter = actor.system.resourceUses?.brawlingSupremacy;
-        if (
-          JSON.stringify(plan()) !== JSON.stringify(original) ||
-          !brawlingFinalEligible(actor.system, check, posted()) ||
-          counter?.epoch !== status.epoch ||
-          counter.used !== status.used + 1
-        )
-          throw new Error(loc`The round or the earlier hits changed. Review them again.`);
-      };
-      return postFinalAttack(actor, item.id, { ...opts, targetActorUuid: original.targetUuid }, receipt, validate);
-    },
-    { workflow: "brawlingSupremacy" }
-  );
+  return limitedFinalAttack(actor, "brawlingSupremacy", {
+    weaponId: item.id,
+    options: { ...opts, targetActorUuid: original.targetUuid },
+    receipt,
+    changed: () =>
+      JSON.stringify(plan()) !== JSON.stringify(original) || !brawlingFinalEligible(actor.system, check, posted()),
+    changedMessage: loc`The round or the earlier hits changed. Review them again.`
+  });
 }
 
 rollPipeline.register({

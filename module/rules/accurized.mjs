@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Accurized (ACC), p.301. Actual training and a currently valid aimed attack
  * are established by the enclosing weapon/action controller, not by feat names.
  */
@@ -14,16 +15,6 @@ export function accurizedAttackPlan(weapon, { trained = false, aimed = false } =
     );
   return { version: 1, accurized, trained, aimed, threatIncrease: accurized && trained && aimed ? 1 : 0 };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateAccurizedProof(weapon, proof, { checkKind, trained = false, aimed = false } = {}) {
   if (!proof) return;
   if (checkKind !== "attack" || stable(accurizedAttackPlan(weapon, { trained, aimed })) !== stable(proof))

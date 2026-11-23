@@ -11,6 +11,7 @@ import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, postFinalAttack, finalWeaponReady } from "./final-attack.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   stable = v =>
@@ -231,10 +232,7 @@ export async function takeTripFinalAttack(actor, input = {}) {
       const lease = {};
       leases.set(lease, { actor, id: proof.id });
       active.add(proof.id);
-      const posted = () =>
-        [...game.messages].find(
-          m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.finalAttack?.id === proof.id
-        );
+      const posted = () => postedReceipt(actor, "finalAttack", proof.id);
       try {
         await row.acting.update({ "flags.spycraft2.tripFinalUse": { id: proof.id, state: "reserved", proof } });
         const validate = () =>

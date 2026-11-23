@@ -50,6 +50,7 @@ import { rerollEligibility } from "../../rules/limited-uses.mjs";
 import { betterLuckSettlement, betterLuckNote } from "../../rules/better-luck.mjs";
 import { actionDieBoostPlan, actionDieBoostResult, generousBoostPlan } from "../../rules/action-dice.mjs";
 import { loc } from "../../i18n.mjs";
+import { same } from "../../rules/equal.mjs";
 
 /** The ready-made attack effects for the critical activation dialog: Table 5.4 for errors, p.329 for threats. */
 function criticalPresetContent(check) {
@@ -893,7 +894,6 @@ export const ActorOutcomes = Base =>
               die: gain?.die ?? null,
               session: String(this.usagePeriods.session ?? "initial")
             },
-            same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
             currentCredit = () => this.flags?.spycraft2?.hardKnocksCredit;
           let restoreWeapon,
             gained = false,
@@ -1210,7 +1210,6 @@ export const ActorOutcomes = Base =>
             previous = structuredClone(this.flags?.spycraft2?.hintCredit),
             before = this.system.actionDice.value,
             receipt = { id, source: input.source, outcome: current.outcome, units: current.units, die: current.die },
-            same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
             credit = () => this.flags?.spycraft2?.hintCredit;
           let credited = false,
             attempted = false;

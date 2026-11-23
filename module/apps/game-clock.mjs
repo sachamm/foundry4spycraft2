@@ -36,7 +36,7 @@ import {
   validTimers
 } from "../rules/timers.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 
 const pad = n => String(n).padStart(2, "0");
 const now = () => Math.max(0, Math.floor(Number(game.time?.worldTime) || 0));
@@ -706,7 +706,7 @@ export function installGameClock() {
     onChange: refreshClock
   });
   game.settings.register("spycraft2", "advanceClockInCombat", {
-    name: loc`Advance the clock each combat round`,
+    name: locKey`Advance the clock each combat round`,
     hint: loc`Each combat round adds ${ROUND_SECONDS} seconds to the game clock, so timers, onset times and timed conditions keep pace with the fight. Going back a round takes the time off again.`,
     scope: "world",
     config: true,
@@ -717,8 +717,8 @@ export function installGameClock() {
     }
   });
   game.settings.register("spycraft2", "clockVisibleToPlayers", {
-    name: loc`Show the clock to players`,
-    hint: loc`When off, players still set timers and see the time each has left, but not the time of day.`,
+    name: locKey`Show the clock to players`,
+    hint: locKey`When off, players still set timers and see the time each has left, but not the time of day.`,
     scope: "world",
     config: true,
     type: Boolean,

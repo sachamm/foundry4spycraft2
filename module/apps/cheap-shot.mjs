@@ -4,25 +4,49 @@ import { standardAttackContextContent, standardAttackContextInput } from "./stan
 import { completeCharacterTarget, attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 export async function rollCheapShot(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
     const esc = foundry.utils.escapeHTML;
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Cheap Shot Standard Attack` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Choose the opponent and attribute or Speed before this Standard Attack. Cheap Shot costs a free action, attack−4 and error+1. Flail Basics grants+2gear on a melee check while a reviewed readied flail is held.`}</p><label>${loc`Readied weapon`} <select name="weaponId">${actor.items
-        .filter(i => i.type === "weapon" && i.system.equipped === true)
-        .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
-        .join(
-          ""
-        )}</select></label><label>${loc`Actual opponent`} <select name="cheapShotTargetUuid"><option value="">${loc`Choose opponent`}</option>${attackCharacterTargetChoices()
-        .filter(a => a.uuid !== actor.uuid)
-        .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
-        .join(
-          ""
-        )}</select></label><label>${loc`Chosen weakness`} <select name="cheapShotChoice">${CHEAP_SHOT_CHOICES.map(k => `<option value="${k}">${k.toUpperCase()}</option>`).join("")}</select></label>${standardAttackContextContent(actor, { includeCheapShot: false, includeCharacterTarget: false })}<label><input name="eligibleConfirmed" type="checkbox" /> ${loc`The target has suffered no successful Cheap Shot this scene`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this legal Standard Attack, range/line of sight, free action and ammunition costs`}</label></div>`
+    input = await formDialog({
+      title: loc`Cheap Shot Standard Attack`,
+      intro: loc`Choose the opponent and attribute or Speed before this Standard Attack. Cheap Shot costs a free action, attack−4 and error+1. Flail Basics grants+2gear on a melee check while a reviewed readied flail is held.`,
+      fields: [
+        {
+          select: "weaponId",
+          label: loc`Readied weapon`,
+          optionsHtml: raw(
+            actor.items
+              .filter(i => i.type === "weapon" && i.system.equipped === true)
+              .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
+              .join("")
+          )
+        },
+        {
+          select: "cheapShotTargetUuid",
+          label: loc`Actual opponent`,
+          options: [["", loc`Choose opponent`]],
+          optionsHtml: raw(
+            attackCharacterTargetChoices()
+              .filter(a => a.uuid !== actor.uuid)
+              .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
+              .join("")
+          )
+        },
+        {
+          select: "cheapShotChoice",
+          label: loc`Chosen weakness`,
+          optionsHtml: raw(CHEAP_SHOT_CHOICES.map(k => `<option value="${k}">${k.toUpperCase()}</option>`).join(""))
+        },
+        raw(standardAttackContextContent(actor, { includeCheapShot: false, includeCharacterTarget: false })),
+        { check: "eligibleConfirmed", label: loc`The target has suffered no successful Cheap Shot this scene` },
+        {
+          check: "confirmed",
+          label: loc`The GC confirms this legal Standard Attack, range/line of sight, free action and ammunition costs`
+        }
+      ]
     });
     if (!input) return null;
   }

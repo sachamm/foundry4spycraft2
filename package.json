@@ -5,6 +5,7 @@
   "description": "Spycraft 2.0 game system for Foundry VTT",
   "scripts": {
     "build": "node tools/build-packs.mjs",
+    "bundle": "node tools/bundle.mjs",
     "test": "npm run validate && node tools/check-engine-fixtures.mjs && node --test \"tools/test-*.mjs\"",
     "test:packs": "node --test tools/check-built-packs.mjs tools/check-sample-scenes-pack.mjs tools/check-npc-library-pack.mjs tools/check-sample-agents-pack.mjs tools/check-glass-wake-pack.mjs",
     "test:layout": "playwright test --config tools/playwright.config.mjs",
@@ -21,6 +22,7 @@
     "@eslint/js": "9.39.5",
     "@playwright/test": "1.58.2",
     "classic-level": "^1.4.1",
+    "esbuild": "0.28.2",
     "eslint": "9.39.5",
     "globals": "17.14.0",
     "handlebars": "4.7.8",

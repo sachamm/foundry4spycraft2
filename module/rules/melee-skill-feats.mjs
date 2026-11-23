@@ -1,6 +1,7 @@
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Readied melee feat skill benefits, pp.176,179–180. Other benefits remain separate. */
 const definitions = [
   { name: "Axe Basics", family: "axe", scopes: ["trip"], bonus: 1 },
@@ -50,16 +51,6 @@ export function meleeSkillFeatPlan(system, key, check) {
     )
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateMeleeSkillFeatProof(system, proof, { checkKind, skillKey, checkId } = {}) {
   if (!proof) return;
   const p = meleeSkillFeatPlan(system, skillKey, { id: checkId });

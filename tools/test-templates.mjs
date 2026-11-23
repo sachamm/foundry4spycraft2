@@ -3,9 +3,10 @@
  * path that points nowhere, a helper nobody registers, and a helper that throws on the values a sheet can pass.
  */
 import test from "node:test";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import assert from "node:assert/strict";
+import { registeredActions } from "./lib/sheet-actions.mjs";
 import {
   BUILTIN_HELPERS,
   createEnvironment,
@@ -114,16 +115,35 @@ test("sheet, catalog and console templates author buttons, not action links, and
 
 test("every class-ability control runs a sheet action and shows an English string", async () => {
   const { CLASS_ABILITY_CONTROLS, classAbilityControl } = await import("../module/sheets/class-ability-controls.mjs");
-  const sheet = readFileSync(join(ROOT, "module/sheets/actor-sheet.mjs"), "utf8");
+  const actions = registeredActions(join(ROOT, "module/sheets"));
   const english = JSON.parse(readFileSync(join(ROOT, "lang/en.json"), "utf8"));
   const lookup = key => key.split(".").reduce((node, part) => node?.[part], english);
   const controls = [...Object.values(CLASS_ABILITY_CONTROLS), classAbilityControl("unknown")];
   assert.ok(controls.length > 30);
   for (const control of controls) {
-    if (control.action) assert.match(sheet, new RegExp(`\\b${control.action}[:(]`), control.action);
+    if (control.action) assert.ok(actions.has(control.action), control.action);
     for (const key of [control.label, control.text, control.playerText].filter(Boolean))
       assert.equal(typeof lookup(key), "string", key);
     assert.ok(control.action || control.text, JSON.stringify(control));
   }
   assert.equal(classAbilityControl(undefined), classAbilityControl("unknown"));
+});
+
+test("every action a template names is registered by a sheet or an application", () => {
+  const registered = registeredActions(join(ROOT, "module/sheets"), join(ROOT, "module/apps"));
+  // Actions Foundry's own document sheets provide.
+  const core = new Set(["editImage"]);
+  const templates = readdirSync(join(ROOT, "templates"), { recursive: true }).filter(file => file.endsWith(".hbs"));
+  assert.ok(templates.length > 30);
+  const missing = [];
+  let seen = 0;
+  for (const file of templates)
+    for (const [, action] of readFileSync(join(ROOT, "templates", file), "utf8").matchAll(
+      /data-action="([A-Za-z]\w*)"/g
+    )) {
+      seen += 1;
+      if (!registered.has(action) && !core.has(action)) missing.push(`${file}: ${action}`);
+    }
+  assert.ok(seen > 400, `only ${seen} template actions found`);
+  assert.deepEqual(missing, [], "A button names an action no sheet or application registers.");
 });

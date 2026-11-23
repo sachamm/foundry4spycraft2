@@ -1,5 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Brawler Ploy: Still Standing, p.66. Actual derived class selection, not a feat name. */
 export function stillStandingSource(system) {
   const level = system?.classLevels?.brawler ?? 0;
@@ -49,16 +50,6 @@ export function stillStandingTakedownPlan(
     bonus: source ? 8 : 0
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateStillStandingResistanceProof(system, proof, response) {
   if (!proof) return;
   if (stable(stillStandingResistancePlan(system, response)) !== stable(proof))

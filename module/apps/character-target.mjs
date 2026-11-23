@@ -1,6 +1,7 @@
 import { characterTargetPlan, characterTargetsEqual } from "../rules/character-target.mjs";
 import { finesseMeleeWeapon } from "../rules/finesse.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw as rawHtml } from "./dialog-kit.mjs";
 const canRead = a =>
   !!a &&
   (a.isOwner === true ||
@@ -85,10 +86,9 @@ export async function completeCharacterTarget(
   } catch (error) {
     if (error.code !== "NEED_CHARACTER_TARGET" || !prompt) throw error;
   }
-  const answer = await foundry.applications.api.DialogV2.input({
-    window: { title: loc`Cleave character target` },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${characterTargetContent(actor, raw, { fixedTargetUuid, fixedTargetName })}</div>`
+  const answer = await formDialog({
+    title: loc`Cleave character target`,
+    fields: [rawHtml(characterTargetContent(actor, raw, { fixedTargetUuid, fixedTargetName }))]
   });
   if (!answer) return null;
   raw = { ...raw, ...answer };

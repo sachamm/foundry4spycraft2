@@ -5,6 +5,7 @@ import { tauntOutcome, underminePlan } from "../rules/taunt.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 const say = (actor, text) => ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: esc(text) });
 
@@ -61,14 +62,20 @@ export async function settleTaunt(message) {
   if (!actor || !target) return refuse(loc`Both Taunt participants must still exist.`);
   const paired = pairedResponse(message, check),
     venomous = actor.system.activeFeatNames?.includes("Venomous Dialogue");
-  const input = await foundry.applications.api.DialogV2.input({
-    window: { title: loc`Settle the Taunt` },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${
-      paired
-        ? `<p>${loc`Paired with ${esc(target.name)}’s Resist Taunt: ${check.effectiveTotal} against ${paired.f.effectiveTotal}.`}</p><label>${loc`On a tie, the winner`} <select name="tieWinner"><option value="">—</option><option value="attacker">${esc(actor.name)}</option><option value="defender">${esc(target.name)}</option></select></label>`
-        : `<p>${loc`No resolved Resist Taunt from ${esc(target.name)} was found; enter the outcome.`}</p><label>${loc`Outcome`} <select name="declared"><option value="won">${loc`${esc(actor.name)} wins`}</option><option value="wonCritical">${loc`${esc(actor.name)} wins with a critical (or the opponent’s critical failure)`}</option><option value="lost">${loc`${esc(target.name)} wins`}</option><option value="lostCritical">${loc`${esc(target.name)} wins with a critical (or the taunter’s critical failure)`}</option></select></label>`
-    }${venomous ? `<label><input name="venomous" type="checkbox" /> ${loc`On a win, use Venomous Dialogue instead of the standard result (once per scene)`}</label>` : ""}</div>`
+  const input = await formDialog({
+    title: loc`Settle the Taunt`,
+    fields: [
+      raw(
+        paired
+          ? `<p>${loc`Paired with ${esc(target.name)}’s Resist Taunt: ${check.effectiveTotal} against ${paired.f.effectiveTotal}.`}</p><label>${loc`On a tie, the winner`} <select name="tieWinner"><option value="">—</option><option value="attacker">${esc(actor.name)}</option><option value="defender">${esc(target.name)}</option></select></label>`
+          : `<p>${loc`No resolved Resist Taunt from ${esc(target.name)} was found; enter the outcome.`}</p><label>${loc`Outcome`} <select name="declared"><option value="won">${loc`${esc(actor.name)} wins`}</option><option value="wonCritical">${loc`${esc(actor.name)} wins with a critical (or the opponent’s critical failure)`}</option><option value="lost">${loc`${esc(target.name)} wins`}</option><option value="lostCritical">${loc`${esc(target.name)} wins with a critical (or the taunter’s critical failure)`}</option></select></label>`
+      ),
+      raw(
+        venomous
+          ? `<label><input name="venomous" type="checkbox" /> ${loc`On a win, use Venomous Dialogue instead of the standard result (once per scene)`}</label>`
+          : ""
+      )
+    ]
   });
   if (!input) return null;
   let outcome;

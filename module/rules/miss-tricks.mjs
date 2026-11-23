@@ -9,6 +9,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 export const MISS_TRICKS = {
   doubleTwirl: { name: "Double Twirl", feat: "Flail Basics", family: "flail" },
   remiss: { name: "Remiss", feat: "Fencing Basics", family: "oneHandedSword" }
@@ -76,16 +77,6 @@ function sourceVersion(original, current) {
   }
   return current;
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateMissTrickSources(
   actor,
   proof,

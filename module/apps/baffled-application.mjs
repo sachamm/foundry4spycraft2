@@ -3,8 +3,8 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  clone = structuredClone;
+import { same } from "../rules/equal.mjs";
+const clone = structuredClone;
 const effectById = (actor, id) => [...(actor.effects ?? [])].find(e => e.id === id);
 const statusList = e => [...e.statuses].sort();
 function hold(actor, review) {

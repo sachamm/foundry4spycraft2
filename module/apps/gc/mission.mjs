@@ -30,14 +30,10 @@ import { loc } from "../../i18n.mjs";
 import { startUsagePeriod } from "../../services/periods.mjs";
 import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
+import { formDialog, raw } from "../dialog-kit.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content) =>
-  foundry.applications.api.DialogV2.input({
-    window: { title },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${content}</div>`
-  });
+const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(

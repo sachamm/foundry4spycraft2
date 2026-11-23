@@ -2,7 +2,7 @@
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
 import { missionCatalog } from "./mission-defaults.mjs";
-import { loc } from "../../i18n.mjs";
+import { loc, locKey } from "../../i18n.mjs";
 
 const SYSTEM = "spycraft2";
 const refresh = () => {
@@ -23,24 +23,24 @@ export function registerGCSettings() {
   // Which console sections this GC has opened or closed, kept in the browser rather than the world.
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   game.settings.register(SYSTEM, "fluidInitiative", {
-    name: loc`Fluid initiative`,
-    hint: loc`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,
+    name: locKey`Fluid initiative`,
+    hint: locKey`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,
     scope: "world",
     config: true,
     type: Boolean,
     default: true
   });
   game.settings.register(SYSTEM, "roundReminders", {
-    name: loc`Round reminders`,
-    hint: loc`Post a card with its button when a burning character's turn begins and, at the end of each round, for every dying character in the fight.`,
+    name: locKey`Round reminders`,
+    hint: locKey`Post a card with its button when a burning character's turn begins and, at the end of each round, for every dying character in the fight.`,
     scope: "world",
     config: true,
     type: Boolean,
     default: true
   });
   game.settings.register(SYSTEM, "startFlatFooted", {
-    name: loc`Start combat flat-footed`,
-    hint: loc`Mark every combatant flat-footed when a combat begins (p.323). It clears by itself as each character’s turn begins or when the character is hit.`,
+    name: locKey`Start combat flat-footed`,
+    hint: locKey`Mark every combatant flat-footed when a combat begins (p.323). It clears by itself as each character’s turn begins or when the character is hit.`,
     scope: "world",
     config: true,
     type: Boolean,

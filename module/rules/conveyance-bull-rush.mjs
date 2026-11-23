@@ -4,6 +4,7 @@ import { restraintActionBlock } from "./restraints.mjs";
 import { DISARM_SIZES } from "./disarm.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** p.354; user-confirmed ruling: borrow only Maneuver's skill/attribute, not its named-check benefits. */
 export const CONVEYANCE_BULL_RUSH_PROFILES = {
   acrobatics: {
@@ -221,17 +222,7 @@ export function validateConveyanceBullRushProof(
       conveyanceBullRushCombat: combat
     }
   );
-  const stable = v =>
-      JSON.stringify(v, (_k, x) =>
-        x && typeof x === "object" && !Array.isArray(x)
-          ? Object.fromEntries(
-              Object.keys(x)
-                .sort()
-                .map(k => [k, x[k]])
-            )
-          : x
-      ),
-    base = CONVEYANCE_BULL_RUSH_PROFILES[skillKey]?.ability,
+  const base = CONVEYANCE_BULL_RUSH_PROFILES[skillKey]?.ability,
     substituted =
       attributeSubstitution?.source === "All According to Plan" &&
       attributeSubstitution.originalAbility === base &&

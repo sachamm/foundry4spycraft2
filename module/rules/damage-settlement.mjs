@@ -1,7 +1,7 @@
 import { rollEvidence } from "./outcomes.mjs";
 import { knockoutDuration } from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "./equal.mjs";
 export function damageEventEvidence(record) {
   const { state, settlement, ...event } = record;
   return JSON.stringify(event);

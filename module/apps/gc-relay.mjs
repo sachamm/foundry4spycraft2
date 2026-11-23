@@ -15,7 +15,7 @@
  * Allow card even when the world applies requests without asking.
  */
 import { esc } from "../html.mjs";
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
 export const RELAY_QUERY = "spycraft2.relay";
@@ -240,16 +240,16 @@ export async function markCard(message, key, value = true, { quiet = false } = {
 /** Register the query and the setting. Call during `init`. */
 export function installGCRelay() {
   game.settings.register("spycraft2", "relayAutoApprove", {
-    name: loc`Apply players' requests without asking`,
-    hint: loc`A player who hits a character they do not own, or treats another player's agent, sends the result to the GC's client to apply. When off, each one waits for Allow on a card in the GC's chat. When on, a request that does not fit its card (damage raised above the roll, or a card the player did not post) still waits for Allow.`,
+    name: locKey`Apply players' requests without asking`,
+    hint: locKey`A player who hits a character they do not own, or treats another player's agent, sends the result to the GC's client to apply. When off, each one waits for Allow on a card in the GC's chat. When on, a request that does not fit its card (damage raised above the roll, or a card the player did not post) still waits for Allow.`,
     scope: "world",
     config: true,
     type: Boolean,
     default: false
   });
   game.settings.register("spycraft2", "showDefenseToPlayers", {
-    name: loc`Show opponents' Defense to players`,
-    hint: loc`Players see a target's Defense when resolving an attack and can resolve against a recorded target in one click. Turn off to keep NPC Defense hidden; players then pick the target in the resolve dialog and the result still says hit or miss.`,
+    name: locKey`Show opponents' Defense to players`,
+    hint: locKey`Players see a target's Defense when resolving an attack and can resolve against a recorded target in one click. Turn off to keep NPC Defense hidden; players then pick the target in the resolve dialog and the result still says hit or miss.`,
     scope: "world",
     config: true,
     type: Boolean,

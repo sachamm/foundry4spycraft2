@@ -4,6 +4,7 @@ import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize, tripSizeIndex } from "./trip.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 export { TRIP_SIZES } from "./trip.mjs";
 /** Ordinary half-action Trip p.361. Weapon qualities, free actions and settlement are separate. */
 export function tripAttackSkillChecks(key, checks = []) {
@@ -138,16 +139,6 @@ export function tripAttackPlan(
     ]
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateTripAttackProof(
   system,
   proof,

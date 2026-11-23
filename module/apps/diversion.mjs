@@ -7,6 +7,7 @@ import { shiftCount } from "./dueling.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 const say = (actor, text) => ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: esc(text) });
 
@@ -60,14 +61,15 @@ export async function settleDiversion(message) {
     target = fromUuidSync(check.diversion.opponentUuid);
   if (!actor || !target) return refuse(loc`Both Diversion participants must still exist.`);
   const paired = pairedResponse(message, check);
-  const input = await foundry.applications.api.DialogV2.input({
-    window: { title: loc`Settle the Diversion` },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${
-      paired
-        ? `<p>${loc`Paired with ${esc(target.name)}’s Resist Diversion: ${check.effectiveTotal} against ${paired.f.effectiveTotal}.`}</p><label>${loc`On a tie, the winner`} <select name="tieWinner"><option value="">—</option><option value="attacker">${esc(actor.name)}</option><option value="defender">${esc(target.name)}</option></select></label>`
-        : `<label>${loc`Outcome`} <select name="declared"><option value="won">${loc`${esc(actor.name)} wins`}</option><option value="wonCritical">${loc`${esc(actor.name)} wins with a critical`}</option><option value="lost">${loc`${esc(target.name)} wins`}</option><option value="lostCritical">${loc`${esc(target.name)} wins with a critical`}</option></select></label>`
-    }</div>`
+  const input = await formDialog({
+    title: loc`Settle the Diversion`,
+    fields: [
+      raw(
+        paired
+          ? `<p>${loc`Paired with ${esc(target.name)}’s Resist Diversion: ${check.effectiveTotal} against ${paired.f.effectiveTotal}.`}</p><label>${loc`On a tie, the winner`} <select name="tieWinner"><option value="">—</option><option value="attacker">${esc(actor.name)}</option><option value="defender">${esc(target.name)}</option></select></label>`
+          : `<label>${loc`Outcome`} <select name="declared"><option value="won">${loc`${esc(actor.name)} wins`}</option><option value="wonCritical">${loc`${esc(actor.name)} wins with a critical`}</option><option value="lost">${loc`${esc(target.name)} wins`}</option><option value="lostCritical">${loc`${esc(target.name)} wins with a critical`}</option></select></label>`
+      )
+    ]
   });
   if (!input) return null;
   let outcome;

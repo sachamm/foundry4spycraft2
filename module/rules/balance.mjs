@@ -1,5 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Table2.10 and Balance p.106; Equilibrium Basics/Mastery p.194. */
 export const BALANCE_SURFACES = {
   flat: {
@@ -191,16 +192,6 @@ export function validateBalanceSurfaceProof(system, proof, { checkKind, skillKey
       balanceConfirmed: proof.confirmed
     }
   );
-  const stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error(
       loc`The Balance surface, movement, current Speed or qualified Equilibrium source changed before posting.`

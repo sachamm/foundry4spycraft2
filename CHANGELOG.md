@@ -20,6 +20,16 @@
 - **Taller roll dialogs.** A dialog's body used to stop at half the screen height (360px at 1280×720). It now uses
   the height left after the header and footer, and scrolls as one box.
 
+- **The browser keeps the search box while you type.** Typing in a browser's search or changing a filter redrew the
+  whole window, filters included. Only the result list is redrawn now, and each entry's summary is worked out once
+  per open window. Prerequisites are still checked on every draw.
+- **Smaller downloads at start-up.** A release now ships its code as one script instead of several hundred files,
+  and the English language file holds only the 34 strings Foundry reads by key (the full list for translators moved
+  to `lang/text-template.json`, which is not shipped).
+- **Under the hood.** One dialog builder (`formDialog`) now draws 52 option dialogs with the same markup as before;
+  shared helpers replace repeated copies of the final-attack flow, the damage reservation, equality checks and
+  receipt lookups; sheet actions are registered from lists and a test fails if a template button has no handler.
+
 - **Attack dialogs open on a Standard Attack.** The ranged attack dialog, and the quick melee and CQB attack
   controls, used to start on "Other attack", so Aim, Burst and miss tricks were refused until the action was changed.
   They now start on Standard Attack; Other is still one click away and a remembered choice is kept.

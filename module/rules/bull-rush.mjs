@@ -2,6 +2,7 @@ import { responseOwnSize } from "./trip.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Ordinary target's on-foot Bull Rush response, p.354; action modifier+0, p.352. */
 export function bullRushDefenseSkillChecks(key, checks = []) {
   if (key !== "athletics") return checks;
@@ -114,21 +115,11 @@ export function validateBullRushDefenseProof(
       bullRushContactConfirmed: proof.contactConfirmed
     }
   );
-  const stable = v =>
-      JSON.stringify(v, (_k, x) =>
-        x && typeof x === "object" && !Array.isArray(x)
-          ? Object.fromEntries(
-              Object.keys(x)
-                .sort()
-                .map(k => [k, x[k]])
-            )
-          : x
-      ),
-    substituted =
-      attributeSubstitution?.source === "All According to Plan" &&
-      attributeSubstitution.originalAbility === "str" &&
-      attributeSubstitution.ability === "int" &&
-      (system.classLevels?.schemer ?? 0) >= 4;
+  const substituted =
+    attributeSubstitution?.source === "All According to Plan" &&
+    attributeSubstitution.originalAbility === "str" &&
+    attributeSubstitution.ability === "int" &&
+    (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "str"))
     throw Error(loc`The Bull Rush response attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))

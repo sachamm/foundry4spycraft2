@@ -1,6 +1,7 @@
 import { refuse } from "../error-notices.mjs";
 import { reflexDamagePlan } from "../rules/defense.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 /** Read-only Evasion adjustment using a recorded Reflex save; health and other mitigation are separate. */
 export async function checkReflexDamage(actor) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
@@ -17,10 +18,49 @@ export async function checkReflexDamage(actor) {
       .reverse(),
     esc = foundry.utils.escapeHTML;
   if (!saves.length) return refuse(loc`Make a Reflex save with recorded Evasion context first.`);
-  const input = await foundry.applications.api.DialogV2.input({
-    window: { title: loc`Reflex save — Evasion damage` },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><label>${loc`Recorded Reflex save`} <select name="messageId">${saves.map(m => `<option value="${m.id}">${loc`${esc(m.flags.spycraft2.baseFlavor ?? "Reflex")} — result ${m.flags.spycraft2.effectiveTotal}, Evasion ${m.flags.spycraft2.evasionContext.grade}${m.flags.spycraft2.evasionContext.flatFooted ? ", flat-footed" : ""}`}</option>`).join("")}</select></label><label>${loc`Source damage before this saving-throw adjustment`} <input name="damage" type="number" min="0" step="1" value="0" /></label><label>${loc`Ordinary damage on a successful save, from the source rule`} <input name="normalSuccessDamage" type="number" min="0" step="1" value="0" /></label><label>${loc`GC-confirmed save outcome`} <select name="succeeded"><option value="">${loc`Choose…`}</option><option value="true">${loc`Succeeded`}</option><option value="false">${loc`Failed`}</option></select></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms these damage amounts and the outcome`}</label><p>${loc`Uses the Evasion grade, flat-footedness and damage-reduction eligibility recorded when the save was made. Apply other damage mitigation and health changes separately.`}</p></div>`
+  const input = await formDialog({
+    title: loc`Reflex save — Evasion damage`,
+    fields: [
+      {
+        select: "messageId",
+        label: loc`Recorded Reflex save`,
+        optionsHtml: raw(
+          saves
+            .map(
+              m =>
+                `<option value="${m.id}">${loc`${esc(m.flags.spycraft2.baseFlavor ?? "Reflex")} — result ${m.flags.spycraft2.effectiveTotal}, Evasion ${m.flags.spycraft2.evasionContext.grade}${m.flags.spycraft2.evasionContext.flatFooted ? ", flat-footed" : ""}`}</option>`
+            )
+            .join("")
+        )
+      },
+      {
+        number: "damage",
+        label: loc`Source damage before this saving-throw adjustment`,
+        min: "0",
+        step: "1",
+        value: "0"
+      },
+      {
+        number: "normalSuccessDamage",
+        label: loc`Ordinary damage on a successful save, from the source rule`,
+        min: "0",
+        step: "1",
+        value: "0"
+      },
+      {
+        select: "succeeded",
+        label: loc`GC-confirmed save outcome`,
+        options: [
+          ["", loc`Choose…`],
+          ["true", loc`Succeeded`],
+          ["false", loc`Failed`]
+        ]
+      },
+      { check: "confirmed", label: loc`The GC confirms these damage amounts and the outcome` },
+      {
+        note: loc`Uses the Evasion grade, flat-footedness and damage-reduction eligibility recorded when the save was made. Apply other damage mitigation and health changes separately.`
+      }
+    ]
   });
   if (!input) return null;
   const message = game.messages.get(input.messageId);

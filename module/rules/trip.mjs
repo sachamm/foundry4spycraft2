@@ -5,6 +5,7 @@ import { attributeDefensePlan } from "./attributes.mjs";
 import { uncannyDodgePlan } from "./defense.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 export const TRIP_SIZES = Object.freeze([
   "Nuisance",
   "Fine",
@@ -200,16 +201,6 @@ export function validateTripDefenseProof(
         : {})
     }
   );
-  const stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
   const substituted =
     attributeSubstitution?.source === "All According to Plan" &&
     attributeSubstitution.originalAbility === "dex" &&

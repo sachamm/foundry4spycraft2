@@ -15,7 +15,7 @@ const css = ["tokens", "spycraft2", "retro", "components"]
 const i18n = readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8").replace(/^export /gm, "");
 const inline = source =>
   source
-    .replace(/^import \{ loc \} from "[^"]+";\n/m, `${i18n}\n`)
+    .replace(/^import \{ loc(?:, locKey)? \} from "[^"]+";\n/m, `${i18n}\n`)
     .replace('"./dialog-sections.mjs"', JSON.stringify(uiModuleUrl("module/apps/dialog-sections.mjs")))
     .replace('"./resolution-guide.mjs"', JSON.stringify(uiModuleUrl("module/apps/resolution-guide.mjs")));
 

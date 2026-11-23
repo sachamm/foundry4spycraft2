@@ -5,6 +5,8 @@ import { twoWeaponStyleState } from "../rules/two-weapon-state.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 const isMap = v => v !== null && typeof v === "object" && !Array.isArray(v);
 const roundKey = c => `${encodeURIComponent(c.id).replaceAll(".", "%2E")}:${c.round}`;
 const matches = (a, b) =>
@@ -23,10 +25,23 @@ export async function declareTwoWeapon(actor, options = {}) {
       choices = weapons
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.system.sizeHands ?? "")})</option>`)
         .join("");
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Declare two-weapon combat` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`At the start of your Initiative Count, choose the full-round tradeoff. Mark the two actual one-handed weapons equipped and carried on Gear first. Each final attack is one free-action Standard Attack; tricks may apply, but adjustments and action combinations do not (p.329). Use Main to take each final attack; the GC counts attacks to determine the least-used weapon.`}</p><label>${loc`First weapon`} <select name="firstWeaponId">${choices}</select></label><label>${loc`Second weapon`} <select name="secondWeaponId">${choices}</select></label><label>${loc`Choice`} <select name="extraAttacks"><option value="1">${loc`Basics: 1 final attack; −2 attack/skill checks`}</option><option value="2">${loc`Mastery: 2 final attacks; −4 attack/skill checks`}</option></select></label><label><input name="atStartOfInitiative" type="checkbox" /> ${loc`This is the start of my Initiative Count`}</label><label><input name="armedConfirmed" type="checkbox" /> ${loc`The GC confirms both weapons are actually readied in separate hands`}</label></div>`
+    input = await formDialog({
+      title: loc`Declare two-weapon combat`,
+      intro: loc`At the start of your Initiative Count, choose the full-round tradeoff. Mark the two actual one-handed weapons equipped and carried on Gear first. Each final attack is one free-action Standard Attack; tricks may apply, but adjustments and action combinations do not (p.329). Use Main to take each final attack; the GC counts attacks to determine the least-used weapon.`,
+      fields: [
+        { select: "firstWeaponId", label: loc`First weapon`, optionsHtml: raw(choices) },
+        { select: "secondWeaponId", label: loc`Second weapon`, optionsHtml: raw(choices) },
+        {
+          select: "extraAttacks",
+          label: loc`Choice`,
+          options: [
+            ["1", loc`Basics: 1 final attack; −2 attack/skill checks`],
+            ["2", loc`Mastery: 2 final attacks; −4 attack/skill checks`]
+          ]
+        },
+        { check: "atStartOfInitiative", label: loc`This is the start of my Initiative Count` },
+        { check: "armedConfirmed", label: loc`The GC confirms both weapons are actually readied in separate hands` }
+      ]
     });
     if (!input) return null;
   }
@@ -116,10 +131,16 @@ export async function reviewTwoWeapon(actor, options = {}) {
     before = snapshot();
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Review two-weapon tradeoff` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Review the actual remaining penalty and final attacks at the table before clearing this declaration. Clearing preserves the declared round’s use and never grants more final attacks. A new round’s legitimate choice remains separate.`}</p><label>${loc`Resolution`} <input name="resolution" /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC has resolved the remaining tradeoff and confirms clearing this saved record`}</label></div>`
+    input = await formDialog({
+      title: loc`Review two-weapon tradeoff`,
+      intro: loc`Review the actual remaining penalty and final attacks at the table before clearing this declaration. Clearing preserves the declared round’s use and never grants more final attacks. A new round’s legitimate choice remains separate.`,
+      fields: [
+        { text: "resolution", label: loc`Resolution` },
+        {
+          check: "confirmed",
+          label: loc`The GC has resolved the remaining tradeoff and confirms clearing this saved record`
+        }
+      ]
     });
     if (!input) return null;
   }
@@ -216,10 +237,17 @@ export async function takeTwoWeaponFinalAttack(actor, options = {}) {
         .filter(Boolean)
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Two-weapon final attack` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`One free-action Standard Attack. The GC counts all attacks this round and confirms the least-used original weapon (choose in a tie). Set Single-Shot mode beforehand. Tricks and normal Standard Attack benefits apply; adjustments and action combinations do not. Use other class attack controls and GC counter review for combined class declarations.`}</p><label>${loc`Weapon`} <select name="weaponId">${choices}</select></label>${standardAttackContextContent(actor)}<label><input name="leastUsedConfirmed" type="checkbox" /> ${loc`The GC confirms this is the least-used weapon and this free final attack is legal now`}</label></div>`
+    input = await formDialog({
+      title: loc`Two-weapon final attack`,
+      intro: loc`One free-action Standard Attack. The GC counts all attacks this round and confirms the least-used original weapon (choose in a tie). Set Single-Shot mode beforehand. Tricks and normal Standard Attack benefits apply; adjustments and action combinations do not. Use other class attack controls and GC counter review for combined class declarations.`,
+      fields: [
+        { select: "weaponId", label: loc`Weapon`, optionsHtml: raw(choices) },
+        raw(standardAttackContextContent(actor)),
+        {
+          check: "leastUsedConfirmed",
+          label: loc`The GC confirms this is the least-used weapon and this free final attack is legal now`
+        }
+      ]
     });
     if (!input) return null;
   }
@@ -258,10 +286,7 @@ export async function takeTwoWeaponFinalAttack(actor, options = {}) {
           throw new Error(loc`The final attack or its reserved use changed. Review it again.`);
       };
       validate();
-      const posted = () =>
-        [...(game.messages ?? [])].find(
-          m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.twoWeaponFinalAttack?.id === receipt.id
-        );
+      const posted = () => postedReceipt(actor, "twoWeaponFinalAttack", receipt.id);
       try {
         const message = await actor.rollAttack(actor.items.get(plan.weaponId), {
           ...attackOptions,

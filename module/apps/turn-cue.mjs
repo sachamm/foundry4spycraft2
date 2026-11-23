@@ -2,7 +2,7 @@
  * Tell a player when the combat reaches a character they control, so nobody has to watch the tracker.
  * A client setting turns it off.
  */
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 
 /** Whether this user should hear that the acting combatant is theirs. */
 export function isMyTurn(combat, user = game.user) {
@@ -28,8 +28,8 @@ export function announceTurn(combat, changed) {
 
 export function installTurnCue() {
   game.settings.register("spycraft2", "turnNotice", {
-    name: loc`Tell me when it is my turn`,
-    hint: loc`Shows a notice when the combat reaches a character you control.`,
+    name: locKey`Tell me when it is my turn`,
+    hint: locKey`Shows a notice when the combat reaches a character you control.`,
     scope: "client",
     config: true,
     type: Boolean,

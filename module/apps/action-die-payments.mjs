@@ -16,8 +16,8 @@ import {
   paymentIdValid
 } from "../rules/action-die-payments.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  clone = structuredClone;
+import { same } from "../rules/equal.mjs";
+const clone = structuredClone;
 const wholeInput = v => (typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v) : NaN);
 const currentSystem = actor => ({
   ...actor.actionDiceFundingSystem,

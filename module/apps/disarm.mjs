@@ -3,6 +3,7 @@ import { standardAttackContextContent, standardAttackContextInput } from "./stan
 import { DISARM_SIZES } from "../rules/disarm.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 /** No automatic weapon transfer or opponent-condition writes. */
 export async function rollDisarm(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
@@ -14,10 +15,30 @@ export async function rollDisarm(actor, options = {}) {
         .filter(i => i.type === "weapon")
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Disarm opposed attack check` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`This rolls your part of the opposed Standard Attack check. The GC confirms the opponent’s actual held weapon Size and compares both results. A ranged attempt must be within CQB Range; a melee/unarmed attempt within Reach. A ranged weapon gains no weapon-Size bonus. This action is not a final attack.`}</p><label>${loc`Your readied weapon (or Unarmed Gear entry)`} <select name="weaponId">${choices}</select></label><label>${loc`Opponent / actual weapon`} <input name="opponentLabel" maxlength="160" /></label>${standardAttackContextContent(actor, { includeCheapShot: false })}<label>${loc`Opponent weapon Size`} <select name="opponentWeaponSize"><option value="">${loc`Choose actual Size`}</option>${DISARM_SIZES.map(s => `<option value="${s}">${s}</option>`).join("")}</select></label><label><input name="opponentArmedConfirmed" type="checkbox" /> ${loc`The opponent holds the declared weapon; unarmed opponents cannot be disarmed`}</label><label><input name="lineOfSightConfirmed" type="checkbox" /> ${loc`I have line of sight to the opponent`}</label><label><input name="rangeConfirmed" type="checkbox" /> ${loc`The opponent is within my Reach (melee/unarmed) or CQB Range (ranged)`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this actual weapon Size, legal Disarm and action/ammunition costs`}</label></div>`
+    input = await formDialog({
+      title: loc`Disarm opposed attack check`,
+      intro: loc`This rolls your part of the opposed Standard Attack check. The GC confirms the opponent’s actual held weapon Size and compares both results. A ranged attempt must be within CQB Range; a melee/unarmed attempt within Reach. A ranged weapon gains no weapon-Size bonus. This action is not a final attack.`,
+      fields: [
+        { select: "weaponId", label: loc`Your readied weapon (or Unarmed Gear entry)`, optionsHtml: raw(choices) },
+        { text: "opponentLabel", label: loc`Opponent / actual weapon`, maxlength: 160 },
+        raw(standardAttackContextContent(actor, { includeCheapShot: false })),
+        {
+          select: "opponentWeaponSize",
+          label: loc`Opponent weapon Size`,
+          options: [["", loc`Choose actual Size`]],
+          optionsHtml: raw(DISARM_SIZES.map(s => `<option value="${s}">${s}</option>`).join(""))
+        },
+        {
+          check: "opponentArmedConfirmed",
+          label: loc`The opponent holds the declared weapon; unarmed opponents cannot be disarmed`
+        },
+        { check: "lineOfSightConfirmed", label: loc`I have line of sight to the opponent` },
+        { check: "rangeConfirmed", label: loc`The opponent is within my Reach (melee/unarmed) or CQB Range (ranged)` },
+        {
+          check: "confirmed",
+          label: loc`The GC confirms this actual weapon Size, legal Disarm and action/ammunition costs`
+        }
+      ]
     });
     if (!input) return null;
   }

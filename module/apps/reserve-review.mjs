@@ -2,13 +2,13 @@ import { queueResources } from "../services/transactions.mjs";
 import { reserveValue, getReserveReview } from "../rules/reserve-transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { same } from "../rules/equal.mjs";
 const balance = value => {
   if (!["string", "number"].includes(typeof value) || (typeof value === "string" && !value.trim()))
     throw new Error(loc`Confirm each final whole-number balance.`);
   return Number(value);
 };
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  clone = structuredClone;
+const clone = structuredClone;
 export function requireSettledReserve(actor) {
   if (getReserveReview(actor).needsReview)
     throw new Error(loc`The GC must review the interrupted Reserve transaction first.`);

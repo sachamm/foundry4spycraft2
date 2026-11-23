@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Superior Accuracy (SPA), p.302: all three qualifications apply to this attack. */
 export function superiorAccuracyAttackPlan(weapon, { trained = false, aimed = false, braced = false } = {}) {
   if ([trained, aimed, braced].some(v => typeof v !== "boolean"))
@@ -18,16 +19,6 @@ export function superiorAccuracyAttackPlan(weapon, { trained = false, aimed = fa
     threatIncrease: superiorAccuracy && trained && aimed && braced ? 1 : 0
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateSuperiorAccuracyProof(
   weapon,
   proof,

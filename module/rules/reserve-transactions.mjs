@@ -1,5 +1,5 @@
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "./equal.mjs";
 export const reserveValue = (actor, path) => path.split(".").reduce((o, key) => o?.[key], actor);
 export function getReserveReview(actor) {
   const stored = actor.flags?.spycraft2?.reserveTransactionReview,

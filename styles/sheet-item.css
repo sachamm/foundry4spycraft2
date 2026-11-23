@@ -12,7 +12,8 @@
 .spycraft2.browser li button { flex: 0 0 32px; height: 26px; line-height: 1; }
 .spycraft2.browser li button.owned { color: var(--sc2-good); }
 .spycraft2.browser .window-content { display: flex; flex-direction: column; }
-.spycraft2.browser .browser { display: flex; flex-direction: column; height: 100%; }
+/* Two parts in a column: the filters keep their height and the results take the rest. */
+.spycraft2.browser .browser-filters { flex: 0 0 auto; }
 
 .spycraft2.sheet.item { container-type: inline-size; }
 .spycraft2.item .sheet-header { align-items: center; }

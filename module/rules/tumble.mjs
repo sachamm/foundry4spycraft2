@@ -2,6 +2,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Tumble and Table2.13 p.109; Equilibrium Mastery p.194. Plans one rolled half action. */
 export function tumblePathPlan(
   system,
@@ -108,16 +109,6 @@ export function validateTumblePathProof(system, proof, { checkKind, skillKey, ch
       tumbleRouteConfirmed: proof.routeConfirmed
     }
   );
-  const stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error(
       loc`The Tumble path, current Speed, movement condition or qualified Equilibrium source changed before posting.`

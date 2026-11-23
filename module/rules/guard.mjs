@@ -1,5 +1,6 @@
 import { weaponGrip, weaponUnavailable } from "./gear.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** Guard (GAR), p.301: actual appropriate proficiency and a physically held weapon.
  * Family labels and feat names do not create a weapon quality.
  */
@@ -96,16 +97,6 @@ export function guardDefensePlan(system, { ranged = false } = {}) {
   if (!Number.isSafeInteger(bonus)) throw Error(loc`Review the combined Guard weapon bonuses.`);
   return { version: 1, ranged: false, weapons, bonus };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateGuardDefenseProof(system, proof, { ranged = false } = {}) {
   if (!proof) return;
   if (stable(guardDefensePlan(system, { ranged })) !== stable(proof))

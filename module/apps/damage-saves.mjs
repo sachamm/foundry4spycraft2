@@ -8,7 +8,7 @@ import {
 } from "../rules/damage-saves.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+import { same } from "../rules/equal.mjs";
 export async function rollPendingDamageSave(actor, options = {}) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
   const expected = damageLedgerSnapshot(actor),

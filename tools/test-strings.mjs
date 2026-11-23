@@ -56,11 +56,20 @@ test("patterns, slugs and keys are stable", () => {
   assert.match(keyOf("Focus, forte and synergy"), /^FocusForteAndSynergy_[0-9a-z]{7}$/);
 });
 
-test("lang/en.json holds exactly the strings written in the source", async () => {
-  const lang = JSON.parse(await readFile(new URL("../lang/en.json", import.meta.url), "utf8"));
+test("the translator template holds exactly the strings written in the source, and English loads only Foundry's keys", async () => {
+  const lang = JSON.parse(await readFile(new URL("../lang/text-template.json", import.meta.url), "utf8"));
   const inSource = Object.fromEntries(collectStrings());
   assert.ok(Object.keys(inSource).length > 5000, "expected thousands of source strings");
-  assert.deepEqual(lang.SPYCRAFT.Text, inSource, "run `npm run strings` to refresh lang/en.json");
+  assert.deepEqual(lang.SPYCRAFT.Text, inSource, "run `npm run strings` to refresh lang/text-template.json");
+  // English text is already in the source, so the loaded file carries only what Foundry localises by itself
+  // (settings names, hints and choices written with locKey). Every such key must be there, or Foundry shows the key.
+  const english = JSON.parse(await readFile(new URL("../lang/en.json", import.meta.url), "utf8"));
+  const forFoundry = Object.fromEntries(collectStrings(undefined, { only: "locKey" }));
+  assert.ok(Object.keys(forFoundry).length >= 30, "expected the settings text");
+  assert.deepEqual(english.SPYCRAFT.Text, forFoundry, "run `npm run strings` to refresh lang/en.json");
+  assert.ok(Object.keys(english.SPYCRAFT.Text).length < 200, "source strings belong in the template, not en.json");
+  const manifest = JSON.parse(await readFile(new URL("../system.json", import.meta.url), "utf8"));
+  assert.ok(!manifest.languages.some(l => l.path.includes("text-template")), "the template is not a language");
   for (const [key, pattern] of Object.entries(inSource)) {
     assert.match(key, /^[A-Za-z0-9]+_[0-9a-z]{7}$/, key);
     // Placeholders are numbered from 0 without gaps, so a translator can see every value.
@@ -104,6 +113,6 @@ test("display names from the rules data are translated in place, and only when a
   const { SPYCRAFT } = await import("../module/config.mjs");
   const names = configStrings(SPYCRAFT);
   assert.ok(names.length > 150, `only ${names.length} data names`);
-  const lang = JSON.parse(await readFile(new URL("../lang/en.json", import.meta.url), "utf8")).SPYCRAFT.Text;
+  const lang = JSON.parse(await readFile(new URL("../lang/text-template.json", import.meta.url), "utf8")).SPYCRAFT.Text;
   for (const name of names) assert.equal(lang[keyOf(name)], name, name);
 });

@@ -1,7 +1,7 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "./equal.mjs";
 /** Incoming Baffled events, distinct from reviewing the current condition (p.340). */
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function baffledSourceSnapshot(actor) {
   const own = [...(actor.effects ?? [])],
     applied = actor.appliedEffects ?? own.filter(e => e.active ?? (!e.disabled && !e.isSuppressed));

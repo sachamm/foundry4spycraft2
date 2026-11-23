@@ -1,8 +1,10 @@
 import { markSource, markPlan, markRecordValid, markDisclosurePlan } from "../rules/mark.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { same } from "../rules/equal.mjs";
+import { postedReceipt } from "../services/message-lookup.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 const state = a => ({ ...a.system, usagePeriods: a.usagePeriods }),
-  same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   recipients = a =>
     game.users?.filter?.(u => u.isGM || a.testUserPermission?.(u, "OWNER")).map(u => u.id) ?? [game.user.id];
 export async function useMark(actor, options = {}) {
@@ -12,10 +14,22 @@ export async function useMark(actor, options = {}) {
     const choices = Object.entries(CONFIG.SPYCRAFT.skills)
       .map(([k, s]) => `<option value="${k}">${foundry.utils.escapeHTML(s.name)}</option>`)
       .join("");
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Mark — name three skills` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`One character in line of sight; three different skills. A free action, usable once per active Style feat per session (p.203). The GC discloses the target’s actual total bonuses after the declaration.`}</p><label>${loc`Target character`} <input name="target" maxlength="200" /></label>${[1, 2, 3].map(n => `<label>${loc`Skill ${n}`}<select name="skill${n}"><option value="">${loc`Choose a skill`}</option>${choices}</select></label>`).join("")}<label><input name="lineOfSightConfirmed" type="checkbox" /> ${loc`The GC confirms this one character is within my line of sight`}</label><label><input name="freeActionConfirmed" type="checkbox" /> ${loc`This is a legal free action now`}</label></div>`
+    input = await formDialog({
+      title: loc`Mark — name three skills`,
+      intro: loc`One character in line of sight; three different skills. A free action, usable once per active Style feat per session (p.203). The GC discloses the target’s actual total bonuses after the declaration.`,
+      fields: [
+        { text: "target", label: loc`Target character`, maxlength: 200 },
+        raw(
+          [1, 2, 3]
+            .map(
+              n =>
+                `<label>${loc`Skill ${n}`}<select name="skill${n}"><option value="">${loc`Choose a skill`}</option>${choices}</select></label>`
+            )
+            .join("")
+        ),
+        { check: "lineOfSightConfirmed", label: loc`The GC confirms this one character is within my line of sight` },
+        { check: "freeActionConfirmed", label: loc`This is a legal free action now` }
+      ]
     });
     if (!input) return null;
     input = { ...input, skills: [input.skill1, input.skill2, input.skill3] };
@@ -64,9 +78,7 @@ export async function useMark(actor, options = {}) {
         });
         return record;
       } catch (error) {
-        const posted = game.messages?.find?.(
-          m => m.flags?.spycraft2?.actorUuid === actor.uuid && m.flags.spycraft2.markObservation?.id === id
-        );
+        const posted = postedReceipt(actor, "markObservation", id);
         if (posted) return record;
         if (actor.flags.spycraft2?.markObservations?.[id])
           try {
@@ -134,10 +146,13 @@ export async function correctMark(actor, id, options = {}) {
     history = structuredClone(actor.flags.spycraft2.markCorrections ?? []);
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`GC: correct Mark observation` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Archive an erroneous observation. This does not refund its spent session use; ordinary counter review remains separate.`}</p><label>${loc`Reason`} <input name="reason" maxlength="1000" /></label><label><input name="confirmed" type="checkbox" /> ${loc`I confirm this observation is erroneous`}</label></div>`
+    input = await formDialog({
+      title: loc`GC: correct Mark observation`,
+      intro: loc`Archive an erroneous observation. This does not refund its spent session use; ordinary counter review remains separate.`,
+      fields: [
+        { text: "reason", label: loc`Reason`, maxlength: 1000 },
+        { check: "confirmed", label: loc`I confirm this observation is erroneous` }
+      ]
     });
     if (!input) return null;
   }

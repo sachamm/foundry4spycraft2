@@ -49,7 +49,7 @@ import { systemDialog } from "./dialog-theme.mjs";
 import { gunplayCountGain, juggernautConversion } from "../rules/class-combat.mjs";
 import { shiftCount } from "./dueling.mjs";
 import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from "./gc-relay.mjs";
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 import { COVER_GRADES } from "../rules/cover.mjs";
 
@@ -304,8 +304,8 @@ export function standingAgainst(check, defense, attacker) {
 /** The GC's setting: a quick (Shift-click) NPC attack on a known target is resolved as soon as it is rolled. */
 export function registerQuickResolveSetting() {
   game.settings.register("spycraft2", "quickNpcResolve", {
-    name: loc`Resolve quick NPC attacks at once`,
-    hint: loc`On: when an NPC's attack is rolled without its dialog against one targeted token, it is resolved against that token's Defense straight away. Use a normal click when you want to spend action dice on the attack first.`,
+    name: locKey`Resolve quick NPC attacks at once`,
+    hint: locKey`On: when an NPC's attack is rolled without its dialog against one targeted token, it is resolved against that token's Defense straight away. Use a normal click when you want to spend action dice on the attack first.`,
     scope: "client",
     config: true,
     type: Boolean,

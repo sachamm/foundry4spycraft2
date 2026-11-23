@@ -7,8 +7,8 @@ import {
 } from "../rules/vitality.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  owned = a => a?.type === "agent" && a.isOwner === true;
+import { same } from "../rules/equal.mjs";
+const owned = a => a?.type === "agent" && a.isOwner === true;
 const validIndex = (a, i) => Number.isSafeInteger(i) && i > 0 && i < (a.system.progression?.length ?? 0);
 const cloneProgression = a => a.system.progression.map(p => structuredClone(p));
 function cache() {

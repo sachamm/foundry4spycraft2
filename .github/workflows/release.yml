@@ -45,9 +45,18 @@ jobs:
       - name: Build compendium packs
         run: npm ci && npm run build
 
+      - name: Bundle the JavaScript into one file
+        # The archive carries the bundle at the manifest's entry path, with its source map, and no module/ folder.
+        run: |
+          npm run bundle
+          cp dist/spycraft2.mjs spycraft2.mjs
+          cp dist/spycraft2.mjs.map spycraft2.mjs.map
+
       - name: Package and verify archive
         run: |
-          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md LICENSING.md LICENSES CHANGELOG.md docs/sample-agents.md docs/sample-cast.md
+          # Data files the code fetches at run time are the only part of module/ that still ships.
+          find module -type f ! -name '*.mjs' > module-data.txt
+          zip -r spycraft2.zip system.json spycraft2.mjs spycraft2.mjs.map $(cat module-data.txt) templates styles lang packs assets README.md LICENSING.md LICENSES CHANGELOG.md docs/sample-agents.md docs/sample-cast.md -x lang/text-template.json
           unzip -t spycraft2.zip
           sha256sum spycraft2.zip system.json > SHA256SUMS.txt
 

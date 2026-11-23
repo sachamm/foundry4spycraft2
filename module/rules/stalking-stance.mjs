@@ -2,6 +2,7 @@ import { combatStanceState } from "./combat-stance.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** The p.179 bonus applies to Sneak checks, not the underlying skill bonus. */
 export function stalkingStancePlan(system, key, check, { combat = null } = {}) {
   const empty = { evidence: null, bonuses: [], notes: [] };
@@ -23,16 +24,6 @@ export function stalkingStancePlan(system, key, check, { combat = null } = {}) {
     notes: active ? [loc`Stalking Stance: +3 with this Sneak check made in combat (p.179).`] : []
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateStalkingStanceProof(actor, proof, { checkKind, skillKey, checkId, rerollOf } = {}) {
   if (!proof) return;
   if (rerollOf) {

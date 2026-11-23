@@ -4,18 +4,9 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "../rules/equal.mjs";
 const leases = new WeakMap(),
-  active = new Map(),
-  stable = v =>
-    JSON.stringify(v, (_k, x) =>
-      x && typeof x === "object" && !Array.isArray(x)
-        ? Object.fromEntries(
-            Object.keys(x)
-              .sort()
-              .map(k => [k, x[k]])
-          )
-        : x
-    );
+  active = new Map();
 const message = id =>
   globalThis.fromUuidSync?.(id) ?? [...(globalThis.game?.messages ?? [])].find(m => m.uuid === id || m.id === id);
 const targetOf = (c, finalAttack) =>

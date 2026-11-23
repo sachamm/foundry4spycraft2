@@ -35,6 +35,7 @@ import { weaponAttack } from "../../rules/gear.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { characterReminders } from "../../rules/feat-reminders.mjs";
 import { loc } from "../../i18n.mjs";
+import { postedReceipt } from "../../services/message-lookup.mjs";
 
 export const ActorRolls = Base =>
   class ActorRolls extends Base {
@@ -484,11 +485,7 @@ export const ActorRolls = Base =>
           if (posted) return posted;
         }
         const receipt = check.preRollFunding?.id,
-          posted =
-            receipt &&
-            [...(game.messages ?? [])].find(
-              m => m.flags?.spycraft2?.actorUuid === this.uuid && m.flags?.spycraft2?.preRollFunding?.id === receipt
-            );
+          posted = receipt && postedReceipt(this, "preRollFunding", receipt);
         if (posted) return posted;
         throw error;
       }

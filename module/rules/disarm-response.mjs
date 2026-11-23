@@ -8,6 +8,7 @@ export { readiedDisarmWeapons };
 import { ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { stable } from "./equal.mjs";
 /** p.356 response; the user resolves p.302's skill/attack wording in favor of
  * +3 gear on the targeted weapon's opposed defensive Standard Attack check.
  */
@@ -127,16 +128,6 @@ export function disarmResponsePlan(
     ]
   };
 }
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
 export function validateDisarmResponseProof(actor, proof, context = {}) {
   if (!proof || (proof.role !== "defender" && proof.version !== 1 && !Object.hasOwn(proof, "sureGrip"))) return;
   const { weapon, operatingProficiency, trained } = ownedWeaponTraining(actor, proof, context),

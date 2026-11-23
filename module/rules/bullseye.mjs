@@ -4,16 +4,7 @@ import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { feintAttackTarget } from "./feint-bonus.mjs";
-const stable = v =>
-  JSON.stringify(v, (_k, x) =>
-    x && typeof x === "object" && !Array.isArray(x)
-      ? Object.fromEntries(
-          Object.keys(x)
-            .sort()
-            .map(k => [k, x[k]])
-        )
-      : x
-  );
+import { stable } from "./equal.mjs";
 /** Retain the actual damage profile; stockpile counts do not describe a fired projectile. */
 export function bullseyeDamageSourceFacts(weapon, ammunition = null) {
   return {

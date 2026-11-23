@@ -1,20 +1,23 @@
 /** The Cleave Basics and Snap Shot controls on the Main tab (see module/rules/drop-follow-up.mjs). */
-import { postFinalAttack, finalAttackOptions, finalWeaponReady } from "./final-attack.mjs";
+import { finalAttackOptions, finalWeaponReady, limitedFinalAttack } from "./final-attack.mjs";
 import { DROP_FOLLOW_UPS, dropTriggerEligible, dropFollowUpPlan, triggerUsed } from "../rules/drop-follow-up.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { loc } from "../i18n.mjs";
 
-const triggerChoices = (actor, combat, ranged) =>
-  [...(game.messages ?? [])].filter(
+const triggerChoices = (actor, combat, ranged) => {
+  // The record of every posted card is needed only once a trigger qualifies, and then the same list serves them all.
+  let records;
+  return [...(game.messages ?? [])].filter(
     m =>
       m.visible !== false &&
       m.isContentVisible !== false &&
       (!m.blind || game.user.isGM) &&
       dropTriggerEligible(m.flags?.spycraft2, { actorUuid: actor.uuid, combat, ranged }) &&
-      !triggerUsed(m.uuid, posted())
+      !triggerUsed(m.uuid, (records ??= posted()))
   );
+};
 const posted = () => [...(game.messages ?? [])].map(m => m.flags?.spycraft2).filter(Boolean);
 
 export async function takeDropFollowUp(actor, key, options = {}) {
@@ -82,27 +85,24 @@ export async function takeDropFollowUp(actor, key, options = {}) {
       triggerMessageUuid: original.message.uuid ?? original.message.id,
       triggerEvidence: evidence
     };
-  return actor.useLimitedAbility(
-    key,
-    async status => {
-      const validate = () => {
-        if (!actor.isOwner || JSON.stringify(expertiseCombatContext(actor)) !== clock)
-          throw new Error(loc`The Initiative Count or ownership changed.`);
-        const fresh = event(),
-          w = actor.items.get(item.id),
-          counter = actor.system.resourceUses?.[key];
-        if (
-          JSON.stringify(fresh.plan) !== JSON.stringify(original.plan) ||
-          rollEvidence(fresh.message.flags.spycraft2) !== evidence ||
-          !finalWeaponReady(w) ||
-          JSON.stringify(actor.weaponAttack(w, opts)) !== signature ||
-          counter?.epoch !== status.epoch ||
-          counter.used !== status.used + 1
-        )
-          throw new Error(loc`The triggering hit, weapon or reserved use changed. Review it again.`);
-      };
-      return postFinalAttack(actor, item.id, opts, receipt, validate);
+  return limitedFinalAttack(actor, key, {
+    weaponId: item.id,
+    options: opts,
+    receipt,
+    check() {
+      if (!actor.isOwner || JSON.stringify(expertiseCombatContext(actor)) !== clock)
+        throw new Error(loc`The Initiative Count or ownership changed.`);
     },
-    { workflow: key }
-  );
+    changed() {
+      const fresh = event(),
+        w = actor.items.get(item.id);
+      return (
+        JSON.stringify(fresh.plan) !== JSON.stringify(original.plan) ||
+        rollEvidence(fresh.message.flags.spycraft2) !== evidence ||
+        !finalWeaponReady(w) ||
+        JSON.stringify(actor.weaponAttack(w, opts)) !== signature
+      );
+    },
+    changedMessage: loc`The triggering hit, weapon or reserved use changed. Review it again.`
+  });
 }

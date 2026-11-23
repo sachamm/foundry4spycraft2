@@ -7,7 +7,7 @@
  * character assigned to them in User Configuration, or failing that by their user name appearing in the agent's name
  * ("Breakwater (Sacha)", "Sacha's agent"). A row the GC unticks is not offered again until the proposal changes.
  */
-import { loc } from "../i18n.mjs";
+import { loc, locKey } from "../i18n.mjs";
 import { isLeadGM } from "../writers.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 
@@ -195,21 +195,21 @@ export function queueOwnershipReview(actors = null) {
 /** Register the settings and hooks. Call during `init`. */
 export function installCharacterOwnership() {
   game.settings.register(SYSTEM, DEFAULT_SETTING, {
-    name: loc`Default player access to new characters`,
-    hint: loc`What every player can do with a newly created agent. Observer lets the table see each other's sheets; the owning player still needs Owner, which the ownership review can set.`,
+    name: locKey`Default player access to new characters`,
+    hint: locKey`What every player can do with a newly created agent. Observer lets the table see each other's sheets; the owning player still needs Owner, which the ownership review can set.`,
     scope: "world",
     config: true,
     type: Number,
     choices: {
-      [OWNERSHIP.NONE]: loc`None (Foundry's default)`,
-      [OWNERSHIP.LIMITED]: loc`Limited`,
-      [OWNERSHIP.OBSERVER]: loc`Observer`
+      [OWNERSHIP.NONE]: locKey`None (Foundry's default)`,
+      [OWNERSHIP.LIMITED]: locKey`Limited`,
+      [OWNERSHIP.OBSERVER]: locKey`Observer`
     },
     default: OWNERSHIP.OBSERVER
   });
   game.settings.register(SYSTEM, REVIEW_SETTING, {
-    name: loc`Review character ownership`,
-    hint: loc`When the world loads, and when a character is created, renamed or assigned to a player, offer the GC any missing ownership: the default player access above, and Owner for the player the character is assigned to or whose user name appears in its name. Nothing changes until the GC confirms.`,
+    name: locKey`Review character ownership`,
+    hint: locKey`When the world loads, and when a character is created, renamed or assigned to a player, offer the GC any missing ownership: the default player access above, and Owner for the player the character is assigned to or whose user name appears in its name. Nothing changes until the GC confirms.`,
     scope: "world",
     config: true,
     type: Boolean,

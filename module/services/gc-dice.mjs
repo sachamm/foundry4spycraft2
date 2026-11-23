@@ -7,6 +7,7 @@ import {
 } from "./transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
+import { same } from "../rules/equal.mjs";
 /** Session-scoped Game Control action dice, pp.397–398. They have no fixed die type. */
 let queue = Promise.resolve();
 const serialize = work => {
@@ -162,7 +163,6 @@ export function adjustGCDice(amount, reason) {
     return pool;
   });
 }
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const rawPool = () => game.settings.get("spycraft2", "gcActionDice") ?? {};
 async function writePool(pool) {
   try {

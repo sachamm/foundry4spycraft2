@@ -4,15 +4,16 @@ import { intenseStancePlan } from "../rules/intense-stance.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 
 export async function declareFightDefensively(actor, options = {}) {
   if (!actor.isOwner) return null;
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Fight Defensively` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Free action at the start of your Initiative Count: −4 to every attack and skill check and +2 dodge to Defense for 1 full round (p.357).`}</p><label><input name="confirmed" type="checkbox" /> ${loc`I take this free action and accept the penalty for the full round`}</label></div>`
+    input = await formDialog({
+      title: loc`Fight Defensively`,
+      intro: loc`Free action at the start of your Initiative Count: −4 to every attack and skill check and +2 dodge to Defense for 1 full round (p.357).`,
+      fields: [{ check: "confirmed", label: loc`I take this free action and accept the penalty for the full round` }]
     });
     if (!input) return null;
   }
@@ -46,10 +47,10 @@ export async function declareIntenseStance(actor, options = {}) {
   if (!actor.isOwner) return null;
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Intense Stance` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Make no attack checks for 1 full round; during the following full round your melee attacks gain +2 to the attack check and damage (p.180).`}</p><label><input name="confirmed" type="checkbox" /> ${loc`I make no attack checks until my next Initiative Count`}</label></div>`
+    input = await formDialog({
+      title: loc`Intense Stance`,
+      intro: loc`Make no attack checks for 1 full round; during the following full round your melee attacks gain +2 to the attack check and damage (p.180).`,
+      fields: [{ check: "confirmed", label: loc`I make no attack checks until my next Initiative Count` }]
     });
     if (!input) return null;
   }

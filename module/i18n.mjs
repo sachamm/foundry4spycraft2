@@ -5,8 +5,9 @@
  *   loc`Roll ${index}: ${total} (natural ${die})`
  *
  * The English stays in the source. Its pattern ("Roll {0}: {1} (natural {2})") names a key under SPYCRAFT.Text in
- * the language files; `npm run strings` collects every pattern into lang/en.json. When the active language has a
- * translation for the key it is used, with the values placed at their numbered positions (a translation may
+ * a language file; `npm run strings` collects every pattern into lang/text-template.json for translators. English
+ * needs no entries: lang/en.json holds only the few keys Foundry localises by itself (see locKey). When the active
+ * language has a translation for the key it is used, with the values placed at their numbered positions (a translation may
  * reorder them); otherwise the English is returned exactly as a plain template literal would produce it.
  *
  * Changing the English changes the key, so a translation is tied to the wording it was written for.
@@ -56,6 +57,16 @@ export function keyOf(pattern) {
 export function fill(pattern, values) {
   if (!values.length) return pattern;
   return pattern.replace(/\{(\d+)\}/g, (match, index) => (index < values.length ? String(values[index]) : match));
+}
+
+/**
+ * Template tag for text that Foundry itself localises when it is shown (a setting's name, hint or choices): returns
+ * the key, which `npm run strings` keeps in lang/en.json. Use it where the text is fixed before the language has
+ * loaded, such as in `init`. It takes no values.
+ */
+export function locKey(strings, ...values) {
+  if (values.length) throw new Error("locKey takes plain text; use loc for text with values.");
+  return PREFIX + keyOf(strings[0]);
 }
 
 /** Template tag: the text in the active language, or the English written in the source. */

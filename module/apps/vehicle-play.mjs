@@ -37,15 +37,11 @@ import {
 } from "../rules/collision.mjs";
 import { loc } from "../i18n.mjs";
 import { refuse, decline } from "../error-notices.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 const speakerFor = doc => ChatMessage.getSpeaker({ actor: doc.documentName === "Actor" ? doc : doc.parent });
 const isVehicleActor = doc => doc?.documentName === "Actor" && doc.type === "vehicle";
-const ask = (title, content) =>
-  foundry.applications.api.DialogV2.input({
-    window: { title },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${content}</div>`
-  });
+const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 
 /** Vehicle Damage results this system records as a counter; the rest are resolved here or reported. */
 const COUNTER_BY_LOCATION = { Cont: "controls", Eng: "engine", Flot: "flotation", Fuel: "fuelHours", Lift: "lift" };

@@ -1,8 +1,9 @@
 import { getShakenApplicationReview, shakenApplicationSnapshot, shakenApplicationPlan } from "../rules/shaken.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
-  clone = structuredClone;
+import { same } from "../rules/equal.mjs";
+import { formDialog } from "./dialog-kit.mjs";
+const clone = structuredClone;
 const matches = (actual, expected) =>
   expected && typeof expected === "object" && !Array.isArray(expected)
     ? actual && Object.entries(expected).every(([k, v]) => matches(actual[k], v))
@@ -18,10 +19,28 @@ export async function applyShaken(actor, options = {}) {
   const expected = shakenApplicationSnapshot(actor);
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Apply a new Shaken source` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Grades from separate Shaken applications add together (p.342). This records a direct condition after its required saves and immunities have been resolved. It does not add stress damage or schedule stress recovery.`}</p><label>${loc`Event reference`} <input name="id" /></label><label>${loc`Source`} <input name="source" /></label><label>${loc`Incoming grade`} <select name="grade"><option value="1">I</option><option value="2">${loc`II`}</option><option value="3">${loc`III`}</option><option value="4">${loc`IV`}</option></select></label><label><input name="selfInflicted" type="checkbox" /> ${loc`This condition is caused by my own action (Uncanny Dodge IV does not halve its Count penalty)`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this new condition applies after all saves and immunities`}</label></div>`
+    input = await formDialog({
+      title: loc`Apply a new Shaken source`,
+      intro: loc`Grades from separate Shaken applications add together (p.342). This records a direct condition after its required saves and immunities have been resolved. It does not add stress damage or schedule stress recovery.`,
+      fields: [
+        { text: "id", label: loc`Event reference` },
+        { text: "source", label: loc`Source` },
+        {
+          select: "grade",
+          label: loc`Incoming grade`,
+          options: [
+            ["1", "I"],
+            ["2", loc`II`],
+            ["3", loc`III`],
+            ["4", loc`IV`]
+          ]
+        },
+        {
+          check: "selfInflicted",
+          label: loc`This condition is caused by my own action (Uncanny Dodge IV does not halve its Count penalty)`
+        },
+        { check: "confirmed", label: loc`The GC confirms this new condition applies after all saves and immunities` }
+      ]
     });
     if (!input) return null;
     input = { ...input, grade: Number(input.grade) };

@@ -188,6 +188,28 @@ function quickAttack(event, actor) {
   return false;
 }
 
+/** Sheet actions for buttons whose whole job is to call the Actor method named like the action. */
+const actorMethods = (...names) =>
+  Object.fromEntries(
+    names.map(name => [
+      name,
+      function () {
+        return this.actor[name]();
+      }
+    ])
+  );
+
+/** Sheet actions for buttons whose whole job is to hand the actor to a workflow function. */
+const actorWorkflows = workflows =>
+  Object.fromEntries(
+    Object.entries(workflows).map(([name, workflow]) => [
+      name,
+      function () {
+        return workflow(this.actor);
+      }
+    ])
+  );
+
 export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2))) {
   /** Career level whose skill points are being edited on the Skills tab. */
   _skillLevel = null;
@@ -222,6 +244,145 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      // Buttons that call the Actor method of the same name.
+      ...actorMethods(
+        "applyShaken",
+        "reviewShakenApplication",
+        "reviewMissionXP",
+        "reviewActionDieAward",
+        "reviewActionDiceSettlement",
+        "activateMasterPlan",
+        "rollDrunkReposition",
+        "beginDrunkSleep",
+        "completeDrunkSleep",
+        "beginFatigueRest",
+        "completeFatigueRest",
+        "reviewRestraintRelease",
+        "applyBaffled",
+        "reviewBaffledApplication",
+        "applyFatigue",
+        "wakeFromSleep",
+        "setSickened",
+        "rollCriticalInjury",
+        "manageCheapShots",
+        "manageAnalysisTasks",
+        "manageTakedown",
+        "manageMeleeTradeoff",
+        "sufferInitiativeLoss",
+        "useEagleEye",
+        "useRenaissanceMan",
+        "useMark",
+        "migrateBrightIdeaUses",
+        "recordAdrenalineWoundLoss",
+        "useFinalDeduction",
+        "useGlobalSearch",
+        "useLittleDetails",
+        "useMasterThief",
+        "useSafeHouse",
+        "useCareerAgentReward",
+        "reviewCareerAgentReward",
+        "useWellFunded",
+        "useToolShed",
+        "improviseCommonItem",
+        "useOneInAMillion",
+        "selectBigStickGear",
+        "selectArmorUseGear",
+        "reviewReserveTransaction",
+        "allocateMissionReserves",
+        "findImprovisedWeapon",
+        "claimGearAcquisition",
+        "recoverResourceTransaction",
+        "settleMissionXP",
+        "awardActionDice",
+        "rollKnowledge",
+        "configureFortuneTeammates",
+        "activateMentalLeap",
+        "recordFatigueEscalation",
+        "startMentalLeapSleep",
+        "completeMentalLeapSleep",
+        "rollWisdomCollapse",
+        "useEverydayGenius",
+        "useKnowItAll",
+        "useAnyTimeAnyPlace",
+        "activateNoFear",
+        "boostFortunesOfWar"
+      ),
+      // Buttons that hand the actor to a workflow.
+      ...actorWorkflows({
+        checkReflexDamage,
+        takeMobileOffense,
+        takeContempt,
+        takeCombatInstincts,
+        takeOpportunist,
+        grantFortunate,
+        applyBlackCat,
+        enterBerserkerRage,
+        useGunslingersEye,
+        takeFireTeamSupremacy,
+        declareDuelingBasics,
+        declareFightDefensively,
+        declareIntenseStance,
+        declareSnakeStrike,
+        leaveIdentity,
+        endBerserkerRage,
+        reviewFeintBonuses: reviewFeintBenefits,
+        takeCounterTrip,
+        reviewCounterTrip,
+        takeTripFinalAttack,
+        reviewTripFinalAttack,
+        manageTripOutcomes,
+        manageFeintOutcomes,
+        takeStrikingAttack,
+        reviewStrikingAttack,
+        manageThreadNeedle,
+        recordFendMovement,
+        reviewStanceMovement,
+        reviewPowerStanceInitiative: managePowerStanceInitiative,
+        declareCombatStance,
+        manageDrivingStance,
+        manageStanceDamage,
+        managePunishingDamage,
+        takeMissTrick,
+        rollCheapShot,
+        declareTwoWeapon,
+        takeTwoWeaponFinalAttack,
+        reviewTwoWeapon,
+        checkNumericalAdvantage,
+        checkCombatMovement,
+        declareDarting,
+        takeDartingFinalAttack,
+        reviewDarting,
+        declareSuperiorCover,
+        reviewSuperiorCover,
+        activateCombatExpertise,
+        settlePendingDamageSave,
+        rollPendingDamageSave,
+        reviewDamageLedger,
+        applyAccumulatedDamage,
+        checkAccumulatedDamage,
+        exposeToContagion,
+        settleGrapple,
+        sufferTypedDamage,
+        survivalSave,
+        exposureFailedSave,
+        endTypedExposure,
+        recordAnticipate,
+        standOff,
+        tireResult,
+        coupDeGraceSave,
+        cancelReady,
+        exposeToFire,
+        burningRound,
+        extinguishFire: extinguish,
+        checkIncomingDefense,
+        checkBurrowMaterial,
+        settleSilverTongueVictory,
+        recoverSilverTongueAtMissionEnd,
+        reviewRules: reviewActorRules,
+        restAndRecover,
+        rollDying,
+        calculateRecoveryRates
+      }),
       toggleEditMode() {
         if (!this.isEditable) return;
         this._editMode = !this._editMode;
@@ -251,53 +412,17 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         return this.render();
       },
       setupTask: SpycraftAgentSheet.#onSetupTask,
-      applyShaken() {
-        return this.actor.applyShaken();
-      },
-      reviewShakenApplication() {
-        return this.actor.reviewShakenApplication();
-      },
       editShakenSource(event, target) {
         return this.actor.editShakenSource(target.dataset.sourceUuid);
       },
       reviewShakenInitiative(event, target) {
         return this.actor.reviewShakenInitiative(target.dataset.combatId, target.dataset.combatantId);
       },
-      reviewMissionXP() {
-        return this.actor.reviewMissionXP();
-      },
-      reviewActionDieAward() {
-        return this.actor.reviewActionDieAward();
-      },
-      reviewActionDiceSettlement() {
-        return this.actor.reviewActionDiceSettlement();
-      },
-      activateMasterPlan() {
-        return this.actor.activateMasterPlan();
-      },
-      rollDrunkReposition() {
-        return this.actor.rollDrunkReposition();
-      },
       applyDrunkReposition(event, target) {
         return this.actor.applyDrunkReposition({ id: target.dataset.recordId });
       },
       confirmDrunkReposition(event, target) {
         return this.actor.confirmDrunkReposition({ id: target.dataset.recordId });
-      },
-      beginDrunkSleep() {
-        return this.actor.beginDrunkSleep();
-      },
-      completeDrunkSleep() {
-        return this.actor.completeDrunkSleep();
-      },
-      beginFatigueRest() {
-        return this.actor.beginFatigueRest();
-      },
-      completeFatigueRest() {
-        return this.actor.completeFatigueRest();
-      },
-      reviewRestraintRelease() {
-        return this.actor.reviewRestraintRelease();
       },
       confirmRestraintEscapeMove(event, target) {
         const message = game.messages.get(target.dataset.messageId);
@@ -307,29 +432,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       escapeRestraint() {
         return this.actor.rollSkill("athletics", "str", { initialCheck: "restraint-escape" });
       },
-      applyBaffled() {
-        return this.actor.applyBaffled();
-      },
-      reviewBaffledApplication() {
-        return this.actor.reviewBaffledApplication();
-      },
-      applyFatigue() {
-        return this.actor.applyFatigue();
-      },
-      wakeFromSleep() {
-        return this.actor.wakeFromSleep();
-      },
       setMovementCondition(event, target) {
         return this.actor.setReviewedCondition(target.dataset.condition);
-      },
-      setSickened() {
-        return this.actor.setSickened();
-      },
-      checkReflexDamage() {
-        return checkReflexDamage(this.actor);
-      },
-      rollCriticalInjury() {
-        return this.actor.rollCriticalInjury();
       },
       reviewCriticalInjury(event, target) {
         return this.actor.reviewCriticalInjury(target.dataset.injury);
@@ -337,50 +441,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       takeTotalDefense: costsAction("full", function () {
         return takeTotalDefense(this.actor);
       }),
-      takeMobileOffense() {
-        return takeMobileOffense(this.actor);
-      },
-      takeContempt() {
-        return takeContempt(this.actor);
-      },
-      takeCombatInstincts() {
-        return takeCombatInstincts(this.actor);
-      },
       takeCleaveBasics() {
         return takeDropFollowUp(this.actor, "cleaveBasics");
       },
       takeSnapShot() {
         return takeDropFollowUp(this.actor, "snapShot");
-      },
-      takeOpportunist() {
-        return takeOpportunist(this.actor);
-      },
-      grantFortunate() {
-        return grantFortunate(this.actor);
-      },
-      applyBlackCat() {
-        return applyBlackCat(this.actor);
-      },
-      enterBerserkerRage() {
-        return enterBerserkerRage(this.actor);
-      },
-      useGunslingersEye() {
-        return useGunslingersEye(this.actor);
-      },
-      takeFireTeamSupremacy() {
-        return takeFireTeamSupremacy(this.actor);
-      },
-      declareDuelingBasics() {
-        return declareDuelingBasics(this.actor);
-      },
-      declareFightDefensively() {
-        return declareFightDefensively(this.actor);
-      },
-      declareIntenseStance() {
-        return declareIntenseStance(this.actor);
-      },
-      declareSnakeStrike() {
-        return declareSnakeStrike(this.actor);
       },
       createCompanion(event, target) {
         return createCompanion(this.actor, target.dataset.feat);
@@ -400,98 +465,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       enterIdentity(event, target) {
         return enterIdentity(this.actor, target.dataset.id);
       },
-      leaveIdentity() {
-        return leaveIdentity(this.actor);
-      },
-      endBerserkerRage() {
-        return endBerserkerRage(this.actor);
-      },
-      manageCheapShots() {
-        return this.actor.manageCheapShots();
-      },
-      reviewFeintBonuses() {
-        return reviewFeintBenefits(this.actor);
-      },
-      takeCounterTrip() {
-        return takeCounterTrip(this.actor);
-      },
-      reviewCounterTrip() {
-        return reviewCounterTrip(this.actor);
-      },
-      takeTripFinalAttack() {
-        return takeTripFinalAttack(this.actor);
-      },
-      reviewTripFinalAttack() {
-        return reviewTripFinalAttack(this.actor);
-      },
-      manageTripOutcomes() {
-        return manageTripOutcomes(this.actor);
-      },
-      manageFeintOutcomes() {
-        return manageFeintOutcomes(this.actor);
-      },
-      takeStrikingAttack() {
-        return takeStrikingAttack(this.actor);
-      },
-      reviewStrikingAttack() {
-        return reviewStrikingAttack(this.actor);
-      },
-      manageThreadNeedle() {
-        return manageThreadNeedle(this.actor);
-      },
-      recordFendMovement() {
-        return recordFendMovement(this.actor);
-      },
-      reviewStanceMovement() {
-        return reviewStanceMovement(this.actor);
-      },
-      reviewPowerStanceInitiative() {
-        return managePowerStanceInitiative(this.actor);
-      },
-      declareCombatStance() {
-        return declareCombatStance(this.actor);
-      },
-      manageDrivingStance() {
-        return manageDrivingStance(this.actor);
-      },
-      manageStanceDamage() {
-        return manageStanceDamage(this.actor);
-      },
-      managePunishingDamage() {
-        return managePunishingDamage(this.actor);
-      },
-      takeMissTrick() {
-        return takeMissTrick(this.actor);
-      },
-      rollCheapShot() {
-        return rollCheapShot(this.actor);
-      },
       rollDisarm: costsAction(attackActionCost, function () {
         return rollDisarm(this.actor);
       }),
       rollDisarmResponse(event, target) {
         return rollDisarmResponse(this.actor, { weaponId: target.closest("[data-item-id]")?.dataset.itemId });
-      },
-      declareTwoWeapon() {
-        return declareTwoWeapon(this.actor);
-      },
-      takeTwoWeaponFinalAttack() {
-        return takeTwoWeaponFinalAttack(this.actor);
-      },
-      reviewTwoWeapon() {
-        return reviewTwoWeapon(this.actor);
-      },
-      checkNumericalAdvantage() {
-        return checkNumericalAdvantage(this.actor);
-      },
-      manageAnalysisTasks() {
-        return this.actor.manageAnalysisTasks();
-      },
-      checkCombatMovement() {
-        return checkCombatMovement(this.actor);
-      },
-      declareDarting() {
-        return declareDarting(this.actor);
       },
       declareFollowUp() {
         return declareDarting(this.actor, { kind: "followUp" });
@@ -499,74 +477,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       declareTwoHit() {
         return declareDarting(this.actor, { kind: "twoHit" });
       },
-      takeDartingFinalAttack() {
-        return takeDartingFinalAttack(this.actor);
-      },
-      reviewDarting() {
-        return reviewDarting(this.actor);
-      },
-      declareSuperiorCover() {
-        return declareSuperiorCover(this.actor);
-      },
-      reviewSuperiorCover() {
-        return reviewSuperiorCover(this.actor);
-      },
-      activateCombatExpertise() {
-        return activateCombatExpertise(this.actor);
-      },
-      settlePendingDamageSave() {
-        return settlePendingDamageSave(this.actor);
-      },
-      rollPendingDamageSave() {
-        return rollPendingDamageSave(this.actor);
-      },
-      reviewDamageLedger() {
-        return reviewDamageLedger(this.actor);
-      },
-      applyAccumulatedDamage() {
-        return applyAccumulatedDamage(this.actor);
-      },
-      checkAccumulatedDamage() {
-        return checkAccumulatedDamage(this.actor);
-      },
-      exposeToContagion() {
-        return exposeToContagion(this.actor);
-      },
-      settleGrapple() {
-        return settleGrapple(this.actor);
-      },
-      sufferTypedDamage() {
-        return sufferTypedDamage(this.actor);
-      },
-      survivalSave() {
-        return survivalSave(this.actor);
-      },
       acidStep(event, target) {
         return acidStep(this.actor, target.dataset.step);
       },
-      exposureFailedSave() {
-        return exposureFailedSave(this.actor);
-      },
-      endTypedExposure() {
-        return endTypedExposure(this.actor);
-      },
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
-      },
-      recordAnticipate() {
-        return recordAnticipate(this.actor);
-      },
-      standOff() {
-        return standOff(this.actor);
-      },
-      tireResult() {
-        return tireResult(this.actor);
-      },
-      coupDeGraceSave() {
-        return coupDeGraceSave(this.actor);
-      },
-      cancelReady() {
-        return cancelReady(this.actor);
       },
       rollContagionSave(event, target) {
         return rollContagionSave(this.actor, target.dataset.id);
@@ -574,35 +489,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       cureHazard(event, target) {
         return cureHazard(this.actor, target.dataset.id);
       },
-      exposeToFire() {
-        return exposeToFire(this.actor);
-      },
-      burningRound() {
-        return burningRound(this.actor);
-      },
       fightFire(event, target) {
         return fightFire(this.actor, target.dataset.method);
       },
       rollFireSave(event, target) {
         return rollFireSave(this.actor, target.dataset.kind);
-      },
-      extinguishFire() {
-        return extinguish(this.actor);
-      },
-      manageTakedown() {
-        return this.actor.manageTakedown();
-      },
-      manageMeleeTradeoff() {
-        return this.actor.manageMeleeTradeoff();
-      },
-      checkIncomingDefense() {
-        return checkIncomingDefense(this.actor);
-      },
-      sufferInitiativeLoss() {
-        return this.actor.sufferInitiativeLoss();
-      },
-      checkBurrowMaterial() {
-        return checkBurrowMaterial(this.actor);
       },
       planAmmunition(event, target) {
         return planAmmunitionStockpile(this.actor.items.get(target.closest("[data-item-id]").dataset.itemId));
@@ -616,29 +507,14 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       reviewLimitedUseCounter(event, target) {
         return this.actor.reviewLimitedUseCounter(target.dataset.resource);
       },
-      useEagleEye() {
-        return this.actor.useEagleEye();
-      },
       chooseTemporaryFocuses(event, target) {
         return this.actor.chooseTemporaryFocuses({ featId: target.dataset.itemId });
-      },
-      useRenaissanceMan() {
-        return this.actor.useRenaissanceMan();
-      },
-      settleSilverTongueVictory() {
-        return settleSilverTongueVictory(this.actor);
       },
       resumeSilverTongueVictory(event, target) {
         return resumeSilverTongueVictory(this.actor, target.dataset.victory);
       },
       correctSilverTongueVictory(event, target) {
         return correctSilverTongueVictory(this.actor, target.dataset.victory);
-      },
-      recoverSilverTongueAtMissionEnd() {
-        return recoverSilverTongueAtMissionEnd(this.actor);
-      },
-      useMark() {
-        return this.actor.useMark();
       },
       discloseMark(event, target) {
         return this.actor.discloseMark(target.dataset.observation);
@@ -652,29 +528,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       useLimitedAbility(event, target) {
         return this.actor.useManualLimitedAbility(target.dataset.resource);
       },
-      migrateBrightIdeaUses() {
-        return this.actor.migrateBrightIdeaUses();
-      },
-      recordAdrenalineWoundLoss() {
-        return this.actor.recordAdrenalineWoundLoss();
-      },
       recordHintResponse(event, target) {
         return this.actor.recordHintResponse({ source: target.dataset.resource });
-      },
-      useFinalDeduction() {
-        return this.actor.useFinalDeduction();
-      },
-      useGlobalSearch() {
-        return this.actor.useGlobalSearch();
-      },
-      useLittleDetails() {
-        return this.actor.useLittleDetails();
-      },
-      useMasterThief() {
-        return this.actor.useMasterThief();
-      },
-      useSafeHouse() {
-        return this.actor.useSafeHouse();
       },
       correctSafeHouseRecord(event, target) {
         return this.actor.correctSafeHouseRecord(target.dataset.house);
@@ -688,64 +543,19 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       reviewSafeHouseScene() {
         return this.actor.reviewLimitedUseCounter("safeHouseScene");
       },
-      useCareerAgentReward() {
-        return this.actor.useCareerAgentReward();
-      },
-      reviewCareerAgentReward() {
-        return this.actor.reviewCareerAgentReward();
-      },
-      useWellFunded() {
-        return this.actor.useWellFunded();
-      },
       reviewWellFundedCounter() {
         return this.actor.reviewLimitedUseCounter("wellFunded");
-      },
-      useToolShed() {
-        return this.actor.useToolShed();
       },
       reviewToolShedCounter() {
         return this.actor.reviewLimitedUseCounter("toolShed");
       },
-      improviseCommonItem() {
-        return this.actor.improviseCommonItem();
-      },
-      useOneInAMillion() {
-        return this.actor.useOneInAMillion();
-      },
       selectMissionCaliberGear(event, target) {
         return this.actor.selectMissionCaliberGear({ source: target.dataset.source });
-      },
-      selectBigStickGear() {
-        return this.actor.selectBigStickGear();
-      },
-      selectArmorUseGear() {
-        return this.actor.selectArmorUseGear();
-      },
-      reviewReserveTransaction() {
-        return this.actor.reviewReserveTransaction();
-      },
-      allocateMissionReserves() {
-        return this.actor.allocateMissionReserves();
-      },
-      findImprovisedWeapon() {
-        return this.actor.findImprovisedWeapon();
       },
       rollGearAcquisition(event, target) {
         return this.actor.rollGearAcquisition(
           target?.dataset.resource ? { requestAbility: target.dataset.resource } : {}
         );
-      },
-      claimGearAcquisition() {
-        return this.actor.claimGearAcquisition();
-      },
-      recoverResourceTransaction() {
-        return this.actor.recoverResourceTransaction();
-      },
-      settleMissionXP() {
-        return this.actor.settleMissionXP();
-      },
-      awardActionDice() {
-        return this.actor.awardActionDice();
       },
       manageGCDice() {
         return game.spycraft2.gcDice.manage();
@@ -757,17 +567,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         await game.spycraft2.resetUsagePeriod(target.dataset.period);
         this.render();
       },
-      rollKnowledge() {
-        return this.actor.rollKnowledge();
-      },
       initializeResources() {
         return this.actor.initializeStartingResources();
       },
       keepResources() {
         return this.actor.initializeStartingResources({ keepCurrent: true });
-      },
-      reviewRules() {
-        return reviewActorRules(this.actor);
       },
       restoreRules() {
         return reviewActorRules(this.actor, { restore: true });
@@ -777,12 +581,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       }),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
-      },
-      restAndRecover() {
-        return restAndRecover(this.actor);
-      },
-      rollDying() {
-        return rollDying(this.actor);
       },
       rollAttack: costsAction(attackActionCost, SpycraftAgentSheet.#onRollAttack),
       rollRangedAttack: costsAction(attackActionCost, function (event, target) {
@@ -801,29 +599,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       refreshAction() {
         return this.actor.refreshWithActionDie();
       },
-      configureFortuneTeammates() {
-        return this.actor.configureFortuneTeammates();
-      },
-      calculateRecoveryRates() {
-        return calculateRecoveryRates(this.actor);
-      },
-      activateMentalLeap() {
-        return this.actor.activateMentalLeap();
-      },
       endMentalLeap(event, target) {
         return this.actor.endMentalLeap({ id: target.dataset.recordId });
-      },
-      recordFatigueEscalation() {
-        return this.actor.recordFatigueEscalation();
-      },
-      startMentalLeapSleep() {
-        return this.actor.startMentalLeapSleep();
-      },
-      completeMentalLeapSleep() {
-        return this.actor.completeMentalLeapSleep();
-      },
-      rollWisdomCollapse() {
-        return this.actor.rollWisdomCollapse();
       },
       summonClassAssistants(event, target) {
         return this.actor.summonClassAssistants(target.dataset.resource);
@@ -831,23 +608,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       withdrawClassAssistants(event, target) {
         return this.actor.withdrawClassAssistants(target.dataset.groupId);
       },
-      useEverydayGenius() {
-        return this.actor.useEverydayGenius();
-      },
-      useKnowItAll() {
-        return this.actor.useKnowItAll();
-      },
-      useAnyTimeAnyPlace() {
-        return this.actor.useAnyTimeAnyPlace();
-      },
       useIntelTemporaryFeats(event, target) {
         return this.actor.useIntelTemporaryFeats(target.dataset.resource);
-      },
-      activateNoFear() {
-        return this.actor.activateNoFear();
-      },
-      boostFortunesOfWar() {
-        return this.actor.boostFortunesOfWar();
       },
       boostDefense() {
         return this.actor.boostDefenseWithActionDie();
@@ -1887,31 +1649,41 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      // Buttons that call the Actor method of the same name.
+      ...actorMethods(
+        "manageTakedown",
+        "applyShaken",
+        "reviewShakenApplication",
+        "applyBaffled",
+        "reviewBaffledApplication",
+        "manageCheapShots"
+      ),
+      // Buttons that hand the actor to a workflow.
+      ...actorWorkflows({
+        npcDamageSave,
+        manageDisposition,
+        npcPackages: manageNpcPackages,
+        restAndRecover,
+        rollDying,
+        exposeToContagion,
+        exposeToFire,
+        burningRound,
+        extinguishFire: extinguish,
+        sufferTypedDamage,
+        survivalSave,
+        exposureFailedSave,
+        endTypedExposure
+      }),
       toggleEditMode() {
         if (!this.isEditable) return;
         this._editMode = !this._editMode;
         return this.render();
-      },
-      manageTakedown() {
-        return this.actor.manageTakedown();
-      },
-      applyShaken() {
-        return this.actor.applyShaken();
-      },
-      reviewShakenApplication() {
-        return this.actor.reviewShakenApplication();
       },
       editShakenSource(event, target) {
         return this.actor.editShakenSource(target.dataset.sourceUuid);
       },
       reviewShakenInitiative(event, target) {
         return this.actor.reviewShakenInitiative(target.dataset.combatId, target.dataset.combatantId);
-      },
-      applyBaffled() {
-        return this.actor.applyBaffled();
-      },
-      reviewBaffledApplication() {
-        return this.actor.reviewBaffledApplication();
       },
       setNpcSkillCondition(event, target) {
         return this.actor.setReviewedCondition(target.dataset.condition);
@@ -1924,21 +1696,12 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       callQualitySave(event, target) {
         return callQualitySave(this.actor, target.dataset.id);
       },
-      npcDamageSave() {
-        return npcDamageSave(this.actor);
-      },
       async resetDamageTrack() {
         await resetDamageTrack(this.actor);
         this.render();
       },
-      manageDisposition() {
-        return manageDisposition(this.actor);
-      },
       async endPromotion() {
         await this.actor.update({ "system.promotion": null });
-      },
-      npcPackages() {
-        return manageNpcPackages(this.actor);
       },
       npcPackageBands() {
         return manageNpcPackages(this.actor, { editBands: true });
@@ -1948,9 +1711,6 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       npcAddQuality: SpycraftNpcSheet.#onAddQuality,
       npcAddPick: SpycraftNpcSheet.#onAddPick,
       npcRemoveRow: SpycraftNpcSheet.#onRemoveRow,
-      manageCheapShots() {
-        return this.actor.manageCheapShots();
-      },
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
       reloadWeapon: costsAction("half", function (event, target) {
@@ -1959,26 +1719,11 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
-      restAndRecover() {
-        return restAndRecover(this.actor);
-      },
-      rollDying() {
-        return rollDying(this.actor);
-      },
-      exposeToContagion() {
-        return exposeToContagion(this.actor);
-      },
       rollContagionSave(event, target) {
         return rollContagionSave(this.actor, target.dataset.id);
       },
       cureHazard(event, target) {
         return cureHazard(this.actor, target.dataset.id);
-      },
-      exposeToFire() {
-        return exposeToFire(this.actor);
-      },
-      burningRound() {
-        return burningRound(this.actor);
       },
       fightFire(event, target) {
         return fightFire(this.actor, target.dataset.method);
@@ -1986,23 +1731,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       rollFireSave(event, target) {
         return rollFireSave(this.actor, target.dataset.kind);
       },
-      extinguishFire() {
-        return extinguish(this.actor);
-      },
-      sufferTypedDamage() {
-        return sufferTypedDamage(this.actor);
-      },
-      survivalSave() {
-        return survivalSave(this.actor);
-      },
       acidStep(event, target) {
         return acidStep(this.actor, target.dataset.step);
-      },
-      exposureFailedSave() {
-        return exposureFailedSave(this.actor);
-      },
-      endTypedExposure() {
-        return endTypedExposure(this.actor);
       },
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);

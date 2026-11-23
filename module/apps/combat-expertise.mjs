@@ -3,6 +3,7 @@ import { attributeActionBlock } from "../rules/attributes.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog } from "./dialog-kit.mjs";
 export function expertiseCombatContext(actor) {
   const c = actor.participatingCombat,
     own = c?.turns?.find(t => t.actor?.uuid === actor.uuid);
@@ -22,10 +23,20 @@ export async function activateCombatExpertise(actor, options = {}) {
   const snapshot = JSON.stringify(expertiseCombatContext(actor));
   let input = options;
   if (!Object.hasOwn(input, "penalty")) {
-    input = await foundry.applications.api.DialogV2.input({
-      window: { title: loc`Combat Expertise` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Free action on your own Initiative Count: take a penalty on every attack and skill check and gain the same amount as a dodge bonus to Defense until the start of your next Initiative Count. The penalty remains even when vulnerability removes the dodge bonus.`}</p><label>${loc`Penalty`} <input name="penalty" type="number" min="1" max="${Math.min(6, actor.system.defense?.base ?? 0)}" step="1" value="1" /></label><label><input name="confirmed" type="checkbox" /> ${loc`I take this free action and accept the penalty for the full round`}</label></div>`
+    input = await formDialog({
+      title: loc`Combat Expertise`,
+      intro: loc`Free action on your own Initiative Count: take a penalty on every attack and skill check and gain the same amount as a dodge bonus to Defense until the start of your next Initiative Count. The penalty remains even when vulnerability removes the dodge bonus.`,
+      fields: [
+        {
+          number: "penalty",
+          label: loc`Penalty`,
+          min: "1",
+          max: Math.min(6, actor.system.defense?.base ?? 0),
+          step: "1",
+          value: "1"
+        },
+        { check: "confirmed", label: loc`I take this free action and accept the penalty for the full round` }
+      ]
     });
     if (!input) return null;
   }

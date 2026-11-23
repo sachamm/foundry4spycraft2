@@ -31,15 +31,11 @@ import {
   senseLimit,
   surfaceMove
 } from "../../rules/gc/combat-reference.mjs";
-import { loc } from "../../i18n.mjs";
+import { loc, locKey } from "../../i18n.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
+import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content) =>
-  foundry.applications.api.DialogV2.input({
-    window: { title },
-    rejectClose: false,
-    content: `<div class="spycraft2-roll-options">${content}</div>`
-  });
+const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -210,8 +206,8 @@ export async function recordAutomaticFluidEvent(actor, id) {
 
 export function registerAutomaticFluidSetting() {
   game.settings.register("spycraft2", "autoFluidEvents", {
-    name: loc`Record fluid initiative from damage`,
-    hint: loc`When applied damage costs a combatant wounds, the matching end-of-round Initiative change is recorded for you.`,
+    name: locKey`Record fluid initiative from damage`,
+    hint: locKey`When applied damage costs a combatant wounds, the matching end-of-round Initiative change is recorded for you.`,
     scope: "world",
     config: true,
     type: Boolean,

@@ -69,7 +69,7 @@ import * as vehiclePlay from "./module/apps/vehicle-play.mjs";
 import { SpycraftBrowser } from "./module/apps/browser.mjs";
 import { evaluate, renderTemplate } from "./module/rules/formula.mjs";
 import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
-import { loc } from "./module/i18n.mjs";
+import { loc, locKey } from "./module/i18n.mjs";
 import { registerSystemHelpers } from "./module/handlebars-helpers.mjs";
 import { localizeConfig } from "./module/i18n-data.mjs";
 import { registerErrorNotices } from "./module/error-notices.mjs";
@@ -143,8 +143,8 @@ Hooks.once("init", () => {
   if (!CONFIG.statusEffects.some(effect => effect.id === "bound"))
     CONFIG.statusEffects.push({ id: "bound", name: "SPYCRAFT.Condition.Bound", img: "icons/svg/net.svg" });
   game.settings.register("spycraft2", "linguistics", {
-    name: loc`Optional Linguistics checks`,
-    hint: loc`Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.`,
+    name: locKey`Optional Linguistics checks`,
+    hint: locKey`Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.`,
     scope: "world",
     config: true,
     type: Boolean,
@@ -152,8 +152,8 @@ Hooks.once("init", () => {
   });
 
   game.settings.register("spycraft2", "countAmmunition", {
-    name: loc`Count ammunition`,
-    hint: loc`Attacks take their shots from the weapon, a weapon that is empty must be reloaded, and Reload draws on the loads its ammunition code supplies.`,
+    name: locKey`Count ammunition`,
+    hint: locKey`Attacks take their shots from the weapon, a weapon that is empty must be reloaded, and Reload draws on the loads its ammunition code supplies.`,
     scope: "world",
     config: true,
     type: Boolean,

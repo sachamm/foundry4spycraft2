@@ -20,6 +20,7 @@ import { hazardSaveResolvers, post, rollTotal, sufferStress } from "./hazards.mj
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { formDialog, raw } from "./dialog-kit.mjs";
 
 const owned = actor => actor?.isOwner === true;
 
@@ -77,10 +78,22 @@ export async function recordAnticipate(actor, options = {}) {
   if (!owned(actor)) return null;
   let input = options;
   if (!input.outcome) {
-    input = await systemDialog.input({
-      window: { title: loc`Anticipate result` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Roll Sense Motive and choose Anticipate Action first. The DC is 10 + the opponent's base attack bonus.`}</p><label>${loc`Opponent`} <select name="opponentUuid">${opponentOptions(actor)}</select></label><label>${loc`Result`} <select name="outcome"><option value="success">${loc`Success`}</option><option value="critical">${loc`Critical success`}</option><option value="failure">${loc`Failure`}</option><option value="criticalFailure">${loc`Critical failure`}</option></select></label></div>`
+    input = await formDialog({
+      title: loc`Anticipate result`,
+      intro: loc`Roll Sense Motive and choose Anticipate Action first. The DC is 10 + the opponent's base attack bonus.`,
+      fields: [
+        { select: "opponentUuid", label: loc`Opponent`, optionsHtml: raw(opponentOptions(actor)) },
+        {
+          select: "outcome",
+          label: loc`Result`,
+          options: [
+            ["success", loc`Success`],
+            ["critical", loc`Critical success`],
+            ["failure", loc`Failure`],
+            ["criticalFailure", loc`Critical failure`]
+          ]
+        }
+      ]
     });
     if (!input) return null;
   }
@@ -171,10 +184,21 @@ export async function tireResult(actor, options = {}) {
   if (!owned(actor)) return null;
   let input = options;
   if (!input.result) {
-    input = await systemDialog.input({
-      window: { title: loc`Tire result` },
-      rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label>${loc`Opponent`} <select name="opponentUuid">${opponentOptions(actor)}</select></label><label>${loc`Result for this character`} <select name="result"><option value="won">${loc`Won`}</option><option value="wonCritical">${loc`Won with a critical success, or the opponent's critical failure`}</option><option value="lost">${loc`Lost`}</option><option value="lostCritical">${loc`Lost to the opponent's critical success, or my critical failure`}</option></select></label></div>`
+    input = await formDialog({
+      title: loc`Tire result`,
+      fields: [
+        { select: "opponentUuid", label: loc`Opponent`, optionsHtml: raw(opponentOptions(actor)) },
+        {
+          select: "result",
+          label: loc`Result for this character`,
+          options: [
+            ["won", loc`Won`],
+            ["wonCritical", loc`Won with a critical success, or the opponent's critical failure`],
+            ["lost", loc`Lost`],
+            ["lostCritical", loc`Lost to the opponent's critical success, or my critical failure`]
+          ]
+        }
+      ]
     });
     if (!input) return null;
   }
