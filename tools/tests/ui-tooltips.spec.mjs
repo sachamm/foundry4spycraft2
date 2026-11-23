@@ -174,10 +174,10 @@ test("clock controls that ask for artwork get distinct pictures, compact hover t
 
 test("every atlas image loads where a region asks for artwork", async ({ page }) => {
   const catalog = JSON.parse(readFileSync(new URL("../../assets/ui/functions/catalog.json", import.meta.url)));
-  await page.route(/\/assets\/ui\/functions\/[^/]+\.png$/, route => {
+  await page.route(/\/assets\/ui\/functions\/[^/]+\.webp$/, route => {
     const file = new URL(route.request().url()).pathname.split("/").at(-1);
     return route.fulfill({
-      contentType: "image/png",
+      contentType: "image/webp",
       body: readFileSync(new URL(`../../assets/ui/functions/${file}`, import.meta.url))
     });
   });

@@ -111,6 +111,3 @@ export function persuadeToJoin(gradeId, result, { triumph = false } = {}) {
   if (grade.joinDC === null) return { dc: null, success: !!triumph, needsTriumph: true };
   return { dc: grade.joinDC, success: Number.isFinite(result) && result >= grade.joinDC, needsTriumph: false };
 }
-
-/** Priority multiplier (how readily the NPC puts the character's needs ahead of its own). */
-export const dispositionPriority = gradeId => dispositionGrade(gradeId).priority;

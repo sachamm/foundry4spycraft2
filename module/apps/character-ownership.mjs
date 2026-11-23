@@ -7,6 +7,7 @@
  * character assigned to them in User Configuration, or failing that by their user name appearing in the agent's name
  * ("Breakwater (Sacha)", "Sacha's agent"). A row the GC unticks is not offered again until the proposal changes.
  */
+import { readSetting } from "../settings.mjs";
 import { loc, locKey } from "../i18n.mjs";
 import { isLeadGM } from "../writers.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
@@ -94,11 +95,7 @@ export function describeProposal(proposal) {
 }
 
 function setting(key, fallback) {
-  try {
-    return game.settings.get(SYSTEM, key);
-  } catch {
-    return fallback;
-  }
+  return readSetting(key, fallback);
 }
 
 /** The default ownership level new agents receive (0 leaves Foundry's own default). */

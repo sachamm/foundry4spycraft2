@@ -16,6 +16,7 @@
  *
  * The rules are in module/rules/timers.mjs.
  */
+import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { refuse } from "../error-notices.mjs";
 import {
@@ -41,11 +42,7 @@ import { loc, locKey } from "../i18n.mjs";
 const pad = n => String(n).padStart(2, "0");
 const now = () => Math.max(0, Math.floor(Number(game.time?.worldTime) || 0));
 const setting = key => {
-  try {
-    return game.settings.get("spycraft2", key);
-  } catch {
-    return undefined;
-  }
+  return readSetting(key, undefined);
 };
 
 /* -------------------------------------------- */

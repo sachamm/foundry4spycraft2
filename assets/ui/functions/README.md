@@ -13,3 +13,6 @@ Action tooltips use compact labels rather than explanatory boilerplate. Full acc
 Common verbs (edit, remove, share, reload, add and the like) now use the single-colour Font Awesome glyphs that ship
 with Foundry, mapped in `module/apps/ui-verb-icons.mjs`. The painted atlases here are illustrations: a control shows
 one only when it sits inside a region marked `data-sc2-art`, or when an icon-only control has no glyph of its own.
+
+The atlases are stored as 512×512 WebP (64px cells in the 8×8 sheets), about three times the largest size an
+icon is drawn at.

@@ -1,3 +1,4 @@
+import { checkFocus, isHideCheck } from "./check-identity.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
 import "./stalking-stance.mjs";
@@ -370,7 +371,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     String(value ?? "")
       .trim()
       .toLowerCase();
-  const applicableFocus = focus || check.name.replace(/ Check$/, "");
+  const applicableFocus = focus || checkFocus(key, check);
   const owned = system.focusTotals?.[key] ?? system.focuses?.[key] ?? [];
   const missingFocus = skill.focus && !owned.some(value => norm(value) === norm(applicableFocus));
   const rankAdjustment = missingFocus ? -Math.ceil(skill.ranks / 2) : 0;
@@ -783,7 +784,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     condition = skillBonusCondition(system, normalSkillBonus + skillExtra);
   const checkAdjustment =
     skillConditionCheckPenalty(conditionSystem, selected) +
-    (key === "sneak" && /^Hide(?: Check)?$/.test(check.name) ? (system.sizeHideModifier ?? 0) : 0) +
+    (isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0) +
     (hasForte ? 1 : 0) +
     armor +
     vision +

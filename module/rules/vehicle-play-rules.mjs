@@ -101,8 +101,6 @@ const UNIT_HOURS = {
   years: 8760,
   r: 1 / 600
 };
-/** Hours of fuel each combat or chase round uses: one minute (p.365). */
-export const FUEL_HOURS_PER_ROUND = 1 / 60;
 
 /** {hours, fuel, fuelName} from a Range/Fuel label such as "7/G", "60 days/F" or "2r/A"; null when it has no fuel range. */
 export function parseRangeFuel(label) {

@@ -3,6 +3,7 @@
  * blast lists who it reaches. Everything measured is a starting value the player can change; with no scene, no
  * token for the character or no single target, the dialogs open as they always did.
  */
+import { readSetting } from "../settings.mjs";
 import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
@@ -36,11 +37,7 @@ export function registerMapSettings() {
 }
 
 function enabled() {
-  try {
-    return game.settings.get("spycraft2", SETTING) !== false;
-  } catch {
-    return true;
-  }
+  return readSetting(SETTING, true) !== false;
 }
 
 /** Whether there is a scene to measure on. */

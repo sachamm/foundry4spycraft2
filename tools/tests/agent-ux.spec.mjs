@@ -181,7 +181,11 @@ for (const width of [560, 820])
     expect(await page.locator(".window-content").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   });
 
-const dialogUX = readFileSync(new URL("../../module/apps/dialog-theme.mjs", import.meta.url), "utf8");
+const settings = readFileSync(new URL("../../module/settings.mjs", import.meta.url), "utf8").replace(/^export /gm, "");
+const dialogUX = readFileSync(new URL("../../module/apps/dialog-theme.mjs", import.meta.url), "utf8").replace(
+  /^import \{ readSetting \} from "[^"]+";\n/m,
+  `${settings}\n`
+);
 
 for (const height of [600, 800])
   test(`system dialogs keep the dossier theme and confirmation reachable with expanded content at ${height}px`, async ({

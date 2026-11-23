@@ -46,7 +46,7 @@
   </table></div>
 
   {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Gear" type="gear" browse="SPYCRAFT.Template.ActorAgentGear.BrowseGear" add="SPYCRAFT.Template.ActorAgentGear.AddGear"}}
-  <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Gear'}}">
+  <div class="inventory-table-wrap"><table class="items inventory-table" data-kind="gear" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Gear'}}">
     <thead><tr><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Name"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Quantity"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Caliber"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Pick"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Actions"}}</th></tr></thead>
     <tbody>{{#each gear}}
       <tr data-item-id="{{item.id}}">
@@ -57,7 +57,7 @@
   </table></div>
 
   {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Template.ActorAgentGear.Vehicles" type="vehicle" browse="SPYCRAFT.Template.ActorAgentGear.BrowseVehicles" add="SPYCRAFT.Template.ActorAgentGear.AddVehicle"}}
-  <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Vehicles'}}">
+  <div class="inventory-table-wrap"><table class="items inventory-table" data-kind="vehicles" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Vehicles'}}">
     <thead><tr><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Name"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Category"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Caliber"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Pick"}}</th><th scope="col"><abbr title="{{localize 'SPYCRAFT.Template.ActorAgentGear.AccelerationTurning'}}">{{localize "SPYCRAFT.Template.ActorAgentGear.AccelTurn"}}</abbr></th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.MPH"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.DefenseSave"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Actions"}}</th></tr></thead>
     <tbody>{{#each vehicles}}
       <tr data-item-id="{{item.id}}">

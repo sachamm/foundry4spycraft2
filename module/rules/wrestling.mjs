@@ -33,8 +33,6 @@ export function openStanceSpec(system) {
     : null;
 }
 
-export const BRUSH_DAMAGE = "1d6";
-
 export function brushPlan(system, weapon, { brush = false, attackAction = "standard" } = {}) {
   if (brush !== true) return null;
   if (!system?.activeFeatNames?.includes("Wrestling Basics"))

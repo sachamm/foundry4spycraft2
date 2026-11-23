@@ -6,6 +6,7 @@
  * character, and this module adds or removes the matching effect whenever that record or the combat clock changes.
  * Only the active GM's client writes, so two clients never create the same effect.
  */
+import { readSetting } from "../settings.mjs";
 import { combatExpertiseState } from "../rules/combat-expertise.mjs";
 import { fightDefensivelyState } from "../rules/fight-defensively.mjs";
 import { combatStanceState } from "../rules/combat-stance.mjs";
@@ -149,11 +150,7 @@ export async function syncRoundStateEffects(actor, { states = ROUND_STATES } = {
 }
 
 const enabled = () => {
-  try {
-    return game.settings.get("spycraft2", "roundStateEffects") !== false;
-  } catch {
-    return false;
-  }
+  return readSetting("roundStateEffects", false) !== false;
 };
 const mine = actor => enabled() && actor?.type === "agent" && game.users?.activeGM?.isSelf === true;
 const report = error => console.error(loc`Spycraft 2.0 | Could not update round-state effects`, error);

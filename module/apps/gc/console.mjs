@@ -1,3 +1,4 @@
+import { readSetting } from "../../settings.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { installToolSearch } from "../tool-search.mjs";
@@ -157,11 +158,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
 const SECTION_SETTING = "gcConsoleSections";
 function storedSections() {
-  try {
-    return game.settings.get("spycraft2", SECTION_SETTING) ?? {};
-  } catch {
-    return {};
-  }
+  return readSetting(SECTION_SETTING, {}) ?? {};
 }
 function rememberSection(section, state, open) {
   const stored = { ...storedSections(), [section]: { state, open } };

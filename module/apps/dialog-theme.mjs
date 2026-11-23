@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+import { readSetting } from "../settings.mjs";
 import { loc, locKey } from "../i18n.mjs";
 
 /** Keep Foundry's dialog behavior and callbacks; opt system-owned dialogs into the skin. */
@@ -27,11 +28,7 @@ export function themeSystemDialog(dialog) {
 
 /** The world setting that lets players' declarations stand without ticking each GC confirmation. */
 export function tableTrusted() {
-  try {
-    return game.settings.get("spycraft2", "trustTheTable") === true;
-  } catch {
-    return false;
-  }
+  return readSetting("trustTheTable", false) === true;
 }
 
 /**

@@ -1,4 +1,5 @@
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
+import { checkFocus } from "../../rules/check-identity.mjs";
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { orderSkillChecks, needsGear } from "../../rules/skill-check-order.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
@@ -462,7 +463,7 @@ export const ActorSkillRolls = Base =>
             ability: fresh.ability,
             skillKey: key,
             checkId: check.id,
-            focus: input.focus || check.name.replace(/ Check$/, ""),
+            focus: input.focus || checkFocus(key, check),
             cleanAndPolished: cleanAndPolishedApplies(this.system, currentGear?.system),
             gearUuid: currentGear?.uuid ?? "",
             requiredBonusPoolId,

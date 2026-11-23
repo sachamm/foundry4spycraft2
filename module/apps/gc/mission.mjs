@@ -9,7 +9,7 @@ import {
   exposurePenalty,
   defaultMission
 } from "../../rules/gc/mission.mjs";
-import { qualityAddition, campaignQuality, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
+import { qualityAddition, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
@@ -502,5 +502,3 @@ export async function editSeasonQualities() {
   });
   return getCampaign();
 }
-
-export const describeQuality = id => campaignQuality(id)?.summary ?? "";

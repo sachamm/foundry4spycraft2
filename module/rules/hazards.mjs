@@ -232,7 +232,6 @@ export const FIRE_AP = [
   { id: "t6000", upTo: 6000, ap: 24 },
   { id: "hotter", upTo: Infinity, ap: 28 }
 ];
-export const FIRE_PAGE = 337;
 
 /** The armor-piercing value of a fire at a temperature in °F. */
 export function fireAP(temperature) {
