@@ -6,7 +6,6 @@
 .spycraft2 .window-content { padding: 6px 10px; }
 .spycraft2 h3 { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; padding-bottom: 2px; border-bottom: 1px solid var(--sc2-border); font-size: 1.05em; }
 .spycraft2 h3 .controls, .spycraft2 h3 .points { margin-left: auto; font-size: 0.85em; font-weight: normal; }
-.spycraft2 h3 .controls a { margin-left: 8px; }
 .spycraft2 .muted { opacity: 0.7; }
 .spycraft2 .bad, .spycraft2 .bad input { color: var(--sc2-bad); font-weight: bold; }
 .spycraft2 .tag { font-size: 0.8em; padding: 0 4px; border: 1px solid var(--sc2-border); border-radius: 3px; opacity: 0.8; }
@@ -67,7 +66,6 @@
 .spycraft2 .header-main input.codename { flex: 1; }
 .spycraft2 .summary, .spycraft2 .resources { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .spycraft2 .resources input { width: 3.5em; text-align: center; }
-.spycraft2 .resources a { margin-left: 4px; }
 .spycraft2 .summary .talent, .spycraft2 .summary .specialty { padding: 0 6px; border-left: 2px solid var(--sc2-action); }
 .spycraft2 details.warnings { border: 1px solid var(--sc2-bad); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
 .spycraft2 details.warnings summary { color: var(--sc2-bad); cursor: pointer; }
@@ -81,7 +79,6 @@
 .spycraft2 .stat b { font-size: 1.3em; }
 .spycraft2 .stat small { opacity: 0.7; font-size: 0.75em; }
 .spycraft2 .abilities td.score { font-weight: bold; font-size: 1.1em; }
-.spycraft2 .abilities td.mod a { font-weight: bold; }
 .spycraft2 .increases { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; font-size: 0.9em; }
 .spycraft2 .increases select { width: auto; }
 .spycraft2 .carry { font-size: 0.85em; }
@@ -100,7 +97,6 @@
 .spycraft2 .feats-list li.unqualified .name { color: var(--sc2-bad); text-decoration: line-through; }
 .spycraft2 .feat-slots, .spycraft2 .gear-picks { display: flex; flex-wrap: wrap; gap: 6px; }
 .spycraft2 .slot { border: 1px solid var(--sc2-border); border-radius: 4px; padding: 1px 6px; font-size: 0.9em; }
-.spycraft2 td.controls a.on, .spycraft2 a.on { color: var(--sc2-good); }
 
 /* Classes */
 .spycraft2 .class-block { border: 1px solid var(--sc2-border); border-radius: 4px; padding: 0 8px 6px; margin-top: 8px; }
@@ -146,10 +142,7 @@
 .spycraft2 details.todo { border: 1px solid var(--sc2-action); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
 .spycraft2 details.todo summary { color: var(--sc2-action); cursor: pointer; font-weight: bold; }
 .spycraft2 details.todo ul { margin: 4px 0; padding-left: 18px; font-size: 0.9em; columns: 2; column-gap: 24px; }
-.spycraft2 .summary .origin a + a { margin-left: 4px; opacity: 0.6; font-size: 0.85em; }
-.spycraft2 .summary .origin a + a:hover { opacity: 1; }
 .spycraft2 [data-tooltip-html] { cursor: help; }
-.spycraft2 a[data-tooltip-html] { cursor: pointer; }
 .spycraft2.browser .row-main .summary { font-size: 0.85em; opacity: 0.85; }
 .spycraft2.browser li button:disabled { opacity: 0.5; cursor: default; }
 

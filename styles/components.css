@@ -3,7 +3,7 @@
 
 /* ---------- Buttons ---------- */
 /* Secondary: the resting look of every action in a sheet or console. */
-.spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action, .sc2-weapon a[data-action]),
+.spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action),
 .spycraft2.application:is(.npc, .vehicle) :where(a[data-action]),
 .gc-console-body :where(button, .sc2-icon-button) {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -13,7 +13,7 @@
   color: var(--sc2-teal); background: var(--sc2-paper-raised);
   border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); box-shadow: none; cursor: pointer;
 }
-.spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-weapon a[data-action]):hover,
+.spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn):hover,
 .spycraft2.application:is(.npc, .vehicle) :where(a[data-action]):hover,
 .gc-console-body :where(button, .sc2-icon-button):hover {
   color: var(--sc2-ink-strong); background: var(--sc2-paper-sunk); border-color: var(--sc2-teal); text-decoration: none;
@@ -51,13 +51,13 @@
   background: var(--sc2-paper-raised); border: 1px solid var(--sc2-brass); border-bottom-width: 2px;
 }
 /* Name link: opens or rolls the thing it names. Reads as text, not as a button. */
-.spycraft2.application :is(a, button):is([data-action="itemEdit"], [data-action="openCompanion"]),
+.spycraft2.application button:is([data-action="itemEdit"], [data-action="openCompanion"]),
 .spycraft2.application .skills-table th button[data-action="rollSkill"] {
   min-height: 28px; min-width: 0; padding: 2px 4px; justify-content: flex-start; text-align: left;
   font-family: inherit; font-weight: 700; color: var(--sc2-ink-strong);
   background: transparent; border: 1px solid transparent;
 }
-.spycraft2.application :is(a, button):is([data-action="itemEdit"], [data-action="openCompanion"]):hover,
+.spycraft2.application button:is([data-action="itemEdit"], [data-action="openCompanion"]):hover,
 .spycraft2.application .skills-table th button[data-action="rollSkill"]:hover {
   color: var(--sc2-teal); background: var(--sc2-teal-tint); border-color: transparent; text-decoration: underline;
 }
@@ -74,7 +74,6 @@
 .spycraft2 .origin.sc2-chip [data-action] { min-width: 44px; min-height: 44px; }
 
 .spycraft2 .sc2-meter { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 2px 6px; min-width: 150px; }
-.spycraft2 .sc2-meter-label { font: 600 var(--sc2-caption-size)/1.35 var(--font-primary, sans-serif); letter-spacing: 0.02em; color: var(--sc2-ink-muted); }
 .spycraft2 .sc2-meter-max { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); white-space: nowrap; }
 .spycraft2 .sc2-meter progress {
   grid-column: 1 / -1; width: 100%; height: 6px; appearance: none; -webkit-appearance: none;
@@ -147,11 +146,11 @@
 }
 .spycraft2.application h3:first-child { margin-top: 0; }
 .spycraft2.application h3 :is(.points, .muted) { margin-left: auto; font-family: var(--sc2-num); letter-spacing: 0; opacity: 1; color: var(--sc2-on-bar); }
-.spycraft2.application h3 .controls :is(button, a) {
+.spycraft2.application h3 .controls button {
   min-height: 22px; padding: 1px 8px; font-size: var(--sc2-text-s);
   color: var(--sc2-on-bar); background: transparent; border-color: color-mix(in srgb, var(--sc2-on-bar) 45%, transparent);
 }
-.spycraft2.application h3 .controls :is(button, a):hover { color: var(--sc2-bar); background: var(--sc2-on-bar); border-color: var(--sc2-on-bar); }
+.spycraft2.application h3 .controls button:hover { color: var(--sc2-bar); background: var(--sc2-on-bar); border-color: var(--sc2-on-bar); }
 .spycraft2.application h3 input { height: 20px; min-height: 0; }
 
 /* Field: a small caption above its value. Stat tiles are fields. */

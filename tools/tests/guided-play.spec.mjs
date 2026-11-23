@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { systemCss } from "../lib/system-css.mjs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 
 test("tool search reveals matching sections and restores current disclosure choices without submitting data", async ({
@@ -95,9 +95,7 @@ test("vehicle section choices and active search survive a sheet replacement", as
 
 for (const theme of ["light", "dark"])
   test(`frequent icon targets are 44px and fit a compact rail in ${theme} mode`, async ({ page }) => {
-    const css = ["tokens", "components"]
-      .map(name => readFileSync(new URL(`../../styles/${name}.css`, import.meta.url), "utf8"))
-      .join("\n");
+    const css = systemCss();
     await page.setContent(
       `<style>${css}</style><div class="theme-${theme}"><div class="spycraft2 application" style="width:240px"><div style="display:flex;flex-wrap:wrap;gap:4px">${Array.from({ length: 6 }, (_, i) => `<button class="sc2-icon-button" data-sc2-mode="icon" aria-label="Action ${i}">+</button>`).join("")}</div></div></div>`
     );

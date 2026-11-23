@@ -20,6 +20,12 @@
 - **Taller roll dialogs.** A dialog's body used to stop at half the screen height (360px at 1280×720). It now uses
   the height left after the header and footer, and scrolls as one box.
 
+- **Under the hood: tooling.** Layout tests now load the same stylesheets, in the same order, as a world does, and
+  check the agent sheet at the sizes it opens at on 1280×720 and 1366×768 screens. Lint fails if the number of
+  warnings grows, and a test stops template lines from getting longer. `npm run check:schemas` no longer exits
+  cleanly when it could not find Foundry. Dependabot watches npm and the CI actions. `docs/architecture.md` maps the
+  layers and lists what to touch when adding an ability. Seven style rules that matched nothing were removed.
+
 - **Fewer redraws during a conflict.** A change to scene state or to a Dramatic Conflict used to recalculate every
   character and redraw every sheet on every client; it now redraws the GC Console only. A mission or campaign change
   still recalculates everyone, but redraws only the sheets that are open.

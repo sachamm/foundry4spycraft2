@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { systemCss } from "../lib/system-css.mjs";
 import { buildPacks } from "../lib/pack-docs.mjs";
 import { planNpcPackage } from "../../module/rules/npc-packages.mjs";
 import { manageNpcPackages, npcPackagePreview } from "../../module/apps/npc-packages.mjs";
@@ -38,9 +38,7 @@ globalThis.ui = {
 await manageNpcPackages(actor, { data });
 await manageNpcPackages(actor, { data, editBands: true });
 const preview = npcPackagePreview(planNpcPackage(snapshot, data, "veteran", { threatLevel: 15 }));
-const css = ["spycraft2.css", "retro.css"]
-  .map(name => readFileSync(new URL(`../../styles/${name}`, import.meta.url), "utf8"))
-  .join("\n");
+const css = systemCss();
 
 for (const height of [560, 900]) {
   test(`package selection, editable bands and preview remain reachable at ${height}px`, async ({ page }, testInfo) => {
