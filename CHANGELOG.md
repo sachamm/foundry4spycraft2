@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 — 2026-11-23
 
 - **Agent tokens are the agent.** A player who opened an agent from its token on a scene could edit a copy that
   belonged to that token alone, so the character in the Actors list never got the changes. Agents and animal
