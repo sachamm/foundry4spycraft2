@@ -52,7 +52,7 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: 12px;
+  font-size: var(--sc2-text-s, 13px);
 }
 .sc2-chat-filter-row label {
   flex: 1;
@@ -71,7 +71,7 @@
 }
 .sc2-chat-search-status {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--sc2-text-s, 13px);
 }
 .sc2-chat-search-results {
   flex: 1;
@@ -95,16 +95,16 @@
   flex: 1;
 }
 .sc2-chat-result-title span {
-  font-size: 12px;
+  font-size: var(--sc2-text-s, 13px);
   text-align: right;
 }
 .sc2-chat-search-result time {
   display: block;
-  font-size: 12px;
+  font-size: var(--sc2-text-s, 13px);
   margin-top: 3px;
 }
 .sc2-chat-search-result p {
-  font-size: 12px;
+  font-size: var(--sc2-text-s, 13px);
   line-height: 1.4;
   white-space: pre-wrap;
 }

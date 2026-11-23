@@ -24,7 +24,8 @@
   instead of taking a row each.
 - **Hover is not a warning.** Links and text buttons turned red on hover, the colour kept for harm. They now take the
   action colour and an underline. The over-budget badge on the creation track is readable in the dark theme, and
-  the GC Console's section arrow no longer animates for people who ask for reduced motion.
+  the GC Console's section arrow no longer animates for people who ask for reduced motion. Twenty labels set at
+  12px (chat search results, console and builder captions) are now 13px, the smallest size the style guide allows.
 
 - **Under the hood: tooling.** Layout tests now load the same stylesheets, in the same order, as a world does, and
   check the agent sheet at the sizes it opens at on 1280×720 and 1366×768 screens. Lint fails if the number of

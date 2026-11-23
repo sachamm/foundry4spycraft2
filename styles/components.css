@@ -452,7 +452,7 @@
   display: inline-block;
   padding: 1px 7px;
   transform: rotate(-1.5deg);
-  font: 700 12px/1.5 var(--sc2-num);
+  font: 700 var(--sc2-text-s)/1.5 var(--sc2-num);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -549,7 +549,7 @@
   display: none;
 }
 .spycraft2 .dossier-band .file-label {
-  font: 400 12px/1.3 var(--sc2-bar-font);
+  font: 400 var(--sc2-text-s)/1.3 var(--sc2-bar-font);
   letter-spacing: 0.1em;
 }
 .spycraft2 .dossier-band .file-stamp {

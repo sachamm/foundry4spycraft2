@@ -41,7 +41,7 @@
 .chat-message.sc2-card :is(.spycraft2-threat, .spycraft2-error) {
   display: inline-block;
   padding: 0 6px;
-  font: 700 12px/1.6 var(--sc2-num);
+  font: 700 var(--sc2-text-s)/1.6 var(--sc2-num);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: 2px solid currentColor;

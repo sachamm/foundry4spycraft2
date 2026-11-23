@@ -429,7 +429,7 @@
   color: var(--sc2-on-action);
 }
 .spycraft2.sheet.agent .track-start {
-  font: 600 12px/1.35 var(--font-primary, sans-serif);
+  font: 600 var(--sc2-text-s)/1.35 var(--font-primary, sans-serif);
   letter-spacing: 0;
   color: var(--sc2-action);
 }
@@ -449,7 +449,7 @@
   min-height: 26px;
   margin: 0;
   padding: 2px 10px;
-  font: 600 12px/1.2 var(--font-primary, sans-serif);
+  font: 600 var(--sc2-text-s)/1.2 var(--font-primary, sans-serif);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--sc2-on-bar);
@@ -497,7 +497,7 @@
   content: attr(data-sc2-cost);
   margin-left: 6px;
   padding: 0 4px;
-  font: 600 12px/1.5 var(--sc2-num);
+  font: 600 var(--sc2-text-s)/1.5 var(--sc2-num);
   letter-spacing: 0.02em;
   text-transform: none;
   color: inherit;
