@@ -81,7 +81,7 @@ test("controls added after rendering receive tooltips on focus or hover", async 
 test("system chat gets help without changing other chat cards", async ({ page }) => {
   const result = await page.evaluate(() => {
     const card = document.createElement("section");
-    card.innerHTML = '<button data-roll-control="finishControl">Outcome resolved</button>';
+    card.innerHTML = '<button data-roll-control="finishControl">Finish</button>';
     window.tooltipHooks.get("renderChatMessageHTML")({ flags: {} }, card);
     const untouched = !card.querySelector("button").hasAttribute("data-tooltip");
     window.tooltipHooks.get("renderChatMessageHTML")({ flags: { spycraft2: {} } }, card);

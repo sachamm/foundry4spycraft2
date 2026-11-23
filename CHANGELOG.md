@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Style-guide audit, rules and results.** The Dying button follows the character's size instead of a fixed
+  −1 to −9 band. A standard NPC built by hand no longer shows vitality and wounds boxes it does not use. Attack
+  cards say "Critical hit" and "Critical miss"; other checks keep "Critical success" and "Critical failure". Threat
+  and error ranges print as die faces ("threat range 19–20", "error range 1"). An unconfirmed result reads "Threat,
+  if it succeeds" or "Error, if it fails".
+- **Chat cards use one set of state words.** The guide at the top of a card reads Pending, Hit, Miss, Success,
+  Failure, Damage rolled, Damage applied or Finished, with an icon and an edge colour for the outcome and "16 → 25"
+  when action dice changed the total. The closing button is "Finish". The critical button names what it activates,
+  and the full action-dice dialog is a ▾ beside the one-click spend.
 - **Chat-card buttons tell the truth.** The line under a chat-card button said "Action finished" when the action had
   been refused, when the character was busy and when the dialog was closed. It now says "Not done" with the reason
   for a refusal, shows nothing after a closed dialog, and says "Action finished" only when the action ran. A refused

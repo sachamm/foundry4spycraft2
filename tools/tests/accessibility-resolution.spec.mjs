@@ -53,7 +53,7 @@ test("failed chat actions announce the error, reenable the control and allow one
   await expect(page.getByRole("alert")).toContainText("Target no longer available");
   await expect(page.getByRole("button")).toBeEnabled();
   await page.getByRole("button").press("Enter");
-  await expect(page.getByRole("status")).toContainText("Action finished");
+  await expect(page.getByRole("status")).toContainText("Done.");
   expect(await page.evaluate(() => window.calls)).toBe(2);
 });
 
@@ -66,11 +66,11 @@ test("chat replacement restores keyboard focus to the updated result without ste
     document.querySelector("button").onclick = event =>
       runChatAction(event.currentTarget, async () => {
         document.querySelector("article").innerHTML =
-          '<section class="sc2-result-guide"><h4>Success confirmed</h4></section>';
+          '<section class="sc2-result-guide"><p class="sc2-guide-title">Success</p></section>';
       });
   }, uiModuleUrl("module/apps/chat-action-feedback.mjs"));
   await page.getByRole("button").press("Enter");
-  await expect(page.getByRole("heading", { name: "Success confirmed" })).toBeFocused();
+  await expect(page.locator(".sc2-guide-title")).toBeFocused();
   await page.evaluate(async url => {
     const { runChatAction } = await import(url);
     document.querySelector("article").innerHTML = '<button>Open</button><dialog><input aria-label="Defense"></dialog>';

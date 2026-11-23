@@ -28,7 +28,7 @@ export async function runChatAction(button, run) {
     if (refusalCount() > refusedBefore) status.textContent = loc`Not done: ${lastRefusalMessage()}`;
     else if (result === false) status.textContent = loc`Not done: see the notice.`;
     else if (result === null) status.remove();
-    else status.textContent = loc`Action finished. Review the result.`;
+    else status.textContent = loc`Done. The next step is at the top of this card.`;
   } catch (error) {
     if (!status) throw error;
     status.setAttribute("role", "alert");
@@ -45,7 +45,7 @@ export async function runChatAction(button, run) {
       const message = [...doc.querySelectorAll("[data-message-id]")].find(node => node.dataset.messageId === messageId);
       const destination = button.isConnected
         ? button
-        : message?.querySelector(".sc2-result-guide h4, button[data-roll-control]");
+        : message?.querySelector(".sc2-result-guide .sc2-guide-title, button[data-roll-control]");
       if (destination) {
         if (destination.tagName !== "BUTTON") destination.tabIndex = -1;
         destination.focus();

@@ -31,7 +31,7 @@ export function resolutionGuide(kind) {
     default:
       return {
         automatic: loc`Calculates the selected check method and includes supported modifiers from the sheet and selected options.`,
-        manual: loc`Choose the check and circumstances. Compare with the difficulty or opposing result; use Confirm result when offered, then close the outcome. Resolve unlisted effects at the table.`
+        manual: loc`Choose the check and circumstances. Compare with the difficulty or opposing result; use Confirm result when offered, then press Finish. Resolve unlisted effects at the table.`
       };
   }
 }

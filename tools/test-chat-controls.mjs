@@ -80,24 +80,24 @@ const labels = (msg, user = game.user) =>
 test("an open check offers boosting and resolution, in one row under the card", () => {
   actor = makeActor();
   assert.deepEqual(labels(message({})), [
-    "card:Boost before outcome",
+    "card:Spend action dice…",
     "card:Generous teammate die",
     "card:Compare with an opposing check",
-    "card:Outcome resolved"
+    "card:Finish"
   ]);
   assert.deepEqual(labels(message({ generousBoost: { id: "g" } })), [
-    "card:Boost before outcome",
+    "card:Spend action dice…",
     "card:Compare with an opposing check",
-    "card:Outcome resolved"
+    "card:Finish"
   ]);
   assert.deepEqual(labels(message({ actionDiceAllowed: false })), [
     "card:Compare with an opposing check",
-    "card:Outcome resolved"
+    "card:Finish"
   ]);
   // Taking 10 or 20 is not allowed on an opposed check, and a settled comparison is not offered again.
-  assert.deepEqual(labels(message({ actionDiceAllowed: false, checkMethod: "take10" })), ["card:Outcome resolved"]);
+  assert.deepEqual(labels(message({ actionDiceAllowed: false, checkMethod: "take10" })), ["card:Finish"]);
   assert.deepEqual(labels(message({ actionDiceAllowed: false, opposed: { outcome: "won", total: 12 } })), [
-    "card:Outcome resolved"
+    "card:Finish"
   ]);
 });
 
@@ -106,12 +106,12 @@ test("confirmation, critical activation and a required bonus die appear in their
   const got = labels(message({ naturalDie: 20, threat: 20, threatConfirmed: true, requiredBonusPoolId: "pool" }));
   assert.deepEqual(got, [
     "card:Spend required class bonus die",
-    "card:Activate critical",
-    "card:Boost before outcome",
+    "card:Activate critical success…",
+    "card:Spend action dice…",
     "card:Generous teammate die",
     "card:Compare with an opposing check",
     "card:Confirm result",
-    "card:Outcome resolved"
+    "card:Finish"
   ]);
   // Once the critical is activated, or the required die is spent, those buttons go.
   const after = labels(
@@ -124,7 +124,10 @@ test("confirmation, critical activation and a required bonus die appear in their
       requiredBonusSpent: true
     })
   );
-  assert.equal(after.includes("card:Activate critical"), false);
+  assert.equal(
+    after.some(label => label.startsWith("card:Activate critical")),
+    false
+  );
   assert.equal(after.includes("card:Spend required class bonus die"), false);
 });
 
@@ -200,14 +203,14 @@ test("the chat hook lays buttons out by placement and runs them once per click",
   assert.equal(row.className, "spycraft2 roll-controls");
   assert.deepEqual(
     row.children.map(b => b.textContent),
-    ["Boost before outcome", "Generous teammate die", "Compare with an opposing check", "Outcome resolved"]
+    ["Spend action dice…", "Generous teammate die", "Compare with an opposing check", "Finish"]
   );
   assert.deepEqual(
     row.children.map(b => b.dataset.rollControl),
     ["boostControl", "generousControl", "opposedCheckControl", "finishControl"]
   );
   const finish = row.children[3];
-  assert.equal(finish.attributes["aria-label"], "Outcome resolved");
+  assert.equal(finish.attributes["aria-label"], "Finish");
   await finish.listeners.click();
   assert.deepEqual(actor.calls, [["finishCheck", msg]]);
   assert.equal(finish.disabled, false);
@@ -267,7 +270,7 @@ test("one-click boost, Generous and NPC cards: only buttons that can work are sh
   game.actors = [pointman];
   // An NPC has no action dice of its own.
   actor = makeActor({ type: "npc" });
-  assert.deepEqual(labels(message({})), ["card:Compare with an opposing check", "card:Outcome resolved"]);
+  assert.deepEqual(labels(message({})), ["card:Compare with an opposing check", "card:Finish"]);
 });
 
 test("the GC spends the session pool from an NPC's card; the NPC's own threat is not offered to agents' wallets", () => {
@@ -276,9 +279,15 @@ test("the GC spends the session pool from an NPC's card; the NPC's own threat is
   assert.deepEqual(labels(message({ checkKind: "attack" }), gc).slice(0, 1), ["card:GC boost (+1d4)"]);
   const threat = labels(message({ checkKind: "attack", threatConfirmed: true }), gc);
   assert.deepEqual(threat.slice(0, 2), ["card:GC: activate threat", "card:GC boost (+1d4)"]);
-  assert.equal(threat.includes("card:Activate critical"), false);
+  assert.equal(
+    threat.some(label => label.startsWith("card:Activate critical")),
+    false
+  );
   // An NPC's error is still activated by its opponents through the usual dialog.
-  assert.equal(labels(message({ errorConfirmed: true }), gc).includes("card:Activate critical"), true);
+  assert.equal(
+    labels(message({ errorConfirmed: true }), gc).includes("card:Activate critical failure… (an opponent pays)"),
+    true
+  );
   // Players never see the GC's buttons.
   assert.equal(labels(message({ checkKind: "attack" })).includes("card:GC boost (+1d4)"), false);
   // An NPC skill roll is posted as a plain check naming the skill.
@@ -295,18 +304,14 @@ test("the GC spends the session pool from an NPC's card; the NPC's own threat is
 test("an attack waiting to be resolved does not offer to close its outcome", () => {
   actor = makeActor();
   const attack = { checkKind: "attack" };
-  assert.equal(labels(message(attack)).includes("card:Outcome resolved"), false);
+  assert.equal(labels(message(attack)).includes("card:Finish"), false);
   assert.equal(
-    labels(message({ ...attack, attackResolution: { hit: true }, successConfirmed: true })).includes(
-      "card:Outcome resolved"
-    ),
+    labels(message({ ...attack, attackResolution: { hit: true }, successConfirmed: true })).includes("card:Finish"),
     true
   );
   // Strafe has no single Defense to resolve against.
   assert.equal(
-    labels(message({ ...attack, attackContext: { fireAction: { action: "strafe" } } })).includes(
-      "card:Outcome resolved"
-    ),
+    labels(message({ ...attack, attackContext: { fireAction: { action: "strafe" } } })).includes("card:Finish"),
     true
   );
 });
@@ -332,12 +337,12 @@ test("button text is translated by contributor id and falls back to the contribu
   const { readFile } = await import("node:fs/promises");
   const strings = JSON.parse(await readFile(new URL("../lang/en.json", import.meta.url), "utf8")).SPYCRAFT.RollControl;
   const i18n = { has: key => key === "SPYCRAFT.RollControl.finishControl", localize: () => "Résolu" };
-  assert.equal(localizedLabel({ id: "finishControl", label: "Outcome resolved" }, i18n), "Résolu");
+  assert.equal(localizedLabel({ id: "finishControl", label: "Finish" }, i18n), "Résolu");
   assert.equal(
     localizedLabel({ id: "restraintEscapeControl", label: "Apply grapple escape benefit" }, i18n),
     "Apply grapple escape benefit"
   );
-  assert.equal(localizedLabel({ id: "finishControl", label: "Outcome resolved" }, undefined), "Outcome resolved");
+  assert.equal(localizedLabel({ id: "finishControl", label: "Finish" }, undefined), "Finish");
   // Every fixed-label button has an English entry that matches what the contributor supplies.
   actor = makeActor();
   const shown = Object.fromEntries(
@@ -351,7 +356,9 @@ test("button text is translated by contributor id and falls back to the contribu
       })
       .map(c => [c.id, c.label])
   );
-  for (const [id, label] of Object.entries(shown)) assert.equal(strings[id], label, id);
+  // A button whose text depends on the check (which critical, which dice) is written with loc in the source instead.
+  const varies = new Set(["criticalControl", "boostControl"]);
+  for (const [id, label] of Object.entries(shown)) if (!varies.has(id)) assert.equal(strings[id], label, id);
 });
 
 test("a check posted in another language has its notes written again for the viewer", async () => {
@@ -373,7 +380,7 @@ test("a check posted in another language has its notes written again for the vie
 test("a damage card stops offering boosts once its damage is applied", () => {
   actor = makeActor();
   const before = labels(message({ checkKind: "damage" }));
-  assert.ok(before.some(label => label.includes("Boost before outcome")));
+  assert.ok(before.some(label => label.includes("Spend action dice…")));
   const after = labels(message({ checkKind: "damage", damageApplied: [{ targetUuid: "Actor.t" }] }));
   assert.equal(
     after.some(label => /Boost|Spend 1 action die|Generous/.test(label)),

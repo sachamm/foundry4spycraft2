@@ -105,6 +105,7 @@ import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
 import { ACTION_COSTS, attackActionCost } from "../rules/combat-actions.mjs";
 import { nonLethalTotals, resolveQuickAttack } from "../apps/damage-application.mjs";
+import { woundState } from "../rules/damage-application.mjs";
 import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
 import { ammunitionLabel } from "../rules/ammunition-use.mjs";
 import { planAmmunitionStockpile } from "../apps/ammunition-planner.mjs";
@@ -1255,7 +1256,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       index,
       spent: index < halfSpent
     }));
-    context.dying = sys.wounds?.value <= -1 && sys.wounds?.value >= -9;
+    context.dying = woundState(Number(sys.wounds?.value), sys.deathThreshold) === "dying";
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
     context.safeHouseSource = safeHouseSource(sys);
     context.safeHouses = safeHouseRows(sys, cfg);
@@ -1800,7 +1801,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       featPlay: npcFeatPlay(sys.featEffects),
       hazards: hazardsView(this.actor),
       nonLethal: nonLethalTotals(this.actor),
-      dying: this.actor.system.wounds?.value <= -1 && this.actor.system.wounds?.value >= -9,
+      dying: woundState(Number(this.actor.system.wounds?.value), this.actor.system.deathThreshold) === "dying",
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),
       npcTypes: {
         standard: loc`Standard`,

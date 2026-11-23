@@ -65,7 +65,7 @@ kind and reduction source; armor penetration, critical hits and special damage h
   carried over, with a **Reset** button. Targets, distances, Aim, Brace and anything the GC confirms always start blank.
 - Roll cards put the next step first as a highlighted button: **Spend 1 action die**, then **Resolve vs Defense** against
   the targeted token, then **Roll damage** (pre-filled from the attack), then **Apply** to the target or to each targeted
-  token. The full dialogs stay one click away for anything unusual. **Outcome resolved** is a small button at the end.
+  token. The full dialogs stay one click away for anything unusual. **Finish** is a small button at the end.
 - Boost buttons appear only on agents' cards; **Generous teammate die** appears only when you own a Pointman teammate.
 - A notice and a highlight on the round tracker tell you when your character's turn comes up (player setting).
 - Drag a weapon or a skill from the sheet onto the hotbar to make a macro that rolls it. Shift-click works there too.

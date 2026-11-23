@@ -18,7 +18,7 @@ test("RAW pp.96–97,330: natural 1 is only a potential error until failure is c
   assert.equal(checkCandidates(check).error, true);
   assert.equal(adjudicateCheck(check, true).errorConfirmed, false);
   assert.equal(adjudicateCheck(check, false).errorConfirmed, true);
-  assert.match(checkFlavor({ ...check, baseFlavor: "Test" }), /Potential error/);
+  assert.match(checkFlavor({ ...check, baseFlavor: "Test" }), /Error, if it fails/);
   assert.equal(
     actionDieBoostPlan({ actionDice: { value: 1, die: 4 } }, { ...check, successConfirmed: true }).blocked,
     false
@@ -386,4 +386,23 @@ test("every optional modern roll context refuses newly added, removed or changed
     }),
     true
   );
+});
+
+test("ranges print as die faces and attacks hit or miss where other checks succeed or fail", async () => {
+  const { formatRange, outcomeLabel } = await import("../module/rules/outcome-labels.mjs");
+  assert.equal(formatRange("threat", 19), "19–20");
+  assert.equal(formatRange("threat", 20), "20");
+  assert.equal(formatRange("error", 1), "1");
+  assert.equal(formatRange("error", 3), "1–3");
+  assert.equal(formatRange("error", 0), "—");
+  assert.equal(formatRange("threat", undefined), "—");
+  assert.equal(outcomeLabel({ checkKind: "attack" }, "criticalSuccess"), "Critical hit");
+  assert.equal(outcomeLabel({ checkKind: "attack" }, "criticalFailure"), "Critical miss");
+  assert.equal(outcomeLabel({ checkKind: "skill" }, "criticalSuccess"), "Critical success");
+  assert.equal(outcomeLabel({ checkKind: "save" }, "criticalFailure"), "Critical failure");
+  const attack = { ...check, checkKind: "attack", naturalDie: 20, threat: 19, error: 2 };
+  assert.match(checkFlavor({ ...attack, criticalSuccess: true }), /Critical hit\./);
+  assert.match(checkFlavor({ ...attack, criticalFailure: true }), /Critical miss\./);
+  assert.match(checkFlavor(attack), /Error range 1–2; threat range 19–20\./);
+  assert.doesNotMatch(checkFlavor({ ...attack, criticalSuccess: true }), /Critical success/);
 });
