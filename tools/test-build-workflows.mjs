@@ -131,6 +131,20 @@ test("adding a level snapshots permanent INT after its class increase while excl
   assert.equal(actor.system.progression[0].intelligenceModifier, 1);
 });
 
+test("an expert class stops at its tenth level", async () => {
+  const actor = new SpycraftActor();
+  const c = classes.find(c => c.key === "sniper");
+  const sniper = { id: "sniper", name: c.name, type: "class", system: { ...c, identifier: c.key } };
+  actor.items = [sniper];
+  actor.system = { level: 14, progression: Array.from({ length: 14 }, () => ({})), classLevels: { sniper: 10 } };
+  let updated = 0;
+  actor.update = async () => {
+    updated++;
+  };
+  assert.equal(await actor.addClassLevel(sniper, { promptVitality: false }), null);
+  assert.equal(updated, 0);
+});
+
 test("expert entry is blocked before item creation and cannot use its own BAB to qualify", async () => {
   const actor = new SpycraftActor();
   actor.items = [];
