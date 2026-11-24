@@ -8,7 +8,7 @@ import { registerActorFolderSetup, setupActorFolders } from "./module/actor-fold
 import { installDialogThemeHooks, registerTableTrustSetting } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
-import { installPoolMaxHooks, schedulePoolMax } from "./module/apps/pool-max.mjs";
+import { installPoolMaxHooks } from "./module/apps/pool-max.mjs";
 import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
@@ -336,8 +336,6 @@ function refreshCombatActorData(scope = null) {
       for (const actor of chosen)
         if (actor?.type === "agent") {
           actor.reset();
-          // A combat change can end an effect that raised a maximum (a Berserker rage's Constitution).
-          schedulePoolMax(actor);
           renderOpenSheet(actor);
         }
       game.spycraft2?.gc?.console?.render(false);

@@ -1,10 +1,12 @@
 /**
  * Keeps each agent's current vitality, wounds and action dice in step with their maximums (module/rules/pool-max.mjs).
- * One client writes for each agent (module/writers.mjs), after the change that moved a maximum has been saved.
+ * One client writes for each agent (module/writers.mjs), after the change that moved a maximum has been saved. The
+ * check follows every preparation, because a maximum can move without the agent itself changing: an item or effect,
+ * a combat round ending a rage, or a teammate's Improved Fortune.
  */
 import { worldMigrating } from "../migrations/index.mjs";
 import { primaryWriterFor } from "../writers.mjs";
-import { isResourceLock, queueResources } from "../services/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { poolMaxPlan, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 
 const planFor = actor => poolMaxPlan(actor.system, actor.flags?.spycraft2?.[POOL_MAX_FLAG]);
@@ -52,18 +54,10 @@ export function schedulePoolMax(actor) {
 }
 
 export function installPoolMaxHooks() {
-  // A new agent recorded empty maximums when it was made (actor _preCreate), so this fills it.
-  Hooks.on("createActor", schedulePoolMax);
-  Hooks.on("updateActor", (actor, _changed, options) => {
-    if (!options?.spycraft2PoolMax) schedulePoolMax(actor);
-  });
-  for (const event of ["createActiveEffect", "updateActiveEffect", "deleteActiveEffect"])
-    Hooks.on(event, e => schedulePoolMax(e.parent?.documentName === "Actor" ? e.parent : e.parent?.parent));
-  for (const event of ["createItem", "updateItem", "deleteItem"])
-    Hooks.on(event, item => {
-      if (!isResourceLock(item)) schedulePoolMax(item.parent);
-    });
-  // Agents made before this was added get their current maximums recorded once, with their values untouched.
+  Hooks.on("spycraft2.agentPrepared", schedulePoolMax);
+  // Every preparation after the world is ready schedules a check (actor.mjs prepareData). Agents prepared before
+  // then, or while the start-up migration ran, are checked here once; agents made before this was added get their
+  // current maximums recorded with their values untouched.
   Hooks.once("spycraft2.ready", () => {
     for (const actor of game.actors ?? []) schedulePoolMax(actor);
   });

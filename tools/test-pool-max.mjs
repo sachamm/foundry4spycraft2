@@ -176,3 +176,45 @@ test("a created agent fills to its maximums once, then follows a new class level
   b.isOwner = false;
   assert.equal(followPoolMax(b), null);
 });
+
+test("any re-preparation after the world is ready (a combat round, a teammate's bonus) makes the writer follow a moved maximum", async () => {
+  globalThis.Actor.prototype.prepareData = function () {};
+  const listeners = [];
+  globalThis.Hooks = {
+    once: () => null,
+    on: (_event, fn) => listeners.push(fn),
+    callAll: (_event, ...args) => listeners.forEach(fn => fn(...args))
+  };
+  const { installPoolMaxHooks } = await import("../module/apps/pool-max.mjs");
+  installPoolMaxHooks();
+  const a = new SpycraftActor();
+  a.flags.spycraft2 = { poolMax: { vitality: 6, wounds: 10, actionDice: 2 } };
+  a.system.vitality.value = 6;
+  a.system.wounds.value = 10;
+  a.system.actionDice.value = 2;
+  a.system.wounds.max = 14; // a Berserker rage raised Constitution
+  game.users = { activeGM: { id: "gm" } };
+  game.spycraft2 = { resourceLocks: { run: (_actors, work) => work() } };
+  game.user.id = "gm";
+  a.prepareData(); // before ready: nothing is scheduled
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(a.updates.length, 0);
+  game.ready = true;
+  try {
+    a.prepareData();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(a.system.wounds.value, 14);
+    a.system.wounds.max = 10; // the rage ended as the round advanced
+    a.prepareData();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(a.system.wounds.value, 10);
+    // Another client is the writer, so this one leaves it alone.
+    game.user.id = "player";
+    a.system.wounds.max = 12;
+    a.prepareData();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(a.system.wounds.value, 10);
+  } finally {
+    game.ready = false;
+  }
+});

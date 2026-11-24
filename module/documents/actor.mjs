@@ -23,6 +23,15 @@ export class SpycraftActor extends ActorRolls(
   )
 ) {
   /** @override */
+  prepareData() {
+    super.prepareData();
+    // Current vitality, wounds and action dice follow their maximums, and any preparation can move one (an item, an
+    // effect, a combat round, a teammate). module/apps/pool-max.mjs listens, checks after this preparation and
+    // writes only on a change.
+    if (this.type === "agent" && globalThis.game?.ready) Hooks.callAll("spycraft2.agentPrepared", this);
+  }
+
+  /** @override */
   getRollData() {
     return this.system.getRollData?.() ?? { ...super.getRollData() };
   }
