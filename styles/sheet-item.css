@@ -143,6 +143,13 @@
 }
 
 /* Browser: the list on the left, the chosen entry on the right. */
+/* The results part has one root: the era line above the two panes, which take the rest of the height. */
+.spycraft2.browser .browser-results {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 .spycraft2.browser .browser-panes {
   flex: 1;
   min-height: 0;

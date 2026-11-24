@@ -142,3 +142,36 @@ test("the version 6 migration copies period items only into worlds that keep imp
   );
   assert.equal(created, null, "an item of that name already exists");
 });
+
+test("each browser part renders one root element, as Foundry's Handlebars parts require", async () => {
+  const { default: Handlebars } = await import("handlebars");
+  const hb = Handlebars.create();
+  hb.registerHelper("localize", key => key);
+  hb.registerHelper("selectOptions", () => "");
+  hb.registerHelper("checked", value => (value ? "checked" : ""));
+  const VOID = new Set(["input", "img", "br", "hr", "meta", "link"]);
+  const roots = html => {
+    let depth = 0,
+      count = 0;
+    for (const [, close, tag, selfClosing] of html.matchAll(/<(\/?)([a-z][a-z0-9-]*)[^>]*?(\/?)>/gi)) {
+      if (close) depth -= 1;
+      else {
+        if (depth === 0) count += 1;
+        if (!VOID.has(tag.toLowerCase()) && !selfClosing) depth += 1;
+      }
+    }
+    return count;
+  };
+  const context = {
+    era: "Everything listed was available by 1955.",
+    dated: true,
+    restrictable: true,
+    rows: [{ name: "Luger P08 9mm", qualified: true, future: true }],
+    preview: { name: "Luger P08 9mm", qualified: true, future: true },
+    filters: {}
+  };
+  for (const part of ["browser-filters", "browser-results"]) {
+    const source = readFileSync(new URL(`../templates/apps/${part}.hbs`, import.meta.url), "utf8");
+    assert.equal(roots(hb.compile(source)(context)), 1, part);
+  }
+});
