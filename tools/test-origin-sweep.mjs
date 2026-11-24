@@ -274,3 +274,36 @@ test("a blank Subplot row does not use a Subplot slot", () => {
   const sys = computeAgent(base, [], cfg);
   assert.equal(sys.subplotPicks.used, 2);
 });
+
+const agentWith = (classItem, skills = {}) => ({
+  abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10, misc: 0 }])),
+  progression: [{ classId: classItem.system.identifier, vitality: 1, skills: { drive: 2 } }],
+  abilityIncreases: {},
+  skills,
+  focuses: {},
+  proficiencies: {},
+  misc: {},
+  pointBuyBudget: 36
+});
+const advocate = () => {
+  const data = read("classes").find(c => c.key === "advocate");
+  return { id: "c1", name: data.name, type: "class", system: { ...structuredClone(data), identifier: data.key } };
+};
+
+test("cross-class Drive costs two points a rank, and an imported class-skill claim is flagged", () => {
+  const plain = computeAgent(agentWith(advocate()), [advocate()], cfg);
+  assert.equal(plain.skillTotals.drive.ranks, 1);
+  assert.ok(!plain.warnings.some(w => /manual class-skill|differ from the book/.test(w)), plain.warnings.join("\n"));
+
+  const ticked = computeAgent(agentWith(advocate(), { drive: { classSkill: true } }), [advocate()], cfg);
+  assert.equal(ticked.skillTotals.drive.ranks, 2);
+  assert.ok(ticked.warnings.some(w => /Drive is bought as a class skill only because/.test(w)));
+
+  const edited = advocate();
+  edited.system.classSkills.push("drive");
+  const imported = computeAgent(agentWith(edited), [edited], cfg);
+  assert.ok(
+    imported.warnings.some(w => /class skills differ from the book \(\+Drive\)/.test(w)),
+    imported.warnings.join("\n")
+  );
+});

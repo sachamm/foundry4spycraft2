@@ -294,6 +294,17 @@ function deriveCareerLevels(state) {
     classLevels[entry.classId] = (classLevels[entry.classId] ?? 0) + 1;
   }
   sys.classLevels = classLevels;
+  for (const ci of new Set(classAtLevel.filter(Boolean))) {
+    const book = cfg.classFeatures?.[ci.system.identifier]?.classSkills;
+    const own = ci.system.classSkills ?? [];
+    if (!book) continue;
+    const extra = own.filter(key => !book.includes(key)),
+      missing = book.filter(key => !own.includes(key));
+    if (extra.length || missing.length)
+      warnings.push(
+        loc`${ci.name}: its class skills differ from the book (${[...extra.map(k => `+${cfg.skills[k]?.name ?? k}`), ...missing.map(k => `−${cfg.skills[k]?.name ?? k}`)].join(", ")}). Use Review catalog updates on the Bio tab to restore them.`
+      );
+  }
   const coreItems = [
     classAtLevel.find(item => item && !item.system.expert),
     classAtLevel.find(item => item?.system.expert)
@@ -968,13 +979,13 @@ function deriveSkillRanks(state) {
     }
   sys.universalClassSkills = [...talentClassSkill];
   const entryClassId = idx => progression[idx]?.classId;
-  const isClassSkillAt = (key, idx) => {
+  const manualClassSkillAt = (key, idx) => {
     const override = sys.skills?.[key];
-    if (
-      stageAt(idx + 1).bonus(`skills.${key}.classSkill`) ||
-      (override?.classSkill && idx + 1 >= (override.classSkillAt ?? 1))
-    )
-      return true;
+    return !!override?.classSkill && idx + 1 >= (override.classSkillAt ?? 1);
+  };
+  const isClassSkillAt = (key, idx) => manualClassSkillAt(key, idx) || ruleClassSkillAt(key, idx);
+  const ruleClassSkillAt = (key, idx) => {
+    if (stageAt(idx + 1).bonus(`skills.${key}.classSkill`)) return true;
     const ci = classAtLevel[idx];
     return (
       !!ci?.system.classSkills?.includes(key) ||
@@ -1006,6 +1017,11 @@ function deriveSkillRanks(state) {
       if (!Number.isSafeInteger(pts) || pts < 0 || !pts) continue;
       spent += pts;
       const classSkill = isClassSkillAt(sd.key, idx);
+      if (classSkill && !ruleClassSkillAt(sd.key, idx)) {
+        const message = loc`Level ${idx + 1}: ${sd.name} is bought as a class skill only because its manual class-skill box is ticked; no class, talent, specialty or feat makes it one. Untick it unless the GC allowed it.`;
+        warnings.push(message);
+        purchaseIssue("manual-class-skill", idx + 1, message, { skill: sd.key });
+      }
       const discount = stageAt(idx + 1).bonus("discountedSkillRanks");
       const purchase = purchasedSkillRanks(pts, classSkill, {
         discountedRanks: Math.max(0, discount - (skillRanks[sd.key] ?? 0))
