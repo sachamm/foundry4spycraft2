@@ -346,7 +346,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         })
       ),
 
-      xp: int(0, { min: 0 }),
+      xp: int(1000, { min: 0 }),
       codename: str(),
       details: new SchemaField({
         faction: str(),
