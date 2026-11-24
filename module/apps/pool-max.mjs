@@ -26,43 +26,45 @@ export function followPoolMax(actor) {
   );
 }
 
+const pending = new WeakMap();
+/** Follow an agent's maximums soon, once for any number of calls in a row. */
+export function schedulePoolMax(actor) {
+  if (!actor || actor.type !== "agent" || !actor.isOwner) return;
+  if (primaryWriterFor(actor)?.id !== game.user.id) return;
+  if (worldMigrating()) return;
+  const old = pending.get(actor);
+  if (old) {
+    old.again = true;
+    return;
+  }
+  const state = { again: true };
+  pending.set(actor, state);
+  Promise.resolve()
+    .then(async () => {
+      do {
+        state.again = false;
+        await followPoolMax(actor);
+      } while (state.again);
+    })
+    // Nothing is lost: the recorded maximums were not updated, so the next change catches up.
+    .catch(error => console.debug("Field Agent's Handbook | Vitality, wounds and dice will catch up later.", error))
+    .finally(() => pending.delete(actor));
+}
+
 export function installPoolMaxHooks() {
-  const pending = new WeakMap();
-  const schedule = actor => {
-    if (!actor || actor.type !== "agent" || !actor.isOwner) return;
-    if (primaryWriterFor(actor)?.id !== game.user.id) return;
-    if (worldMigrating()) return;
-    const old = pending.get(actor);
-    if (old) {
-      old.again = true;
-      return;
-    }
-    const state = { again: true };
-    pending.set(actor, state);
-    Promise.resolve()
-      .then(async () => {
-        do {
-          state.again = false;
-          await followPoolMax(actor);
-        } while (state.again);
-      })
-      // Nothing is lost: the recorded maximums were not updated, so the next change catches up.
-      .catch(error => console.debug("Field Agent's Handbook | Vitality, wounds and dice will catch up later.", error))
-      .finally(() => pending.delete(actor));
-  };
   // A new agent recorded empty maximums when it was made (actor _preCreate), so this fills it.
-  Hooks.on("createActor", schedule);
+  Hooks.on("createActor", schedulePoolMax);
   Hooks.on("updateActor", (actor, _changed, options) => {
-    if (!options?.spycraft2PoolMax) schedule(actor);
+    if (!options?.spycraft2PoolMax) schedulePoolMax(actor);
   });
   for (const event of ["createActiveEffect", "updateActiveEffect", "deleteActiveEffect"])
-    Hooks.on(event, e => schedule(e.parent?.documentName === "Actor" ? e.parent : e.parent?.parent));
+    Hooks.on(event, e => schedulePoolMax(e.parent?.documentName === "Actor" ? e.parent : e.parent?.parent));
   for (const event of ["createItem", "updateItem", "deleteItem"])
     Hooks.on(event, item => {
-      if (!isResourceLock(item)) schedule(item.parent);
+      if (!isResourceLock(item)) schedulePoolMax(item.parent);
     });
   // Agents made before this was added get their current maximums recorded once, with their values untouched.
   Hooks.once("spycraft2.ready", () => {
-    for (const actor of game.actors ?? []) schedule(actor);
+    for (const actor of game.actors ?? []) schedulePoolMax(actor);
   });
 }
