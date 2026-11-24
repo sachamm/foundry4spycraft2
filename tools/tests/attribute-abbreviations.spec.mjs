@@ -64,7 +64,7 @@ const full = keys.map(key => en.Ability[key]);
 const short = keys.map(key => en.AbilityAbbr[key]);
 
 for (const [kind, cases] of Object.entries({
-  npc: { 320: short, 400: short, 480: short, 640: short, 720: full, 860: full },
+  npc: { 300: short, 320: short, 400: short, 480: short, 640: short, 720: full, 860: full },
   agent: { 600: full, 720: full, 760: short, 840: short, 900: full }
 })) {
   for (const [width, expected] of Object.entries(cases)) {
