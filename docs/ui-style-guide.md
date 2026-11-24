@@ -414,6 +414,7 @@ The NPC sheet is a stat block for play, not an agent-sized form.
 - **Size:** default 480×640; minimum width 420px. Per-kind minimums are the `MIN_WIDTHS` table in `module/sheets/sheet-placement.mjs`; the shared 640px minimum is for agents.
 - **Header chips:** TL · NPC kind and role · Defense · Initiative · health (V/W for special NPCs; "Save +4 · next DC 14 · ✗✗□" for standard NPCs) · condition stamps.
 - **Only the track the NPC uses:** a standard NPC shows its Damage-save track and no vitality/wounds; a special NPC shows vitality/wounds and stress/subdual and no Damage-save track.
+- **Attribute tiles** show the full names when they fit and the three-letter abbreviations (STR, DEX…) below a 690px container, with the full name in the button's accessible name and the abbreviation's tooltip. The agent Play strip does the same while the rail squeezes it (721–857px).
 - **Weapons first**, each row as in 7.1.
 - **Glance values read-only in Play.** BAB, saves, Defense and Initiative inputs are Edit only.
 - **Rare actions** (takedown, cheap shot, Shaken, Baffled/Incompetent review) live under "More actions"; a review warning appears only when one fires.

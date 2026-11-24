@@ -34,7 +34,8 @@
   border-color: transparent;
 }
 
-.spycraft2.sheet.vehicle {
+.spycraft2.sheet.vehicle,
+.spycraft2.sheet.npc {
   container-type: inline-size;
 }
 .spycraft2.sheet.vehicle .spycraft2-sheet > p {
@@ -182,4 +183,26 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sc2-space-1);
+}
+
+/* A thin NPC window: six tiles cannot hold the longest attribute names, so every tile shows its abbreviation. */
+@container (max-width: 689px) {
+  .spycraft2.sheet.npc .abilities-row .ability-name {
+    display: none;
+  }
+  .spycraft2.sheet.npc .abilities-row .ability-abbr {
+    display: inline;
+  }
+}
+/* Thinner still, the tiles give up their side padding so the abbreviations keep fitting. */
+@container (max-width: 420px) {
+  .spycraft2.sheet.npc .abilities-row {
+    gap: var(--sc2-space-1);
+  }
+  .spycraft2.sheet.npc .abilities-row .ability {
+    padding-inline: 0;
+  }
+  .spycraft2.application.npc .abilities-row [data-action="rollAbility"] {
+    padding-inline: 0;
+  }
 }

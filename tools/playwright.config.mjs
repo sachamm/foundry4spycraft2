@@ -15,7 +15,8 @@ export default defineConfig({
     "guided-play.spec.mjs",
     "accessibility-resolution.spec.mjs",
     "chat-theme.spec.mjs",
-    "keep-place.spec.mjs"
+    "keep-place.spec.mjs",
+    "attribute-abbreviations.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

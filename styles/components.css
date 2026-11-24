@@ -960,3 +960,9 @@
 .spycraft2.application :is(.sc2-prose, prose-mirror) summary {
   min-height: 0;
 }
+
+/* Attribute tiles carry the full name and the three-letter abbreviation; a sheet's container query swaps them when
+   the tiles get too narrow for the full name. */
+.spycraft2 .ability-abbr {
+  display: none;
+}
