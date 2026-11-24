@@ -475,3 +475,10 @@ test("a renamed NPC takes its tokens along unless the GC named them by hand", as
   assert.equal(renamedTokenName("Guard", "Guard", "Guard"), null);
   assert.equal(renamedTokenName(undefined, "Guard", "Sentry"), null);
 });
+
+test("a dialog's Cancel button answers like closing the dialog", async () => {
+  const { cancellable } = await import("../module/apps/dialog-kit.mjs");
+  assert.equal(await cancellable(async () => "cancel", {}), null, "Foundry answers a plain button with its name");
+  assert.deepEqual(await cancellable(async options => options, { name: "x" }), { name: "x" });
+  assert.equal(await cancellable(async () => null, {}), null);
+});

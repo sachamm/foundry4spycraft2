@@ -125,18 +125,30 @@ export function wireConditionalFields(root) {
  * @param {object} [spec.dialog]   Further DialogV2 options
  */
 export function formDialog({ title, intro, fields, ok, dialog = {} }) {
-  return systemDialog.input({
+  return cancellable(systemDialog.input, {
     window: { title },
     rejectClose: false,
     content: focusFirstField(optionsMarkup({ intro, fields })),
     ok: { label: ok ?? loc`Confirm` },
-    buttons: [{ action: "cancel", label: loc`Cancel`, callback: () => null }],
+    buttons: [cancelButton()],
     ...dialog,
     render: (event, app) => {
       wireConditionalFields(app?.element ?? event?.target);
       return dialog.render?.(event, app);
     }
   });
+}
+
+/** The Cancel button every option dialog carries. */
+export const cancelButton = () => ({ action: "cancel", label: loc`Cancel` });
+
+/**
+ * Open a dialog whose Cancel button answers like closing it. Foundry answers a button that has no result of its
+ * own with the button's name, so "cancel" is turned into null here, the answer callers already treat as "closed".
+ */
+export async function cancellable(open, options) {
+  const result = await open(options);
+  return result === "cancel" ? null : result;
 }
 
 /** A weapon picker listing the actor's items that pass `ready`, by name. */

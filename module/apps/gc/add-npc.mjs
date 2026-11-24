@@ -7,6 +7,7 @@ import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
+import { cancellable, cancelButton } from "../dialog-kit.mjs";
 import { antagonistRecorded, recordAntagonist } from "./mission.mjs";
 import { getMission } from "./state.mjs";
 
@@ -164,12 +165,12 @@ export async function addNpcToScene() {
   for (const choice of choices) groups.set(choice.source, [...(groups.get(choice.source) ?? []), choice]);
   const fight = game.combat ?? null,
     mission = getMission();
-  const input = await systemDialog.input({
+  const input = await cancellable(systemDialog.input, {
     window: { title: loc`Add NPC to scene` },
     position: { width: 520 },
     rejectClose: false,
     ok: { label: loc`Place on the scene` },
-    buttons: [{ action: "cancel", label: loc`Cancel`, callback: () => null }],
+    buttons: [cancelButton()],
     render: (_event, dialog) => filterList(dialog),
     content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list" required>${[
       ...groups
