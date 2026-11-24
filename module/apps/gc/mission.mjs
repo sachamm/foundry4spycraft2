@@ -300,7 +300,7 @@ export const antagonistRecorded = actor =>
   !!actor && getMission().antagonists.some(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid);
 
 /** Add an NPC actor to the mission's XP record without a dialog; a type already listed is left alone. */
-export async function recordAntagonist(actor) {
+export async function recordAntagonist(actor, { encountered = false } = {}) {
   requireGC();
   if (!actor || antagonistRecorded(actor)) return null;
   const antagonist = {
@@ -312,7 +312,7 @@ export async function recordAntagonist(actor) {
     type: ["special", "villain"].includes(actor.system.npcType) ? "special" : "standard",
     full: false,
     scenes: 1,
-    encountered: false
+    encountered
   };
   await updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
   return antagonist;

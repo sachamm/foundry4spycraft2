@@ -7,7 +7,7 @@ import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
-import { cancellable, cancelButton } from "../dialog-kit.mjs";
+import { cancellable, cancelButton, freeCancel } from "../dialog-kit.mjs";
 import { antagonistRecorded, recordAntagonist } from "./mission.mjs";
 import { getMission } from "./state.mjs";
 
@@ -134,7 +134,9 @@ export function placementData(prototype, { corners, names, disposition = "hostil
     hidden,
     ...(disposition in DISPOSITIONS ? { disposition: DISPOSITIONS[disposition] } : {}),
     // Several copies of one NPC are separate people: each keeps its own damage.
-    ...(corners.length > 1 ? { actorLink: false } : {})
+    ...(corners.length > 1 ? { actorLink: false } : {}),
+    // A numbered name is final: Foundry's own numbering is not added on top.
+    ...(names[index] && names[index] !== prototype.name ? { appendNumber: false } : {})
   }));
 }
 
@@ -159,6 +161,7 @@ export async function joinFight(combat, tokens) {
 export async function addNpcToScene() {
   if (!game.user.isGM) return null;
   if (!canvas?.ready || !canvas.scene) return refuse(loc`View a scene first, then add the NPC to it.`);
+  const sceneId = canvas.scene.id;
   const choices = await npcChoices();
   if (!choices.length) return refuse(loc`There are no NPCs in the world or in the NPC compendiums.`);
   const groups = new Map();
@@ -171,8 +174,11 @@ export async function addNpcToScene() {
     rejectClose: false,
     ok: { label: loc`Place on the scene` },
     buttons: [cancelButton()],
-    render: (_event, dialog) => filterList(dialog),
-    content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list" required>${[
+    render: (_event, dialog) => {
+      freeCancel(dialog?.element);
+      return filterList(dialog);
+    },
+    content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list">${[
       ...groups
     ]
       .map(
@@ -189,6 +195,10 @@ export async function addNpcToScene() {
   });
   if (!input) return null;
   if (!input.uuid) return refuse(loc`No NPC is chosen. Clear the search or pick one from the list.`);
+  // The dialog does not block the map: the scene it was opened for must still be the one in view.
+  const scene = canvas?.scene;
+  if (!scene || scene.id !== sceneId)
+    return refuse(loc`The scene changed while the dialog was open. Nothing was added.`);
   let actor = await fromUuid(input.uuid);
   if (actor?.pack)
     actor = importedCopy(input.uuid) ?? (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
@@ -202,7 +212,7 @@ export async function addNpcToScene() {
     height: prototype.height,
     snap: point => canvas.grid.getTopLeftPoint?.(point) ?? point
   });
-  const others = [...canvas.scene.tokens];
+  const others = [...scene.tokens];
   const corners = spreadCorners({
     origin,
     count,
@@ -217,7 +227,7 @@ export async function addNpcToScene() {
     corners.length,
     others.filter(token => token.actorId === actor.id).map(token => token.name)
   );
-  const tokens = await canvas.scene.createEmbeddedDocuments(
+  const tokens = await scene.createEmbeddedDocuments(
     "Token",
     placementData(prototype.toObject(), {
       corners,
@@ -226,14 +236,17 @@ export async function addNpcToScene() {
       hidden: !!input.hidden
     })
   );
-  const done = [loc`${tokens.length} × ${actor.name} added to ${canvas.scene.name}`];
+  const done = [loc`${tokens.length} × ${actor.name} added to ${scene.name}`];
+  let joined = false;
   if (input.join && fight) {
-    await joinFight(fight, tokens);
-    done.push(loc`joined the fight`);
+    // A fight deleted meanwhile leaves the tokens placed; the notice says they did not join.
+    joined = !!game.combats?.get?.(fight.id) && !!(await joinFight(fight, tokens).catch(() => null));
+    done.push(joined ? loc`joined the fight` : loc`the fight is gone, so they did not join it`);
   }
   if (input.record && !antagonistRecorded(actor)) {
-    await recordAntagonist(actor);
-    done.push(loc`recorded for mission XP`);
+    // An NPC that walks straight into a fight has been faced.
+    const entry = await recordAntagonist(actor, { encountered: joined });
+    done.push(entry?.xp ? loc`recorded for mission XP` : loc`recorded for mission XP with 0 XP: enter its reward`);
   }
   ui.notifications.info(`${done.join("; ")}.`);
   return tokens.length === 1 ? tokens[0] : tokens;

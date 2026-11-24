@@ -21,22 +21,53 @@ export function flatten(object, prefix = "", out = {}) {
 
 const same = (a, b) => a === b || JSON.stringify(a) === JSON.stringify(b);
 
+const under = (map, path) => Object.keys(map).filter(key => key.startsWith(`${path}.`));
+/** The nested value at `path`, rebuilt from the flat paths below it. */
+const rebuilt = (map, path) => {
+  const out = {};
+  for (const key of under(map, path)) {
+    const keys = key.slice(path.length + 1).split(".");
+    let target = out;
+    for (const part of keys.slice(0, -1)) target = target[part] ??= {};
+    target[keys.at(-1)] = map[key];
+  }
+  return out;
+};
+
 /**
  * What it takes to turn `after` back into `before`, both flat maps of path to value.
- * @returns {{restore: object, unset: string[], expect: object}}  `restore` holds the earlier values, `unset` the
- *   paths that did not exist before, and `expect` the values the step left, to notice later changes.
+ * @returns {{restore: object, unset: string[], expect: object, whole: string[]}}  `restore` holds the earlier
+ *   values, `unset` the paths that did not exist before, and `expect` the values the step left, to notice later
+ *   changes. `whole` lists restored paths that changed kind (an empty record that was filled, or the reverse):
+ *   those are replaced outright, because one update cannot both clear a record and remove its parts.
  */
 export function differences(before, after) {
   const restore = {},
     unset = [],
-    expect = {};
+    expect = {},
+    whole = [];
+  // A value on one side and a record with parts on the other: handled once, at the shallower path.
+  const filled = Object.keys(before).filter(path => !(path in after) && under(after, path).length),
+    emptied = Object.keys(after).filter(path => !(path in before) && under(before, path).length);
+  const covered = path => [...filled, ...emptied].some(top => path.startsWith(`${top}.`));
+  for (const path of filled) {
+    restore[path] = before[path];
+    whole.push(path);
+    for (const key of under(after, path)) expect[key] = after[key];
+  }
+  for (const path of emptied) {
+    restore[path] = rebuilt(before, path);
+    whole.push(path);
+    expect[path] = after[path];
+  }
   for (const path of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    if (filled.includes(path) || emptied.includes(path) || covered(path)) continue;
     if (same(before[path], after[path])) continue;
     if (path in before) restore[path] = before[path];
     else unset.push(path);
     if (path in after) expect[path] = after[path];
   }
-  return { restore, unset, expect };
+  return { restore, unset, expect, whole };
 }
 
 const combatantsOf = actor =>
@@ -54,41 +85,60 @@ export function snapshot(actor) {
       combat: combatant.parent?.id,
       id: combatant.id,
       defeated: !!combatant.defeated,
-      initiative: combatant.initiative ?? null
+      initiative: combatant.initiative ?? null,
+      // Damage can record a fluid initiative event on the combatant; Undo takes that back too.
+      fluid: structuredClone(combatant.flags?.spycraft2?.fluid ?? null)
     }))
   };
 }
 
 /** The undo record for one character, or null when the step left it as it was. */
 export function undoEntry(actor, before, after) {
-  const { restore, unset, expect } = differences(before.data, after.data);
+  const { restore, unset, expect, whole } = differences(before.data, after.data);
   const created = [...after.effects.keys()].filter(id => !before.effects.has(id)),
     removed = [...before.effects].filter(([id]) => !after.effects.has(id)).map(([, data]) => data);
   const combatants = before.combatants.filter(was => {
     const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat);
-    return now && (now.defeated !== was.defeated || now.initiative !== was.initiative);
+    return now && (now.defeated !== was.defeated || now.initiative !== was.initiative || !same(now.fluid, was.fluid));
   });
   if (!Object.keys(restore).length && !unset.length && !created.length && !removed.length && !combatants.length)
     return null;
-  return { uuid: actor.uuid, name: actor.name, restore, unset, expect, created, removed, combatants };
+  // Stored as pairs: a chat message expands dotted keys in its flags, which would turn each path into a nest.
+  return {
+    uuid: actor.uuid,
+    name: actor.name,
+    restore: Object.entries(restore),
+    unset,
+    expect: Object.entries(expect),
+    whole,
+    created,
+    removed,
+    combatants
+  };
 }
+
+/** A stored map as [path, value] pairs, whether it was kept as pairs or as an object. */
+const pairs = value => (Array.isArray(value) ? value : Object.entries(flatten(value ?? {})));
 
 const valueAt = (object, path) => path.split(".").reduce((value, key) => value?.[key], object);
 
 /** Paths the step set that hold something else now: a later change that Undo would overwrite. */
 export function movedSince(entry, source) {
-  return Object.entries(entry.expect ?? {})
+  return pairs(entry.expect)
     .filter(([path, value]) => !same(valueAt(source, path), value))
     .map(([path]) => path);
 }
 
 /** The update that puts one character back. A path that did not exist before is removed. */
 export function restoreUpdate(entry) {
-  const update = { ...entry.restore };
-  for (const path of entry.unset ?? []) {
-    const cut = path.lastIndexOf(".");
-    update[`${path.slice(0, cut)}.-=${path.slice(cut + 1)}`] = null;
-  }
+  const update = {},
+    keyed = (path, mark) => {
+      const cut = path.lastIndexOf(".");
+      return `${path.slice(0, cut + 1)}${mark}${path.slice(cut + 1)}`;
+    };
+  for (const [path, value] of pairs(entry.restore))
+    update[(entry.whole ?? []).includes(path) ? keyed(path, "==") : path] = value;
+  for (const path of entry.unset ?? []) update[keyed(path, "-=")] = null;
   return update;
 }
 
@@ -117,20 +167,39 @@ export async function withUndo(actors, label, work, extra = {}) {
 export function postUndo(label, entries, { gcDice = 0, damageCard = null } = {}) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
-    whisper: [game.user.id],
+    // The GC sees every note, so a step a player took can be undone by the GC too.
+    whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
     flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, done: false } } }
   });
 }
 
+const running = new Set();
 /** Put everything on a note back. Returns the names restored, or null when the GC backs out. */
 export async function applyUndo(message) {
   const record = message?.flags?.spycraft2?.undo;
   if (!record || record.done) return null;
+  // One note is undone once, however many copies of its button are pressed.
+  const key = message.id ?? message;
+  if (running.has(key)) return null;
+  running.add(key);
+  try {
+    return await undoRecord(message, record);
+  } finally {
+    running.delete(key);
+  }
+}
+
+async function undoRecord(message, record) {
   const targets = [];
   for (const entry of record.entries ?? []) {
     const actor = await fromUuid(entry.uuid);
-    if (!actor?.isOwner) {
+    if (!actor) {
+      // A character deleted since has nothing to put back; the rest of the step is still undone.
+      ui.notifications.warn(loc`${entry.name} no longer exists, so it is skipped.`);
+      continue;
+    }
+    if (!actor.isOwner) {
       ui.notifications.warn(loc`${entry.name} can no longer be changed from here.`);
       return null;
     }
@@ -147,6 +216,8 @@ export async function applyUndo(message) {
     });
     if (!ok) return null;
   }
+  // Marked first, so a failure half way cannot lead to dice being given back twice on a retry.
+  await message.update({ "flags.spycraft2.undo.done": true });
   for (const [entry, actor] of targets) {
     const update = restoreUpdate(entry);
     if (Object.keys(update).length) await actor.update(update);
@@ -156,12 +227,18 @@ export async function applyUndo(message) {
     if (gone.length) await actor.createEmbeddedDocuments("ActiveEffect", gone, { keepId: true });
     for (const was of entry.combatants ?? []) {
       const combatant = game.combats?.get(was.combat)?.combatants.get(was.id);
-      if (combatant) await combatant.update({ defeated: was.defeated, initiative: was.initiative });
+      if (!combatant) continue;
+      const change = { defeated: was.defeated, initiative: was.initiative };
+      if ("fluid" in was) change[was.fluid ? "flags.spycraft2.==fluid" : "flags.spycraft2.-=fluid"] = was.fluid;
+      await combatant.update(change);
     }
   }
   if (record.gcDice > 0 && game.user.isGM) {
     const { adjustGCDice } = await import("../services/gc-dice.mjs");
-    await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`);
+    // A new session has its own pool: the characters are still put back, and the GC is told about the dice.
+    await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>
+      ui.notifications.warn(loc`The GC action dice were not given back: ${error.message}`)
+    );
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;
@@ -173,7 +250,6 @@ export async function applyUndo(message) {
     const last = marks.at(-1);
     if (last) await card.update({ [`flags.spycraft2.damageAppliedBy.-=${last[0]}`]: null }).catch(() => null);
   }
-  await message.update({ "flags.spycraft2.undo.done": true });
   return targets.map(([entry]) => entry.name);
 }
 
@@ -186,11 +262,13 @@ export function renderUndo(message, html) {
   if (record.done) {
     const note = document.createElement("p");
     note.className = "hint";
+    note.setAttribute("role", "status");
     note.textContent = loc`Undone.`;
     row.append(note);
   } else {
     const button = document.createElement("button");
     button.type = "button";
+    button.className = "sc2-quiet-action";
     button.textContent = loc`Undo`;
     button.dataset.tooltip = loc`Puts back what this step changed${record.gcDice ? loc` and returns ${record.gcDice} GC action di${record.gcDice === 1 ? "e" : "ce"}` : ""}`;
     button.addEventListener("click", async () => {

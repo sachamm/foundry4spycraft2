@@ -24,6 +24,7 @@ const makeActor = (system, flags = {}) => {
         for (const key of keys.slice(0, -1)) target = target[key] ??= {};
         const last = keys.at(-1);
         if (last.startsWith("-=")) delete target[last.slice(2)];
+        else if (last.startsWith("==")) target[last.slice(2)] = value;
         else target[last] = value;
       }
     },
@@ -46,7 +47,7 @@ test("only what a step changed is kept, with arrays and null as whole values", (
     e: "x"
   });
   const diff = differences({ "a.b": 1, "a.c": [1, 2], keep: 5 }, { "a.b": 3, "a.c": [1, 2], keep: 5, fresh: true });
-  assert.deepEqual(diff, { restore: { "a.b": 1 }, unset: ["fresh"], expect: { "a.b": 3, fresh: true } });
+  assert.deepEqual(diff, { restore: { "a.b": 1 }, unset: ["fresh"], expect: { "a.b": 3, fresh: true }, whole: [] });
 });
 
 test("a step's writes, new conditions and tracker changes are put back by Undo", async () => {
@@ -74,10 +75,13 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
   actor.effects.push({ id: "e1", toObject: () => ({ _id: "e1" }) });
   combatant.defeated = true;
   const entry = undoEntry(actor, before, snapshot(actor));
-  assert.deepEqual(entry.restore, { "system.vitality.value": 20, "system.wounds.value": 12 });
+  assert.deepEqual(entry.restore, [
+    ["system.vitality.value", 20],
+    ["system.wounds.value", 12]
+  ]);
   assert.deepEqual(entry.unset, ["flags.spycraft2.nonLethal.subdual"]);
   assert.deepEqual(entry.created, ["e1"]);
-  assert.deepEqual(entry.combatants, [{ combat: "fight", id: "c1", defeated: false, initiative: 14 }]);
+  assert.deepEqual(entry.combatants, [{ combat: "fight", id: "c1", defeated: false, initiative: 14, fluid: null }]);
   assert.deepEqual(restoreUpdate(entry), {
     "system.vitality.value": 20,
     "system.wounds.value": 12,
@@ -117,8 +121,74 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
 });
 
 test("Undo notices a value that moved again after the step", () => {
-  const entry = { expect: { "system.vitality.value": 5, "system.wounds.value": 9 } };
+  const entry = {
+    expect: [
+      ["system.vitality.value", 5],
+      ["system.wounds.value", 9]
+    ]
+  };
   assert.deepEqual(movedSince(entry, { system: { vitality: { value: 2 }, wounds: { value: 9 } } }), [
     "system.vitality.value"
   ]);
+});
+
+test("an empty record that a step filled is put back whole, and the note survives a chat message's key expansion", async () => {
+  // A standard NPC's first Damage save: the track goes from nothing to a record with parts.
+  const actor = makeActor({ damageTrack: null, wounds: { value: 3 } });
+  const before = snapshot(actor);
+  actor.system.damageTrack = { accumulated: 9, failed: 1 };
+  const entry = undoEntry(actor, before, snapshot(actor));
+  assert.deepEqual(entry.whole, ["system.damageTrack"]);
+  assert.deepEqual(restoreUpdate(entry), { "system.==damageTrack": null }, "one key, no parts removed beside it");
+  // Stored on a chat message, dotted keys inside objects become nests; pairs do not.
+  const stored = JSON.parse(JSON.stringify(entry));
+  assert.deepEqual(movedSince(stored, actor.toObject()), [], "nothing moved, so Undo does not ask");
+  actor.system.damageTrack.accumulated = 12;
+  assert.deepEqual(movedSince(stored, actor.toObject()), ["system.damageTrack.accumulated"]);
+  await actor.update(restoreUpdate(stored));
+  assert.equal(actor.system.damageTrack, null);
+
+  // The reverse: a record a step cleared comes back with its parts.
+  const full = makeActor({ promotion: { scene: 2, by: "gc" } });
+  const was = snapshot(full);
+  full.system.promotion = null;
+  const cleared = undoEntry(full, was, snapshot(full));
+  assert.deepEqual(restoreUpdate(cleared), { "system.==promotion": { scene: 2, by: "gc" } });
+});
+
+test("two presses of one Undo run once; a fluid initiative event the step recorded is taken back", async () => {
+  const actor = makeActor({ vitality: { value: 20 } });
+  const combatant = {
+    id: "c1",
+    actor,
+    parent: { id: "fight" },
+    defeated: false,
+    initiative: 10,
+    flags: {},
+    updates: [],
+    async update(change) {
+      this.updates.push(change);
+    }
+  };
+  const fight = { id: "fight", combatants: Object.assign([combatant], { get: () => combatant }) };
+  game.combats = Object.assign([fight], { get: () => fight });
+  const before = snapshot(actor);
+  actor.system.vitality.value = 4;
+  combatant.flags = { spycraft2: { fluid: { modifiers: [{ id: "wounds", value: -2 }] } } };
+  const entry = undoEntry(actor, before, snapshot(actor));
+  globalThis.fromUuid = async () => actor;
+  game.messages = { get: () => null };
+  let marked = 0;
+  const note = {
+    id: "note1",
+    flags: { spycraft2: { undo: { label: "x", entries: [entry] } } },
+    async update() {
+      marked += 1;
+    }
+  };
+  const [first, second] = await Promise.all([applyUndo(note), applyUndo(note)]);
+  assert.deepEqual([first, second], [["Guard"], null]);
+  assert.equal(marked, 1);
+  assert.deepEqual(combatant.updates, [{ defeated: false, initiative: 10, "flags.spycraft2.-=fluid": null }]);
+  game.combats = [];
 });
