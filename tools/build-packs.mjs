@@ -45,6 +45,8 @@ for (const [name, pack] of Object.entries(packs)) {
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   const db = new ClassicLevel(dir, { valueEncoding: "json" });
+  // classic-level 2+ only queues get/put/del until the database opens, not chained batches, so open it first.
+  await db.open();
   const batch = db.batch();
   for (const f of pack.folders) batch.put(`!folders!${f._id}`, f);
   const collection = pack.collection ?? "items";
