@@ -38,6 +38,13 @@ export function registerGCSettings() {
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
   game.settings.register(SYSTEM, "gcConsoleView", { scope: "client", config: false, type: Object, default: {} });
+  // Set once every first-session step has been done, so the list does not return with each new mission.
+  game.settings.register(SYSTEM, "gcFirstSessionDone", {
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: false
+  });
   game.settings.register(SYSTEM, "fluidInitiative", {
     name: locKey`Fluid initiative`,
     hint: locKey`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,

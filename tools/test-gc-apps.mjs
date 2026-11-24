@@ -723,6 +723,12 @@ test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's 
   assert.equal(consoleView("active", { view: "prep", state: "active" }), "prep");
   assert.equal(consoleView("combat", { view: "prep", state: "active" }), "play", "a fight brings Play back");
   assert.equal(consoleView("active", { view: "nonsense", state: "active" }), "play");
+  assert.equal(
+    consoleView("combat", { view: "prep", state: "combat", key: "fight1" }, "fight2"),
+    "play",
+    "a choice made in one fight does not hide Combat in the next"
+  );
+  assert.equal(consoleView("combat", { view: "prep", state: "combat", key: "fight1" }, "fight1"), "prep");
   const context = consoleContext();
   assert.equal(context.view, "play");
   assert.equal(context.hiddenSections.combat, false);

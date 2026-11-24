@@ -253,14 +253,17 @@ const viewState = () => {
   const m = getMission();
   return game.combat ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning";
 };
+/** What the choice was made in: this fight, or outside a fight. A choice made in one fight does not hold in the next. */
+const viewKey = () => game.combat?.id ?? null;
 /** The view in use: the GC's choice for the current state, or the one that state calls for. */
-export function consoleView(state, stored = null) {
-  if (stored && stored.state === state && VIEWS.includes(stored.view)) return stored.view;
+export function consoleView(state, stored = null, key = null) {
+  if (stored && stored.state === state && (stored.key ?? null) === key && VIEWS.includes(stored.view))
+    return stored.view;
   return state === "planning" ? "prep" : state === "ended" ? "wrap" : "play";
 }
 function rememberView(view, state) {
   if (!VIEWS.includes(view)) return null;
-  return game.settings.set("spycraft2", VIEW_SETTING, { view, state });
+  return game.settings.set("spycraft2", VIEW_SETTING, { view, state, key: viewKey() });
 }
 /** Which sections each view shows. A search looks through all of them. */
 const VIEW_SECTIONS = {
@@ -386,7 +389,7 @@ export function consoleContext() {
     combatNow = game.combat ?? null,
     conflictList = conflicts.conflictRows();
   const state = combatNow ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning",
-    view = consoleView(state, readSetting(VIEW_SETTING, null));
+    view = consoleView(state, readSetting(VIEW_SETTING, null), viewKey());
   const acting = turn.actingBlock(combatNow),
     paid = Object.keys(m.standingPaid ?? {}).length;
   const checklist = firstSessionChecklist({
@@ -395,6 +398,10 @@ export function consoleContext() {
     npcActors: [...(game.actors ?? [])].filter(actor => actor.type === "npc").length,
     combatSeen: !!combatNow || (m.scenesPlayed ?? 0) > 0
   });
+  // Done once is done for good: a new mission or session does not bring the list back.
+  if (readSetting("gcFirstSessionDone", false)) checklist.complete = true;
+  else if (checklist.complete && game.user?.isGM)
+    Promise.resolve(game.settings.set("spycraft2", "gcFirstSessionDone", true)).catch(() => {});
   return {
     view,
     views: [
@@ -416,7 +423,12 @@ export function consoleContext() {
           ? loc`Round ${combatNow.round}: ${combatNow.combatant?.name ?? "—"}`
           : loc`Fight not begun`
         : loc`No combat`,
-      dice: dice.current ? loc`${dice.value} left of ${team.length + 2 * m.caliber}` : loc`not set up`
+      // Awards can take the pool past its starting number; "left of" would then read oddly.
+      dice: !dice.current
+        ? loc`not set up`
+        : dice.value > team.length + 2 * m.caliber
+          ? loc`${dice.value} left`
+          : loc`${dice.value} left of ${team.length + 2 * m.caliber}`
     },
     wrap: {
       standing:
@@ -517,8 +529,9 @@ function refreshSoon() {
   if (refreshTimer) return;
   refreshTimer = setTimeout(() => {
     refreshTimer = null;
-    const instance = game.spycraft2?.gc?.console;
-    if (instance?.rendered) instance.render();
+    // The sidebar console and a popped-out copy both follow the fight.
+    for (const instance of new Set([game.spycraft2?.gc?.console, ui.gc, ui.gc?.popout]))
+      if (instance?.rendered) instance.render();
   }, 120);
 }
 const inFight = actor =>

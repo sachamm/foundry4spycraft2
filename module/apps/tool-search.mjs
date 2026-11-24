@@ -43,8 +43,14 @@ export function installToolSearch(root, selector, caption = loc`Find a tool`, st
       section.dataset.searchOpen = String(open);
       section.open = open;
     }
-    status.textContent =
-      count === 1 ? loc`1 section shown` : count ? loc`${count} sections shown` : loc`No matching tools`;
+    // With nothing typed the count says nothing useful, and a view may be hiding some of the sections.
+    status.textContent = !query
+      ? ""
+      : count === 1
+        ? loc`1 section shown`
+        : count
+          ? loc`${count} sections shown`
+          : loc`No matching tools`;
     clear.disabled = !search.value;
   };
   search.addEventListener("input", filter);
