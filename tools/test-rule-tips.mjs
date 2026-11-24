@@ -48,3 +48,8 @@ test("chosen picks show each option's label and skip blank fields", () => {
     ]
   );
 });
+
+test("summary text keeps out-of-range entities as written and drops single-quoted secrets", () => {
+  assert.equal(summaryText("<p>A &#x110000; B &#99999999; C</p>"), "A &#x110000; B &#99999999; C");
+  assert.equal(summaryText("<p>Open.</p><section class='secret'><p>GC only</p></section>"), "Open.");
+});

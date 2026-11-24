@@ -8,21 +8,24 @@ const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", 
 
 /**
  * Plain text of stored or rendered rich text: secret blocks and tags dropped, block ends kept apart, document links
- * reduced to their label, common entities decoded. Secrets go even for owners, since a tooltip shows to anyone.
+ * reduced to their label, common entities decoded.
  */
 export function summaryText(html) {
-  return String(html ?? "")
-    .replace(/<section\b[^>]*\bclass="[^"]*\bsecret\b[^"]*"[^>]*>[\s\S]*?<\/section>/gi, " ")
-    .replace(/@\w+\[([^\]]*)\](?:\{([^}]*)\})?/g, (whole, target, label) => label ?? target.split(".").at(-1))
-    .replace(/<\/(p|div|li|h[1-6])>|<br\s*\/?>/gi, "$& ")
-    .replace(/<[^>]*>/g, "")
-    .replace(/&(#x?[0-9a-f]+|\w+);/gi, (whole, code) => {
-      if (code[0] !== "#") return ENTITIES[code.toLowerCase()] ?? whole;
-      const point = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
-      return Number.isFinite(point) ? String.fromCodePoint(point) : whole;
-    })
-    .replace(/\s+/g, " ")
-    .trim();
+  return (
+    String(html ?? "")
+      // A last guard only: callers pass text already rendered with secrets off (see enrich()).
+      .replace(/<section\b[^>]*\bclass=(["'])[^"']*\bsecret\b[^"']*\1[^>]*>[\s\S]*?<\/section>/gi, " ")
+      .replace(/@\w+\[([^\]]*)\](?:\{([^}]*)\})?/g, (whole, target, label) => label ?? target.split(".").at(-1))
+      .replace(/<\/(p|div|li|h[1-6])>|<br\s*\/?>/gi, "$& ")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&(#x?[0-9a-f]+|\w+);/gi, (whole, code) => {
+        if (code[0] !== "#") return ENTITIES[code.toLowerCase()] ?? whole;
+        const point = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+        return Number.isInteger(point) && point >= 0 && point <= 0x10ffff ? String.fromCodePoint(point) : whole;
+      })
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 const escape = text =>

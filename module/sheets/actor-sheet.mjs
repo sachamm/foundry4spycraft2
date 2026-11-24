@@ -1027,9 +1027,10 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       origin.description = await enrich(origin.item.system.description, origin.item);
       // What the pick does and how its owner set it up, for the rail chip and for viewers who cannot edit it.
       origin.picks = chosenPicks(origin.fields);
+      // The tooltip shows to anyone, so it leaves out the secret blocks an owner sees in the description.
       origin.tip = ruleTip({
         kind: game.i18n.localize(`SPYCRAFT.Origin.${origin.item.system.originType}`),
-        summary: origin.description,
+        summary: await enrich(origin.item.system.description, origin.item, { secrets: false }),
         picks: origin.picks
       });
       delete origin.item;
@@ -1184,16 +1185,22 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         return {
           item: f,
           treeLabel,
-          tip: ruleTip({
-            kind: treeLabel ? loc`${treeLabel} feat` : game.i18n.localize("TYPES.Item.feat"),
-            summary: f.system.description
-          }),
+          tipKind: treeLabel ? loc`${treeLabel} feat` : game.i18n.localize("TYPES.Item.feat"),
           status,
           actions: featActions(f, { qualified: status.ok, isGM: game.user.isGM }),
           prereqText: describePrereq(f.system.prerequisites)
         };
       })
       .sort((a, b) => a.treeLabel.localeCompare(b.treeLabel) || a.item.name.localeCompare(b.item.name));
+    // Hover help shows to anyone who can open the sheet, so it is rendered with every secret block left out.
+    await Promise.all(
+      context.feats.map(async feat => {
+        feat.tip = ruleTip({
+          kind: feat.tipKind,
+          summary: await enrich(feat.item.system.description, feat.item, { secrets: false })
+        });
+      })
+    );
     context.featTrees = Object.entries(sys.feats?.trees ?? {})
       .filter(([, v]) => v.slots || v.spent || v.owned)
       .map(([k, v]) => ({ key: k, label: cfg.featTrees[k], ...v }));
