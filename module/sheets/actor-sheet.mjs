@@ -8,6 +8,7 @@ import { systemDialog } from "../apps/dialog-theme.mjs";
 import { formDialog } from "../apps/dialog-kit.mjs";
 import { weaponFacts } from "./play-rows.mjs";
 import { formatRange } from "../rules/outcome-labels.mjs";
+import { originRuleName } from "../rules/rule-name.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
 import { KeepPlace } from "./keep-place.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
@@ -942,10 +943,10 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.talent = byType("origin").find(i => i.system.originType === "talent");
     context.specialty = byType("origin").find(i => i.system.originType === "specialty");
     context.originSelections = byType("origin").map(item => {
-      const rule = cfg.tables.originChoices?.[item.name] ?? {};
+      const rule = cfg.tables.originChoices?.[originRuleName(item)] ?? {};
       const choices = item.system.originChoices ?? {};
       const fields = [];
-      const focusRule = cfg.tables.originFocuses?.[item.name];
+      const focusRule = cfg.tables.originFocuses?.[originRuleName(item)];
       if (focusRule?.choiceSkill) {
         const skill = focusRule.choiceSkill;
         fields.push({
@@ -1011,7 +1012,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
               value: camouflageTerrain(choices[`npcDetails${index}`]),
               options: CAMOUFLAGE_TERRAINS
             });
-          else
+          else if (["augmented", "naturalAttack"].includes(choices[`npcQuality${index}`])) {
+            // The built-in item is one the agent carries: a weapon for a natural attack, any weapon or gear if augmented.
+            const kinds = choices[`npcQuality${index}`] === "naturalAttack" ? ["weapon"] : ["weapon", "armor", "gear"];
+            fields.push({
+              key: `npcDetails${index}`,
+              label: loc`Quality ${index + 1} built-in item`,
+              value: choices[`npcDetails${index}`],
+              options: Object.fromEntries(items.filter(i => kinds.includes(i.type)).map(i => [i.name, i.name]))
+            });
+          } else
             fields.push({
               key: `npcDetails${index}`,
               label: loc`Quality ${index + 1} details / chosen item`,

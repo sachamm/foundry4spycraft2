@@ -52,6 +52,10 @@ export const ActorProgression = Base =>
       const ident = classData.system?.identifier || classData.name;
       let cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === ident);
       const definition = cls?.system ?? classData.system;
+      // A class has as many levels as its table: 10 for an expert class, 20 for a base class (pp.26, 64).
+      const classMax = definition.table?.length || (definition.expert ? 10 : 20);
+      if ((sys.classLevels?.[ident] ?? 0) >= classMax)
+        return refuseStep(loc`${classData.name} has only ${classMax} levels; choose another class.`);
       const firstExpertLevel = definition.expert && !sys.classLevels?.[ident];
       if (firstExpertLevel && sys.level < 4)
         return refuseStep(game.i18n.format("SPYCRAFT.Class.ExpertTooEarly", { name: classData.name }));

@@ -41,7 +41,7 @@ test("all five restricted origin fortes must relate to that origin’s exact gra
     ["Hot Rodder", "drive", "Standard Ground Vehicles", "Personal Aircraft"],
     ["Pilot", "drive", "Performance Aircraft", "Rotary-Wing Aircraft"],
     ["Sailor", "drive", "Ships", "Submarines"],
-    ["Thrill Seeker", "drive", "Personal Watercraft", "Personal Aircraft"]
+    ["Thrill-Seeker", "drive", "Personal Watercraft", "Personal Aircraft"]
   ]) {
     const rule = { name, skill, focus },
       valid = compute(rule, focus),
@@ -129,6 +129,20 @@ test("adding a level snapshots permanent INT after its class increase while excl
   assert.equal(actor.system.progression[5].careerEntryId, "career-entry-test");
   assert.equal(actor.system.progression[5].intelligenceModifier, 2);
   assert.equal(actor.system.progression[0].intelligenceModifier, 1);
+});
+
+test("an expert class stops at its tenth level", async () => {
+  const actor = new SpycraftActor();
+  const c = classes.find(c => c.key === "sniper");
+  const sniper = { id: "sniper", name: c.name, type: "class", system: { ...c, identifier: c.key } };
+  actor.items = [sniper];
+  actor.system = { level: 14, progression: Array.from({ length: 14 }, () => ({})), classLevels: { sniper: 10 } };
+  let updated = 0;
+  actor.update = async () => {
+    updated++;
+  };
+  assert.equal(await actor.addClassLevel(sniper, { promptVitality: false }), null);
+  assert.equal(updated, 0);
 });
 
 test("expert entry is blocked before item creation and cannot use its own BAB to qualify", async () => {

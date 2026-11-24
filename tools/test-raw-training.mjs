@@ -45,7 +45,7 @@ test("RAW pp.28,298: all 16 proficiency/forte options use fixed grants without s
     assert.equal(invalid.totals[key].forte, false);
     assert.equal(invalid.warnings.length, 1);
   }
-  for (const name of ["Burly", "Criminal", "Doctor", "Hunter", "Recruit", "Warrior", "Special Ops"])
+  for (const name of ["Burly", "Criminal", "Doctor", "Hunter", "Serviceman", "Warrior", "Special Ops"])
     assert.ok(
       Object.values(compute(1, [origin(name)]).proficiencyTotals).some(p => p.granted),
       name
@@ -79,7 +79,7 @@ test("RAW pp.21–26: named focus grants and required fortes are preserved", () 
     ["Hot Rodder", "drive", "Standard Ground Vehicles"]
   ];
   for (const [name, key, value] of checks) assert.ok(compute(1, [origin(name)]).focusTotals[key].includes(value), name);
-  for (const name of ["Authority", "Hot Rodder", "Pilot", "Sailor", "Thrill Seeker"])
+  for (const name of ["Authority", "Hot Rodder", "Pilot", "Sailor", "Thrill-Seeker"])
     assert.ok(
       compute(1, [origin(name)]).todo.some(t => t.text.includes("granted forte")),
       name
