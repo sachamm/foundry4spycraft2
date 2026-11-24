@@ -112,7 +112,7 @@ Security devices at any Power Rating with sensor and trap rolls (Table 7.9), haz
 ## What is left to the GC
 
 - Strategy choices are entered by the GC; players tell the GC their choice privately. Opposed checks are rolled on the sheets and the totals typed in.
-- Advantage effects other than Lead, Swap, Victory and Halt are reported, not applied. Chase vehicles, Maneuvering Room and Smash points are not tracked.
+- Advantage effects other than Lead, Swap, Victory and Halt are reported, not applied.
 - Disposition and campaign-quality modifiers are shown but not added to agents' rolls automatically. Of the campaign qualities, only XP, action die cost and starting action dice are applied; the rest is a reference list.
 - Initiative boosts for the dramatic-scene spend change the Count; Defense and DC boosts are reported for the GC to apply.
 - Some printed cells are garbled or inconsistent in the source text; each is listed under `anomalies` in `src/data/gc-tables.json` and `src/data/conflicts.json` and kept as printed.

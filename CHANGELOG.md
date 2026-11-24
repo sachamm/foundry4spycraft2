@@ -366,7 +366,7 @@
 
 - Added contextual tooltips across system sheets, dialogs, chat actions and Game Control, including fields, buttons, tabs and expandable sections. Existing authored help is preserved.
 
-Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/remaining-work.md`.
+Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/archive/build-notes-2026-11.md`.
 
 - **Game clock.** The world keeps the time. A badge above the players list shows it and opens the Clock window; the
   GC moves it on in steps (a round, a minute, ten minutes, an hour, eight hours, a day) or by any amount, from that
@@ -451,7 +451,7 @@ Fixes from a live test of 0.5.0:
 
 - Added the Sample Level-1 Agents compendium: 16 complete characters across all 12 base classes, four alternate builds, matching compressed WebP portraits and tokens, and a linked Scout animal partner created on import.
 
-Not yet tried in a running Foundry world; see `docs/remaining-work.md` for the checks to make.
+Not yet tried in a running Foundry world; see `docs/backlog.md` for the checks still to make.
 
 - Attacks resolve against a target: "Resolve against Defense" on an attack card, "Roll damage" on a hit, and "Apply
   damage to a target" on a damage card (vitality and wounds, damage reduction, critical hits, conditions, standard NPC

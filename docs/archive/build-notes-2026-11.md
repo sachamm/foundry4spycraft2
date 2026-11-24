@@ -1,7 +1,11 @@
-# Remaining work
+# Build notes, November 2026
 
-Written 2026-11-17, after the roll pipeline, gear catalog and vehicles were added (commit `77d9624`).
-Items are grouped by area and ordered roughly by how much they block. Tick them off or delete them as they land.
+This was `docs/remaining-work.md`, the working to-do list of 17 and 18 November 2026. Everything in it that was
+still not done on 2026-11-24 is now in [../backlog.md](../backlog.md) (rows citing `RW-` and a line number of this
+file as it then was). It is kept, unmaintained, for what else it records: data corrections and house rules, the roll
+pipeline design, why the document lock stays the default, the typed-record and localisation notes, how the main loop
+is joined, clock and timer storage, and what was checked live and when. "Not done", "left to the table" and "still to
+check" passages below are history; the backlog is the current list.
 
 ## Verify what was just built
 
