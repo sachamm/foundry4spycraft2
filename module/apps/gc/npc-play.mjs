@@ -259,7 +259,7 @@ export async function npcDamageSave(actor, input = null) {
         overlay: result.state === "dead"
       });
     } catch (error) {
-      console.warn(loc`Spycraft 2.0 | status not applied`, error);
+      console.warn(loc`Field Agent's Handbook | status not applied`, error);
     }
     for (const combat of game.combats ?? [])
       for (const combatant of combat.combatants)

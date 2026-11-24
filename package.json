@@ -2,7 +2,7 @@
   "name": "spycraft2",
   "private": true,
   "type": "module",
-  "description": "Spycraft 2.0 game system for Foundry VTT",
+  "description": "The Field Agent's Handbook: an unofficial espionage game system for Foundry VTT",
   "engines": {
     "node": ">=22"
   },

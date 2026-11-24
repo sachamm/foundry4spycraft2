@@ -134,7 +134,7 @@ function nameSystemStatuses() {
 
 Hooks.once("init", () => {
   registerErrorNotices();
-  console.log("Spycraft 2.0 | Initializing system");
+  console.log("Field Agent's Handbook | Initializing system");
   installChatSearchHooks();
   installDialogThemeHooks();
   installUITooltipHooks();
@@ -357,14 +357,16 @@ Hooks.once("ready", async () => {
   try {
     await runWorldMigrations();
   } catch (error) {
-    console.error(loc`Spycraft 2.0 | World data migration failed`, error);
-    ui.notifications?.error(loc`Spycraft 2.0 could not update this world's data. See the console for details.`);
+    console.error(loc`Field Agent's Handbook | World data migration failed`, error);
+    ui.notifications?.error(
+      loc`The Field Agent's Handbook could not update this world's data. See the console for details.`
+    );
   }
   for (const setup of [setupSampleScenes, setupActorFolders, setupGCTables, setupSoundtrack])
     try {
       await setup();
     } catch (error) {
-      console.error(loc`Spycraft 2.0 | A first-load setup step failed`, error);
+      console.error(loc`Field Agent's Handbook | A first-load setup step failed`, error);
     }
   Hooks.callAll("spycraft2.ready");
 });

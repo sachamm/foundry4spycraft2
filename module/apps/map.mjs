@@ -223,7 +223,7 @@ export function measureInto(actor) {
       const measurement = measureAttack(actor);
       if (measurement) applyMeasurement(dialog?.element ?? event?.target, measurement);
     } catch (error) {
-      console.warn("Spycraft 2.0 | The map could not be measured for this roll.", error);
+      console.warn("Field Agent's Handbook | The map could not be measured for this roll.", error);
     }
   };
 }
@@ -285,7 +285,7 @@ export function drawBlast(zero, total, increment, { seconds = 8 } = {}) {
     canvas.ping?.(centre);
     return true;
   } catch (error) {
-    console.warn("Spycraft 2.0 | The blast could not be drawn.", error);
+    console.warn("Field Agent's Handbook | The blast could not be drawn.", error);
     return false;
   }
 }

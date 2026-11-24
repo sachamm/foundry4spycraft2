@@ -87,7 +87,10 @@ export async function retargetLinkedCompanions(game = globalThis.game) {
     try {
       await actor.update(update);
     } catch (error) {
-      console.error(`Spycraft 2.0 | Could not point the companion ${actor.name ?? actor.id} at its agent`, error);
+      console.error(
+        `Field Agent's Handbook | Could not point the companion ${actor.name ?? actor.id} at its agent`,
+        error
+      );
     }
 }
 
@@ -126,7 +129,7 @@ export async function reviewTokenLinks(proposals) {
       linked++;
     } catch (error) {
       failed++;
-      console.error(`Spycraft 2.0 | Could not link the token ${proposal.key}`, error);
+      console.error(`Field Agent's Handbook | Could not link the token ${proposal.key}`, error);
     }
   }
   await game.settings.set(SYSTEM, DISMISSED_SETTING, dismissed);
@@ -152,7 +155,7 @@ export function queueTokenLinkReview() {
         pendingLinkProposals(game.scenes, { dismissed: game.settings.get(SYSTEM, DISMISSED_SETTING) ?? {} })
       );
     } catch (error) {
-      console.error("Spycraft 2.0 | Agent token link review failed", error);
+      console.error("Field Agent's Handbook | Agent token link review failed", error);
     } finally {
       reviewing = false;
     }

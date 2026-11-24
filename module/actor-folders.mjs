@@ -102,6 +102,6 @@ async function seedActors() {
     }
     await game.settings.set(SYSTEM, SAMPLES, { ...state, status: "done" });
   } catch (error) {
-    console.error("Spycraft 2.0 | Starter Actor setup failed; retrying on the next GM launch", error);
+    console.error("Field Agent's Handbook | Starter Actor setup failed; retrying on the next GM launch", error);
   }
 }

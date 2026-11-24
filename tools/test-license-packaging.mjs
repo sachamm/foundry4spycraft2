@@ -27,6 +27,7 @@ test("the OGL copy carries the rulebook's section 15 and this project's notice",
     "Open Game License v1.0a Copyright 2000, Wizards of the Coast, Inc.",
     "Spycraft Soldier/Wheelman Class Guide Copyright 2003",
     "Spycraft Copyright 2005, Alderac Entertainment Group.",
-    "foundry4spycraft2 Copyright 2026"
-  ]) assert.ok(ogl.includes(entry), `LICENSES/OGL-1.0a.txt omits "${entry}"`);
+    "The Field Agent's Handbook Copyright 2026"
+  ])
+    assert.ok(ogl.includes(entry), `LICENSES/OGL-1.0a.txt omits "${entry}"`);
 });

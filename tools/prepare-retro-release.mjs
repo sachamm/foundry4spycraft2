@@ -16,7 +16,7 @@ const version = `${match[1]}.${match[2]}.${Number(match[3]) + 1}-retro.${env.GIT
 const archive = `spycraft2-retro-${env.GITHUB_RUN_ID}-${env.GITHUB_RUN_ATTEMPT}.zip`;
 const base = `https://github.com/${env.GITHUB_REPOSITORY}/releases/download/${env.TEST_TAG}`;
 Object.assign(manifest, {
-  title: "Spycraft 2.0 — Retro Test",
+  title: "The Field Agent's Handbook — Retro Test",
   version,
   manifest: `${base}/system.json`,
   download: `${base}/${archive}`

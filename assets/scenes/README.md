@@ -2,7 +2,7 @@
 
 Three original AI-generated backgrounds, created with the built-in OpenAI image generation tool using the running world's drawing-based encounter test beds as layout guides. No third-party map art was used. Prompts are retained in src/scenes/generation-prompts.json in the source repository.
 
-Open **Compendium Packs → Spycraft 2.0 → Sample Scenes**, then import the scenes you want into your world. These are environments with no actor or token dependencies. They do not create characters or encounters.
+Open **Compendium Packs → The Field Agent's Handbook → Sample Scenes**, then import the scenes you want into your world. These are environments with no actor or token dependencies. They do not create characters or encounters.
 
 - **Warehouse Breach:** crate stacks block sight and movement, low pallets block movement only, loading door and office door start closed.
 - **Night Infiltration:** dark courtyard with security office, locked server-room door, service exit and local lights. Give your own tokens appropriate vision before playing.

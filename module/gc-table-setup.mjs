@@ -66,7 +66,7 @@ async function importMissingTables() {
     if (created) ui.notifications.info(loc`${created} GC tables added to the Rollable Tables tab.`);
     return { created };
   } catch (error) {
-    console.error("Spycraft 2.0 | GC table setup failed", error);
+    console.error("Field Agent's Handbook | GC table setup failed", error);
     ui.notifications.warn(
       loc`GC table setup could not finish. Missing tables will retry the next time the GC opens the world.`
     );

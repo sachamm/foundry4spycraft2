@@ -168,12 +168,19 @@ These points cannot be settled with what the project has now:
 
 1. **The Spycraft name.** OGL section 7 forbids indicating compatibility with
    another party's Trademark, or using its Product Identity, without a
-   separate agreement. The system's display title ("Spycraft 2.0"), manifest
-   description, README, system id (`spycraft2`), repository name and some
-   in-game text use the Spycraft name. Complying requires either renaming the
-   system's public title and descriptions or a written agreement with the
-   trademark owner. The system id is stored in every world that uses it, so a
-   rename would need a migration plan.
+   separate agreement. The system's public name is therefore **The Field
+   Agent's Handbook**, and its title, descriptions, README, sheet names,
+   compendium folder and messages no longer use the Spycraft name. Three uses
+   remain:
+   - The Foundry package id `spycraft2`, which shows in install and asset
+     URLs. Every world and compendium stores it, so changing it would break
+     existing worlds.
+   - The GitHub repository name, `foundry4spycraft2`, which also forms the
+     manifest and download URLs.
+   - Page citations in item sources and code comments, such as
+     "Spycraft 2.0 p.250". These credit the book as the source of the Open
+     Game Content, which the book asks reusers to do, rather than claiming
+     compatibility.
 2. **Erik Dewey's spreadsheet.** The data values imported from it are the
    book's game mechanics, which this project now uses as Open Game Content
    from the book itself. The spreadsheet carries no licence. On 23 November

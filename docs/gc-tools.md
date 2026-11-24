@@ -4,7 +4,7 @@ Open the **GC Console** from the first sidebar tab, marked with a spy icon (GC o
 
 New to the console? Start with [gc-quickstart.md](gc-quickstart.md).
 
-Foundry already supplies scenes, tokens, journals, roll tables and the combat tracker. These tools add what is specific to Spycraft 2.0.
+Foundry already supplies scenes, tokens, journals, roll tables and the combat tracker. These tools add what is specific to this system's rules.
 
 ## Running a session
 

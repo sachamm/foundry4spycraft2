@@ -61,6 +61,6 @@ Spycraft Soldier/Wheelman Class Guide Copyright 2003, Alderac Entertainment Grou
 
 Spycraft Copyright 2005, Alderac Entertainment Group.
 
-foundry4spycraft2 Copyright 2026, Sacha Mallais.
+The Field Agent's Handbook Copyright 2026, Sacha Mallais.
 
 END OF LICENSE

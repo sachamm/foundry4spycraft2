@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **The system is now The Field Agent's Handbook.** Its rules data is used as Open Game Content under the Open
+  Game License 1.0a, which forbids using another publisher's trademark to signal compatibility. The system's
+  title, descriptions, sheet names, compendium folder and messages use the new name. The package id stays
+  `spycraft2`, so existing worlds keep working. The OGL and its copyright notices ship in `LICENSES/`, and
+  `LICENSING.md` lists which content is Open Game Content.
 - **Agent tokens are the agent.** A player who opened an agent from its token on a scene could edit a copy that
   belonged to that token alone, so the character in the Actors list never got the changes. Agents and animal
   partners are now always placed with linked tokens. On the first load, existing agents and companions are switched

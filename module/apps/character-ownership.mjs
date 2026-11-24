@@ -182,7 +182,7 @@ export function queueOwnershipReview(actors = null) {
         })
       );
     } catch (error) {
-      console.error("Spycraft 2.0 | Character ownership review failed", error);
+      console.error("Field Agent's Handbook | Character ownership review failed", error);
     } finally {
       reviewing = false;
     }
