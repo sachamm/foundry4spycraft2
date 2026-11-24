@@ -55,6 +55,15 @@ export function clockEpoch() {
   return Number.isSafeInteger(epoch) ? epoch : null;
 }
 
+/** The year the clock shows, or null while the GC has set no date. The gear browser hides gear newer than this. */
+export function clockYear(time = now()) {
+  const epoch = clockEpoch(),
+    calendar = game.time?.calendar;
+  if (epoch === null || typeof calendar?.timeToComponents !== "function") return null;
+  const year = calendar.timeToComponents(time + epoch)?.year;
+  return Number.isSafeInteger(year) ? year : null;
+}
+
 /** Players see the clock unless the GC hides it; their timers show time left either way. */
 export const clockVisible = () => game.user?.isGM === true || setting("clockVisibleToPlayers") !== false;
 

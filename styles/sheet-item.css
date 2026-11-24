@@ -2,12 +2,13 @@
 /* Browser */
 .spycraft2.browser .filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
   margin-bottom: 6px;
 }
 .spycraft2.browser .filters input[type="search"] {
-  flex: 1;
+  flex: 1 1 200px;
 }
 .spycraft2.browser .browser-list {
   list-style: none;
@@ -39,6 +40,17 @@
   opacity: 1;
   margin-right: 6px;
   white-space: nowrap;
+}
+/* Gear newer than the game clock's year, shown on request: the tag carries the state, as for unqualified rows. */
+.spycraft2.browser li.future .future-tag {
+  color: var(--sc2-ink-muted);
+  border-color: currentColor;
+  margin-right: 6px;
+}
+.spycraft2.browser .browser-era {
+  margin: 0 0 6px;
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
 }
 .spycraft2.browser li button {
   flex: 0 0 32px;

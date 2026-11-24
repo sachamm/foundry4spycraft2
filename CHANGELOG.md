@@ -1,7 +1,20 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 — not yet released
 
+- **Gear by the game clock's year.** Every gear, weapon, armor and vehicle entry now has the year it came out: the
+  book's Year column where it prints one, and our own dates (from public history) for the rest. The browser hides
+  anything newer than the year on the game clock; **Show future gear** lists it again, marked "Not yet". With no
+  date on the clock nothing is hidden. The browser also filters by Caliber, and gear and vehicles by restriction.
+- **Period gear.** Twenty house items fill gaps where a kind of gear had nothing from 1939–1949: a 60mm mortar,
+  a wired bug, a radio homing beacon, an infrared viewer, an early parabolic microphone, a police-band receiver, an
+  early portable radar, an early phone tap, a polygraph, a flare pistol, a line-throwing gun, dried plasma,
+  amphetamine tablets, sulfa and field dressings, a subminiature camera, a 16mm movie camera, a wire recorder, an
+  early helicopter, an early infrared sight and a time-pencil detonator. Each is marked as a house item and names the
+  book entry its numbers come from.
+- **World update (schema 6).** Gear, weapons, armor and vehicles already in a world or on a character take their
+  compendium entry's year. A world that keeps its own imported copies of a gear compendium gets copies of the new
+  period items too.
 - **Second council, fixes to the changes above** (none of them had been released):
   - End mission, Resume and the mission dialog no longer write back an old copy of the mission, so an objective
     ticked while a question is open is kept. The standing award re-reads who was paid after its dialog and cannot pay
