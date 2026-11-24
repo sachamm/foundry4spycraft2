@@ -9,7 +9,8 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { quickAttackHasTarget, quickAttackOptions, skipDialog } from "../remembered-choices.mjs";
 import { resolveQuickAttack } from "../damage-application.mjs";
 import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
-import { halfActionsLeft, trackerRowStates } from "./combat.mjs";
+import { halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
+import { attackActionCost } from "../../rules/combat-actions.mjs";
 
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 
@@ -121,9 +122,16 @@ export async function openCombatant(combat, id) {
 export async function attackWith(actor, itemId, event = null) {
   const item = actor?.items?.get(itemId);
   if (!item) return refuse(loc`That weapon is no longer on the sheet.`);
-  if (skipDialog(event) && quickAttackHasTarget(actor))
-    return resolveQuickAttack(await actor.rollAttack(item, quickAttackOptions(actor, item)));
-  return actor.rollAttack(item, { askContext: true });
+  const quick = skipDialog(event) && quickAttackHasTarget(actor);
+  const message = await actor.rollAttack(item, quick ? quickAttackOptions(actor, item) : { askContext: true });
+  return attackMade(actor, message, quick);
+}
+
+/** A rolled attack marks its time on the attacker's turn, as one made from the sheet does; a cancelled one does not. */
+async function attackMade(actor, message, quick = true) {
+  if (!message) return null;
+  await markActionSpent(actor, attackActionCost(message));
+  return quick ? resolveQuickAttack(message) : message;
 }
 
 /** Share targets among attackers in turn: the first attacker takes the first target, and so on round the list. */
@@ -173,23 +181,27 @@ export async function mobAttackDialog(combat, key = null) {
       const actor = attacker.actor,
         item = [...(actor.items ?? [])].find(entry => entry.type === "weapon" && entry.name === input.weapon);
       if (!item) continue;
-      // The quick attack reads the one targeted token, so each attacker's target is set just before its roll.
+      // The quick attack reads the one targeted token and measures from the attacker's controlled token, so both
+      // are set just before each roll: members that share one linked actor still measure from where they stand.
+      attacker.token?.object?.control?.({ releaseOthers: true });
       target.token.object?.setTarget?.(true, { releaseOthers: true });
       const message = await actor.rollAttack(
         item,
         quickAttackHasTarget(actor) ? quickAttackOptions(actor, item) : { targetActorUuid: target.actor.uuid }
       );
-      if (message) {
-        await resolveQuickAttack(message);
-        rolled++;
-      }
+      if (await attackMade(actor, message)) rolled++;
     }
   } finally {
     // Leave the GC's own targets as they were.
     for (const token of [...(game.user?.targets ?? [])]) token.setTarget?.(false, { releaseOthers: false });
     for (const id of before) canvas?.tokens?.get?.(id)?.setTarget?.(true, { releaseOthers: false });
   }
-  if (input.advance) await passGroup(combat, group.members);
+  // A member whose attack was cancelled has not acted, so the turn stays for the GC to finish by hand.
+  if (input.advance && rolled === group.members.length) await passGroup(combat, group.members);
+  else if (input.advance)
+    ui.notifications.info(
+      loc`${rolled} of ${group.members.length} attacks were rolled, so the turn has not been moved on.`
+    );
   return rolled;
 }
 

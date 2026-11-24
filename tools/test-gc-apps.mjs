@@ -567,8 +567,14 @@ test("the tracker menu entries use the Foundry 14 shape and act on the clicked r
   await find("Delay 1 Count").onClick(null, row);
   const mook = fight.combatants.get("c-guard");
   assert.equal(mook.initiative, 19);
+  // Readying costs a half action on the character's own turn; off its turn it is refused.
+  assert.ok(!(await find("Ready an action").onClick(null, row)));
+  assert.equal(mook.flags.spycraft2?.readied, undefined);
+  fight.turn = 1;
+  assert.equal(fight.combatant, mook);
   await find("Ready an action").onClick(null, row);
   assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round });
+  assert.equal(combat.halfActionsLeft(mook), 1);
   assert.equal(find("Ready an action").visible(row), false);
   assert.equal(find("Readied action triggered").visible(row), true);
   // The trigger comes on the acting character's Count; the guard is already lower, so it stays put.

@@ -610,7 +610,10 @@ export async function readyCombatant(combatant) {
   const combat = combatant.parent;
   if (!combat?.started) return refuse(loc`Start the combat first.`);
   if (combatant.flags?.spycraft2?.readied) return refuse(loc`${combatant.name} already has a readied action.`);
-  if (combat.combatant?.id === combatant.id && (await spendTurnAction(combatant, "half")) === null) return null;
+  // Readying is a half action taken on the character's own turn; only its trigger comes at another time.
+  if (combat.combatant?.id !== combatant.id)
+    return refuse(loc`${combatant.name} can ready an action only on its own turn.`);
+  if ((await spendTurnAction(combatant, "half")) === null) return null;
   await combatant.update({ "flags.spycraft2.readied": { round: combat.round } });
   await say(
     loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`
