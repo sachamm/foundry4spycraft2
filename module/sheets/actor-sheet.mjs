@@ -1012,7 +1012,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
               value: camouflageTerrain(choices[`npcDetails${index}`]),
               options: CAMOUFLAGE_TERRAINS
             });
-          else
+          else if (["augmented", "naturalAttack"].includes(choices[`npcQuality${index}`])) {
+            // The built-in item is one the agent carries: a weapon for a natural attack, any weapon or gear if augmented.
+            const kinds = choices[`npcQuality${index}`] === "naturalAttack" ? ["weapon"] : ["weapon", "armor", "gear"];
+            fields.push({
+              key: `npcDetails${index}`,
+              label: loc`Quality ${index + 1} built-in item`,
+              value: choices[`npcDetails${index}`],
+              options: Object.fromEntries(items.filter(i => kinds.includes(i.type)).map(i => [i.name, i.name]))
+            });
+          } else
             fields.push({
               key: `npcDetails${index}`,
               label: loc`Quality ${index + 1} details / chosen item`,

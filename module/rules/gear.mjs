@@ -20,6 +20,7 @@ import { quirkyWeaponPlan } from "./quirky-weapon.mjs";
 import { superiorAccuracyWeaponPlan } from "./superior-accuracy-weapon.mjs";
 import { weaponDamageExpression } from "./weapon-damage-expression.mjs";
 import { trainedOnlyWeaponPlan } from "./trained-only-weapon.mjs";
+import { builtInQuality } from "./origins.mjs";
 import { accurizedWeaponPlan } from "./accurized-weapon.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import "./cleave.mjs";
@@ -268,7 +269,8 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     };
   const ability = weapon.attackAbility || cfg.proficiencies[weapon.proficiency]?.ability || "dex";
   const p = (system.proficiencyTotals ?? system.proficiencies)?.[weapon.proficiency];
-  const trained = type !== "agent" || !!p?.proficient,
+  const builtIn = type === "agent" ? builtInQuality(system, sourceWeapon) : "";
+  const trained = type !== "agent" || !!p?.proficient || !!builtIn,
     forte = p?.forte ? 1 : 0;
   const range = weaponRanges(weapon, system.unarmed),
     grip = weaponGrip(
@@ -426,6 +428,10 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
   const stanceKey = combatStanceState(system)?.key,
     attacking = !ranged && options.disarm?.role !== "defender";
   const notes = terms.merge("notes", [
+    [
+      5,
+      builtIn ? loc`${builtIn}: built in, so always proficient, readied as a free action and impossible to disarm.` : ""
+    ],
     [10, reach?.notes ?? []],
     [20, meleeArmorPiercing.notes],
     [

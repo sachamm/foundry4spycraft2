@@ -5,6 +5,7 @@ import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { weaponAttack } from "../module/rules/gear.mjs";
 import { classCheckEffects, talentSurpriseBonus } from "../module/rules/class-checks.mjs";
+import { focusTotals, proficiencyTotals } from "../module/rules/training.mjs";
 import { LEGACY_ORIGIN_NAMES, originRuleName } from "../module/rules/rule-name.mjs";
 import { specialtyAttackAction, specialtyAttackBonus } from "../module/rules/specialty-attacks.mjs";
 
@@ -206,4 +207,70 @@ test("pp.18, 21: Clever and Vigilant add a growing bonus only to checks that det
 
 test("Subplots offer Impending Doom (p.55)", () => {
   assert.ok(read("core").tables.subplots.includes("Impending Doom"));
+});
+
+test("Test Subject: Augmented and Natural Attack make the chosen item a proficient, built-in weapon", () => {
+  const knife = { ...smg, proficiency: "edged", name: "Claws", fireModes: [], fireMode: "", ammo: "", recoil: 0 };
+  const untrained = shooter("Test Subject");
+  untrained.proficiencies = {};
+  untrained.proficiencyTotals = { edged: { proficient: false, forte: false } };
+  const plain = weaponAttack(untrained, knife, cfg, "agent", { attackAction: "standard" });
+  const built = weaponAttack(
+    {
+      ...untrained,
+      originEffects: [{ qualityKey: "naturalAttack", name: "Natural attack (Caliber II)", details: "claws" }]
+    },
+    knife,
+    cfg,
+    "agent",
+    { attackAction: "standard" }
+  );
+  assert.equal(plain.trained, false);
+  assert.equal(built.trained, true);
+  assert.match(built.notes, /built in/);
+});
+
+test("weapon proficiency picks beyond the allowance are not applied", () => {
+  const sys = {
+    proficiencies: { blunt: { proficient: true }, edged: { proficient: true }, rifle: { proficient: true } }
+  };
+  const result = proficiencyTotals(sys, cfg, () => 0, 2);
+  const applied = Object.values(result.totals).filter(t => t.proficient).length;
+  assert.equal(applied, 2);
+  assert.equal(result.picks.used, 3);
+  assert.ok(result.warnings.some(w => /Not applied/.test(w)));
+});
+
+test("an invalid or repeated skill forte gives no bonus", () => {
+  const sys = {
+    focuses: { science: ["Chemistry"] },
+    skillFortes: [
+      { skill: "science", focus: "Chemistry", forte: "Plastic explosive" },
+      { skill: "science", focus: "Chemistry", forte: "plastic explosive" },
+      { skill: "science", focus: "Genetics", forte: "Cloning" },
+      { skill: "science", focus: "Chemistry", forte: " " }
+    ]
+  };
+  const result = focusTotals(sys, [], cfg, () => 0, { level: 1, startingIntelligence: 0 });
+  assert.deepEqual(
+    result.activeFortes.map(r => r.forte),
+    ["Plastic explosive"]
+  );
+  assert.ok(result.warnings.some(w => /listed twice/.test(w)));
+});
+
+test("a blank Subplot row does not use a Subplot slot", () => {
+  const base = {
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10, misc: 0 }])),
+    progression: [{ classId: "x", vitality: 1, skills: {} }],
+    abilityIncreases: {},
+    skills: {},
+    focuses: {},
+    proficiencies: {},
+    misc: {},
+    pointBuyBudget: 36,
+    subplots: [{ name: "Nemesis" }, { name: "", notes: "" }, { name: "", notes: "an idea" }]
+  };
+  const sys = computeAgent(base, [], cfg);
+  assert.equal(sys.subplotPicks.used, 2);
 });

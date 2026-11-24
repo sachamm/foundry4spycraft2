@@ -107,6 +107,8 @@ export function resolveOriginChoices(item, system, items, cfg) {
       if (terrain) camouflageSelections.add(terrain);
       const resistance = key === "damageResistance" ? resistanceType(choices[`npcDetails${index}`]) : null;
       if (key === "damageResistance" && !resistance) pending.push(loc`choose the damage type for quality ${index + 1}`);
+      if (["augmented", "naturalAttack"].includes(key) && !String(choices[`npcDetails${index}`] ?? "").trim())
+        pending.push(loc`choose the built-in item for quality ${index + 1}`);
       if (key !== "fleet") bonuses.push(...quality.bonuses);
       notes.push({
         qualityKey: key,
@@ -120,4 +122,23 @@ export function resolveOriginChoices(item, system, items, cfg) {
     }
   }
   return { bonuses, pending, warnings, rule, notes };
+}
+
+/**
+ * Test Subject's Augmented and Natural Attack (pp.446, 449): the chosen item is built in, so its wielder is always
+ * proficient with it, readies it as a free action and cannot be disarmed of it. Returns the quality's label, or "".
+ */
+export function builtInQuality(system, item) {
+  const name = String(item?.name ?? "")
+    .trim()
+    .toLowerCase();
+  if (!name) return "";
+  const effect = (system?.originEffects ?? []).find(
+    e =>
+      ["augmented", "naturalAttack"].includes(e.qualityKey) &&
+      String(e.details ?? "")
+        .trim()
+        .toLowerCase() === name
+  );
+  return effect?.name ?? "";
 }

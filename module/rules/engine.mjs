@@ -2075,12 +2075,13 @@ function deriveProficiencies(state) {
 
   const unfinishedSubplots = (sys.subplots ?? []).filter(row => !row.complete),
     minimumSubplots = sys.activeFeatNames.includes("Trouble Magnet") ? 1 : 0;
+  // A row counts once it names or describes its Subplot (p.53); a blank row is not a Subplot yet.
   const subplotsInPlay = unfinishedSubplots.filter(
     row => String(row.name ?? "").trim() || String(row.notes ?? "").trim()
   ).length;
   sys.subplotPicks = {
     available: (lr?.subplots ?? 0) + B.get("subplots"),
-    used: unfinishedSubplots.length,
+    used: subplotsInPlay,
     minimum: minimumSubplots,
     inPlay: subplotsInPlay,
     needsSubplot: subplotsInPlay < minimumSubplots
