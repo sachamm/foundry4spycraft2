@@ -176,9 +176,13 @@ These points cannot be settled with what the project has now:
    rename would need a migration plan.
 2. **Erik Dewey's spreadsheet.** The data values imported from it are the
    book's game mechanics, which this project now uses as Open Game Content
-   from the book itself. The spreadsheet carries no licence, so any of its own
-   wording or structure that remains is not covered; it has not been audited
-   line by line.
+   from the book itself. The spreadsheet carries no licence. On 23 November
+   2026 every string of five or more words in the original import was compared
+   with the current data. Apart from the lifestyle home and appearance labels,
+   which were rewritten in this project's own words, the surviving strings
+   are names only: weapon models, class abilities, feats and weapon quality
+   codes, all of which appear in the book. Only the spreadsheet's author could
+   confirm that nothing else of his remains.
 3. **Borderline Product Identity terms.** The book's Product Identity list
    includes "capitalized names" and gadgets from its setting, while also
    opening its classes and gear. Capitalized rule names such as gadget
