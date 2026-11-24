@@ -13,7 +13,8 @@ import { loc } from "../i18n.mjs";
 export function formatRange(kind, bound) {
   const n = Number(bound);
   if (!Number.isFinite(n) || n <= 0) return "—";
-  if (kind === "threat") return n >= 20 ? "20" : `${Math.trunc(n)}–20`;
+  // A bound above 20 is a range a rule has closed (a villain role): no face threatens.
+  if (kind === "threat") return n > 20 ? "—" : n === 20 ? "20" : `${Math.trunc(n)}–20`;
   return n <= 1 ? "1" : `1–${Math.min(20, Math.trunc(n))}`;
 }
 

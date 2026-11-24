@@ -95,7 +95,10 @@ globalThis.foundry = {
           if (!dialogAnswers.length) throw new Error("Unexpected dialog");
           return dialogAnswers.shift();
         },
-        confirm: async () => (confirmAnswers.length ? confirmAnswers.shift() : true)
+        confirm: async () => {
+          const answer = confirmAnswers.length ? confirmAnswers.shift() : true;
+          return typeof answer === "function" ? answer() : answer;
+        }
       },
       ApplicationV2: class {
         render() {
@@ -343,6 +346,23 @@ test("End mission asks first, keeps the record for settlement, and Resume reopen
   assert.equal(await mission.resumeMission(), null, "already active");
 });
 
+test("a change made while End mission is asking is kept; a record ended by an older version reads as ended", async () => {
+  const id = state.getMission().objectives[0].id;
+  await mission.changeEntry("objectives", id, "complete");
+  assert.equal(state.getMission().objectives[0].complete, false);
+  confirmAnswers.push(async () => {
+    await mission.changeEntry("objectives", id, "complete");
+    return true;
+  });
+  await mission.endMission();
+  assert.equal(state.getMission().objectives[0].complete, true, "ticked while the question was open");
+  const stored = { ...state.getMission() };
+  delete stored.ended;
+  await game.settings.set("spycraft2", "mission", stored);
+  assert.equal(state.getMission().ended, true, "inactive with a fixed Threat Level");
+  await mission.resumeMission();
+});
+
 test("starting an ended mission again asks, then clears the last run's results", async () => {
   await mission.endMission();
   confirmAnswers.push(false);
@@ -358,6 +378,24 @@ test("starting an ended mission again asks, then clears the last run's results",
   await mission.changeEntry("antagonists", m.antagonists[1].id, "encountered");
 });
 
+test("dice that could not be taken at 0 are not handed back when the change goes", async () => {
+  const a1 = actors.get("a1"),
+    kept = { value: a1.system.actionDice.value, flag: a1.flags.spycraft2?.sessionDiceAdjusted };
+  a1.system.actionDice.value = 1;
+  a1.flags.spycraft2 ??= {};
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 0);
+  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2, applied: -1 });
+  await state.setCampaign({ qualities: [] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 1, "only the one die really taken comes back");
+  a1.system.actionDice.value = kept.value;
+  if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
+  else delete a1.flags.spycraft2.sessionDiceAdjusted;
+});
+
 test("starting-dice adjustments apply once per session", async () => {
   await state.setCampaign({ qualities: ["bleak"] });
   await mission.applySessionDiceAdjustments();
@@ -369,7 +407,7 @@ test("starting-dice adjustments apply once per session", async () => {
 
 test("a change that arrives after the first adjustment gives only the difference", async () => {
   const a1 = actors.get("a1");
-  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2 });
+  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2, applied: -2 });
   await mission.applySessionDiceAdjustments();
   assert.equal(a1.system.actionDice.value, 3, "the quality is gone, so its 2 dice come back");
   assert.equal(a1.flags.spycraft2.sessionDiceAdjusted.change, 0);
@@ -685,6 +723,12 @@ test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's 
   assert.equal(consoleView("active", { view: "prep", state: "active" }), "prep");
   assert.equal(consoleView("combat", { view: "prep", state: "active" }), "play", "a fight brings Play back");
   assert.equal(consoleView("active", { view: "nonsense", state: "active" }), "play");
+  assert.equal(
+    consoleView("combat", { view: "prep", state: "combat", key: "fight1" }, "fight2"),
+    "play",
+    "a choice made in one fight does not hide Combat in the next"
+  );
+  assert.equal(consoleView("combat", { view: "prep", state: "combat", key: "fight1" }, "fight1"), "prep");
   const context = consoleContext();
   assert.equal(context.view, "play");
   assert.equal(context.hiddenSections.combat, false);
@@ -758,7 +802,43 @@ test("the Combat section names the acting combatant, words each row and finds th
     this.turn++;
   };
   assert.equal(await turnTools.passGroup(fight, [fight.combatants.get("g1"), fight.combatants.get("g2")]), 2);
+  assert.equal(fight.combatant.id, "b"); // Off the group's own turn the mob does not attack.
+  assert.ok(!(await turnTools.mobAttackDialog(fight, "guard")), "the turn is someone else's");
+});
+
+test("a Count that changes off-turn leaves the turn with the character who was acting", async () => {
+  const { keepActingTurn } = await import("../module/apps/gc/combat.mjs");
+  const order = ["x", "b", "r"].map(id => ({ id }));
+  const fight = {
+    id: "keep",
+    started: true,
+    turn: 1,
+    turns: order,
+    get combatant() {
+      return this.turns[this.turn];
+    },
+    updates: [],
+    async update(change, options) {
+      this.updates.push([change, options?.spycraft2KeepTurn]);
+      Object.assign(this, change);
+    }
+  };
+  // First sight: the acting character is learned, nothing is written.
+  assert.equal(await keepActingTurn(fight), null);
+  assert.deepEqual(fight.updates, []);
+  // R's readied action goes off and R now sorts ahead of B: place 1 is R, but B is still acting.
+  fight.turns = ["x", "r", "b"].map(id => ({ id }));
+  await keepActingTurn(fight);
+  assert.deepEqual(fight.updates, [[{ turn: 2 }, true]]);
   assert.equal(fight.combatant.id, "b");
+  // The acting character steps down on purpose: the turn passes to whoever stands in its place.
+  fight.turns = ["x", "r", "q", "b"].map(id => ({ id }));
+  await keepActingTurn(fight, { handOver: true });
+  assert.equal(fight.updates.length, 1);
+  assert.equal(fight.combatant.id, "q");
+  fight.turns = ["q", "x", "r", "b"].map(id => ({ id }));
+  await keepActingTurn(fight);
+  assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
 });
 
 test("console sections open for the state in play and keep the GC's choice until that state changes", () => {

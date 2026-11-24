@@ -244,8 +244,49 @@ test("an NPC follows vitality and wounds only: a new special NPC starts full, an
   assert.deepEqual(poolMaxPlan(standard, { vitality: 50, wounds: 14 }, rules), {
     "system.vitality.value": 0,
     "system.wounds.value": 0,
-    "flags.spycraft2.poolMax": { vitality: 0, wounds: 0 }
+    "flags.spycraft2.poolMax": { vitality: 0, wounds: 0, kept: { vitality: { value: 20, max: 50, after: 0 } } }
   });
   // An NPC made before this was added records its maximums and keeps its values.
   assert.deepEqual(poolMaxPlan(hurt, undefined, rules), { "flags.spycraft2.poolMax": { vitality: 50, wounds: 14 } });
+});
+
+test("a maximum that falls and comes back restores the damage taken instead of healing it", () => {
+  const rules = poolRules("npc");
+  // Special, hurt at 5 of 40 and 2 of 12; switched to standard by mistake, then back.
+  const gone = poolMaxPlan(
+    { vitality: { value: 5, max: 0 }, wounds: { value: 2, max: 0 } },
+    { vitality: 40, wounds: 12 },
+    rules
+  );
+  assert.equal(gone["system.vitality.value"], 0);
+  const back = poolMaxPlan(
+    { vitality: { value: 0, max: 40 }, wounds: { value: 0, max: 12 } },
+    gone["flags.spycraft2.poolMax"],
+    rules
+  );
+  assert.equal(back["system.vitality.value"], 5);
+  assert.equal(back["system.wounds.value"], 2);
+  assert.deepEqual(back["flags.spycraft2.poolMax"].kept, { vitality: null, wounds: null }, "the memory is spent");
+  // A Threat Level that drops and returns (mission ended, then resumed): 5 of 40 stays 5 of 40.
+  const lower = poolMaxPlan(
+    { vitality: { value: 5, max: 30 }, wounds: { value: 2, max: 10 } },
+    { vitality: 40, wounds: 12 },
+    rules
+  );
+  assert.equal(lower["system.vitality.value"], 0);
+  assert.equal(lower["system.wounds.value"], 1);
+  const again = poolMaxPlan(
+    { vitality: { value: 0, max: 40 }, wounds: { value: 1, max: 12 } },
+    lower["flags.spycraft2.poolMax"],
+    rules
+  );
+  assert.equal(again["system.vitality.value"], 5);
+  assert.equal(again["system.wounds.value"], 2);
+  // Healing in between makes the memory stale: the rise is followed from where the pool now stands.
+  const healed = poolMaxPlan(
+    { vitality: { value: 8, max: 40 }, wounds: { value: 1, max: 12 } },
+    lower["flags.spycraft2.poolMax"],
+    rules
+  );
+  assert.equal(healed["system.vitality.value"], 18);
 });

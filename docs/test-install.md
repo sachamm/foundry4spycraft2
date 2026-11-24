@@ -1,21 +1,35 @@
-# Install the retro test branch
+# Install a test build
+
+A test build is any branch packaged for the test server. It never replaces the stable release.
+
+## Publish one
+
+On GitHub open **Actions → Test build → Run workflow** and pick the branch. The run passes every check a pull request
+must pass, then puts a ZIP and a manifest on the rolling `test-build` prerelease. Each run has a higher version than
+the last (the system's version with the run number added), and its own ZIP, uploaded before the manifest is replaced.
+
+## Install it
 
 In Foundry's Setup screen, open **Game Systems → Install System**, paste this Manifest URL, and click Install:
 
 ```text
-https://github.com/sachamm/foundry4spycraft2/releases/download/test-retro/system.json
+https://github.com/sachamm/foundry4spycraft2/releases/download/test-build/system.json
 ```
 
-Requires Foundry 14. This package keeps the `spycraft2` ID and replaces any installed copy of the system; it does not install as a second system. Use a disposable test world for visual checks. If already installed and Foundry skips installation, unlock the package and uninstall/reinstall the system using this URL. Keep a backup of any edits made directly in the installed system or its compendiums.
+Requires Foundry 14. The package keeps the `spycraft2` ID and replaces the installed copy of the system; it does not
+install as a second system. Use a disposable test world. If Foundry skips the installation because the system is
+already there, unlock the package, uninstall it and install again from this URL. Worlds are not removed with the
+system.
 
-Future successful pushes to `feat/retro-spy-assets` publish a newer version. Use **Update System** from Setup to get it, then reload the browser. No local build, ZIP extraction, or folder copying is needed.
+After that, each new test build arrives through **Update System** in Setup; reload the browser afterwards.
 
-The GitHub workflow builds the compendiums, runs the engine checks, stamps a monotonically increasing prerelease version, and publishes an installable ZIP. The rolling `test-retro` prerelease provides the fixed manifest URL. Each build has a unique ZIP filename; the ZIP is uploaded before replacing the manifest, so previous manifest downloads remain usable. The source manifest and normal stable release channel are unchanged. The rolling tag identifies the first publication; release notes identify the current build's commit.
+## Return to stable
 
-The test release is explicitly a prerelease and is never marked Latest. To return to stable, reinstall using:
+Reinstall from the stable manifest:
 
 ```text
 https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.json
 ```
 
-Reinstall explicitly when leaving the test channel; automatic updates may not offer an older stable version. Installing stable does not downgrade world data migrations.
+Reinstall explicitly when leaving the test channel: updates do not offer an older stable version, and installing
+stable does not undo world data migrations a test build ran.

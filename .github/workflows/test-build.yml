@@ -1,0 +1,77 @@
+name: Test build
+
+# Publishes an installable build of any branch for the test server, without touching the stable release.
+# Run it by hand (Actions → Test build → Run workflow) and pick the branch. Each run replaces the manifest on the
+# rolling "test-build" prerelease, so Foundry's Update System picks up the newest run. See docs/test-install.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One at a time, so an older run cannot overwrite a newer manifest.
+concurrency:
+  group: test-build
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    uses: ./.github/workflows/validate.yml
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TEST_TAG: test-build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Stamp a rising test version and the test manifest into system.json
+        run: |
+          BASE_VERSION="$(jq -r .version system.json)"
+          VERSION="${BASE_VERSION}.${GITHUB_RUN_NUMBER}"
+          ARCHIVE="spycraft2-test-${GITHUB_RUN_NUMBER}.zip"
+          BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TEST_TAG}"
+          jq --arg v "$VERSION" --arg dl "$BASE/$ARCHIVE" --arg m "$BASE/system.json" \
+             '.version = $v | .download = $dl | .manifest = $m' system.json > system.tmp && mv system.tmp system.json
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+
+      - name: Build compendium packs
+        run: npm ci && npm run build
+
+      - name: Bundle the JavaScript into one file
+        run: |
+          npm run bundle
+          cp dist/spycraft2.mjs spycraft2.mjs
+          cp dist/spycraft2.mjs.map spycraft2.mjs.map
+
+      - name: Package and verify archive
+        run: |
+          find module -type f ! -name '*.mjs' > module-data.txt
+          zip -r "$ARCHIVE" system.json spycraft2.mjs spycraft2.mjs.map $(cat module-data.txt) templates styles lang packs assets README.md LICENSING.md LICENSES CHANGELOG.md docs/sample-agents.md docs/sample-cast.md -x lang/text-template.json
+          unzip -t "$ARCHIVE"
+
+      - name: Publish the archive, then the manifest
+        run: |
+          printf 'Test build of %s.\n\nCommit: %s\nVersion: %s\n\nInstall manifest: https://github.com/%s/releases/download/%s/system.json\n\nRequires Foundry 14. Uses the spycraft2 system ID and replaces the installed copy of the system. Not a stable release.\n' \
+            "$GITHUB_REF_NAME" "$GITHUB_SHA" "$VERSION" "$GITHUB_REPOSITORY" "$TEST_TAG" > release-notes.md
+          if ! gh release view "$TEST_TAG" >/dev/null 2>&1; then
+            gh release create "$TEST_TAG" --target "$GITHUB_SHA" --title 'Test builds' \
+              --notes-file release-notes.md --prerelease --latest=false
+          fi
+          # The archive goes up first, so a manifest never points at a file that is not there yet.
+          gh release upload "$TEST_TAG" "$ARCHIVE"
+          gh release upload "$TEST_TAG" system.json --clobber
+          gh release edit "$TEST_TAG" --prerelease --latest=false --title 'Test builds' --notes-file release-notes.md
+          printf '### Foundry test install\n\nManifest URL: https://github.com/%s/releases/download/%s/system.json\n\nVersion: %s\n' \
+            "$GITHUB_REPOSITORY" "$TEST_TAG" "$VERSION" >> "$GITHUB_STEP_SUMMARY"

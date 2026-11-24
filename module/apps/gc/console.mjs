@@ -42,15 +42,22 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
 const ROMAN = ["I", "II", "III", "IV", "V"];
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
-const guard = work =>
-  async function (event, target) {
+/** A console action runs once at a time: a second press while it is still working, or its dialog is open, is dropped. */
+const guard = work => {
+  let busy = false;
+  return async function (event, target) {
+    if (busy) return;
+    busy = true;
     try {
       await work.call(this, event, target);
     } catch (error) {
       ui.notifications.warn(error.message);
+    } finally {
+      busy = false;
     }
     this.render();
   };
+};
 
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
@@ -113,7 +120,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       surprise: guard(() => combat.surpriseRoundDialog()),
       combatReference: guard(() => combat.combatReferenceDialog()),
       openCombatant: guard((event, target) => turn.openCombatant(game.combat, target.dataset.id)),
-      actingAttack: guard((event, target) => turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event)),
+      actingAttack: guard((event, target) =>
+        turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event, game.combat?.combatant)
+      ),
       actingSpend: guard((event, target) => combat.spendTurnAction(game.combat?.combatant, target.dataset.kind)),
       actingDamageSave: guard(() => npcDamageSaveWithUndo(game.combat?.combatant?.actor)),
       actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),
@@ -187,13 +196,25 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 }
 
 /** How a control is found again after a redraw: its action and the data that tells it from its neighbours. */
-const controlKey = element => {
+const SAME = ["action", "list", "key", "change", "id", "view", "kind", "seconds", "single", "planned"];
+const twins = (root, wanted) =>
+  [...(root?.querySelectorAll?.(`[data-action="${wanted.action}"]`) ?? [])].filter(element =>
+    SAME.every(name => element.dataset[name] === wanted[name])
+  );
+const controlKey = (element, root = null) => {
   if (!element?.dataset) return null;
   if (element.matches?.(".sc2-tool-search input")) return { search: true };
+  // A section heading has no action of its own: it is found again by its section.
+  if (element.matches?.("summary")) {
+    const section = element.closest?.("details[data-section]")?.dataset.section;
+    return section ? { section } : null;
+  }
   const { action, list, key, change, id, view, kind, seconds, single, planned } = element.dataset;
-  return action ? { action, list, key, change, id, view, kind, seconds, single, planned } : null;
+  if (!action) return null;
+  const wanted = { action, list, key, change, id, view, kind, seconds, single, planned };
+  // The same action can stand in two places (the acting block and the list): the place is kept too.
+  return { ...wanted, nth: Math.max(0, twins(root, wanted).indexOf(element)) };
 };
-const SAME = ["action", "list", "key", "change", "id", "view", "kind", "seconds", "single", "planned"];
 
 /** Read the parts of the console's state that a redraw would otherwise drop. */
 export function captureConsoleState(root) {
@@ -206,7 +227,7 @@ export function captureConsoleState(root) {
     active = focused?.matches?.(":focus-visible") ? focused : null;
   return {
     scrollTop: scrolled?.scrollTop ?? 0,
-    focus: controlKey(active),
+    focus: controlKey(active, root),
     selection: active?.matches?.("input") ? [active.selectionStart, active.selectionEnd] : null,
     more: [...root.querySelectorAll("details.gc-more")].map(details => details.open)
   };
@@ -219,11 +240,12 @@ export function restoreConsoleState(root, kept) {
     if (kept.more[index]) details.open = true;
   });
   if (kept.focus) {
+    const same = kept.focus.action ? twins(root, kept.focus) : [];
     const target = kept.focus.search
       ? root.querySelector(".sc2-tool-search input")
-      : [...root.querySelectorAll(`[data-action="${kept.focus.action}"]`)].find(element =>
-          SAME.every(name => element.dataset[name] === kept.focus[name])
-        );
+      : kept.focus.section
+        ? root.querySelector(`details[data-section="${kept.focus.section}"] > summary`)
+        : (same[kept.focus.nth ?? 0] ?? same[0]);
     target?.focus?.({ preventScroll: true });
     if (kept.selection && target?.setSelectionRange)
       try {
@@ -244,14 +266,17 @@ const viewState = () => {
   const m = getMission();
   return game.combat ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning";
 };
+/** What the choice was made in: this fight, or outside a fight. A choice made in one fight does not hold in the next. */
+const viewKey = () => game.combat?.id ?? null;
 /** The view in use: the GC's choice for the current state, or the one that state calls for. */
-export function consoleView(state, stored = null) {
-  if (stored && stored.state === state && VIEWS.includes(stored.view)) return stored.view;
+export function consoleView(state, stored = null, key = null) {
+  if (stored && stored.state === state && (stored.key ?? null) === key && VIEWS.includes(stored.view))
+    return stored.view;
   return state === "planning" ? "prep" : state === "ended" ? "wrap" : "play";
 }
 function rememberView(view, state) {
   if (!VIEWS.includes(view)) return null;
-  return game.settings.set("spycraft2", VIEW_SETTING, { view, state });
+  return game.settings.set("spycraft2", VIEW_SETTING, { view, state, key: viewKey() });
 }
 /** Which sections each view shows. A search looks through all of them. */
 const VIEW_SECTIONS = {
@@ -377,15 +402,20 @@ export function consoleContext() {
     combatNow = game.combat ?? null,
     conflictList = conflicts.conflictRows();
   const state = combatNow ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning",
-    view = consoleView(state, readSetting(VIEW_SETTING, null));
+    view = consoleView(state, readSetting(VIEW_SETTING, null), viewKey());
   const acting = turn.actingBlock(combatNow),
-    paid = Object.keys(m.standingPaid ?? {}).length;
+    // Only receipts for the agents on the team now: one who left does not stand in for one who joined.
+    paid = team.filter(actor => m.standingPaid?.[actor.id]).length;
   const checklist = firstSessionChecklist({
     mission: m,
     diceCurrent: dice.current,
     npcActors: [...(game.actors ?? [])].filter(actor => actor.type === "npc").length,
     combatSeen: !!combatNow || (m.scenesPlayed ?? 0) > 0
   });
+  // Done once is done for good: a new mission or session does not bring the list back.
+  if (readSetting("gcFirstSessionDone", false)) checklist.complete = true;
+  else if (checklist.complete && game.user?.isGM)
+    Promise.resolve(game.settings.set("spycraft2", "gcFirstSessionDone", true)).catch(() => {});
   return {
     view,
     views: [
@@ -407,7 +437,12 @@ export function consoleContext() {
           ? loc`Round ${combatNow.round}: ${combatNow.combatant?.name ?? "—"}`
           : loc`Fight not begun`
         : loc`No combat`,
-      dice: dice.current ? loc`${dice.value} left of ${team.length + 2 * m.caliber}` : loc`not set up`
+      // Awards can take the pool past its starting number; "left of" would then read oddly.
+      dice: !dice.current
+        ? loc`not set up`
+        : dice.value > team.length + 2 * m.caliber
+          ? loc`${dice.value} left`
+          : loc`${dice.value} left of ${team.length + 2 * m.caliber}`
     },
     wrap: {
       standing:
@@ -508,8 +543,9 @@ function refreshSoon() {
   if (refreshTimer) return;
   refreshTimer = setTimeout(() => {
     refreshTimer = null;
-    const instance = game.spycraft2?.gc?.console;
-    if (instance?.rendered) instance.render();
+    // The sidebar console and a popped-out copy both follow the fight.
+    for (const instance of new Set([game.spycraft2?.gc?.console, ui.gc, ui.gc?.popout]))
+      if (instance?.rendered) instance.render();
   }, 120);
 }
 const inFight = actor =>
@@ -532,6 +568,11 @@ export function registerGCConsoleTab() {
   for (const hook of ["createActiveEffect", "deleteActiveEffect"])
     Hooks.on(hook, effect => {
       if (inFight(effect?.parent)) refreshSoon();
+    });
+  // A weapon added, changed or removed, or an effect switched on or off, changes what the acting block offers.
+  for (const hook of ["updateActiveEffect", "createItem", "updateItem", "deleteItem"])
+    Hooks.on(hook, document => {
+      if (inFight(document?.parent)) refreshSoon();
     });
   CONFIG.ui.gc = GCConsole;
   const Sidebar = CONFIG.ui.sidebar;

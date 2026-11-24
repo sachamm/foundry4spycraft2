@@ -225,9 +225,10 @@ test("an action from the sheet marks its time on the acting character's own turn
   actor.participatingCombat = combat;
   assert.equal((await markActionSpent(actor, "half")).left, 1);
   assert.equal(combatant.flags.spycraft2.actions.used, 1);
-  // A full action with one half left is too much: the record stays and the player is told.
+  // A full action with one half left is too much: the player is told and the turn reads as used up.
   assert.equal(await markActionSpent(actor, "full"), null);
-  assert.equal(combatant.flags.spycraft2.actions.used, 1);
+  assert.equal(combatant.flags.spycraft2.actions.used, 2);
+  combatant.flags.spycraft2.actions.used = 1;
   assert.match(notices[0], /Vector had 1 half action/);
   // Someone else's turn: nothing is marked.
   combat.combatant = { actor: { uuid: "Actor.other" } };
@@ -417,12 +418,21 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
       hidden: true
     }
   );
-  assert.deepEqual(rows[1], { name: "Guard 2", actorLink: false, disposition: -1, x: 100, y: 0, hidden: true });
+  assert.deepEqual(rows[1], {
+    name: "Guard 2",
+    actorLink: false,
+    appendNumber: false,
+    disposition: -1,
+    x: 100,
+    y: 0,
+    hidden: true
+  });
   const kept = placementData(
     { name: "Boss", actorLink: true, disposition: 1 },
     { corners: [{ x: 0, y: 0 }], names: ["Boss"], disposition: "keep" }
   );
   assert.deepEqual([kept[0].actorLink, kept[0].disposition], [true, 1]);
+  assert.equal("appendNumber" in kept[0], false, "a name left alone keeps the token's own setting");
 
   const created = [];
   const fight = {
@@ -481,4 +491,29 @@ test("a dialog's Cancel button answers like closing the dialog", async () => {
   assert.equal(await cancellable(async () => "cancel", {}), null, "Foundry answers a plain button with its name");
   assert.deepEqual(await cancellable(async options => options, { name: "x" }), { name: "x" });
   assert.equal(await cancellable(async () => null, {}), null);
+});
+
+test("a hidden field's limits are set aside so it cannot hold the dialog, and come back when it shows", async () => {
+  const { relaxHiddenRules, freeCancel } = await import("../module/apps/dialog-kit.mjs");
+  const attrs = new Map([
+    ["max", "8"],
+    ["required", ""]
+  ]);
+  const control = {
+    dataset: {},
+    hasAttribute: name => attrs.has(name),
+    getAttribute: name => attrs.get(name),
+    setAttribute: (name, value) => attrs.set(name, value),
+    removeAttribute: name => attrs.delete(name)
+  };
+  const field = { hidden: true, querySelectorAll: () => [control] };
+  relaxHiddenRules(field);
+  assert.deepEqual([...attrs.keys()], []);
+  field.hidden = false;
+  relaxHiddenRules(field);
+  assert.deepEqual(Object.fromEntries(attrs), { max: "8", required: "" });
+  assert.equal(control.dataset.heldRules, undefined);
+  const cancel = {};
+  freeCancel({ querySelectorAll: () => [cancel] });
+  assert.equal(cancel.formNoValidate, true);
 });

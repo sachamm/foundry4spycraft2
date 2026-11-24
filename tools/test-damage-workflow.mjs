@@ -177,7 +177,7 @@ test("lethal damage comes off a special character's vitality and wounds and sets
   assert.match(posted.at(-1).content, /takes 9 damage \(11 less damage reduction 2\)/);
   const note = undoNotes.at(-1).flags.spycraft2.undo;
   assert.equal(note.label, "11 lethal damage applied to Kevin");
-  assert.ok(Object.keys(note.entries[0].restore).some(path => path.startsWith("system.vitality")));
+  assert.ok(note.entries[0].restore.some(([path]) => path.startsWith("system.vitality")));
   assert.equal(note.damageCard.targetUuid, note.entries[0].uuid);
   assert.deepEqual(appliedDamageEntries(damage.flags.spycraft2), [
     { targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }

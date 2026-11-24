@@ -108,10 +108,45 @@ export function wireConditionalFields(root) {
   const form = fields[0].closest("form") ?? root;
   const valueOf = name => form.querySelector(`[name="${name}"]`)?.value ?? "";
   const apply = () => {
-    for (const field of fields) field.hidden = !whenMatches(field.dataset.when, valueOf);
+    for (const field of fields) {
+      field.hidden = !whenMatches(field.dataset.when, valueOf);
+      relaxHiddenRules(field);
+    }
   };
   form.addEventListener("change", apply);
   apply();
+}
+
+const RULES = ["required", "min", "max", "step", "pattern", "minlength", "maxlength"];
+/**
+ * A hidden field must not stop the dialog: the browser checks hidden controls too and cannot show its message on
+ * them. Their limits are set aside while hidden and put back when the field shows again.
+ */
+export function relaxHiddenRules(field) {
+  const controls = [
+    ...(field.matches?.("input, select, textarea") ? [field] : []),
+    ...(field.querySelectorAll?.("input, select, textarea") ?? [])
+  ];
+  for (const control of controls) {
+    if (field.hidden) {
+      const kept = {};
+      for (const rule of RULES)
+        if (control.hasAttribute(rule)) {
+          kept[rule] = control.getAttribute(rule);
+          control.removeAttribute(rule);
+        }
+      if (Object.keys(kept).length) control.dataset.heldRules = JSON.stringify(kept);
+    } else if (control.dataset.heldRules) {
+      for (const [rule, value] of Object.entries(JSON.parse(control.dataset.heldRules)))
+        control.setAttribute(rule, value);
+      delete control.dataset.heldRules;
+    }
+  }
+}
+
+/** Cancel always closes: it skips the browser's field checks, which would otherwise hold the dialog open. */
+export function freeCancel(root) {
+  for (const button of root?.querySelectorAll?.('button[data-action="cancel"]') ?? []) button.formNoValidate = true;
 }
 
 /**
@@ -134,6 +169,7 @@ export function formDialog({ title, intro, fields, ok, dialog = {} }) {
     ...dialog,
     render: (event, app) => {
       wireConditionalFields(app?.element ?? event?.target);
+      freeCancel(app?.element ?? event?.target);
       return dialog.render?.(event, app);
     }
   });

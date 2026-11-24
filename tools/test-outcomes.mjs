@@ -392,6 +392,7 @@ test("ranges print as die faces and attacks hit or miss where other checks succe
   const { formatRange, outcomeLabel } = await import("../module/rules/outcome-labels.mjs");
   assert.equal(formatRange("threat", 19), "19–20");
   assert.equal(formatRange("threat", 20), "20");
+  assert.equal(formatRange("threat", 21), "—", "a range a villain role closed");
   assert.equal(formatRange("error", 1), "1");
   assert.equal(formatRange("error", 3), "1–3");
   assert.equal(formatRange("error", 0), "—");

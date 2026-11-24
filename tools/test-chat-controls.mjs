@@ -409,7 +409,7 @@ test("the GC boost shortcut takes the card under the pointer, else the newest ca
   const mine = id => id.startsWith("m");
   assert.equal(boostCardButton(root(), mine), mineOld, "another GC's newer card is passed over");
   assert.equal(boostCardButton(root(cards[2]), mine), theirs, "the pointer chooses any card");
-  assert.equal(boostCardButton(root(cards[1]), mine), mineOld, "a spent card under the pointer falls back");
+  assert.equal(boostCardButton(root(cards[1]), mine), null, "a spent card under the pointer boosts nothing else");
   assert.equal(
     boostCardButton(root(), () => false),
     null

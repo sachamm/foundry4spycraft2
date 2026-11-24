@@ -79,8 +79,8 @@ export async function editMission() {
   );
   if (!input) return null;
   const override = Number(input.threatOverride);
-  return setMission({
-    ...mission,
+  // Only this dialog's fields are written: the record may have moved on while the dialog was open.
+  return updateMission({
     name: String(input.name ?? "").trim(),
     caliber: Number(input.caliber),
     threatAdjust: Math.max(-2, Math.min(2, Math.trunc(Number(input.threatAdjust) || 0))),
@@ -146,17 +146,21 @@ export async function nextScene() {
 export async function startMission() {
   requireGC();
   const before = getMission();
+  // A second press, or a stale button, must not wipe the results of the run in progress.
+  if (before.active) return decline(loc`The mission is already active. End it first to start a new run.`);
   // An ended record still holds the last run's results. Starting it again is a new run, so they are cleared first.
   const hadResults =
-    before.ended &&
+    !before.active &&
     ((before.objectives ?? []).some(objective => objective.complete) ||
       (before.antagonists ?? []).some(antagonist => antagonist.encountered) ||
       (before.infractions ?? []).length > 0 ||
+      (before.scenesPlayed ?? 0) > 0 ||
       Object.keys(before.standingPaid ?? {}).length > 0);
   if (hadResults) {
     const ok = await confirmStep(loc`Start the mission again`, [
-      loc`This record was ended. Starting it again begins a new run of the same mission.`,
+      loc`This record holds the results of an earlier run. Starting it again begins a new run of the same mission.`,
       loc`Completed objectives, antagonists faced, infractions, scenes played and the standing payout are cleared.`,
+      loc`A new mission period begins: per-mission uses come back and promoted NPCs return to standard.`,
       loc`To carry on the run that was ended, cancel and use Resume mission.`
     ]);
     if (!ok) return null;
@@ -196,7 +200,8 @@ export async function endMission({ clear = false } = {}) {
     loc`Resume mission reopens it with nothing changed.`
   ]);
   if (!ok) return null;
-  await setMission({ ...mission, active: false, ended: true });
+  // Only the two flags are written: objectives ticked while the question was open are kept.
+  await updateMission({ active: false, ended: true });
   await say(
     `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`
   );
@@ -208,8 +213,10 @@ export async function resumeMission() {
   requireGC();
   const mission = getMission();
   if (mission.active) return decline(loc`The mission is already active.`);
-  await setMission({ ...mission, active: true, ended: false });
+  await updateMission({ active: true, ended: false });
   await say(`<b>${loc`Mission ${esc(mission.name || "")} resumed.`}</b>`);
+  // Threat Level dice taken back by an adjustment made while the mission was ended are returned.
+  if (sessionStarted()) await applySessionDiceAdjustments({ quiet: true });
   return true;
 }
 
@@ -295,7 +302,7 @@ export const antagonistRecorded = actor =>
   !!actor && getMission().antagonists.some(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid);
 
 /** Add an NPC actor to the mission's XP record without a dialog; a type already listed is left alone. */
-export async function recordAntagonist(actor) {
+export async function recordAntagonist(actor, { encountered = false } = {}) {
   requireGC();
   if (!actor || antagonistRecorded(actor)) return null;
   const antagonist = {
@@ -307,7 +314,7 @@ export async function recordAntagonist(actor) {
     type: ["special", "villain"].includes(actor.system.npcType) ? "special" : "standard",
     full: false,
     scenes: 1,
-    encountered: false
+    encountered
   };
   await updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
   return antagonist;
@@ -500,11 +507,17 @@ export async function applySessionDiceAdjustments({ quiet = false } = {}) {
       lines.push(loc`${esc(actor.name)}: already adjusted this session`);
       continue;
     }
-    const step = change - (before?.change ?? 0);
-    const value = Math.max(0, (actor.system.actionDice?.value ?? 0) + step);
+    const flag = actor.flags?.spycraft2?.sessionDiceAdjusted,
+      earlier = before?.change ?? 0,
+      really = before && Number.isSafeInteger(flag?.applied) ? flag.applied : earlier;
+    // Dice that could not be taken at 0 are not handed back when the change is later undone.
+    const wanted = change - earlier,
+      step = wanted > 0 ? Math.max(0, wanted - Math.max(0, really - earlier)) : wanted;
+    const current = actor.system.actionDice?.value ?? 0,
+      value = Math.max(0, current + step);
     await actor.update({
       "system.actionDice.value": value,
-      "flags.spycraft2.sessionDiceAdjusted": { session, change }
+      "flags.spycraft2.sessionDiceAdjusted": { session, change, applied: really + (value - current) }
     });
     lines.push(`${esc(actor.name)}: ${signed(step)} → ${value}`);
   }
@@ -555,6 +568,7 @@ export async function missionReport({ planned = false, whisper = true } = {}) {
  * Pay the Table 7.10 standing reward to the team. The mission remembers who was paid, so a second press, or a retry
  * after an interruption, pays only those still unpaid unless the GC asks for a correction.
  */
+let payingStanding = false;
 export async function awardStanding() {
   requireGC();
   const mission = getMission(),
@@ -575,7 +589,7 @@ export async function awardStanding() {
     allPaid = team.length > 0 && team.every(actor => paid[actor.id]);
   const input = await formDialog({
     title: loc`Award Reputation or Net Worth — Table 7.10`,
-    ok: allPaid ? loc`Pay again` : loc`Pay the unpaid`,
+    ok: allPaid ? loc`Pay standing` : loc`Pay the unpaid`,
     fields: [
       raw(`
     <p>${loc`Each character earns this for completing the mission whether or not it succeeded; failed critical objectives are exposure infractions recorded separately. A Profession/Accomplishment check may raise it.`}</p>
@@ -587,22 +601,32 @@ export async function awardStanding() {
       ],
       effects.gearRules === "freelance" ? "netWorth" : "reputation"
     )}</select></label>
-    ${anyPaid ? `<label><input type="checkbox" name="again" /> ${loc`Correction: also pay those already paid`}</label>` : ""}`)
+    ${anyPaid ? `<label><input type="checkbox" name="again" /> ${loc`Correction: pay everyone the full reward again, including those already paid`}</label>` : ""}`)
     ]
   });
   if (!input) return null;
+  // The record is read again: another dialog, or another GC, may have paid while this one was open.
+  const paidNow = () => getMission().standingPaid ?? {};
   const amount = standing[input.currency],
-    due = team.filter(actor => input.again || !paid[actor.id]);
+    due = team.filter(actor => input.again || !paidNow()[actor.id]);
   if (!due.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
+  if (payingStanding) return decline(loc`A standing payout is already running.`);
+  payingStanding = true;
   const done = [];
-  for (const actor of due) {
-    await actor.update({ [`system.${input.currency}`]: (actor.system[input.currency] ?? 0) + amount });
-    // Recorded agent by agent, so an interrupted payout knows where it stopped.
-    await updateMission(m => ({
-      standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: { currency: input.currency, amount } }
-    }));
-    done.push(actor.name);
+  try {
+    for (const actor of due) {
+      if (!input.again && paidNow()[actor.id]) continue;
+      // Recorded before the agent is paid, so an interrupted payout can never pay the same agent twice.
+      await updateMission(m => ({
+        standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: { currency: input.currency, amount } }
+      }));
+      await actor.update({ [`system.${input.currency}`]: (actor.system[input.currency] ?? 0) + amount });
+      done.push(actor.name);
+    }
+  } finally {
+    payingStanding = false;
   }
+  if (!done.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
   await say(
     loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(done.join(", "))}.`,
     false
