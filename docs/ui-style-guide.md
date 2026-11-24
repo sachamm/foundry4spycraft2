@@ -405,7 +405,7 @@ An empty list says what goes there and offers the one button that fills it: "No 
 
 **Skill row:** name · total(s) as roll buttons (one per attribute option) · threat range · error range only when wider than 1.
 
-**Edit mode:** stepper, budgets (one "spent / available" widget, red with reason when over), browsers. "Next setup step" stays at the top of the rail. The stepper, the next-step button and the checklist read from one task list that ends with "Ready to play → Begin play".
+**Edit mode:** stepper, budgets (one "spent / available" widget, red with reason when over), browsers. "Next setup step" stays at the top of the rail. The stepper, the next-step button and the checklist read from one task list that ends with "Ready to play".
 
 ### 7.2 NPC sheet (stat block)
 

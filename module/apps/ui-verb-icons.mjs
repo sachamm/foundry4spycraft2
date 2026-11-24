@@ -38,7 +38,6 @@ export const VERB_ICONS = {
   refreshAction: "fa-hourglass-half",
   boostDefense: "fa-shield",
   restAndRecover: "fa-bed",
-  initializeStartingDice: "fa-play",
   startMission: "fa-play",
   beginSession: "fa-play",
   nextScene: "fa-forward-step",

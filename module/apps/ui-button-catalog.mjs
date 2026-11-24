@@ -134,7 +134,6 @@ export const BUTTON_ICONS = {
   healActionDice: [2, 3],
   improviseCommonItem: [2, 4],
   initializeResources: [2, 5],
-  initializeStartingDice: [2, 6],
   issueToTeam: [2, 7],
   itemChat: [2, 8],
   itemDelete: [2, 9],

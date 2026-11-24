@@ -171,7 +171,6 @@ test("period-change derivation refresh reaches each world/unlinked actor once, k
 
 import { queueResources } from "../module/services/transactions.mjs";
 import { spendGCDice } from "../module/services/gc-dice.mjs";
-import { startingDiceEntryPlan } from "../module/rules/starting-dice.mjs";
 async function pendingStart() {
   reset();
   const a = game.actors[0],
@@ -377,7 +376,7 @@ test("review rejects changed balances, receipt state, roster, counters or GC rol
     }
   }
 });
-test("removed participants require GC acknowledgement; newly added unentered characters retain a one-time entry in the chosen session", async () => {
+test("removed participants require GC acknowledgement; a character added during the interruption keeps its confirmed dice", async () => {
   await pendingStart();
   game.actors = game.actors.filter(a => a.id !== "b");
   await assert.rejects(
@@ -395,38 +394,24 @@ test("removed participants require GC acknowledgement; newly added unentered cha
   assert.deepEqual(review.removedParticipants, ["Actor.b"]);
   await pendingStart();
   const n = actor("new", 0, 3);
-  n.flags = { spycraft2: { startingDiceCreation: { id: "newCreation", session: "old", claimed: false } } };
   game.actors.push(n);
   await reviewUsagePeriod({
     keepStart: true,
-    balances: { "Actor.a": 3, "Actor.b": 6, "Actor.new": 0 },
-    entered: { "Actor.new": false },
+    balances: { "Actor.a": 3, "Actor.b": 6, "Actor.new": 2 },
     confirmed: true,
-    resolution: "New character not yet entered"
+    resolution: "New character added"
   });
-  assert.equal(n.system.actionDice.value, 0);
-  assert.equal(n.flags.spycraft2.startingDiceCreation.session, "epoch1");
-  assert.equal(n.flags.spycraft2.startingDiceCreation.claimed, false);
-  assert.equal(
-    startingDiceEntryPlan(n.system, n.flags.spycraft2.startingDiceCreation, { session: "epoch1" }).blocked,
-    false
-  );
+  assert.equal(n.system.actionDice.value, 2);
 });
-test("unentered level-zero characters wait through a session start instead of claiming an incomplete starting pool", async () => {
+test("a level-zero character with an old unclaimed creation entry gets starting dice at a session start like everyone else", async () => {
   reset();
   const a = game.actors[1];
   a.system.level = 0;
   a.system.actionDice.max = 3;
   a.flags = { spycraft2: { startingDiceCreation: { id: "newCreation", session: "old", claimed: false } } };
   await startUsagePeriod("session");
-  assert.equal(a.system.actionDice.value, 0);
-  assert.equal(a.flags.spycraft2.startingDiceCreation.session, "epoch1");
-  assert.equal(a.flags.spycraft2.sessionDiceReset, undefined);
-  a.system.level = 1;
-  assert.equal(
-    startingDiceEntryPlan(a.system, a.flags.spycraft2.startingDiceCreation, { session: "epoch1" }).blocked,
-    false
-  );
+  assert.equal(a.system.actionDice.value, 3);
+  assert.equal(a.flags.spycraft2.sessionDiceReset.session, "epoch1");
 });
 test("pending character settlements and a stale queued start cannot silently expire unresolved currencies or reset a second session", async () => {
   reset();

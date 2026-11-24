@@ -804,12 +804,6 @@
     "subject": "initialize Resources"
   },
   {
-    "action": "initializeStartingDice",
-    "sheet": 2,
-    "index": 6,
-    "subject": "initialize Starting Dice"
-  },
-  {
     "action": "issueToTeam",
     "sheet": 2,
     "index": 7,

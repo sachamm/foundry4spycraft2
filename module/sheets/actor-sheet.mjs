@@ -143,7 +143,6 @@ import {
 import { costsAction } from "../apps/gc/combat.mjs";
 import { loc } from "../i18n.mjs";
 import { featActions } from "./feat-actions.mjs";
-import { esc } from "../html.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
 
@@ -643,18 +642,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         if (!input || !Number.isSafeInteger(value) || value < 0 || value === held) return null;
         return this.actor.update({ "system.actionDice.value": value });
       },
-      async initializeStartingDice() {
-        // Beginning play is once only, so an unfinished build asks first instead of starting silently.
-        const open = buildSetupGuide(this.actor.system.todo).count;
-        if (open) {
-          const ok = await systemDialog.confirm({
-            window: { title: loc`Begin play` },
-            content: `<p>${esc(loc`This character still has ${open} setup reminder(s). Begin play anyway? Starting action dice are granted only once.`)}</p>`
-          });
-          if (!ok) return null;
-        }
-        return this.actor.initializeStartingDice();
-      },
       spendActionDie: SpycraftAgentSheet.#onSpendActionDie,
       addLevel: SpycraftAgentSheet.#onAddLevel,
       addLevelInClass: SpycraftAgentSheet.#onAddLevelInClass,
@@ -778,11 +765,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     // The status getter is not cached: it reads a setting, scans the combats and maps every limited-use ability.
     // Read it once per render.
     const uses = actor.limitedUseStatus ?? [];
-    // A new or unfinished character (setup reminders open and play not yet begun) opens ready for building.
-    this._editMode ??=
-      this.isEditable &&
-      (sys.level === 0 ||
-        (!actor.flags?.spycraft2?.startingDiceCreation?.claimed && buildSetupGuide(sys.todo).count > 0));
+    // A new or unfinished character opens ready for building: Career Level 0, or setup reminders still open before
+    // its first session (a GC session start records sessionDiceReset; a claimed creation entry is the older record).
+    const played =
+      !!actor.flags?.spycraft2?.sessionDiceReset || !!actor.flags?.spycraft2?.startingDiceCreation?.claimed;
+    this._editMode ??= this.isEditable && (sys.level === 0 || (!played && buildSetupGuide(sys.todo).count > 0));
     const cfg = CONFIG.SPYCRAFT;
     const rollData = actor.getRollData();
     Object.assign(context, {
@@ -792,7 +779,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       system: sys,
       shakenInitiativeReviews: actor.shakenInitiativeReviews,
       usagePeriodReview: game.spycraft2?.getUsagePeriodReview?.() ?? {},
-      startingDiceEntry: actor.startingDiceEntry,
       source: actor.system._source,
       config: cfg,
       editable: this.isEditable,
