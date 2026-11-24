@@ -74,7 +74,8 @@ export async function editMission() {
     <label>${loc`Common Items in the mission bundle (−1 XP each)`} <input type="number" name="bundleCommonItems" min="0" value="${mission.bundleCommonItems}" /></label>
     <label>${loc`Scenes played so far`} <input type="number" name="scenesPlayed" min="0" value="${mission.scenesPlayed}" /></label>
     <fieldset><legend>${loc`Team (Threat Level = sum of career levels ÷ 5, rounded up)`}</legend>${team || `<p>${loc`No agents exist yet.`}</p>`}</fieldset>
-    <label>${loc`Notes`} <input name="notes" value="${esc(mission.notes)}" /></label>`
+    <label>${loc`Notes`} <input name="notes" value="${esc(mission.notes)}" /></label>`,
+    loc`Save mission`
   );
   if (!input) return null;
   const override = Number(input.threatOverride);
@@ -235,7 +236,8 @@ export async function addObjective() {
     <label>${loc`Sample (Table 7.6)`} <select name="sample"><option value="">${loc`Custom`}</option>${samples}</select></label>
     <label>${loc`Name (state exactly how it is completed)`} <input name="name" /></label>
     <label>${loc`Grade for a custom objective`} <input type="number" name="grade" min="1" max="5" value="1" /></label>
-    <label><input type="checkbox" name="critical" /> ${loc`Critical objective (failing it causes exposure)`}</label>`
+    <label><input type="checkbox" name="critical" /> ${loc`Critical objective (failing it causes exposure)`}</label>`,
+    loc`Add objective`
   );
   if (!input) return null;
   const [sampleName, sampleGrade] = String(input.sample || "").split("|");
@@ -269,7 +271,8 @@ export async function addAntagonist() {
       ""
     )}</select></label>
     <label><input type="checkbox" name="full" /> ${loc`‘Full’ special NPC (300 XP per scene)`}</label>
-    <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="1" /></label>`
+    <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="1" /></label>`,
+    loc`Record for XP`
   );
   if (!input) return null;
   const actor = input.uuid ? await fromUuid(input.uuid) : null;
@@ -285,6 +288,29 @@ export async function addAntagonist() {
     encountered: false
   };
   return updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
+}
+
+/** Whether the mission's XP record already lists this NPC's type. */
+export const antagonistRecorded = actor =>
+  !!actor && getMission().antagonists.some(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid);
+
+/** Add an NPC actor to the mission's XP record without a dialog; a type already listed is left alone. */
+export async function recordAntagonist(actor) {
+  requireGC();
+  if (!actor || antagonistRecorded(actor)) return null;
+  const antagonist = {
+    id: foundry.utils.randomID(),
+    uuid: actor.uuid,
+    typeKey: actor.uuid,
+    name: actor.name,
+    xp: Number.isFinite(actor.system.npcBuild?.xp) ? actor.system.npcBuild.xp : 0,
+    type: ["special", "villain"].includes(actor.system.npcType) ? "special" : "standard",
+    full: false,
+    scenes: 1,
+    encountered: false
+  };
+  await updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
+  return antagonist;
 }
 
 export async function addComplication() {
@@ -308,16 +334,17 @@ export async function addComplication() {
       ],
       "security"
     )}</select></label>
-    <label>${loc`Campaign quality`} <select name="quality">${options(qualityRows)}</select></label>
-    <label>${loc`Security device`} <select name="security">${options(SECURITY_DEVICES.map(device => [device.id, `${device.name} (${device.kind}; XP ${device.xp})`]))}</select></label>
-    <label>${loc`Device Power Rating`} <input type="number" name="pr" min="1" value="${Math.max(1, mission.threatLevel ?? 1)}" /></label>
-    <label>${loc`Device XP if the table gives no plain formula`} <input type="number" name="deviceXP" min="0" /></label>
-    <label>${loc`Gear restriction`} <select name="gear">${options(T.gearRestrictions.map(entry => [entry.id, `${entry.name} (${signed(entry.xp)} XP)`]))}</select></label>
-    <label>${loc`Exposure objective`} <select name="exposure">${options(T.exposure.map(entry => [entry.id, `${entry.objective} (${entry.xpPrinted ?? signed(entry.xp)} XP)`]))}</select></label>
-    <label>${loc`Bundle pick or other complication name`} <input name="name" /></label>
-    <label>${loc`Bundle pick Caliber (−10 XP per Caliber)`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
-    <label>${loc`Other complication XP`} <input type="number" name="xp" value="0" /></label>
-    <label>${loc`How many`} <input type="number" name="count" min="1" value="1" /></label>`
+    <label data-when="kind=quality">${loc`Campaign quality`} <select name="quality">${options(qualityRows)}</select></label>
+    <label data-when="kind=security">${loc`Security device`} <select name="security">${options(SECURITY_DEVICES.map(device => [device.id, `${device.name} (${device.kind}; XP ${device.xp})`]))}</select></label>
+    <label data-when="kind=security">${loc`Device Power Rating`} <input type="number" name="pr" min="1" value="${Math.max(1, mission.threatLevel ?? 1)}" /></label>
+    <label data-when="kind=security">${loc`Device XP if the table gives no plain formula`} <input type="number" name="deviceXP" min="0" /></label>
+    <label data-when="kind=gear">${loc`Gear restriction`} <select name="gear">${options(T.gearRestrictions.map(entry => [entry.id, `${entry.name} (${signed(entry.xp)} XP)`]))}</select></label>
+    <label data-when="kind=exposure">${loc`Exposure objective`} <select name="exposure">${options(T.exposure.map(entry => [entry.id, `${entry.objective} (${entry.xpPrinted ?? signed(entry.xp)} XP)`]))}</select></label>
+    <label data-when="kind=bundle|other">${loc`Bundle pick or other complication name`} <input name="name" /></label>
+    <label data-when="kind=bundle">${loc`Bundle pick Caliber (−10 XP per Caliber)`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
+    <label data-when="kind=other">${loc`Other complication XP`} <input type="number" name="xp" value="0" /></label>
+    <label>${loc`How many`} <input type="number" name="count" min="1" value="1" /></label>`,
+    loc`Add complication`
   );
   if (!input) return null;
   const count = Math.max(1, Number(input.count) || 1),
@@ -418,7 +445,8 @@ export async function recordInfraction() {
       rules === "freelance" ? "netWorth" : "reputation"
     )}</select></label>
     <label><input type="checkbox" name="preventing" /> ${loc`Committed to prevent an equal or worse infraction (half, rounded up)`}</label>
-    <label><input type="checkbox" name="honor" /> ${loc`Honor-code violation under the Corrupt campaign quality (half, rounded down)`}</label>`
+    <label><input type="checkbox" name="honor" /> ${loc`Honor-code violation under the Corrupt campaign quality (half, rounded down)`}</label>`,
+    loc`Record infraction`
   );
   if (!input) return null;
   const actor = game.actors.get(input.actor),
@@ -595,7 +623,8 @@ export async function editSeasonQualities() {
     .join("");
   const input = await ask(
     loc`Season campaign qualities — pp.405–408`,
-    `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward.`}</p><div class="sc2-scroll-list">${boxes}</div>`
+    `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward.`}</p><div class="sc2-scroll-list">${boxes}</div>`,
+    loc`Save qualities`
   );
   if (!input) return null;
   await setCampaign({

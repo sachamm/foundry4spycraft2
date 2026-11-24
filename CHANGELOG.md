@@ -31,7 +31,12 @@
   open "More mission tools" list.
 - **Shortcuts keep working after a mouse click.** Alt+B now acts on the card under the pointer or on your own newest
   card, never another GC's, and names the card. Alt+S waits for a turn change and follows the turn with one sheet.
-- **Console dialogs have a Cancel button, a named main button and the cursor in the first field.**
+- **Console dialogs have a Cancel button, a named main button and the cursor in the first field.** The spend-dice,
+  complication, fluid initiative, combat reference and disposition dialogs show only the fields for the option
+  chosen.
+- **Add NPC to scene places a group.** The list shows its rows, and the dialog takes a number of copies, placed on
+  free squares with numbered names, hostile by default, hidden if wanted, joined to a running fight on its kind's
+  Count, and optionally recorded for mission XP. It is also on the Play view.
 
 ## 0.7.0 — 2026-11-23
 

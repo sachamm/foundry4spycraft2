@@ -1,12 +1,17 @@
 /**
- * Add NPC to scene: the GC picks an NPC from the world or from the system's NPC compendiums and it is placed at the
- * centre of the current view. A compendium NPC is imported once; later placements reuse that world actor instead of
- * filling the Actors directory with copies.
+ * Add NPC to scene: the GC picks an NPC from the world or from the system's NPC compendiums and one or more tokens
+ * are placed around the centre of the current view, on free squares, with numbered names. A compendium NPC is
+ * imported once; later placements reuse that world actor instead of filling the Actors directory with copies.
  */
 import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
+import { antagonistRecorded, recordAntagonist } from "./mission.mjs";
+import { getMission } from "./state.mjs";
+
+const kindLabel = type =>
+  ({ standard: loc`standard`, special: loc`special`, villain: loc`special`, animal: loc`animal` })[type] ?? "";
 
 /**
  * The NPCs to choose from, world actors first, then each NPC compendium's, each list by name.
@@ -16,18 +21,19 @@ export async function npcChoices({ actors = game.actors, packs = game.packs } = 
   const byName = (a, b) => a.name.localeCompare(b.name);
   const world = [...(actors ?? [])]
     .filter(actor => actor.type === "npc")
-    .map(actor => ({ uuid: actor.uuid, name: actor.name, source: loc`World` }))
+    .map(actor => ({ uuid: actor.uuid, name: actor.name, source: loc`World`, kind: kindLabel(actor.system?.npcType) }))
     .sort(byName);
   const fromPacks = [];
   for (const pack of packs ?? []) {
     if (pack.documentName !== "Actor") continue;
-    const index = await pack.getIndex({ fields: ["type"] });
+    const index = await pack.getIndex({ fields: ["type", "system.npcType"] });
     const rows = [...index]
       .filter(entry => entry.type === "npc")
       .map(entry => ({
         uuid: entry.uuid ?? `Compendium.${pack.collection}.Actor.${entry._id}`,
         name: entry.name,
-        source: pack.title
+        source: pack.title,
+        kind: kindLabel(entry.system?.npcType)
       }))
       .sort(byName);
     fromPacks.push(...rows);
@@ -47,6 +53,50 @@ export function importedCopy(uuid, actors = game.actors) {
 /** The top-left corner that puts a token of this many grid squares at the centre of the view, on the grid. */
 export function viewCentreCorner({ centre, gridSize, width = 1, height = 1, snap = point => point }) {
   return snap({ x: centre.x - (width * gridSize) / 2, y: centre.y - (height * gridSize) / 2 });
+}
+
+/**
+ * Top-left corners for a number of tokens, starting at the origin square and working outward ring by ring, skipping
+ * squares something already stands on. All values are in pixels; the origin is already on the grid.
+ * @param {{origin: {x:number,y:number}, count: number, gridSize: number, width?: number, height?: number,
+ *   occupied?: {x:number,y:number,width?:number,height?:number}[]}} facts
+ */
+export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, occupied = [] }) {
+  const stepX = width * gridSize,
+    stepY = height * gridSize;
+  const taken = occupied.map(token => ({
+    x: token.x,
+    y: token.y,
+    w: (token.width ?? 1) * gridSize,
+    h: (token.height ?? 1) * gridSize
+  }));
+  const free = point =>
+    !taken.some(
+      box => point.x < box.x + box.w && point.x + stepX > box.x && point.y < box.y + box.h && point.y + stepY > box.y
+    );
+  const placed = [];
+  for (let ring = 0; placed.length < count && ring < 40; ring++)
+    for (let dy = -ring; dy <= ring && placed.length < count; dy++)
+      for (let dx = -ring; dx <= ring && placed.length < count; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
+        const point = { x: origin.x + dx * stepX, y: origin.y + dy * stepY };
+        if (point.x < 0 || point.y < 0 || !free(point)) continue;
+        placed.push(point);
+        taken.push({ x: point.x, y: point.y, w: stepX, h: stepY });
+      }
+  return placed;
+}
+
+/**
+ * Names for new tokens of one NPC. A lone token on a scene with no other keeps the plain name; otherwise each gets
+ * the next free number, so the tracker, the map and the chat cards can tell them apart.
+ */
+export function numberedNames(name, count, existing = []) {
+  const pattern = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?: (\\d+))?$`);
+  const used = existing.map(other => pattern.exec(other)).filter(Boolean);
+  if (count === 1 && !used.length) return [name];
+  let next = Math.max(0, ...used.map(match => Number(match[1] ?? 1))) + 1;
+  return Array.from({ length: count }, () => `${name} ${next++}`);
 }
 
 function filterList(dialog) {
@@ -69,6 +119,42 @@ function filterList(dialog) {
   search.focus();
 }
 
+const DISPOSITIONS = { hostile: -1, neutral: 0, friendly: 1 };
+
+/**
+ * Token data for a placement: where each copy goes, what it is called and how it stands toward the team.
+ * @returns {object[]} One creation object per token.
+ */
+export function placementData(prototype, { corners, names, disposition = "hostile", hidden = false }) {
+  return corners.map((corner, index) => ({
+    ...prototype,
+    ...corner,
+    name: names[index] ?? prototype.name,
+    hidden,
+    ...(disposition in DISPOSITIONS ? { disposition: DISPOSITIONS[disposition] } : {}),
+    // Several copies of one NPC are separate people: each keeps its own damage.
+    ...(corners.length > 1 ? { actorLink: false } : {})
+  }));
+}
+
+/** Put new tokens into the running fight. One of a kind that has already rolled joins on that kind's Count. */
+export async function joinFight(combat, tokens) {
+  if (!combat || !tokens.length) return [];
+  const known = token =>
+    combat.combatants.find?.(other => other.actorId === token.actorId && Number.isFinite(other.initiative))
+      ?.initiative ?? null;
+  return combat.createEmbeddedDocuments(
+    "Combatant",
+    tokens.map(token => ({
+      tokenId: token.id,
+      sceneId: token.parent?.id ?? canvas.scene?.id,
+      actorId: token.actorId,
+      hidden: !!token.hidden,
+      ...(known(token) === null ? {} : { initiative: known(token) })
+    }))
+  );
+}
+
 export async function addNpcToScene() {
   if (!game.user.isGM) return null;
   if (!canvas?.ready || !canvas.scene) return refuse(loc`View a scene first, then add the NPC to it.`);
@@ -76,36 +162,78 @@ export async function addNpcToScene() {
   if (!choices.length) return refuse(loc`There are no NPCs in the world or in the NPC compendiums.`);
   const groups = new Map();
   for (const choice of choices) groups.set(choice.source, [...(groups.get(choice.source) ?? []), choice]);
+  const fight = game.combat ?? null,
+    mission = getMission();
   const input = await systemDialog.input({
     window: { title: loc`Add NPC to scene` },
+    position: { width: 520 },
     rejectClose: false,
-    ok: { label: loc`Place at view centre` },
+    ok: { label: loc`Place on the scene` },
+    buttons: [{ action: "cancel", label: loc`Cancel`, callback: () => null }],
     render: (_event, dialog) => filterList(dialog),
-    content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" /></label><label>${loc`NPC`} <select name="uuid" size="12" required>${[
+    content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list" required>${[
       ...groups
     ]
       .map(
         ([source, rows], g) =>
-          `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${g === 0 && i === 0 ? " selected" : ""}>${esc(row.name)}</option>`).join("")}</optgroup>`
+          `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${g === 0 && i === 0 ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
       )
-      .join(
-        ""
-      )}</select></label><p class="hint">${loc`A compendium NPC is imported the first time and reused after that. The token is placed at the centre of your view; drag it from there.`}</p></div>`
+      .join("")}</select></label>
+      <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" value="1" /></label>
+      <label>${loc`Stands toward the team as`} <select name="disposition"><option value="hostile" selected>${loc`Hostile`}</option><option value="neutral">${loc`Neutral`}</option><option value="friendly">${loc`Friendly`}</option><option value="keep">${loc`As its own token is set`}</option></select></label>
+      <label><input type="checkbox" name="hidden" /> ${loc`Hidden from the players`}</label>
+      ${fight ? `<label><input type="checkbox" name="join" checked /> ${loc`Join the fight on the tracker`}</label>` : ""}
+      ${mission.name || mission.active ? `<label><input type="checkbox" name="record" /> ${loc`Also record it for mission XP, if its type is not listed yet`}</label>` : ""}
+      <p class="hint">${loc`A compendium NPC is imported the first time and reused after that. Tokens go on free squares around the centre of your view, numbered when there is more than one.`}</p></div>`
   });
-  if (!input?.uuid) return null;
+  if (!input) return null;
+  if (!input.uuid) return refuse(loc`No NPC is chosen. Clear the search or pick one from the list.`);
   let actor = await fromUuid(input.uuid);
   if (actor?.pack)
     actor = importedCopy(input.uuid) ?? (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
   if (actor?.type !== "npc") return refuse(loc`That NPC could not be found.`);
   const prototype = await actor.getTokenDocument();
-  const { x, y } = viewCentreCorner({
+  const count = Math.min(20, Math.max(1, Math.trunc(Number(input.copies)) || 1));
+  const origin = viewCentreCorner({
     centre: canvas.stage.pivot,
     gridSize: canvas.grid.size,
     width: prototype.width,
     height: prototype.height,
     snap: point => canvas.grid.getTopLeftPoint?.(point) ?? point
   });
-  const [token] = await canvas.scene.createEmbeddedDocuments("Token", [{ ...prototype.toObject(), x, y }]);
-  ui.notifications.info(loc`${actor.name} added to ${canvas.scene.name}.`);
-  return token;
+  const others = [...canvas.scene.tokens];
+  const corners = spreadCorners({
+    origin,
+    count,
+    gridSize: canvas.grid.size,
+    width: prototype.width,
+    height: prototype.height,
+    occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height }))
+  });
+  if (!corners.length) return refuse(loc`There is no free square near the centre of the view.`);
+  const names = numberedNames(
+    prototype.name || actor.name,
+    corners.length,
+    others.filter(token => token.actorId === actor.id).map(token => token.name)
+  );
+  const tokens = await canvas.scene.createEmbeddedDocuments(
+    "Token",
+    placementData(prototype.toObject(), {
+      corners,
+      names,
+      disposition: input.disposition,
+      hidden: !!input.hidden
+    })
+  );
+  const done = [loc`${tokens.length} × ${actor.name} added to ${canvas.scene.name}`];
+  if (input.join && fight) {
+    await joinFight(fight, tokens);
+    done.push(loc`joined the fight`);
+  }
+  if (input.record && !antagonistRecorded(actor)) {
+    await recordAntagonist(actor);
+    done.push(loc`recorded for mission XP`);
+  }
+  ui.notifications.info(`${done.join("; ")}.`);
+  return tokens.length === 1 ? tokens[0] : tokens;
 }

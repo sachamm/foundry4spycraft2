@@ -86,6 +86,35 @@ export function focusFirstField(content) {
 }
 
 /**
+ * Whether a field marked data-when="name=a|b" (or "name!=a|b") is wanted for the form's current choices.
+ * @param {string} rule
+ * @param {(name: string) => string} valueOf  Current value of the named control
+ */
+export function whenMatches(rule, valueOf) {
+  const match = /^([\w-]+)(!?=)(.*)$/.exec(String(rule ?? ""));
+  if (!match) return true;
+  const listed = match[3].split("|").includes(String(valueOf(match[1]) ?? ""));
+  return match[2] === "=" ? listed : !listed;
+}
+
+/**
+ * Show only the fields that go with the option chosen: every element carrying data-when is hidden until the control
+ * it names holds one of the listed values. Hidden fields keep their values, so what was typed survives a change of
+ * mind, and the code reading the form sees the same names as before.
+ */
+export function wireConditionalFields(root) {
+  const fields = [...(root?.querySelectorAll?.("[data-when]") ?? [])];
+  if (!fields.length) return;
+  const form = fields[0].closest("form") ?? root;
+  const valueOf = name => form.querySelector(`[name="${name}"]`)?.value ?? "";
+  const apply = () => {
+    for (const field of fields) field.hidden = !whenMatches(field.dataset.when, valueOf);
+  };
+  form.addEventListener("change", apply);
+  apply();
+}
+
+/**
  * Open a themed option dialog built from fields and resolve to its values by field name, or null if it is closed.
  * The dialog has a Cancel button, its main button names the action, and the keyboard starts in the first field.
  * @param {object} spec
@@ -102,7 +131,11 @@ export function formDialog({ title, intro, fields, ok, dialog = {} }) {
     content: focusFirstField(optionsMarkup({ intro, fields })),
     ok: { label: ok ?? loc`Confirm` },
     buttons: [{ action: "cancel", label: loc`Cancel`, callback: () => null }],
-    ...dialog
+    ...dialog,
+    render: (event, app) => {
+      wireConditionalFields(app?.element ?? event?.target);
+      return dialog.render?.(event, app);
+    }
   });
 }
 

@@ -19,7 +19,7 @@ import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from ".
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -74,22 +74,23 @@ export async function spendGCDice(input = {}) {
       loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
-      <label>${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
-      <label>${loc`Threat scored with`} <select name="checkKind">${options(
+      <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
+      <label data-when="id=activateThreat">${loc`Threat scored with`} <select name="checkKind">${options(
         [
           ["attack", "an attack"],
           ["skill", "a skill check"]
         ],
         "attack"
       )}</select></label>
-      <label>${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
-      <label>${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
-      <label>${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
-      <label><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
-      <label><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
-      <label>${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
-      <label><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
-      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`
+      <label data-when="id=activateThreat|activateError">${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
+      <label data-when="id=event">${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
+      <label data-when="id=event">${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
+      <label data-when="id=event"><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
+      <label data-when="id=event"><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
+      <label data-when="id=campaignQuality">${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
+      <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
+      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
+      loc`Spend dice`
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };

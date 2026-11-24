@@ -38,7 +38,7 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -234,10 +234,11 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     <p>${loc`Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.`}</p>
     <label>${loc`Combatant`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
     <label>${loc`Event`} <select name="id">${eventOptions}</select></label>
-    <label>${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
-    <label>${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
-    <label>${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
-    <label>${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`
+    <label data-when="id!=press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup">${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
+    <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
+    <label data-when="id=unproficient">${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
+    <label data-when="id=ready">${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`,
+    loc`Record event`
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
@@ -425,7 +426,8 @@ export async function surpriseRoundDialog(combat = game.combat) {
         ["opponents", loc`Opponents`]
       ],
       "opponents"
-    )}</select></label>`
+    )}</select></label>`,
+    loc`Set the surprise round`
   );
   if (!input) return null;
   let result;
@@ -694,17 +696,18 @@ export async function combatReferenceDialog() {
       ["gas", loc`Gas cloud spread`],
       ["surface", loc`Special surface (Table 5.3)`]
     ])}</select></label>
-    <label>${loc`Location (encounter)`} <select name="location">${options(Object.keys(ENCOUNTER_DISTANCES).map(key => [key, ENCOUNTER_LABELS[key]]))}</select></label>
-    <label>${loc`Range increment to the target (deviation)`} <input type="number" name="increment" min="1" max="10" value="1" /></label>
-    <label>${loc`Rounds since release (gas)`} <input type="number" name="rounds" min="0" value="0" /></label>
-    <label>${loc`Wind (gas)`} <select name="wind">${options([
+    <label data-when="tool=encounter">${loc`Location (encounter)`} <select name="location">${options(Object.keys(ENCOUNTER_DISTANCES).map(key => [key, ENCOUNTER_LABELS[key]]))}</select></label>
+    <label data-when="tool=deviation">${loc`Range increment to the target (deviation)`} <input type="number" name="increment" min="1" max="10" value="1" /></label>
+    <label data-when="tool=gas">${loc`Rounds since release (gas)`} <input type="number" name="rounds" min="0" value="0" /></label>
+    <label data-when="tool=gas">${loc`Wind (gas)`} <select name="wind">${options([
       ["none", loc`Still`],
       ["light", loc`Light`],
       ["moderate", loc`Moderate`],
       ["strong", loc`Strong or severe`]
     ])}</select></label>
-    <label>${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
-    <label>${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`
+    <label data-when="tool=surface">${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
+    <label data-when="tool=surface">${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`,
+    loc`Look up`
   );
   if (!input) return null;
   const roll = async formula => new Roll(formula).evaluate();
