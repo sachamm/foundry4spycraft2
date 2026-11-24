@@ -29,7 +29,7 @@ export function sampleAgentState(spec, data) {
         skills: structuredClone(spec.skills)
       }
     ],
-    xp: 0,
+    xp: 1000,
     codename: spec.codename,
     details: structuredClone(spec.details),
     proficiencies: structuredClone(spec.proficiencies),
