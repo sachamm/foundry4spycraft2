@@ -197,6 +197,12 @@ export function criticalPlan(
     adjustment++;
     sources.push(loc`Tough Luck (Black Cat target) +1`);
   }
+  // A Henchman or Mastermind is dearer to score a critical against (pp.447-448); recorded when the attack was rolled.
+  const role = check.attackContext?.targetRole;
+  if (kind === "success" && Number.isSafeInteger(role?.extraDiceToActivate) && role.extraDiceToActivate > 0) {
+    adjustment += role.extraDiceToActivate;
+    sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
+  }
   const cost = Math.max(minimum, baseCost + adjustment);
   if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {

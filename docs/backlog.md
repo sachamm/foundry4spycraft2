@@ -42,10 +42,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-006 | **The tracker's right-click menu has none of the system's entries on Foundry 14.370** (Spend a half action, Spend a full action, Give back this round's actions, Fluid initiative event). Three reviewers saw only Foundry's four. The hook in `module/apps/gc/combat.mjs` is not the one this build calls. Then add Delay…, Ready and Readied action triggered as one-step entries that move the turn. | XGC-04, DES-42, UX-19, SG-T2, LR-5b | S, then M | live |
-| B-007 | **The Henchman quality's two critical rules are printed on the sheet and not applied**: a natural 20 was still a threat and the critical cost 1 die. Apply both from the target's role, or mark both "apply by hand" on the card. | XGC-18 | M | live |
-| B-008 | **A combat begun by a GM who is not the lead GM starts with nobody flat-footed.** Mark it from an event every client sees, or route it to the lead GM. Seen by two reviewers; both had a non-active combat, so re-check in a one-GC world as well. | XGC-05, UX-15 | S | live |
-| B-009 | **"Roll NPC Initiative by type" also rolls for agents no player owns** (an absent player's character, an unassigned agent), with no chance to boost. Go by actor type, or name who will be rolled before rolling. *GC to confirm* the intent. | NGC-32, XGC-20 | S | live |
 | B-010 | **GC die DC boosts are never capped.** The spend dialog has no named DC, so the count of earlier boosts is always 0. Attach a boost to a named check and keep its remaining allowance. (pp.397–399, 424) | CX-E2, XGC-30 | M | code |
 | B-011 | **Promoting a standard NPC does not reach the mission's XP.** The antagonist row keeps the standard reward. Link promotion and scenes appeared in to the antagonist record, with a manual override. (pp.398, 452) | CX-E3 | M | code |
 | B-012 | **Reset on a standard NPC restores the sheet but leaves the combatant marked defeated.** Clear the defeat that the failed Damage save caused, and no other. | CX-E5 | S | code |

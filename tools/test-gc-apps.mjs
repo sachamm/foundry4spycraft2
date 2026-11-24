@@ -536,6 +536,48 @@ test("delaying on your own turn hands the turn to whoever is next, so nobody is 
   assert.equal(fight.turn, 0);
 });
 
+test("group initiative rolls NPCs only and names an agent nobody owns instead of rolling it", async () => {
+  const absent = makeActor("absent", "agent", { initiative: { total: 2 } }, { name: "Absent", hasPlayerOwner: false });
+  absent.hasPlayerOwner = false;
+  const fight = makeCombat([
+    ["g1", guard, null, false],
+    ["x", absent, null, false]
+  ]);
+  dice(10);
+  assert.equal(await combat.rollGroupInitiative(fight), 1);
+  assert.equal(fight.combatants.get("x").initiative, null);
+  assert.match(lastMessage(), /Not rolled, no player owns them: Absent/);
+});
+
+test("the tracker menu entries use the Foundry 14 shape and act on the clicked row", async () => {
+  const fight = makeCombat([
+    ["c-a1", actors.get("a1"), 22, true],
+    ["c-guard", guard, 20, false]
+  ]);
+  game.combat = fight;
+  const entries = combat.trackerMenuEntries();
+  for (const entry of entries) {
+    assert.deepEqual(Object.keys(entry), ["label", "icon", "visible", "onClick"]);
+    assert.match(entry.icon, /^fa-solid fa-/);
+  }
+  const row = { dataset: { combatantId: "c-guard" } };
+  const find = label => entries.find(entry => entry.label === label);
+  assert.equal(find("Spend a half action").visible(row), true);
+  assert.equal(find("Readied action triggered").visible(row), false);
+  await find("Delay 1 Count").onClick(null, row);
+  const mook = fight.combatants.get("c-guard");
+  assert.equal(mook.initiative, 19);
+  await find("Ready an action").onClick(null, row);
+  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round });
+  assert.equal(find("Ready an action").visible(row), false);
+  assert.equal(find("Readied action triggered").visible(row), true);
+  // The trigger comes on the acting character's Count; the guard is already lower, so it stays put.
+  await find("Readied action triggered").onClick(null, row);
+  assert.equal(mook.initiative, 19);
+  assert.equal(mook.flags.spycraft2.readied, null);
+  game.combat = null;
+});
+
 test("group initiative makes one roll per NPC type; tie-breaks are stored", async () => {
   const twin = makeActor("guard2", "npc", npcSystem(), { name: "Guard" });
   const fight = makeCombat([

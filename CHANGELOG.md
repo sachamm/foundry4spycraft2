@@ -13,6 +13,12 @@
 - **A new special NPC starts unhurt.** An NPC's vitality and wounds now follow their maximums the way an agent's do:
   a new NPC that becomes a special character starts full, a Threat Level change moves a hurt NPC by the same amount,
   and existing NPCs keep their current values.
+- **The combat tracker's right-click menu is back on Foundry 14**, with new one-step entries: **Delay 1 Count**,
+  **Delay…**, **Ready an action** and **Readied action triggered**. A readied combatant is marked on its row.
+- **Henchman and Mastermind critical rules are applied.** An attack that names such an NPC as its target threatens
+  on a narrower range and its critical hit costs more action dice; the attack card says so.
+- **A fight begun by any GM starts flat-footed.** The lead GM marks the fight whoever pressed Begin combat.
+- **Group Initiative rolls NPCs only.** An agent no player owns is named in the report instead of being rolled.
 - **Console dialogs have a Cancel button, a named main button and the cursor in the first field.**
 
 ## 0.7.0 — 2026-11-23

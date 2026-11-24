@@ -1,4 +1,5 @@
 /** Attacks and damage. */
+import { targetRoleCriticalRules, threatAgainstRole } from "../../rules/npc-qualities.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
@@ -326,13 +327,17 @@ export const ActorAttackRolls = Base =>
       const tripPenalty = options.finalAttack?.source === "trip" ? 4 : 0;
       // A modifier the GC calls for that no rule on the sheet covers, typed into the attack dialog.
       const situational = Math.trunc(Number(options.situationalModifier)) || 0;
+      // A villain role on the declared target narrows the threat range and raises the critical's cost (pp.447-448).
+      const targetRole = declaredTargetUuid
+        ? targetRoleCriticalRules(globalThis.fromUuidSync?.(declaredTargetUuid)?.system)
+        : null;
       const message = await this.rollCheck(
         "1d20 + @total",
         { total: atk.total - tripPenalty + situational },
         {
           planModifiers: atk.planModifiers,
           featReminders: options.featReminders,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,
@@ -341,7 +346,7 @@ export const ActorAttackRolls = Base =>
           twoWeaponFinalAttack: options.twoWeaponFinalAttack,
           validateFinalAttack: options.validateFinalAttack,
           validateAttackContext,
-          threat: atk.threat,
+          threat: threatAgainstRole(atk.threat, targetRole),
           error: cunning?.error ?? atk.error,
           cunningPlan: cunning ?? !!options.cunningPlan,
           chooseTwice: millionDollar,
@@ -388,6 +393,7 @@ export const ActorAttackRolls = Base =>
             feintBonus: feintBonusProof,
             combatStance: combatStanceProof(this.system, { ranged: atk.ranged }),
             targetActorUuid: declaredTargetUuid,
+            targetRole,
             missTrickSources: atk.missTrickSources,
             cheapShot: atk.cheapShot?.active ? atk.cheapShot : null,
             quirky,

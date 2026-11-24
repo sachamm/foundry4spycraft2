@@ -81,8 +81,8 @@ test("flat-footed ends as a combatant's turn begins, except in a surprise round 
       return this.turns[this.turn];
     }
   };
-  await Promise.all(hooks.combatStart.map(fn => fn(fight)));
-  assert.ok(a.actor.statuses.has("flat-footed") && b.actor.statuses.has("flat-footed"));
+  // The start is read from the combat's own update, so the lead GM marks a fight another GM began.
+  assert.equal(hooks.combatStart, undefined);
   for (const fn of hooks.updateCombat) await fn(fight, { round: 1, turn: 0 }, { direction: 1 });
   assert.ok(!a.actor.statuses.has("flat-footed"), "A acts first and is no longer flat-footed");
   assert.ok(b.actor.statuses.has("flat-footed"), "B has not acted yet");

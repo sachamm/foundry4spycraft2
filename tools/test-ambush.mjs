@@ -271,3 +271,23 @@ test("Supremacy is an explicit single-source reduction with the normal take-10 e
   assert.equal(take.blocked, true);
   assert.match(take.blockedReason, /error range/);
 });
+
+test("a critical hit on a Henchman or Mastermind costs more, and their threat range is narrower", async () => {
+  const { targetRoleCriticalRules, threatAgainstRole } = await import("../module/rules/npc-qualities.mjs");
+  const role = targetRoleCriticalRules({
+    qualityEffects: { role: { id: "henchman", threatRangeReduction: 1, extraDiceToActivate: 1 } }
+  });
+  assert.deepEqual([role.id, role.threatRangeReduction, role.extraDiceToActivate], ["henchman", 1, 1]);
+  assert.equal(targetRoleCriticalRules({ qualityEffects: { role: { id: "minion", threatRangeReduction: 0 } } }), null);
+  assert.equal(targetRoleCriticalRules({}), null);
+  assert.equal(threatAgainstRole(20, role), 21, "a natural 20 alone no longer threatens");
+  assert.equal(threatAgainstRole(18, role), 19);
+  assert.equal(threatAgainstRole(0, role), 0);
+  assert.equal(threatAgainstRole(19, null), 19);
+  const check = { checkKind: "attack", threatConfirmed: true, attackContext: { targetRole: role } },
+    options = { baseCost: 1, effect: "Critical hit", effectConfirmed: true, beforeDamage: true, available: 4 };
+  const plan = criticalPlan({}, check, options);
+  assert.equal(plan.cost, 2);
+  assert.match(plan.sources.join(), /Henchman target \+1/);
+  assert.equal(criticalPlan({}, { ...check, attackContext: {} }, options).cost, 1);
+});
