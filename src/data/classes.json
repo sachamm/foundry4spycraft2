@@ -369,7 +369,7 @@
   "abilities": [
    {
     "level": 1,
-    "name": "Absolute certainity"
+    "name": "Absolute certainty"
    },
    {
     "level": 2,
@@ -1565,7 +1565,7 @@
    },
    {
     "level": 14,
-    "name": "Doppleganger 1/mission"
+    "name": "Doppelganger 1/mission"
    },
    {
     "level": 15,
@@ -2048,7 +2048,7 @@
   "abilities": [
    {
     "level": 1,
-    "name": "lee7"
+    "name": "'L337"
    },
    {
     "level": 2,
@@ -2124,7 +2124,7 @@
    },
    {
     "level": 20,
-    "name": "Bonus feat, synchronization (all teammates)"
+    "name": "Bonus feat, synchronized (all teammates)"
    }
   ],
   "choiceLists": [
@@ -3263,7 +3263,7 @@
    },
    {
     "level": 15,
-    "name": "Cross-class ablity, lead 7/session, versatility (7)"
+    "name": "Cross-class ability, lead 7/session, versatility (7)"
    },
    {
     "level": 16,
@@ -7258,7 +7258,7 @@
    },
    {
     "level": 20,
-    "name": "\"That's impossible!\" 2/session, vehicle familiarity IV (third vehicle)"
+    "name": "\"That's impossible!\" 2/session, vehicle familiarity V (third vehicle)"
    }
   ],
   "choiceLists": [
@@ -7640,7 +7640,7 @@
    },
    {
     "level": 10,
-    "name": "Juggernaught"
+    "name": "Juggernaut"
    }
   ],
   "choiceLists": [
@@ -8014,11 +8014,11 @@
    },
    {
     "level": 8,
-    "name": "Must complete mission. Merciless"
+    "name": "Must complete mission, merciless"
    },
    {
     "level": 9,
-    "name": "Glib explanation (perfect), status qup 4/mission"
+    "name": "Glib explanation (perfect), status quo 4/mission"
    },
    {
     "level": 10,
@@ -9427,7 +9427,7 @@
    },
    {
     "level": 4,
-    "name": "\"Any time, any place\", interpereter"
+    "name": "\"Any time, any place\", interpreter"
    },
    {
     "level": 5,
@@ -9451,7 +9451,7 @@
    },
    {
     "level": 10,
-    "name": "Master of camoflauge"
+    "name": "Master of camouflage"
    }
   ],
   "choiceLists": [],
@@ -13175,7 +13175,7 @@
    },
    {
     "level": 8,
-    "name": "Bamboozle, professional courtsey (2)"
+    "name": "Bamboozle, professional courtesy (2)"
    },
    {
     "level": 9,

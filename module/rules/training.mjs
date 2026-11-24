@@ -1,4 +1,4 @@
-import { ruleName } from "./rule-name.mjs";
+import { originRuleName, ruleName } from "./rule-name.mjs";
 import { loc } from "../i18n.mjs";
 const norm = value =>
   String(value ?? "")
@@ -37,7 +37,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
     pending = [],
     forteGrants = [];
   for (const item of items.filter(i => i.type === "origin")) {
-    const rules = cfg.tables.originFocuses?.[item.name] ?? {};
+    const rules = cfg.tables.originFocuses?.[originRuleName(item)] ?? {};
     for (const [key, values] of Object.entries(rules.fixed ?? {}))
       for (const value of values) {
         forced[key].add(value);

@@ -8,6 +8,7 @@ import { systemDialog } from "../apps/dialog-theme.mjs";
 import { formDialog } from "../apps/dialog-kit.mjs";
 import { weaponFacts } from "./play-rows.mjs";
 import { formatRange } from "../rules/outcome-labels.mjs";
+import { originRuleName } from "../rules/rule-name.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
 import { KeepPlace } from "./keep-place.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
@@ -942,10 +943,10 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.talent = byType("origin").find(i => i.system.originType === "talent");
     context.specialty = byType("origin").find(i => i.system.originType === "specialty");
     context.originSelections = byType("origin").map(item => {
-      const rule = cfg.tables.originChoices?.[item.name] ?? {};
+      const rule = cfg.tables.originChoices?.[originRuleName(item)] ?? {};
       const choices = item.system.originChoices ?? {};
       const fields = [];
-      const focusRule = cfg.tables.originFocuses?.[item.name];
+      const focusRule = cfg.tables.originFocuses?.[originRuleName(item)];
       if (focusRule?.choiceSkill) {
         const skill = focusRule.choiceSkill;
         fields.push({

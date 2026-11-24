@@ -17,7 +17,7 @@ The **Sample Level-1 Agents** Actor compendium includes 16 ready-to-import chara
 | Sofia Rossi / Mosaic | Sleuth | Shrewd / Investigator | Case-building detective |
 | Daniel Chen / Relay | Snoop | Clever / Journalist | Signals and surveillance |
 | Luka Petrov / Breakwater | Soldier | Burly / Warrior | Close protection |
-| Inez Duarte / Vector | Soldier | Fit / Mercenary | Ranged security |
+| Inez Duarte / Vector | Soldier | Fit / Soldier of Fortune | Ranged security |
 | Mateo Silva / Apex | Wheelman | Daring / Hot Rodder | Ground extraction driver |
 | Noor Al-Masri / Skylark | Wheelman | Agile / Pilot | Air rescue pilot |
 

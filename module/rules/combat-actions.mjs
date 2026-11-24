@@ -14,6 +14,7 @@
  */
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { specialtyAttackAction, specialtyAttackBonus } from "./specialty-attacks.mjs";
 
 /**
  * The time each sheet action takes, where the action table gives one (pp.352–353). Most sheet tools record or
@@ -471,17 +472,24 @@ rollPipeline.register({
       { pummel: options.pummel === true, strengthMod: system.abilities?.str?.mod ?? 0 }
     );
     const blocked = [plan, pummel].find(part => part?.blocked);
+    const specialty = specialtyAttackBonus(
+      system,
+      specialtyAttackAction(plan && !plan.blocked ? plan.action : "", pummel && !pummel.blocked)
+    );
     return [
       {
         key: "fireAction",
         plan: plan && !plan.blocked ? plan : null,
         rowAt: 255,
-        rows: plan
-          ? [
-              [loc`Fire action`, plan.attack],
-              [loc`Strafe recoil`, plan.extraRecoil]
-            ]
-          : [],
+        rows: [
+          ...(plan
+            ? [
+                [loc`Fire action`, plan.attack],
+                [loc`Strafe recoil`, plan.extraRecoil]
+              ]
+            : []),
+          ...(specialty ? [[loc`Specialty: ${system.specialtyName}`, specialty]] : [])
+        ],
         error: plan?.error ?? 0,
         blockAt: 195,
         blocked: blocked?.reason ?? "",

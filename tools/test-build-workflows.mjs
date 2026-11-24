@@ -41,7 +41,7 @@ test("all five restricted origin fortes must relate to that origin’s exact gra
     ["Hot Rodder", "drive", "Standard Ground Vehicles", "Personal Aircraft"],
     ["Pilot", "drive", "Performance Aircraft", "Rotary-Wing Aircraft"],
     ["Sailor", "drive", "Ships", "Submarines"],
-    ["Thrill Seeker", "drive", "Personal Watercraft", "Personal Aircraft"]
+    ["Thrill-Seeker", "drive", "Personal Watercraft", "Personal Aircraft"]
   ]) {
     const rule = { name, skill, focus },
       valid = compute(rule, focus),

@@ -2,12 +2,13 @@ import { camouflageTerrain } from "./quality-checks.mjs";
 import { resistanceType } from "./resistances.mjs";
 import { evaluate } from "./formula.mjs";
 import { loc } from "../i18n.mjs";
+import { originRuleName } from "./rule-name.mjs";
 
 const KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 
 /** Resolve creation-time Origin selections without silently choosing for the player. */
 export function resolveOriginChoices(item, system, items, cfg) {
-  const rule = cfg.tables.originChoices?.[item.name] ?? {};
+  const rule = cfg.tables.originChoices?.[originRuleName(item)] ?? {};
   const choices = item.system.originChoices ?? {};
   const bonuses = [],
     pending = [],
@@ -22,7 +23,7 @@ export function resolveOriginChoices(item, system, items, cfg) {
         const key = bonus.target?.match(/^abilities\.(\w+)$/)?.[1];
         if (KEYS.includes(key)) bases[key] += evaluate(bonus.value);
       }
-      if (cfg.tables.originChoices?.[talent.name]?.attributes) {
+      if (cfg.tables.originChoices?.[originRuleName(talent)]?.attributes) {
         if (KEYS.includes(talent.system.originChoices?.up)) bases[talent.system.originChoices.up] += 2;
         if (KEYS.includes(talent.system.originChoices?.down)) bases[talent.system.originChoices.down] -= 2;
       }

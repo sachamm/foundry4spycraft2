@@ -1,4 +1,4 @@
-import { ruleName } from "./rule-name.mjs";
+import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "./cheap-shot-effects.mjs";
@@ -273,7 +273,8 @@ function deriveCareerLevels(state) {
   const progression = sys.progression ?? [];
   const level = progression.length;
   sys.level = level;
-  sys.specialtyName = items.find(i => i.type === "origin" && i.system?.originType === "specialty")?.name ?? "";
+  sys.specialtyName = originRuleName(items.find(i => i.type === "origin" && i.system?.originType === "specialty"));
+  sys.talentName = originRuleName(items.find(i => i.type === "origin" && i.system?.originType === "talent"));
   sys.activeFeatSelections = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id))
     .map(i => ({ name: ruleName(i), choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));

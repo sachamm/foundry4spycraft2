@@ -9,3 +9,19 @@
 export function ruleName(item) {
   return item?.flags?.spycraft2?.ruleName || item?.flags?.babele?.originalName || item?.name || "";
 }
+
+/**
+ * Origins whose names were corrected to the book's Table 1.2 (p.22). Items made before the correction keep the old
+ * name until the GC refreshes them from the compendium, so the rules accept either.
+ */
+export const LEGACY_ORIGIN_NAMES = Object.freeze({
+  Mercenary: "Soldier of Fortune",
+  Recruit: "Serviceman",
+  "Thrill Seeker": "Thrill-Seeker"
+});
+
+/** The name the rules know an origin (talent or specialty) by. */
+export function originRuleName(item) {
+  const name = ruleName(item);
+  return item?.type === "origin" && Object.hasOwn(LEGACY_ORIGIN_NAMES, name) ? LEGACY_ORIGIN_NAMES[name] : name;
+}
