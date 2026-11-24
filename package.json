@@ -27,7 +27,7 @@
     "@playwright/test": "1.65.1",
     "classic-level": "1.4.1",
     "esbuild": "0.28.2",
-    "eslint": "9.39.5",
+    "eslint": "10.15.0",
     "globals": "17.14.0",
     "handlebars": "4.7.10",
     "prettier": "3.10.1",
