@@ -23,7 +23,7 @@ The **Sample Level-1 Agents** Actor compendium includes 16 ready-to-import chara
 
 ## Creation assumptions
 
-Each is a faction agent of the original **Lantern Office**, with 36-point attributes, one base-class level, maximum first-level vitality, full wounds and starting action dice, 0 XP and 2 Reputation. No mission reward has been awarded. Demographics include age, gender, homeland, nationality, height, weight, eyes and hair. Original biographies supply a reason to work with the team and an unfinished personal case.
+Each is a faction agent of the original **Lantern Office**, with 36-point attributes, one base-class level, maximum first-level vitality, full wounds and starting action dice, 1,000 XP (p.27) and 2 Reputation. No mission reward has been awarded. Demographics include age, gender, homeland, nationality, height, weight, eyes and hair. Original biographies supply a reason to work with the team and an unfinished personal case.
 
 Every creation allocation is explicit: Talent choices, Specialty focus and forte grants, class ability choices, permanent feats and their acquisition level, skill points and historical Intelligence, weapon proficiencies and fortes, skill focuses and fortes, Interests, Contacts and relationship grades, a Subplot, and Wealth allocation. Cultures and Science use the printed focus lists. Cultural fortes name countries, Drive fortes name vehicle types, Science fortes name gear types and Profession fortes name tasks.
 
