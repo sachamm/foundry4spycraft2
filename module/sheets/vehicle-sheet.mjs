@@ -1,3 +1,4 @@
+import { editPortrait } from "../apps/portrait-picker.mjs";
 import { refuse } from "../error-notices.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
@@ -102,6 +103,8 @@ export class SpycraftVehicleSheet extends KeepPlace(HandlebarsApplicationMixin(S
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      // Players without Foundry's file browser can still change the picture (module/apps/portrait-picker.mjs).
+      editImage: editPortrait,
       damageSave() {
         return rollObjectDamageSave(this.actor);
       },

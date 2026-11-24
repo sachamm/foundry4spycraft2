@@ -625,6 +625,29 @@
   font: 600 var(--sc2-text-m, 14px) / 1.3 var(--font-primary, sans-serif);
 }
 
+/* Picture dialog for users without the file browser: preview beside the address field. */
+.spycraft2 .sc2-portrait-picker {
+  display: flex;
+  gap: var(--sc2-space-4);
+  align-items: flex-start;
+}
+.spycraft2 .sc2-portrait-picker .form-group {
+  flex: 1;
+  min-width: 0;
+}
+.spycraft2 .sc2-portrait-preview {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--sc2-rule);
+  border-radius: var(--sc2-radius);
+}
+.spycraft2 .sc2-portrait-preview.sc2-invalid {
+  opacity: 0.4;
+  border-color: var(--sc2-danger);
+}
+
 /* Advanced forms expose small groups with readable declarations and optional search. */
 .spycraft2 :is(.sc2-option-group, .sc2-damage-options) {
   margin: 10px 0;

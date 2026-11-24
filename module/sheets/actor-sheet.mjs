@@ -1,3 +1,4 @@
+import { editPortrait } from "../apps/portrait-picker.mjs";
 import { refuse, refuseStep } from "../error-notices.mjs";
 import { placeSheet, rememberSheetPlacement } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
@@ -254,6 +255,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      // Players without Foundry's file browser can still change the picture (module/apps/portrait-picker.mjs).
+      editImage: editPortrait,
       // Buttons that call the Actor method of the same name.
       ...actorMethods(
         "applyShaken",
@@ -1753,6 +1756,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      // Players without Foundry's file browser can still change the picture (module/apps/portrait-picker.mjs).
+      editImage: editPortrait,
       // Buttons that call the Actor method of the same name.
       ...actorMethods(
         "manageTakedown",

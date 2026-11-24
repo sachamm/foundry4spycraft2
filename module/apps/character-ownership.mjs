@@ -126,7 +126,7 @@ export async function reviewOwnership(proposals, { recheck = currentProposal } =
   const rows = proposals
     .map(
       proposal =>
-        `<label class="sc2-ownership-row"><input type="checkbox" name="apply-${esc(proposal.actor.id)}" checked /> <strong>${esc(proposal.actor.name)}</strong>: ${esc(describeProposal(proposal))}</label>`
+        `<label class="sc2-ownership-row"><input type="checkbox" name="apply-${esc(proposal.actor.id)}" checked /> <span><strong>${esc(proposal.actor.name)}</strong>: ${esc(describeProposal(proposal))}</span></label>`
     )
     .join("");
   const input = await systemDialog.input({
@@ -138,7 +138,7 @@ export async function reviewOwnership(proposals, { recheck = currentProposal } =
   });
   if (!input) return { applied: 0 };
   const dismissed = { ...(setting(DISMISSED_SETTING, {}) ?? {}) };
-  let applied = 0;
+  const applied = [];
   const changed = [];
   for (const proposal of proposals) {
     const now = recheck(proposal.actor);
@@ -149,13 +149,35 @@ export async function reviewOwnership(proposals, { recheck = currentProposal } =
     if (input[`apply-${proposal.actor.id}`]) {
       await (now.actor ?? proposal.actor).update({ ownership: proposal.changes });
       delete dismissed[proposal.actor.id];
-      applied++;
+      applied.push(now);
     } else dismissed[proposal.actor.id] = proposal.signature;
   }
   await game.settings.set(SYSTEM, DISMISSED_SETTING, dismissed);
-  if (applied) ui.notifications?.info(loc`Updated ownership on ${applied} character(s).`);
+  // Name each change when there are few; a first load that opens many sheets to the table gets one line.
+  if (applied.length > 3) ui.notifications?.info(loc`Updated ownership on ${applied.length} characters.`);
+  else for (const proposal of applied) ui.notifications?.info(appliedMessage(proposal));
   if (changed.length) queueOwnershipReview(changed);
-  return { applied, changed: changed.length };
+  return { applied: applied.length, changed: changed.length };
+}
+
+/** What the GC is told after a row is applied: who can now edit which character. */
+export function appliedMessage(proposal) {
+  const name = proposal.actor.name;
+  if (proposal.player) return loc`${proposal.player.name} now owns ${name} and can edit the sheet.`;
+  return loc`Every player can now see ${name}.`;
+}
+
+/**
+ * On a player's own client: say so when the GC has just made them the owner of an agent, so the change is visible
+ * where they are looking. Their open sheet re-renders by itself.
+ */
+export function announceNewOwnership(actor, changed, _options, userId) {
+  const user = globalThis.game?.user;
+  if (!user || user.isGM || actor?.type !== "agent" || userId === user.id) return false;
+  const level = changed?.ownership?.[user.id];
+  if (level === undefined || level < OWNERSHIP.OWNER) return false;
+  ui.notifications?.info(loc`The GC made you the owner of ${actor.name}. You can now edit the sheet.`);
+  return true;
 }
 
 let queued = null;
@@ -215,6 +237,7 @@ export function installCharacterOwnership() {
   game.settings.register(SYSTEM, DISMISSED_SETTING, { scope: "world", config: false, type: Object, default: {} });
   Hooks.on("preCreateActor", applyDefaultOwnership);
   Hooks.on("createActor", actor => queueOwnershipReview([actor]));
+  Hooks.on("updateActor", announceNewOwnership);
   Hooks.on("updateActor", (actor, changed) => {
     // A GC lowering ownership by hand is not second-guessed; only a new name can identify a new player.
     if (Object.hasOwn(changed, "name")) queueOwnershipReview([actor]);
