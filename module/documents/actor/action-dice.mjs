@@ -26,7 +26,6 @@ import {
   markMultipartActionDieReview
 } from "../../apps/action-die-payments.mjs";
 import { shakenRules } from "../../rules/shaken.mjs";
-import { startingDiceEntryPlan } from "../../rules/starting-dice.mjs";
 import {
   actionDiceFundingContext,
   actionDicePaymentPlan,
@@ -911,8 +910,6 @@ export const ActorActionDice = Base =>
     async awardActionDice(options = {}) {
       if (!game.user?.isGM) throw new Error(loc`Only the GC can award action dice.`);
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (this.startingDiceEntry?.blocked === false)
-        throw new Error(loc`Begin this character’s first session with starting dice before recording awards.`);
       if (this.flags?.spycraft2?.missionXPReview?.needsReview)
         throw new Error(loc`Review the interrupted mission XP settlement before recording more awards.`);
       if (this.flags?.spycraft2?.actionDieAwardReview?.needsReview)
@@ -928,8 +925,6 @@ export const ActorActionDice = Base =>
       }
       return queueResources([this], () =>
         withGCDicePool(async pool => {
-          if (this.startingDiceEntry?.blocked === false)
-            throw new Error(loc`Begin this character’s first session with starting dice before recording awards.`);
           if (this.flags?.spycraft2?.missionXPReview?.needsReview)
             throw new Error(loc`Review the interrupted mission XP settlement before recording more awards.`);
           if (!game.user?.isGM || this.flags?.spycraft2?.actionDieAwardReview?.needsReview)
@@ -1359,48 +1354,6 @@ export const ActorActionDice = Base =>
             throw error;
         }
         return completed;
-      });
-    }
-
-    get startingDiceEntry() {
-      return startingDiceEntryPlan(
-        { ...this.actionDiceFundingSystem, missionXPReview: this.flags?.spycraft2?.missionXPReview },
-        this.flags?.spycraft2?.startingDiceCreation,
-        { session: this.usagePeriods.session ?? "initial", resetReceipt: this.flags?.spycraft2?.sessionDiceReset }
-      );
-    }
-
-    initializeStartingDice() {
-      if (this.type !== "agent" || !this.isOwner) return null;
-      return queueResources([this], async () => {
-        if (!this.isOwner) throw new Error(loc`Choose an owned character.`);
-        const plan = this.startingDiceEntry;
-        if (plan.blocked) return refuseStep(plan.reason);
-        const receiptId = foundry.utils.randomID(),
-          record = {
-            ...this.flags.spycraft2.startingDiceCreation,
-            claimed: true,
-            starting: plan.value,
-            die: plan.die,
-            receiptId,
-            claimedAt: game.time?.worldTime ?? 0
-          };
-        // A character that has never played has empty health tracks; it enters play at full health.
-        const health = {};
-        for (const track of ["vitality", "wounds"]) {
-          const { value, max } = this.system[track] ?? {};
-          if (value === 0 && max > 0) health[`system.${track}.value`] = max;
-        }
-        try {
-          await this.update({
-            "system.actionDice.value": plan.value,
-            ...health,
-            ...this.actorRecordRestorePatch("flags.spycraft2.startingDiceCreation", record)
-          });
-        } catch (error) {
-          if (this.flags?.spycraft2?.startingDiceCreation?.receiptId !== receiptId) throw error;
-        }
-        return record;
       });
     }
 

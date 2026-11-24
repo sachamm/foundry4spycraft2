@@ -684,8 +684,6 @@
     "RemoveTalent": "Remove talent",
     "ChangeSpecialty": "Change specialty",
     "RemoveSpecialty": "Remove specialty",
-    "BeginPlayOnceWithThisCharacter": "Begin play once: starting action dice, and full vitality and wounds for a new character",
-    "BeginPlay": "Begin play",
     "Spend": "Roll action die",
     "HealOutsideCombatWithActionDice": "Heal outside combat with action dice",
     "Heal": "Heal",
@@ -697,7 +695,7 @@
     "Next": "Next:",
     "ContinueSetup": "Continue setup",
     "RemainingCharacterSetup": "Remaining character setup",
-    "NoSetupRemindersCheckAnyCharacter": "Ready to play: no setup reminders are left. Check any character-building warnings, then Begin play."
+    "NoSetupRemindersCheckAnyCharacter": "Ready to play: no setup reminders are left. Check any character-building warnings before the first session."
    },
    "ActorAgentMain": {
     "Hazards": "Hazards",

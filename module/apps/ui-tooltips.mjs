@@ -52,7 +52,6 @@ const actions = () => ({
   itemDelete: loc`Remove item`,
   toggleEditMode: loc`Edit character`,
   syncGrants: loc`Refresh grants`,
-  initializeStartingDice: loc`Starting dice`,
   startMission: loc`Start mission`,
   endMission: loc`End mission`,
   clearMission: loc`Clear mission`,

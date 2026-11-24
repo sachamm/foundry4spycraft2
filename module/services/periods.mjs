@@ -52,7 +52,7 @@ export function sessionGain(system, starting) {
   if (!starting || ![4, 6, 8, 10, 12].includes(die)) return { units: starting, die };
   return actionDiceGain(system, die, starting);
 }
-/** p.27: discard old ordinary dice and use starting counts; unentered level-zero creations wait. */
+/** p.27: discard old ordinary dice and use starting counts. */
 export function sessionDicePlan(actors) {
   return actors
     .filter(actor => actor.type === "agent")
@@ -61,15 +61,15 @@ export function sessionDicePlan(actors) {
         before = actor.system.actionDice?.value;
       if (!Number.isSafeInteger(starting) || starting < 0 || !Number.isSafeInteger(before) || before < 0)
         throw new Error(loc`${actor.name}: review the starting/current action-die count before starting a session.`);
-      const deferred =
-        actor.system.level === 0 && before === 0 && actor.flags?.spycraft2?.startingDiceCreation?.claimed === false;
       return {
         actor,
         before,
         // Fortune Favors the Bold (p.189) improves the dice gained at the start of each session.
-        value: deferred ? 0 : sessionGain(actor.system, starting).units,
+        value: sessionGain(actor.system, starting).units,
         starting,
-        deferred,
+        // Characters used to wait for a "Begin play" entry before their first session; none do now. A review saved
+        // by an older version can still hold such an entry, so the review below keeps reading it.
+        deferred: false,
         level: actor.system.level,
         die: actor.system.actionDice?.die ?? null
       };
@@ -289,7 +289,7 @@ export async function reviewUsagePeriod(options = {}) {
       .map((r, i) => {
         const a = r.actor,
           entry = r.entry,
-          optional = !entry || entry.deferred,
+          optional = !!entry?.deferred,
           entered = r.creation?.claimed === true || a.system.actionDice.value > 0;
         return (
           "<p><b>" +
@@ -360,7 +360,7 @@ export async function reviewUsagePeriod(options = {}) {
             balance = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
           if (!Number.isSafeInteger(balance) || balance < 0)
             throw new Error(loc`Confirm a whole nonnegative balance for ` + r.actor.name + ".");
-          const optional = !r.entry || r.entry.deferred,
+          const optional = !!r.entry?.deferred,
             entered = optional ? (input.entered?.[r.actor.uuid] ?? input["entered_" + i] === true) : true,
             patch = { "system.actionDice.value": balance };
           if (typeof entered !== "boolean") throw new Error(loc`Confirm whether ${r.actor.name} has entered play.`);

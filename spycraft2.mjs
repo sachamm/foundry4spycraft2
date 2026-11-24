@@ -8,6 +8,7 @@ import { registerActorFolderSetup, setupActorFolders } from "./module/actor-fold
 import { installDialogThemeHooks, registerTableTrustSetting } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
+import { installPoolMaxHooks } from "./module/apps/pool-max.mjs";
 import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
@@ -230,6 +231,7 @@ Hooks.once("init", () => {
   installShakenInitiativeHooks();
   installCombatStanceHooks();
   installPowerStanceInitiativeHooks();
+  installPoolMaxHooks();
   installFuriousStanceHooks();
   CONFIG.Actor.documentClass = SpycraftActor;
   CONFIG.Item.documentClass = SpycraftItem;

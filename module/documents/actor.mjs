@@ -11,6 +11,7 @@ import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
 import { agentTokenDefaults } from "../rules/creation-defaults.mjs";
+import { newAgentPoolMax, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
 
@@ -38,16 +39,15 @@ export class SpycraftActor extends ActorRolls(
       }
     }
     if ((data.type ?? this.type) === "agent") {
-      const creation = {
-          id: foundry.utils.randomID(),
-          session: String(this.usagePeriods.session ?? "initial"),
-          at: game.time?.worldTime ?? 0,
-          claimed: false
-        },
-        flags = {
-          ...(data.flags ?? this.flags ?? {}),
-          spycraft2: { ...(data.flags?.spycraft2 ?? this.flags?.spycraft2 ?? {}), startingDiceCreation: creation }
-        };
+      // A new agent starts with full vitality, wounds and action dice: it records empty maximums here, and the
+      // pool-max hooks (module/apps/pool-max.mjs) then raise each empty pool to its maximum.
+      const flags = {
+        ...(data.flags ?? this.flags ?? {}),
+        spycraft2: {
+          ...(data.flags?.spycraft2 ?? this.flags?.spycraft2 ?? {}),
+          [POOL_MAX_FLAG]: newAgentPoolMax(this._source?.system ?? data.system)
+        }
+      };
       data.flags = flags;
       updates.flags = flags;
       // A character entering the world (new, or imported from a compendium) has taken no stress or subdual

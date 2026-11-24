@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- **New agents start at full vitality, wounds and action dice.** A new agent starts at the Career Level 0
+  maximums, and every build choice that changes a maximum (a class level, a vitality roll, Constitution, an origin,
+  a feat) moves the current value by the same amount. In play, a raised maximum adds the increase and leaves damage
+  already taken; a lowered one removes the same amount but never knocks a character out by itself. Existing agents
+  keep their current values. The **Begin play** button is gone, since there is nothing left for it to fill. GC
+  action-die awards no longer wait for it, and a new agent's first session start gives starting dice as for anyone.
+  A character still opens in Edit mode while it has setup reminders and has not been through a session.
+
 ## 0.7.0 — 2026-11-23
 
 - **The system is now The Field Agent's Handbook.** Its rules data is used as Open Game Content under the Open
