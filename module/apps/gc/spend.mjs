@@ -1,4 +1,5 @@
 /** Spending GC action dice (pp.397–399, 424, 452): pay from the session pool, roll the right die and apply what can be applied. */
+import { snapshot, undoEntry, postUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { adjustGCDice, gcDiceStatus } from "../../services/gc-dice.mjs";
@@ -121,6 +122,9 @@ export async function spendGCDice(input = {}) {
   }
   if (plan.cost > status.value) return refuse(loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
 
+  // What the spend changes on the NPC is pictured first; scene and mission changes have their own way back.
+  const undoable = !["dramaticScene", "campaignQuality"].includes(input.id),
+    beforeSpend = actor && undoable ? snapshot(actor) : null;
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
   if (plan.cost > 0) {
@@ -202,6 +206,14 @@ export async function spendGCDice(input = {}) {
     // A private spend stays private: whispered to the GC, and its dice shown only there.
     ...(input.public ? {} : { whisper: gmWhisper(), blind: true })
   });
+  if (undoable)
+    try {
+      const entry = beforeSpend ? undoEntry(actor, beforeSpend, snapshot(actor)) : null;
+      if (entry || plan.cost > 0)
+        await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], { gcDice: plan.cost });
+    } catch (error) {
+      console.warn("Field Agent's Handbook | No Undo note could be left for this spend.", error);
+    }
   return { plan, die };
 }
 

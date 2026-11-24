@@ -26,7 +26,7 @@ import * as conflicts from "./conflicts.mjs";
 import * as tables from "./tables.mjs";
 import { addNpcToScene } from "./add-npc.mjs";
 import * as turn from "./console-turn.mjs";
-import { npcDamageSave } from "./npc-play.mjs";
+import { npcDamageSaveWithUndo } from "./npc-play.mjs";
 import { pressNewestCard } from "../keybindings.mjs";
 import {
   advanceClock,
@@ -115,7 +115,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       openCombatant: guard((event, target) => turn.openCombatant(game.combat, target.dataset.id)),
       actingAttack: guard((event, target) => turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event)),
       actingSpend: guard((event, target) => combat.spendTurnAction(game.combat?.combatant, target.dataset.kind)),
-      actingDamageSave: guard(() => npcDamageSave(game.combat?.combatant?.actor)),
+      actingDamageSave: guard(() => npcDamageSaveWithUndo(game.combat?.combatant?.actor)),
       actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),
       actingReady: guard(() => combat.readyCombatant(game.combat?.combatant)),
       cardNextStep: guard(() => {

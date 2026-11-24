@@ -31,6 +31,12 @@
   open "More mission tools" list.
 - **Shortcuts keep working after a mouse click.** Alt+B now acts on the card under the pointer or on your own newest
   card, never another GC's, and names the card. Alt+S waits for a turn change and follows the turn with one sheet.
+- **Undo for steps that changed a character.** Applying damage, a standard NPC's Damage save and a GC action-dice
+  spend each leave a one-line note, whispered to whoever did it, with an **Undo** button. Undo puts back the
+  numbers, conditions and tracker state from before the step, returns the GC dice, lets the damage card be applied
+  again, and warns first if a value has changed since.
+- **The NPC builder comes first in Edit**, under a pinned strip of the numbers the choices produce. Renaming an NPC
+  renames its prototype token and its placed tokens that still carry the old name, numbered ones included.
 - **Console dialogs have a Cancel button, a named main button and the cursor in the first field.** The spend-dice,
   complication, fluid initiative, combat reference and disposition dialogs show only the fields for the option
   chosen.

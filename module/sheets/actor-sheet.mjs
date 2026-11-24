@@ -135,7 +135,7 @@ import { SpycraftBrowser } from "../apps/browser.mjs";
 import {
   rollNpcSkill,
   callQualitySave,
-  npcDamageSave,
+  npcDamageSaveWithUndo,
   resetDamageTrack,
   manageDisposition,
   damageSaveState,
@@ -1778,7 +1778,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       ),
       // Buttons that hand the actor to a workflow.
       ...actorWorkflows({
-        npcDamageSave,
+        npcDamageSave: npcDamageSaveWithUndo,
         manageDisposition,
         npcPackages: manageNpcPackages,
         restAndRecover,

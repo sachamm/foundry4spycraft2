@@ -1,4 +1,5 @@
 /** Running NPCs at the table: skill checks, standard-NPC Damage saves and disposition (pp.331–332, 452, 457–458). */
+import { withUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { messageModeOption } from "../../rolls/message-mode.mjs";
@@ -269,6 +270,10 @@ export async function npcDamageSave(actor, input = null) {
   }
   return result;
 }
+
+/** The same save, from a sheet or the console, leaving an Undo note for what it changed. */
+export const npcDamageSaveWithUndo = (actor, input = null) =>
+  withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
 
 export async function resetDamageTrack(actor, { heal = null } = {}) {
   if (!actor.isOwner) return null;

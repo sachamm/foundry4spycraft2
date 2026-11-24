@@ -13,6 +13,7 @@
  * The rules are in module/rules/damage-application.mjs. Whoever applies damage must own the target: the GC, or the
  * target's own player.
  */
+import { snapshot, undoEntry, postUndo } from "./undo.mjs";
 import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
@@ -740,6 +741,8 @@ export async function applyDamage(message, options = {}) {
   let lines = [],
     pendingSave = null,
     result = null;
+  // A picture of the target before anything is written, so the application can be undone from chat.
+  const beforeDamage = snapshot(target);
   try {
     if (target.type === "vehicle") {
       if (damage < 1) return refuse(loc`A Damage save needs at least 1 point of damage.`);
@@ -862,6 +865,15 @@ export async function applyDamage(message, options = {}) {
     !attack.criticalShotApplied
   )
     await markCard(attackMessage, "criticalShotApplied", { damageMessageId: message.id }, { quiet: true });
+  try {
+    const entry = undoEntry(target, beforeDamage, snapshot(target));
+    if (entry)
+      await postUndo(loc`${damage} ${kind} damage applied to ${target.name}`, [entry], {
+        damageCard: { messageId: message.id, targetUuid: target.uuid }
+      });
+  } catch (error) {
+    console.warn("Field Agent's Handbook | No Undo note could be left for this damage.", error);
+  }
   return result ?? true;
 }
 

@@ -464,3 +464,14 @@ test("a dialog field marked for one choice shows only while that choice is made"
     '<input type="checkbox" name="a" /><select autofocus name="b"></select><input name="c" />'
   );
 });
+
+test("a renamed NPC takes its tokens along unless the GC named them by hand", async () => {
+  const { renamedTokenName } = await import("../module/rules/creation-defaults.mjs");
+  assert.equal(renamedTokenName("Guard", "Guard", "Sentry"), "Sentry");
+  assert.equal(renamedTokenName("Guard 3", "Guard", "Sentry"), "Sentry 3");
+  assert.equal(renamedTokenName("Guardian", "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard captain", "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("The Broker", "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard", "Guard", "Guard"), null);
+  assert.equal(renamedTokenName(undefined, "Guard", "Sentry"), null);
+});

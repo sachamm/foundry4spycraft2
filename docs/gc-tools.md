@@ -112,6 +112,14 @@ turn: the sheet it opened last closes when it opens the next one.
 
 Every control is also reachable with Tab; Enter submits a dialog and Esc cancels it.
 
+### Undo
+
+Applying damage from a card, rolling a standard NPC's Damage save and spending GC action dice each leave a short
+note in chat that only you see, with an **Undo** button. Undo restores what the step changed on the character
+(vitality, wounds, the damage track, conditions it added or removed, a defeated mark, an Initiative Count), gives
+back the GC dice, and frees the damage card to be applied again. If a number has moved again since, it asks before
+overwriting. A GC boost bought from a card cannot be undone.
+
 ## Standard NPC damage (pp.331–332, 452)
 
 Standard NPCs and animals show a Damage save line on their sheet. **Suffer damage** rolls against DC 10 + half of all damage taken this scene. A failure kills (lethal) or knocks out (subdual, stress); blast damage adds a failed save per 10 points missed; each die spent activating a critical hit is an automatic failure; each *tough* grade ignores one failed save per scene. Accumulated damage clears when a save fails or a new scene starts. The **save adjustment** field holds the +1 per wound / per 2 vitality conversion.

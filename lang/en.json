@@ -77,6 +77,9 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Npc": {
+   "PinnedResults": "What these choices give",
+   "PinnedXP": "XP reward",
+   "PinnedHealth": "Health",
    "DamageSave": "Damage save",
    "DamageTaken": "Damage taken",
    "NextDC": "Next DC",
@@ -1170,8 +1173,8 @@
    },
    "ActorNpcBuilder": {
     "NPCCreation": "NPC creation",
-    "UseManualStatBlock": "Use manual stat block",
-    "UseGradedNPCCreation": "Use graded NPC creation",
+    "UseManualStatBlock": "Type the numbers by hand instead",
+    "UseGradedNPCCreation": "Build from grades (works out the numbers and XP)",
     "ChooseGradesListedSkillsEquipmentPicks": "Choose grades, listed skills, equipment picks and qualities. Attributes below start at 10; changes are priced as attribute qualities. Other quality effects require GC adjudication.",
     "NPCTier": "NPC Tier",
     "NPCGroup": "NPC group",

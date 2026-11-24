@@ -27,6 +27,19 @@
       </div>{{/if}}{{/unless}}
     </div>
   </header>
+  {{#if editMode}}
+  {{!-- While editing, the numbers the choices produce stay in sight and the builder comes first. --}}
+  <div class="npc-pinned" role="status" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.ThreatLevel"}}</span><b class="sc2-value">{{system.effectiveThreatLevel}}</b></div>
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Attack"}}</span><b class="sc2-value">{{signed system.bab}}</b></div>
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value">{{system.defense.total}}</b></div>
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value">{{signed system.initiative.total}}</b></div>
+    {{#each saves}}<div class="sc2-field"><span class="sc2-caption">{{label}}</span><b class="sc2-value">{{signed total}}</b></div>{{/each}}
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.PinnedHealth"}}</span><b class="sc2-value">{{healthChip}}</b></div>
+    {{#if system.npcProfile.enabled}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.PinnedXP"}}</span><b class="sc2-value">{{system.npcBuild.xp}}</b></div>{{/if}}
+  </div>
+  {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
+  {{/if}}
   {{!-- Weapons first: attacking is what an NPC does most in play. --}}
   <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
   <ul class="item-list compact">
@@ -128,7 +141,6 @@
   {{else}}
   {{> "systems/spycraft2/templates/actor/npc-graded-play.hbs"}}
   {{/unless}}
-  {{#if editMode}}{{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}{{/if}}
   {{#if system.qualityEffects.notes.length}}<div class="npc-qualities-play">
     <h3>{{localize "SPYCRAFT.Template.ActorNpcSheet.QualitiesInPlay"}}</h3>
     <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>

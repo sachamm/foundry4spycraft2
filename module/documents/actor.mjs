@@ -10,7 +10,7 @@ import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
-import { agentTokenDefaults } from "../rules/creation-defaults.mjs";
+import { agentTokenDefaults, renamedTokenName } from "../rules/creation-defaults.mjs";
 import { newAgentPoolMax, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
@@ -90,6 +90,33 @@ export class SpycraftActor extends ActorRolls(
       }
     }
     if (Object.keys(updates).length) this.updateSource(updates, { recursive: false });
+  }
+
+  /** An NPC's prototype token follows a rename while it still carries the old name. */
+  async _preUpdate(changed, options, user) {
+    if ((await super._preUpdate(changed, options, user)) === false) return false;
+    if (this.type !== "npc" || typeof changed.name !== "string" || changed.name === this.name) return;
+    options.spycraft2RenamedFrom = this.name;
+    if (changed.prototypeToken?.name !== undefined) return;
+    const next = renamedTokenName(this.prototypeToken?.name, this.name, changed.name);
+    if (next) changed.prototypeToken = { ...(changed.prototypeToken ?? {}), name: next };
+  }
+
+  /** Placed tokens still called by the old name (with or without a number) follow too, on the renaming client. */
+  _onUpdate(changed, options, userId) {
+    super._onUpdate(changed, options, userId);
+    const old = options?.spycraft2RenamedFrom;
+    if (!old || this.type !== "npc" || userId !== game.user?.id || typeof changed.name !== "string") return;
+    for (const scene of game.scenes ?? []) {
+      const updates = [...scene.tokens]
+        .filter(token => token.actorId === this.id)
+        .map(token => ({ _id: token.id, name: renamedTokenName(token.name, old, changed.name) }))
+        .filter(update => update.name);
+      if (updates.length && scene.isOwner !== false)
+        scene
+          .updateEmbeddedDocuments("Token", updates)
+          .catch(error => console.warn("Field Agent's Handbook | Tokens kept their old name.", error));
+    }
   }
 
   toCompendium(pack, options = {}) {

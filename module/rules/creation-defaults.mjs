@@ -23,3 +23,15 @@ export function equipsAsFirstWeapon(data = {}, items = []) {
   for (const item of items) if (item.type === "weapon" && item.system?.equipped) return false;
   return true;
 }
+
+/**
+ * A token's name after its actor is renamed. A token still called by the old name, or by the old name and a number
+ * ("Guard 3"), follows the actor; one the GC named by hand is left alone (null).
+ */
+export function renamedTokenName(tokenName, oldName, newName) {
+  if (!oldName || !newName || oldName === newName || typeof tokenName !== "string") return null;
+  if (tokenName === oldName) return newName;
+  if (tokenName.startsWith(`${oldName} `) && /^\d+$/.test(tokenName.slice(oldName.length + 1)))
+    return `${newName}${tokenName.slice(oldName.length)}`;
+  return null;
+}
