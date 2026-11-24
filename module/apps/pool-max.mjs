@@ -1,5 +1,6 @@
 /**
- * Keeps each agent's current vitality, wounds and action dice in step with their maximums (module/rules/pool-max.mjs).
+ * Keeps each agent's current vitality, wounds and action dice in step with their maximums (module/rules/pool-max.mjs),
+ * and each NPC's vitality and wounds, so an NPC that becomes a special character starts unhurt.
  * One client writes for each agent (module/writers.mjs), after the change that moved a maximum has been saved. The
  * check follows every preparation, because a maximum can move without the agent itself changing: an item or effect,
  * a combat round ending a rage, or a teammate's Improved Fortune.
@@ -7,13 +8,15 @@
 import { worldMigrating } from "../migrations/index.mjs";
 import { primaryWriterFor } from "../writers.mjs";
 import { queueResources } from "../services/transactions.mjs";
-import { poolMaxPlan, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
+import { poolMaxPlan, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 
-const planFor = actor => poolMaxPlan(actor.system, actor.flags?.spycraft2?.[POOL_MAX_FLAG]);
+const planFor = actor => poolMaxPlan(actor.system, actor.flags?.spycraft2?.[POOL_MAX_FLAG], poolRules(actor.type));
+/** Agents, and NPCs: a special NPC's vitality and wounds come from its build and the Threat Level. */
+const followed = actor => actor?.type === "agent" || actor?.type === "npc";
 
 /** Write the plan for one agent. Returns the update written, or null when nothing changed. */
 export function followPoolMax(actor) {
-  if (actor?.type !== "agent" || !actor.isOwner) return null;
+  if (!followed(actor) || !actor.isOwner) return null;
   // Most updates move no maximum, so they are checked here without taking the character's resource lock.
   if (!Object.keys(planFor(actor)).length) return null;
   return queueResources(
@@ -31,7 +34,7 @@ export function followPoolMax(actor) {
 const pending = new WeakMap();
 /** Follow an agent's maximums soon, once for any number of calls in a row. */
 export function schedulePoolMax(actor) {
-  if (!actor || actor.type !== "agent" || !actor.isOwner) return;
+  if (!followed(actor) || !actor.isOwner) return;
   if (primaryWriterFor(actor)?.id !== game.user.id) return;
   if (worldMigrating()) return;
   const old = pending.get(actor);

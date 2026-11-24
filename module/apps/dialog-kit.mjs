@@ -20,6 +20,7 @@
  */
 import { esc, markup, markupFragment, raw, RawHTML } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { loc } from "../i18n.mjs";
 
 export { esc, markup, markupFragment, raw, RawHTML };
 export { refuse } from "../error-notices.mjs";
@@ -68,19 +69,39 @@ export function optionsMarkup({ intro, fields = [] }) {
   return markup`<div class="spycraft2-roll-options">${intro ? markupFragment`<p>${intro}</p>` : ""}${fields.map(fieldMarkup)}</div>`;
 }
 
+/** Put the keyboard in the first field a person fills in, so the submit button is not what Enter lands on first. */
+export function focusFirstField(content) {
+  let done = false;
+  return String(content).replace(/<(input|select|textarea)\b([^>]*)>/g, (tag, name, rest) => {
+    if (
+      done ||
+      /\bautofocus\b/.test(rest) ||
+      /type="(?:checkbox|radio|hidden)"/.test(rest) ||
+      /\bdisabled\b/.test(rest)
+    )
+      return tag;
+    done = true;
+    return `<${name} autofocus${rest}>`;
+  });
+}
+
 /**
  * Open a themed option dialog built from fields and resolve to its values by field name, or null if it is closed.
+ * The dialog has a Cancel button, its main button names the action, and the keyboard starts in the first field.
  * @param {object} spec
  * @param {string} spec.title
  * @param {string} [spec.intro]    One purpose line, shown first
  * @param {Array} spec.fields      See fieldMarkup()
+ * @param {string} [spec.ok]       Label of the main button: the action it takes ("Add objective"), not "Confirm"
  * @param {object} [spec.dialog]   Further DialogV2 options
  */
-export function formDialog({ title, intro, fields, dialog = {} }) {
+export function formDialog({ title, intro, fields, ok, dialog = {} }) {
   return systemDialog.input({
     window: { title },
     rejectClose: false,
-    content: optionsMarkup({ intro, fields }),
+    content: focusFirstField(optionsMarkup({ intro, fields })),
+    ok: { label: ok ?? loc`Confirm` },
+    buttons: [{ action: "cancel", label: loc`Cancel`, callback: () => null }],
     ...dialog
   });
 }

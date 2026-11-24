@@ -7,7 +7,8 @@ import {
   missionStanding,
   characterMissionXP,
   exposurePenalty,
-  defaultMission
+  defaultMission,
+  sessionDiceApplied
 } from "../../rules/gc/mission.mjs";
 import { qualityAddition, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
@@ -33,7 +34,7 @@ import { systemDialog } from "../dialog-theme.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -94,10 +95,12 @@ export async function editMission() {
 
 /** Begin the mission: the Threat Level is calculated once, now (p.423), and NPCs that follow the mission rescale. */
 /** Ask once before a step that resets characters' uses. */
-const confirmStep = (title, lines) =>
+const confirmStep = (title, lines, yes = title) =>
   systemDialog.confirm({
     window: { title },
     content: `<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>`,
+    yes: { label: yes },
+    no: { label: loc`Cancel` },
     rejectClose: false
   });
 
@@ -141,23 +144,81 @@ export async function nextScene() {
 
 export async function startMission() {
   requireGC();
+  const before = getMission();
+  // An ended record still holds the last run's results. Starting it again is a new run, so they are cleared first.
+  const hadResults =
+    before.ended &&
+    ((before.objectives ?? []).some(objective => objective.complete) ||
+      (before.antagonists ?? []).some(antagonist => antagonist.encountered) ||
+      (before.infractions ?? []).length > 0 ||
+      Object.keys(before.standingPaid ?? {}).length > 0);
+  if (hadResults) {
+    const ok = await confirmStep(loc`Start the mission again`, [
+      loc`This record was ended. Starting it again begins a new run of the same mission.`,
+      loc`Completed objectives, antagonists faced, infractions, scenes played and the standing payout are cleared.`,
+      loc`To carry on the run that was ended, cancel and use Resume mission.`
+    ]);
+    if (!ok) return null;
+  }
   // The mission record and the mission's usage period begin together: mission uses come back.
   await startUsagePeriod("mission");
-  await updateMission({ active: true, infractions: [], scenesPlayed: 0 });
+  await updateMission(mission => ({
+    active: true,
+    ended: false,
+    infractions: [],
+    scenesPlayed: 0,
+    standingPaid: {},
+    objectives: (mission.objectives ?? []).map(objective => ({ ...objective, complete: false })),
+    antagonists: (mission.antagonists ?? []).map(antagonist => ({ ...antagonist, encountered: false }))
+  }));
   const tl = await fixThreatLevel(),
     mission = getMission(),
     standing = missionStanding(mission);
   await say(
     `<b>${loc`Mission ${esc(mission.name || "")} begins.`}</b> ${loc`Threat Level`} <b>${tl.value}</b>${loc`${tl.override ? " (fixed)" : ` (${tl.base}${tl.adjust ? ` ${signed(tl.adjust)}` : ""})`}, Caliber ${mission.caliber}.${tl.bonusDice ? loc` Each player character starts each session with ${tl.bonusDice} extra action di${tl.bonusDice === 1 ? "e" : "ce"} (p.61).` : ""} Base standing reward: Reputation ${standing.reputation} or Net Worth ${money(standing.netWorth)}. GC starting dice: ${teamActors(mission).length} + ${2 * mission.caliber}.`}`
   );
+  // A session already under way began without this mission's Threat Level, so its bonus dice are given now (p.61).
+  if (sessionStarted()) await applySessionDiceAdjustments({ quiet: true });
   return tl;
 }
 
+/** End the mission after asking: the record stays for the XP report, settlement and the standing payout. */
 export async function endMission({ clear = false } = {}) {
   requireGC();
   const mission = getMission();
-  await setMission(clear ? defaultMission() : { ...mission, active: false });
+  if (clear) return setMission(defaultMission());
+  const open = (mission.objectives ?? []).filter(objective => !objective.complete).length;
+  const ok = await confirmStep(loc`End the mission`, [
+    loc`The mission stops being active: NPCs that follow the mission's Threat Level go back to their own.`,
+    loc`The record is kept, so the XP report, each agent's XP settlement and the standing payout still work.`,
+    ...(open ? [loc`${open} objective(s) are not marked complete.`] : []),
+    loc`Resume mission reopens it with nothing changed.`
+  ]);
+  if (!ok) return null;
+  await setMission({ ...mission, active: false, ended: true });
+  await say(
+    `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`
+  );
+  return true;
 }
+
+/** Reopen an ended mission exactly as it was: nothing is reset and no new usage period starts. */
+export async function resumeMission() {
+  requireGC();
+  const mission = getMission();
+  if (mission.active) return decline(loc`The mission is already active.`);
+  await setMission({ ...mission, active: true, ended: false });
+  await say(`<b>${loc`Mission ${esc(mission.name || "")} resumed.`}</b>`);
+  return true;
+}
+
+const sessionStarted = () => {
+  try {
+    return !!game.settings.get("spycraft2", "usagePeriods")?.session && gcDiceStatus().current;
+  } catch {
+    return false;
+  }
+};
 
 export async function addObjective() {
   requireGC();
@@ -382,8 +443,12 @@ export async function recordInfraction() {
   return penalty;
 }
 
-/** Per-session starting dice changes the base sheet does not know about: the Threat Level bonus (p.61) and campaign qualities. */
-export async function applySessionDiceAdjustments() {
+/**
+ * Per-session starting dice changes the base sheet does not know about: the Threat Level bonus (p.61) and campaign
+ * qualities. Each agent remembers what this session has already given, so running it again gives only the difference:
+ * a mission started after the session began still brings its Threat Level bonus, once.
+ */
+export async function applySessionDiceAdjustments({ quiet = false } = {}) {
   requireGC();
   const mission = getMission(),
     { effects } = currentCampaignEffects(),
@@ -391,20 +456,31 @@ export async function applySessionDiceAdjustments() {
   const session = String(game.settings.get("spycraft2", "usagePeriods")?.session ?? "initial");
   const bonus = mission.active && mission.threatLevel ? threatBonusActionDice(mission.threatLevel, levels) : 0,
     delta = bonus + (effects.startingActionDice ?? 0);
-  if (!delta) return decline(loc`No Threat Level or campaign-quality change to starting action dice applies.`);
+  const applied = actor => sessionDiceApplied(actor.flags?.spycraft2?.sessionDiceAdjusted, session);
+  const team = teamActors(mission);
+  if (!delta && !team.some(actor => applied(actor)?.change)) {
+    if (quiet) return 0;
+    return decline(loc`No Threat Level or campaign-quality change to starting action dice applies.`);
+  }
   const lines = [];
-  for (const actor of teamActors(mission)) {
-    if (actor.flags?.spycraft2?.sessionDiceAdjusted === session) {
+  for (const actor of team) {
+    const starting = actor.system.actionDice?.max ?? 0,
+      target = adjustedStartingDice(starting, effects, bonus),
+      change = target - starting,
+      before = applied(actor);
+    if (before && (before.change === null || before.change === change)) {
       lines.push(loc`${esc(actor.name)}: already adjusted this session`);
       continue;
     }
-    const starting = actor.system.actionDice?.max ?? 0,
-      target = adjustedStartingDice(starting, effects, bonus),
-      change = target - starting;
-    const value = Math.max(0, (actor.system.actionDice?.value ?? 0) + change);
-    await actor.update({ "system.actionDice.value": value, "flags.spycraft2.sessionDiceAdjusted": session });
-    lines.push(`${esc(actor.name)}: ${signed(change)} → ${value}`);
+    const step = change - (before?.change ?? 0);
+    const value = Math.max(0, (actor.system.actionDice?.value ?? 0) + step);
+    await actor.update({
+      "system.actionDice.value": value,
+      "flags.spycraft2.sessionDiceAdjusted": { session, change }
+    });
+    lines.push(`${esc(actor.name)}: ${signed(step)} → ${value}`);
   }
+  if (quiet && !lines.some(line => line.includes("→"))) return delta;
   await say(
     `<b>${loc`Starting action dice adjusted`}</b> ${loc`(Threat Level bonus ${signed(bonus)}; campaign qualities ${signed(effects.startingActionDice ?? 0)}).`}<br>${lines.join("<br>")}`
   );
@@ -447,34 +523,60 @@ export async function missionReport({ planned = false, whisper = true } = {}) {
   return xp;
 }
 
-/** Pay the Table 7.10 standing reward to every team member. */
+/**
+ * Pay the Table 7.10 standing reward to the team. The mission remembers who was paid, so a second press, or a retry
+ * after an interruption, pays only those still unpaid unless the GC asks for a correction.
+ */
 export async function awardStanding() {
   requireGC();
   const mission = getMission(),
     standing = missionStanding(mission),
-    { effects } = currentCampaignEffects();
-  const input = await ask(
-    loc`Award Reputation or Net Worth — Table 7.10`,
-    `
+    { effects } = currentCampaignEffects(),
+    team = teamActors(mission),
+    paid = mission.standingPaid ?? {};
+  const label = entry =>
+    entry.currency === "reputation" ? `Reputation ${signed(entry.amount)}` : `Net Worth +${money(entry.amount)}`;
+  const rows = team
+    .map(actor =>
+      paid[actor.id]
+        ? `<li>${loc`${esc(actor.name)}: already paid ${label(paid[actor.id])}`}</li>`
+        : `<li>${loc`${esc(actor.name)}: not paid yet`}</li>`
+    )
+    .join("");
+  const anyPaid = team.some(actor => paid[actor.id]),
+    allPaid = team.length > 0 && team.every(actor => paid[actor.id]);
+  const input = await formDialog({
+    title: loc`Award Reputation or Net Worth — Table 7.10`,
+    ok: allPaid ? loc`Pay again` : loc`Pay the unpaid`,
+    fields: [
+      raw(`
     <p>${loc`Each character earns this for completing the mission whether or not it succeeded; failed critical objectives are exposure infractions recorded separately. A Profession/Accomplishment check may raise it.`}</p>
+    <ul>${rows || `<li>${loc`No agents are on the team.`}</li>`}</ul>
     <label>${loc`Paid in`} <select name="currency">${options(
       [
         ["reputation", `Reputation ${signed(standing.reputation)}`],
         ["netWorth", `Net Worth +${money(standing.netWorth)}`]
       ],
       effects.gearRules === "freelance" ? "netWorth" : "reputation"
-    )}</select></label>`
-  );
+    )}</select></label>
+    ${anyPaid ? `<label><input type="checkbox" name="again" /> ${loc`Correction: also pay those already paid`}</label>` : ""}`)
+    ]
+  });
   if (!input) return null;
-  const amount = standing[input.currency];
-  for (const actor of teamActors(mission))
+  const amount = standing[input.currency],
+    due = team.filter(actor => input.again || !paid[actor.id]);
+  if (!due.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
+  const done = [];
+  for (const actor of due) {
     await actor.update({ [`system.${input.currency}`]: (actor.system[input.currency] ?? 0) + amount });
+    // Recorded agent by agent, so an interrupted payout knows where it stopped.
+    await updateMission(m => ({
+      standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: { currency: input.currency, amount } }
+    }));
+    done.push(actor.name);
+  }
   await say(
-    loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(
-      teamActors(mission)
-        .map(actor => actor.name)
-        .join(", ")
-    )}.`,
+    loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(done.join(", "))}.`,
     false
   );
   return amount;

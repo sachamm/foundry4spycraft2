@@ -9,6 +9,7 @@ const settings = new Map(),
   messages = [],
   warnings = [];
 let dialogAnswers = [],
+  confirmAnswers = [],
   diceQueue = [],
   idCounter = 0;
 const answer = (...list) => {
@@ -94,7 +95,7 @@ globalThis.foundry = {
           if (!dialogAnswers.length) throw new Error("Unexpected dialog");
           return dialogAnswers.shift();
         },
-        confirm: async () => true
+        confirm: async () => (confirmAnswers.length ? confirmAnswers.shift() : true)
       },
       ApplicationV2: class {
         render() {
@@ -305,6 +306,58 @@ test("exposure infractions reduce standing at once; standing award pays the Cali
   assert.equal(actors.get("a2").system.reputation, 14);
 });
 
+test("the standing award pays each agent once per mission; a correction pays again", async () => {
+  assert.deepEqual(Object.keys(state.getMission().standingPaid), ["a1", "a2", "a3", "a4"]);
+  answer({ currency: "reputation", again: false });
+  assert.equal(await mission.awardStanding(), null, "nobody is unpaid");
+  assert.equal(actors.get("a2").system.reputation, 14);
+  const record = state.getMission().standingPaid;
+  delete record.a3;
+  delete record.a4;
+  await state.updateMission({ standingPaid: record });
+  answer({ currency: "reputation", again: false });
+  await mission.awardStanding();
+  assert.equal(actors.get("a2").system.reputation, 14, "paid agents are skipped on a retry");
+  assert.equal(actors.get("a3").system.reputation, 26);
+  assert.match(lastMessage(), /to a3, a4\./);
+  answer({ currency: "reputation", again: true });
+  await mission.awardStanding();
+  assert.equal(actors.get("a2").system.reputation, 26, "the correction pays everyone");
+  for (const id of ["a2", "a3", "a4"]) await actors.get(id).update({ "system.reputation": 14 });
+});
+
+test("End mission asks first, keeps the record for settlement, and Resume reopens it unchanged", async () => {
+  confirmAnswers.push(false);
+  assert.equal(await mission.endMission(), null);
+  assert.equal(state.getMission().active, true, "cancelled");
+  assert.equal(await mission.endMission(), true);
+  let m = state.getMission();
+  assert.deepEqual([m.active, m.ended], [false, true]);
+  assert.match(lastMessage(), /ended/);
+  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6 }, "settlement still has the totals");
+  assert.equal(consoleContext().mission.ended, true);
+  await mission.resumeMission();
+  m = state.getMission();
+  assert.deepEqual([m.active, m.ended, m.infractions.length], [true, false, 2]);
+  assert.equal(m.objectives[0].complete, true);
+  assert.equal(await mission.resumeMission(), null, "already active");
+});
+
+test("starting an ended mission again asks, then clears the last run's results", async () => {
+  await mission.endMission();
+  confirmAnswers.push(false);
+  assert.equal(await mission.startMission(), null);
+  assert.equal(state.getMission().objectives[0].complete, true, "cancelled: nothing cleared");
+  await mission.startMission();
+  const m = state.getMission();
+  assert.deepEqual([m.active, m.ended, m.infractions.length, m.scenesPlayed], [true, false, 0, 0]);
+  assert.equal(m.objectives[0].complete, false);
+  assert.equal(m.antagonists[1].encountered, false);
+  assert.deepEqual(m.standingPaid, {});
+  await mission.changeEntry("objectives", m.objectives[0].id, "complete");
+  await mission.changeEntry("antagonists", m.antagonists[1].id, "encountered");
+});
+
 test("starting-dice adjustments apply once per session", async () => {
   await state.setCampaign({ qualities: ["bleak"] });
   await mission.applySessionDiceAdjustments();
@@ -312,6 +365,23 @@ test("starting-dice adjustments apply once per session", async () => {
   await mission.applySessionDiceAdjustments();
   assert.equal(actors.get("a1").system.actionDice.value, 1);
   await state.setCampaign({ qualities: [] });
+});
+
+test("a change that arrives after the first adjustment gives only the difference", async () => {
+  const a1 = actors.get("a1");
+  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2 });
+  await mission.applySessionDiceAdjustments();
+  assert.equal(a1.system.actionDice.value, 3, "the quality is gone, so its 2 dice come back");
+  assert.equal(a1.flags.spycraft2.sessionDiceAdjusted.change, 0);
+  a1.flags.spycraft2.sessionDiceAdjusted = "initial";
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments();
+  assert.equal(a1.system.actionDice.value, 3, "a flag from an older version counts as already adjusted");
+  await state.setCampaign({ qualities: [] });
+  for (const id of ["a1", "a2", "a3", "a4"]) {
+    actors.get(id).flags.spycraft2.sessionDiceAdjusted = undefined;
+    await actors.get(id).update({ "system.actionDice.value": 3 });
+  }
 });
 
 test("NPC skill check uses Competence or the skilled bonus plus the attribute", async () => {

@@ -65,6 +65,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       editMission: guard(() => mission.editMission()),
       startMission: guard(() => mission.startMission()),
       endMission: guard(() => mission.endMission()),
+      resumeMission: guard(() => mission.resumeMission()),
       clearMission: guard(async () => {
         if (
           await systemDialog.confirm({

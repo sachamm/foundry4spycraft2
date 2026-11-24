@@ -119,6 +119,13 @@
   },
   "Console": {
    "Time": "Time",
+   "MissionEnded": "ended",
+   "EndMissionHint": "Asks first. The record is kept for the XP report, XP settlement and standing",
+   "ResumeMission": "Resume mission",
+   "ResumeMissionHint": "Reopens the ended mission with nothing reset",
+   "StartAgain": "Start again",
+   "StartAgainHint": "Begins a new run: clears completed objectives, antagonists faced, infractions, scenes and the standing payout",
+   "StartMissionHint": "Fixes the Threat Level from the team, starts the mission period and gives any Threat Level bonus dice",
    "Scene": "Scene",
    "Dice": "GC dice",
    "Round": "Round",

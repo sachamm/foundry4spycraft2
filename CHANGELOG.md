@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- **Ending a mission is safe.** End mission asks first and says what it does, the console shows the mission as
+  ended, and **Resume mission** reopens it with nothing changed. The ended record still feeds the XP report and each
+  agent's XP settlement. **Start again** on an ended mission asks, then clears the last run's completed objectives,
+  antagonists faced, infractions, scenes and standing payout, so old results cannot count twice.
+- **The standing award pays each agent once per mission.** The dialog lists who has been paid, a second press pays
+  only those still unpaid, and a correction box pays again on purpose.
+- **Threat Level bonus dice arrive whichever button comes first.** Begin session and Start mission can be pressed in
+  either order; the second gives only the dice the first could not. The quickstart now lists Start mission first.
+- **A new special NPC starts unhurt.** An NPC's vitality and wounds now follow their maximums the way an agent's do:
+  a new NPC that becomes a special character starts full, a Threat Level change moves a hurt NPC by the same amount,
+  and existing NPCs keep their current values.
+- **Console dialogs have a Cancel button, a named main button and the cursor in the first field.**
+
 ## 0.7.0 — 2026-11-23
 
 - **New agents start at full vitality, wounds and action dice.** A new agent starts at the Career Level 0

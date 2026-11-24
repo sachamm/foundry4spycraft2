@@ -16,7 +16,8 @@ export const missionCatalog = {
 export function missionSettlementDefaults() {
   try {
     const mission = globalThis.game?.settings?.get("spycraft2", "mission");
-    if (!mission?.active) return { baseXP: 0, threatLevel: null };
+    // An ended mission still settles: its record is kept until the next one starts.
+    if (!mission?.active && !mission?.ended) return { baseXP: 0, threatLevel: null };
     const season = (globalThis.game.settings.get("spycraft2", "campaign")?.qualities ?? []).map(id => ({
       id,
       scripted: true

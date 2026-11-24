@@ -6,6 +6,11 @@
 import { same } from "./equal.mjs";
 
 export const FOLLOWED_POOLS = ["vitality", "wounds", "actionDice"];
+/** An NPC has no action dice of its own; its vitality and wounds exist only while it is a special character. */
+export const NPC_POOLS = ["vitality", "wounds"];
+/** The pools followed for one actor type, and whether a maximum of 0 empties the pool (an NPC that stops being special). */
+export const poolRules = type =>
+  type === "npc" ? { pools: NPC_POOLS, emptyAtZero: true } : { pools: FOLLOWED_POOLS, emptyAtZero: false };
 /** Where each agent records the maximums its current values last followed. */
 export const POOL_MAX_FLAG = "poolMax";
 
@@ -17,10 +22,10 @@ const whole = Number.isSafeInteger;
  * @param {object|null|undefined} seen  The maximums recorded last time. Missing means none were recorded yet: the
  *   current maximums are recorded and the current values are left as they are.
  */
-export function poolMaxPlan(system, seen) {
+export function poolMaxPlan(system, seen, { pools = FOLLOWED_POOLS, emptyAtZero = false } = {}) {
   const patch = {},
     next = {};
-  for (const key of FOLLOWED_POOLS) {
+  for (const key of pools) {
     const value = system?.[key]?.value,
       max = system?.[key]?.max;
     if (!whole(value) || !whole(max)) {
@@ -28,7 +33,8 @@ export function poolMaxPlan(system, seen) {
       continue;
     }
     next[key] = max;
-    const after = whole(seen?.[key]) && seen[key] !== max ? followedValue(key, value, max - seen[key], max) : value;
+    const moved = whole(seen?.[key]) && seen[key] !== max;
+    const after = !moved ? value : emptyAtZero && max === 0 ? 0 : followedValue(key, value, max - seen[key], max);
     if (after !== value) patch[`system.${key}.value`] = after;
   }
   if (!same(next, seen ?? null)) patch[`flags.spycraft2.${POOL_MAX_FLAG}`] = next;
@@ -40,9 +46,9 @@ export function poolMaxPlan(system, seen) {
  * the full maximum the way any rise is followed; a pool that already holds a value (a copy of a played character)
  * records nothing and keeps that value.
  */
-export function newAgentPoolMax(system) {
+export function newAgentPoolMax(system, pools = FOLLOWED_POOLS) {
   const seen = {};
-  for (const key of FOLLOWED_POOLS) if ((system?.[key]?.value ?? 0) === 0) seen[key] = 0;
+  for (const key of pools) if ((system?.[key]?.value ?? 0) === 0) seen[key] = 0;
   return seen;
 }
 
