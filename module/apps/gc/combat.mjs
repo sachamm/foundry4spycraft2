@@ -68,7 +68,7 @@ async function condition(actor, id, label) {
   try {
     await setConditionStatus(actor, id, true, { label });
   } catch (error) {
-    console.warn(loc`Spycraft 2.0 | ${label} not applied to ${actor.name}`, error);
+    console.warn(loc`Field Agent's Handbook | ${label} not applied to ${actor.name}`, error);
   }
 }
 

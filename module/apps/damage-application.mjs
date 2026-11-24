@@ -324,7 +324,7 @@ export async function resolveQuickAttack(message) {
     const known = declaredTarget(check);
     if (known) await resolveAttack(message, { targetUuid: known.actor.uuid, defense: "" });
   } catch (error) {
-    console.warn("Spycraft 2.0 | The quick attack was left for its card.", error);
+    console.warn("Field Agent's Handbook | The quick attack was left for its card.", error);
   }
   return message;
 }

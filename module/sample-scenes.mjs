@@ -45,7 +45,7 @@ export async function setupSampleScenes() {
     await game.settings.set(SYSTEM, SETTING, { status: "done" });
     ui.notifications.info(loc`Three sample scenes are ready in the Scenes tab.`);
   } catch (error) {
-    console.error(loc`Spycraft 2.0 | Sample scene setup failed`, error);
+    console.error(loc`Field Agent's Handbook | Sample scene setup failed`, error);
     ui.notifications.warn(
       loc`Sample scene setup could not finish. It will retry the next time the GC opens the world; you can also import scenes from the Sample Scenes compendium.`
     );

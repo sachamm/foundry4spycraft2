@@ -17,7 +17,7 @@ export function reportRecord(name, shape, value, log = console.warn) {
     if (reported.has(key)) continue;
     reported.add(key);
     log(
-      `Spycraft 2.0 | record "${name}"${path ? ` at ${path}` : ""}: ${problem}. Update module/data/record-shapes.mjs if this is intended.`
+      `Field Agent's Handbook | record "${name}"${path ? ` at ${path}` : ""}: ${problem}. Update module/data/record-shapes.mjs if this is intended.`
     );
   }
   return problems;

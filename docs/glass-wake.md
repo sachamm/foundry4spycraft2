@@ -4,7 +4,7 @@ Operation Glass Wake is an original first-session scenario for four level-1 agen
 
 ## Import and prepare
 
-Open **Compendium Packs → Spycraft 2.0 → Operation Glass Wake**, open the adventure and choose **Import Adventure**. No add-on module is required. The imported private GM journal begins with **Start Here — Import and Mission Setup** and includes the session run sheet. The separate Player Briefing has Observer access for players; PCs require player ownership assignments.
+Open **Compendium Packs → The Field Agent's Handbook → Operation Glass Wake**, open the adventure and choose **Import Adventure**. No add-on module is required. The imported private GM journal begins with **Start Here — Import and Mission Setup** and includes the session run sheet. The separate Player Briefing has Observer access for players; PCs require player ownership assignments.
 
 The adventure contains three scenes, nine actors, two journals with three pages, one macro and five folders. The reception stages Leila and Luc, Jun, Mara and Luka. The annex stages Niko and four independent watchkeepers. The warehouse stages Milo, four watchkeepers and Ada. Maps retain their walls, doors and lighting. The three scenes start inactive; move the agents between maps according to the route they take.
 

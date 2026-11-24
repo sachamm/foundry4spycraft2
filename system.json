@@ -1,7 +1,7 @@
 {
   "id": "spycraft2",
-  "title": "Spycraft 2.0",
-  "description": "Core rules and character options for the Spycraft 2.0 roleplaying game.",
+  "title": "The Field Agent's Handbook",
+  "description": "An unofficial espionage roleplaying system: core rules and character options built on Open Game Content.",
   "version": "0.7.0",
   "compatibility": {
     "minimum": "14",
@@ -321,7 +321,7 @@
   "bugs": "https://github.com/sachamm/foundry4spycraft2/issues",
   "packFolders": [
     {
-      "name": "Spycraft 2.0",
+      "name": "The Field Agent's Handbook",
       "sorting": "m",
       "color": "#1d2b3a",
       "packs": [

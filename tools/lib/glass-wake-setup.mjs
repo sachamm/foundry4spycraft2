@@ -1,7 +1,8 @@
 /** Serialized into the adventure's GM macro; keep this function independent of imports and closures. */
 export async function configureGlassWakeMission({ mission, emptyMission, participants }) {
   if (!game.user.isGM) return ui.notifications.warn("Only the GM can configure this mission.");
-  if (game.system.id !== "spycraft2") return ui.notifications.error("Operation Glass Wake requires Spycraft 2.0.");
+  if (game.system.id !== "spycraft2")
+    return ui.notifications.error("Operation Glass Wake requires The Field Agent's Handbook system.");
   const same = (a, b) => {
     if (a === b) return true;
     if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;

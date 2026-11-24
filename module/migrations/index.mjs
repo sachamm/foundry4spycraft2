@@ -193,12 +193,12 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
   if (from >= to) return { ...report, to: from };
   if (list.length) {
     world.notify?.(
-      loc`Updating world data for Spycraft 2.0 (${list.map(m => m.label ?? `version ${m.version}`).join("; ")}).`
+      loc`Updating world data for The Field Agent's Handbook (${list.map(m => m.label ?? `version ${m.version}`).join("; ")}).`
     );
     const options = { spycraft2Migration: to };
     const failed = (kind, document, error) => {
       report.failed += 1;
-      console.error(loc`Spycraft 2.0 | Could not migrate ${kind} ${document.name ?? document.id}`, error);
+      console.error(loc`Field Agent's Handbook | Could not migrate ${kind} ${document.name ?? document.id}`, error);
     };
     const migrate = async (kind, document, parentSource) => {
       try {
@@ -239,7 +239,10 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
         );
         report.updated += updates.length;
       } catch (error) {
-        console.warn(loc`Spycraft 2.0 | Retrying the items of ${actor.name ?? actor.id} one at a time`, error);
+        console.warn(
+          loc`Field Agent's Handbook | Retrying the items of ${actor.name ?? actor.id} one at a time`,
+          error
+        );
         for (const { item, update } of updates)
           try {
             await item.update(update, options);
@@ -277,7 +280,10 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
           await migration.world(world);
         } catch (error) {
           report.failed += 1;
-          console.error(loc`Spycraft 2.0 | Could not apply the ${migration.label ?? migration.version} setting`, error);
+          console.error(
+            loc`Field Agent's Handbook | Could not apply the ${migration.label ?? migration.version} setting`,
+            error
+          );
         }
     } finally {
       migrating = false;
@@ -322,7 +328,7 @@ export async function worldCompendiumDocuments(packs) {
       (pack.documentName === "Actor" ? actors : items).push(...documents);
     } catch (error) {
       skipped.push(pack.metadata.label ?? pack.collection ?? "");
-      console.error(loc`Spycraft 2.0 | Could not read a compendium for migration`, error);
+      console.error(loc`Field Agent's Handbook | Could not read a compendium for migration`, error);
     }
   }
   return { actors, items, skipped };

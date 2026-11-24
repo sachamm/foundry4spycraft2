@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build step for the Spycraft 2.0 system.
+ * Build step for The Field Agent's Handbook system.
  *
  *   src/data/*.json  ──►  module/rules/*tables.mjs  (generated rules tables)
  *                    ──►  packs/<name>/             (LevelDB compendium packs)
@@ -78,6 +78,8 @@ system.packs = Object.entries(packs).map(([name, pack]) => ({
       : { PLAYER: "OBSERVER", ASSISTANT: "OWNER" },
   flags: {}
 }));
-system.packFolders = [{ name: "Spycraft 2.0", sorting: "m", color: "#1d2b3a", packs: Object.keys(packs) }];
+system.packFolders = [
+  { name: "The Field Agent's Handbook", sorting: "m", color: "#1d2b3a", packs: Object.keys(packs) }
+];
 writeFileSync(join(ROOT, "system.json"), JSON.stringify(system, null, 2) + "\n");
 console.log("module/rules/tables.mjs and system.json updated");

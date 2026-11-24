@@ -4492,72 +4492,72 @@
   "lifestyle": [
    {
     "rank": 1,
-    "home": "Dorm, trailer, 1 bedroom apt(2)",
+    "home": "Dorm, trailer or one-bedroom flat (2)",
     "vehicle": "I/0",
-    "appearance": "Slummy - poor street look",
+    "appearance": "Slummy: shabby street clothes",
     "appearanceMod": -2
    },
    {
     "rank": 2,
-    "home": "Private quarters, 2 bedroom apt(4)",
+    "home": "Private quarters or two-bedroom flat (4)",
     "vehicle": "I/1",
-    "appearance": "Ragged - worn street look",
+    "appearance": "Ragged: tired street clothes",
     "appearanceMod": -1
    },
    {
     "rank": 3,
-    "home": "Private suite, loft, 1 bedroom house(6)",
+    "home": "Suite, loft or one-bedroom house (6)",
     "vehicle": "I/2",
-    "appearance": "Average - common street look",
+    "appearance": "Average: everyday street clothes",
     "appearanceMod": 0
    },
    {
     "rank": 4,
-    "home": "Condo, houseboat, 2 bedroom house(8)",
+    "home": "Condo, houseboat or two-bedroom house (8)",
     "vehicle": "II/1",
-    "appearance": "Trendy - last season's designer streetwear",
+    "appearance": "Trendy: stylish but a season behind",
     "appearanceMod": 0
    },
    {
     "rank": 5,
-    "home": "3 bedroom house, yacht, or any two (10)",
+    "home": "Three-bedroom house, yacht, or any two (10)",
     "vehicle": "II/2 or any two",
-    "appearance": "Fashionable - always-current streetwear",
+    "appearance": "Fashionable: current high-street style",
     "appearanceMod": 1
    },
    {
     "rank": 6,
-    "home": "Penthouse, 4 bedroom house (15)",
+    "home": "Penthouse or four-bedroom house (15)",
     "vehicle": "III/1",
-    "appearance": "Executive - power player look",
+    "appearance": "Executive: sharp business wear",
     "appearanceMod": 1
    },
    {
     "rank": 7,
-    "home": "Mountain aerie, 5 bedroom house (25)",
+    "home": "Mountain retreat or five-bedroom house (25)",
     "vehicle": "III/2",
-    "appearance": "Upscale - mogul look",
+    "appearance": "Upscale: tycoon wardrobe",
     "appearanceMod": 2
    },
    {
     "rank": 8,
-    "home": "Private compound, hidden base (50)",
+    "home": "Private compound or hidden base (50)",
     "vehicle": "IV/1",
-    "appearance": "Designer - personalized custom-fit",
+    "appearance": "Designer: tailored to fit",
     "appearanceMod": 2
    },
    {
     "rank": 9,
-    "home": "Mansion, chateaux, luxury liner (75)",
+    "home": "Mansion, château or luxury liner (75)",
     "vehicle": "IV/2",
-    "appearance": "Select - limited edition look",
+    "appearance": "Select: rare, limited pieces",
     "appearanceMod": 3
    },
    {
     "rank": 10,
     "home": "Palace or private island (100), or any three",
     "vehicle": "V/1 or any three",
-    "appearance": "Unique - perfect made-to-order",
+    "appearance": "Unique: bespoke, one of a kind",
     "appearanceMod": 4
    }
   ],

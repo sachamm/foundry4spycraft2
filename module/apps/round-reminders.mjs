@@ -161,7 +161,9 @@ export function installRoundReminders() {
       if (posted.has(key)) continue;
       posted.add(key);
       if (posted.size > 200) posted.delete(posted.values().next().value);
-      await post(reminder, combat).catch(error => console.warn(loc`Spycraft 2.0 | round reminder not posted`, error));
+      await post(reminder, combat).catch(error =>
+        console.warn(loc`Field Agent's Handbook | round reminder not posted`, error)
+      );
     }
   });
   Hooks.on("renderChatMessageHTML", renderButton);

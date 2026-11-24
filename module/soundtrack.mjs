@@ -42,7 +42,7 @@ export async function setupSoundtrack() {
     }
     await game.settings.set(SYSTEM, SETTING, true);
   } catch (error) {
-    console.error("Spycraft 2.0 | Soundtrack setup failed", error);
+    console.error("Field Agent's Handbook | Soundtrack setup failed", error);
     ui.notifications.warn(
       loc`Soundtrack setup could not finish. It will retry the next time the GC opens the world; you can also import the album from the Soundtrack compendium.`
     );

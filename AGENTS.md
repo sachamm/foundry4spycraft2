@@ -2,7 +2,7 @@
 
 ## Do not use copyrighted material
 
-The Spycraft 2.0 rulebook is not ours and is **not open content**. Nothing from it may be copied into this repository.
+The Spycraft 2.0 rulebook is not ours. This project uses the book's game mechanics as Open Game Content under the OGL 1.0a, but much of the book is reserved Product Identity (see [LICENSING.md](LICENSING.md)). Never use the book's setting, characters, organizations, stories or art. As a house rule, nothing from its text may be copied into this repository either.
 
 - Never commit the rulebook, extracts of it, page images or text dumps, in any format.
 - Game data may record **names, numbers, dice, DCs and table values** as bare labels. All descriptive text must be an original summary in our own words; never reuse the book's sentences, examples or flavour text.

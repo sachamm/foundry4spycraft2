@@ -6,7 +6,7 @@ In Foundry's Setup screen, open **Game Systems → Install System**, paste this 
 https://github.com/sachamm/foundry4spycraft2/releases/download/test-retro/system.json
 ```
 
-Requires Foundry 14. This package keeps the `spycraft2` ID and replaces any installed Spycraft 2.0 system; it does not install as a second system. Use a disposable test world for visual checks. If already installed and Foundry skips installation, unlock the package and uninstall/reinstall the system using this URL. Keep a backup of any edits made directly in the installed system or its compendiums.
+Requires Foundry 14. This package keeps the `spycraft2` ID and replaces any installed copy of the system; it does not install as a second system. Use a disposable test world for visual checks. If already installed and Foundry skips installation, unlock the package and uninstall/reinstall the system using this URL. Keep a backup of any edits made directly in the installed system or its compendiums.
 
 Future successful pushes to `feat/retro-spy-assets` publish a newer version. Use **Update System** from Setup to get it, then reload the browser. No local build, ZIP extraction, or folder copying is needed.
 

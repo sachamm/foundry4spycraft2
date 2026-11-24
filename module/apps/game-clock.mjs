@@ -485,7 +485,7 @@ export async function liftExpiredCondition(effect) {
       });
     }
   } catch (error) {
-    console.error(loc`Spycraft 2.0 | Could not end a timed condition`, error);
+    console.error(loc`Field Agent's Handbook | Could not end a timed condition`, error);
   } finally {
     lifting.delete(effect.uuid);
   }

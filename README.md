@@ -1,6 +1,6 @@
-# Spycraft 2.0 for Foundry VTT
+# The Field Agent's Handbook for Foundry VTT
 
-An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com) implementing the core rules and character options of the Spycraft 2.0 RPG.
+An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com) for espionage roleplaying. It implements core rules and character options built on Open Game Content; see [Legal](#legal).
 
 - **System ID:** `spycraft2`
 - **Foundry compatibility:** v14 (minimum 14, verified on 14.370)
@@ -9,7 +9,7 @@ An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com)
 
 The **Sample Level-1 Agents** compendium contains 16 fully built agents covering all 12 base classes, including four alternate builds. Each has completed creation choices, an example Caliber-II mission loadout, background, contacts, portrait and matching token. All 16 are copied into the Sample PCs Actor folder on the first GM launch; Tomas also receives his linked animal partner, Bracken. Additional copies can be imported from the compendium. See [the roster and build assumptions](docs/sample-agents.md) and [art gallery](assets/agents/catalog.html).
 
-The built-in **Operation Glass Wake** Adventure compendium prepares a first session for four level-1 agents: three staged encounters, four pregens, five NPCs, private GM notes, a player briefing and a mission-setup macro. Open **Compendium Packs → Spycraft 2.0 → Operation Glass Wake**, open the adventure and choose **Import Adventure**. Then read **Start Here — Import and Mission Setup** in the imported GM journal. The macro asks before preparing an inactive TL 1 / Caliber II mission and refuses to replace an existing mission record; review and start it through GC Console, then initialize session resources. Import is optional and leaves the active scene unchanged. Reimporting can replace this adventure's previously imported documents after Foundry's overwrite prompt. No separate add-on module is needed.
+The built-in **Operation Glass Wake** Adventure compendium prepares a first session for four level-1 agents: three staged encounters, four pregens, five NPCs, private GM notes, a player briefing and a mission-setup macro. Open **Compendium Packs → The Field Agent's Handbook → Operation Glass Wake**, open the adventure and choose **Import Adventure**. Then read **Start Here — Import and Mission Setup** in the imported GM journal. The macro asks before preparing an inactive TL 1 / Caliber II mission and refuses to replace an existing mission record; review and start it through GC Console, then initialize session resources. Import is optional and leaves the active scene unchanged. Reimporting can replace this adventure's previously imported documents after Foundry's overwrite prompt. No separate add-on module is needed.
 
 ## Development setup
 
@@ -21,7 +21,7 @@ ln -s "$PWD" \
   "$HOME/Library/Application Support/FoundryVTT/Data/systems/spycraft2"
 ```
 
-Then create a world using the **Spycraft 2.0** system.
+Then create a world using **The Field Agent's Handbook** system.
 
 ## Building
 
@@ -144,18 +144,22 @@ The Chat Messages sidebar has a text search and Character / Roll type filters. F
 
 ## Credits
 
-Erik Dewey created the [Spycraft 2.0 Character Generator spreadsheet](https://www.erikdewey.com/gaming.htm)
+Erik Dewey created the [character generator spreadsheet](https://www.erikdewey.com/gaming.htm)
 used for the initial data import. Its source archive is
 [spycraft2generator.zip](https://www.erikdewey.com/spycraft2generator.zip).
 
 ## Legal
 
-Spycraft is a trademark of Crafty Games. This project is unofficial and not affiliated with or endorsed by Crafty Games.
+This project is unofficial and is not affiliated with or endorsed by any game publisher. Trademarks belong to their owners.
+
+This project contains Open Game Content, used under the
+[Open Game License 1.0a](LICENSES/OGL-1.0a.txt). [LICENSING.md](LICENSING.md)
+identifies which parts are Open Game Content.
 
 See [Licensing and provenance](LICENSING.md) for existing file-level licenses,
 asset sources, soundtrack provenance, and unresolved permission questions.
 
-The rulebook's protected text must not be copied into this repository. Contributions must use bare labels and original summaries as required by [AGENTS.md](AGENTS.md). Legacy imported material still needs clearance or replacement; see [LICENSING.md](LICENSING.md). You need the rulebook to play.
+The source rulebook's text must not be copied into this repository. Contributions must use bare labels and original summaries as required by [AGENTS.md](AGENTS.md). Outstanding licensing exceptions are listed in [LICENSING.md](LICENSING.md). Rules descriptions here are short summaries with page references, so the GC needs the full printed rules to play.
 
 ## Installing in Foundry
 
@@ -331,7 +335,7 @@ ammunition planning and equip/remove controls. Printed stockpile sizes are label
 separately from ammunition remaining. Armor, gear and vehicles retain tables with
 clear action labels, empty-state guidance and contained scrolling at narrow widths.
 
-Spycraft roll and character dialogs use the dossier palette, readable inputs and
+Roll and character dialogs use the dossier palette, readable inputs and
 a confirmation footer outside the scrolling options. Unrelated Foundry dialogs
 keep their normal appearance. Toolbars include visible action labels, and compact
 icon controls have contextual names and tooltips.

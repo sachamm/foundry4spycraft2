@@ -64,7 +64,10 @@ export function queueResources(actors, work, { messages = [], allowPeriodReview 
     .catch(error => {
       if (error instanceof ResourceBusyError) {
         if (background && error instanceof ResourceLockedError)
-          console.debug("Spycraft 2.0 | Background bookkeeping skipped: the character stayed busy.", error.message);
+          console.debug(
+            "Field Agent's Handbook | Background bookkeeping skipped: the character stayed busy.",
+            error.message
+          );
         else refuseStep(error.message);
         return null;
       }

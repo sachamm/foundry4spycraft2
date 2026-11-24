@@ -22,10 +22,10 @@
    "Classified": "Classified"
   },
   "Sheet": {
-   "Agent": "Spycraft Agent Sheet",
-   "Npc": "Spycraft NPC Sheet",
-   "Item": "Spycraft Item Sheet",
-   "Vehicle": "Spycraft Vehicle Sheet"
+   "Agent": "Agent Sheet",
+   "Npc": "NPC Sheet",
+   "Item": "Item Sheet",
+   "Vehicle": "Vehicle Sheet"
   },
   "Tab": {
    "Main": "Main",
@@ -239,7 +239,7 @@
     "feat": "{actor} already has {name}. To take a feat more than once, raise “Times taken” on the feat itself.",
     "origin": "{actor} already has {name}."
    },
-   "MissingPack": "This compendium is missing from the installed system. Ask the GC to update or reinstall Spycraft 2.0."
+   "MissingPack": "This compendium is missing from the installed system. Ask the GC to update or reinstall The Field Agent's Handbook."
   },
   "Roll": {
    "Threat": "Threat!",
