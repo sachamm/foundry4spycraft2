@@ -8,7 +8,9 @@ import {
   pendingProposals,
   describeProposal,
   applyDefaultOwnership,
-  reviewOwnership
+  reviewOwnership,
+  appliedMessage,
+  announceNewOwnership
 } from "../module/apps/character-ownership.mjs";
 
 const gm = { id: "gm", name: "Game Control", isGM: true };
@@ -146,6 +148,36 @@ test("a row that changed while the review was open is not applied or remembered"
   assert.deepEqual(result, { applied: 1, changed: 1 });
   assert.deepEqual(updates, [["b", { ownership: { default: OWNERSHIP.OBSERVER } }]]);
   assert.deepEqual(saved.ownershipReviewDismissed, {});
+  delete globalThis.game;
+  delete globalThis.ui;
+});
+
+test("the GC is told who can now edit which character", () => {
+  const actor = agent("Breakwater");
+  assert.equal(
+    appliedMessage({ actor, player: sacha, changes: { u1: OWNERSHIP.OWNER } }),
+    "Sacha now owns Breakwater and can edit the sheet."
+  );
+  assert.equal(
+    appliedMessage({ actor, player: null, changes: { default: OWNERSHIP.OBSERVER } }),
+    "Every player can now see Breakwater."
+  );
+});
+
+test("a player is told on their own screen when the GC makes them an agent's owner", () => {
+  const shown = [];
+  globalThis.ui = { notifications: { info: text => shown.push(text) } };
+  globalThis.game = { user: { id: "u1", isGM: false } };
+  const actor = agent("Breakwater");
+  assert.equal(announceNewOwnership(actor, { ownership: { u1: OWNERSHIP.OWNER } }, {}, "gm"), true);
+  assert.match(shown[0], /owner of Breakwater/);
+  // Someone else's ownership, a lower level, the player's own change and the GC's client say nothing.
+  assert.equal(announceNewOwnership(actor, { ownership: { u2: OWNERSHIP.OWNER } }, {}, "gm"), false);
+  assert.equal(announceNewOwnership(actor, { ownership: { u1: OWNERSHIP.OBSERVER } }, {}, "gm"), false);
+  assert.equal(announceNewOwnership(actor, { ownership: { u1: OWNERSHIP.OWNER } }, {}, "u1"), false);
+  globalThis.game.user = gm;
+  assert.equal(announceNewOwnership(actor, { ownership: { u1: OWNERSHIP.OWNER } }, {}, "gm"), false);
+  assert.equal(shown.length, 1);
   delete globalThis.game;
   delete globalThis.ui;
 });

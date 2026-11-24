@@ -19,6 +19,12 @@
   partners are now always placed with linked tokens. On the first load, existing agents and companions are switched
   to linked tokens, and so are placed tokens with no changes of their own. Any placed token that does hold changes
   is listed for the GC: a ticked row copies the token's changes to the character, then links the token.
+- **Players can change their pictures.** Foundry's file browser needs the "Use File Browser" permission, which
+  players do not have by default, so clicking a portrait did nothing. Players now get a small dialog that takes a web
+  address or a Data folder path, with a preview. Users who can browse files still get Foundry's picker.
+- **The ownership review says what it did.** After the GC applies it, the GC is told who now owns which character,
+  and the player sees a notice that they can now edit the sheet. The review's rows no longer split the description
+  into a separate column.
 - **Style-guide audit, rules and results.** The Dying button follows the character's size instead of a fixed
   −1 to −9 band. A standard NPC built by hand no longer shows vitality and wounds boxes it does not use. Attack
   cards say "Critical hit" and "Critical miss"; other checks keep "Critical success" and "Critical failure". Threat

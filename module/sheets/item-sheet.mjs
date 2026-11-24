@@ -1,3 +1,4 @@
+import { editPortrait } from "../apps/portrait-picker.mjs";
 import { ruleName } from "../rules/rule-name.mjs";
 import { formatRange } from "../rules/outcome-labels.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
@@ -46,6 +47,8 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      // Players without Foundry's file browser can still change the picture (module/apps/portrait-picker.mjs).
+      editImage: editPortrait,
       reviewCandidate() {
         return reviewCandidate(this.item);
       },
