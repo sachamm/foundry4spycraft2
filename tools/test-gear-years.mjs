@@ -175,3 +175,15 @@ test("each browser part renders one root element, as Foundry's Handlebars parts 
     assert.equal(roots(hb.compile(source)(context)), 1, part);
   }
 });
+
+test("a house item helps with the same checks as the entry it is adapted from", async () => {
+  const { gearUsePlan } = await import("../module/rules/gear-play-rules.mjs");
+  const polygraph = packs.gear.docs.find(d => d.name === "Polygraph");
+  const plan = gearUsePlan("senseMotive", "detect-lie", { name: polygraph.name, system: polygraph.system });
+  assert.equal(plan.applies, true);
+  assert.equal(plan.capIncrease, 5);
+  assert.equal(
+    plan.bonuses.reduce((sum, b) => sum + (b.value ?? 0), 0),
+    1
+  );
+});

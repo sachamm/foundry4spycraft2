@@ -31,6 +31,9 @@ export function addPeriodGear({ equipment, gear, gearSummaries, vehicles, upgrad
     for (const row of rows) {
       if (!row.summary) throw new Error(`period-gear.json: ${row.name} needs a summary`);
       gearSummaries[row.name] = row.summary;
+      // Checks the source entry helps with (GEAR_RULES.skillUses, read by name at play time) carry over.
+      if (gear.skillUses?.[row.basedOn] && !gear.skillUses[row.name])
+        gear.skillUses[row.name] = structuredClone(gear.skillUses[row.basedOn]);
     }
     add(gear[list], rows);
   }

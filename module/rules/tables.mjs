@@ -9979,6 +9979,12 @@ export const GEAR_RULES = {
     "search/perception"
    ],
    "note": "also adds range penalties"
+  },
+  "Polygraph": {
+   "checks": [
+    "senseMotive/detect-lie"
+   ],
+   "gearBonus": 1
   }
  }
 };
