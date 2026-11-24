@@ -81,8 +81,8 @@ test("flat-footed ends as a combatant's turn begins, except in a surprise round 
       return this.turns[this.turn];
     }
   };
-  await Promise.all(hooks.combatStart.map(fn => fn(fight)));
-  assert.ok(a.actor.statuses.has("flat-footed") && b.actor.statuses.has("flat-footed"));
+  // The start is read from the combat's own update, so the lead GM marks a fight another GM began.
+  assert.equal(hooks.combatStart, undefined);
   for (const fn of hooks.updateCombat) await fn(fight, { round: 1, turn: 0 }, { direction: 1 });
   assert.ok(!a.actor.statuses.has("flat-footed"), "A acts first and is no longer flat-footed");
   assert.ok(b.actor.statuses.has("flat-footed"), "B has not acted yet");
@@ -383,6 +383,62 @@ test("Add NPC lists world NPCs before compendium ones, reuses an imported copy a
   });
 });
 
+test("Add NPC spreads copies over free squares, numbers them, sets the side and joins the fight", async () => {
+  const { spreadCorners, numberedNames, placementData, joinFight } = await import("../module/apps/gc/add-npc.mjs");
+  const corners = spreadCorners({
+    origin: { x: 200, y: 200 },
+    count: 4,
+    gridSize: 100,
+    occupied: [
+      { x: 200, y: 200 },
+      { x: 100, y: 100, width: 1, height: 1 }
+    ]
+  });
+  assert.equal(corners.length, 4);
+  assert.equal(new Set(corners.map(c => `${c.x},${c.y}`)).size, 4, "no two share a square");
+  assert.ok(!corners.some(c => (c.x === 200 && c.y === 200) || (c.x === 100 && c.y === 100)), "taken squares skipped");
+  assert.deepEqual(spreadCorners({ origin: { x: 0, y: 0 }, count: 1, gridSize: 100 }), [{ x: 0, y: 0 }]);
+  assert.ok(spreadCorners({ origin: { x: 0, y: 0 }, count: 5, gridSize: 100 }).every(c => c.x >= 0 && c.y >= 0));
+
+  assert.deepEqual(numberedNames("Guard", 1), ["Guard"]);
+  assert.deepEqual(numberedNames("Guard", 3), ["Guard 1", "Guard 2", "Guard 3"]);
+  assert.deepEqual(numberedNames("Guard", 2, ["Guard 1", "Guard 4", "Guardian"]), ["Guard 5", "Guard 6"]);
+  assert.deepEqual(numberedNames("Guard", 1, ["Guard"]), ["Guard 2"]);
+  assert.deepEqual(numberedNames("Dr. X (clone)", 1, ["Dr. X (clone) 2"]), ["Dr. X (clone) 3"]);
+
+  const rows = placementData(
+    { name: "Guard", actorLink: true, disposition: 0 },
+    {
+      corners: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 }
+      ],
+      names: ["Guard 1", "Guard 2"],
+      hidden: true
+    }
+  );
+  assert.deepEqual(rows[1], { name: "Guard 2", actorLink: false, disposition: -1, x: 100, y: 0, hidden: true });
+  const kept = placementData(
+    { name: "Boss", actorLink: true, disposition: 1 },
+    { corners: [{ x: 0, y: 0 }], names: ["Boss"], disposition: "keep" }
+  );
+  assert.deepEqual([kept[0].actorLink, kept[0].disposition], [true, 1]);
+
+  const created = [];
+  const fight = {
+    combatants: [{ actorId: "guard", initiative: 14 }],
+    createEmbeddedDocuments: async (_type, data) => (created.push(...data), data)
+  };
+  await joinFight(fight, [
+    { id: "t1", actorId: "guard", hidden: false, parent: { id: "s1" } },
+    { id: "t2", actorId: "thug", hidden: true, parent: { id: "s1" } }
+  ]);
+  assert.deepEqual(created, [
+    { tokenId: "t1", sceneId: "s1", actorId: "guard", hidden: false, initiative: 14 },
+    { tokenId: "t2", sceneId: "s1", actorId: "thug", hidden: true }
+  ]);
+});
+
 test("an NPC sheet may be narrower than an agent sheet", async () => {
   const { sheetPlacement } = await import("../module/sheets/sheet-placement.mjs");
   const room = { width: 1280, height: 720, sidebar: 348, open: 0 };
@@ -390,4 +446,39 @@ test("an NPC sheet may be narrower than an agent sheet", async () => {
   assert.equal(sheetPlacement({ width: 860, height: 760 }, { ...room, width: 1000 }, "agent").width, 640);
   assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "npc").width, 420);
   assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "agent").width, 640);
+});
+
+test("a dialog field marked for one choice shows only while that choice is made", async () => {
+  const { whenMatches, focusFirstField } = await import("../module/apps/dialog-kit.mjs");
+  const form = { kind: "security", id: "ready" };
+  const valueOf = name => form[name];
+  assert.equal(whenMatches("kind=security", valueOf), true);
+  assert.equal(whenMatches("kind=bundle|other", valueOf), false);
+  assert.equal(whenMatches("id!=press|ready", valueOf), false);
+  assert.equal(whenMatches("id!=press", valueOf), true);
+  assert.equal(whenMatches("", valueOf), true, "an unmarked field always shows");
+  assert.equal(whenMatches("missing=x", valueOf), false);
+  // The keyboard starts in the first field a person fills in, not on a tick box or the submit button.
+  assert.equal(
+    focusFirstField('<input type="checkbox" name="a" /><select name="b"></select><input name="c" />'),
+    '<input type="checkbox" name="a" /><select autofocus name="b"></select><input name="c" />'
+  );
+});
+
+test("a renamed NPC takes its tokens along unless the GC named them by hand", async () => {
+  const { renamedTokenName } = await import("../module/rules/creation-defaults.mjs");
+  assert.equal(renamedTokenName("Guard", "Guard", "Sentry"), "Sentry");
+  assert.equal(renamedTokenName("Guard 3", "Guard", "Sentry"), "Sentry 3");
+  assert.equal(renamedTokenName("Guardian", "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard captain", "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("The Broker", "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard", "Guard", "Guard"), null);
+  assert.equal(renamedTokenName(undefined, "Guard", "Sentry"), null);
+});
+
+test("a dialog's Cancel button answers like closing the dialog", async () => {
+  const { cancellable } = await import("../module/apps/dialog-kit.mjs");
+  assert.equal(await cancellable(async () => "cancel", {}), null, "Foundry answers a plain button with its name");
+  assert.deepEqual(await cancellable(async options => options, { name: "x" }), { name: "x" });
+  assert.equal(await cancellable(async () => null, {}), null);
 });

@@ -206,3 +206,27 @@
     padding-inline: 0;
   }
 }
+
+/* Edit mode: the numbers the build produces stay pinned above the builder while the page scrolls. */
+.spycraft2.sheet.npc .npc-pinned {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5em, 1fr));
+  gap: 2px 8px;
+  margin: 4px 0;
+  padding: 4px 8px;
+  background: var(--sc2-surface-raised);
+  border: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 30%, transparent));
+  border-radius: var(--sc2-radius);
+}
+.spycraft2.sheet.npc .npc-pinned .sc2-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.spycraft2.sheet.npc .npc-pinned .sc2-value {
+  font-family: var(--sc2-num);
+  overflow-wrap: anywhere;
+}

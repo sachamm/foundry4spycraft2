@@ -966,3 +966,19 @@
 .spycraft2 .ability-abbr {
   display: none;
 }
+
+/* A pick list keeps the rows its size asks for; Foundry's one-line select height would cut it to a single row. */
+.spycraft2-roll-options select.sc2-pick-list {
+  height: auto;
+  min-height: 15em;
+  padding: 2px;
+}
+.spycraft2-roll-options select.sc2-pick-list option {
+  padding: 2px 6px;
+}
+
+/* A field that belongs to another choice stays out of the way until that choice is made. */
+.spycraft2.application .spycraft2-roll-options [data-when][hidden],
+.spycraft2-roll-options [data-when][hidden] {
+  display: none;
+}

@@ -8,7 +8,7 @@ import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -72,7 +72,8 @@ export async function securityDeviceDialog() {
       "show"
     )}</select></label>
     <label>${loc`Intruder's opposed result, or target's Defense`} <input type="number" name="target" value="10" /></label>
-    <label>${loc`Reflex save result (save-based traps)`} <input type="number" name="save" /></label>`
+    <label>${loc`Reflex save result (save-based traps)`} <input type="number" name="save" /></label>`,
+    loc`Look up`
   );
   if (!input) return null;
   let device;
@@ -130,7 +131,8 @@ export async function hazardLookupDialog() {
     <p>${loc`These events cost 1–4 GC action dice (one less if a listed trigger has occurred); the effect depends on the dice spent.`}</p>
     <label>${loc`Hazard`} <select name="hazard"><option value="">—</option>${options(names("hazards").map(name => [name, name]))}</select></label>
     <label>${loc`Nature’s fury`} <select name="fury"><option value="">—</option>${options(names("naturesFury").map(name => [name, name]))}</select></label>
-    <label>${loc`Action dice spent`} <input type="number" name="cost" min="1" max="8" value="1" /></label>`
+    <label>${loc`Action dice spent`} <input type="number" name="cost" min="1" max="8" value="1" /></label>`,
+    loc`Look up`
   );
   if (!input) return null;
   const key = input.hazard ? "hazards" : "naturesFury",
@@ -159,7 +161,8 @@ export async function eventReferenceDialog() {
   requireGC();
   const input = await ask(
     loc`GC events — pp.399–404`,
-    `<label>${loc`Event`} <select name="id">${options(T.events.map(event => [event.id, event.name]))}</select></label>`
+    `<label>${loc`Event`} <select name="id">${options(T.events.map(event => [event.id, event.name]))}</select></label>`,
+    loc`Show event`
   );
   if (!input) return null;
   const event = T.events.find(entry => entry.id === input.id);
@@ -173,7 +176,8 @@ export async function randomPossessionsDialog() {
   requireGC();
   const input = await ask(
     loc`Random possessions — Table 7.16`,
-    `<label>${loc`NPC`} <select name="id">${options(T.rollTables.map(table => [table.id, table.name]))}</select></label><label>${loc`Rolls`} <input type="number" name="count" min="1" max="10" value="1" /></label>`
+    `<label>${loc`NPC`} <select name="id">${options(T.rollTables.map(table => [table.id, table.name]))}</select></label><label>${loc`Rolls`} <input type="number" name="count" min="1" max="10" value="1" /></label>`,
+    loc`Roll`
   );
   if (!input) return null;
   const table = T.rollTables.find(entry => entry.id === input.id),

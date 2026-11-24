@@ -15,9 +15,10 @@ are printed page numbers of the rulebook.
 
 ## When play begins
 
-1. Press **Begin session**. This starts the session, sets up the GC action dice and gives each agent its starting
-   action dice.
-2. Press **Start mission** the first time the mission is played.
+1. Press **Start mission** the first time the mission is played. This fixes the Threat Level from the team.
+2. Press **Begin session** at the start of every session. This starts the session, sets up the GC action dice and
+   gives each agent its starting action dice, with any Threat Level bonus. The two can be pressed in either order:
+   whichever comes second adds only what the first could not.
 3. Press **Next scene** each time the scene changes.
 
 ## The first combat

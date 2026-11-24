@@ -341,12 +341,12 @@
 .gc-console-body .gc-current-turn {
   font-weight: 700;
 }
-.gc-console-body .gc-current-turn::before {
+.gc-console-body .gc-current-turn .gc-row-name::before {
   content: "▶ ";
 }
-.gc-console-body [data-defeated="true"] {
-  text-decoration: line-through;
-  opacity: 0.7;
+/* Defeated is said in words on the row; the name stays readable. */
+.gc-console-body [data-defeated="true"] .gc-row-name {
+  color: var(--sc2-ink-muted);
 }
 
 /* Label and value pairs for the mission, XP and GC action dice lines. */
@@ -374,4 +374,100 @@
 }
 .gc-console-body .gc-facts .gc-note {
   font-size: var(--sc2-text-s);
+}
+
+/* Prep, Play and Wrap-up: one console, three views. A search looks through every section whatever the view. */
+.gc-console-body .gc-views {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0.4rem 0;
+}
+.gc-console-body .gc-views button {
+  width: 100%;
+  min-height: 32px;
+}
+.gc-console-body .gc-views button[aria-pressed="true"] {
+  color: var(--sc2-on-bar);
+  background: var(--sc2-bar);
+  font-weight: 700;
+}
+.gc-console-body details.gc-section[data-view-hidden="true"]:not([data-tool-search-active="true"]) {
+  display: none;
+}
+.gc-console-body .gc-now .gc-note {
+  display: block;
+  font-size: var(--sc2-text-s);
+}
+/* The first-session steps, the wrap-up steps and the acting combatant are raised panels above the sections. */
+.gc-console-body :is(.gc-checklist, .gc-wrap, .gc-acting) {
+  margin: 0.4rem 0;
+  padding: 6px 8px;
+  background: var(--sc2-surface-raised);
+  border: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 30%, transparent));
+  border-radius: var(--sc2-radius);
+}
+.gc-console-body :is(.gc-checklist, .gc-wrap, .gc-acting) h3 {
+  margin: 0 0 0.3em;
+  font: 700 var(--sc2-text-m) / 1.3 var(--font-primary, sans-serif);
+}
+.gc-console-body :is(.gc-checklist, .gc-wrap) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gc-console-body .gc-wrap li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 2px 0;
+}
+.gc-console-body .gc-checklist li {
+  display: grid;
+  grid-template-columns: 1.4em minmax(0, 1fr);
+  gap: 2px 4px;
+  padding: 2px 0;
+}
+.gc-console-body .gc-checklist li button {
+  grid-column: 2;
+  justify-self: start;
+}
+.gc-console-body .gc-checklist li[data-done="true"] {
+  color: var(--sc2-ink-muted);
+}
+.gc-console-body .gc-checklist li[aria-current="step"] {
+  font-weight: 700;
+}
+.gc-console-body :is(.gc-checklist, .gc-wrap) li button {
+  width: auto;
+  flex: 0 0 auto;
+}
+/* A combat row is one button: it shows the token and opens the sheet. */
+.gc-console-body ul.gc-combat-rows {
+  padding: 0;
+  list-style: none;
+}
+.gc-console-body .gc-row-button {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 28px;
+  padding: 2px 6px;
+  text-align: left;
+  line-height: 1.3;
+  white-space: normal;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.gc-console-body .gc-row-button:is(:hover, :focus-visible) {
+  border-color: currentColor;
+}
+.gc-console-body .gc-acting h3 .gc-row-button {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+.gc-console-body .gc-row-count {
+  font-family: var(--sc2-num);
 }

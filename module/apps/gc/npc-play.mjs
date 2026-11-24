@@ -1,4 +1,5 @@
 /** Running NPCs at the table: skill checks, standard-NPC Damage saves and disposition (pp.331–332, 452, 457–458). */
+import { withUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { messageModeOption } from "../../rolls/message-mode.mjs";
@@ -21,7 +22,7 @@ import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -121,7 +122,8 @@ export async function rollNpcSkill(actor, input = null) {
       <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
       <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" value="1" /></label>
       ${qualityCheckContent(actor.system.qualityEffects)}
-      <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`
+      <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`,
+      loc`Roll`
     );
     if (!input) return null;
   }
@@ -220,7 +222,8 @@ export async function npcDamageSave(actor, input = null) {
       )}</select></label>
       <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
       <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
-      <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`
+      <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
+      loc`Roll Damage save`
     );
     if (!input) return null;
   }
@@ -267,6 +270,10 @@ export async function npcDamageSave(actor, input = null) {
   }
   return result;
 }
+
+/** The same save, from a sheet or the console, leaving an Undo note for what it changed. */
+export const npcDamageSaveWithUndo = (actor, input = null) =>
+  withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
 
 export async function resetDamageTrack(actor, { heal = null } = {}) {
   if (!actor.isOwner) return null;
@@ -330,13 +337,14 @@ export async function manageDisposition(actor) {
       ],
       "show"
     )}</select></label>
-    <label>${loc`Shift (positive is friendlier)`} <input type="number" name="steps" value="1" /></label>
-    <label><input type="checkbox" name="automatic" /> ${loc`The shift comes from an ability that shifts disposition automatically (once per mission)`}</label>
-    <label>${loc`Grade to set`} <select name="grade">${options(
+    <label data-when="action=shift">${loc`Shift (positive is friendlier)`} <input type="number" name="steps" value="1" /></label>
+    <label data-when="action=shift"><input type="checkbox" name="automatic" /> ${loc`The shift comes from an ability that shifts disposition automatically (once per mission)`}</label>
+    <label data-when="action=set">${loc`Grade to set`} <select name="grade">${options(
       DISPOSITIONS.map(grade => [grade.id, grade.name]),
       "neutral"
     )}</select></label>
-    <label>${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`
+    <label data-when="action=loyalty|combat">${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`,
+    loc`Apply`
   );
   if (!input) return null;
   const targetId = input.target || "",

@@ -1,4 +1,5 @@
 /** Spending GC action dice (pp.397–399, 424, 452): pay from the session pool, roll the right die and apply what can be applied. */
+import { snapshot, undoEntry, postUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { adjustGCDice, gcDiceStatus } from "../../services/gc-dice.mjs";
@@ -19,7 +20,7 @@ import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from ".
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -74,22 +75,23 @@ export async function spendGCDice(input = {}) {
       loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
-      <label>${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
-      <label>${loc`Threat scored with`} <select name="checkKind">${options(
+      <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
+      <label data-when="id=activateThreat">${loc`Threat scored with`} <select name="checkKind">${options(
         [
           ["attack", "an attack"],
           ["skill", "a skill check"]
         ],
         "attack"
       )}</select></label>
-      <label>${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
-      <label>${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
-      <label>${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
-      <label><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
-      <label><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
-      <label>${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
-      <label><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
-      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`
+      <label data-when="id=activateThreat|activateError">${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
+      <label data-when="id=event">${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
+      <label data-when="id=event">${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
+      <label data-when="id=event"><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
+      <label data-when="id=event"><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
+      <label data-when="id=campaignQuality">${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
+      <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
+      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
+      loc`Spend dice`
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };
@@ -120,6 +122,9 @@ export async function spendGCDice(input = {}) {
   }
   if (plan.cost > status.value) return refuse(loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
 
+  // What the spend changes on the NPC is pictured first; scene and mission changes have their own way back.
+  const undoable = !["dramaticScene", "campaignQuality"].includes(input.id),
+    beforeSpend = actor && undoable ? snapshot(actor) : null;
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
   if (plan.cost > 0) {
@@ -201,6 +206,14 @@ export async function spendGCDice(input = {}) {
     // A private spend stays private: whispered to the GC, and its dice shown only there.
     ...(input.public ? {} : { whisper: gmWhisper(), blind: true })
   });
+  if (undoable)
+    try {
+      const entry = beforeSpend ? undoEntry(actor, beforeSpend, snapshot(actor)) : null;
+      if (entry || plan.cost > 0)
+        await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], { gcDice: plan.cost });
+    } catch (error) {
+      console.warn("Field Agent's Handbook | No Undo note could be left for this spend.", error);
+    }
   return { plan, die };
 }
 

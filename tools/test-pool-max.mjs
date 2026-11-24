@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { poolMaxPlan, newAgentPoolMax, followedValue } from "../module/rules/pool-max.mjs";
+import { poolMaxPlan, newAgentPoolMax, followedValue, poolRules } from "../module/rules/pool-max.mjs";
 
 const pools = (vitality, wounds, actionDice) => ({
   vitality: { value: vitality[0], max: vitality[1] },
@@ -217,4 +217,35 @@ test("any re-preparation after the world is ready (a combat round, a teammate's 
   } finally {
     game.ready = false;
   }
+});
+
+test("an NPC follows vitality and wounds only: a new special NPC starts full, and one that stops being special empties", () => {
+  const rules = poolRules("npc");
+  assert.deepEqual(rules.pools, ["vitality", "wounds"]);
+  const blank = { vitality: { value: 0, max: 0 }, wounds: { value: 0, max: 0 }, actionDice: { value: 0, max: 3 } };
+  const seen = newAgentPoolMax(blank, rules.pools);
+  assert.deepEqual(seen, { vitality: 0, wounds: 0 });
+  // The type changes to special: both maximums rise from 0 and the current values follow.
+  const special = { ...blank, vitality: { value: 0, max: 40 }, wounds: { value: 0, max: 12 } };
+  assert.deepEqual(poolMaxPlan(special, seen, rules), {
+    "system.vitality.value": 40,
+    "system.wounds.value": 12,
+    "flags.spycraft2.poolMax": { vitality: 40, wounds: 12 }
+  });
+  // A Threat Level change moves a hurt NPC by the same amount.
+  const hurt = { vitality: { value: 10, max: 50 }, wounds: { value: 12, max: 14 } };
+  assert.deepEqual(poolMaxPlan(hurt, { vitality: 40, wounds: 12 }, rules), {
+    "system.vitality.value": 20,
+    "system.wounds.value": 14,
+    "flags.spycraft2.poolMax": { vitality: 50, wounds: 14 }
+  });
+  // Back to a standard NPC: nothing is left in either pool.
+  const standard = { vitality: { value: 20, max: 0 }, wounds: { value: 14, max: 0 } };
+  assert.deepEqual(poolMaxPlan(standard, { vitality: 50, wounds: 14 }, rules), {
+    "system.vitality.value": 0,
+    "system.wounds.value": 0,
+    "flags.spycraft2.poolMax": { vitality: 0, wounds: 0 }
+  });
+  // An NPC made before this was added records its maximums and keeps its values.
+  assert.deepEqual(poolMaxPlan(hurt, undefined, rules), { "flags.spycraft2.poolMax": { vitality: 50, wounds: 14 } });
 });

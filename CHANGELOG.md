@@ -1,5 +1,49 @@
 # Changelog
 
+## Unreleased
+
+- **Ending a mission is safe.** End mission asks first and says what it does, the console shows the mission as
+  ended, and **Resume mission** reopens it with nothing changed. The ended record still feeds the XP report and each
+  agent's XP settlement. **Start again** on an ended mission asks, then clears the last run's completed objectives,
+  antagonists faced, infractions, scenes and standing payout, so old results cannot count twice.
+- **The standing award pays each agent once per mission.** The dialog lists who has been paid, a second press pays
+  only those still unpaid, and a correction box pays again on purpose.
+- **Threat Level bonus dice arrive whichever button comes first.** Begin session and Start mission can be pressed in
+  either order; the second gives only the dice the first could not. The quickstart now lists Start mission first.
+- **A new special NPC starts unhurt.** An NPC's vitality and wounds now follow their maximums the way an agent's do:
+  a new NPC that becomes a special character starts full, a Threat Level change moves a hurt NPC by the same amount,
+  and existing NPCs keep their current values.
+- **The combat tracker's right-click menu is back on Foundry 14**, with new one-step entries: **Delay 1 Count**,
+  **Delay…**, **Ready an action** and **Readied action triggered**. A readied combatant is marked on its row.
+- **Henchman and Mastermind critical rules are applied.** An attack that names such an NPC as its target threatens
+  on a narrower range and its critical hit costs more action dice; the attack card says so.
+- **A fight begun by any GM starts flat-footed.** The lead GM marks the fight whoever pressed Begin combat.
+- **Group Initiative rolls NPCs only.** An agent no player owns is named in the report instead of being rolled.
+- **The GC Console has Prep, Play and Wrap-up views.** It picks one from the state of play and keeps your choice
+  until that state changes. Prep carries a first-session list that ticks itself; Wrap-up lists the closing steps.
+  The strip at the top now names the mission, the scene period, the round and whose turn, and GC dice left of the
+  starting number.
+- **The console can run a turn.** Its Combat section shows the acting combatant with Defense, health, conditions,
+  half actions left and a button per weapon, and follows the fight as turns change. Each row opens that combatant.
+  **Mob attack** rolls one attack for every standing member of a group of identical standard NPCs and moves the turn
+  past them.
+- **The console keeps its place.** A redraw no longer drops the scroll position, keyboard focus, search text or the
+  open "More mission tools" list.
+- **Shortcuts keep working after a mouse click.** Alt+B now acts on the card under the pointer or on your own newest
+  card, never another GC's, and names the card. Alt+S waits for a turn change and follows the turn with one sheet.
+- **Undo for steps that changed a character.** Applying damage, a standard NPC's Damage save and a GC action-dice
+  spend each leave a one-line note, whispered to whoever did it, with an **Undo** button. Undo puts back the
+  numbers, conditions and tracker state from before the step, returns the GC dice, lets the damage card be applied
+  again, and warns first if a value has changed since.
+- **The NPC builder comes first in Edit**, under a pinned strip of the numbers the choices produce. Renaming an NPC
+  renames its prototype token and its placed tokens that still carry the old name, numbered ones included.
+- **Console dialogs have a Cancel button, a named main button and the cursor in the first field.** The spend-dice,
+  complication, fluid initiative, combat reference and disposition dialogs show only the fields for the option
+  chosen.
+- **Add NPC to scene places a group.** The list shows its rows, and the dialog takes a number of copies, placed on
+  free squares with numbered names, hostile by default, hidden if wanted, joined to a running fight on its kind's
+  Count, and optionally recorded for mission XP. It is also on the Play view.
+
 ## 0.7.0 — 2026-11-23
 
 - **New agents start at full vitality, wounds and action dice.** A new agent starts at the Career Level 0
@@ -366,7 +410,7 @@
 
 - Added contextual tooltips across system sheets, dialogs, chat actions and Game Control, including fields, buttons, tabs and expandable sections. Existing authored help is preserved.
 
-Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/remaining-work.md`.
+Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/archive/build-notes-2026-11.md`.
 
 - **Game clock.** The world keeps the time. A badge above the players list shows it and opens the Clock window; the
   GC moves it on in steps (a round, a minute, ten minutes, an hour, eight hours, a day) or by any amount, from that
@@ -451,7 +495,7 @@ Fixes from a live test of 0.5.0:
 
 - Added the Sample Level-1 Agents compendium: 16 complete characters across all 12 base classes, four alternate builds, matching compressed WebP portraits and tokens, and a linked Scout animal partner created on import.
 
-Not yet tried in a running Foundry world; see `docs/remaining-work.md` for the checks to make.
+Not yet tried in a running Foundry world; see `docs/backlog.md` for the checks still to make.
 
 - Attacks resolve against a target: "Resolve against Defense" on an attack card, "Roll damage" on a hit, and "Apply
   damage to a target" on a damage card (vitality and wounds, damage reduction, critical hits, conditions, standard NPC

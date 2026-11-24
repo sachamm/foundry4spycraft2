@@ -13,4 +13,4 @@ The Spycraft 2.0 rulebook is not ours. This project uses the book's game mechani
 
 ## Follow the UI style guide
 
-Any change to sheets, dialogs, chat cards, the combat tracker, the GC Console or user-facing strings follows [docs/ui-style-guide.md](docs/ui-style-guide.md). When you touch an existing surface, fix the guide's divergences in the lines you change; the audit in its section 10 lists the known ones.
+Any change to sheets, dialogs, chat cards, the combat tracker, the GC Console or user-facing strings follows [docs/ui-style-guide.md](docs/ui-style-guide.md). When you touch an existing surface, fix the guide's divergences in the lines you change; [docs/backlog.md](docs/backlog.md) lists the known ones. Delete a backlog row when your change fixes it, and add new to-do items there rather than in a new file.

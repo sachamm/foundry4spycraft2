@@ -1,6 +1,6 @@
 # UI style guide
 
-This guide sets how the Spycraft 2.0 system looks, reads and behaves in Foundry VTT v14. It covers sheets, dialogs, chat cards, the combat tracker, the GC Console, the NPC builder, the compendium browser and settings. It applies to **new work and to existing features**: section 10 lists where the current tree (main at `c2abca8`) diverges, with a suggested fix for each.
+This guide sets how the Spycraft 2.0 system looks, reads and behaves in Foundry VTT v14. It covers sheets, dialogs, chat cards, the combat tracker, the GC Console, the NPC builder, the compendium browser and settings. It applies to **new work and to existing features**: [backlog.md](backlog.md) lists where the current tree still diverges, with a suggested fix for each.
 
 It was written from five table perspectives (a rules expert, an expert GC, a novice GC, a seasoned player and a novice player) and from the live reviews of November 2026. Rule numbers and page references are to the printed rulebook. Nothing from the rulebook is quoted here; see [AGENTS.md](../AGENTS.md).
 
@@ -31,7 +31,7 @@ The system grew feature by feature, and each made sensible local choices. The re
 - **New features** follow the guide from the first PR. A reviewer may block a PR that adds a new divergence.
 - **Existing features** are brought in line in two ways:
   - when a PR touches a template, stylesheet or string, it fixes the divergences in the lines it touches (no sweeping rewrites hidden inside feature PRs);
-  - the audit in section 10 is worked through as its own PRs, P0 first. The first pass (PR 63) closed 82 of its 120 items; 10.14 lists what it added and where each pattern now lives, so later work reuses it.
+  - the open divergences are in [backlog.md](backlog.md) and are worked through as their own PRs, P0 first. The first pass (PR 63) closed 82 of the audit's 120 items; 10.14 lists what it added and where each pattern now lives, so later work reuses it.
 - When the guide and the rulebook disagree, the rulebook wins and the guide is wrong. Open a PR against this file.
 - When the guide and a GC's ruling disagree at the table, the GC wins. The system must make that ruling possible (section 8).
 
@@ -40,7 +40,7 @@ The system grew feature by feature, and each made sensible local choices. The re
 Propose a change as a PR that edits this file and nothing else, or that edits this file together with the code that motivates it. State:
 
 - the rule being added, changed or dropped;
-- the surfaces it affects and whether existing features then diverge (add them to section 10);
+- the surfaces it affects and whether existing features then diverge (add them to [backlog.md](backlog.md));
 - for vocabulary, the exact term and its banned variants, so the lint in section 11 can be updated.
 
 Keep rule changes small. A guide that changes every week is not a guide.
@@ -259,7 +259,7 @@ Dark `danger` on `raised` is just under target; nudge the dark `--sc2-danger` sl
 | `--sc2-value-size` | 22px | Tile values                                                 |
 | (card total)       | 28px | The one large number on a chat card                         |
 
-- **13px is the minimum for any text that carries information.** 12px is allowed only for decorative labels whose words are not needed to play (the dossier band label). Some rules at 12px remain (section 10.9); the console's section titles and tags are no longer among them.
+- **13px is the minimum for any text that carries information.** 12px is allowed only for decorative labels whose words are not needed to play (the dossier band label). Some rules at 12px remain (see [backlog.md](backlog.md)); the console's section titles and tags are no longer among them.
 - Faces: `--font-primary` (Foundry's Signika) for text; `--sc2-num` (system monospace) for values, dice and stamps; `--sc2-bar-font` only for the dossier band.
 - Prefer token sizes to `em` sizes. Do not add a new pixel size without adding a token.
 - No letter-spaced upper case for buttons or headings. Dialog footer buttons and GC Console section titles used to be exceptions and are now sentence case.
@@ -625,107 +625,11 @@ Heading levels do not skip: window title (h1, Foundry), section bars h2, sub-sec
 
 ## 10. Audit of existing features
 
-Line references are to `main` at `c2abca8`. Each item was checked against the tree; member claims that did not hold were dropped or corrected (see 10.12). Priorities:
+The audit of 2026-11-23 listed 120 places where the system diverged from this guide. PR 63 fixed 82 of them. The 38 still open moved to [backlog.md](backlog.md) on 2026-11-24, where each keeps its old id with an `SG-` prefix (`G2` is `SG-G2`), beside the findings of the later reviews. **New divergences go in the backlog, not here.**
 
-- **P0:** the UI shows a wrong rule or state, or a newcomer loses a resource or misreads the result.
-- **P1:** friction or confusion in a common action, or a direct breach of a principle in sections 2–8.
-- **P2:** consistency, polish and hygiene.
+What stays in this section is what a contributor needs while working: what already complies (10.11), claims that were checked and dropped (10.12), decisions already made (10.13) and the shared pieces to reuse (10.14).
 
-"Section" is the guide section the item breaks.
-
-### 10.1 Agent sheet
-
-| ID  | Where                                                                                                        | Divergence                                                                                         | Sec.     | P   | Fix                                                                                             |
-| --- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------- | --- | ----------------------------------------------------------------------------------------------- |
-| A10 | `templates/actor/play/combat-attacks.hbs:7-10`; `play/reference-combat.hbs:23`                               | Disarm, Cheap Shot, Counter-Trip, Trip final attack, Improved Fortune shown to every agent         | 2.4      | P1  | Gate on the feat or a prior result, like `combatTools.striking` (:5)                            |
-| A12 | `templates/actor/agent-feats.hbs:24-27`                                                                      | Feat activations keyed by item name in templates and only on Abilities                             | 6.5      | P1  | Declare activations in data; render in "Abilities in play"                                      |
-| A17 | `templates/actor/agent-gear.hbs:8,10,14`                                                                     | Two attack buttons (Attack, Measured attack); untrained styled `bad`; Error/Threat as bare bounds  | 2.5, 5.6 | P2  | One attack control; `.sc2-untrained`; ranges                                                    |
-| A18 | `templates/actor/agent-gear.hbs:69-116`                                                                      | Gear picks, Caliber and gear check buried in a closed panel below inventory                        | 7.1      | P2  | "Mission loadout" panel at the top of Gear                                                      |
-| A19 | `templates/actor/play/reference-combat.hbs:19-20`                                                            | Request and Gear check are values, not rolls (Knowledge beside them rolls)                         | 2.8      | P2  | Make them roll tiles                                                                            |
-| A23 | `templates/actor/play/identities.hbs`                                                                        | Cover identity only mid-page; not on rail or cards                                                 | 7.1, 7.5 | P2  | Rail chip "Cover: name [Leave]"; identity in card headers                                       |
-
-### 10.2 NPC sheet and builder
-
-| ID  | Where                                                                        | Divergence                                                                                     | Sec.     | P   | Fix                                                      |
-| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------- | --- | -------------------------------------------------------- |
-| N11 | `templates/actor/npc-sheet.hbs:68`                                           | Builder below the stat block; results not visible while editing grades                         | 7.8      | P2  | Sticky results strip                                     |
-| N14 | `spycraft2.mjs:222-226`                                                      | NPC token bars offer vitality/wounds only; a standard NPC's damage track has no bar            | 7.8      | P2  | Expose the Damage-save track as a bar attribute          |
-
-### 10.3 Vehicle sheet, item sheets and browser
-
-| ID  | Where                                                                                                     | Divergence                                                       | Sec. | P   | Fix                               |
-| --- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---- | --- | --------------------------------- |
-| I6  | `styles/sheet-item.css` browser rows                                                                      | Rows about 61px; preview empty until a pick                      | 7.9  | P2  | ~36px rows; preview first row     |
-
-### 10.4 Roll and option dialogs
-
-| ID  | Where                                                                                            | Divergence                                                                                               | Sec.     | P   | Fix                                                                     |
-| --- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------- | --- | ----------------------------------------------------------------------- |
-| D2  | `module/documents/actor/rolls.mjs:497-521`, `:529-551`                                           | Attribute checks never open a dialog; saves open one only for Reflex or certain feats                    | 7.4      | P1  | Minimal dialog (modifier, visibility) for both; same gestures           |
-| D3  | `module/sheets/actor-sheet.mjs:1731-1736`                                                        | Damage and Initiative ignore Shift                                                                       | 7.4      | P1  | Apply the gesture table                                                 |
-| D5  | `module/rolls/dialogs/attack.mjs:42` (and 159 `…Confirmed` names in 74 files)                    | Attestation-length checkbox labels; `briefOption` covers only listed fields                              | 6.8, 8.2 | P1  | Effect labels ("Flanking +2"), detail as hint; `briefOption` by default |
-| D9  | `module/apps/remembered-choices.mjs:93`                                                          | Shift-click documented only in a setting hint                                                            | 4.7      | P2  | Tooltip suffix on roll controls; one-time hint                          |
-| D10 | `module/apps/gc/combat.mjs:242-250`, `:577-593`                                                  | Fluid-event and combat-reference dialogs show every field for every choice                               | 6.8      | P2  | Show fields for the chosen event or lookup only                         |
-| D11 | `module/apps/rules-refresh.mjs:67`                                                               | Raw field paths and JSON shown to the GC                                                                 | 4.3      | P2  | Field labels from `ui-tooltips.mjs`; JSON under "Technical detail"      |
-| D12 | NPC attack and save dialogs (`module/apps/gc/npc-play.mjs:177` has `secret` for skills only)     | No per-roll "GC only" toggle on NPC attacks and saves                                                    | 8.4      | P2  | Add with a remembered default                                           |
-
-### 10.5 Chat cards
-
-| ID  | Where                                                                                      | Divergence                                                                                                      | Sec.     | P   | Fix                                                                      |
-| --- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | -------- | --- | ------------------------------------------------------------------------ |
-| C10 | `module/apps/damage-application.mjs:692,971,1033,1125`; `module/apps/gc/npc-card-dice.mjs` | No undo for applied damage or GC boosts                                                                         | 8.3      | P1  | Before-image on the card; Undo as the only remaining control             |
-| C11 | `module/apps/gc-relay.mjs:71,115,153`                                                      | Pending requests held in memory (lost on reload); 120 s auto-decline                                            | 8.5      | P1  | Persist on the message; timeout as a world setting; notify on lapse      |
-| C12 | `styles/chat.css:7`; `module/documents/actor/attack-rolls.mjs:825`                         | Header flavor carries up to ~15 rule notes                                                                      | 7.5      | P1  | Header who/whom/what; notes in the Why disclosure                        |
-| C16 | `module/apps/resolution-guide.mjs` on cards (`chat-guidance.mjs:66`)                       | "Automatic vs table / GC steps" on every card guide                                                             | 3.3      | P2  | Client setting to hide after first open                                  |
-
-### 10.6 Combat tracker and token HUD
-
-| ID  | Where                                      | Divergence                                                                                 | Sec. | P   | Fix                                                                  |
-| --- | ------------------------------------------ | ------------------------------------------------------------------------------------------ | ---- | --- | -------------------------------------------------------------------- |
-| T2  | `module/apps/gc/combat.mjs:546-567`        | Context menu lacks Delay…, Ready, Readied action triggered                                 | 7.6  | P1  | Add one-step entries that move the turn                              |
-
-### 10.7 GC Console
-
-| ID  | Where                                                                    | Divergence                                                                         | Sec. | P   | Fix                                                     |
-| --- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ---- | --- | ------------------------------------------------------- |
-| G2  | `templates/apps/gc-console.hbs:67`; `module/apps/gc/console.mjs:296-315` | Combat list is name, Count and pending only; rows do nothing on click              | 7.7  | P1  | Half actions, Defense, health, conditions; pan and open |
-| G6  | `templates/apps/gc-console.hbs:3`                                        | Status strip repeats the clock; no pending count or team dice                      | 7.7  | P2  | Replace Time with Pending N; team row                   |
-| G9  | `templates/apps/gc-console.hbs` (most buttons)                           | Only Begin session, Next scene and Record for XP have tooltips                     | 7.7  | P2  | One-line "what this changes" tooltip                    |
-
-### 10.8 Strings (`lang/en.json` and `loc` sources)
-
-Counts are over the 10,332 string values in `lang/en.json`.
-
-| ID  | Where                                                                                                           | Divergence                                                                        | Sec. | P   | Fix                                                         |
-| --- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---- | --- | ----------------------------------------------------------- |
-| L9  | ~156 strings start or end with a separator or bracket (e.g. `:1293`, `:1371`)                                   | Fragment keys                                                                     | 4.5  | P2  | Whole-sentence keys                                         |
-| L10 | "actual" (487), "recorded" (335), "receipt" (111), "RAW" (`:149`), "Health" section (7)                         | Internal vocabulary; a "Health" section that does not exist                       | 4.3  | P2  | Plain words; name the real place                            |
-| L11 | 71 strings start "I ", 27 contain "I am"                                                                        | First person in labels                                                            | 4.1  | P2  | "you", or mark as the player's declaration                  |
-| L12 | 46 strings over 300 characters, 335 over 160                                                                    | Walls of text in hints                                                            | 4.1  | P2  | One sentence; rest in docs                                  |
-| L13 | `lang/en.json:7342`                                                                                             | Developer error shown to users                                                    | 4.3  | P2  | `console.warn` only                                         |
-| L14 | `lang/en.json:2925, 2976, 5927, 9553`                                                                           | Refusals without the fix, or in internal language                                 | 4.6  | P2  | What / why / next                                           |
-
-### 10.9 Visual system
-
-| ID  | Where                                                                                                                                                                            | Divergence                                                                           | Sec. | P   | Fix                               |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---- | --- | --------------------------------- |
-| S1  | `styles/spycraft2.css:7`, `styles/retro.css:108-113`, `styles/components.css:90`, `:142-147`                                                                                     | Section heading styled four times; first three mostly overridden                     | 5    | P2  | One rule in components.css        |
-| S2  | `styles/retro.css:114-123`, `:157-158` vs `styles/components.css:194-204`                                                                                                        | Tabs styled twice; microfilm border-image set then removed                           | 5    | P2  | One rule                          |
-| S6  | `styles/spycraft2.css:3`, `:199`; `styles/chat-search.css:23`                                                                                                                    | Literal colours and stale fallbacks outside tokens                                   | 5.1  | P2  | Tokens (`--sc2-warn` for hazards) |
-| S8  | `styles/tokens.css:104` (dark `--sc2-danger`)                                                                                                                                    | 4.48:1 on `raised`                                                                   | 5.3  | P2  | Lighten slightly; add to ui-lab   |
-| S9  | `styles/retro.css:154-156` vs `styles/sheet-agent.css:17`                                                                                                                        | Agent name rules disagree (nowrap 20px vs wrap 17px); retro.css header comment stale | 5    | P2  | One rule; update comment          |
-| S10 | `tools/tests/ui-lab.spec.mjs:45-70`                                                                                                                                              | Contrast test omits good, warn, danger-on-raised and borders                         | 5.3  | P2  | Cover every row of 5.3            |
-
-### 10.10 Docs
-
-| ID  | Where                                      | Divergence                                                                   | P   | Fix                                                         |
-| --- | ------------------------------------------ | ---------------------------------------------------------------------------- | --- | ----------------------------------------------------------- |
-| O2  | `docs/gc-quickstart.md`                    | Quickstart page exists; the console has no first-session checklist           | P1  | A dismissible console checklist linking the quickstart      |
-| O3  | `docs/npc-creation.md`, `docs/gc-tools.md` | GC and maintainer content mixed                                              | P2  | Split into GC and maintainer pages                          |
-
-### 10.11 Counts and what to keep
-
-**Totals:** 0 P0, 11 P1, 27 P2 (38 items) still open, of the 120 first listed (5 P0, 52 P1, 63 P2). Rows are removed from the tables above as they are fixed.
+### 10.11 What to keep
 
 **Keep — already compliant, do not regress:**
 
@@ -832,7 +736,7 @@ Two constraints met along the way, for whoever continues:
 
 ### 11.2 Lints that can run in CI
 
-These do not need the rulebook, so they can run in CI beside `npm test`. Each can start as a warning and become an error once the matching audit items are done. None is written yet. After the first pass few hits remain for Banned terms ("Current VP", "Current WP"), Glued numbers, Ranges and Templates: title (four authored `title` attributes), and Keybindings passes, so these five are the cheapest to turn on first.
+These do not need the rulebook, so they can run in CI beside `npm test`. Each can start as a warning and become an error once the matching audit items are done. None is written yet (backlog B-215). The audit ids in the last column are the audit's own; the open ones are in the backlog as `SG-` rows. After the first pass few hits remain for Banned terms ("Current VP", "Current WP"), Glued numbers, Ranges and Templates: title (four authored `title` attributes), and Keybindings passes, so these five are the cheapest to turn on first.
 
 | Lint                     | Check                                                                                                                                                                                                                      | Audit items  |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |

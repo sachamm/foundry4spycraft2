@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 
 /* Foundry stand-ins: enough for the attack, damage, ammunition and opposed-check workflows to run. */
 const registry = new Map();
-const posted = [];
+const posted = [],
+  undoNotes = [];
 const warnings = [];
 globalThis.foundry = {
   utils: {
@@ -30,7 +31,8 @@ globalThis.Roll = class {
 };
 globalThis.ChatMessage = {
   getSpeaker: ({ actor }) => ({ alias: actor?.name }),
-  create: async data => (posted.push(data), data)
+  // Undo notes are whispered to the person who applied the damage; they are kept apart from the reports.
+  create: async data => ((data.flags?.spycraft2?.undo ? undoNotes : posted).push(data), data)
 };
 globalThis.game = {
   user: { isGM: true, targets: [] },
@@ -173,6 +175,10 @@ test("lethal damage comes off a special character's vitality and wounds and sets
   assert.deepEqual([kevin.system.vitality.value, kevin.system.wounds.value], [0, 9]);
   assert.equal(kevin.statuses.has("fatigued"), true);
   assert.match(posted.at(-1).content, /takes 9 damage \(11 less damage reduction 2\)/);
+  const note = undoNotes.at(-1).flags.spycraft2.undo;
+  assert.equal(note.label, "11 lethal damage applied to Kevin");
+  assert.ok(Object.keys(note.entries[0].restore).some(path => path.startsWith("system.vitality")));
+  assert.equal(note.damageCard.targetUuid, note.entries[0].uuid);
   assert.deepEqual(appliedDamageEntries(damage.flags.spycraft2), [
     { targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }
   ]);

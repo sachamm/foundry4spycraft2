@@ -222,14 +222,14 @@ export function npcQualityEffects(profile, { type = "standard", threatLevel = 1,
     note(
       "mastermind",
       loc`Mastermind`,
-      loc`GC action die ${role.actionDie}. Threat ranges against this NPC shrink by 2 and a critical against it costs 2 more action dice. Saved from death for 2 dice fewer.`,
+      loc`GC action die ${role.actionDie}. Threat ranges against this NPC shrink by 2 and a critical against it costs 2 more action dice. Saved from death for 2 dice fewer. Applied to attacks that target it; by hand on skill checks.`,
       448
     );
   if (roleId === "henchman")
     note(
       "henchman",
       loc`Henchman`,
-      loc`GC action die ${role.actionDie}. Threat ranges against this NPC shrink by 1 and a critical against it costs 1 more action die. Saved from death for 1 die fewer.`,
+      loc`GC action die ${role.actionDie}. Threat ranges against this NPC shrink by 1 and a critical against it costs 1 more action die. Saved from death for 1 die fewer. Applied to attacks that target it; by hand on skill checks.`,
       447
     );
   if (roleId === "minion")
@@ -361,3 +361,23 @@ export function npcSkillQualityPlan(effects, { skillKey = "", checkId = "", chos
 export function npcSkillOptionsFor(effects, skillKey = "") {
   return effects.skillOptions.filter(option => !option.skills || !skillKey || option.skills.includes(skillKey));
 }
+
+/**
+ * What a villain role on the target changes about criticals scored against it (pp.447-448): a narrower threat range
+ * and a dearer critical. Null for a target without such a role.
+ * @param {object|null} system  The target's prepared data.
+ */
+export function targetRoleCriticalRules(system) {
+  const role = system?.qualityEffects?.role;
+  if (!role || !(role.threatRangeReduction > 0 || role.extraDiceToActivate > 0)) return null;
+  return {
+    id: role.id,
+    label: role.id === "mastermind" ? loc`Mastermind` : loc`Henchman`,
+    threatRangeReduction: role.threatRangeReduction,
+    extraDiceToActivate: role.extraDiceToActivate
+  };
+}
+
+/** A threat number with the target's role applied: the range shrinks from its low end, and can vanish. */
+export const threatAgainstRole = (threat, role) =>
+  threat > 0 && role?.threatRangeReduction > 0 ? threat + role.threatRangeReduction : threat;

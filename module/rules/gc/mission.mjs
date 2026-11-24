@@ -14,6 +14,7 @@ export function defaultMission() {
     version: 1,
     name: "",
     active: false,
+    ended: false,
     caliber: 1,
     threatAdjust: 0,
     threatOverride: null,
@@ -32,8 +33,21 @@ export function defaultMission() {
     otherComplications: [],
     infractions: [],
     scenesPlayed: 0,
+    standingPaid: {},
     notes: ""
   };
+}
+
+/**
+ * What a session has already given an agent in starting-dice changes, from the stored flag. The flag was once just
+ * the session id, with no amount: that reads as "adjusted, amount unknown" (change null), so nothing is given twice.
+ * @returns {{change: number|null}|null} null when this session has given nothing yet
+ */
+export function sessionDiceApplied(flag, session) {
+  if (!flag) return null;
+  if (typeof flag === "string") return flag === session ? { change: null } : null;
+  if (flag.session !== session) return null;
+  return { change: Number.isSafeInteger(flag.change) ? flag.change : null };
 }
 
 /** p.423: sum of career levels ÷ 5, rounded up, minimum 1; the GC may shift it by up to 2; never above 20. */

@@ -38,7 +38,7 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -234,10 +234,11 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     <p>${loc`Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.`}</p>
     <label>${loc`Combatant`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
     <label>${loc`Event`} <select name="id">${eventOptions}</select></label>
-    <label>${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
-    <label>${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
-    <label>${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
-    <label>${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`
+    <label data-when="id!=press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup">${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
+    <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
+    <label data-when="id=unproficient">${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
+    <label data-when="id=ready">${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`,
+    loc`Record event`
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
@@ -259,6 +260,10 @@ const actionsOf = combatant =>
 
 /** A Press this round buys one more half action. */
 const extraHalfActions = combatant => (fluidForRound(combatant, combatant.parent?.round).pressed ? 1 : 0);
+
+/** Half actions a combatant still has this turn, counting a Press. */
+export const halfActionsLeft = combatant =>
+  HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
 
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
 export async function spendTurnAction(combatant, kind) {
@@ -368,9 +373,11 @@ export async function rollTiebreaks(combat = game.combat) {
 export async function rollGroupInitiative(combat = game.combat, { single = false } = {}) {
   if (!game.user.isGM) return null;
   if (!combat) return refuse(loc`There is no active combat.`);
-  const pending = combat.combatants.filter(
-    combatant => !combatant.hasPlayerOwner && combatant.initiative === null && combatant.actor
-  );
+  // NPCs only: an agent nobody owns today (an absent player's character) still rolls its own check, so it can be
+  // boosted, and is named in the report instead.
+  const unrolled = combat.combatants.filter(combatant => combatant.initiative === null && combatant.actor),
+    pending = unrolled.filter(combatant => combatant.actor.type === "npc"),
+    left = unrolled.filter(combatant => combatant.actor.type !== "npc" && !combatant.hasPlayerOwner);
   const groups = new Map();
   for (const combatant of pending) {
     const key = single
@@ -386,8 +393,13 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     for (const combatant of members) await combatant.update({ initiative: roll.total + bonusOf(combatant) });
     lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${roll.total}`);
   }
+  if (left.length)
+    lines.push(
+      loc`Not rolled, no player owns them: ${esc(left.map(member => member.name).join(", "))}. Roll from the sheet or the tracker.`
+    );
   if (lines.length) await say(`<b>${loc`Group Initiative`}</b><br>${lines.join("<br>")}`, { whisper: true });
-  return lines.length;
+  else ui.notifications?.info(loc`Every NPC in this fight already has an Initiative Count.`);
+  return lines.length - (left.length ? 1 : 0);
 }
 
 /** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */
@@ -414,7 +426,8 @@ export async function surpriseRoundDialog(combat = game.combat) {
         ["opponents", loc`Opponents`]
       ],
       "opponents"
-    )}</select></label>`
+    )}</select></label>`,
+    loc`Set the surprise round`
   );
   if (!input) return null;
   let result;
@@ -464,7 +477,10 @@ let startPass = Promise.resolve();
 
 export function installFluidInitiativeHooks() {
   // Everyone starts a fight flat-footed unless he joins it deliberately after it begins (p.323).
-  Hooks.on("combatStart", combat => {
+  // The start is read from the combat's own update, which every client sees: the lead GM marks the fight whoever
+  // pressed Begin combat.
+  Hooks.on("updateCombat", (combat, changed, options) => {
+    if (changed?.round !== 1 || options?.direction < 0) return;
     if (!isLeadGM() || !setting("startFlatFooted")) return;
     startPass = (async () => {
       for (const combatant of combat.combatants) await condition(combatant.actor, "flat-footed", "Flat-footed");
@@ -483,6 +499,9 @@ export function installFluidInitiativeHooks() {
     }
     const combatant = combat.combatant,
       actor = combatant?.actor;
+    // A readied action that never went off is lost when the character's next turn comes round.
+    const readied = combatant?.flags?.spycraft2?.readied;
+    if (readied && readied.round !== combat.round) await combatant.update({ "flags.spycraft2.readied": null });
     if (!actor?.statuses?.has?.("flat-footed")) return;
     const facts = { round: combat.round, surprise: combat.flags?.spycraft2?.surprise ?? null };
     if (!flatFootedEndsOnTurn(facts, { playerSide: actor.hasPlayerOwner === true })) return;
@@ -532,6 +551,7 @@ export function installFluidInitiativeHooks() {
         notes.push(left === 1 ? loc`1 half action left` : loc`${left} half actions left`);
       }
       // Health is shown only to someone who may open the sheet; a flat-footed character is plain to all.
+      if (combatant.flags?.spycraft2?.readied) notes.push(loc`readied action`);
       notes.push(...trackerRowStates(combatant.actor, { health: combatant.actor?.isOwner === true }));
       if (!notes.length) continue;
       const badge = document.createElement("span");
@@ -540,29 +560,111 @@ export function installFluidInitiativeHooks() {
       name.append(badge);
     }
   });
-  // Combat tracker entries: record an event for one combatant.
-  Hooks.on("getCombatantContextOptions", (_app, entries) => {
-    const picked = li => game.combat?.combatants.get((li instanceof HTMLElement ? li : li?.[0])?.dataset?.combatantId);
-    for (const [kind, name, icon] of [
-      ["half", loc`Spend a half action`, "fa-circle-half-stroke"],
-      ["full", loc`Spend a full action`, "fa-circle"],
-      ["reset", loc`Give back this round's actions`, "fa-rotate-left"]
-    ])
-      entries.push({
-        name,
-        icon: `<i class="fa-solid ${icon}"></i>`,
-        condition: li => picked(li)?.isOwner === true,
-        callback: li => spendTurnAction(picked(li), kind)
-      });
-    entries.push({
-      name: loc`Fluid initiative event`,
-      icon: '<i class="fa-solid fa-arrows-up-down"></i>',
-      callback: li => {
-        const el = li instanceof HTMLElement ? li : li?.[0];
-        fluidEventDialog(game.combat, game.combat?.combatants.get(el?.dataset?.combatantId));
-      }
-    });
+  // Foundry 14 builds the tracker's right-click menu under the tracker's own class name.
+  Hooks.on("getCombatTrackerContextOptions", (_app, entries) => {
+    entries.push(...trackerMenuEntries());
   });
+}
+
+const rowCombatant = li => {
+  const id = (li?.dataset ?? li?.[0]?.dataset)?.combatantId;
+  return (ui.combat?.viewed ?? game.combat)?.combatants?.get(id) ?? game.combat?.combatants?.get(id) ?? null;
+};
+
+/** Report one immediate fluid event for a combatant, or say why it cannot be recorded. */
+async function quickFluidEvent(combatant, id, input, label) {
+  if (!combatant) return null;
+  if (!combatant.parent?.started) return refuse(loc`Start the combat first.`);
+  try {
+    const result = await recordFluidEvent(combatant, id, input);
+    await say(`${esc(combatant.name)}: ${esc(label)} — ${loc`Initiative Count is now`} <b>${result.count}</b>.`);
+    return result;
+  } catch (error) {
+    return refuse(error.message);
+  }
+}
+
+/** Delay by a number of Counts; with no number, ask for one. */
+export async function delayCombatant(combatant, counts = null) {
+  if (!combatant) return null;
+  let times = counts;
+  if (times === null) {
+    const input = await formDialog({
+      title: loc`Delay — ${combatant.name}`,
+      ok: loc`Delay`,
+      fields: [
+        raw(
+          `<label>${loc`Counts to step down (now at ${combatant.initiative ?? "—"})`} <input type="number" name="times" min="1" value="1" /></label>`
+        )
+      ]
+    });
+    if (!input) return null;
+    times = Number(input.times) || 1;
+  }
+  return quickFluidEvent(combatant, "delay", { times }, loc`Delay`);
+}
+
+/** Mark a combatant as holding a readied action: a half action now, and a note on its tracker row. */
+export async function readyCombatant(combatant) {
+  if (!combatant) return null;
+  const combat = combatant.parent;
+  if (!combat?.started) return refuse(loc`Start the combat first.`);
+  if (combatant.flags?.spycraft2?.readied) return refuse(loc`${combatant.name} already has a readied action.`);
+  // Readying is a half action taken on the character's own turn; only its trigger comes at another time.
+  if (combat.combatant?.id !== combatant.id)
+    return refuse(loc`${combatant.name} can ready an action only on its own turn.`);
+  if ((await spendTurnAction(combatant, "half")) === null) return null;
+  await combatant.update({ "flags.spycraft2.readied": { round: combat.round } });
+  await say(
+    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`
+  );
+  return true;
+}
+
+/** The readied action goes off now: the combatant drops to the acting combatant's Count if that is lower. */
+export async function triggerReadied(combatant) {
+  if (!combatant) return null;
+  const combat = combatant.parent,
+    at = combat?.combatant?.initiative ?? combatant.initiative;
+  const result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
+  if (result) await combatant.update({ "flags.spycraft2.readied": null });
+  return result;
+}
+
+/**
+ * The system's entries for the combat tracker's right-click menu, in the shape Foundry 14 reads: a label, an icon
+ * class, a visibility test and a click handler that both receive the row.
+ */
+export function trackerMenuEntries() {
+  const mine = li => rowCombatant(li)?.isOwner === true,
+    started = li => mine(li) && rowCombatant(li)?.parent?.started === true,
+    readied = li => !!rowCombatant(li)?.flags?.spycraft2?.readied;
+  const entry = (label, icon, visible, run) => ({
+    label,
+    icon: `fa-solid ${icon}`,
+    visible,
+    onClick: (_event, li) => run(rowCombatant(li))
+  });
+  return [
+    entry(loc`Spend a half action`, "fa-circle-half-stroke", mine, c => spendTurnAction(c, "half")),
+    entry(loc`Spend a full action`, "fa-circle", mine, c => spendTurnAction(c, "full")),
+    entry(loc`Give back this round's actions`, "fa-rotate-left", mine, c => spendTurnAction(c, "reset")),
+    entry(loc`Delay 1 Count`, "fa-arrow-down", started, c => delayCombatant(c, 1)),
+    entry(loc`Delay…`, "fa-arrow-down-wide-short", started, c => delayCombatant(c)),
+    entry(
+      loc`Ready an action`,
+      "fa-hourglass-half",
+      li => started(li) && !readied(li),
+      c => readyCombatant(c)
+    ),
+    entry(
+      loc`Readied action triggered`,
+      "fa-bolt",
+      li => started(li) && readied(li),
+      c => triggerReadied(c)
+    ),
+    entry(loc`Fluid initiative event…`, "fa-arrows-up-down", started, c => fluidEventDialog(c?.parent, c))
+  ];
 }
 
 /** The short state words a tracker row shows for an actor: flat-footed, and the wound state when it may be seen. */
@@ -597,17 +699,18 @@ export async function combatReferenceDialog() {
       ["gas", loc`Gas cloud spread`],
       ["surface", loc`Special surface (Table 5.3)`]
     ])}</select></label>
-    <label>${loc`Location (encounter)`} <select name="location">${options(Object.keys(ENCOUNTER_DISTANCES).map(key => [key, ENCOUNTER_LABELS[key]]))}</select></label>
-    <label>${loc`Range increment to the target (deviation)`} <input type="number" name="increment" min="1" max="10" value="1" /></label>
-    <label>${loc`Rounds since release (gas)`} <input type="number" name="rounds" min="0" value="0" /></label>
-    <label>${loc`Wind (gas)`} <select name="wind">${options([
+    <label data-when="tool=encounter">${loc`Location (encounter)`} <select name="location">${options(Object.keys(ENCOUNTER_DISTANCES).map(key => [key, ENCOUNTER_LABELS[key]]))}</select></label>
+    <label data-when="tool=deviation">${loc`Range increment to the target (deviation)`} <input type="number" name="increment" min="1" max="10" value="1" /></label>
+    <label data-when="tool=gas">${loc`Rounds since release (gas)`} <input type="number" name="rounds" min="0" value="0" /></label>
+    <label data-when="tool=gas">${loc`Wind (gas)`} <select name="wind">${options([
       ["none", loc`Still`],
       ["light", loc`Light`],
       ["moderate", loc`Moderate`],
       ["strong", loc`Strong or severe`]
     ])}</select></label>
-    <label>${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
-    <label>${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`
+    <label data-when="tool=surface">${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
+    <label data-when="tool=surface">${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`,
+    loc`Look up`
   );
   if (!input) return null;
   const roll = async formula => new Roll(formula).evaluate();

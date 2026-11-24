@@ -279,7 +279,7 @@ CI runs `lint`, `format:check`, the build, `npm test`, `npm run test:packs` and 
 runs the Playwright layout tests (`npm run test:layout`). `npm run check:schemas` needs a local Foundry installation and
 is not run in CI; it exits with an error when Foundry is not found, so a skipped check cannot pass for a clean one.
 
-[docs/architecture.md](docs/architecture.md) maps the layers and lists the places to touch when adding an ability.
+[docs/architecture.md](docs/architecture.md) maps the layers and lists the places to touch when adding an ability. [docs/backlog.md](docs/backlog.md) is the one list of work still to do.
 
 A release ships the JavaScript as one file: `npm run bundle` (esbuild, not minified, with a source map) writes
 `dist/spycraft2.mjs`, and the release workflow puts it at the manifest's entry path in place of `module/`. Development

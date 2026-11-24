@@ -1,3 +1,4 @@
+import { installUndo } from "./module/apps/undo.mjs";
 import { renderOpenSheet } from "./module/services/refresh.mjs";
 import { installUITooltipHooks } from "./module/apps/ui-tooltips.mjs";
 import { installSampleAgentHooks } from "./module/sample-agents.mjs";
@@ -214,6 +215,7 @@ Hooks.once("init", () => {
   // The game clock sets how much time a combat round adds (CONFIG.time.roundTime).
   gameClock.installGameClock();
   installGCRelay();
+  installUndo();
   registerFastPathSetting();
   registerQuickResolveSetting();
   registerTableTrustSetting();

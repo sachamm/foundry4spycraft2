@@ -41,7 +41,7 @@ import { recentResultsHint } from "../opposed-checks.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content) => formDialog({ title, fields: [raw(content)] });
+const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -151,7 +151,8 @@ export async function startConflictDialog() {
       <label>${loc`Predator vehicle or character`} <select name="predatorActor">${options(chaseActorOptions(), "")}</select></label>
       <label>${loc`Prey vehicle or character`} <select name="preyActor">${options(chaseActorOptions(), "")}</select></label>
       <label>${loc`Maneuvering Room`} <select name="room">${options(roomRows(), "close")}</select></label>
-    </fieldset>`
+    </fieldset>`,
+    loc`Next`
   );
   if (!first) return null;
   const rules = CONFLICT_TYPES[first.type];
@@ -187,7 +188,8 @@ export async function startConflictDialog() {
     ${ratingInputs}
     <fieldset><legend>${loc`Conflict feats (pp.192–193, 208–209): Predator`}</legend>${featBoxes("p", participantFeats(chase?.predator))}</fieldset>
     <fieldset><legend>${loc`Conflict feats: Prey`}</legend>${featBoxes("q", participantFeats(chase?.prey))}</fieldset>
-    <p>${loc`Jackrabbit Start and Relentless Pursuit move the starting Lead by 2 after the value above.`}</p>`
+    <p>${loc`Jackrabbit Start and Relentless Pursuit move the starting Lead by 2 after the value above.`}</p>`,
+    loc`Start the conflict`
   );
   if (!second) return null;
   const ratings = side =>
