@@ -20,4 +20,10 @@ export function registerSystemHelpers(handlebars) {
       `data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
     );
   });
+  // Tooltip attributes for a pick's rules summary, from ruleTip() in module/sheets/rule-tips.mjs.
+  handlebars.registerHelper("sc2ruletip", tip => {
+    if (!tip?.text) return "";
+    const esc = handlebars.escapeExpression;
+    return new handlebars.SafeString(`data-tooltip="${esc(tip.text)}" data-tooltip-html="${esc(tip.html)}"`);
+  });
 }

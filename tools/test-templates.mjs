@@ -21,7 +21,15 @@ import {
 
 const SYSTEM = "systems/spycraft2/templates/";
 const paths = templatePaths();
-const known = new Set([...BUILTIN_HELPERS, ...foundryHelperNames(), "signed", "sc2eq", "sc2lt", "sc2tip"]);
+const known = new Set([
+  ...BUILTIN_HELPERS,
+  ...foundryHelperNames(),
+  "signed",
+  "sc2eq",
+  "sc2lt",
+  "sc2tip",
+  "sc2ruletip"
+]);
 
 test("every template parses and calls only registered helpers and existing partials", () => {
   assert.ok(paths.length > 20, "templates found");
