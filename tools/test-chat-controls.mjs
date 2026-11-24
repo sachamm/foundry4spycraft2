@@ -397,3 +397,44 @@ test("a card shortcut presses the newest enabled matching button, skipping cards
   assert.equal(newestCardButton(root, "button"), old);
   assert.equal(newestCardButton({ querySelectorAll: () => [] }, "button"), null);
 });
+
+test("the GC boost shortcut takes the card under the pointer, else the newest card this user posted", async () => {
+  const { boostCardButton } = await import("../module/apps/keybindings.mjs");
+  const card = (id, buttons) => ({ dataset: { messageId: id }, querySelectorAll: () => buttons });
+  const mineOld = { disabled: false, name: "mine-old" },
+    theirs = { disabled: false, name: "theirs" },
+    spent = { disabled: true, name: "spent" };
+  const cards = [card("m1", [mineOld]), card("m2", [spent]), card("t1", [theirs])];
+  const root = hovered => ({ querySelector: () => hovered ?? null, querySelectorAll: () => cards });
+  const mine = id => id.startsWith("m");
+  assert.equal(boostCardButton(root(), mine), mineOld, "another GC's newer card is passed over");
+  assert.equal(boostCardButton(root(cards[2]), mine), theirs, "the pointer chooses any card");
+  assert.equal(boostCardButton(root(cards[1]), mine), mineOld, "a spent card under the pointer falls back");
+  assert.equal(
+    boostCardButton(root(), () => false),
+    null
+  );
+});
+
+test("a mouse click lets go of a button so shortcuts keep working; a keyboard press keeps its focus", async () => {
+  const { releaseFocusAfterClick } = await import("../module/apps/keybindings.mjs");
+  let blurred = 0;
+  const button = (inside, dialog = false) => {
+    const self = {
+      blur: () => blurred++,
+      closest: selector =>
+        selector.startsWith("button") ? self : selector.startsWith("dialog") ? (dialog ? {} : null) : inside ? {} : null
+    };
+    return self;
+  };
+  const sheetButton = button(true);
+  assert.equal(releaseFocusAfterClick({ detail: 1, target: sheetButton }, sheetButton), true);
+  assert.equal(blurred, 1);
+  assert.equal(releaseFocusAfterClick({ detail: 0, target: sheetButton }, sheetButton), false, "keyboard press");
+  const elsewhere = button(false);
+  assert.equal(releaseFocusAfterClick({ detail: 1, target: elsewhere }, elsewhere), false, "not this system's");
+  const inDialog = button(true, true);
+  assert.equal(releaseFocusAfterClick({ detail: 1, target: inDialog }, inDialog), false, "dialogs keep focus");
+  assert.equal(releaseFocusAfterClick({ detail: 1, target: sheetButton }, {}), false, "focus already moved");
+  assert.equal(blurred, 1);
+});

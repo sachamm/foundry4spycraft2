@@ -36,6 +36,8 @@ export function registerGCSettings() {
   game.settings.register(SYSTEM, "conflicts", hidden({}, refreshConsole));
   // Which console sections this GC has opened or closed, kept in the browser rather than the world.
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
+  // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
+  game.settings.register(SYSTEM, "gcConsoleView", { scope: "client", config: false, type: Object, default: {} });
   game.settings.register(SYSTEM, "fluidInitiative", {
     name: locKey`Fluid initiative`,
     hint: locKey`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,

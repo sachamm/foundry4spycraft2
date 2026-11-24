@@ -260,6 +260,10 @@ const actionsOf = combatant =>
 /** A Press this round buys one more half action. */
 const extraHalfActions = combatant => (fluidForRound(combatant, combatant.parent?.round).pressed ? 1 : 0);
 
+/** Half actions a combatant still has this turn, counting a Press. */
+export const halfActionsLeft = combatant =>
+  HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
+
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
 export async function spendTurnAction(combatant, kind) {
   if (!combatant) return null;

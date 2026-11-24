@@ -19,6 +19,18 @@
   on a narrower range and its critical hit costs more action dice; the attack card says so.
 - **A fight begun by any GM starts flat-footed.** The lead GM marks the fight whoever pressed Begin combat.
 - **Group Initiative rolls NPCs only.** An agent no player owns is named in the report instead of being rolled.
+- **The GC Console has Prep, Play and Wrap-up views.** It picks one from the state of play and keeps your choice
+  until that state changes. Prep carries a first-session list that ticks itself; Wrap-up lists the closing steps.
+  The strip at the top now names the mission, the scene period, the round and whose turn, and GC dice left of the
+  starting number.
+- **The console can run a turn.** Its Combat section shows the acting combatant with Defense, health, conditions,
+  half actions left and a button per weapon, and follows the fight as turns change. Each row opens that combatant.
+  **Mob attack** rolls one attack for every standing member of a group of identical standard NPCs and moves the turn
+  past them.
+- **The console keeps its place.** A redraw no longer drops the scroll position, keyboard focus, search text or the
+  open "More mission tools" list.
+- **Shortcuts keep working after a mouse click.** Alt+B now acts on the card under the pointer or on your own newest
+  card, never another GC's, and names the card. Alt+S waits for a turn change and follows the turn with one sheet.
 - **Console dialogs have a Cancel button, a named main button and the cursor in the first field.**
 
 ## 0.7.0 — 2026-11-23

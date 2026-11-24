@@ -25,6 +25,9 @@ import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
 import * as tables from "./tables.mjs";
 import { addNpcToScene } from "./add-npc.mjs";
+import * as turn from "./console-turn.mjs";
+import { npcDamageSave } from "./npc-play.mjs";
+import { pressNewestCard } from "../keybindings.mjs";
 import {
   advanceClock,
   advanceClockDialog,
@@ -109,6 +112,18 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       ),
       surprise: guard(() => combat.surpriseRoundDialog()),
       combatReference: guard(() => combat.combatReferenceDialog()),
+      openCombatant: guard((event, target) => turn.openCombatant(game.combat, target.dataset.id)),
+      actingAttack: guard((event, target) => turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event)),
+      actingSpend: guard((event, target) => combat.spendTurnAction(game.combat?.combatant, target.dataset.kind)),
+      actingDamageSave: guard(() => npcDamageSave(game.combat?.combatant?.actor)),
+      actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),
+      actingReady: guard(() => combat.readyCombatant(game.combat?.combatant)),
+      cardNextStep: guard(() => {
+        if (!pressNewestCard("button.sc2-primary-action[data-roll-control]"))
+          ui.notifications.info(loc`No chat card is waiting for a next step.`);
+      }),
+      mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
+      consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
       startConflict: guard(() => conflicts.startConflictDialog()),
       advanceConflict: guard((event, target) => conflicts.advanceConflict(target.dataset.id)),
       manageConflict: guard((event, target) => conflicts.manageConflict(target.dataset.id)),
@@ -140,6 +155,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     return { ...(await super._prepareContext(options)), ...consoleContext() };
   }
 
+  /** What the GC was looking at, kept across a redraw: the scroll position, the focused control and open sub-lists. */
+  _preRender(context, options) {
+    this._kept = captureConsoleState(this.element);
+    return super._preRender?.(context, options);
+  }
+
   _onRender(context, options) {
     super._onRender(context, options);
     for (const details of this.element.querySelectorAll("details.gc-section[data-section]")) {
@@ -153,14 +174,136 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         rememberSection(key, details.dataset.state, details.open);
       });
     }
-    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`);
+    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
+    restoreConsoleState(this.element, this._kept);
+    this._kept = null;
   }
 
   async _onFirstRender(context, options) {
     await super._onFirstRender(context, options);
     if (!this.isPopout) game.spycraft2.gc.console = this;
   }
+}
+
+/** How a control is found again after a redraw: its action and the data that tells it from its neighbours. */
+const controlKey = element => {
+  if (!element?.dataset) return null;
+  if (element.matches?.(".sc2-tool-search input")) return { search: true };
+  const { action, list, key, change, id, view, kind, seconds, single, planned } = element.dataset;
+  return action ? { action, list, key, change, id, view, kind, seconds, single, planned } : null;
+};
+const SAME = ["action", "list", "key", "change", "id", "view", "kind", "seconds", "single", "planned"];
+
+/** Read the parts of the console's state that a redraw would otherwise drop. */
+export function captureConsoleState(root) {
+  if (!root?.querySelector) return null;
+  const scroller = root.matches?.(".gc-console-body") ? root : root.querySelector(".gc-console-body");
+  const scrolled = [root, scroller, scroller?.parentElement].find(element => element?.scrollTop > 0);
+  // Only focus that the keyboard put there is given back: a button clicked with the mouse lets go of it, so the
+  // shortcuts keep working.
+  const focused = root.contains?.(document.activeElement) ? document.activeElement : null,
+    active = focused?.matches?.(":focus-visible") ? focused : null;
+  return {
+    scrollTop: scrolled?.scrollTop ?? 0,
+    focus: controlKey(active),
+    selection: active?.matches?.("input") ? [active.selectionStart, active.selectionEnd] : null,
+    more: [...root.querySelectorAll("details.gc-more")].map(details => details.open)
+  };
+}
+
+/** Put the kept state back onto a freshly drawn console. */
+export function restoreConsoleState(root, kept) {
+  if (!root?.querySelector || !kept) return;
+  [...root.querySelectorAll("details.gc-more")].forEach((details, index) => {
+    if (kept.more[index]) details.open = true;
+  });
+  if (kept.focus) {
+    const target = kept.focus.search
+      ? root.querySelector(".sc2-tool-search input")
+      : [...root.querySelectorAll(`[data-action="${kept.focus.action}"]`)].find(element =>
+          SAME.every(name => element.dataset[name] === kept.focus[name])
+        );
+    target?.focus?.({ preventScroll: true });
+    if (kept.selection && target?.setSelectionRange)
+      try {
+        target.setSelectionRange(...kept.selection);
+      } catch {
+        /* a field that holds no text selection */
+      }
+  }
+  const scroller = root.matches?.(".gc-console-body") ? root : root.querySelector(".gc-console-body");
+  for (const element of [root, scroller, scroller?.parentElement])
+    if (element && element.scrollHeight > element.clientHeight) element.scrollTop = kept.scrollTop;
+}
+
+const VIEW_SETTING = "gcConsoleView";
+const VIEWS = ["prep", "play", "wrap"];
+/** The state the view choice belongs to: a choice made while planning does not hold once a fight is on. */
+const viewState = () => {
+  const m = getMission();
+  return game.combat ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning";
+};
+/** The view in use: the GC's choice for the current state, or the one that state calls for. */
+export function consoleView(state, stored = null) {
+  if (stored && stored.state === state && VIEWS.includes(stored.view)) return stored.view;
+  return state === "planning" ? "prep" : state === "ended" ? "wrap" : "play";
+}
+function rememberView(view, state) {
+  if (!VIEWS.includes(view)) return null;
+  return game.settings.set("spycraft2", VIEW_SETTING, { view, state });
+}
+/** Which sections each view shows. A search looks through all of them. */
+const VIEW_SECTIONS = {
+  prep: ["mission", "objectives", "antagonists", "complications", "campaign", "reference"],
+  play: ["combat", "dice", "objectives", "antagonists", "conflicts", "clock", "reference"],
+  wrap: ["mission", "objectives", "antagonists", "campaign"]
+};
+
+/**
+ * The first-session steps, ticked from what the world already holds. Shown in the Prep view until all are done.
+ */
+export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatSeen }) {
+  const steps = [
+    {
+      id: "mission",
+      label: loc`Record the mission: name, team and Caliber`,
+      done: !!mission.name,
+      action: "editMission"
+    },
+    {
+      id: "objectives",
+      label: loc`Add at least one objective`,
+      done: (mission.objectives ?? []).length > 0,
+      action: "addObjective"
+    },
+    {
+      id: "npcs",
+      label: loc`Prepare the opposition: make an NPC and place it`,
+      done: npcActors > 0,
+      action: "addNpcToScene"
+    },
+    {
+      id: "start",
+      label: loc`Start mission (fixes the Threat Level)`,
+      done: !!mission.active || !!mission.ended,
+      action: "startMission"
+    },
+    {
+      id: "session",
+      label: loc`Begin session (GC dice and starting action dice)`,
+      done: !!diceCurrent,
+      action: "beginSession"
+    },
+    { id: "combat", label: loc`First combat: add tokens to the tracker, roll Initiative`, done: !!combatSeen }
+  ];
+  const next = steps.find(step => !step.done);
+  return {
+    steps: steps.map(step => ({ ...step, next: step === next })),
+    done: steps.filter(step => step.done).length,
+    total: steps.length,
+    complete: !next
+  };
 }
 
 const SECTION_SETTING = "gcConsoleSections";
@@ -233,7 +376,46 @@ export function consoleContext() {
   const T = GC_DATA.tables,
     combatNow = game.combat ?? null,
     conflictList = conflicts.conflictRows();
+  const state = combatNow ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning",
+    view = consoleView(state, readSetting(VIEW_SETTING, null));
+  const acting = turn.actingBlock(combatNow),
+    paid = Object.keys(m.standingPaid ?? {}).length;
+  const checklist = firstSessionChecklist({
+    mission: m,
+    diceCurrent: dice.current,
+    npcActors: [...(game.actors ?? [])].filter(actor => actor.type === "npc").length,
+    combatSeen: !!combatNow || (m.scenesPlayed ?? 0) > 0
+  });
   return {
+    view,
+    views: [
+      { id: "prep", label: loc`Prep`, hint: loc`Mission record, opposition and campaign` },
+      { id: "play", label: loc`Play`, hint: loc`Combat, scene and GC action dice` },
+      { id: "wrap", label: loc`Wrap-up`, hint: loc`XP, standing and exposure` }
+    ].map(entry => ({ ...entry, active: entry.id === view })),
+    shown: Object.fromEntries(Object.keys(VIEW_SECTIONS).map(id => [id, id === view])),
+    hiddenSections: Object.fromEntries(
+      [...new Set(Object.values(VIEW_SECTIONS).flat())].map(id => [id, !VIEW_SECTIONS[view].includes(id)])
+    ),
+    checklist,
+    status: {
+      mission: m.name || loc`No mission recorded`,
+      missionState: m.active ? loc`active` : m.ended ? loc`ended` : loc`not started`,
+      scene: `${m.scenesPlayed ? loc`Scene ${m.scenesPlayed}, ` : ""}${scene.dramatic ? loc`dramatic` : loc`standard`}`,
+      turn: combatNow
+        ? combatNow.started
+          ? loc`Round ${combatNow.round}: ${combatNow.combatant?.name ?? "—"}`
+          : loc`Fight not begun`
+        : loc`No combat`,
+      dice: dice.current ? loc`${dice.value} left of ${team.length + 2 * m.caliber}` : loc`not set up`
+    },
+    wrap: {
+      standing:
+        team.length && paid >= team.length
+          ? loc`Standing: everyone paid`
+          : loc`Standing: ${Math.min(paid, team.length)} of ${team.length} paid`,
+      infractions: (m.infractions ?? []).length
+    },
     isGM: game.user.isGM,
     sections: consoleSections(
       {
@@ -302,19 +484,13 @@ export function consoleContext() {
           round: combatNow.round,
           started: combatNow.started,
           surprise: combatNow.flags?.spycraft2?.surprise ?? null,
-          combatants: combatNow.turns.map(c => {
-            const fluid = c.flags?.spycraft2?.fluid,
-              pending =
-                fluid?.round === combatNow.round ? fluid.modifiers.reduce((sum, entry) => sum + entry.amount, 0) : 0;
-            return {
-              name: c.name,
-              current: combatNow.started && combatNow.combatant?.id === c.id,
-              defeated: !!c.isDefeated,
-              count: c.initiative,
-              pending: pending ? signed(pending) : "",
-              mustPress: !!c.flags?.spycraft2?.mustPress
-            };
-          })
+          acting,
+          combatants: turn.combatRows(combatNow),
+          mobs: turn.mobGroups(combatNow).map(group => ({
+            key: group.key,
+            label: loc`Mob attack: ${group.name} ×${group.count}`
+          })),
+          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length
         }
       : null,
     conflicts: conflictList,
@@ -326,8 +502,37 @@ export function consoleContext() {
   };
 }
 
+// The Combat section shows the acting combatant, so the console follows the fight instead of waiting for a press.
+let refreshTimer = null;
+function refreshSoon() {
+  if (refreshTimer) return;
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    const instance = game.spycraft2?.gc?.console;
+    if (instance?.rendered) instance.render();
+  }, 120);
+}
+const inFight = actor =>
+  !!actor && [...(game.combat?.combatants ?? [])].some(combatant => combatant.actor?.uuid === actor.uuid);
+
 /** Register before Foundry constructs its sidebar applications. */
 export function registerGCConsoleTab() {
+  for (const hook of [
+    "createCombat",
+    "deleteCombat",
+    "updateCombat",
+    "createCombatant",
+    "deleteCombatant",
+    "updateCombatant"
+  ])
+    Hooks.on(hook, refreshSoon);
+  Hooks.on("updateActor", actor => {
+    if (inFight(actor)) refreshSoon();
+  });
+  for (const hook of ["createActiveEffect", "deleteActiveEffect"])
+    Hooks.on(hook, effect => {
+      if (inFight(effect?.parent)) refreshSoon();
+    });
   CONFIG.ui.gc = GCConsole;
   const Sidebar = CONFIG.ui.sidebar;
   const tabs = Object.entries(Sidebar.TABS).filter(([name]) => name !== "gc");

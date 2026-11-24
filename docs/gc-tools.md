@@ -8,6 +8,13 @@ Foundry already supplies scenes, tokens, journals, roll tables and the combat tr
 
 ## Running a session
 
+- The console has three views. **Prep** shows the mission record, the opposition and the campaign, with a
+  first-session list that ticks itself. **Play** shows combat, the scene and the GC action dice. **Wrap-up** lists
+  the closing steps: XP report, exposure, standing, End mission. The console picks the view from the state of play
+  (planning, a mission or a fight under way, a mission ended) and keeps your own choice until that state changes. The
+  search looks through every section whatever the view.
+- The strip at the top names the mission and its state, the scene period, the round and whose turn it is, and the GC
+  action dice left of the starting number.
 - **Begin session** (top of the console) starts the session's usage period, sets up the GC pool from the team and the
   mission's Caliber, and applies each agent's starting-dice adjustments in one step. **Next scene** starts a new scene
   period and counts the scene on the active mission. **Start mission** also starts a mission period.
@@ -57,7 +64,13 @@ A **dramatic scene** lasts until the next scene starts. While it lasts, GC dice 
 - Combatants start flat-footed (world setting).
 - Order is Count, then Initiative bonus, then a stored d20 roll-off.
 - **Fluid initiative event** (console, or the combatant's context menu) records a Table 5.2 modifier. When the round advances the recorded modifiers are applied, limited to ±10; a Count of 0 or less causes reeling and flat-footed and gains 20; 50 or more flags a forced Press. Delay, Press and a triggered Ready change the Count at once.
-- **Roll NPC Initiative** makes one roll per NPC type, or one for all.
+- **Roll NPC Initiative** makes one roll per NPC type, or one for all. It rolls NPCs only; an agent no player owns
+  is named in the report so it can be rolled from its sheet.
+- The tracker's right-click menu has **Spend a half action**, **Spend a full action**, **Give back this round's
+  actions**, **Delay 1 Count**, **Delay…**, **Ready an action**, **Readied action triggered** and **Fluid initiative
+  event…**. A readied combatant is marked on its row until the action goes off or its next turn comes.
+- A Henchman or Mastermind named as an attack's target narrows the threat range and raises the critical's cost; the
+  attack card says so. Apply the same rule by hand to skill checks aimed at them.
 - **Surprise round** takes each side's opposed result and announces who acts.
 
 Fluid initiative can be turned off in the system settings.
@@ -72,6 +85,15 @@ Fluid initiative can be turned off in the system settings.
    button is the next step. Press **Finish** when nothing is left to do on the card.
 4. Record spent actions from the combatant's context menu if the roll did not do so, then press **Next turn**.
 
+The console's Combat section can run the same turn without the sheet. The **acting block** names the combatant
+whose turn it is, with Defense, health, conditions and half actions left, a button for each weapon (with one token
+targeted it goes straight to hit or miss), Delay, Ready, the standard NPC's Damage save and **Next step on the newest
+card**. Each row of the list is a button that centres the map on the token and opens the sheet.
+
+**Mob attack** appears when two or more standing standard NPCs of one kind are in the fight. Pick the weapon and
+tick the targets: every member makes one attack, the targets are shared out in order, and the turn then moves past
+the group.
+
 ### Keyboard
 
 These shortcuts are listed under Configure Controls, where each can be changed or cleared.
@@ -83,7 +105,10 @@ These shortcuts are listed under Configure Controls, where each can be changed o
 | Alt+G     | Open the GC Console                                | GC  |
 | Alt+S     | Open the sheet of the combatant whose turn it is   | GC  |
 | Alt+Enter | Press the main button on the newest chat card      | All |
-| Alt+B     | GC boost on the newest NPC card that can take one  | GC  |
+| Alt+B     | GC boost on the card under the pointer, else your newest NPC card | GC  |
+
+A button clicked with the mouse lets go of the focus, so the shortcuts keep working after a click. Alt+S follows the
+turn: the sheet it opened last closes when it opens the next one.
 
 Every control is also reachable with Tab; Enter submits a dialog and Esc cancels it.
 

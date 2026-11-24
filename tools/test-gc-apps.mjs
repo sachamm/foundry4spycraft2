@@ -670,6 +670,91 @@ test("console context summarises everything without throwing", async () => {
     (await import("node:fs")).writeFileSync(process.env.GC_CONTEXT_OUT, JSON.stringify(context));
 });
 
+test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's choice for that state", async () => {
+  const { consoleView, firstSessionChecklist } = await import("../module/apps/gc/console.mjs");
+  assert.equal(consoleView("planning"), "prep");
+  assert.equal(consoleView("active"), "play");
+  assert.equal(consoleView("combat"), "play");
+  assert.equal(consoleView("ended"), "wrap");
+  assert.equal(consoleView("active", { view: "prep", state: "active" }), "prep");
+  assert.equal(consoleView("combat", { view: "prep", state: "active" }), "play", "a fight brings Play back");
+  assert.equal(consoleView("active", { view: "nonsense", state: "active" }), "play");
+  const context = consoleContext();
+  assert.equal(context.view, "play");
+  assert.equal(context.hiddenSections.combat, false);
+  assert.equal(context.hiddenSections.campaign, true);
+  assert.match(context.status.dice, /left of 10|not set up/);
+  assert.equal(context.status.missionState, "active");
+
+  const blank = firstSessionChecklist({ mission: { objectives: [] }, diceCurrent: false, npcActors: 0 });
+  assert.deepEqual([blank.done, blank.total, blank.complete], [0, 6, false]);
+  assert.equal(blank.steps.find(step => step.next).id, "mission");
+  const ready = firstSessionChecklist({
+    mission: { name: "Cold Open", objectives: [{}], active: true },
+    diceCurrent: true,
+    npcActors: 2,
+    combatSeen: false
+  });
+  assert.equal(ready.steps.find(step => step.next).id, "combat");
+  assert.equal(
+    firstSessionChecklist({
+      ...{ mission: { name: "x", objectives: [{}], ended: true } },
+      diceCurrent: true,
+      npcActors: 1,
+      combatSeen: true
+    }).complete,
+    true
+  );
+});
+
+test("the Combat section names the acting combatant, words each row and finds the mobs", async () => {
+  const turnTools = await import("../module/apps/gc/console-turn.mjs");
+  const twin = makeActor("guard", "npc", npcSystem(), { name: "Guard" });
+  const fight = makeCombat([
+    ["h", actors.get("a1"), 22, true],
+    ["g1", guard, 15, false],
+    ["g2", twin, 15, false],
+    ["b", boss, null, false]
+  ]);
+  fight.combatants.get("g2").isDefeated = false;
+  const acting = turnTools.actingBlock(fight);
+  assert.equal(acting.name, "a1");
+  assert.equal(acting.halfActions, "2 half actions left");
+  assert.equal(acting.npc, false);
+  const rows = turnTools.combatRows(fight);
+  assert.deepEqual(
+    rows.map(row => [row.id, row.count, row.current]),
+    [
+      ["h", "Count 22", true],
+      ["g1", "Count 15", false],
+      ["g2", "Count 15", false],
+      ["b", "not rolled", false]
+    ]
+  );
+  const mobs = turnTools.mobGroups(fight);
+  assert.deepEqual(
+    mobs.map(group => [group.key, group.count]),
+    [["guard", 2]]
+  );
+  fight.combatants.get("g2").isDefeated = true;
+  assert.equal(turnTools.mobGroups(fight).length, 0, "one standing guard is not a mob");
+  assert.match(turnTools.combatRows(fight)[2].notes, /defeated/);
+  assert.deepEqual(turnTools.shareTargets(["a", "b", "c"], ["x", "y"]), [
+    ["a", "x"],
+    ["b", "y"],
+    ["c", "x"]
+  ]);
+  assert.deepEqual(turnTools.shareTargets(["a"], []), []);
+  // One Next for the group: the turn moves on until it leaves the mob.
+  fight.combatants.get("g2").isDefeated = false;
+  fight.turn = 1;
+  fight.nextTurn = async function () {
+    this.turn++;
+  };
+  assert.equal(await turnTools.passGroup(fight, [fight.combatants.get("g1"), fight.combatants.get("g2")]), 2);
+  assert.equal(fight.combatant.id, "b");
+});
+
 test("console sections open for the state in play and keep the GC's choice until that state changes", () => {
   const planning = consoleSections({ missionActive: false, combat: false, conflictsRunning: false });
   assert.equal(planning.mission.open, true);
