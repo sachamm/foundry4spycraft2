@@ -58,6 +58,7 @@ export async function editPortrait(event, target) {
           <input type="text" id="sc2-portrait-path" name="path" value="${esc(current)}"
             placeholder="https://example.com/portrait.webp" autocomplete="off" />
           <p class="hint">${loc`Paste a web address, or a path in the Foundry Data folder such as worlds/my-world/portraits/agent.webp.`}</p>
+          <p class="hint sc2-portrait-error" role="alert" hidden>${loc`Not an image address yet: use a web address or Data folder path ending in .webp, .png, .jpg or another image type.`}</p>
           <p class="hint">${loc`To pick from files instead, the GC can turn on Use File Browser for players in Configure Permissions.`}</p>
         </div>
       </div>`,
@@ -66,11 +67,19 @@ export async function editPortrait(event, target) {
       const root = dialog.element ?? dialog;
       const field = root.querySelector('input[name="path"]');
       const preview = root.querySelector(".sc2-portrait-preview");
-      field?.addEventListener("input", () => {
+      const error = root.querySelector(".sc2-portrait-error");
+      const ok = root.querySelector('button[data-action="ok"]');
+      // An address that is not an image keeps the dialog open: the reason shows under the field and OK waits.
+      const check = () => {
         const path = portraitPath(field.value);
         if (path) preview.src = path;
         preview.classList.toggle("sc2-invalid", !path);
-      });
+        field.setAttribute("aria-invalid", String(!path));
+        if (error) error.hidden = Boolean(path) || !field.value.trim();
+        if (ok) ok.disabled = !path;
+      };
+      field?.addEventListener("input", check);
+      if (field) check();
       field?.select();
     }
   });

@@ -4407,6 +4407,7 @@
    "NotAdjacent_1ru912k": "not adjacent",
    "NotAnAllowedAnimalSkillP_0cr3lcy": "{0}: not an allowed animal skill (p.445).",
    "NotAnExistingActor_1tu3u83": "Not an existing actor",
+   "NotAnImageAddressYetUse_1fca86p": "Not an image address yet: use a web address or Data folder path ending in .webp, .png, .jpg or another image type.",
    "NotAppliedAutomatically_0ma5tuq": "Not applied automatically: {0}",
    "NotAppliedToCheckTheWarnings_0vwk5s6": "Not applied to: {0}. Check the warnings and apply those by hand.",
    "NotAppliedUntilAPickIs_19ju0zw": "Not applied until a pick is earned: {0}.",

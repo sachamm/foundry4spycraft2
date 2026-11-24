@@ -643,6 +643,9 @@
   border: 1px solid var(--sc2-rule);
   border-radius: var(--sc2-radius);
 }
+.spycraft2.application.sc2-dialog .sc2-portrait-error {
+  color: var(--sc2-danger);
+}
 .spycraft2 .sc2-portrait-preview.sc2-invalid {
   opacity: 0.4;
   border-color: var(--sc2-danger);
