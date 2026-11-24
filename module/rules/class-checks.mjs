@@ -5,6 +5,12 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 export const intelligenceAnalysisNote = () =>
   loc`Intelligence Analysis: half standard time, rounded up, minimum 1 minute.`;
 export const boobyTrapNote = () => loc`Booby Trap: half standard time, rounded down, minimum 1 half action.`;
+/** Clever and Vigilant talents (pp.18, 21): +1 to checks that determine surprise, +1 more at Career Levels 4, 8, 12, 16, 20. */
+export function talentSurpriseBonus(system) {
+  if (!["Clever", "Vigilant"].includes(system?.talentName)) return 0;
+  const level = Number.isSafeInteger(system.level) ? system.level : 0;
+  return 1 + Math.min(5, Math.floor(level / 4));
+}
 /** Reviewed conditional class options, pp.36,38,42,46–48,52. */
 export function classCheckEffects(
   system,
@@ -87,6 +93,11 @@ export function classCheckEffects(
   if (surprise && has("sleuth", "Alertness")) {
     result.bonuses.push({ value: 4, type: "" });
     result.notes.push(loc`Alertness: +4 to determine surprise.`);
+  }
+  const talentSurprise = surprise ? talentSurpriseBonus(system) : 0;
+  if (talentSurprise) {
+    result.bonuses.push({ value: talentSurprise, type: "" });
+    result.notes.push(loc`${system.talentName}: +${talentSurprise} to determine surprise.`);
   }
   return result;
 }

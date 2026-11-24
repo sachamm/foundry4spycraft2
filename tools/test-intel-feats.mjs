@@ -400,7 +400,8 @@ test("source downgrade during a multi-feat claim rolls back its partial grant, a
   assert.equal(a.system.classLevels.tactician, 3);
   for (const key of Object.keys(cfg.proficiencies).filter(k => k !== "unarmed")) {
     a = reset("artOfWar", 3);
-    a.system.proficiencies[key] = { proficient: true };
+    // Level 3 earns one proficiency pick, so the agent holds only the one being focused.
+    a.system.proficiencies = { [key]: { proficient: true } };
     a.derive();
     const [created] = await a.useIntelTemporaryFeats("artOfWar", { ...options(["Weapon Focus"]), featChoices: [key] });
     assert.equal(created.system.choice, key);

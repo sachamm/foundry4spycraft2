@@ -197,6 +197,7 @@
    "Total": "Total",
    "Threat": "Threat",
    "ThreatRange": "Threat range",
+   "FocusHint": "Focus skill: choose focuses as you buy ranks, with another every 4 ranks. A check outside your focuses uses half your ranks and counts as untrained.",
    "ThreatHint": "The die faces that may become a critical success if the check also succeeds.",
    "ClassManual": "Class skill (manual)",
    "Cap": "Cap",

@@ -1094,27 +1094,6 @@
   },
   {
    "num": 20,
-   "name": "Mercenary",
-   "originType": "specialty",
-   "bonuses": [
-    {
-     "target": "prof.tactical",
-     "value": "1"
-    },
-    {
-     "target": "contacts",
-     "value": "@tb.t3"
-    },
-    {
-     "target": "featSlots.rangedCombat",
-     "value": "1"
-    }
-   ],
-   "grants": [],
-   "classSkills": []
-  },
-  {
-   "num": 21,
    "name": "Motorhead",
    "originType": "specialty",
    "bonuses": [
@@ -1135,7 +1114,7 @@
    "classSkills": []
   },
   {
-   "num": 22,
+   "num": 21,
    "name": "Operative",
    "originType": "specialty",
    "bonuses": [
@@ -1156,7 +1135,7 @@
    "classSkills": []
   },
   {
-   "num": 23,
+   "num": 22,
    "name": "Outdoorsman",
    "originType": "specialty",
    "bonuses": [
@@ -1181,7 +1160,7 @@
    "classSkills": []
   },
   {
-   "num": 24,
+   "num": 23,
    "name": "Pickpocket",
    "originType": "specialty",
    "bonuses": [
@@ -1212,7 +1191,7 @@
    "classSkills": []
   },
   {
-   "num": 25,
+   "num": 24,
    "name": "Pilot",
    "originType": "specialty",
    "bonuses": [
@@ -1243,7 +1222,7 @@
    "classSkills": []
   },
   {
-   "num": 26,
+   "num": 25,
    "name": "Playboy",
    "originType": "specialty",
    "bonuses": [
@@ -1260,28 +1239,7 @@
    "classSkills": []
   },
   {
-   "num": 27,
-   "name": "Recruit",
-   "originType": "specialty",
-   "bonuses": [
-    {
-     "target": "prof.handgun",
-     "value": "1"
-    },
-    {
-     "target": "prof.rifle",
-     "value": "1"
-    }
-   ],
-   "grants": [
-    {
-     "feat": "Officer"
-    }
-   ],
-   "classSkills": []
-  },
-  {
-   "num": 28,
+   "num": 26,
    "name": "Rescuer",
    "originType": "specialty",
    "bonuses": [
@@ -1308,7 +1266,7 @@
    "classSkills": []
   },
   {
-   "num": 29,
+   "num": 27,
    "name": "Researcher",
    "originType": "specialty",
    "bonuses": [
@@ -1334,7 +1292,7 @@
    "classSkills": []
   },
   {
-   "num": 30,
+   "num": 28,
    "name": "Sailor",
    "originType": "specialty",
    "bonuses": [
@@ -1362,6 +1320,50 @@
      "feat": "Wave Runner"
     }
    ],
+   "classSkills": []
+  },
+  {
+   "num": 29,
+   "name": "Serviceman",
+   "legacyName": "Recruit",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.handgun",
+     "value": "1"
+    },
+    {
+     "target": "prof.rifle",
+     "value": "1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Officer"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 30,
+   "name": "Soldier of Fortune",
+   "legacyName": "Mercenary",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.tactical",
+     "value": "1"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "featSlots.rangedCombat",
+     "value": "1"
+    }
+   ],
+   "grants": [],
    "classSkills": []
   },
   {
@@ -1491,7 +1493,8 @@
   },
   {
    "num": 37,
-   "name": "Thrill Seeker",
+   "name": "Thrill-Seeker",
+   "legacyName": "Thrill Seeker",
    "originType": "specialty",
    "bonuses": [
     {

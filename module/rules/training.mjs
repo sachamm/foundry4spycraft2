@@ -1,4 +1,4 @@
-import { ruleName } from "./rule-name.mjs";
+import { originRuleName, ruleName } from "./rule-name.mjs";
 import { loc } from "../i18n.mjs";
 const norm = value =>
   String(value ?? "")
@@ -9,19 +9,26 @@ export function proficiencyTotals(system, cfg, bonus, available) {
     hints = {},
     warnings = [];
   let used = 0;
+  // Picks beyond the earned allowance are recorded but give nothing; they are dropped in list order (pp.27–28).
+  const unpaid = [];
+  const pay = () => used++ < available;
   for (const key of Object.keys(cfg.proficiencies)) {
     const selected = system.proficiencies?.[key] ?? {};
     const granted = bonus(`prof.${key}`) > 0;
     const forteGranted = bonus(`forte.${key}`) > 0;
-    const proficient = !!selected.proficient || granted;
-    const forte = proficient && (!!selected.forte || forteGranted);
-    if (selected.proficient && !granted) used++;
-    if (selected.forte && !forteGranted) used++;
+    const paidProficiency = !!selected.proficient && !granted ? pay() : false;
+    if (selected.proficient && !granted && !paidProficiency) unpaid.push(cfg.proficiencies[key].label);
+    const proficient = granted || paidProficiency;
+    const paidForte = !!selected.forte && !forteGranted && proficient ? pay() : false;
+    if (selected.forte && !forteGranted && proficient && !paidForte)
+      unpaid.push(loc`${cfg.proficiencies[key].label} forte`);
+    const forte = proficient && (forteGranted || paidForte);
     if ((selected.forte || forteGranted) && !proficient)
       warnings.push(loc`${cfg.proficiencies[key].label}: a forte requires its weapon proficiency.`);
     totals[key] = { proficient, forte, granted, forteGranted };
     hints[key] = granted;
   }
+  if (unpaid.length) warnings.push(loc`Not applied until a pick is earned: ${unpaid.join(", ")}.`);
   return { totals, picks: { available, used, remaining: available - used, hints }, warnings };
 }
 
@@ -37,7 +44,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
     pending = [],
     forteGrants = [];
   for (const item of items.filter(i => i.type === "origin")) {
-    const rules = cfg.tables.originFocuses?.[item.name] ?? {};
+    const rules = cfg.tables.originFocuses?.[originRuleName(item)] ?? {};
     for (const [key, values] of Object.entries(rules.fixed ?? {}))
       for (const value of values) {
         forced[key].add(value);
@@ -64,14 +71,25 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
     }
     if (rules.forte) forteGrants.push({ name: item.name, skill, focus });
   }
-  const fortes = system.skillFortes ?? [];
-  for (const row of fortes) {
-    if (
-      !groups.includes(row.skill) ||
-      !totals[row.skill].some(value => norm(value) === norm(canonical(row.focus))) ||
-      !row.forte?.trim()
-    )
+  // A forte must name an owned focus and a subdivision of it, once (p.98). Rows that don't give no bonus.
+  const seen = new Set(),
+    fortes = [];
+  for (const row of system.skillFortes ?? []) {
+    const valid =
+      groups.includes(row.skill) &&
+      totals[row.skill].some(value => norm(value) === norm(canonical(row.focus))) &&
+      !!row.forte?.trim();
+    if (!valid) {
       warnings.push(loc`A skill forte must name an owned focus and one of its subdivisions.`);
+      continue;
+    }
+    const key = `${row.skill}|${norm(canonical(row.focus))}|${norm(row.forte)}`;
+    if (seen.has(key)) {
+      warnings.push(loc`The ${row.forte.trim()} forte is listed twice; it counts once.`);
+      continue;
+    }
+    seen.add(key);
+    fortes.push(row);
   }
   const picks = {};
   let genericUsed = (system.focuses?.fortes ?? []).length;

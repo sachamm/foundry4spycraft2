@@ -4628,6 +4628,7 @@
    "Discredited",
    "Fear",
    "GC Fiat",
+   "Impending Doom",
    "Liaison",
    "Long-term Mission",
    "Mistaken/True Identity",
@@ -6560,7 +6561,7 @@
     "forte": true,
     "choiceSkill": "drive"
    },
-   "Thrill Seeker": {
+   "Thrill-Seeker": {
     "domain": [
      "Personal Ground Vehicles",
      "Personal Aircraft",

@@ -4598,6 +4598,7 @@ export const TABLES = {
   "Discredited",
   "Fear",
   "GC Fiat",
+  "Impending Doom",
   "Liaison",
   "Long-term Mission",
   "Mistaken/True Identity",
@@ -6530,7 +6531,7 @@ export const TABLES = {
    "forte": true,
    "choiceSkill": "drive"
   },
-  "Thrill Seeker": {
+  "Thrill-Seeker": {
    "domain": [
     "Personal Ground Vehicles",
     "Personal Aircraft",
