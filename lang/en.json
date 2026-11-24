@@ -150,6 +150,14 @@
    "wis": "Wisdom",
    "cha": "Charisma"
   },
+  "AbilityAbbr": {
+   "str": "STR",
+   "dex": "DEX",
+   "con": "CON",
+   "int": "INT",
+   "wis": "WIS",
+   "cha": "CHA"
+  },
   "Save": {
    "fort": "Fortitude",
    "ref": "Reflex",

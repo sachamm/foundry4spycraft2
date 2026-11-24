@@ -898,7 +898,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.abilities = Object.entries(cfg.abilities).map(([key, label]) => ({
       key,
       label: game.i18n.localize(label),
-      abbr: key.toUpperCase(),
+      abbr: game.i18n.localize(`SPYCRAFT.AbilityAbbr.${key}`),
       ...sys.abilities[key]
     }));
     context.increaseLevels = cfg.abilityIncreaseLevels.map(l => ({
@@ -1870,6 +1870,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       abilities: Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => ({
         key,
         label: game.i18n.localize(label),
+        abbr: game.i18n.localize(`SPYCRAFT.AbilityAbbr.${key}`),
         ...sys.abilities[key]
       })),
       saves: Object.entries(CONFIG.SPYCRAFT.saves).map(([key, s]) => ({

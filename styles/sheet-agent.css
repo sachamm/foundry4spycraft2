@@ -403,6 +403,16 @@
 .spycraft2.sheet.agent .ability-strip {
   margin-bottom: var(--sc2-space-2);
 }
+/* Between the rail folding (720px) and the default width, the rail squeezes the strip and the longest attribute
+   names no longer fit, so the tiles show abbreviations. */
+@container (min-width: 721px) and (max-width: 857px) {
+  .spycraft2.sheet.agent .ability-strip .ability-name {
+    display: none;
+  }
+  .spycraft2.sheet.agent .ability-strip .ability-abbr {
+    display: inline;
+  }
+}
 
 /* ---------- Creation track: the build order, each step in its own hue ---------- */
 .spycraft2.sheet.agent .creation-track[hidden] {
