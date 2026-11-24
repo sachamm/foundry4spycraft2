@@ -270,6 +270,8 @@ export function renderUndo(message, html) {
     button.type = "button";
     button.className = "sc2-quiet-action";
     button.textContent = loc`Undo`;
+    // Several notes each carry a button: its name says which step it takes back.
+    button.setAttribute("aria-label", loc`Undo: ${record.label}`);
     button.dataset.tooltip = loc`Puts back what this step changed${record.gcDice ? loc` and returns ${record.gcDice} GC action di${record.gcDice === 1 ? "e" : "ce"}` : ""}`;
     button.addEventListener("click", async () => {
       button.disabled = true;

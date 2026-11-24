@@ -196,13 +196,25 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 }
 
 /** How a control is found again after a redraw: its action and the data that tells it from its neighbours. */
-const controlKey = element => {
+const SAME = ["action", "list", "key", "change", "id", "view", "kind", "seconds", "single", "planned"];
+const twins = (root, wanted) =>
+  [...(root?.querySelectorAll?.(`[data-action="${wanted.action}"]`) ?? [])].filter(element =>
+    SAME.every(name => element.dataset[name] === wanted[name])
+  );
+const controlKey = (element, root = null) => {
   if (!element?.dataset) return null;
   if (element.matches?.(".sc2-tool-search input")) return { search: true };
+  // A section heading has no action of its own: it is found again by its section.
+  if (element.matches?.("summary")) {
+    const section = element.closest?.("details[data-section]")?.dataset.section;
+    return section ? { section } : null;
+  }
   const { action, list, key, change, id, view, kind, seconds, single, planned } = element.dataset;
-  return action ? { action, list, key, change, id, view, kind, seconds, single, planned } : null;
+  if (!action) return null;
+  const wanted = { action, list, key, change, id, view, kind, seconds, single, planned };
+  // The same action can stand in two places (the acting block and the list): the place is kept too.
+  return { ...wanted, nth: Math.max(0, twins(root, wanted).indexOf(element)) };
 };
-const SAME = ["action", "list", "key", "change", "id", "view", "kind", "seconds", "single", "planned"];
 
 /** Read the parts of the console's state that a redraw would otherwise drop. */
 export function captureConsoleState(root) {
@@ -215,7 +227,7 @@ export function captureConsoleState(root) {
     active = focused?.matches?.(":focus-visible") ? focused : null;
   return {
     scrollTop: scrolled?.scrollTop ?? 0,
-    focus: controlKey(active),
+    focus: controlKey(active, root),
     selection: active?.matches?.("input") ? [active.selectionStart, active.selectionEnd] : null,
     more: [...root.querySelectorAll("details.gc-more")].map(details => details.open)
   };
@@ -228,11 +240,12 @@ export function restoreConsoleState(root, kept) {
     if (kept.more[index]) details.open = true;
   });
   if (kept.focus) {
+    const same = kept.focus.action ? twins(root, kept.focus) : [];
     const target = kept.focus.search
       ? root.querySelector(".sc2-tool-search input")
-      : [...root.querySelectorAll(`[data-action="${kept.focus.action}"]`)].find(element =>
-          SAME.every(name => element.dataset[name] === kept.focus[name])
-        );
+      : kept.focus.section
+        ? root.querySelector(`details[data-section="${kept.focus.section}"] > summary`)
+        : (same[kept.focus.nth ?? 0] ?? same[0]);
     target?.focus?.({ preventScroll: true });
     if (kept.selection && target?.setSelectionRange)
       try {
@@ -391,7 +404,8 @@ export function consoleContext() {
   const state = combatNow ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning",
     view = consoleView(state, readSetting(VIEW_SETTING, null), viewKey());
   const acting = turn.actingBlock(combatNow),
-    paid = Object.keys(m.standingPaid ?? {}).length;
+    // Only receipts for the agents on the team now: one who left does not stand in for one who joined.
+    paid = team.filter(actor => m.standingPaid?.[actor.id]).length;
   const checklist = firstSessionChecklist({
     mission: m,
     diceCurrent: dice.current,
@@ -554,6 +568,11 @@ export function registerGCConsoleTab() {
   for (const hook of ["createActiveEffect", "deleteActiveEffect"])
     Hooks.on(hook, effect => {
       if (inFight(effect?.parent)) refreshSoon();
+    });
+  // A weapon added, changed or removed, or an effect switched on or off, changes what the acting block offers.
+  for (const hook of ["updateActiveEffect", "createItem", "updateItem", "deleteItem"])
+    Hooks.on(hook, document => {
+      if (inFight(document?.parent)) refreshSoon();
     });
   CONFIG.ui.gc = GCConsole;
   const Sidebar = CONFIG.ui.sidebar;

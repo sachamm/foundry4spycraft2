@@ -80,7 +80,8 @@ function openActingSheet() {
     if (!sheet) return;
     // One sheet follows the turn: the one this shortcut opened last is closed when the turn has moved on.
     if (shortcutSheet && shortcutSheet !== sheet && shortcutSheet.rendered) shortcutSheet.close();
-    shortcutSheet = sheet;
+    // A sheet the GC already had open is theirs: the shortcut does not close it later.
+    shortcutSheet = sheet.rendered ? null : sheet;
     sheet.render(true);
   });
   return true;

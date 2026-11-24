@@ -384,7 +384,9 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
   if (!combat) return refuse(loc`There is no active combat.`);
   // NPCs only: an agent nobody owns today (an absent player's character) still rolls its own check, so it can be
   // boosted, and is named in the report instead.
-  const unrolled = combat.combatants.filter(combatant => combatant.initiative === null && combatant.actor),
+  const unrolled = combat.combatants.filter(
+      combatant => combatant.initiative === null && combatant.actor && !combatant.isDefeated
+    ),
     // An NPC a player runs is that player's to roll.
     pending = unrolled.filter(combatant => combatant.actor.type === "npc" && !combatant.hasPlayerOwner),
     left = unrolled.filter(combatant => combatant.actor.type !== "npc" && !combatant.hasPlayerOwner);

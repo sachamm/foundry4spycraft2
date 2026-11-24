@@ -150,7 +150,9 @@ export async function mobAttackDialog(combat, key = null) {
   if (!combat?.started) return refuse(loc`Start the combat first.`);
   const groups = mobGroups(combat);
   if (!groups.length) return refuse(loc`No group of two or more standard NPCs of one kind is in this fight.`);
-  const group = groups.find(entry => entry.key === key) ?? groups[0];
+  // A group that has since fallen below two members is not replaced by another one.
+  const group = key ? groups.find(entry => entry.key === key) : groups[0];
+  if (!group) return refuse(loc`That group no longer has two standing members.`);
   // A mob acts on its own turn, and only with members whose turn has not passed this round.
   const acting = combat.turns.findIndex(entry => entry.id === combat.combatant?.id);
   if (!group.members.some(member => member.id === combat.combatant?.id))

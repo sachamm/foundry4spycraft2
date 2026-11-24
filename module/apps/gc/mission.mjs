@@ -146,6 +146,8 @@ export async function nextScene() {
 export async function startMission() {
   requireGC();
   const before = getMission();
+  // A second press, or a stale button, must not wipe the results of the run in progress.
+  if (before.active) return decline(loc`The mission is already active. End it first to start a new run.`);
   // An ended record still holds the last run's results. Starting it again is a new run, so they are cleared first.
   const hadResults =
     !before.active &&

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **Second council, fixes to the changes above** (none of them had been released):
+  - End mission, Resume and the mission dialog no longer write back an old copy of the mission, so an objective
+    ticked while a question is open is kept. The standing award re-reads who was paid after its dialog and cannot pay
+    an agent twice from two dialogs. Start mission refuses on an active mission, and asks before clearing any record
+    that holds results, including one ended by an older version.
+  - A wounded NPC whose maximum falls and comes back (End then Resume, or a type switched and switched back) gets
+    its damage back instead of being healed.
+  - Undo works on a standard NPC's first Damage save, asks only when a value really changed again, runs once however
+    often it is pressed, takes back the fluid initiative event the damage recorded, and is visible to the GC for a
+    step a player took.
+  - The turn stays with the acting character when a readied action goes off, someone delays off-turn or Initiative
+    is rolled mid-fight. Mob attack runs only on the group's turn, with the members whose turn has not passed.
+  - A hidden dialog field can no longer hold the main button, Cancel always closes, console buttons run once at a
+    time, and a view chosen in one fight does not hide Combat in the next.
+  - A threat range closed by a Henchman or Mastermind prints as none, not "20".
+- **Test builds.** A "Test build" workflow packages any branch for the test server; see `docs/test-install.md`.
 - **Ending a mission is safe.** End mission asks first and says what it does, the console shows the mission as
   ended, and **Resume mission** reopens it with nothing changed. The ended record still feeds the XP report and each
   agent's XP settlement. **Start again** on an ended mission asks, then clears the last run's completed objectives,
