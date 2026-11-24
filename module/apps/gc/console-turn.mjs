@@ -119,9 +119,11 @@ export async function openCombatant(combat, id) {
 }
 
 /** Attack with one of the acting character's weapons: straight to hit or miss with one target, else the dialog. */
-export async function attackWith(actor, itemId, event = null) {
+export async function attackWith(actor, itemId, event = null, combatant = null) {
   const item = actor?.items?.get(itemId);
   if (!item) return refuse(loc`That weapon is no longer on the sheet.`);
+  // Range and flanking are measured from the selected token: with several tokens of one actor, the acting one.
+  combatant?.token?.object?.control?.({ releaseOthers: true });
   const quick = skipDialog(event) && quickAttackHasTarget(actor);
   const message = await actor.rollAttack(item, quick ? quickAttackOptions(actor, item) : { askContext: true });
   return attackMade(actor, message, quick);
@@ -149,16 +151,22 @@ export async function mobAttackDialog(combat, key = null) {
   const groups = mobGroups(combat);
   if (!groups.length) return refuse(loc`No group of two or more standard NPCs of one kind is in this fight.`);
   const group = groups.find(entry => entry.key === key) ?? groups[0];
+  // A mob acts on its own turn, and only with members whose turn has not passed this round.
+  const acting = combat.turns.findIndex(entry => entry.id === combat.combatant?.id);
+  if (!group.members.some(member => member.id === combat.combatant?.id))
+    return refuse(loc`Mob attack is for the group's own turn: wait until one of ${group.name} is acting.`);
+  const attackers = group.members.filter(member => combat.turns.findIndex(entry => entry.id === member.id) >= acting);
   const weapons = [...(group.members[0].actor.items ?? [])].filter(item => item.type === "weapon");
   if (!weapons.length) return refuse(loc`${group.name} has no weapon on its sheet.`);
   const foes = combat.turns.filter(
     combatant => combatant.actor && !combatant.isDefeated && !group.members.includes(combatant) && combatant.token
   );
   if (!foes.length) return refuse(loc`There is nobody else in the fight to attack.`);
-  const likely = foes.filter(combatant => combatant.actor.type === "agent");
+  const down = combatant => ["dead", "dying", "unconscious"].some(state => combatant.actor.statuses?.has?.(state));
+  const likely = foes.filter(combatant => combatant.actor.type === "agent" && !down(combatant));
   const input = await formDialog({
-    title: loc`Mob attack — ${group.name} ×${group.count}`,
-    ok: loc`Roll ${group.count} attacks`,
+    title: loc`Mob attack — ${group.name} ×${attackers.length}`,
+    ok: attackers.length === 1 ? loc`Roll 1 attack` : loc`Roll ${attackers.length} attacks`,
     fields: [
       raw(`<p>${loc`Each standing member makes one attack. Ticked targets are shared out in order, measured from each attacker on the map.`}</p>
       <label>${loc`Weapon`} <select name="weapon">${weapons.map(item => `<option value="${esc(item.name)}">${esc(item.name)}</option>`).join("")}</select></label>
@@ -174,13 +182,17 @@ export async function mobAttackDialog(combat, key = null) {
   if (!input) return null;
   const targets = foes.filter(combatant => input[`target-${combatant.id}`]);
   if (!targets.length) return refuse(loc`Tick at least one target.`);
-  const before = [...(game.user?.targets ?? [])].map(token => token.id);
+  const before = [...(game.user?.targets ?? [])].map(token => token.id),
+    selected = [...(canvas?.tokens?.controlled ?? [])].map(token => token.id);
   let rolled = 0;
   try {
-    for (const [attacker, target] of shareTargets(group.members, targets)) {
+    // The GC's own target must not stand in for a ticked one whose token is not on this map.
+    for (const token of [...(game.user?.targets ?? [])]) token.setTarget?.(false, { releaseOthers: false });
+    for (const [attacker, target] of shareTargets(attackers, targets)) {
       const actor = attacker.actor,
-        item = [...(actor.items ?? [])].find(entry => entry.type === "weapon" && entry.name === input.weapon);
-      if (!item) continue;
+        item = [...(actor?.items ?? [])].find(entry => entry.type === "weapon" && entry.name === input.weapon);
+      // A member or target removed while the dialog was open is passed over and counts as not rolled.
+      if (!item || !target.token || !target.actor) continue;
       // The quick attack reads the one targeted token and measures from the attacker's controlled token, so both
       // are set just before each roll: members that share one linked actor still measure from where they stand.
       attacker.token?.object?.control?.({ releaseOthers: true });
@@ -189,18 +201,32 @@ export async function mobAttackDialog(combat, key = null) {
         item,
         quickAttackHasTarget(actor) ? quickAttackOptions(actor, item) : { targetActorUuid: target.actor.uuid }
       );
-      if (await attackMade(actor, message)) rolled++;
+      if (!message) continue;
+      // Only the member whose turn it is has a turn record to mark; the others are passed by the step below.
+      if (attacker.id === combat.combatant?.id) await markActionSpent(actor, attackActionCost(message));
+      await resolveQuickAttack(message);
+      rolled++;
     }
   } finally {
     // Leave the GC's own targets as they were.
     for (const token of [...(game.user?.targets ?? [])]) token.setTarget?.(false, { releaseOthers: false });
     for (const id of before) canvas?.tokens?.get?.(id)?.setTarget?.(true, { releaseOthers: false });
+    // And the GC's own selection.
+    canvas?.tokens?.releaseAll?.();
+    for (const id of selected) canvas?.tokens?.get?.(id)?.control?.({ releaseOthers: false });
   }
   // A member whose attack was cancelled has not acted, so the turn stays for the GC to finish by hand.
-  if (input.advance && rolled === group.members.length) await passGroup(combat, group.members);
-  else if (input.advance)
+  if (input.advance && rolled === attackers.length) {
+    await passGroup(combat, attackers);
+    // Members separated from the rest by someone else's turn have attacked but still come up later this round.
+    const later = attackers.filter(member => combat.turns.findIndex(entry => entry.id === member.id) > combat.turn);
+    if (later.length && attackers.some(member => member.id !== combat.combatant?.id))
+      ui.notifications.info(
+        loc`Already attacked this round, pass their turn when it comes: ${later.map(member => member.name).join(", ")}.`
+      );
+  } else if (input.advance)
     ui.notifications.info(
-      loc`${rolled} of ${group.members.length} attacks were rolled, so the turn has not been moved on.`
+      loc`${rolled} of ${attackers.length} attacks were rolled, so the turn has not been moved on.`
     );
   return rolled;
 }

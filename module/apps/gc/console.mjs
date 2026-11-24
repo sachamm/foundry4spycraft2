@@ -42,15 +42,22 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
 const ROMAN = ["I", "II", "III", "IV", "V"];
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
-const guard = work =>
-  async function (event, target) {
+/** A console action runs once at a time: a second press while it is still working, or its dialog is open, is dropped. */
+const guard = work => {
+  let busy = false;
+  return async function (event, target) {
+    if (busy) return;
+    busy = true;
     try {
       await work.call(this, event, target);
     } catch (error) {
       ui.notifications.warn(error.message);
+    } finally {
+      busy = false;
     }
     this.render();
   };
+};
 
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
@@ -113,7 +120,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       surprise: guard(() => combat.surpriseRoundDialog()),
       combatReference: guard(() => combat.combatReferenceDialog()),
       openCombatant: guard((event, target) => turn.openCombatant(game.combat, target.dataset.id)),
-      actingAttack: guard((event, target) => turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event)),
+      actingAttack: guard((event, target) =>
+        turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event, game.combat?.combatant)
+      ),
       actingSpend: guard((event, target) => combat.spendTurnAction(game.combat?.combatant, target.dataset.kind)),
       actingDamageSave: guard(() => npcDamageSaveWithUndo(game.combat?.combatant?.actor)),
       actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),

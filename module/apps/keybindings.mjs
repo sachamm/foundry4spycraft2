@@ -31,8 +31,9 @@ const press = selector => () => pressNewestCard(selector);
  */
 export function boostCardButton(root, mine, selector = 'button[data-roll-key="gcBoost"]') {
   const usable = card => [...(card?.querySelectorAll?.(selector) ?? [])].find(button => !button.disabled) ?? null;
-  const hovered = usable(root?.querySelector?.("[data-message-id]:hover"));
-  if (hovered) return hovered;
+  // The pointer names the card: when that card cannot be boosted, no other card is boosted in its place.
+  const pointed = root?.querySelector?.("[data-message-id]:hover");
+  if (pointed) return usable(pointed);
   const cards = [...(root?.querySelectorAll?.("[data-message-id]") ?? [])].reverse();
   for (const card of cards) {
     if (!mine(card.dataset?.messageId)) continue;
@@ -50,7 +51,9 @@ function gcBoostShortcut() {
     };
   const button = boostCardButton(document.querySelector("#chat") ?? document, mine);
   if (!button) {
-    ui.notifications.info(loc`No card of yours can be boosted. Point at a card to boost that one.`);
+    ui.notifications.info(
+      loc`Nothing to boost: the card under the pointer cannot be boosted, or none of your cards can. Point at a card to boost that one.`
+    );
     return true;
   }
   const id = button.closest("[data-message-id]")?.dataset.messageId,

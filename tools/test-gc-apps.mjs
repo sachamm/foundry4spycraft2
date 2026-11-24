@@ -796,7 +796,43 @@ test("the Combat section names the acting combatant, words each row and finds th
     this.turn++;
   };
   assert.equal(await turnTools.passGroup(fight, [fight.combatants.get("g1"), fight.combatants.get("g2")]), 2);
+  assert.equal(fight.combatant.id, "b"); // Off the group's own turn the mob does not attack.
+  assert.ok(!(await turnTools.mobAttackDialog(fight, "guard")), "the turn is someone else's");
+});
+
+test("a Count that changes off-turn leaves the turn with the character who was acting", async () => {
+  const { keepActingTurn } = await import("../module/apps/gc/combat.mjs");
+  const order = ["x", "b", "r"].map(id => ({ id }));
+  const fight = {
+    id: "keep",
+    started: true,
+    turn: 1,
+    turns: order,
+    get combatant() {
+      return this.turns[this.turn];
+    },
+    updates: [],
+    async update(change, options) {
+      this.updates.push([change, options?.spycraft2KeepTurn]);
+      Object.assign(this, change);
+    }
+  };
+  // First sight: the acting character is learned, nothing is written.
+  assert.equal(await keepActingTurn(fight), null);
+  assert.deepEqual(fight.updates, []);
+  // R's readied action goes off and R now sorts ahead of B: place 1 is R, but B is still acting.
+  fight.turns = ["x", "r", "b"].map(id => ({ id }));
+  await keepActingTurn(fight);
+  assert.deepEqual(fight.updates, [[{ turn: 2 }, true]]);
   assert.equal(fight.combatant.id, "b");
+  // The acting character steps down on purpose: the turn passes to whoever stands in its place.
+  fight.turns = ["x", "r", "q", "b"].map(id => ({ id }));
+  await keepActingTurn(fight, { handOver: true });
+  assert.equal(fight.updates.length, 1);
+  assert.equal(fight.combatant.id, "q");
+  fight.turns = ["q", "x", "r", "b"].map(id => ({ id }));
+  await keepActingTurn(fight);
+  assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
 });
 
 test("console sections open for the state in play and keep the GC's choice until that state changes", () => {

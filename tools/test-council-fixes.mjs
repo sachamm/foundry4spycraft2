@@ -225,9 +225,10 @@ test("an action from the sheet marks its time on the acting character's own turn
   actor.participatingCombat = combat;
   assert.equal((await markActionSpent(actor, "half")).left, 1);
   assert.equal(combatant.flags.spycraft2.actions.used, 1);
-  // A full action with one half left is too much: the record stays and the player is told.
+  // A full action with one half left is too much: the player is told and the turn reads as used up.
   assert.equal(await markActionSpent(actor, "full"), null);
-  assert.equal(combatant.flags.spycraft2.actions.used, 1);
+  assert.equal(combatant.flags.spycraft2.actions.used, 2);
+  combatant.flags.spycraft2.actions.used = 1;
   assert.match(notices[0], /Vector had 1 half action/);
   // Someone else's turn: nothing is marked.
   combat.combatant = { actor: { uuid: "Actor.other" } };

@@ -141,7 +141,7 @@
    "TurnLeft": "This turn",
    "Conditions": "Conditions",
    "AttackWith": "Attack: {weapon}",
-   "AttackHint": "With one token targeted, goes straight to hit or miss. Otherwise opens the attack dialog",
+   "AttackHint": "Opens the attack dialog. Shift-click with one token targeted goes straight to hit or miss",
    "SpendHalf": "Spend half action",
    "SpendFull": "Spend full action",
    "Delay": "Delay…",
