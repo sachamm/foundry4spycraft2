@@ -18,13 +18,15 @@ old `docs/remaining-work.md`. Add new work here; delete a row when it lands.
 | --- | --- |
 | `DES-`, `NGC-`, `XGC-`, `UX-` | GC-side live council, 2026-11-24: designer, novice GC, expert GC, UI/UX expert |
 | `CX-D`, `CX-N`, `CX-E`, `CX-U` | Parallel ChatGPT Codex council, 2026-11-24 (rendered from the layout harness and read from code; no Foundry server) |
+| `CM-`, `CC-`, `CU-` | Second GC-side code council, 2026-11-24: mission and NPCs, combat, console and undo |
+| `CX2-D`, `CX2-N`, `CX2-E`, `CX2-U` | Second ChatGPT Codex council, 2026-11-24 (same method as the first) |
 | `LR-` | Live review, 2026-11-22, row number in its summary |
 | `SGI-` | The five inputs to the style guide, 2026-11-23 (`expert-gc`, `novice-gc`, `novice-player`, `rules-expert`, `seasoned-player`) |
 | `JS-`, `HBS-`, `CSS-`, `WEB-`, `R-`, `J`, `H`, `C`, `W` + number | Code council, 2026-11-23 (the single letters are findings carried from the first code council) |
 | `SG-` | A row of the style guide's former section 10 audit, with its old id (`SG-G2` was `G2`) |
 | `RW-` | The old `remaining-work.md` (now [archive/build-notes-2026-11.md](archive/build-notes-2026-11.md)), by line |
 
-The reports are kept outside the repository, in the project's `reviews/` folder (`council-gc-2026-11-24/`,
+The reports are kept outside the repository, in the project's `reviews/` folder (`council-gc-2026-11-24/`, `council-gc-2026-11-24b/`,
 `live-2026-11-22/`, `styleguide-2026-11-23/`, `council-2026-11-23/`, `council-2026-11/`).
 
 ## Suggested order
@@ -47,6 +49,15 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-013 | **Flanking +2 was added for an attacker 10 ft. away**, after the GC accepted "Target beyond Reach", and the card gives no way to remove it. Require adjacency before suggesting it; make it a chip the GC can untick. *GC to confirm.* (pp.176, 341) | XGC-19 | S | live |
 | B-014 | **An NPC attack stopped half-resolved and showed a raw database error** (`_id [sc2ResourceLock1] already exists…`) with two GM clients connected. Catch the collision and retry once; never show the internal id; leave the normal Resolve button on the card. | XGC-06, LR-28 | M | live |
 | B-016 | **Next turn can advance the wrong fight.** The console follows whichever combat is viewed and names neither it nor its scene; a combat with no scene shows on every scene. Name the encounter and its scene in the Combat header and warn when it is not this scene's. | UX-02, NGC-43 | S | live |
+| B-216 | **The console's acting block acts on whoever is acting when the button is pressed**, not on the combatant it was drawn for. Carry the combatant's id on each button and refuse, with a notice, when the turn has moved. | CX2-D01 | S | code |
+| B-217 | **Mob attack picks each member's weapon by name** and passes over a member who lacks it without saying so; the dialog can tick more targets than there are attackers and does not preview who attacks whom. Match by item, list the members left out, and show the pairing before the roll. | CX2-D03, CX2-D14 | S | code |
+| B-218 | **"Next step on the newest card" can press an older, unrelated card**, and does not say which card it pressed. Limit it to the newest card with an open step and name the card in the notice. | CX2-D04, CC-13 | S | code |
+| B-219 | **Resume after an agent has settled XP leaves that agent shut out** of later awards and of a second settlement. Reopen the agent's settlement, or settle only the difference. | CX2-N05 | M | code |
+| B-220 | **Session dice adjustment gaps.** A change to starting dice is not converted for a character whose dice convert (one d12 to two d6); and a Begin session that fails part way leaves Start mission skipping the adjustment. Convert through the same rule as the pool, and mark the session adjusted only after every agent is written. | CX2-N07, CX2-N09 | M | code |
+| B-221 | **An ended mission's XP defaults are worked out again from the season's current qualities**, and a settlement dialog left open shows stale figures. Keep the figures with the mission when it ends and re-read them when the dialog confirms. | CX2-N10 | M | code |
+| B-222 | **Undo: what it trusts and what it leaves.** The note's own chat flag decides which paths a GC's client restores; the changed-since check covers the actor only, not combatants or cards; a step that fails part way leaves no note; Undo takes off the newest "applied" mark instead of its own, leaves a critical shot's source attack marked, leaves a pending massive-damage or threshold save card live, cannot give GC dice back for a deleted NPC or after a new session began, and does not free marks on old cards. Keep the undo record where only the GC can write it, key marks to the step, give dice back first and independently, and close the pending save card. | CX2-U02, CX2-U03, CX2-U04, CX2-U05, CX2-U06, CX2-U07, CX2-U08, CU-08 | L | code |
+| B-223 | **A Damage save started from the console or sheet takes its "before" picture before the dialog opens**, so its Undo also rolls back whatever else changed while the dialog was open (an Initiative roll, a new condition). Take the picture after the dialog is answered. | CU-06 | S | code |
+| B-224 | **A player who undoes their own applied damage leaves the card marked as applied**, because the card belongs to the GC. Clear the mark through the GC relay, as setting it already does. | CU-07 | S | code |
 
 ## P1: running the game
 
@@ -60,6 +71,12 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-027 | **A late initiative roller sorts above the current turn and loses round 1.** Insert them correctly for the current round. | LR-11 | S | earlier |
 | B-028 | **NPC attacks cannot use Burst, Autofire or Suppressive Fire**: the NPC sheet never opens the ranged-attack dialog that has them. Same gap on the agent's Play tab. One attack control with the fire actions. | LR-17, SG-A17, UX-41 | M | earlier |
 | B-029 | **Dramatic scene**: starting one is silent; scripted (free) and paid entries sit apart; doubling opponents' Initiative is a separate action that skips unrolled combatants. One place, a visible "Dramatic" state, a preview of who will be doubled, and late Counts covered. (p.424) | UX-10, CX-D13, CX-N8, CX-E14 | M | live |
+| B-225 | **Turn start is fragile.** A readied trigger changes the Count and posts to chat before the readied marker clears; the round-1 flat-footed pass can run twice and the turn-start step reads the acting combatant after waiting, so a quick Next turn leaves someone flat-footed; a Delay on one's own turn hands over without the turn-start step and a player owner gets an error; Previous turn from the first turn of round 1 un-starts the fight, and Begin combat then marks everyone flat-footed again. Capture the combatant before waiting, mark flat-footed once per fight, share one turn-start function, and stop stepping back past the first turn. | CX2-E03, CX2-E06, CC-06, CC-07, CC-19 | M | code |
+| B-226 | **Every Count change re-rolls the roll-off for the whole tie group**, in overlapping runs, so two tied combatants can swap places mid-round. Roll only for members with no stored roll-off and run one at a time per fight. | CC-16 | S | code |
+| B-227 | **A Delay is not counted toward the round's ±10 limit at round end.** *GC to confirm.* (p.324) | CX2-E09, CC-17 | S | code |
+| B-228 | **Henchman and Mastermind attack rules follow the declared target only.** Changing target at Resolve keeps the first target's threat range and critical cost; an attack with no declared target gets neither; and the public card names the NPC's role to the players. Re-read the role at Resolve, offer the surcharge when a critical is activated with no target, and show the role line to the GC only. | CX2-E10, CM-15 | M | code |
+| B-229 | **A mob whose members sit on different Counts** (20, 15, 10): the members at or after the turn pointer all attack and a notice names the later ones, but their own turns still come up and they can act again. Mark the later members' turns as used, or attack only with members on the acting Count. | CX2-E01 | M | code |
+| B-234 | **Alt+S straight after Alt+N at a round change can open the old order's first combatant**, because the round-end reorder has not landed. Wait for the round to settle before opening. | CC-15 | S | code |
 
 ### Console structure and stability
 
@@ -71,6 +88,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-034 | **Tooltips**: 63 of 66 console controls get a generated tooltip; 30 repeat the label, 15 abbreviate it ("Surprise rd", "Fluid init") and 3 explain. They stay on screen after the control is pressed or redrawn and cover the next button. Write one line on what the button changes; never generate one from the label; dismiss on click and on redraw. | DES-15, UX-08, UX-24, NGC-05, XGC-40, SG-G9, LR-38a | M | live |
 | B-035 | **The console and the chat log share one sidebar slot**, so the GC cannot see a tool and its result together. The pop-out is hidden, opens 720×800 over the map and uses the width for nothing. Make the pop-out obvious, give it a two-column layout and a remembered place; echo results (XP report, Planned XP, Begin session done) where the GC is looking. | UX-16, DES-25, DES-24, NGC-29, NGC-40, XGC-41 | M | live |
 | B-036 | **Search finds sections, not tools, and misses the words people type** ("XP report" finds one section; "player request" and "disposition" find nothing). Add search terms per action, open nested matches, mark the match, give the field an accessible name. | NGC-03, NGC-04, XGC-39, UX-22, DES-21, CX-U7, SGI-novice-gc R1 | S | live |
+| B-233 | **Console layout and first-session list, second pass.** Search brings back an open or closed state saved under another view; Next turn sits below the fold (about 990 to 1,300px down) at all three tested sizes; long names grow the status strip to 265px; the Play view hides Mission, where the quickstart sends the GC to wrap up; the first-session list ticks "make and place" for any NPC and "first combat" for any scene, and still prints a file path instead of a link; the dice line drops "of N" when over but does not keep what the session started with; an NPC recorded for XP counts as faced only once it joins a fight. | CX2-D06, CX2-D10, CX2-D11, CX2-D12, CX2-N12, CX2-N13, CX2-N14, CX2-U15, CU-15 | M | code |
 
 ### Safety: confirm, undo, feedback
 
@@ -119,6 +137,9 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-069 | **Numbers on the sheet do not match the roll** (Attack base +1 beside weapon Attack +3); "Follow mission TL" leaves a live, wrong number in the Threat Level box. Label base against effective; grey out the overridden field. | NGC-28, XGC-26, CX-E19 | S | live |
 | B-070 | **Per-roll "GC only" on NPC attacks and saves**, with a remembered default (skills have it). | SG-D12, CX-U12 | S | earlier |
 | B-071 | **Reusing NPCs across missions works by accident**: Add NPC reuses an imported actor silently. Say "already in this world" and offer a fresh copy. | XGC-35, CX-E18 | S | live |
+| B-230 | **Add NPC to scene: placement.** Free squares ignore the scene's edge, walls and non-square grids; placing a linked NPC twice, one at a time, gives two numbered tokens that share one health record; a compendium pick reuses a world actor imported from that entry even after the GC rebuilt it into someone else; the list is ten rows tall for two results. Keep inside the scene rectangle, unlink when a token of that actor is already there, reuse only an import that still has the entry's name, and size the list to its results. | CX2-E11, CX2-E13, CX2-D15, CM-17, CM-18, CM-20 | M | code |
+| B-231 | **NPC vitality and wounds at the edges.** Duplicating an NPC at 0 vitality fills the copy; an old unlinked NPC promoted before its first check keeps empty pools; an Animal Partner prepared before its owner at world load may be healed (not seen running); two wounded unlinked tokens of one NPC can follow a Threat Level change differently. Give each token its own recorded maximums and prepare partners after their owners. | CX2-E14, CX2-E15, CM-06, CM-09 | M | code |
+| B-232 | **Renaming an NPC: gaps.** Quick renames in a row can leave a token with an older name; a number the GC typed by hand is treated as a generated one; Foundry's own "Name (2)" form is not followed; a player who renames an NPC they own cannot update its tokens. Accept both number forms and do the token updates on the lead GC's client. | CX2-E16, CM-21 | S | code |
 
 ### Chat cards the GC works
 
@@ -146,6 +167,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-090 | **Dark `--sc2-danger` on raised is 4.48:1**; step hues have no dark values; the contrast test omits good, warn, danger-on-raised and borders. | SG-S8, SG-S10, CSS-10, CX-U18 | S | earlier |
 | B-091 | **Results are not announced**: no live region for request state, initiative results or search counts. | CX-U11, CX-U17, UX-35 | S | code |
 | B-092 | **At 200% zoom the console works but a sheet buries it**; the chat log moves under the pointer. | UX-37, UX-40 | S | live |
+| B-235 | **Console and NPC strip status regions are replaced whole on every redraw**, so a turn or grade change is not announced as a change; a redraw between mouse-down and mouse-up swallows a click; and the console's focus release also acts on Foundry's own sidebar buttons. Update the status text in place, hold redraws while a pointer is down in the console, and limit the release to the console's buttons. | CU-11, CU-19, CX2-U11 | M | code |
 
 ## P1: player side, carried from earlier reviews
 
@@ -214,6 +236,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-160 | At least 20 strings still have numbers glued to words ("adds1 damage", "lost5vitality or1wound"). | SGI-rules-expert D18 | S |
 | B-161 | Abbreviation leftovers: "Current VP", "Current WP", "DR", "Codename", "VP · SP" in the class browser; the formula hint under Bonuses shows to every owner. | SGI-novice-gc D17, LR-40b, LR-39b | S |
 | B-162 | English literals in context builders; hard-coded English in attributes; raw schema keys as labels; text localised at load time stays English (migration labels, the console tab tooltip). | HBS-11, H6, WEB-09 | S |
+| B-236 | Console and undo wording, second pass: "record" and "settlement" in the end-mission texts and "{count} recorded" on the wrap-up strip; plurals glued from pieces in the undo tooltip and the GC dice spend label; the scene status glued from two parts; the Add NPC summary joined with "; " and reading "1 × Guard"; `h3` headings in the console with no `h2` above; and Undo still lives on its own whispered note instead of on the card that made the change (7.5, 8.3). | CU-16, CU-17 | S |
 
 ### Visual system
 
