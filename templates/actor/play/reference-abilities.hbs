@@ -30,6 +30,7 @@
   <h3>{{localize "SPYCRAFT.Origin.Label"}}</h3>
   {{#each originSelections}}
     <details {{#if @root.editMode}}open{{/if}}><summary>{{name}}</summary>
+      {{#if picks.length}}<ul class="plain play-only">{{#each picks}}<li>{{label}}: <b>{{value}}</b></li>{{/each}}</ul>{{/if}}
       <div class="edit-only">{{#each fields}}
         <label>{{label}} {{#if text}}<input type="text" name="originChoice.{{../id}}.{{key}}" value="{{value}}" />{{else}}<select name="originChoice.{{../id}}.{{key}}">{{selectOptions options selected=value blank="—"}}</select>{{/if}}</label>
       {{/each}}</div>

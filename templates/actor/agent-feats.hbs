@@ -19,7 +19,7 @@
   <ul class="item-list feats-list">
     {{#each feats}}
       <li data-item-id="{{item.id}}" class="{{#unless status.ok}}unqualified{{/unless}} {{#if item.system.granted}}granted{{/if}}">
-        <button type="button" data-action="itemEdit" class="name sc2-action">{{item.name}}{{#if (sc2lt 1 item.system.ranks)}} ×{{item.system.ranks}}{{/if}}</button>
+        <button type="button" data-action="itemEdit" class="name sc2-action" {{sc2ruletip tip}}>{{item.name}}{{#if (sc2lt 1 item.system.ranks)}} ×{{item.system.ranks}}{{/if}}</button>
         {{#if (sc2eq item.system.featKind "temporary")}}<span class="tag">{{localize "SPYCRAFT.Template.ActorAgentFeats.Temporary"}}{{#if item.system.temporaryGrant}} {{localize "SPYCRAFT.Template.ActorAgentFeats.UntilTheEndOfThis"}} {{item.system.temporaryGrant.period}}{{/if}}</span>{{/if}}
         {{#each actions}}<button type="button" class="sc2-action" data-action="{{action}}"{{#if resource}} data-resource="{{resource}}"{{/if}}>{{localize label}}</button>{{/each}}
         <span class="tree">{{treeLabel}}</span>

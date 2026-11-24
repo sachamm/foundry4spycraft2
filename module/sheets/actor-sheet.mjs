@@ -2,6 +2,7 @@ import { editPortrait } from "../apps/portrait-picker.mjs";
 import { refuse, refuseStep } from "../error-notices.mjs";
 import { placeSheet, rememberSheetPlacement } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
+import { chosenPicks, ruleTip } from "./rule-tips.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
@@ -1024,8 +1025,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     // Origin text is the item's own rich text: its secrets are for the item's owners and its links resolve from it.
     for (const origin of context.originSelections) {
       origin.description = await enrich(origin.item.system.description, origin.item);
+      // What the pick does and how its owner set it up, for the rail chip and for viewers who cannot edit it.
+      origin.picks = chosenPicks(origin.fields);
+      origin.tip = ruleTip({
+        kind: game.i18n.localize(`SPYCRAFT.Origin.${origin.item.system.originType}`),
+        summary: origin.description,
+        picks: origin.picks
+      });
       delete origin.item;
     }
+    const originTip = item => context.originSelections.find(origin => origin.id === item?.id)?.tip ?? null;
+    context.talentTip = originTip(context.talent);
+    context.specialtyTip = originTip(context.specialty);
 
     // Classes & progression
     const classItems = byType("class");
@@ -1169,9 +1180,14 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.feats = byType("feat")
       .map(f => {
         const status = sys.featStatus?.[f.id] ?? { ok: true, unmet: [] };
+        const treeLabel = cfg.featTrees[f.system.tree] ?? f.system.tree;
         return {
           item: f,
-          treeLabel: cfg.featTrees[f.system.tree] ?? f.system.tree,
+          treeLabel,
+          tip: ruleTip({
+            kind: treeLabel ? loc`${treeLabel} feat` : game.i18n.localize("TYPES.Item.feat"),
+            summary: f.system.description
+          }),
           status,
           actions: featActions(f, { qualified: status.ok, isGM: game.user.isGM }),
           prereqText: describePrereq(f.system.prerequisites)
