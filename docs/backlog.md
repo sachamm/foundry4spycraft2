@@ -29,13 +29,12 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 ## Suggested order
 
-1. **P0 table**, top to bottom. B-001 to B-006 are small and each fixes a wrong result a GC would hit in a first
-   session.
-2. **Run an NPC turn from the console** (B-020 to B-024) together with the tracker menu (B-025). Every reviewer in
-   both councils and both earlier live reviews named this as the largest gap in play.
-3. **Console safety and stability** (B-030 to B-036): confirmations, undo, keeping state across redraws.
-4. **Dialogs** (B-040 to B-046), which share one fix: a dialog shows only the fields for the chosen option, names its
-   action on the button and has Cancel.
+1. **P0 table**, top to bottom: what is left there gives a GC a wrong result or loses work.
+2. **Finish the console turn**: combat setup and end inside the console (B-023), fluid initiative (B-025), half
+   actions (B-026) and the NPC fire actions (B-028).
+3. **Console safety and stability**: what is left of B-030 to B-039, chiefly undo for a GC boost (B-037), undo on
+   mission rows (B-038) and a sign that a button finished (B-039).
+4. **Dialogs** (B-040 to B-046): sizing, the focus ring and keeping values after a refusal.
 5. The rest of P1 by area, then P2 when a surface is touched anyway.
 
 ## P0: wrong results, lost data, double payment
