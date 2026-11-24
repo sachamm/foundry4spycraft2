@@ -95,6 +95,8 @@ export class SpycraftActor extends ActorRolls(
   /** An NPC's prototype token follows a rename while it still carries the old name. */
   async _preUpdate(changed, options, user) {
     if ((await super._preUpdate(changed, options, user)) === false) return false;
+    // One unlinked token's own actor is renamed alone: its siblings keep their names.
+    if (this.isToken) return;
     if (this.type !== "npc" || typeof changed.name !== "string" || changed.name === this.name) return;
     options.spycraft2RenamedFrom = this.name;
     if (changed.prototypeToken?.name !== undefined) return;
@@ -106,7 +108,8 @@ export class SpycraftActor extends ActorRolls(
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
     const old = options?.spycraft2RenamedFrom;
-    if (!old || this.type !== "npc" || userId !== game.user?.id || typeof changed.name !== "string") return;
+    if (!old || this.isToken || this.type !== "npc" || userId !== game.user?.id || typeof changed.name !== "string")
+      return;
     for (const scene of game.scenes ?? []) {
       const updates = [...scene.tokens]
         .filter(token => token.actorId === this.id)

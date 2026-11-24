@@ -95,7 +95,10 @@ globalThis.foundry = {
           if (!dialogAnswers.length) throw new Error("Unexpected dialog");
           return dialogAnswers.shift();
         },
-        confirm: async () => (confirmAnswers.length ? confirmAnswers.shift() : true)
+        confirm: async () => {
+          const answer = confirmAnswers.length ? confirmAnswers.shift() : true;
+          return typeof answer === "function" ? answer() : answer;
+        }
       },
       ApplicationV2: class {
         render() {
@@ -343,6 +346,23 @@ test("End mission asks first, keeps the record for settlement, and Resume reopen
   assert.equal(await mission.resumeMission(), null, "already active");
 });
 
+test("a change made while End mission is asking is kept; a record ended by an older version reads as ended", async () => {
+  const id = state.getMission().objectives[0].id;
+  await mission.changeEntry("objectives", id, "complete");
+  assert.equal(state.getMission().objectives[0].complete, false);
+  confirmAnswers.push(async () => {
+    await mission.changeEntry("objectives", id, "complete");
+    return true;
+  });
+  await mission.endMission();
+  assert.equal(state.getMission().objectives[0].complete, true, "ticked while the question was open");
+  const stored = { ...state.getMission() };
+  delete stored.ended;
+  await game.settings.set("spycraft2", "mission", stored);
+  assert.equal(state.getMission().ended, true, "inactive with a fixed Threat Level");
+  await mission.resumeMission();
+});
+
 test("starting an ended mission again asks, then clears the last run's results", async () => {
   await mission.endMission();
   confirmAnswers.push(false);
@@ -358,6 +378,24 @@ test("starting an ended mission again asks, then clears the last run's results",
   await mission.changeEntry("antagonists", m.antagonists[1].id, "encountered");
 });
 
+test("dice that could not be taken at 0 are not handed back when the change goes", async () => {
+  const a1 = actors.get("a1"),
+    kept = { value: a1.system.actionDice.value, flag: a1.flags.spycraft2?.sessionDiceAdjusted };
+  a1.system.actionDice.value = 1;
+  a1.flags.spycraft2 ??= {};
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 0);
+  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2, applied: -1 });
+  await state.setCampaign({ qualities: [] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 1, "only the one die really taken comes back");
+  a1.system.actionDice.value = kept.value;
+  if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
+  else delete a1.flags.spycraft2.sessionDiceAdjusted;
+});
+
 test("starting-dice adjustments apply once per session", async () => {
   await state.setCampaign({ qualities: ["bleak"] });
   await mission.applySessionDiceAdjustments();
@@ -369,7 +407,7 @@ test("starting-dice adjustments apply once per session", async () => {
 
 test("a change that arrives after the first adjustment gives only the difference", async () => {
   const a1 = actors.get("a1");
-  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2 });
+  assert.deepEqual(a1.flags.spycraft2.sessionDiceAdjusted, { session: "initial", change: -2, applied: -2 });
   await mission.applySessionDiceAdjustments();
   assert.equal(a1.system.actionDice.value, 3, "the quality is gone, so its 2 dice come back");
   assert.equal(a1.flags.spycraft2.sessionDiceAdjusted.change, 0);

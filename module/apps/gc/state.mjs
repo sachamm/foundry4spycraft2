@@ -75,7 +75,12 @@ export const requireGC = () => {
   if (!game.user?.isGM) throw new Error(loc`Only the GC can do this.`);
 };
 
-export const getMission = () => ({ ...defaultMission(), ...read("mission", {}) });
+/** A record ended before the "ended" flag existed is inactive with a fixed Threat Level: it reads as ended. */
+const endedBefore = stored => !("ended" in stored) && !stored.active && stored.threatLevel != null;
+export const getMission = () => {
+  const stored = read("mission", {}) ?? {};
+  return { ...defaultMission(), ...stored, ...(endedBefore(stored) ? { ended: true } : {}) };
+};
 export async function setMission(mission) {
   requireGC();
   await game.settings.set(SYSTEM, "mission", { ...defaultMission(), ...mission });

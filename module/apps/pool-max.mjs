@@ -12,7 +12,8 @@ import { poolMaxPlan, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 
 const planFor = actor => poolMaxPlan(actor.system, actor.flags?.spycraft2?.[POOL_MAX_FLAG], poolRules(actor.type));
 /** Agents, and NPCs: a special NPC's vitality and wounds come from its build and the Threat Level. */
-const followed = actor => actor?.type === "agent" || actor?.type === "npc";
+// A compendium entry is never written to: it is followed once it is imported.
+const followed = actor => !actor?.pack && (actor?.type === "agent" || actor?.type === "npc");
 
 /** Write the plan for one agent. Returns the update written, or null when nothing changed. */
 export function followPoolMax(actor) {

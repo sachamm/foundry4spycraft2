@@ -337,7 +337,7 @@ export const ActorAttackRolls = Base =>
         {
           planModifiers: atk.planModifiers,
           featReminders: options.featReminders,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}${threatAgainstRole(atk.threat, targetRole) > 20 ? loc` This attack cannot threaten.` : ""}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,

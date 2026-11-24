@@ -33,8 +33,22 @@ export function poolMaxPlan(system, seen, { pools = FOLLOWED_POOLS, emptyAtZero 
       continue;
     }
     next[key] = max;
+    // A fall that could not take its full amount (a floor, or an NPC that stopped being special) remembers where
+    // the pool stood, so a maximum that comes back restores the damage taken instead of healing it. Any other
+    // change to the value in between (damage, healing) makes the memory stale and it is dropped.
+    const memory = seen?.kept?.[key],
+      remembered = memory && whole(memory.value) && whole(memory.max) && memory.after === value ? memory : null;
     const moved = whole(seen?.[key]) && seen[key] !== max;
-    const after = !moved ? value : emptyAtZero && max === 0 ? 0 : followedValue(key, value, max - seen[key], max);
+    let after = value,
+      keep = remembered;
+    if (moved) {
+      const from = remembered ?? { value, max: seen[key] },
+        net = max - from.max;
+      after = emptyAtZero && max === 0 ? 0 : followedValue(key, from.value, net, max);
+      keep = after === from.value + net ? null : { value: from.value, max: from.max, after };
+    }
+    // An update merges into the stored record, so a memory that is spent is overwritten with null, not left out.
+    if (keep || (seen?.kept && key in seen.kept)) (next.kept ??= {})[key] = keep ?? null;
     if (after !== value) patch[`system.${key}.value`] = after;
   }
   if (!same(next, seen ?? null)) patch[`flags.spycraft2.${POOL_MAX_FLAG}`] = next;
