@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 — 2026-11-23
 
 - **The system is now The Field Agent's Handbook.** Its rules data is used as Open Game Content under the Open
   Game License 1.0a, which forbids using another publisher's trademark to signal compatibility. The system's

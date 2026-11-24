@@ -31,7 +31,7 @@ The system grew feature by feature, and each made sensible local choices. The re
 - **New features** follow the guide from the first PR. A reviewer may block a PR that adds a new divergence.
 - **Existing features** are brought in line in two ways:
   - when a PR touches a template, stylesheet or string, it fixes the divergences in the lines it touches (no sweeping rewrites hidden inside feature PRs);
-  - the audit in section 10 is worked through as its own PRs, P0 first.
+  - the audit in section 10 is worked through as its own PRs, P0 first. The first pass (PR 63) closed 82 of its 120 items; 10.14 lists what it added and where each pattern now lives, so later work reuses it.
 - When the guide and the rulebook disagree, the rulebook wins and the guide is wrong. Open a PR against this file.
 - When the guide and a GC's ruling disagree at the table, the GC wins. The system must make that ruling possible (section 8).
 
@@ -95,7 +95,7 @@ There are two modes, and a surface is always in exactly one of them.
 - **Play** (default for a finished character, every NPC and the console during a session): glance values are read-only text; actions are buttons; build controls are hidden.
 - **Prep/Edit** (building a character, editing an NPC, recording a mission): inputs, budgets, browsers and the builder.
 
-The agent and NPC sheets already have the switch (`.play-mode` / `.edit-mode`, `styles/retro.css:145-146`). The GC Console needs one (7.7). An unfinished agent reopens in Edit; a pregenerated or sample agent opens in Play with no setup reminders.
+The agent and NPC sheets already have the switch (`.play-mode` / `.edit-mode`, `styles/retro.css:145-146`). The GC Console still needs one (7.7); for now it moves Combat to the top while a combat exists. An unfinished agent reopens in Edit; a pregenerated or sample agent opens in Play with no setup reminders.
 
 ### 3.3 Progressive disclosure
 
@@ -149,6 +149,8 @@ Definitions are our own short summaries for the `?` tooltip. They say what the t
 | **subdual**, **stress**                                            | Non-lethal damage to body and mind; each has a threshold.                               | —                                                    |
 | **Shaken**, **Baffled**, **Incompetent**                           | Named conditions; show the grade as a Roman numeral (Shaken II).                        | —                                                    |
 
+"GC pool", "session pool", "AD", "HP", "saving throw", "Tyre" and "next GM launch" were removed from user-facing strings in the first pass; the banned-terms lint in 11.2 is what keeps them out.
+
 Capitalisation: **Defense**, **Initiative**, **Threat Level**, **Caliber**, **Career Level** and save names are always capitalised. **vitality**, **wounds**, **flat-footed**, **action dice** are lower case in running text and capitalised only as a field label or heading.
 
 ### 4.3 Words that never reach a player
@@ -170,7 +172,7 @@ Internal mechanics vocabulary describes how the code works, not what happened at
 | Page cites                                   | (p.341), (pp.339, 358), (pp.423–440) | (page 341), (pp.91,352) |
 | Change of a value                            | 16 → 25                              | 16 -> 25                |
 
-Use one helper for each: `signed()` (exists), and a `formatRange(kind, bound)` for threat and error ranges, used by the skill table, weapon rows, item sheets and cards.
+Use one helper for each: `signed()`, and `formatRange(kind, bound)` in `module/rules/outcome-labels.mjs` for threat and error ranges ("19–20", "20", "1", "1–3", "—"). The skill table, weapon rows, item sheets, dialogs and cards all call it; do not format a range by hand. Weapon rows build their one-line facts ("threat 19–20 · error 1 · range 25 ft.") with `weaponFacts()` in `module/sheets/play-rows.mjs`.
 
 ### 4.5 Strings are whole sentences
 
@@ -194,8 +196,8 @@ Every refusal, warning and error answers three things in one or two sentences: *
 
 - **Explain, never repeat.** A tooltip equal to the visible label is a defect; rely on `aria-label`.
 - **Meaning first, then breakdown.** "Defense: how hard you are to hit." then "10 base + 2 class + 1 Dex …". The breakdown always sums to the shown value.
-- Use `data-tooltip` only. Never author `title` (the runtime strips it in `module/apps/ui-tooltips.mjs:435-446`, but templates should not rely on that).
-- Glossary terms get a visible `fa-circle-question` icon after the caption the first time they appear on a surface (the rail pattern, `templates/actor/agent-rail.hbs:31,34,48`). Put the `?` on the caption, not on a button.
+- Use `data-tooltip` only. Never author `title` (the runtime strips it in `module/apps/ui-tooltips.mjs`, but templates should not rely on that).
+- Glossary terms get a visible `fa-circle-question` icon after the caption the first time they appear on a surface (the rail pattern: the vitality, wounds and action-dice captions in `templates/actor/agent-rail.hbs`). Put the `?` on the caption, not on a button.
 - Page cites go in tooltips and details, not in labels.
 - Roll controls end their tooltip with the fast-path hint ("Shift-click: roll with your last choices").
 
@@ -257,10 +259,10 @@ Dark `danger` on `raised` is just under target; nudge the dark `--sc2-danger` sl
 | `--sc2-value-size` | 22px | Tile values                                                 |
 | (card total)       | 28px | The one large number on a chat card                         |
 
-- **13px is the minimum for any text that carries information.** 12px is allowed only for decorative labels whose words are not needed to play (the dossier band label). There are 17 rules at 12px today (section 10.10).
+- **13px is the minimum for any text that carries information.** 12px is allowed only for decorative labels whose words are not needed to play (the dossier band label). Some rules at 12px remain (section 10.9); the console's section titles and tags are no longer among them.
 - Faces: `--font-primary` (Foundry's Signika) for text; `--sc2-num` (system monospace) for values, dice and stamps; `--sc2-bar-font` only for the dossier band.
 - Prefer token sizes to `em` sizes. Do not add a new pixel size without adding a token.
-- No letter-spaced upper case for buttons or headings; dialog footer buttons (`components.css:241`) are the exception to remove.
+- No letter-spaced upper case for buttons or headings. Dialog footer buttons and GC Console section titles used to be exceptions and are now sentence case.
 
 ### 5.5 Spacing, radius, sizing
 
@@ -281,7 +283,7 @@ Nothing interactive is smaller than 28px tall. Density comes from tighter text a
 | State               | Cue (all of)                                                     |
 | ------------------- | ---------------------------------------------------------------- |
 | Rollable value      | `--sc2-action` 3px lower edge, hover tint, die glyph in tooltip  |
-| Untrained           | `.sc2-untrained`: "untrained" word or ⚠ icon, tooltip, aria text |
+| Untrained           | `.sc2-untrained`: the word "untrained", tooltip, aria text       |
 | Spent / used        | Muted, struck through or dashed, count "0/3"                     |
 | Over budget         | `danger` border, ⚠ icon, "over by N" text, `aria-describedby`    |
 | Disabled (not now)  | `disabled` attribute, 45% icon opacity, tooltip with the reason  |
@@ -294,11 +296,11 @@ Nothing interactive is smaller than 28px tall. Density comes from tighter text a
 - "Text carries data; pictograms carry verbs" (`components.css:1`). Pictograms come from the function atlases (`data-sc2-sheet`, `styles/spycraft2.css:144-167`); Font Awesome glyphs are fallbacks and are hidden when a pictogram exists.
 - Every icon-only control has an `aria-label` and a tooltip that explains (4.7).
 - Use `data-sc2-display="icon"` only for repeated row verbs (edit, delete, reload). One-off and primary actions show a text label.
-- Status icons on tokens are Spycraft conditions only (6.7, 10.6).
+- Status icons on tokens are Spycraft conditions only (6.7). `spycraft2.mjs` replaces `CONFIG.statusEffects` with the `SYSTEM_STATUSES` list plus the core entries Foundry itself reads (`CONFIG.specialStatusEffects`, such as defeated and invisible). Add a condition to that list, keep the ids the code reads (`module/data/actor.mjs` lists the aliases), and never append to core's list.
 
 ### 5.8 Motion
 
-Motion is limited to colour transitions of 120ms or less, inside `@media (prefers-reduced-motion: no-preference)` (`components.css:221-223`). No animated entrances, no spinners for actions under a second (disable the button and show "Working…", as `chat-action-feedback.mjs` does). The console's disclosure arrow rotation (`gc-console.css:9`) must move inside the same media query.
+Motion is limited to colour transitions of 120ms or less, inside `@media (prefers-reduced-motion: no-preference)` (`components.css:221-223`). No animated entrances, no spinners for actions under a second (disable the button and show "Working…", as `chat-action-feedback.mjs` does). The console's disclosure arrow follows this rule (`gc-console.css`).
 
 ---
 
@@ -337,14 +339,14 @@ A row reads: name (opens the item) → facts → actions, with repeated verbs as
 
 ### 6.5 Limited-use counters
 
-One partial for every limited use, everywhere:
+One partial for every limited use, everywhere (`templates/actor/parts/use-counter.hbs`; `SPYCRAFT.Uses.*` strings):
 
 `[2/3] Name · per session [Use]`
 
 - The count chip (`.sc2-uses`) comes first; it turns `spent` at 0.
 - The Use button is disabled at 0, with a tooltip saying when uses return.
 - On Play, all limited uses are listed once, under "Abilities in play", grouped Combat / Social / Gear / Other.
-- Activations are declared in item data and rendered generically; templates do not branch on item names.
+- Activations are declared in item data and rendered generically; templates do not branch on item names. (The Play tab list exists; declaring activations in item data is still open, A12.)
 
 ### 6.6 Tracks and meters
 
@@ -354,11 +356,11 @@ Vitality and wounds are meters (`.sc2-meter`) with current/max. Damage saves, ve
 
 - A **stamp** (`.sc2-stamp`) is a status that must not be missed: a condition, HIT, MISS, THREAT, ERROR. Upper case, monospace, 13px, `currentColor` border. Every stamp has a tooltip with its glossary sentence and current effect.
 - A **chip** (`.sc2-chip`) is a passive fact: Career Level, NPC kind, TL, "Cover: Mara".
-- Condition stamps use the Spycraft name and grade (Shaken II).
+- Condition stamps use the Spycraft name and grade (Shaken II). `conditionStamps()` in `module/sheets/agent-ux.mjs` builds them with their one-line reminder for the agent rail and the NPC header. Leave the reminder out for a condition whose effect cannot be said in our own words without risk of misstating the rule.
 
 ### 6.8 Forms and inputs
 
-- In Play, glance values are read-only text. Correction is through a pencil (`Adjust…`) that opens a small dialog with the old value, the new value and an optional reason.
+- In Play, glance values are read-only text. Correction is through a pencil (`Adjust…`) that opens a small dialog with the old value, the new value and an optional reason. The rail's action dice are the model (`adjustActionDice` in `module/sheets/actor-sheet.mjs`).
 - **Exception:** current vitality and wounds stay as inputs on agent and special-NPC sheets, because GCs call damage aloud and players type it. They must not change on mouse wheel.
 - Labels sit above or beside their control and are real `<label>`s. Table inputs carry the row name in their accessible label ("Stealth misc").
 - Checkboxes have labels of eight words or fewer; the full condition goes in a hint below (`briefOption`, `module/apps/dialog-sections.mjs`).
@@ -367,11 +369,11 @@ Vitality and wounds are meters (`.sc2-meter`) with current/max. Damage saves, ve
 
 ### 6.9 Disclosures
 
-Use `<details>`/`<summary>` with a plain-text summary (no headings or controls inside a summary). Summaries are at least 44px tall (`components.css:287`). The summary names the content and, when closed, shows a count or status ("Combat tools · 3 pinned"). Disclosures remember their state per sheet (`data-key`).
+Use `<details>`/`<summary>` with a plain-text summary (no headings or controls inside a summary). Summaries are at least 44px tall (`components.css:287`). The summary names the content and, when closed, shows a count or status ("Combat tools · 3 pinned"). Disclosures remember their state per sheet (`data-key`). Rare actions go in a small "More" disclosure beside the common ones: `.rail-more` on the agent rail, "More actions" on the NPC sheet, `.gc-more` ("More mission tools") in the console.
 
 ### 6.10 Empty states
 
-An empty list says what goes there and offers the one button that fills it: "No objectives. Add one to set the mission's XP. [Add objective]". Never just "None yet." Use `.sc2-empty`.
+An empty list says what goes there and offers the one button that fills it: "No objectives. Add one to set the mission's XP. [Add objective]". Never just "None yet." Use `.sc2-empty`. The console lists and the Play tab ("Nothing needs review.", no trained skills) follow this.
 
 ### 6.11 Notifications
 
@@ -393,13 +395,13 @@ An empty list says what goes there and offers the one button that fills it: "No 
 1. Name, code name, active cover identity chip.
 2. Conditions as stamps.
 3. Vitality and wounds meters with band word; stress and subdual when non-zero.
-4. Defense with a flat-footed figure ("16 · FF 12") and DR; Initiative; Speed; the three saves.
-5. Action dice: count (read-only), die type, pips; the one common spend (Boost Defense, with its state).
+4. Defense with the flat-footed figure written out beneath it (`flatFootedDefense()`, `.rail-defense-note`) and DR; Initiative; Speed; the three saves. The Defense tile opens the incoming-attack check.
+5. Action dice: count (read-only, with a pencil), die type, pips; the one common spend (Boost Defense, disabled with its reason or showing that it is active, from `defenseBoostState()`). Roll action die, Heal and Refresh sit under "More".
 6. A single "Setup: N left" chip if setup is unfinished (opens Edit). The checklist itself is Edit only.
 
-**Play tab (act tier):** round tracker with half-action pips → a "Your turn" strip (Attack with the readied weapon, Skill…, Total Defense, End turn) → attributes → weapons → trained and pinned skills → abilities in play (6.5) → active effects (one chip per running effect with its expiry and an End button) → combat tools (disclosures) → reference (closed).
+**Play tab (act tier, `templates/actor/play/dashboard.hbs`):** round tracker with half-action pips → a "Your turn" strip (Attack with the readied weapon, Skill…, Total Defense, End turn) → attributes → weapons → trained and pinned skills → abilities in play (6.5) → active effects (one chip per running effect, from `activeEffectLines()`; expiry and an End button where the effect has them) → combat tools (disclosures) → reference (closed).
 
-**Weapon row:** name · "Attack +6 · 19–20" (primary) · damage dice (roll) · range increment or Reach · ammo loaded/capacity · state chips (untrained, not readied). Everything needed to attack without opening the item.
+**Weapon row** (`templates/actor/parts/weapon-row.hbs`, shared by the agent Play tab and the NPC sheet): name · "Attack +6 · 19–20" (primary) · damage dice (roll) · range increment or Reach · ammo loaded/capacity · state chips (untrained, not readied). Everything needed to attack without opening the item. Threat range, error range and range print as one facts line under the row.
 
 **Skill row:** name · total(s) as roll buttons (one per attribute option) · threat range · error range only when wider than 1.
 
@@ -409,19 +411,20 @@ An empty list says what goes there and offers the one button that fills it: "No 
 
 The NPC sheet is a stat block for play, not an agent-sized form.
 
-- **Size:** default about 480×640; per-kind minimum width 420px (the shared 640px minimum in `sheet-placement.mjs:11` is for agents).
+- **Size:** default 480×640; minimum width 420px. Per-kind minimums are the `MIN_WIDTHS` table in `module/sheets/sheet-placement.mjs`; the shared 640px minimum is for agents.
 - **Header chips:** TL · NPC kind and role · Defense · Initiative · health (V/W for special NPCs; "Save +4 · next DC 14 · ✗✗□" for standard NPCs) · condition stamps.
 - **Only the track the NPC uses:** a standard NPC shows its Damage-save track and no vitality/wounds; a special NPC shows vitality/wounds and stress/subdual and no Damage-save track.
 - **Weapons first**, each row as in 7.1.
 - **Glance values read-only in Play.** BAB, saves, Defense and Initiative inputs are Edit only.
 - **Rare actions** (takedown, cheap shot, Shaken, Baffled/Incompetent review) live under "More actions"; a review warning appears only when one fires.
-- **Edit:** the builder, with a sticky results strip at its top so grade changes show their effect without scrolling.
+- **A skill roll made openly** prints the result only. The bonus, cap and modifier breakdown goes to the GC-only (secret) card.
+- **Edit:** the builder, with a sticky results strip at its top so grade changes show their effect without scrolling (the strip is still open, N11). Delete icons, Reset and hand-typed stats are `edit-only`.
 - Grades are Roman numerals everywhere.
 
 ### 7.3 Vehicle and item sheets
 
 - Vehicle: speed, handling, Defense, condition track with broken/destroyed boxes marked (`.sc2-track`). Thresholds are one string with placeholders.
-- Items: the play figures in a summary row (`.item-summary`) above the form. Developer fields (JSON prerequisites, formula keys such as `@tb.t1`) are GC-only and behind "Technical detail". Choices a feat needs (an armor type, a skill) are made inline on the character's feat row, not on the item sheet.
+- Items: the play figures in a summary row (`.item-summary`) above the form. Developer fields (JSON prerequisites, formula keys such as `@tb.t1`) are GC-only and behind "Technical detail"; item templates test `isGM` from the sheet context. The decorative agency seal is gone from vehicle and item headers and the browser. Choices a feat needs (an armor type, a skill) are made inline on the character's feat row, not on the item sheet.
 
 ### 7.4 Roll and option dialogs
 
@@ -439,13 +442,15 @@ This holds for attributes, saves, skills, attacks, damage, initiative and knowle
 
 1. One purpose line, if the title is not enough.
 2. The decision fields in the order they are decided, most common option preselected, target and measured range filled in.
-3. **Situational modifier** (number, default 0) — in every roll dialog, in the quick section.
+3. **Situational modifier** (number, default 0) — in every roll dialog, in the quick section. It is never remembered between rolls (`NEVER_REMEMBERED` in `module/apps/remembered-choices.mjs`) and the card's header says when one was applied. Skill and attack dialogs have it; attribute, save and damage rolls do not open a dialog yet (D2, D3).
 4. Roll visibility for the GC (public / GC only) on NPC rolls.
 5. Named circumstance groups, collapsed, with a "N set" count (`attack-dialog-ux.mjs` is the model).
-6. "What the system does for you" disclosure, last and collapsed.
+6. "What the system does for you" disclosure, last and collapsed (`installResolutionGuide(root, kind, { append: true })` in `module/apps/resolution-guide.mjs`).
 7. Footer: one primary that names the result ("Roll attack: Beretta 92"), and Cancel. Enter submits; Esc cancels.
 
-- Dropdown options are names; mechanics for the selected option appear as one line under the select.
+- Dropdown options are names; mechanics for the selected option appear as one line under the select. Put the detail on the option as `data-detail`; `module/apps/skill-dialog-ux.mjs` shows it in `.sc2-check-detail`.
+- When the GC opens a dialog, its GC confirmations arrive ticked with a note saying how many (`trustConfirmations(element, { asGC })` in `module/apps/dialog-theme.mjs`). _Trust the table_ does the same for everyone.
+- An option that depends on the kind of check names that kind: the critical dialog offers "Critical hit (you pay)" on an attack and "Critical success" elsewhere.
 - Width 560px for ordinary dialogs, 720px for tables (rosters, references). Height capped by `.sc2-dialog .dialog-content` (the screen height less 200px for header, footer and margins); the footer stays visible and the body is the only scrolling box.
 - Remember last choices per dialog and offer "Reset" (`module/apps/remembered-choices.mjs`).
 
@@ -471,12 +476,15 @@ This holds for attributes, saves, skills, attacks, damage, initiative and knowle
 | Damage applied   | —                                   | Undo (GC)                                        |
 | Finished         | —                                   | (collapsed to one summary line)                  |
 
-**State words (one set, used by guidance titles, feedback lines and buttons):** Pending → Hit / Miss or Success / Failure → Damage rolled → Damage applied → Finished. Before confirmation say "Threat, if it succeeds" / "Error, if it fails"; after activation say "Critical hit" (attack) or "Critical success" (other checks), and their failure counterparts.
+**State words (one set, used by guidance titles, feedback lines and buttons; `checkGuidance()` in `module/rolls/chat-guidance.mjs` returns the title, note, tone and change, and `outcomeLabel()` in `module/rules/outcome-labels.mjs` picks hit/miss or success/failure):** Pending → Hit / Miss or Success / Failure → Damage rolled → Damage applied → Finished. Before confirmation say "Threat, if it succeeds" / "Error, if it fails"; after activation say "Critical hit" (attack) or "Critical success" (other checks), and their failure counterparts.
 
 **Rules:**
 
 - The outcome vocabulary switches on `checkKind`: attacks hit/miss and critical hit/miss; everything else success/failure and critical success/failure. No slash forms on a card that knows which applies.
-- Two buttons that do nearly the same thing never share a card; the quick spend and the full boost dialog become one button with a ▾ for options.
+- Two buttons that do nearly the same thing never share a card; the quick spend and the full boost dialog are one button with a ▾ beside it (`split: true`, `.sc2-split-more`).
+- The closing button is "Finish". A button whose wording depends on the card (the critical button, the spend button) sets its own label and has no `SPYCRAFT.RollControl.*` override.
+- The line under a pressed button says "Done. The next step is at the top of this card.", "Not done: {reason}", or nothing after a closed dialog (`module/apps/chat-action-feedback.mjs`).
+- A control that a keyboard shortcut must find carries a `key` (rendered as `data-roll-key`), as GC boost does.
 - Spent controls leave and become a line ("Damage applied: 6 to Mercenary").
 - Onlookers see the same card without buttons, and a passive status ("Waiting for the GC to apply 6 to Security Guard").
 - A card the system wrote to an actor from keeps an Undo for the GC for as long as the card exists.
@@ -484,8 +492,10 @@ This holds for attributes, saves, skills, attacks, damage, initiative and knowle
 
 ### 7.6 Combat tracker and turn flow
 
-- Each row shows Initiative Count, half actions left (acting combatant), flat-footed, wound state word, Press/reeling and conditions as text.
-- Context menu: Spend half / full action, Give back, **Delay…**, **Ready**, **Readied action triggered**, Fluid initiative event. Delay moves the turn on.
+- Each row shows Initiative Count, half actions left (acting combatant), flat-footed, wound state word, Press/reeling and conditions as text. `trackerRowStates()` in `module/apps/gc/combat.mjs` supplies flat-footed for everyone and the wound state only to someone who may open that sheet; standard NPCs have no wound state.
+- Counts use a real plural: two strings ("1 half action left", "{n} half actions left"), never "(s)".
+- Context menu: Spend half / full action, Give back, **Delay…**, **Ready**, **Readied action triggered**, Fluid initiative event. Delay moves the turn on. (Delay and Ready are not built yet, T2.)
+- The agent's "Your turn" strip has End turn, which refuses with a reason when it is not that character's turn.
 - Defeated and unconscious combatants are visibly skipped; the GC can still give them a turn.
 - Half actions are marked automatically by posted actions, with undo from the card and a pip to correct by hand. Exceeding the budget warns and does not block.
 
@@ -508,9 +518,12 @@ A PR that pushes one of these over budget explains why.
 
 - **Prep | Play switch** at the top. Play hides mission editing and keeps one summary line (TL, Caliber, XP so far); Prep shows the mission, objectives, antagonists, complications and campaign qualities.
 - **Status strip** (`gc-now`): Scene, GC dice, Round, and "Pending N" (player requests + unresolved attack cards + open threats and errors), which jumps to the oldest. Add the team's action dice. Time already shows on the clock badge.
-- **During a combat, Combat comes first**, directly under the strip. For the acting combatant it shows a mini stat block: Defense, health, conditions, half actions left, one button per weapon ("Attack +5 · 2d6", Shift-click semantics against the T-target), "Apply last damage to target", and Next. Each list row pans to the token and opens the sheet on click.
+- **During a combat, Combat comes first**, directly under the strip (`templates/apps/gc-console-combat.hbs`, rendered at the top while a combat exists and in its usual place otherwise). For the acting combatant it shows a mini stat block: Defense, health, conditions, half actions left, one button per weapon ("Attack +5 · 2d6", Shift-click semantics against the T-target), "Apply last damage to target", and Next. Each list row pans to the token and opens the sheet on click.
 - **One primary per section and state:** before the fight, "Roll NPC Initiative"; during it, "Next turn".
 - Rare tools (Recalculate TL, Clear record, exposure infractions) sit under "More mission tools".
+- Facts are label and value pairs in a `.gc-facts` grid of `.sc2-field` tiles (Threat Level, Caliber, standing reward, XP, GC action dice). A value with several parts is one string with placeholders (`SPYCRAFT.Console.*`).
+- Row buttons are verbs in sentence case with no dash before them: "Mark complete", "Mark faced", "Remove".
+- Section titles are 13px sentence case, set by one rule.
 - Every button that changes world state has a tooltip saying what it changes (the `Console.NextSceneHint` style).
 - Console search matches labels and hidden synonyms (`data-search-terms`): "npc", "add enemy", "initiative", "turn", "damage", "xp", "dice".
 - Each section header has a `?` linking to the matching GC guide section.
@@ -521,7 +534,7 @@ Grades and TL at the top, results strip sticky, reference tables behind a disclo
 
 ### 7.9 Compendium browser
 
-Two panes (list, preview). Rows about 36px with name, one-line summary and an Add button; the first row previews by default. Enter adds the focused entry; an option closes the browser after adding. "Qualified only" is on by default while the builder is active. Pack tiles have distinct art and the GC-facing packs (NPC templates, sample agents, Glass Wake) sit at the top.
+Two panes (list, preview). Rows about 36px with name, one-line summary and an Add button; the first row previews by default. Enter adds the focused entry; an option closes the browser after adding. "Qualified only" is on by default only when the browser was opened for a character. Pack tiles have distinct art and the GC-facing packs (NPC templates, sample agents, Glass Wake) sit at the top.
 
 ### 7.10 Settings
 
@@ -579,17 +592,19 @@ Only show controls that are legal now (principle 4). Boost Defense outside the r
 
 - Every interactive element is a `<button>`, input, select or summary, in a logical Tab order. Templates no longer author `<a data-action>` (0 today); keep it that way.
 - The sheet tablist is one Tab stop that hands off to the panel. Dialogs trap focus and return it on close; focus starts in the first meaningful field, or on the primary if there is none. Enter submits; Esc cancels. Chat card buttons are reachable by Tab.
-- Focus is shown by one rule: a 3px `--sc2-focus-color` outline, offset 3px (`components.css:284-286`). Do not add other focus styles (`spycraft2.css:225`, the warm icon ring, is one to remove).
+- Focus is shown by one rule: a 3px `--sc2-focus-color` outline, offset 3px (the `:focus-visible` rule in `components.css`). Do not add other focus styles; the warm ring on icon buttons was the last one and has been removed.
 
-**Keybindings** (registered with `game.keybindings.register`, all rebindable, documented in `docs/gc-tools.md`):
+**Keybindings** (registered in `module/apps/keybindings.mjs` with `game.keybindings.register`, all rebindable under Configure Controls, documented in `docs/gc-tools.md`):
 
-| Action                                      | Who |
-| ------------------------------------------- | --- |
-| Next turn / Previous turn                   | GC  |
-| Open or focus the GC Console                | GC  |
-| Open the active combatant's sheet           | GC  |
-| Press the primary button on the newest card | All |
-| GC boost on the newest open NPC card        | GC  |
+| Action                                      | Default   | Who |
+| ------------------------------------------- | --------- | --- |
+| Next turn / Previous turn                   | Alt+N / P | GC  |
+| Open or focus the GC Console                | Alt+G     | GC  |
+| Open the active combatant's sheet           | Alt+S     | GC  |
+| Press the primary button on the newest card | Alt+Enter | All |
+| GC boost on the newest open NPC card        | Alt+B     | GC  |
+
+A new shortcut is added to that file's table, marked `restricted` when it is for the GC, and listed in `docs/gc-tools.md`. Card shortcuts find their button by `.sc2-primary-action` or `data-roll-key`, not by its text.
 
 ### 9.2 Screen sizes
 
@@ -713,14 +728,14 @@ Counts are over the 10,332 string values in `lang/en.json`.
 
 **Keep — already compliant, do not regress:**
 
-- The rail plus creation track with "Next setup step" at the top (`agent-rail.hbs:22-26`); the inline vitality die on level-up.
-- The `?` captions on vitality, wounds and action dice (`agent-rail.hbs:31,34,48`).
+- The rail plus creation track with "Next setup step" at the top (`agent-rail.hbs`); the inline vitality die on level-up.
+- The `?` captions on vitality, wounds and action dice (`agent-rail.hbs`).
 - The attack dialog's quick/advanced split with a "N set" counter, `briefOption`, and remembered choices with Reset.
 - One-click Resolve with a hit/miss preview; NPC quick resolve against the T-target; the cover selector in Resolve (`damage-application.mjs:208`).
 - GC boost and GC activate threat on NPC cards, paid from the GC dice.
 - Reach: block the player, ask the GC — the model for 8.3.
 - "Begin combat" warning with "Roll for NPCs and remind players" as the default (`module/apps/gc/combat.mjs:96-102`) — the model for 4.6 and 6.1.
-- _Trust the table_ marking what it ticked (`dialog-theme.mjs:41-57`).
+- _Trust the table_ marking what it ticked, and the same note for a GC (`trustConfirmations` in `dialog-theme.mjs`).
 - GC-only reference results whispered; the player's secret-check note.
 - Console sections that open by game state; Add NPC to scene with Record for XP separated and explained.
 - Token-based theming with chat following the interface theme, tested in `chat-theme.spec.mjs`; container queries; `forced-colors` and `prefers-contrast` hooks; 44px icon targets; one strong focus ring.
@@ -728,7 +743,7 @@ Counts are over the 10,332 string values in `lang/en.json`.
 
 ### 10.12 Member claims dropped or corrected
 
-- **No token bars declared** — wrong. `CONFIG.Actor.trackableAttributes` is set at `spycraft2.mjs:222-226`; the real gap is the standard NPC's damage track (N14).
+- **No token bars declared** — wrong. `CONFIG.Actor.trackableAttributes` is set in `spycraft2.mjs`; the real gap is the standard NPC's damage track (N14).
 - **`spycraft2.css` overrides the danger/good tokens** (earlier HTML/CSS review) — fixed in the current tree; dropped.
 - **Chat search uses literal light colours; inline `style=` in dialogs** — fixed (Foundry variables; `.sc2-scroll-list`); dropped.
 - **Player Play tab shows review notices all the time** — players see them only when a review is pending (`agent-main.hbs:28-36`); the always-on buttons are in the GC's view (A14).
@@ -749,6 +764,33 @@ Counts are over the 10,332 string values in `lang/en.json`.
 | Turn bar or console combat panel                 | **Console combat panel first**, poppable; floating bar optional later                    | Reuses the existing surface and its state handling                                 |
 | Minimum text size 12px or 13px                   | **13px** for information, 12px decorative only                                           | Stamps and tags carry meaning at the table                                         |
 | GC confirmation boxes                            | **Replace with defaults** long term; **pre-tick for the GC** now                         | Fast relief now without blocking the larger rework                                 |
+
+### 10.14 What the first pass added
+
+PR 63 fixed 82 items. The shared pieces it added, to reuse instead of rebuilding:
+
+| Need                                           | Use                                                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Print a threat or error range                  | `formatRange()` in `module/rules/outcome-labels.mjs`                                        |
+| Choose hit/miss or success/failure wording     | `outcomeLabel()` in the same file                                                           |
+| Card state title, note, tone and "16 → 25"     | `checkGuidance()` in `module/rolls/chat-guidance.mjs`; `.sc2-outcome-<tone>` in `chat.css`  |
+| A weapon row on any sheet                      | `templates/actor/parts/weapon-row.hbs` with `weaponFacts()` from `module/sheets/play-rows.mjs` |
+| A limited-use counter                          | `templates/actor/parts/use-counter.hbs`                                                     |
+| Condition stamps with reminders                | `conditionStamps()` in `module/sheets/agent-ux.mjs`                                         |
+| Flat-footed Defense, Boost Defense state       | `flatFootedDefense()`, `defenseBoostState()` in the same file                               |
+| Wound state word (size-aware)                  | `woundState(wounds, deathThreshold)` in `module/rules/damage-application.mjs`               |
+| State words on a tracker row                   | `trackerRowStates()` in `module/apps/gc/combat.mjs`                                         |
+| A per-kind minimum sheet width                 | `MIN_WIDTHS` in `module/sheets/sheet-placement.mjs`                                         |
+| GC confirmations ticked for the GC             | `trustConfirmations()` in `module/apps/dialog-theme.mjs`                                    |
+| "What the system does for you" in a dialog     | `installResolutionGuide()` in `module/apps/resolution-guide.mjs`                            |
+| Detail line under a select                     | `data-detail` on the option; `.sc2-check-detail` in `module/apps/skill-dialog-ux.mjs`       |
+| A keyboard shortcut                            | the table in `module/apps/keybindings.mjs`                                                  |
+| Label and value pairs in the console           | `.gc-facts` in `styles/gc-console.css`                                                      |
+
+Two constraints met along the way, for whoever continues:
+
+- `module/sheets/agent-ux.mjs` and `module/apps/skill-dialog-ux.mjs` are inlined into test pages with only their `loc` import rewritten. They must not import anything else; put helpers that need other modules in a file of their own (as `play-rows.mjs` does).
+- A partial used by a sheet or the console must be listed in that part's `templates`, and `tools/test-templates.mjs` checks it. Handlebars inline partials are not accepted by that test.
 
 ---
 
@@ -789,7 +831,7 @@ Counts are over the 10,332 string values in `lang/en.json`.
 
 ### 11.2 Lints that can run in CI
 
-These do not need the rulebook, so they can run in CI beside `npm test`. Each can start as a warning and become an error once the matching audit items are done.
+These do not need the rulebook, so they can run in CI beside `npm test`. Each can start as a warning and become an error once the matching audit items are done. None is written yet. After the first pass few hits remain for Banned terms ("Current VP", "Current WP"), Glued numbers, Ranges and Templates: title (four authored `title` attributes), and Keybindings passes, so these five are the cheapest to turn on first.
 
 | Lint                     | Check                                                                                                                                                                                                                      | Audit items  |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |

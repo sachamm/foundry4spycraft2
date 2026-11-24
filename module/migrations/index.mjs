@@ -18,10 +18,17 @@ import { companionRetargets, deltaIsEmpty, isPersonalCharacter } from "../rules/
  *
  * A migration reads plain source data (document.toObject()) and returns a flat or nested update object. It must be
  * safe to run on data that already has the new shape, because a failed run is retried on the next start.
+ *
+ * Schema version each release writes, so a world from any of them is brought forward by the migrations above it:
+ * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5. Add the new release here when SCHEMA_VERSION changes
+ * (tools/test-migrations.mjs checks the list).
  */
 
 /** The data schema version this build of the system writes. */
 export const SCHEMA_VERSION = 5;
+
+/** The schema version each published release wrote (see above). */
+export const RELEASE_SCHEMAS = Object.freeze({ "0.4.0": 1, "0.5.0": 2, "0.5.2": 2, "0.6.0": 3, "0.7.0": 5 });
 
 /**
  * Version 2: feats gained `system.reminder`. A feat already on a character or in the world takes the reminder its
