@@ -74,9 +74,10 @@ function change(event, update) {
   const view = views.get(chatInput());
   if (!view) console.warn("Field Agent's Handbook | The chat box is not ready for the dice bar.");
   syncWithInput(view);
+  const hadDice = state.dice.size > 0;
   update();
-  // Only write when there is a formula, so a modifier chosen before any die does not clear a draft.
-  if (view && state.dice.size) writeFormula(view);
+  // Only write when there is or was a formula, so a modifier chosen before any die does not clear a draft.
+  if (view && (hadDice || state.dice.size)) writeFormula(view);
   // A mouse click leaves the cursor in the chat box; a key press keeps focus on the bar for keyboard users.
   if (view && event.detail > 0) view.focus();
   refreshBar();
@@ -87,6 +88,14 @@ function change(event, update) {
  * does not shrink and grow again between clicks.
  */
 const keepChatFocus = node => node.addEventListener("mousedown", event => event.preventDefault());
+
+/** Right-click handling without the browser's menu. It counts as a mouse click, so the cursor goes to the chat box. */
+const onRightClick = (node, handler) =>
+  node.addEventListener("contextmenu", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    handler({ detail: 1 });
+  });
 
 /** Send the chat box as Enter would, so the roll joins the chat history and the box clears. */
 async function sendRoll() {
@@ -144,7 +153,7 @@ function buildBar() {
     "sc2-action",
     "−",
     loc`Lower the modifier by 1`,
-    loc`Takes 1 off the modifier on the roll in the chat box.`
+    loc`Takes 1 off the modifier on the roll in the chat box. Right-click adds 1.`
   );
   down.dataset.step = "-1";
   const value = make("output");
@@ -154,14 +163,16 @@ function buildBar() {
     "sc2-action",
     "+",
     loc`Raise the modifier by 1`,
-    loc`Adds 1 to the modifier on the roll in the chat box.`
+    loc`Adds 1 to the modifier on the roll in the chat box. Right-click takes 1 off.`
   );
   up.dataset.step = "1";
   for (const step of [down, up]) keepChatFocus(step);
-  for (const step of [down, up])
-    step.addEventListener("click", event =>
-      change(event, () => (state.modifier = clampModifier(state.modifier + Number(step.dataset.step))))
-    );
+  for (const step of [down, up]) {
+    const by = Number(step.dataset.step);
+    step.addEventListener("click", event => change(event, () => (state.modifier = clampModifier(state.modifier + by))));
+    // A right-click steps the other way.
+    onRightClick(step, event => change(event, () => (state.modifier = clampModifier(state.modifier - by))));
+  }
   modifier.append(down, value, up);
   const send = button("sc2-action sc2-chat-dice-send", loc`Roll`, loc`Roll the dice in the chat box`);
   send.addEventListener("click", async () => {
@@ -179,13 +190,21 @@ function buildBar() {
       "sc2-action",
       undefined,
       loc`Add a d${faces} to the roll in the chat box`,
-      loc`Adds a d${faces} to the /r roll in the chat box. Press Enter in the chat box to roll it.`
+      loc`Adds a d${faces} to the /r roll in the chat box; right-click takes one away. Press Roll or Enter to roll it.`
     );
     die.dataset.faces = String(faces);
     die.append(make("span", "sc2-chat-dice-face", `d${faces}`), make("span", "sc2-chat-dice-count"));
     keepChatFocus(die);
     die.addEventListener("click", event =>
       change(event, () => state.dice.set(faces, (state.dice.get(faces) ?? 0) + 1))
+    );
+    // A right-click takes one of that die away.
+    onRightClick(die, event =>
+      change(event, () => {
+        const count = (state.dice.get(faces) ?? 0) - 1;
+        if (count > 0) state.dice.set(faces, count);
+        else state.dice.delete(faces);
+      })
     );
     dice.append(die);
   }

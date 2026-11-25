@@ -218,3 +218,28 @@ test("Roll sends the built roll and is off until a die is picked", async ({ page
   await expect(bar.locator("output")).toHaveText("+0");
   await expect(roll).toBeDisabled();
 });
+
+test("right-click takes a die away and steps the modifier the other way", async ({ page }) => {
+  await mount(page, 300);
+  const bar = page.getByRole("region", { name: "Dice" });
+  const d6 = bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" });
+  const d8 = bar.getByRole("button", { name: "Add a d8 to the roll in the chat box" });
+  await d6.click();
+  await d6.click();
+  await d8.click();
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click({ button: "right" });
+  expect(await page.evaluate(() => window.chatView.text)).toBe("/r 2d6+1d8-1");
+  await bar.getByRole("button", { name: "Lower the modifier by 1" }).click({ button: "right" });
+  await bar.getByRole("button", { name: "Lower the modifier by 1" }).click({ button: "right" });
+  await d6.click({ button: "right" });
+  expect(await page.evaluate(() => window.chatView.text)).toBe("/r 1d6+1d8+1");
+  await d6.click({ button: "right" });
+  await expect(d6).toHaveAttribute("aria-pressed", "false");
+  // Taking the last die away clears the roll from the chat box.
+  await d8.click({ button: "right" });
+  expect(await page.evaluate(() => window.chatView.text)).toBe("");
+  await expect(bar.getByRole("button", { name: "Roll the dice in the chat box" })).toBeDisabled();
+  // A right-click on a die that is not in the roll does nothing.
+  await d8.click({ button: "right" });
+  expect(await page.evaluate(() => window.chatView.text)).toBe("");
+});
