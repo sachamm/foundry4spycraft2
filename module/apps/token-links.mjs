@@ -32,6 +32,8 @@ import { systemDialog } from "./dialog-theme.mjs";
 
 const SYSTEM = "spycraft2";
 const DISMISSED_SETTING = "tokenLinkReviewDismissed";
+/** Token flag: the version 7 rescue left this token for the GC review because another token's changes went first. */
+const LEFT_FLAG = "rescueLeftForReview";
 
 /** A token of an agent or companion that is not linked to its character, with what linking it would copy, or null. */
 export function linkProposal(token, scene = token?.parent) {
@@ -170,7 +172,10 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
         if (actor) {
           if (!isPersonalCharacter(actor)) continue;
           const changes = deltaChanges(deltaSource(token), actor.toObject?.() ?? actor);
-          if (changes.count && copied.has(actor.id)) {
+          // A token set aside on an earlier run stays set aside, even once the other token is linked.
+          if (changes.count && (copied.has(actor.id) || token.flags?.[SYSTEM]?.[LEFT_FLAG])) {
+            if (!token.flags?.[SYSTEM]?.[LEFT_FLAG])
+              await token.update({ [`flags.${SYSTEM}.${LEFT_FLAG}`]: true }, options);
             report.left++;
             continue;
           }
@@ -184,6 +189,11 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
         const created = await world.createActor(data, options);
         if (!created?.id) throw new Error(loc`The rescued character ${data.name} was not created.`);
         actors.push(created);
+        // Companions made from this token's sheet named its copy as their owner; they follow the new character.
+        const ownerUuid = `Scene.${scene.id}.Token.${token.id}.Actor.`;
+        for (const companion of actors)
+          if (companion.system?.companionOf?.ownerUuid?.startsWith(ownerUuid))
+            await companion.update({ "system.companionOf.ownerUuid": `Actor.${created.id}` }, options);
         await token.update({ actorId: created.id, actorLink: true }, options);
         report.created++;
       } catch (error) {

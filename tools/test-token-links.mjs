@@ -444,9 +444,15 @@ test("version 7 copies a token's character into the Actors list and links the to
     update: async data => Object.assign(orphan, data)
   };
   const linked = { id: "t5", actorLink: true, update: async () => assert.fail("a linked token is left alone") };
+  // A companion created from the orphan token's sheet follows the rebuilt agent.
+  const companion = {
+    id: "dog",
+    system: { companionOf: { ownerUuid: "Scene.meeting.Token.t4.Actor.deleted" } },
+    update: async data => (companion.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"])
+  };
   const { world: target, created } = rescueWorld(
     [changed.token, empty.token, second.token, orphan, linked],
-    [changed.actor]
+    [changed.actor, companion]
   );
   const report = await rescueTokenCharacters(target);
   assert.deepEqual(report, { linked: 2, created: 1, left: 1 });
@@ -461,6 +467,12 @@ test("version 7 copies a token's character into the Actors list and links the to
   assert.equal(created[0].name, "Arthur Smithwick");
   assert.equal(orphan.actorId, "new1");
   assert.equal(orphan.actorLink, true);
+  assert.equal(companion.system.companionOf.ownerUuid, "Actor.new1");
+  // The token left for the review is marked, so a retry does not copy its changes over the first token's.
+  assert.equal(second.token["flags.spycraft2.rescueLeftForReview"], true);
+  second.token.flags = { spycraft2: { rescueLeftForReview: true } };
+  assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 0, left: 1 });
+  assert.equal(second.token.actorLink, false);
 });
 
 test("a token that could not be rescued keeps the world's version, so the rescue runs again", async () => {
