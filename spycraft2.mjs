@@ -8,6 +8,7 @@ import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-sce
 import { registerActorFolderSetup, setupActorFolders } from "./module/actor-folders.mjs";
 import { installDialogThemeHooks, registerTableTrustSetting } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
+import { installChatDiceHooks } from "./module/apps/chat-dice.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
 import { installPoolMaxHooks } from "./module/apps/pool-max.mjs";
 import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
@@ -138,6 +139,7 @@ Hooks.once("init", () => {
   registerErrorNotices();
   console.log("Field Agent's Handbook | Initializing system");
   installChatSearchHooks();
+  installChatDiceHooks();
   installDialogThemeHooks();
   installUITooltipHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;

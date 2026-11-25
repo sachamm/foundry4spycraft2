@@ -1,0 +1,74 @@
+/* The dice bar under the chat log. It sits in Foundry's sidebar chrome, so like the chat search it takes Foundry's
+ * theme colours rather than the system's tokens. Every control is at least 28px tall (style guide 5.5). */
+.sc2-chat-dice {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 4px;
+  pointer-events: auto;
+}
+.sc2-chat-dice-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.sc2-chat-dice button {
+  min-width: 0;
+  min-height: 28px;
+  height: auto;
+  margin: 0;
+  padding: 0 4px;
+  font-size: var(--sc2-text-m, 14px);
+  line-height: 1;
+  white-space: nowrap;
+}
+.sc2-chat-dice-quick {
+  flex: 1 1 auto;
+  font-weight: bold;
+}
+.sc2-chat-dice-modifier {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+.sc2-chat-dice-modifier button {
+  width: 28px;
+  padding: 0;
+}
+.sc2-chat-dice-modifier output {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2em;
+  padding: 0 2px;
+  border: 1px solid var(--color-border, #777);
+  border-radius: 2px;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: var(--sc2-text-m, 14px);
+}
+.sc2-chat-dice-dice {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+}
+.sc2-chat-dice-dice button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+/* A die already in the formula: bold, a heavier edge and, from the second, its count. Never colour alone. */
+.sc2-chat-dice-dice button[aria-pressed="true"] {
+  font-weight: bold;
+  border-width: 2px;
+  border-color: currentColor;
+}
+.sc2-chat-dice-count {
+  font-size: var(--sc2-text-s, 13px);
+}
+.sc2-chat-dice-count:empty {
+  display: none;
+}

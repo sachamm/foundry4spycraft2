@@ -16,7 +16,8 @@ export default defineConfig({
     "accessibility-resolution.spec.mjs",
     "chat-theme.spec.mjs",
     "keep-place.spec.mjs",
-    "attribute-abbreviations.spec.mjs"
+    "attribute-abbreviations.spec.mjs",
+    "chat-dice.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,
