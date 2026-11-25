@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.7 — 2026-11-25
 
 - **Tooltips that show where a bonus comes from.** Every button on a character sheet that shows a roll bonus now
   lists its parts on hover or keyboard focus, one per line, ending in a total that matches the button: attributes
