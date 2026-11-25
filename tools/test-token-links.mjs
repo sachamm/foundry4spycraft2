@@ -422,8 +422,12 @@ function rescueWorld(tokens, actors) {
       currentScenes: [scene],
       worldActors: actors,
       createActor: async data => {
-        const actor = { id: `new${created.length + 1}`, ...data };
-        created.push(data);
+        const actor = { id: `new${created.length + 1}`, ...structuredClone(data) };
+        actor.update = async update => {
+          if (update["system.companionOf.ownerUuid"])
+            actor.system.companionOf.ownerUuid = update["system.companionOf.ownerUuid"];
+        };
+        created.push(actor);
         return actor;
       }
     }
@@ -518,7 +522,39 @@ test("a companion rebuilt after its rebuilt owner follows the owner's new charac
   const { world: target, created } = rescueWorld([owner, pet], []);
   assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 2, left: 0 });
   assert.equal(created[1].system.companionOf.ownerUuid, "Actor.new1");
+  // A retry with the owner already rebuilt still points a late companion at it.
+  const late = token("t3", "deletedPet2", {
+    ...emptyDelta(),
+    system: { companionOf: { ownerUuid: "Actor.deletedOwner", feat: "Animal Partner" } }
+  });
+  const retry = rescueWorld([late], created);
+  await rescueTokenCharacters(retry.world);
+  assert.equal(retry.created[0].system.companionOf.ownerUuid, "Actor.new1");
   assert.equal(pet.actorId, "new2");
+});
+
+test("a companion's own token copied after its owner was rebuilt does not undo the repoint", async () => {
+  const owner = {
+    id: "t1",
+    actorId: "deletedOwner",
+    actorLink: false,
+    _source: { delta: orphanDelta() },
+    update: async data => Object.assign(owner, data)
+  };
+  const pet = world({ type: "npc" });
+  pet.actor.system = { companionOf: { ownerUuid: "Actor.deletedOwner" } };
+  pet.actor.update = async data => {
+    if (data.system?.companionOf) pet.actor.system.companionOf = data.system.companionOf;
+    if (data["system.companionOf.ownerUuid"])
+      pet.actor.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"];
+  };
+  pet.actor.toObject = () => ({ ...baseSource(), type: "npc", system: structuredClone(pet.actor.system) });
+  // The pet's token holds a change that still names the deleted owner.
+  pet.token._source.delta = { ...emptyDelta(), system: { companionOf: { ownerUuid: "Actor.deletedOwner" }, note: 1 } };
+  const { world: target } = rescueWorld([owner, pet.token], [pet.actor]);
+  await rescueTokenCharacters(target);
+  assert.equal(pet.token.actorLink, true);
+  assert.equal(pet.actor.system.companionOf.ownerUuid, "Actor.new1");
 });
 
 test("a token that could not be rescued keeps the world's version, so the rescue runs again", async () => {
