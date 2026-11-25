@@ -7,9 +7,10 @@ import { loc } from "../i18n.mjs";
 import { esc } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 
-const leaf = value => value === null || typeof value !== "object" || Array.isArray(value);
+// An empty record is a value too: without it, a record the step created could not be told from one it filled.
+const leaf = value => value === null || typeof value !== "object" || Array.isArray(value) || !Object.keys(value).length;
 
-/** A nested object as dotted paths; arrays and null count as values. */
+/** A nested object as dotted paths; arrays, null and empty records count as values. */
 export function flatten(object, prefix = "", out = {}) {
   for (const [key, value] of Object.entries(object ?? {})) {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -35,6 +36,19 @@ const rebuilt = (map, path) => {
 };
 
 /**
+ * The shallowest part of `path` that did not exist before the step. A record the step created is removed at its own
+ * key: removing only its values would leave an empty shell behind, which a later reader takes for a damaged record.
+ */
+const newRoot = (before, path) => {
+  const keys = path.split(".");
+  for (let depth = 1; depth < keys.length; depth++) {
+    const top = keys.slice(0, depth).join(".");
+    if (!(top in before) && !under(before, top).length) return top;
+  }
+  return path;
+};
+
+/**
  * What it takes to turn `after` back into `before`, both flat maps of path to value.
  * @returns {{restore: object, unset: string[], expect: object, whole: string[]}}  `restore` holds the earlier
  *   values, `unset` the paths that did not exist before, and `expect` the values the step left, to notice later
@@ -50,10 +64,16 @@ export function differences(before, after) {
   const filled = Object.keys(before).filter(path => !(path in after) && under(after, path).length),
     emptied = Object.keys(after).filter(path => !(path in before) && under(before, path).length);
   const covered = path => [...filled, ...emptied].some(top => path.startsWith(`${top}.`));
+  const emptyRecord = value => value !== null && typeof value === "object" && !Array.isArray(value);
   for (const path of filled) {
+    for (const key of under(after, path)) expect[key] = after[key];
+    // An empty record that gained parts: each new part is removed at its own key and the record stays.
+    if (emptyRecord(before[path])) {
+      for (const key of under(after, path)) unset.push(`${path}.${key.slice(path.length + 1).split(".")[0]}`);
+      continue;
+    }
     restore[path] = before[path];
     whole.push(path);
-    for (const key of under(after, path)) expect[key] = after[key];
   }
   for (const path of emptied) {
     restore[path] = rebuilt(before, path);
@@ -64,10 +84,10 @@ export function differences(before, after) {
     if (filled.includes(path) || emptied.includes(path) || covered(path)) continue;
     if (same(before[path], after[path])) continue;
     if (path in before) restore[path] = before[path];
-    else unset.push(path);
+    else unset.push(newRoot(before, path));
     if (path in after) expect[path] = after[path];
   }
-  return { restore, unset, expect, whole };
+  return { restore, unset: [...new Set(unset)], expect, whole };
 }
 
 const combatantsOf = actor =>
@@ -127,6 +147,28 @@ export function movedSince(entry, source) {
   return pairs(entry.expect)
     .filter(([path, value]) => !same(valueAt(source, path), value))
     .map(([path]) => path);
+}
+
+const POOLS = ["vitality", "wounds"];
+/**
+ * Vitality and wounds that moved again after the step (a maximum followed a new Threat Level, or more damage came
+ * in): Undo gives back what the step took, counted from where the pool stands now, instead of the old number.
+ */
+export function poolsGivenBack(entry, actor) {
+  const out = {},
+    restore = new Map(pairs(entry.restore)),
+    expect = new Map(pairs(entry.expect));
+  for (const pool of POOLS) {
+    const path = `system.${pool}.value`,
+      was = restore.get(path),
+      left = expect.get(path),
+      now = actor.system?.[pool]?.value,
+      max = actor.system?.[pool]?.max;
+    if (![was, left, now].every(Number.isFinite) || now === left) continue;
+    const back = now + (was - left);
+    out[path] = Number.isFinite(max) && was <= max ? Math.min(back, Math.max(max, now)) : back;
+  }
+  return out;
 }
 
 /** The update that puts one character back. A path that did not exist before is removed. */
@@ -209,7 +251,7 @@ async function undoRecord(message, record) {
   if (moved.length) {
     const ok = await systemDialog.confirm({
       window: { title: loc`Undo` },
-      content: `<p>${loc`${esc(moved.map(([entry]) => entry.name).join(", "))} changed again after this step. Undo puts back the values from before the step and drops the later change to the same numbers.`}</p>`,
+      content: `<p>${loc`${esc(moved.map(([entry]) => entry.name).join(", "))} changed again after this step. Undo gives back the vitality and wounds the step took, and sets anything else it changed to its value from before the step.`}</p>`,
       yes: { label: loc`Undo anyway` },
       no: { label: loc`Cancel` },
       rejectClose: false
@@ -220,6 +262,7 @@ async function undoRecord(message, record) {
   await message.update({ "flags.spycraft2.undo.done": true });
   for (const [entry, actor] of targets) {
     const update = restoreUpdate(entry);
+    Object.assign(update, poolsGivenBack(entry, actor));
     if (Object.keys(update).length) await actor.update(update);
     const made = (entry.created ?? []).filter(id => actor.effects?.get?.(id));
     if (made.length) await actor.deleteEmbeddedDocuments("ActiveEffect", made);

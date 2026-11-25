@@ -188,17 +188,23 @@ export async function recordFluidEvent(combatant, id, input = {}) {
  */
 export async function recordAutomaticFluidEvent(actor, id) {
   const enabled = readSetting("autoFluidEvents", true) !== false;
-  const combat = game.combat;
-  if (!enabled || !combat?.started || !actor) return null;
-  const combatant = [...combat.combatants].find(
-    entry => entry.actor === actor || (entry.actor?.uuid && entry.actor.uuid === actor.uuid)
-  );
+  if (!enabled || !actor) return null;
+  // The character's own fight, whichever scene this client is viewing; the viewed fight is tried first.
+  const fights = [game.combat, ...(game.combats ?? [])].filter(
+      (combat, i, all) => combat?.started && all.indexOf(combat) === i
+    ),
+    all = fights.flatMap(combat => [...combat.combatants]),
+    exact = all.filter(entry => entry.actor === actor || (entry.actor?.uuid && entry.actor.uuid === actor.uuid)),
+    // A world actor whose one token in the fights is unlinked is still that combatant.
+    loose = exact.length || actor.isToken ? [] : all.filter(entry => entry.actorId === actor.id),
+    combatant = exact[0] ?? (loose.length === 1 ? loose[0] : null);
   if (!combatant?.isOwner || !Number.isFinite(combatant.initiative)) return null;
   const event = FLUID_EVENTS.find(entry => entry.id === id);
   try {
     await recordFluidEvent(combatant, id);
-  } catch {
-    return null;
+  } catch (error) {
+    console.warn("Field Agent's Handbook | Fluid initiative was not recorded from damage.", error);
+    return loc`Fluid initiative was not recorded for this (${error?.message ?? ""}); add it with Fluid initiative event.`;
   }
   return loc`Initiative ${event?.amount ?? ""} at the end of the round (${event?.label ?? id}); change it with Fluid initiative event if it should not count.`;
 }

@@ -469,9 +469,10 @@ async function nonLethalDamage(target, kind, amount, facts) {
     } catch (error) {
       return {
         lines: [
-          loc`${esc(target.name)}: ${amount} ${kind} damage could not be recorded (${esc(error.message)}); record it by hand.`
+          loc`Not applied: ${esc(target.name)}'s ${amount} ${kind} damage could not be recorded (${esc(error.message)}). Record it by hand.`
         ],
-        pendingSave: null
+        pendingSave: null,
+        failed: true
       };
     }
   }
@@ -740,6 +741,7 @@ export async function applyDamage(message, options = {}) {
   const hit = { damage, dr: drForAttack(target.system, attackKind), armorPiercing, armorPiercingAll, critical };
   let lines = [],
     pendingSave = null,
+    failed = false,
     result = null;
   // A picture of the target before anything is written, so the application can be undone from chat.
   const beforeDamage = snapshot(target);
@@ -814,7 +816,7 @@ export async function applyDamage(message, options = {}) {
       if (type)
         lines.push(loc`${typeLabel(type)} damage: its other effects on ${esc(target.name)} are worked out by hand.`);
     } else if (damage > 0) {
-      ({ lines, pendingSave } = await nonLethalDamage(target, kind, damage, {
+      ({ lines, pendingSave, failed } = await nonLethalDamage(target, kind, damage, {
         source,
         attackKind,
         armorPiercing,
@@ -848,6 +850,8 @@ export async function applyDamage(message, options = {}) {
     );
   }
   if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
+  // Nothing was written, so the card is not marked: its Apply button stays for another try.
+  if (failed) return null;
   // When the card cannot be marked the report above is the record.
   await markCard(
     message,
