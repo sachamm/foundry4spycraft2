@@ -5,7 +5,10 @@ import {
   applyLinkProposal,
   describeLinkProposal,
   linkProposal,
+  linksOnCreate,
+  orphanCharacterData,
   pendingLinkProposals,
+  rescueTokenCharacters,
   retargetLinkedCompanions,
   reviewTokenLinks
 } from "../module/apps/token-links.mjs";
@@ -18,7 +21,7 @@ import {
   migrateWorld,
   retargetTokenCompanions
 } from "../module/migrations/index.mjs";
-import { agentTokenDefaults } from "../module/rules/creation-defaults.mjs";
+import { agentTokenDefaults, linkedImport } from "../module/rules/creation-defaults.mjs";
 import { RESOURCE_LOCK_ID } from "../module/rules/resource-locks.mjs";
 
 /** An ActorDelta source as Foundry stores it for a token with no changes of its own. */
@@ -354,4 +357,144 @@ test("a companion repoint that failed is tried again on the next load, for any l
   tokens.set("t1", { actorLink: false });
   await retargetLinkedCompanions({ actors: [waiting], scenes: new Map([["warehouse", { tokens }]]) });
   assert.deepEqual(waiting.writes, []);
+});
+
+/** A character recovered from a token whose character was deleted, as Foundry stores that token's delta. */
+const orphanDelta = () => ({
+  ...emptyDelta(),
+  name: "Arthur Smithwick",
+  img: "arthur.webp",
+  system: { codename: "Cognac", progression: [{ classId: "explorer" }] },
+  items: [
+    { _id: "cls", name: "Explorer", type: "class", system: {} },
+    { _id: "gone", _tombstone: true },
+    { _id: RESOURCE_LOCK_ID, name: "lock", type: "gear", flags: { spycraft2: { resourceLock: { token: "x" } } } }
+  ],
+  ownership: { default: 0, u1: 3 }
+});
+
+test("a token whose character was deleted holds enough to rebuild the agent, and nothing else is rebuilt", () => {
+  const data = orphanCharacterData({
+    name: "Ben",
+    texture: { src: "ben-token.webp" },
+    _source: { delta: orphanDelta() }
+  });
+  assert.equal(data.type, "agent");
+  assert.equal(data.name, "Arthur Smithwick");
+  assert.equal(data.img, "arthur.webp");
+  // Deletions and the resource lock are not part of the character.
+  assert.deepEqual(
+    data.items.map(item => item._id),
+    ["cls"]
+  );
+  assert.deepEqual(data.ownership, { default: 0, u1: 3 });
+  assert.equal(data.prototypeToken.actorLink, true);
+  // A generic NPC's leftover changes, or an empty delta, are not a character.
+  assert.equal(
+    orphanCharacterData({ _source: { delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } } }),
+    null
+  );
+  assert.equal(orphanCharacterData({ _source: { delta: emptyDelta() } }), null);
+  // A companion is known by its owner.
+  assert.equal(
+    orphanCharacterData({ _source: { delta: { ...emptyDelta(), system: { companionOf: { ownerUuid: "Actor.a" } } } } })
+      .type,
+    "npc"
+  );
+});
+
+/** A scene of unlinked tokens for the rescue, and the world it reads. */
+function rescueWorld(tokens, actors) {
+  const scene = { id: "meeting", name: "Meeting", tokens };
+  for (const token of tokens) token.parent = scene;
+  const created = [];
+  return {
+    scene,
+    created,
+    world: {
+      scenes: [scene],
+      currentScenes: [scene],
+      worldActors: actors,
+      createActor: async data => {
+        const actor = { id: `new${created.length + 1}`, ...data };
+        created.push(data);
+        return actor;
+      }
+    }
+  };
+}
+
+test("version 7 copies a token's character into the Actors list and links the token, without asking", async () => {
+  const changed = world({ delta: { ...emptyDelta(), name: "Arthur Smithwick", system: { codename: "Cognac" } } });
+  const empty = world();
+  empty.token.id = "t2";
+  // A second changed token of the same character is left for the GC review, so neither overwrites the other unseen.
+  const second = world({ delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } });
+  second.token.id = "t3";
+  second.token.baseActor = changed.actor;
+  second.token.actorId = changed.actor.id;
+  empty.token.baseActor = changed.actor;
+  empty.token.actorId = changed.actor.id;
+  const orphan = {
+    id: "t4",
+    name: "Ben",
+    actorId: "deleted",
+    actorLink: false,
+    _source: { delta: orphanDelta() },
+    update: async data => Object.assign(orphan, data)
+  };
+  const linked = { id: "t5", actorLink: true, update: async () => assert.fail("a linked token is left alone") };
+  const { world: target, created } = rescueWorld(
+    [changed.token, empty.token, second.token, orphan, linked],
+    [changed.actor]
+  );
+  const report = await rescueTokenCharacters(target);
+  assert.deepEqual(report, { linked: 2, created: 1, left: 1 });
+  assert.deepEqual(changed.writes[0], [
+    "actor.update",
+    { system: { codename: "Cognac" }, name: "Arthur Smithwick" },
+    { spycraft2TokenLink: true }
+  ]);
+  assert.equal(changed.token.actorLink, true);
+  assert.equal(empty.token.actorLink, true);
+  assert.equal(second.token.actorLink, false);
+  assert.equal(created[0].name, "Arthur Smithwick");
+  assert.equal(orphan.actorId, "new1");
+  assert.equal(orphan.actorLink, true);
+});
+
+test("a token that could not be rescued keeps the world's version, so the rescue runs again", async () => {
+  const { token, actor } = world({ delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } });
+  actor.update = async () => {
+    throw new Error("offline");
+  };
+  const { world: target } = rescueWorld([token], [actor]);
+  const originalError = console.error;
+  console.error = () => {};
+  try {
+    const report = await migrateWorld(
+      { ...target, version: 6, actors: [], items: [], setVersion: async () => assert.fail("version kept") },
+      { migrations: MIGRATIONS.filter(m => m.version === 7), to: 7 }
+    );
+    assert.equal(report.failed, 1);
+  } finally {
+    console.error = originalError;
+  }
+  assert.equal(token.actorLink, false);
+});
+
+test("an agent token placed unlinked is linked as it is created, unless it carries changes of its own", () => {
+  const { token } = world();
+  assert.equal(linksOnCreate(token, {}), true);
+  assert.equal(linksOnCreate(token, { delta: { system: { vitality: { value: 3 } } } }), false);
+  assert.equal(linksOnCreate(token, { actorLink: true }), false);
+  assert.equal(linksOnCreate(world({ type: "npc" }).token, {}), false);
+});
+
+test("an imported agent keeps a linked prototype token, even from an old unlinked export", () => {
+  const old = { type: "agent", name: "Ben", prototypeToken: { actorLink: false, name: "Ben" } };
+  assert.deepEqual(linkedImport(old).prototypeToken, { actorLink: true, name: "Ben" });
+  assert.equal(linkedImport({ ...old, type: undefined }, "agent").prototypeToken.actorLink, true);
+  assert.equal(linkedImport({ ...old, type: "npc" }), null);
+  assert.equal(linkedImport({ ...old, prototypeToken: { actorLink: true } }), null);
 });

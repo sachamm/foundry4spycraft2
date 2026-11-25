@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Characters kept on tokens move to the Actors list (world update, schema 7).** An agent or companion whose sheet
+  was edited from an unlinked token kept those edits on the token only. The update now copies what each such token
+  holds to its character in the Actors list and links the token, without waiting for the GC's link review. It starts
+  with the scene the GC is on and covers every scene. A token whose character was deleted from the Actors list gets a
+  new character built from what the token holds. When two unlinked tokens of one character both hold changes, only
+  the first is copied; the other stays in the link review so neither is overwritten unseen.
+- **Agent tokens stay linked.** An agent or companion token placed unlinked is linked as it is created when it holds
+  nothing of its own, and Import Data on an agent keeps its token linked even when the file comes from an older
+  version with unlinked tokens.
 - **Second council, live part.** Four reviewers ran the GC side on a test build. Fixed from what they saw:
   - Undoing subdual or stress damage on an agent no longer leaves a damaged record that blocked every later hit of
     that kind. Vitality and wounds that moved again since the step get back what the step took. A hit that could

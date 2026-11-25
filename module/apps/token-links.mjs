@@ -12,10 +12,22 @@
  * to the GC in one review on the lead GC's client: a ticked row copies the token's changes to the character, then
  * links the token, so the token shows exactly what it showed before and the character in the list now matches it.
  * An unticked row is not offered again.
+ *
+ * The version 7 migration does that review's work without asking (rescueTokenCharacters below), and also rescues a
+ * character that lives only on a token because its entry in the Actors list was deleted. Tokens placed afterwards are
+ * linked as they are created when they hold nothing of their own, and an imported character keeps a linked prototype
+ * token, so the review is left for tokens that were copied with their own changes or unlinked by hand.
  */
 import { loc } from "../i18n.mjs";
 import { isLeadGM } from "../writers.mjs";
-import { companionRetargets, deltaChanges, deltaSource, isPersonalCharacter } from "../rules/token-delta.mjs";
+import {
+  companionRetargets,
+  deltaChanges,
+  deltaIsEmpty,
+  deltaSource,
+  isPersonalCharacter
+} from "../rules/token-delta.mjs";
+import { isResourceLock } from "../rules/resource-locks.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 
 const SYSTEM = "spycraft2";
@@ -94,6 +106,112 @@ export async function retargetLinkedCompanions(game = globalThis.game) {
     }
 }
 
+/**
+ * The character data an unlinked token holds when its character is no longer in the Actors list, as data for a new
+ * character, or null when the token holds no agent or companion. Foundry cannot show such a token's sheet, so without
+ * this everything the token kept would be lost.
+ */
+export function orphanCharacterData(token) {
+  const delta = deltaSource(token);
+  if (!delta) return null;
+  const system = structuredClone(delta.system ?? {});
+  const items = (delta.items ?? [])
+    .filter(item => item?._id && item._tombstone !== true && !isResourceLock(item))
+    .map(item => structuredClone(item));
+  const effects = (delta.effects ?? [])
+    .filter(effect => effect?._id && effect._tombstone !== true)
+    .map(effect => structuredClone(effect));
+  for (const entry of [...items, ...effects]) delete entry._tombstone;
+  // A delta records its type only when it differs from the character's, so an agent is known by its build.
+  const looksLikeAgent = (system.progression?.length ?? 0) > 0 || items.some(item => item.type === "class");
+  const type = delta.type ?? (looksLikeAgent ? "agent" : system.companionOf?.ownerUuid ? "npc" : null);
+  if (!isPersonalCharacter({ type, system })) return null;
+  const img = delta.img ?? token.texture?.src;
+  return {
+    name: delta.name || token.name || loc`Recovered agent`,
+    type,
+    ...(img ? { img } : {}),
+    system,
+    items,
+    effects,
+    flags: structuredClone(delta.flags ?? {}),
+    ...(delta.ownership ? { ownership: structuredClone(delta.ownership) } : {}),
+    prototypeToken: { name: token.name ?? delta.name ?? "", actorLink: true, ...(img ? { texture: { src: img } } : {}) }
+  };
+}
+
+/** Scenes in the order the rescue walks them: the scene the GC is on first, then the active one, then the rest. */
+function scenesInOrder(scenes, first = []) {
+  const out = [];
+  for (const scene of [...first, ...(scenes ?? [])]) if (scene && !out.includes(scene)) out.push(scene);
+  return out;
+}
+
+/**
+ * Version 7: put every agent or companion that an unlinked token holds into the Actors list, and link the token to
+ * it. A token of a character in the list has its changes copied to that character (as a ticked review row would);
+ * a token whose character was deleted becomes a new character. When two unlinked tokens of one character both hold
+ * changes, only the first (on the current scene first) is copied without asking; the other stays for the GC review,
+ * so neither token's changes overwrite the other's unseen.
+ * @param {{scenes?: Iterable, currentScenes?: object[], worldActors?: Iterable, createActor?: Function}} world
+ * @returns {{linked: number, created: number, left: number}}
+ */
+export async function rescueTokenCharacters(world, options = { spycraft2TokenLink: true }) {
+  const actors = [...(world?.worldActors ?? [])].filter(actor => !actor.isToken);
+  const find = id => (id ? actors.find(actor => actor.id === id) : null);
+  const copied = new Set();
+  const report = { linked: 0, created: 0, left: 0 };
+  const errors = [];
+  for (const scene of scenesInOrder(world?.scenes, world?.currentScenes))
+    for (const token of [...(scene?.tokens ?? [])]) {
+      if (token.actorLink) continue;
+      try {
+        const actor = find(token.actorId);
+        if (actor) {
+          if (!isPersonalCharacter(actor)) continue;
+          const changes = deltaChanges(deltaSource(token), actor.toObject?.() ?? actor);
+          if (changes.count && copied.has(actor.id)) {
+            report.left++;
+            continue;
+          }
+          if (changes.count) copied.add(actor.id);
+          await applyLinkProposal({ token, scene, actor, changes }, options);
+          report.linked++;
+          continue;
+        }
+        const data = orphanCharacterData(token);
+        if (!data || typeof world?.createActor !== "function") continue;
+        const created = await world.createActor(data, options);
+        if (!created?.id) throw new Error(loc`The rescued character ${data.name} was not created.`);
+        actors.push(created);
+        await token.update({ actorId: created.id, actorLink: true }, options);
+        report.created++;
+      } catch (error) {
+        errors.push(error);
+        console.error(
+          `Field Agent's Handbook | Could not rescue the character on token ${token.uuid ?? token.id}`,
+          error
+        );
+      }
+    }
+  // A failure keeps the world's old version, so the rescue runs again next time; tokens already linked are skipped.
+  if (errors.length) throw new Error(loc`${errors.length} token(s) could not be linked to a character.`);
+  return report;
+}
+
+/**
+ * Whether a token being created should be linked to its character: an agent or companion token that is not linked
+ * and holds nothing of its own, so it would only ever be the character in the list (a character imported from an old
+ * export can carry an unlinked prototype token). A copy that holds its own changes is left for the GC review.
+ */
+export function linksOnCreate(token, data = {}) {
+  const linked = data.actorLink ?? token?.actorLink;
+  if (linked !== false) return false;
+  const actor = token?.baseActor ?? globalThis.game?.actors?.get?.(data.actorId ?? token?.actorId);
+  if (!isPersonalCharacter(actor)) return false;
+  return deltaIsEmpty(data.delta ?? deltaSource(token), actor.toObject?.() ?? actor);
+}
+
 /** Ask the GC about each unlinked agent or companion token; link ticked rows and remember unticked ones. */
 export async function reviewTokenLinks(proposals) {
   if (!proposals.length) return { linked: 0 };
@@ -169,6 +287,9 @@ export function installTokenLinks() {
   Hooks.once("spycraft2.ready", () => {
     if (isLeadGM()) retargetLinkedCompanions();
     queueTokenLinkReview();
+  });
+  Hooks.on("preCreateToken", (token, data) => {
+    if (linksOnCreate(token, data)) token.updateSource({ actorLink: true });
   });
   Hooks.on("createToken", token => {
     if (!token.actorLink && isPersonalCharacter(token.baseActor)) queueTokenLinkReview();

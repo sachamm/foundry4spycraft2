@@ -2,6 +2,7 @@ import { loc } from "../i18n.mjs";
 import { FEAT_REMINDERS } from "../rules/tables.mjs";
 import { companionRetargets, deltaIsEmpty, isPersonalCharacter } from "../rules/token-delta.mjs";
 import { GEAR_YEARS, PERIOD_ITEMS } from "../data/gear-year-index.mjs";
+import { rescueTokenCharacters } from "../apps/token-links.mjs";
 /**
  * World data migrations.
  *
@@ -21,12 +22,12 @@ import { GEAR_YEARS, PERIOD_ITEMS } from "../data/gear-year-index.mjs";
  * safe to run on data that already has the new shape, because a failed run is retried on the next start.
  *
  * Schema version each release writes, so a world from any of them is brought forward by the migrations above it:
- * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5, 0.8.0 → 6. Add the new release here when SCHEMA_VERSION changes
+ * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5, 0.8.0 → 7. Add the new release here when SCHEMA_VERSION changes
  * (tools/test-migrations.mjs checks the list).
  */
 
 /** The data schema version this build of the system writes. */
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /** The schema version each published release wrote (see above). */
 export const RELEASE_SCHEMAS = Object.freeze({
@@ -35,7 +36,7 @@ export const RELEASE_SCHEMAS = Object.freeze({
   "0.5.2": 2,
   "0.6.0": 3,
   "0.7.0": 5,
-  "0.8.0": 6
+  "0.8.0": 7
 });
 
 /**
@@ -93,7 +94,8 @@ export function agentLinkUpdate(source, _parentSource, { synthetic = false } = {
 
 /**
  * The same for an agent's token already on a scene, when the token holds no changes of its own. A token that does is
- * left for the GC's link review (module/apps/token-links.mjs), which copies its changes to the character first.
+ * left for version 7 (rescueTokenCharacters in module/apps/token-links.mjs), which copies its changes to the
+ * character first.
  * `actorSource` is the token's base character.
  */
 export function agentTokenLinkUpdate(source, actorSource) {
@@ -172,7 +174,12 @@ export const MIGRATIONS = [
     token: agentTokenLinkUpdate,
     world: retargetTokenCompanions
   },
-  { version: 6, label: loc`gear dates for the game clock`, item: gearYearUpdate, world: importPeriodGear }
+  { version: 6, label: loc`gear dates for the game clock`, item: gearYearUpdate, world: importPeriodGear },
+  {
+    version: 7,
+    label: loc`characters kept on tokens moved to the Actors list`,
+    world: world => rescueTokenCharacters(world)
+  }
 ];
 
 /** Migrations still to run for a world at version `from`, oldest first. */
@@ -408,6 +415,9 @@ export async function runWorldMigrations() {
     items: [...(game.items ?? []), ...packed.items],
     tokens: [...(game.scenes ?? [])].flatMap(scene => [...(scene.tokens ?? [])]),
     scenes: game.scenes,
+    currentScenes: [game.scenes?.viewed, game.scenes?.active],
+    worldActors: game.actors,
+    createActor: (data, options) => Actor.implementation.create(data, options),
     settings: game.settings,
     worldItems: game.items,
     createItems: async entries => {
