@@ -177,6 +177,8 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
   const actors = [...(world?.worldActors ?? [])].filter(actor => !actor.isToken);
   const find = id => (id ? actors.find(actor => actor.id === id) : null);
   const copied = new Set();
+  // Owners rebuilt so far, by every UUID a companion may still name them by.
+  const rebuiltOwners = new Map();
   const report = { linked: 0, created: 0, left: 0 };
   const errors = [];
   for (const scene of scenesInOrder(world?.scenes, world?.currentScenes))
@@ -201,6 +203,9 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
         }
         const data = orphanCharacterData(token);
         if (!data || typeof world?.createActor !== "function") continue;
+        // A companion rebuilt after its owner names the owner's new character.
+        const rebuiltOwner = rebuiltOwners.get(data.system.companionOf?.ownerUuid);
+        if (rebuiltOwner) data.system.companionOf.ownerUuid = rebuiltOwner;
         // A retry after a failed relink reuses the character the earlier run built, instead of building another.
         const key = rescueKey(token);
         let created = actors.find(actor => actor.flags?.[SYSTEM]?.[RESCUED_FLAG] === key);
@@ -213,6 +218,8 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
         // sheet in the Actors list) as their owner; either way they follow the rebuilt character.
         const tokenOwner = `Scene.${scene.id}.Token.${token.id}.Actor.`,
           deletedOwner = token.actorId ? `Actor.${token.actorId}` : null;
+        rebuiltOwners.set(deletedOwner, `Actor.${created.id}`);
+        rebuiltOwners.set(`${tokenOwner}${token.actorId}`, `Actor.${created.id}`);
         for (const companion of actors) {
           const owner = companion.system?.companionOf?.ownerUuid;
           if (owner?.startsWith(tokenOwner) || (deletedOwner && owner === deletedOwner))

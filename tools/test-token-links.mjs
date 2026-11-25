@@ -504,6 +504,23 @@ test("a retried orphan rescue reuses the character the earlier run built", async
   assert.equal(orphan.actorId, "built");
 });
 
+test("a companion rebuilt after its rebuilt owner follows the owner's new character", async () => {
+  const token = (id, actorId, delta) => {
+    const placed = { id, actorId, actorLink: false, _source: { delta } };
+    placed.update = async data => Object.assign(placed, data);
+    return placed;
+  };
+  const owner = token("t1", "deletedOwner", orphanDelta());
+  const pet = token("t2", "deletedPet", {
+    ...emptyDelta(),
+    system: { companionOf: { ownerUuid: "Actor.deletedOwner", feat: "Animal Partner" } }
+  });
+  const { world: target, created } = rescueWorld([owner, pet], []);
+  assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 2, left: 0 });
+  assert.equal(created[1].system.companionOf.ownerUuid, "Actor.new1");
+  assert.equal(pet.actorId, "new2");
+});
+
 test("a token that could not be rescued keeps the world's version, so the rescue runs again", async () => {
   const { token, actor } = world({ delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } });
   actor.update = async () => {
