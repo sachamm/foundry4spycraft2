@@ -3347,6 +3347,8 @@
    "HardCoreInfluenceTimingP203_0ykqmry": "Hard Core — Influence timing (p.203)",
    "HardRockConcreteTile_1d2vnuh": "Hard (rock, concrete, tile)",
    "HasAMaximumOfLevels_1vxj139": "{0} has a maximum of {1} levels.",
+   "HasActedThisRoundPassIts_1w66sta": "{0} has acted this round: pass its turn when it comes up again at the new Count.",
+   "HasAlreadyActedThisRoundTo_0i0do4d": "{0} has already acted this round. To move its Count anyway, use Fluid initiative event.",
    "HasAlreadyBeenPaidFor_1xcklu0": "{0} has already been paid for.",
    "HasAlreadyBeenSelectedThisMission_0jl4s36": "{0} has already been selected this mission.",
    "HasAlreadyHadFirstAidThis_0vcoa62": "{0} has already had First Aid this scene.",

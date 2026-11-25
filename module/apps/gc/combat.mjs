@@ -641,12 +641,24 @@ const rowCombatant = li => {
 };
 
 /** Report one immediate fluid event for a combatant, or say why it cannot be recorded. */
+/** An NPC no player runs: what it plans stays between the GCs. */
+const gcOnly = combatant => ({ whisper: !combatant?.hasPlayerOwner });
+/** Whether the combatant's place in this round's order is already behind the turn pointer. */
+const hasActed = combatant => {
+  const combat = combatant?.parent,
+    at = combat?.turns?.findIndex?.(entry => entry.id === combatant.id) ?? -1;
+  return !!combat?.started && Number.isInteger(combat.turn) && at >= 0 && at < combat.turn;
+};
+
 async function quickFluidEvent(combatant, id, input, label) {
   if (!combatant) return null;
   if (!combatant.parent?.started) return refuse(loc`Start the combat first.`);
   try {
     const result = await recordFluidEvent(combatant, id, input);
-    await say(`${esc(combatant.name)}: ${esc(label)} — ${loc`Initiative Count is now`} <b>${result.count}</b>.`);
+    await say(
+      `${esc(combatant.name)}: ${esc(label)} — ${loc`Initiative Count is now`} <b>${result.count}</b>.`,
+      gcOnly(combatant)
+    );
     return result;
   } catch (error) {
     return refuse(error.message);
@@ -656,6 +668,11 @@ async function quickFluidEvent(combatant, id, input, label) {
 /** Delay by a number of Counts; with no number, ask for one. */
 export async function delayCombatant(combatant, counts = null) {
   if (!combatant) return null;
+  // Delay is chosen on a character's own turn, or before it: after it, a lower Count would be a second turn.
+  if (hasActed(combatant))
+    return refuse(
+      loc`${combatant.name} has already acted this round. To move its Count anyway, use Fluid initiative event.`
+    );
   let times = counts;
   if (times === null) {
     const input = await formDialog({
@@ -690,7 +707,8 @@ export async function readyCombatant(combatant) {
     "flags.spycraft2.readied": { round: combat.round }
   });
   await say(
-    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`
+    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
+    gcOnly(combatant)
   );
   return true;
 }
@@ -700,8 +718,27 @@ export async function triggerReadied(combatant) {
   if (!combatant) return null;
   const combat = combatant.parent,
     at = combat?.combatant?.initiative ?? combatant.initiative;
+  const acted = hasActed(combatant);
   const result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
-  if (result) await combatant.update({ "flags.spycraft2.readied": null });
+  if (!result) return result;
+  // The readied action was this round's action. If the new Count puts the combatant ahead of the turn pointer
+  // again, its turn is marked as used up so the tracker and console show nothing left to do.
+  const again = acted && !hasActed(combatant) && combat.combatant?.id !== combatant.id;
+  await combatant.update({
+    "flags.spycraft2.readied": null,
+    ...(again
+      ? {
+          "flags.spycraft2.actions": {
+            round: combat.round,
+            used: HALF_ACTIONS_PER_TURN + Math.max(0, extraHalfActions(combatant))
+          }
+        }
+      : {})
+  });
+  if (again)
+    ui.notifications.info(
+      loc`${combatant.name} has acted this round: pass its turn when it comes up again at the new Count.`
+    );
   return result;
 }
 

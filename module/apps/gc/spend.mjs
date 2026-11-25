@@ -123,7 +123,8 @@ export async function spendGCDice(input = {}) {
   if (plan.cost > status.value) return refuse(loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
 
   // What the spend changes on the NPC is pictured first; scene and mission changes have their own way back.
-  const undoable = !["dramaticScene", "campaignQuality"].includes(input.id),
+  // A spend made from a chat card changes that card's own result, which a note cannot take back: no note is left.
+  const undoable = !input.onCard && !["dramaticScene", "campaignQuality"].includes(input.id),
     beforeSpend = actor && undoable ? snapshot(actor) : null;
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;

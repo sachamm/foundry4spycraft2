@@ -29,10 +29,11 @@ const press = selector => () => pressNewestCard(selector);
  * @param {{querySelector: Function, querySelectorAll: Function}} root
  * @param {(id: string) => boolean} mine  Whether this user posted the message with that id.
  */
-export function boostCardButton(root, mine, selector = 'button[data-roll-key="gcBoost"]') {
+export function boostCardButton(root, mine, selector = 'button[data-roll-key="gcBoost"]', pointRoot = root) {
   const usable = card => [...(card?.querySelectorAll?.(selector) ?? [])].find(button => !button.disabled) ?? null;
   // The pointer names the card: when that card cannot be boosted, no other card is boosted in its place.
-  const pointed = root?.querySelector?.("[data-message-id]:hover");
+  // The pointer is looked for everywhere a card is drawn: the sidebar, a popped-out chat log, a notification.
+  const pointed = pointRoot?.querySelector?.("[data-message-id]:hover");
   if (pointed) return usable(pointed);
   const cards = [...(root?.querySelectorAll?.("[data-message-id]") ?? [])].reverse();
   for (const card of cards) {
@@ -49,7 +50,7 @@ function gcBoostShortcut() {
       const author = messages?.get(id)?.author;
       return (author?.id ?? author) === game.user.id;
     };
-  const button = boostCardButton(document.querySelector("#chat") ?? document, mine);
+  const button = boostCardButton(document.querySelector("#chat") ?? document, mine, undefined, document);
   if (!button) {
     ui.notifications.info(
       loc`Nothing to boost: the card under the pointer cannot be boosted, or none of your cards can. Point at a card to boost that one.`
