@@ -5,14 +5,16 @@ import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 
-const css = readFileSync(new URL("../../styles/chat-dice.css", import.meta.url), "utf8");
+const css = ["tokens.css", "chat-dice.css"]
+  .map(file => readFileSync(new URL(`../../styles/${file}`, import.meta.url), "utf8"))
+  .join("\n");
 const moduleUrl = uiModuleUrl("module/apps/chat-dice.mjs");
 
 // A stand-in for Foundry's sidebar chat form, its hooks and the chat box's ProseMirror view.
-async function mount(page, width) {
+async function mount(page, width, theme = "light") {
   await page.setContent(
     `<style>${css} button { box-sizing: border-box; border: 1px solid #777; }</style>
-     <section id="chat" style="width:${width}px;display:flex;flex-direction:column">
+     <section id="chat" class="themed theme-${theme}" style="width:${width}px;display:flex;flex-direction:column">
        <div class="chat-scroll" style="height:200px"></div>
        <form class="chat-form"><div id="chat-controls">modes</div><div id="chat-message"></div></form>
      </section>`
@@ -105,4 +107,28 @@ for (const width of [240, 300])
     expect(sizes.overflow).toBeLessThanOrEqual(0);
     expect(sizes.right).toBeLessThanOrEqual(sizes.barRight + 0.5);
     for (const height of sizes.heights) expect(height).toBeGreaterThanOrEqual(28);
+  });
+
+test("a modifier chosen before a die survives a draft already in the chat box", async ({ page }) => {
+  await mount(page, 300);
+  await page.evaluate(() => (window.chatView.text = "see you at the docks"));
+  const bar = page.getByRole("region", { name: "Dice" });
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click();
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click();
+  await expect(bar.locator("output")).toHaveText("+2");
+  expect(await page.evaluate(() => window.chatView.text)).toBe("see you at the docks");
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click();
+  expect(await page.evaluate(() => window.chatView.text)).toBe("/r 1d6+2");
+});
+
+for (const [theme, ink] of [
+  ["light", "#1b2323"],
+  ["dark", "#e8e4d8"]
+])
+  test(`the dice bar takes the system tokens and follows a ${theme} sidebar`, async ({ page }) => {
+    await mount(page, 300, theme);
+    const value = await page.evaluate(() =>
+      getComputedStyle(document.querySelector(".sc2-chat-dice")).getPropertyValue("--sc2-ink").trim().toLowerCase()
+    );
+    expect(value).toBe(ink);
   });

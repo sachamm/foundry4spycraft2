@@ -23,8 +23,12 @@ export const modifierLabel = modifier => (modifier < 0 ? `−${-modifier}` : `+$
 export const clampModifier = value => Math.max(-MODIFIER_LIMIT, Math.min(MODIFIER_LIMIT, Math.trunc(value) || 0));
 
 const views = new WeakMap();
-const state = { dice: new Map(), modifier: 0, written: "" };
+// `seen` is the chat box text the bar last knew about: what it wrote, or a draft it has already noticed.
+const state = { dice: new Map(), modifier: 0, seen: "" };
 let bar;
+// The input Foundry last placed in a chat log. It can live in another window's document when the log is detached.
+let currentInput;
+const hooked = new WeakSet();
 let installed = false;
 
 const make = (tag, className, text) => {
@@ -41,15 +45,16 @@ const button = (className, text, label, tooltip) => {
   return node;
 };
 
-const chatInput = () => document.querySelector("#chat-message");
+const chatInput = () => currentInput;
 const inputText = view => view?.state.doc.textContent.trim() ?? "";
 
-/** Forget the formula once the chat box no longer holds what the bar last wrote: it was sent, cleared or edited. */
+/** Start over once the chat box changes under the bar: the formula was sent, cleared or edited. */
 function syncWithInput(view) {
-  if (inputText(view) === state.written) return;
+  const text = inputText(view);
+  if (text === state.seen) return;
+  state.seen = text;
   state.dice.clear();
   state.modifier = 0;
-  state.written = "";
   refreshBar();
 }
 
@@ -62,7 +67,7 @@ function writeFormula({ focus }) {
   const text = chatDiceFormula(state.dice, state.modifier);
   const { state: editor } = view;
   const paragraph = editor.schema.nodes.paragraph.create(null, text ? editor.schema.text(text) : null);
-  state.written = text;
+  state.seen = text;
   view.dispatch(editor.tr.replaceWith(0, editor.doc.content.size, paragraph));
   if (focus) view.focus();
 }
@@ -71,7 +76,7 @@ function change(event, update) {
   syncWithInput(views.get(chatInput()));
   update();
   // Only write when there is a formula, so a modifier chosen before any die does not clear a draft.
-  if (state.dice.size || state.written) writeFormula({ focus: event.detail > 0 });
+  if (state.dice.size) writeFormula({ focus: event.detail > 0 });
   refreshBar();
 }
 
@@ -155,6 +160,12 @@ function placeBar(_app, elements) {
     bar?.remove();
     return;
   }
+  currentInput = input;
+  // Also listen on the input itself, which reaches it in a detached window's document too.
+  if (!hooked.has(input)) {
+    hooked.add(input);
+    input.addEventListener("plugins", addViewPlugin);
+  }
   bar ??= buildBar();
   controls.before(bar);
   refreshBar();
@@ -163,7 +174,7 @@ function placeBar(_app, elements) {
 /** Watch each chat editor through a ProseMirror plugin, which is how the bar reaches the editor to write in it. */
 function addViewPlugin(event) {
   const input = event.target;
-  if (!(input instanceof HTMLElement) || input.id !== "chat-message" || !event.plugins) return;
+  if (input?.id !== "chat-message" || !event.plugins) return;
   const { Plugin } = foundry.prosemirror;
   event.plugins.sc2ChatDice = new Plugin({
     view(view) {

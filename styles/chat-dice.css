@@ -1,25 +1,27 @@
-/* The dice bar under the chat log. It sits in Foundry's sidebar chrome, so like the chat search it takes Foundry's
- * theme colours rather than the system's tokens. Every control is at least 28px tall (style guide 5.5). */
+/* The dice bar under the chat log. It is a token root (tokens.css), so its spacing, type and borders come from the
+ * system tokens and follow the sidebar's interface theme. Its buttons keep Foundry's own button look so they match
+ * the chat mode buttons beside them. Every control is at least 28px tall, the compact size in style guide 5.5. */
 .sc2-chat-dice {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin: 0 0 4px;
+  gap: var(--sc2-space-1);
+  margin: 0 0 var(--sc2-space-1);
   pointer-events: auto;
 }
 .sc2-chat-dice-row {
   display: flex;
   align-items: stretch;
-  gap: 4px;
+  gap: var(--sc2-space-1);
 }
 .sc2-chat-dice button {
   min-width: 0;
   min-height: 28px;
   height: auto;
   margin: 0;
-  padding: 0 4px;
-  font-size: var(--sc2-text-m, 14px);
+  padding: 0 var(--sc2-space-1);
+  border-radius: var(--sc2-radius);
+  font-size: var(--sc2-text-m);
   line-height: 1;
   white-space: nowrap;
 }
@@ -31,7 +33,7 @@
   flex: 0 0 auto;
   display: flex;
   align-items: stretch;
-  gap: 2px;
+  gap: var(--sc2-space-1);
 }
 .sc2-chat-dice-modifier button {
   width: 28px;
@@ -42,23 +44,23 @@
   align-items: center;
   justify-content: center;
   min-width: 3.2em;
-  padding: 0 2px;
-  border: 1px solid var(--color-border, #777);
-  border-radius: 2px;
-  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-  font-size: var(--sc2-text-m, 14px);
+  padding: 0 var(--sc2-space-1);
+  border: 1px solid var(--sc2-rule-strong);
+  border-radius: var(--sc2-radius);
+  font-family: var(--sc2-num);
+  font-size: var(--sc2-text-m);
 }
 .sc2-chat-dice-dice {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 4px;
+  gap: var(--sc2-space-1);
 }
 .sc2-chat-dice-dice button {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1px;
-  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-family: var(--sc2-num);
 }
 /* A die already in the formula: bold, a heavier edge and, from the second, its count. Never colour alone. */
 .sc2-chat-dice-dice button[aria-pressed="true"] {
@@ -67,7 +69,7 @@
   border-color: currentColor;
 }
 .sc2-chat-dice-count {
-  font-size: var(--sc2-text-s, 13px);
+  font-size: var(--sc2-text-s);
 }
 .sc2-chat-dice-count:empty {
   display: none;
