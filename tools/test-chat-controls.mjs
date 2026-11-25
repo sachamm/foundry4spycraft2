@@ -410,6 +410,9 @@ test("the GC boost shortcut takes the card under the pointer, else the newest ca
   assert.equal(boostCardButton(root(), mine), mineOld, "another GC's newer card is passed over");
   assert.equal(boostCardButton(root(cards[2]), mine), theirs, "the pointer chooses any card");
   assert.equal(boostCardButton(root(cards[1]), mine), null, "a spent card under the pointer boosts nothing else");
+  // A card pointed at in a popped-out chat log is outside the sidebar's list, and still the one chosen.
+  const popout = card("t9", [{ disabled: false, name: "popout" }]);
+  assert.equal(boostCardButton(root(), mine, undefined, root(popout)).name, "popout");
   assert.equal(
     boostCardButton(root(), () => false),
     null

@@ -39,7 +39,7 @@ export async function gcBoostCard(message, actor) {
     ui.notifications.warn(loc`This card can no longer be boosted.`);
     return null;
   }
-  const result = await spendGCDice({ id: "boostRoll", actor });
+  const result = await spendGCDice({ id: "boostRoll", actor, onCard: true });
   if (!result?.die) return null;
   const check = message.flags.spycraft2,
     boostTotal = (check.boostTotal ?? 0) + result.die.total,
@@ -64,6 +64,7 @@ export async function gcActivateThreat(message, actor) {
   const result = await spendGCDice({
     id: "activateThreat",
     actor,
+    onCard: true,
     dice: 1,
     checkKind: check.checkKind === "attack" ? "attack" : "skill"
   });

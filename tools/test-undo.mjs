@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 globalThis.foundry = { utils: { escapeHTML: String } };
 globalThis.game = { combats: [], user: { id: "gm", isGM: true }, i18n: { localize: String } };
-const { flatten, differences, snapshot, undoEntry, movedSince, restoreUpdate, applyUndo } =
+const { flatten, differences, snapshot, undoEntry, movedSince, restoreUpdate, poolsGivenBack, applyUndo } =
   await import("../module/apps/undo.mjs");
 
 const makeActor = (system, flags = {}) => {
@@ -79,13 +79,13 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
     ["system.vitality.value", 20],
     ["system.wounds.value", 12]
   ]);
-  assert.deepEqual(entry.unset, ["flags.spycraft2.nonLethal.subdual"]);
+  assert.deepEqual(entry.unset, ["flags.spycraft2.nonLethal"]);
   assert.deepEqual(entry.created, ["e1"]);
   assert.deepEqual(entry.combatants, [{ combat: "fight", id: "c1", defeated: false, initiative: 14, fluid: null }]);
   assert.deepEqual(restoreUpdate(entry), {
     "system.vitality.value": 20,
     "system.wounds.value": 12,
-    "flags.spycraft2.nonLethal.-=subdual": null
+    "flags.spycraft2.-=nonLethal": null
   });
   assert.deepEqual(movedSince(entry, actor.toObject()), []);
 
@@ -111,7 +111,7 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
   };
   assert.deepEqual(await applyUndo(note), ["Guard"]);
   assert.deepEqual([actor.system.vitality.value, actor.system.wounds.value], [20, 12]);
-  assert.equal(actor.flags.spycraft2.nonLethal.subdual, undefined);
+  assert.equal(actor.flags.spycraft2.nonLethal, undefined);
   assert.equal(actor.effects.length, 0);
   assert.equal(combatant.defeated, false);
   assert.deepEqual(card.updates, [{ "flags.spycraft2.damageAppliedBy.-=k1": null }], "the card may be applied again");
@@ -191,4 +191,36 @@ test("two presses of one Undo run once; a fluid initiative event the step record
   assert.equal(marked, 1);
   assert.deepEqual(combatant.updates, [{ defeated: false, initiative: 10, "flags.spycraft2.-=fluid": null }]);
   game.combats = [];
+});
+
+test("a record the step created is removed at its own key, leaving no empty shell", () => {
+  const before = flatten({ flags: { spycraft2: { damageEvents: {}, kept: 1 } } }),
+    after = flatten({
+      flags: { spycraft2: { damageEvents: { ev1: { version: 1, request: { amount: 6 }, context: {} } }, kept: 1 } }
+    });
+  const found = differences(before, after);
+  assert.deepEqual(found.unset, ["flags.spycraft2.damageEvents.ev1"]);
+  assert.deepEqual(found.restore, {});
+  // No record at all before: the first new key under what existed is the one removed.
+  const fresh = differences(flatten({ flags: { spycraft2: { kept: 1 } } }), after);
+  assert.deepEqual(fresh.unset, ["flags.spycraft2.damageEvents"]);
+});
+
+test("a pool that moved again gets back what the step took, not its old number", () => {
+  const entry = {
+    restore: [
+      ["system.vitality.value", 6],
+      ["system.wounds.value", 19]
+    ],
+    expect: [
+      ["system.vitality.value", 0],
+      ["system.wounds.value", 15]
+    ]
+  };
+  // The maximums rose from 6 and 19 to 18 and 20, and the values followed to 12 and 16.
+  const raised = { system: { vitality: { value: 12, max: 18 }, wounds: { value: 16, max: 20 } } };
+  assert.deepEqual(poolsGivenBack(entry, raised), { "system.vitality.value": 18, "system.wounds.value": 20 });
+  // Untouched since the step: the plain restore stands.
+  const still = { system: { vitality: { value: 0, max: 6 }, wounds: { value: 15, max: 19 } } };
+  assert.deepEqual(poolsGivenBack(entry, still), {});
 });

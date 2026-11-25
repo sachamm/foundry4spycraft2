@@ -68,7 +68,10 @@ A **dramatic scene** lasts until the next scene starts. While it lasts, GC dice 
   is named in the report so it can be rolled from its sheet.
 - The tracker's right-click menu has **Spend a half action**, **Spend a full action**, **Give back this round's
   actions**, **Delay 1 Count**, **Delay…**, **Ready an action**, **Readied action triggered** and **Fluid initiative
-  event…**. A readied combatant is marked on its row until the action goes off or its next turn comes.
+  event…**. A readied combatant is marked on its row until the action goes off or its next turn comes. Delay is
+  refused for a combatant whose turn has already passed this round; a readied action that goes off after the
+  combatant's turn uses up the turn it would get at the new Count. Delay and Ready lines for an NPC no player
+  runs are whispered to the GCs.
 - A Henchman or Mastermind named as an attack's target narrows the threat range and raises the critical's cost; the
   attack card says so. Apply the same rule by hand to skill checks aimed at them.
 - **Surprise round** takes each side's opposed result and announces who acts.
@@ -88,7 +91,9 @@ Fluid initiative can be turned off in the system settings.
 The console's Combat section can run the same turn without the sheet. The **acting block** names the combatant
 whose turn it is, with Defense, health, conditions and half actions left, a button for each weapon (with one token
 targeted it goes straight to hit or miss), Delay, Ready, the standard NPC's Damage save and **Next step on the newest
-card**. Each row of the list is a button that centres the map on the token and opens the sheet.
+card**. A defeated combatant gets no attack or action buttons. Each row of the list is a button that centers the
+map on the token and opens the sheet. While a fight runs, the Combat section stays on screen in every view, and
+**Previous turn** stops at the first turn of round 1.
 
 **Mob attack** appears when two or more standing standard NPCs of one kind are in the fight. Pick the weapon and
 tick the targets: every member makes one attack, the targets are shared out in order, and the turn then moves past
@@ -115,10 +120,11 @@ Every control is also reachable with Tab; Enter submits a dialog and Esc cancels
 ### Undo
 
 Applying damage from a card, rolling a standard NPC's Damage save and spending GC action dice each leave a short
-note in chat that only you see, with an **Undo** button. Undo restores what the step changed on the character
+note in chat, whispered to you and the GCs, with an **Undo** button. Undo restores what the step changed on the character
 (vitality, wounds, the damage track, conditions it added or removed, a defeated mark, an Initiative Count), gives
-back the GC dice, and frees the damage card to be applied again. If a number has moved again since, it asks before
-overwriting. A GC boost bought from a card cannot be undone.
+back the GC dice, and frees the damage card to be applied again. If a number has moved again since, it asks first;
+vitality and wounds then get back the amount the step took, counted from where they stand now. A GC boost or a
+critical bought from a card changes the card itself and leaves no Undo note.
 
 ## Standard NPC damage (pp.331–332, 452)
 

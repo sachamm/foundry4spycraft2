@@ -29,6 +29,8 @@ class Roll {
       match && Number(match[1]) > 1
         ? diceQueue.splice(0, Number(match[1])).reduce((a, b) => a + b, 0) + Number(match[3] ?? 0)
         : diceQueue.shift();
+    // One die: the natural face is kept apart from the total, as Foundry's own Roll does.
+    if (!(match && Number(match[1]) > 1)) this.dice = [{ total: this.total }];
     return this;
   }
   async toMessage(data) {

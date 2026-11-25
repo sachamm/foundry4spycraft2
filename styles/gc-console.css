@@ -36,14 +36,18 @@
 }
 /* Section headings use the same face as the sheets' bars, in sentence case. */
 .gc-console-body details.gc-section > summary .gc-section-title {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   margin: 0;
   border: 0;
   font: 700 var(--sc2-text-s)/1.4 var(--font-primary, sans-serif);
   color: inherit;
 }
+/* A long note (the game clock's date) wraps under itself; it never squeezes the title to one letter a line. */
 .gc-console-body details.gc-section > summary .gc-note {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: end;
   font-size: 0.85em;
   opacity: 0.8;
 }

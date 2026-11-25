@@ -37,6 +37,7 @@ import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
+import { markAntagonistsFaced } from "./mission.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -187,17 +188,23 @@ export async function recordFluidEvent(combatant, id, input = {}) {
  */
 export async function recordAutomaticFluidEvent(actor, id) {
   const enabled = readSetting("autoFluidEvents", true) !== false;
-  const combat = game.combat;
-  if (!enabled || !combat?.started || !actor) return null;
-  const combatant = [...combat.combatants].find(
-    entry => entry.actor === actor || (entry.actor?.uuid && entry.actor.uuid === actor.uuid)
-  );
+  if (!enabled || !actor) return null;
+  // The character's own fight, whichever scene this client is viewing; the viewed fight is tried first.
+  const fights = [game.combat, ...(game.combats ?? [])].filter(
+      (combat, i, all) => combat?.started && all.indexOf(combat) === i
+    ),
+    all = fights.flatMap(combat => [...combat.combatants]),
+    exact = all.filter(entry => entry.actor === actor || (entry.actor?.uuid && entry.actor.uuid === actor.uuid)),
+    // A world actor whose one token in the fights is unlinked is still that combatant.
+    loose = exact.length || actor.isToken ? [] : all.filter(entry => entry.actorId === actor.id),
+    combatant = exact[0] ?? (loose.length === 1 ? loose[0] : null);
   if (!combatant?.isOwner || !Number.isFinite(combatant.initiative)) return null;
   const event = FLUID_EVENTS.find(entry => entry.id === id);
   try {
     await recordFluidEvent(combatant, id);
-  } catch {
-    return null;
+  } catch (error) {
+    console.warn("Field Agent's Handbook | Fluid initiative was not recorded from damage.", error);
+    return loc`Fluid initiative was not recorded for this (${error?.message ?? ""}); add it with Fluid initiative event.`;
   }
   return loc`Initiative ${event?.amount ?? ""} at the end of the round (${event?.label ?? id}); change it with Fluid initiative event if it should not count.`;
 }
@@ -520,6 +527,16 @@ export function installFluidInitiativeHooks() {
     })();
     return startPass;
   });
+  // An NPC in a running fight has been faced: its row in the mission's XP list is marked, once, by the lead GM.
+  const faced = combatants =>
+    isLeadGM() &&
+    markAntagonistsFaced([...combatants].map(combatant => game.actors?.get?.(combatant.actorId))).catch(() => 0);
+  Hooks.on("updateCombat", (combat, changed, options) => {
+    if (changed?.round === 1 && !(options?.direction < 0)) faced(combat.combatants);
+  });
+  Hooks.on("createCombatant", combatant => {
+    if (combatant.combat?.started) faced([combatant]);
+  });
   // Flat-footedness ends when the character acts (p.342): clear it as the combatant's turn begins.
   Hooks.on("updateCombat", (combat, changed) => {
     if (Object.hasOwn(changed, "turn") || Object.hasOwn(changed, "round"))
@@ -624,12 +641,24 @@ const rowCombatant = li => {
 };
 
 /** Report one immediate fluid event for a combatant, or say why it cannot be recorded. */
+/** An NPC no player runs: what it plans stays between the GCs. */
+const gcOnly = combatant => ({ whisper: !combatant?.hasPlayerOwner });
+/** Whether the combatant's place in this round's order is already behind the turn pointer. */
+const hasActed = combatant => {
+  const combat = combatant?.parent,
+    at = combat?.turns?.findIndex?.(entry => entry.id === combatant.id) ?? -1;
+  return !!combat?.started && Number.isInteger(combat.turn) && at >= 0 && at < combat.turn;
+};
+
 async function quickFluidEvent(combatant, id, input, label) {
   if (!combatant) return null;
   if (!combatant.parent?.started) return refuse(loc`Start the combat first.`);
   try {
     const result = await recordFluidEvent(combatant, id, input);
-    await say(`${esc(combatant.name)}: ${esc(label)} — ${loc`Initiative Count is now`} <b>${result.count}</b>.`);
+    await say(
+      `${esc(combatant.name)}: ${esc(label)} — ${loc`Initiative Count is now`} <b>${result.count}</b>.`,
+      gcOnly(combatant)
+    );
     return result;
   } catch (error) {
     return refuse(error.message);
@@ -639,6 +668,11 @@ async function quickFluidEvent(combatant, id, input, label) {
 /** Delay by a number of Counts; with no number, ask for one. */
 export async function delayCombatant(combatant, counts = null) {
   if (!combatant) return null;
+  // Delay is chosen on a character's own turn, or before it: after it, a lower Count would be a second turn.
+  if (hasActed(combatant))
+    return refuse(
+      loc`${combatant.name} has already acted this round. To move its Count anyway, use Fluid initiative event.`
+    );
   let times = counts;
   if (times === null) {
     const input = await formDialog({
@@ -654,6 +688,19 @@ export async function delayCombatant(combatant, counts = null) {
     times = Number(input.times) || 1;
   }
   return quickFluidEvent(combatant, "delay", { times }, loc`Delay`);
+}
+
+/**
+ * Step back one turn. The first turn of round 1 is as far back as a fight goes: stepping past it would un-start the
+ * fight, and starting it again would mark everyone flat-footed a second time.
+ */
+export function stepBackTurn(combat) {
+  if (!combat?.started) return null;
+  if (combat.round <= 1 && !(combat.turn > 0)) {
+    ui.notifications.info(loc`This is the first turn of the fight.`);
+    return null;
+  }
+  return combat.previousTurn();
 }
 
 /** Mark a combatant as holding a readied action: a half action now, and a note on its tracker row. */
@@ -673,7 +720,8 @@ export async function readyCombatant(combatant) {
     "flags.spycraft2.readied": { round: combat.round }
   });
   await say(
-    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`
+    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
+    gcOnly(combatant)
   );
   return true;
 }
@@ -683,8 +731,27 @@ export async function triggerReadied(combatant) {
   if (!combatant) return null;
   const combat = combatant.parent,
     at = combat?.combatant?.initiative ?? combatant.initiative;
+  const acted = hasActed(combatant);
   const result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
-  if (result) await combatant.update({ "flags.spycraft2.readied": null });
+  if (!result) return result;
+  // The readied action was this round's action. If the new Count puts the combatant ahead of the turn pointer
+  // again, its turn is marked as used up so the tracker and console show nothing left to do.
+  const again = acted && !hasActed(combatant) && combat.combatant?.id !== combatant.id;
+  await combatant.update({
+    "flags.spycraft2.readied": null,
+    ...(again
+      ? {
+          "flags.spycraft2.actions": {
+            round: combat.round,
+            used: HALF_ACTIONS_PER_TURN + Math.max(0, extraHalfActions(combatant))
+          }
+        }
+      : {})
+  });
+  if (again)
+    ui.notifications.info(
+      loc`${combatant.name} has acted this round: pass its turn when it comes up again at the new Count.`
+    );
   return result;
 }
 

@@ -201,7 +201,10 @@ export const ActorAttackRolls = Base =>
           const go = await systemDialog.confirm({
             window: { title: loc`Target beyond Reach` },
             rejectClose: false,
-            content: `<p>${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`
+            // The attacker is named: a group attack asks once for each member.
+            content: `<p>${esc(loc`${this.name}:`)} ${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`,
+            yes: { label: loc`Attack anyway`, default: true },
+            no: { label: loc`Cancel` }
           });
           if (!go) return null;
         }
