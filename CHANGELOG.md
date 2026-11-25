@@ -4,7 +4,8 @@
 
 - **Dice bar under the chat log.** **Roll d20** rolls 1d20 straight away. The d4 to d20 buttons and the −/+
   modifier write a roll such as `/r 1d8+2` in the chat box; press Enter there to roll it, or edit it first. Clicking
-  a die again adds another (`/r 2d6`), and the bar starts over once the chat box is sent or cleared.
+  a die again adds another (`/r 2d6`), and the bar starts over once the chat box is sent or cleared. While
+  another sidebar tab is open, the bar sits just above the chat box there.
 - **Second council, live part.** Four reviewers ran the GC side on a test build. Fixed from what they saw:
   - Undoing subdual or stress damage on an agent no longer leaves a damaged record that blocked every later hit of
     that kind. Vitality and wounds that moved again since the step get back what the step took. A hit that could

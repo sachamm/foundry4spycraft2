@@ -16,8 +16,9 @@ async function mount(page, width, theme = "light") {
     `<style>${css} button { box-sizing: border-box; border: 1px solid #777; }</style>
      <section id="chat" class="themed theme-${theme}" style="width:${width}px;display:flex;flex-direction:column">
        <div class="chat-scroll" style="height:200px"></div>
-       <form class="chat-form"><div id="chat-controls">modes</div><div id="chat-message"></div></form>
-     </section>`
+       <form class="chat-form"><div id="chat-controls"><div id="message-modes" class="split-button">modes</div></div><div id="chat-message"></div></form>
+     </section>
+     <div id="chat-notifications" class="themed theme-${theme}" style="position:relative;margin-left:120px;width:300px"></div>`
   );
   await page.evaluate(async url => {
     const hooks = {};
@@ -57,7 +58,17 @@ async function mount(page, width, theme = "light") {
     event.plugins = {};
     input.dispatchEvent(event);
     view.watcher = event.plugins.sc2ChatDice.spec.view(view);
-    hooks.renderChatInput(null, { "#chat-message": input, "#chat-controls": document.querySelector("#chat-controls") });
+    const controls = document.querySelector("#chat-controls");
+    const modes = document.querySelector("#message-modes");
+    const elements = { "#chat-message": input, "#chat-controls": controls, "#message-modes": modes };
+    // Foundry's move between the chat log and the notification area beside the other sidebar tabs.
+    window.showChatIn = where => {
+      if (where === "log") document.querySelector(".chat-form").append(controls, input);
+      else document.querySelector("#chat-notifications").append(input, controls);
+      modes.classList.toggle("vertical", where !== "log");
+      hooks.renderChatInput(null, elements);
+    };
+    window.showChatIn("log");
   }, moduleUrl);
 }
 
@@ -149,4 +160,24 @@ test("die labels stay inside their buttons with counts showing in a 240px sideba
   );
   for (const { faces, inside } of spills) expect(inside, `d${faces}`).toBe(true);
   await expect(bar.getByRole("button", { name: "Add a d20 to the roll in the chat box" })).toContainText("×12");
+});
+
+test("on other sidebar tabs the bar sits just above the chat box and keeps the formula", async ({ page }) => {
+  await mount(page, 300);
+  await page.getByRole("button", { name: "Raise the modifier by 1" }).click();
+  await page.evaluate(() => window.showChatIn("notifications"));
+  await expect(page.locator(".sc2-chat-dice")).toHaveCount(1);
+  expect(await page.evaluate(() => document.querySelector(".sc2-chat-dice").nextElementSibling.id)).toBe(
+    "chat-message"
+  );
+  const bar = page.locator("#chat-notifications").getByRole("region", { name: "Dice" });
+  await expect(bar.locator("output")).toHaveText("+1");
+  await bar.getByRole("button", { name: "Add a d8 to the roll in the chat box" }).click();
+  expect(await page.evaluate(() => window.chatView.text)).toBe("/r 1d8+1");
+  await bar.getByRole("button", { name: "Roll d20 now" }).click();
+  expect(await page.evaluate(() => window.sent)).toEqual(["/r 1d20"]);
+  await page.evaluate(() => window.showChatIn("log"));
+  expect(await page.evaluate(() => document.querySelector(".sc2-chat-dice").nextElementSibling.id)).toBe(
+    "chat-controls"
+  );
 });

@@ -2,8 +2,8 @@ import { loc } from "../i18n.mjs";
 /**
  * The dice bar under the chat log: one button that rolls 1d20 at once, die buttons that build a "/r" formula in the
  * chat box, and a modifier stepper. The player still sends the formula themselves, so it can be checked or edited.
- * Foundry moves the one chat input between the sidebar, a popped-out log and the notification area; the bar follows
- * it into the first two and stays out of the third.
+ * Foundry moves the one chat input between the sidebar, a popped-out log and the notification area it shows while
+ * another sidebar tab is open; the bar follows it everywhere.
  */
 
 export const CHAT_DICE = [4, 6, 8, 10, 12, 20];
@@ -101,7 +101,7 @@ function buildBar() {
     "sc2-primary-action",
     loc`Roll d20`,
     loc`Roll d20 now`,
-    loc`Rolls 1d20 straight away, with no modifier, in the chat mode chosen below.`
+    loc`Rolls 1d20 straight away, with no modifier, in the chat mode set by the chat buttons.`
   );
   quick.addEventListener("click", async () => {
     quick.disabled = true;
@@ -156,15 +156,14 @@ function buildBar() {
   return root;
 }
 
-/** Keep the bar just above the chat controls wherever the input sits in a chat log; hide it in the notification area. */
+/**
+ * Follow the chat box. In a chat log the bar sits just above the chat controls. While another sidebar tab is open,
+ * Foundry shows the chat box in the notification area instead, and the bar sits just above it there.
+ */
 function placeBar(_app, elements) {
   const input = elements?.["#chat-message"];
   const controls = elements?.["#chat-controls"];
-  const form = input?.closest?.(".chat-form");
-  if (!form || !controls) {
-    bar?.remove();
-    return;
-  }
+  if (!input || !controls) return;
   currentInput = input;
   // Also listen on the input itself, which reaches it in a detached window's document too.
   if (!hooked.has(input)) {
@@ -172,7 +171,8 @@ function placeBar(_app, elements) {
     input.addEventListener("plugins", addViewPlugin);
   }
   bar ??= buildBar();
-  controls.before(bar);
+  if (input.closest?.(".chat-form")) controls.before(bar);
+  else input.before(bar);
   refreshBar();
 }
 
