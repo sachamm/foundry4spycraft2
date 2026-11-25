@@ -10,7 +10,7 @@ import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
-import { agentTokenDefaults, renamedTokenName } from "../rules/creation-defaults.mjs";
+import { agentTokenDefaults, linkedImport, renamedTokenName } from "../rules/creation-defaults.mjs";
 import { newAgentPoolMax, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
@@ -49,7 +49,8 @@ export class SpycraftActor extends ActorRolls(
       }
     }
     const type = data.type ?? this.type;
-    if (type === "agent" || type === "npc") {
+    // A character rebuilt from a token (module/apps/token-links.mjs) keeps the vitality, wounds and dice it had.
+    if ((type === "agent" || type === "npc") && !options?.spycraft2TokenLink) {
       // A new agent starts with full vitality, wounds and action dice, and a new NPC with full vitality and wounds
       // once it is a special character: empty maximums are recorded here, and the pool-max hooks
       // (module/apps/pool-max.mjs) then raise each empty pool to its maximum.
@@ -90,6 +91,18 @@ export class SpycraftActor extends ActorRolls(
       }
     }
     if (Object.keys(updates).length) this.updateSource(updates, { recursive: false });
+  }
+
+  /** An imported agent or companion keeps a linked prototype token, whatever the file says. */
+  async importFromJSON(json) {
+    let text = json;
+    try {
+      const fixed = linkedImport(JSON.parse(json), this.type);
+      if (fixed) text = JSON.stringify(fixed);
+    } catch {
+      // Not JSON: Foundry reports that itself.
+    }
+    return super.importFromJSON(text);
   }
 
   /** An NPC's prototype token follows a rename while it still carries the old name. */

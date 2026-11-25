@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Characters kept on tokens move to the Actors list (world update, schema 7).** An agent or companion whose sheet
+  was edited from an unlinked token kept those edits on the token only. The update now copies what each such token
+  holds to its character in the Actors list and links the token, without waiting for the GC's link review. It starts
+  with the scene the GC is on and covers every scene. A token whose character was deleted from the Actors list gets a
+  new character built from what the token holds. When two unlinked tokens of one character both hold changes, only
+  the first is copied; the other stays in the link review so neither is overwritten unseen.
+- **Agent tokens stay linked.** An agent or companion token placed unlinked is linked as it is created when it holds
+  nothing of its own, and Import Data on an agent keeps its token linked even when the file comes from an older
+  version with unlinked tokens.
 - **Shorter check cards.** The header names the roller by code name (or the name without the token's role), with
   the full name as its tooltip, and keeps one line of what was rolled. Rule notes such as error and threat ranges,
   and the System / You and GC reminder, move into a closed **Details** at the foot of the card. The next-step

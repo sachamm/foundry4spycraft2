@@ -5,7 +5,10 @@ import {
   applyLinkProposal,
   describeLinkProposal,
   linkProposal,
+  linksOnCreate,
+  orphanCharacterData,
   pendingLinkProposals,
+  rescueTokenCharacters,
   retargetLinkedCompanions,
   reviewTokenLinks
 } from "../module/apps/token-links.mjs";
@@ -18,7 +21,7 @@ import {
   migrateWorld,
   retargetTokenCompanions
 } from "../module/migrations/index.mjs";
-import { agentTokenDefaults } from "../module/rules/creation-defaults.mjs";
+import { agentTokenDefaults, linkedImport } from "../module/rules/creation-defaults.mjs";
 import { RESOURCE_LOCK_ID } from "../module/rules/resource-locks.mjs";
 
 /** An ActorDelta source as Foundry stores it for a token with no changes of its own. */
@@ -354,4 +357,238 @@ test("a companion repoint that failed is tried again on the next load, for any l
   tokens.set("t1", { actorLink: false });
   await retargetLinkedCompanions({ actors: [waiting], scenes: new Map([["warehouse", { tokens }]]) });
   assert.deepEqual(waiting.writes, []);
+});
+
+/** A character recovered from a token whose character was deleted, as Foundry stores that token's delta. */
+const orphanDelta = () => ({
+  ...emptyDelta(),
+  name: "Arthur Smithwick",
+  img: "arthur.webp",
+  system: { codename: "Cognac", progression: [{ classId: "explorer" }] },
+  items: [
+    { _id: "cls", name: "Explorer", type: "class", system: {} },
+    { _id: "gone", _tombstone: true },
+    { _id: RESOURCE_LOCK_ID, name: "lock", type: "gear", flags: { spycraft2: { resourceLock: { token: "x" } } } }
+  ],
+  ownership: { default: 0, u1: 3 }
+});
+
+test("a token whose character was deleted holds enough to rebuild the agent, and nothing else is rebuilt", () => {
+  const data = orphanCharacterData({
+    name: "Ben",
+    texture: { src: "ben-token.webp" },
+    _source: { delta: orphanDelta() }
+  });
+  assert.equal(data.type, "agent");
+  assert.equal(data.name, "Arthur Smithwick");
+  assert.equal(data.img, "arthur.webp");
+  // Deletions and the resource lock are not part of the character.
+  assert.deepEqual(
+    data.items.map(item => item._id),
+    ["cls"]
+  );
+  assert.deepEqual(data.ownership, { default: 0, u1: 3 });
+  assert.equal(data.prototypeToken.actorLink, true);
+  // A generic NPC's leftover changes, or an empty delta, are not a character.
+  assert.equal(
+    orphanCharacterData({ _source: { delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } } }),
+    null
+  );
+  assert.equal(orphanCharacterData({ _source: { delta: emptyDelta() } }), null);
+  // A companion is known by its owner: an Animal Partner is an NPC, a Personal Lieutenant an agent.
+  const companionDelta = feat => ({
+    _source: { delta: { ...emptyDelta(), system: { companionOf: { ownerUuid: "Actor.a", feat } } } }
+  });
+  assert.equal(orphanCharacterData(companionDelta("Animal Partner")).type, "npc");
+  assert.equal(orphanCharacterData(companionDelta("Personal Lieutenant")).type, "agent");
+  // The deleted character's pool maximums are not carried over, and the rebuilt one remembers its token.
+  const pooled = orphanCharacterData({
+    uuid: "Scene.s.Token.t",
+    _source: { delta: { ...orphanDelta(), flags: { spycraft2: { poolMax: { vitality: 30 }, note: 1 } } } }
+  });
+  assert.deepEqual(pooled.flags, { spycraft2: { note: 1, rescuedFromToken: "Scene.s.Token.t" } });
+});
+
+/** A scene of unlinked tokens for the rescue, and the world it reads. */
+function rescueWorld(tokens, actors) {
+  const scene = { id: "meeting", name: "Meeting", tokens };
+  for (const token of tokens) token.parent = scene;
+  const created = [];
+  return {
+    scene,
+    created,
+    world: {
+      scenes: [scene],
+      currentScenes: [scene],
+      worldActors: actors,
+      createActor: async data => {
+        const actor = { id: `new${created.length + 1}`, ...structuredClone(data) };
+        actor.update = async update => {
+          if (update["system.companionOf.ownerUuid"])
+            actor.system.companionOf.ownerUuid = update["system.companionOf.ownerUuid"];
+        };
+        created.push(actor);
+        return actor;
+      }
+    }
+  };
+}
+
+test("version 7 copies a token's character into the Actors list and links the token, without asking", async () => {
+  const changed = world({ delta: { ...emptyDelta(), name: "Arthur Smithwick", system: { codename: "Cognac" } } });
+  const empty = world();
+  empty.token.id = "t2";
+  // A second changed token of the same character is left for the GC review, so neither overwrites the other unseen.
+  const second = world({ delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } });
+  second.token.id = "t3";
+  second.token.baseActor = changed.actor;
+  second.token.actorId = changed.actor.id;
+  empty.token.baseActor = changed.actor;
+  empty.token.actorId = changed.actor.id;
+  const orphan = {
+    id: "t4",
+    name: "Ben",
+    actorId: "deleted",
+    actorLink: false,
+    _source: { delta: orphanDelta() },
+    update: async data => Object.assign(orphan, data)
+  };
+  const linked = { id: "t5", actorLink: true, update: async () => assert.fail("a linked token is left alone") };
+  // A companion created from the orphan token's sheet follows the rebuilt agent.
+  const companion = {
+    id: "dog",
+    system: { companionOf: { ownerUuid: "Scene.meeting.Token.t4.Actor.deleted" } },
+    update: async data => (companion.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"])
+  };
+  // So does one made from the deleted character's own sheet.
+  const partner = {
+    id: "hawk",
+    system: { companionOf: { ownerUuid: "Actor.deleted" } },
+    update: async data => (partner.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"])
+  };
+  const { world: target, created } = rescueWorld(
+    [changed.token, empty.token, second.token, orphan, linked],
+    [changed.actor, companion, partner]
+  );
+  const report = await rescueTokenCharacters(target);
+  assert.deepEqual(report, { linked: 2, created: 1, left: 1 });
+  assert.deepEqual(changed.writes[0], [
+    "actor.update",
+    { system: { codename: "Cognac" }, name: "Arthur Smithwick" },
+    { spycraft2TokenLink: true }
+  ]);
+  assert.equal(changed.token.actorLink, true);
+  assert.equal(empty.token.actorLink, true);
+  assert.equal(second.token.actorLink, false);
+  assert.equal(created[0].name, "Arthur Smithwick");
+  assert.equal(orphan.actorId, "new1");
+  assert.equal(orphan.actorLink, true);
+  assert.equal(companion.system.companionOf.ownerUuid, "Actor.new1");
+  assert.equal(partner.system.companionOf.ownerUuid, "Actor.new1");
+  // The token left for the review is marked, so a retry does not copy its changes over the first token's.
+  assert.equal(second.token["flags.spycraft2.rescueLeftForReview"], true);
+  second.token.flags = { spycraft2: { rescueLeftForReview: true } };
+  assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 0, left: 1 });
+  assert.equal(second.token.actorLink, false);
+});
+
+test("a retried orphan rescue reuses the character the earlier run built", async () => {
+  const orphan = {
+    id: "t4",
+    name: "Ben",
+    actorId: "deleted",
+    actorLink: false,
+    _source: { delta: orphanDelta() },
+    update: async data => Object.assign(orphan, data)
+  };
+  const earlier = { id: "built", flags: { spycraft2: { rescuedFromToken: "Scene.meeting.Token.t4" } } };
+  const { world: target, created } = rescueWorld([orphan], [earlier]);
+  assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 1, left: 0 });
+  assert.equal(created.length, 0);
+  assert.equal(orphan.actorId, "built");
+});
+
+test("a companion rebuilt after its rebuilt owner follows the owner's new character", async () => {
+  const token = (id, actorId, delta) => {
+    const placed = { id, actorId, actorLink: false, _source: { delta } };
+    placed.update = async data => Object.assign(placed, data);
+    return placed;
+  };
+  const owner = token("t1", "deletedOwner", orphanDelta());
+  const pet = token("t2", "deletedPet", {
+    ...emptyDelta(),
+    system: { companionOf: { ownerUuid: "Actor.deletedOwner", feat: "Animal Partner" } }
+  });
+  const { world: target, created } = rescueWorld([owner, pet], []);
+  assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 2, left: 0 });
+  assert.equal(created[1].system.companionOf.ownerUuid, "Actor.new1");
+  // A retry with the owner already rebuilt still points a late companion at it.
+  const late = token("t3", "deletedPet2", {
+    ...emptyDelta(),
+    system: { companionOf: { ownerUuid: "Actor.deletedOwner", feat: "Animal Partner" } }
+  });
+  const retry = rescueWorld([late], created);
+  await rescueTokenCharacters(retry.world);
+  assert.equal(retry.created[0].system.companionOf.ownerUuid, "Actor.new1");
+  assert.equal(pet.actorId, "new2");
+});
+
+test("a companion's own token copied after its owner was rebuilt does not undo the repoint", async () => {
+  const owner = {
+    id: "t1",
+    actorId: "deletedOwner",
+    actorLink: false,
+    _source: { delta: orphanDelta() },
+    update: async data => Object.assign(owner, data)
+  };
+  const pet = world({ type: "npc" });
+  pet.actor.system = { companionOf: { ownerUuid: "Actor.deletedOwner" } };
+  pet.actor.update = async data => {
+    if (data.system?.companionOf) pet.actor.system.companionOf = data.system.companionOf;
+    if (data["system.companionOf.ownerUuid"])
+      pet.actor.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"];
+  };
+  pet.actor.toObject = () => ({ ...baseSource(), type: "npc", system: structuredClone(pet.actor.system) });
+  // The pet's token holds a change that still names the deleted owner.
+  pet.token._source.delta = { ...emptyDelta(), system: { companionOf: { ownerUuid: "Actor.deletedOwner" }, note: 1 } };
+  const { world: target } = rescueWorld([owner, pet.token], [pet.actor]);
+  await rescueTokenCharacters(target);
+  assert.equal(pet.token.actorLink, true);
+  assert.equal(pet.actor.system.companionOf.ownerUuid, "Actor.new1");
+});
+
+test("a token that could not be rescued keeps the world's version, so the rescue runs again", async () => {
+  const { token, actor } = world({ delta: { ...emptyDelta(), system: { vitality: { value: 3 } } } });
+  actor.update = async () => {
+    throw new Error("offline");
+  };
+  const { world: target } = rescueWorld([token], [actor]);
+  const originalError = console.error;
+  console.error = () => {};
+  try {
+    const report = await migrateWorld(
+      { ...target, version: 6, actors: [], items: [], setVersion: async () => assert.fail("version kept") },
+      { migrations: MIGRATIONS.filter(m => m.version === 7), to: 7 }
+    );
+    assert.equal(report.failed, 1);
+  } finally {
+    console.error = originalError;
+  }
+  assert.equal(token.actorLink, false);
+});
+
+test("an agent token placed unlinked is linked as it is created, unless it carries changes of its own", () => {
+  const { token } = world();
+  assert.equal(linksOnCreate(token, {}), true);
+  assert.equal(linksOnCreate(token, { delta: { system: { vitality: { value: 3 } } } }), false);
+  assert.equal(linksOnCreate(token, { actorLink: true }), false);
+  assert.equal(linksOnCreate(world({ type: "npc" }).token, {}), false);
+});
+
+test("an imported agent keeps a linked prototype token, even from an old unlinked export", () => {
+  const old = { type: "agent", name: "Ben", prototypeToken: { actorLink: false, name: "Ben" } };
+  assert.deepEqual(linkedImport(old).prototypeToken, { actorLink: true, name: "Ben" });
+  assert.equal(linkedImport({ ...old, type: undefined }, "agent").prototypeToken.actorLink, true);
+  assert.equal(linkedImport({ ...old, type: "npc" }), null);
+  assert.equal(linkedImport({ ...old, prototypeToken: { actorLink: true } }), null);
 });
