@@ -1,6 +1,5 @@
 import { loc } from "../i18n.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
-import { installResolutionGuide } from "../apps/resolution-guide.mjs";
 import { outcomeLabel } from "../rules/outcome-labels.mjs";
 
 /** Only recorded outcomes count: a high die alone never implies a hit or success. */
@@ -81,9 +80,14 @@ export function renderCheckGuidance(message, check, html, user) {
     change.textContent = guidance.change;
     title.append(" ", change);
   }
-  const note = document.createElement("p");
-  note.textContent = guidance.note;
-  box.append(title, note);
-  installResolutionGuide(box, check.checkKind, { append: true });
+  // The next-step sentence is a hint on the title, not a paragraph: the buttons already say what to do.
+  const hint = document.createElement("i");
+  hint.className = "fa-solid fa-circle-info sc2-guide-hint";
+  hint.tabIndex = 0;
+  hint.setAttribute("role", "img");
+  hint.setAttribute("aria-label", guidance.note);
+  hint.dataset.tooltip = guidance.note;
+  title.append(" ", hint);
+  box.append(title);
   content.prepend(box);
 }

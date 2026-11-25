@@ -22,6 +22,7 @@ import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs"
 import { installRoundReminders } from "./module/apps/round-reminders.mjs";
 import { installTargetNotices } from "./module/apps/target-response.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
+import { compactChatCard } from "./module/rolls/chat-compact.mjs";
 import {
   startUsagePeriod,
   refreshUsagePeriodActors,
@@ -323,6 +324,8 @@ Hooks.once("init", () => {
 
 // Buttons under posted checks come from roll pipeline contributors (module/rolls/chat-controls.mjs).
 Hooks.on("renderChatMessageHTML", renderCheckControls);
+// Then the card is shortened: code name in the header, rule notes behind "Details" (module/rolls/chat-compact.mjs).
+Hooks.on("renderChatMessageHTML", compactChatCard);
 
 // Recompute round-based bonuses and counters when combat progresses or ends. Changes arriving together (a round
 // advance updates many combatants) are gathered into one pass; a combat change only touches that combat's agents.

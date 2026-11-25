@@ -459,12 +459,12 @@ This holds for attributes, saves, skills, attacks, damage, initiative and knowle
 
 **Fixed anatomy:**
 
-1. **Header bar:** who → whom · what ("Latch → Mercenary · Attack (Tonfa)"). One display name per person; "(you)" after the viewer's own character. No paragraphs in the header.
+1. **Header bar:** who → whom · what ("Latch → Mercenary · Attack (Tonfa)"). One short display name per person: the code name when there is one, otherwise the name without the role a token name adds, with the full name as the tooltip (`shortSpeakerName()` in `module/rolls/chat-compact.mjs`); "(you)" after the viewer's own character. One line of what; no paragraphs in the header.
 2. **Outcome:** a stamp with word and icon (✓ HIT, ✗ MISS, SUCCESS, FAILURE, PENDING), never colour alone.
 3. **The number that matters:** the final total large, the natural die beside it, "16 → 25" when action dice changed it, and the comparison ("vs Defense 14: hit by 3"; "capped at 40" when a cap bit).
-4. **Next step:** one sentence saying who acts next, and exactly one primary button for it.
+4. **Next step:** exactly one primary button for it. The sentence saying who acts next is a hint (ⓘ) on the outcome title, not a paragraph.
 5. **Secondary actions** in one wrapping row at intrinsic width.
-6. **Why:** modifiers, ranges, feat notes and page cites in a collapsed "How this was worked out".
+6. **Why:** modifiers, ranges, feat notes and page cites, then what the system does and what the table decides, in one closed "Details" disclosure at the foot (`compactChatCard()` moves every flavor line after the first there).
 
 **Primary by state:**
 

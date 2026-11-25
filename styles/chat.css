@@ -29,7 +29,7 @@
   box-shadow: none;
 }
 .chat-message.sc2-card .dice-total {
-  font: 700 28px/1.3 var(--sc2-num);
+  font: 700 28px/1.15 var(--sc2-num);
   color: var(--sc2-ink-strong);
   background: var(--sc2-surface-raised);
   border: 1px solid var(--sc2-rule);
@@ -96,15 +96,22 @@
 
 .spycraft2.sc2-result-guide {
   border-left: 3px solid var(--sc2-teal);
-  padding: 6px 10px;
-  margin-bottom: 8px;
+  padding: 2px 8px;
+  margin-bottom: 4px;
   background: var(--sc2-paper-raised);
   color: var(--sc2-ink);
 }
 .spycraft2.sc2-result-guide .sc2-guide-title {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 15px;
   font-weight: 700;
+}
+/* The next-step sentence, as a hint on the title. */
+.spycraft2.sc2-result-guide .sc2-guide-hint {
+  margin-left: var(--sc2-space-1);
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
+  cursor: help;
 }
 .spycraft2.sc2-result-guide .sc2-guide-change {
   margin-left: var(--sc2-space-1);
@@ -198,4 +205,25 @@
   line-height: 1.25;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+/* Rule notes and the system/table reminder, closed at the foot of the card (module/rolls/chat-compact.mjs). */
+.chat-message .spycraft2.sc2-card-details {
+  margin-top: 4px;
+  font-size: var(--sc2-text-s);
+  line-height: 1.4;
+  color: var(--sc2-ink);
+}
+.chat-message .spycraft2.sc2-card-details > summary {
+  min-height: 28px;
+  align-content: center;
+  cursor: pointer;
+  color: var(--sc2-action);
+}
+.chat-message .spycraft2.sc2-card-details p {
+  margin: 4px 0;
+}
+.chat-message .spycraft2.sc2-card-details .sc2-card-guide {
+  padding-top: 2px;
+  border-top: 1px solid var(--sc2-rule);
 }

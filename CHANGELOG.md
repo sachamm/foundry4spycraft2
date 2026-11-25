@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Shorter check cards.** The header names the roller by code name (or the name without the token's role), with
+  the full name as its tooltip, and keeps one line of what was rolled. Rule notes such as error and threat ranges,
+  and the System / You and GC reminder, move into a closed **Details** at the foot of the card. The next-step
+  sentence under Pending, Hit and the other states is now a hint on the ⓘ beside the title.
 - **Second council, live part.** Four reviewers ran the GC side on a test build. Fixed from what they saw:
   - Undoing subdual or stress damage on an agent no longer leaves a damaged record that blocked every later hit of
     that kind. Vitality and wounds that moved again since the step get back what the step took. A hit that could

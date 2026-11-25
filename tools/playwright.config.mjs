@@ -15,6 +15,7 @@ export default defineConfig({
     "guided-play.spec.mjs",
     "accessibility-resolution.spec.mjs",
     "chat-theme.spec.mjs",
+    "chat-compact.spec.mjs",
     "keep-place.spec.mjs",
     "attribute-abbreviations.spec.mjs"
   ],
