@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import { ClassicLevel } from "classic-level";
 import { firearmDefaults } from "../module/rules/firearms.mjs";
 const source = JSON.parse(readFileSync(new URL("../src/data/equipment.json", import.meta.url)));
+/** House items for period games (src/data/period-gear.json) are built into the same packs as the book's rows. */
+const period = JSON.parse(readFileSync(new URL("../src/data/period-gear.json", import.meta.url)));
 async function items(name) {
   const db = new ClassicLevel(
     process.env.SPYCRAFT_PACKS_DIR
@@ -23,7 +25,7 @@ async function items(name) {
 }
 test("rebuilt weapon pack retains every source record, complete bundle/stockpile weights and firing metadata", async () => {
   const docs = await items("weapons");
-  assert.equal(docs.length, 458);
+  assert.equal(docs.length, 458 + period.weapons.length);
   for (const item of source.weapons) {
     const doc = docs.find(d => d.name === item.name);
     assert.ok(doc, item.name);
@@ -179,7 +181,12 @@ test("rebuilt gear, vehicle and vehicle-upgrade packs hold every source row unde
     upgrades = read("upgrades"),
     contagions = read("contagions");
   const expected = {
-    "equipment-upgrades": upgrades.armor.length + upgrades.weapons.length + upgrades.detonators.length,
+    "equipment-upgrades":
+      upgrades.armor.length +
+      upgrades.weapons.length +
+      upgrades.detonators.length +
+      period.upgrades.weapons.length +
+      period.upgrades.detonators.length,
     contagions: contagions.contagions.length,
     gear:
       gear.electronics.length +
@@ -187,8 +194,9 @@ test("rebuilt gear, vehicle and vehicle-upgrade packs hold every source row unde
       gear.resources.length +
       gear.security.length +
       gear.tradecraft.length +
-      gear.housings.length,
-    vehicles: vehicles.vehicles.length,
+      gear.housings.length +
+      Object.values(period.gear).flat().length,
+    vehicles: vehicles.vehicles.length + period.vehicles.length,
     "vehicle-upgrades":
       vehicles.upgrades.length +
       vehicles.weapons.filter(w => w.optionOf || !vehicles.weapons.some(o => o.optionOf === w.name)).length
@@ -208,7 +216,13 @@ test("rebuilt gear, vehicle and vehicle-upgrade packs hold every source row unde
             : "gear",
         doc.name
       );
-      assert.match(doc.system.source, /^Spycraft 2\.0 p\.\d+$/, doc.name);
+      assert.match(
+        doc.system.source,
+        doc.flags?.spycraft2?.periodItem
+          ? /^House item, adapted from .+ \(Spycraft 2\.0 p\.\d+\)$/
+          : /^Spycraft 2\.0 p\.\d+$/,
+        doc.name
+      );
       assert.match(doc.system.sourceTable, /^Table 4\.\d+$/, doc.name);
       assert.ok(doc.folder, doc.name);
     }

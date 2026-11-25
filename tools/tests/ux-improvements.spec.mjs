@@ -16,6 +16,8 @@ const browserSource = data(
     )
     .replace('import { describe } from "../rules/prerequisites.mjs";', 'const describe = () => "";')
     .replace('import { VEHICLE_RULES } from "../rules/tables.mjs";', "const VEHICLE_RULES = {};")
+    .replace('import { clockYear } from "./game-clock.mjs";', "const clockYear = () => null;")
+    .replace('"../rules/gear-era.mjs"', JSON.stringify(data(read("module/rules/gear-era.mjs"))))
     .replace('"../i18n.mjs"', JSON.stringify(i18n))
 );
 const tooltips = data(

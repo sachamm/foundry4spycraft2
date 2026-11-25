@@ -3,6 +3,8 @@ import { enrich } from "../sheets/enrich.mjs";
 import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { loc } from "../i18n.mjs";
+import { availableIn } from "../rules/gear-era.mjs";
+import { clockYear } from "./game-clock.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -36,7 +38,9 @@ const FIELDS = {
     "system.streetValue",
     "system.standingOnly",
     "system.standingCost",
-    "system.sourceTable"
+    "system.sourceTable",
+    "system.year",
+    "system.restricted"
   ],
   vehicle: [
     "system.vehicleClass",
@@ -47,7 +51,9 @@ const FIELDS = {
     "system.mph",
     "system.defenseSave",
     "system.standingOnly",
-    "system.standingCost"
+    "system.standingCost",
+    "system.year",
+    "system.restricted"
   ],
   class: [
     "system.identifier",
@@ -72,16 +78,22 @@ const FIELDS = {
     "system.damage",
     "system.errorThreat",
     "system.range",
-    "system.qualities"
+    "system.qualities",
+    "system.year"
   ],
   armor: [
     "system.caliber",
     "system.damageReduction",
     "system.damageReductionSubdual",
     "system.defensePenalty",
-    "system.armorCheck"
+    "system.armorCheck",
+    "system.year"
   ]
 };
+
+/** Item types filtered by the game clock's year, Caliber and (where the tables mark it) restriction. */
+const DATED = new Set(["gear", "weapon", "armor", "vehicle"]);
+const RESTRICTABLE = new Set(["gear", "vehicle"]);
 
 /** Item types an agent can only hold once; the browser won't add a second copy. */
 const UNIQUE = new Set(["origin"]);
@@ -104,6 +116,19 @@ function plainText(html) {
   return new DOMParser().parseFromString(spaced, "text/html").body.textContent.replace(/\s+/g, " ").trim();
 }
 
+/** One line on what the game clock's year is doing to the list. */
+function eraStatus(year, later, showFuture) {
+  if (!Number.isSafeInteger(year)) return loc`Set a date on the game clock to hide gear that did not exist yet.`;
+  if (!later) return loc`Everything listed was available by ${year}.`;
+  if (showFuture)
+    return later === 1
+      ? loc`1 item marked "Not yet" came out after ${year}.`
+      : loc`${later} items marked "Not yet" came out after ${year}.`;
+  return later === 1
+    ? loc`1 item that came out after ${year} is hidden.`
+    : loc`${later} items that came out after ${year} are hidden.`;
+}
+
 /**
  * Compendium browser that shows which options a character
  * qualifies for (feats, expert classes) and lets the player add them in one click.
@@ -114,7 +139,15 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     this.actor = actor;
     this.itemType = itemType;
     // With a character open, start with what that character may take; the box is one click from the full list.
-    this.filters = { search: "", group: originType ?? "", qualifiedOnly: !!actor, acquisitionSource: "" };
+    this.filters = {
+      search: "",
+      group: originType ?? "",
+      qualifiedOnly: !!actor,
+      acquisitionSource: "",
+      showFuture: false,
+      caliber: "",
+      restricted: ""
+    };
     /** The entry shown in the preview pane. */
     this.selected = null;
     /** Plain-text descriptions by uuid: parsing each one is the costly part of building the list. */
@@ -153,6 +186,11 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     return this.render({ parts: ["results"] });
   }
 
+  /** The game clock's date changed: gear newer than its year comes and goes. */
+  refreshForClock() {
+    if (DATED.has(this.itemType)) return this.renderResults();
+  }
+
   get title() {
     return game.i18n.format("SPYCRAFT.Browser.Title", { type: game.i18n.localize(`TYPES.Item.${this.itemType}`) });
   }
@@ -168,6 +206,10 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     const cfg = CONFIG.SPYCRAFT;
     const owned = new Set(this.actor?.items.filter(i => i.type === this.itemType).map(i => i.name.toLowerCase()) ?? []);
     const search = this.filters.search.toLowerCase();
+    const dated = DATED.has(this.itemType),
+      year = dated ? clockYear() : null,
+      caliber = Number(this.filters.caliber) || 0;
+    let later = 0;
 
     const freeSources =
       this.itemType === "feat"
@@ -261,6 +303,13 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       }
       groups[group] = groupLabel;
       if (this.filters.group && group !== this.filters.group) continue;
+      if (caliber && Number(s.caliber) !== caliber) continue;
+      if (this.filters.restricted === "hide" && s.restricted) continue;
+      if (this.filters.restricted === "only" && !s.restricted) continue;
+      const future = dated && !availableIn(s.year, year);
+      if (future) later += 1;
+      if (future && !this.filters.showFuture) continue;
+      if (dated && s.year) extra = extra ? loc`${extra} · from ${s.year}` : loc`From ${s.year}`;
       let summary = this.summaries.get(e.uuid);
       if (summary === undefined) this.summaries.set(e.uuid, (summary = plainText(s.description)));
       if (search && !e.name.toLowerCase().includes(search) && !summary.toLowerCase().includes(search)) continue;
@@ -286,7 +335,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
         qualified: check.ok,
         unmet: check.unmet.join("; "),
         prereq: req ? describe(req) : "",
-        notChecked: s.prerequisitesNotChecked
+        notChecked: s.prerequisitesNotChecked,
+        future
       });
     }
     rows.sort((a, b) => a.groupLabel.localeCompare(b.groupLabel) || a.name.localeCompare(b.name));
@@ -310,13 +360,27 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       hasPrereqs: ["feat", "class"].includes(this.itemType),
       groups: Object.fromEntries(Object.entries(groups).sort((a, b) => a[1].localeCompare(b[1]))),
       actor: this.actor,
-      missingPack: !packs.length
+      missingPack: !packs.length,
+      dated,
+      restrictable: RESTRICTABLE.has(this.itemType),
+      calibers: Object.fromEntries([1, 2, 3, 4, 5].map(n => [String(n), loc`Caliber ${cfg.calibers[n]}`])),
+      restrictedOptions: { hide: loc`Hide restricted`, only: loc`Restricted only` },
+      era: dated ? eraStatus(year, later, this.filters.showFuture) : "",
+      // With no date on the clock nothing is newer than it, so the box could change nothing.
+      futureReason: dated && !Number.isSafeInteger(year) ? loc`Set a date on the game clock first.` : ""
     };
   }
 
   _onRender(context, options) {
     super._onRender(context, options);
     const html = this.element;
+    // Only the results part is redrawn on a search or a clock change, so keep the future-gear box in step here.
+    const future = html.querySelector("[name=showFuture]");
+    if (future) {
+      future.disabled = Boolean(context.futureReason);
+      if (context.futureReason) future.closest("label").dataset.tooltip = context.futureReason;
+      else delete future.closest("label").dataset.tooltip;
+    }
     // The filter controls are drawn once and keep their listeners; only a full draw replaces them.
     const search = html.querySelector("[name=search]");
     if (!search || search.dataset.sc2Wired) return;
@@ -365,6 +429,15 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       this.filters.qualifiedOnly = ev.target.checked;
       this.renderResults();
     });
+    html.querySelector("[name=showFuture]")?.addEventListener("change", ev => {
+      this.filters.showFuture = ev.target.checked;
+      this.renderResults();
+    });
+    for (const key of ["caliber", "restricted"])
+      html.querySelector(`[name=${key}]`)?.addEventListener("change", ev => {
+        this.filters[key] = ev.target.value;
+        this.renderResults();
+      });
   }
 
   static async #onAdd(event, target) {
