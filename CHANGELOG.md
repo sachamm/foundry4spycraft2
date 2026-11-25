@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- **Second council, live part.** Four reviewers ran the GC side on a test build. Fixed from what they saw:
+  - Undoing subdual or stress damage on an agent no longer leaves a damaged record that blocked every later hit of
+    that kind. Vitality and wounds that moved again since the step get back what the step took. A hit that could
+    not be recorded does not mark its card as applied.
+  - Alt+B boosts the card under the pointer in a popped-out chat log too. A boost or critical bought from a card
+    leaves no Undo note, because the note could not take it off the card.
+  - A readied action that goes off after the combatant's turn, or a Delay on someone who has already acted, no
+    longer gives a second turn in the round. Previous turn stops at the first turn of round 1.
+  - The console's Game clock heading no longer collapses to one letter a line. Combat stays on screen in every
+    view while a fight runs, a defeated combatant gets no action buttons, and another scene's fight does not
+    redraw the console.
+  - Begin session and Next scene say when a session has begun or a fight is running. A listed antagonist is marked
+    faced when it is in a started fight.
+  - The Damage save card's large number is the save total. Add NPC to scene starts in the search field and shows
+    the chosen row. Delay and Ready lines for NPCs go to the GCs only.
+
 ## 0.8.0 — 2026-11-24
 
 - **Gear by the game clock's year.** Every gear, weapon, armor and vehicle entry now has the year it came out: the
