@@ -48,7 +48,10 @@ async function mount(page, width, theme = "light") {
         this.text = paragraph;
         this.watcher?.update();
       },
-      focus() {}
+      focused: 0,
+      focus() {
+        this.focused++;
+      }
     };
     window.chatView = view;
     const { installChatDiceHooks } = await import(url);
@@ -180,4 +183,22 @@ test("on other sidebar tabs the bar sits just above the chat box and keeps the f
   expect(await page.evaluate(() => document.querySelector(".sc2-chat-dice").nextElementSibling.id)).toBe(
     "chat-controls"
   );
+});
+
+test("clicking the roll-building buttons leaves the cursor in the chat box; Roll d20 does not", async ({ page }) => {
+  await mount(page, 300);
+  const bar = page.getByRole("region", { name: "Dice" });
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click();
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click();
+  await bar.getByRole("button", { name: "Lower the modifier by 1" }).click();
+  expect(await page.evaluate(() => window.chatView.focused)).toBe(3);
+  // The buttons never took focus from the chat box.
+  expect(await page.evaluate(() => document.activeElement.closest?.(".sc2-chat-dice") ?? null)).toBeNull();
+  await bar.getByRole("button", { name: "Roll d20 now" }).click();
+  expect(await page.evaluate(() => window.chatView.focused)).toBe(3);
+  // From the keyboard, focus stays on the bar.
+  await bar.getByRole("button", { name: "Add a d8 to the roll in the chat box" }).focus();
+  await page.keyboard.press("Enter");
+  expect(await page.evaluate(() => window.chatView.focused)).toBe(3);
+  expect(await page.evaluate(() => window.chatView.text)).toBe("/r 1d6+1d8");
 });

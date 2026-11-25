@@ -58,27 +58,35 @@ function syncWithInput(view) {
   refreshBar();
 }
 
-function writeFormula({ focus }) {
-  const view = views.get(chatInput());
-  if (!view) {
-    console.warn("Field Agent's Handbook | The chat box is not ready for the dice bar.");
-    return;
-  }
+function writeFormula(view) {
   const text = chatDiceFormula(state.dice, state.modifier);
   const { state: editor } = view;
   const paragraph = editor.schema.nodes.paragraph.create(null, text ? editor.schema.text(text) : null);
   state.seen = text;
-  view.dispatch(editor.tr.replaceWith(0, editor.doc.content.size, paragraph));
-  if (focus) view.focus();
+  let tr = editor.tr.replaceWith(0, editor.doc.content.size, paragraph);
+  // Leave the cursor after the formula, ready for Enter.
+  const TextSelection = globalThis.foundry?.prosemirror?.TextSelection;
+  if (TextSelection && tr.doc) tr = tr.setSelection(TextSelection.atEnd(tr.doc));
+  view.dispatch(tr);
 }
 
 function change(event, update) {
-  syncWithInput(views.get(chatInput()));
+  const view = views.get(chatInput());
+  if (!view) console.warn("Field Agent's Handbook | The chat box is not ready for the dice bar.");
+  syncWithInput(view);
   update();
   // Only write when there is a formula, so a modifier chosen before any die does not clear a draft.
-  if (state.dice.size) writeFormula({ focus: event.detail > 0 });
+  if (view && state.dice.size) writeFormula(view);
+  // A mouse click leaves the cursor in the chat box; a key press keeps focus on the bar for keyboard users.
+  if (view && event.detail > 0) view.focus();
   refreshBar();
 }
+
+/**
+ * The buttons that build a roll do not take focus when pressed with the mouse, so the chat box keeps its cursor and
+ * does not shrink and grow again between clicks.
+ */
+const keepChatFocus = node => node.addEventListener("mousedown", event => event.preventDefault());
 
 function refreshBar() {
   if (!bar) return;
@@ -131,6 +139,7 @@ function buildBar() {
     loc`Adds 1 to the modifier on the roll in the chat box.`
   );
   up.dataset.step = "1";
+  for (const step of [down, up]) keepChatFocus(step);
   for (const step of [down, up])
     step.addEventListener("click", event =>
       change(event, () => (state.modifier = clampModifier(state.modifier + Number(step.dataset.step))))
@@ -147,6 +156,7 @@ function buildBar() {
     );
     die.dataset.faces = String(faces);
     die.append(make("span", "sc2-chat-dice-face", `d${faces}`), make("span", "sc2-chat-dice-count"));
+    keepChatFocus(die);
     die.addEventListener("click", event =>
       change(event, () => state.dice.set(faces, (state.dice.get(faces) ?? 0) + 1))
     );
