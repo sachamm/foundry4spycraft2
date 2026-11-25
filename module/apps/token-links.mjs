@@ -209,11 +209,15 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
           if (!created?.id) throw new Error(loc`The rescued character ${data.name} was not created.`);
           actors.push(created);
         }
-        // Companions made from this token's sheet named its copy as their owner; they follow the new character.
-        const ownerUuid = `Scene.${scene.id}.Token.${token.id}.Actor.`;
-        for (const companion of actors)
-          if (companion.system?.companionOf?.ownerUuid?.startsWith(ownerUuid))
+        // Companions name the token's copy (made from the token's sheet) or the deleted character (made from its
+        // sheet in the Actors list) as their owner; either way they follow the rebuilt character.
+        const tokenOwner = `Scene.${scene.id}.Token.${token.id}.Actor.`,
+          deletedOwner = token.actorId ? `Actor.${token.actorId}` : null;
+        for (const companion of actors) {
+          const owner = companion.system?.companionOf?.ownerUuid;
+          if (owner?.startsWith(tokenOwner) || (deletedOwner && owner === deletedOwner))
             await companion.update({ "system.companionOf.ownerUuid": `Actor.${created.id}` }, options);
+        }
         await token.update({ actorId: created.id, actorLink: true }, options);
         report.created++;
       } catch (error) {

@@ -456,9 +456,15 @@ test("version 7 copies a token's character into the Actors list and links the to
     system: { companionOf: { ownerUuid: "Scene.meeting.Token.t4.Actor.deleted" } },
     update: async data => (companion.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"])
   };
+  // So does one made from the deleted character's own sheet.
+  const partner = {
+    id: "hawk",
+    system: { companionOf: { ownerUuid: "Actor.deleted" } },
+    update: async data => (partner.system.companionOf.ownerUuid = data["system.companionOf.ownerUuid"])
+  };
   const { world: target, created } = rescueWorld(
     [changed.token, empty.token, second.token, orphan, linked],
-    [changed.actor, companion]
+    [changed.actor, companion, partner]
   );
   const report = await rescueTokenCharacters(target);
   assert.deepEqual(report, { linked: 2, created: 1, left: 1 });
@@ -474,6 +480,7 @@ test("version 7 copies a token's character into the Actors list and links the to
   assert.equal(orphan.actorId, "new1");
   assert.equal(orphan.actorLink, true);
   assert.equal(companion.system.companionOf.ownerUuid, "Actor.new1");
+  assert.equal(partner.system.companionOf.ownerUuid, "Actor.new1");
   // The token left for the review is marked, so a retry does not copy its changes over the first token's.
   assert.equal(second.token["flags.spycraft2.rescueLeftForReview"], true);
   second.token.flags = { spycraft2: { rescueLeftForReview: true } };
