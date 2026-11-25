@@ -35,6 +35,7 @@ import { weaponAttack } from "../../rules/gear.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { characterReminders } from "../../rules/feat-reminders.mjs";
 import { loc } from "../../i18n.mjs";
+import { breakdownRows, expandRow, saveBreakdown } from "../../rules/bonus-breakdown.mjs";
 import { postedReceipt } from "../../services/message-lookup.mjs";
 
 export const ActorRolls = Base =>
@@ -357,6 +358,8 @@ export const ActorRolls = Base =>
         ...(pipelineModifiers.rows.length ? { pipelineModifiers: pipelineModifiers.rows } : {}),
         // Rows contributors added while the total was planned are already inside the total; they are recorded only.
         ...(options.planModifiers?.length ? { planModifiers: options.planModifiers } : {}),
+        // The labelled parts of the bonus, for the card's breakdown tooltip (module/rolls/chat-breakdown.mjs).
+        ...(Array.isArray(options.breakdown) && options.breakdown.length ? { breakdown: options.breakdown } : {}),
         attributeDamage,
         oldSchool,
         analysisTask: options.analysisTask
@@ -512,6 +515,10 @@ export const ActorRolls = Base =>
           checkKind: "ability",
           ability: key,
           conditionAbilityAdjustment,
+          breakdown: breakdownRows([
+            { label: key.toUpperCase(), value: this.system.abilities[key]?.mod, keep: true },
+            { label: loc`Drunk`, value: conditionAbilityAdjustment }
+          ]),
           ...(Object.hasOwn(options, "oldSchool") ? { oldSchool: options.oldSchool } : {})
         }
       );
@@ -566,11 +573,17 @@ export const ActorRolls = Base =>
               reflexReducesDamage: input.reflexReducesDamage === true
             })
           : null;
-      const { total, planModifiers } = planTotal(
+      const saveBonusLabel = loc`Save bonus`;
+      const { total, planModifiers, modifiers } = planTotal(
         "save",
         { actor: this, system: this.system, saveKey: key, input },
-        terms.merge("rows", [[10, [loc`Save bonus`, this.system.saves?.[key]?.total ?? 0]]])
+        terms.merge("rows", [[10, [saveBonusLabel, this.system.saves?.[key]?.total ?? 0]]])
       );
+      // The card's tooltip lists the save's own parts in place of the one "Save bonus" row.
+      const savePartRows = saveBreakdown(this.system, key, CONFIG.SPYCRAFT.saves[key].ability);
+      const breakdown = modifiers.some(row => row.label === saveBonusLabel)
+        ? expandRow(modifiers, saveBonusLabel, savePartRows)
+        : [...savePartRows, ...modifiers];
       const guards = terms.list.filter(term => typeof term.facts === "function"),
         planned = guards.map(term => term.facts());
       return this.rollCheck(
@@ -578,6 +591,7 @@ export const ActorRolls = Base =>
         { total },
         {
           planModifiers,
+          breakdown,
           featReminders: input.featReminders,
           flavor: terms
             .merge("flavor", [

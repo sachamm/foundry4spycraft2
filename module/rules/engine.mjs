@@ -765,6 +765,8 @@ function deriveAttributes(state) {
     const a = sys.abilities[k];
     a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
+    // Where that bonus comes from, for the sheet's breakdown tooltip.
+    a.bonusSources = abilityBonus.sources.get(k) ?? [];
     a.temporaryBonus = (sys.mentalLeapState.bonuses[k] ?? 0) + (["str", "con"].includes(k) ? rageBonus : 0);
     a.damage = sys.attributeDamageState.byAbility[k].total;
     a.undamagedValue = a.base + a.increase + (a.misc ?? 0) + a.bonus + a.temporaryBonus;

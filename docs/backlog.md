@@ -231,6 +231,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-138 | Cover identity only mid-page; not on the rail or cards. | SG-A23 | S |
 | B-139 | Browser rows about 61px; preview empty until a pick; the browser stays open after adding (except talents and specialties); a row click redraws list and preview; prerequisites recomputed on every draw. | SG-I6, LR-24b, LR-24f, HBS-04 | M |
 | B-140 | Stepper and sheet tabs are two navigations; steps may open browsers inconsistently (live check). | LR-21e, LR-21f | M |
+| B-255 | **Breakdown tooltips, the rest.** Roll buttons and roll cards now list the parts of their bonus. Still without one: the NPC graded tiles (Initiative, attack base, saves, Damage save), skill error range, the vehicle sheet's figures, and initiative cards (Foundry posts those without the system's check record). A damage card lists its flat bonus but not where each extra die came from. Action dice added after the roll show as "16 → 25" on the card, not as tooltip rows. | PR for bonus tooltips, 2026-11-25 | S |
 | B-141 | Weapon row shows no "not readied" state before the click. | LR-22b, SGI-seasoned-player D12 | S |
 | B-142 | Wounds help does not name the bands; thresholds on the Play reference grid are unexplained; no line saying what two half actions buy. | LR-23b, SGI-rules-expert D3, SGI-novice-player D10 | S |
 | B-143 | Sheets cover the map: the agent sheet opens 860 wide; no compact Play width; tablet width untested. | LR-15a, SGI-seasoned-player D24 | M |
@@ -321,6 +322,10 @@ Do these when touching the area. The council's conditions still apply: equality 
 
 Short passes in a running world. Delete a line when it has been seen working, or move it up if it fails.
 
+- Bonus breakdown tooltips in a running world: hover an attribute, a save, a skill and a weapon's Attack button on
+  an agent and an NPC, then the result on an attack, skill, save and damage card; check the lines add up to the
+  figure shown, that the tooltip does not cover the button being pressed, and that a player sees no parts on an
+  NPC's card. (B-255)
 - The five from the old to-do file: the clock hidden when "Show the clock to players" is off; First Aid on another
   player's agent from the medic's own client; the save dialog from the player's button; a blast across a wall and its
   outline; a player without "Query users" getting a clear message. (RW-404 to RW-408)

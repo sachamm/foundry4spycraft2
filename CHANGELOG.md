@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- **Tooltips that show where a bonus comes from.** Every button on a character sheet that shows a roll bonus now
+  lists its parts on hover or keyboard focus, one per line, ending in a total that matches the button: attributes
+  (what the score is made of, then its modifier), saves, Initiative, skills (each total when a skill has two
+  attributes), Knowledge and each weapon's Attack button, on the Play tab, the Skills and Gear tabs and the NPC
+  sheet. A bonus of +0 or below is explained too. Roll cards in chat do the same on their result: the die, each part
+  of the bonus and the total, with anything a rule added at roll time. Damage cards list the parts of their flat
+  bonus. The cards are no taller than before. An NPC's parts are shown only to the GC.
+
 ## 0.8.0 — 2026-11-25
 
 - **Characters kept on tokens move to the Actors list (world update, schema 7).** An agent or companion whose sheet

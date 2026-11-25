@@ -2,10 +2,10 @@
   <h3>{{localize "SPYCRAFT.Combat"}}</h3>
   <div class="stat-grid">
     <div class="stat"><span>{{localize "SPYCRAFT.Template.ActorAgentMain.CQBRangeBeyondReach"}}</span><b>{{system.cqbRange}} {{localize "SPYCRAFT.Template.ActorAgentMain.Ft2"}}</b></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><b>{{signed system.bab}}</b></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.AttackUnarmed"}}</span><b>{{signed system.attack.unarmed}}</b></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.AttackMelee"}}</span><b>{{signed system.attack.melee}}</b></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.AttackRanged"}}</span><b>{{signed system.attack.ranged}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><b {{sc2tip tips.bab}}>{{signed system.bab}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.AttackUnarmed"}}</span><b {{sc2tip tips.attackUnarmed}}>{{signed system.attack.unarmed}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.AttackMelee"}}</span><b {{sc2tip tips.attackMelee}}>{{signed system.attack.melee}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.AttackRanged"}}</span><b {{sc2tip tips.attackRanged}}>{{signed system.attack.ranged}}</b></div>
     <div class="stat"><span>{{localize "SPYCRAFT.StressThreshold"}}</span><b>{{system.stressThreshold}}</b></div>
     <div class="stat"><span>{{localize "SPYCRAFT.SubdualThreshold"}}</span><b>{{system.subdualThreshold}}</b></div>
   </div>
@@ -16,8 +16,8 @@
   <h3>{{localize "SPYCRAFT.Checks"}}</h3>
   <div class="stat-grid">
     <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><button type="button" class="sc2-action" data-action="rollKnowledge" {{sc2tip tips.knowledge}}>{{signed system.knowledge}}</button></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b>{{signed system.requestCheck}}</b></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b>{{signed system.gearCheck}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b {{sc2tip tips.request}}>{{signed system.requestCheck}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b {{sc2tip tips.gearCheck}}>{{signed system.gearCheck}}</b></div>
   </div>
   {{#if system.actionDieAwardSummary.count}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.GCActionDiceAwardedThisMission"}} {{system.actionDieAwardSummary.count}} · {{#if system.actionDieAwardSummary.settled}}{{localize "SPYCRAFT.Template.ActorAgentMain.MissionRewardSettled"}} {{system.actionDieAwardSummary.totalXP}} {{localize "SPYCRAFT.Template.ActorAgentMain.XP"}}{{else}}+{{system.actionDieAwardSummary.baseXP}} {{localize "SPYCRAFT.Template.ActorAgentMain.BaseMissionXPBeforeTheCareer"}}{{/if}}</p>{{/if}}
   <p><button type="button" class="sc2-action" data-action="configureFortuneTeammates">{{localize "SPYCRAFT.Template.ActorAgentMain.ImprovedFortuneTeammates"}}</button>{{#if system.improvedFortune.value}} · +{{system.improvedFortune.value}} {{localize "SPYCRAFT.Template.ActorAgentMain.StartingActionDiceTeamCap3"}}{{/if}}</p>

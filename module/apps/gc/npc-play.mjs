@@ -20,6 +20,7 @@ import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
+import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
@@ -172,6 +173,16 @@ export async function rollNpcSkill(actor, input = null) {
           ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
           : ""),
       ability,
+      // The card shows these parts only to someone who may open the NPC (module/rolls/chat-breakdown.mjs).
+      breakdown: breakdownRows(
+        [
+          { label: loc`Skill bonus`, value: plan.bonus, keep: true },
+          { label: ability.toUpperCase(), value: actor.system.abilities[ability]?.mod, keep: true },
+          { label: loc`Situational modifier`, value: Number(input.modifier) || 0 },
+          ...quality.rows
+        ],
+        total
+      ),
       cap: plan.cap,
       error: Math.max(0, Number(input.error) || 0) + quality.errorIncrease,
       npcSkill: skill.key,

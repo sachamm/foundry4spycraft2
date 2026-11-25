@@ -3,6 +3,7 @@ import { refuse, refuseStep } from "../error-notices.mjs";
 import { placeSheet, rememberSheetPlacement } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
 import { chosenPicks, ruleTip } from "./rule-tips.mjs";
+import { abilityTip, agentBonusTips, npcSkillTip, saveTip, skillTip, weaponAttackTip } from "./bonus-tips.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
@@ -821,13 +822,14 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       for (const t of targets) for (const s of src[t] ?? []) rows.push([s.source, s.value]);
       return rows;
     };
-    const abilTip = k => [k.toUpperCase(), sys.abilities[k].mod];
     const miscLabel = game.i18n.localize("SPYCRAFT.Misc");
     const classLabel = game.i18n.localize("SPYCRAFT.Class.Label");
     const armorLabel = game.i18n.localize("SPYCRAFT.Armor");
     const vitBonus = (src.vitality ?? []).reduce((n, s) => n + s.value, 0);
     const conPart = sys.abilities.con.mod * sys.level;
     context.tips = {
+      // Roll bonuses: every part, then a total that matches the button (module/sheets/bonus-tips.mjs).
+      ...agentBonusTips(sys),
       defense: tip(
         [
           [game.i18n.localize("SPYCRAFT.Base"), 10],
@@ -840,7 +842,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         ],
         "defense"
       ),
-      initiative: tip([[classLabel, sys.initiative.base], abilTip("dex"), [miscLabel, misc.initiative]], "initiative"),
       speed: tip(
         [
           [game.i18n.localize("SPYCRAFT.Base"), 30],
@@ -848,15 +849,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
           [miscLabel, misc.speed]
         ],
         "speed"
-      ),
-      knowledge: tip(
-        [
-          [game.i18n.localize("SPYCRAFT.Level"), sys.level],
-          abilTip("int"),
-          [miscLabel, misc.knowledge],
-          [loc`Baffled/Incompetent`, sys.knowledgeSkillBonusCondition?.adjustment ?? 0]
-        ],
-        "knowledge"
       ),
       vitality: tip(
         [
@@ -900,7 +892,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       key,
       label: game.i18n.localize(label),
       abbr: game.i18n.localize(`SPYCRAFT.AbilityAbbr.${key}`),
-      ...sys.abilities[key]
+      ...sys.abilities[key],
+      tip: abilityTip(sys, key, game.i18n.localize(label))
     }));
     context.increaseLevels = cfg.abilityIncreaseLevels.map(l => ({
       level: l,
@@ -916,15 +909,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       key,
       label: game.i18n.localize(s.label),
       ...sys.saves[key],
-      tip: tip(
-        [
-          [classLabel, sys.saves[key].base],
-          abilTip(s.ability),
-          key === "ref" ? [armorLabel, sys.armor?.check] : [armorLabel, 0],
-          [miscLabel, misc[key]]
-        ],
-        `saves.${key}`
-      )
+      tip: saveTip(sys, key, s.ability)
     }));
 
     // Items by type
@@ -1164,17 +1149,14 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       totals: s.totals.map(t => ({
         ...t,
         rollLabel: loc`Roll ${s.name} (${t.ability.toUpperCase()})`,
-        tip: tip(
-          [
-            [game.i18n.localize("SPYCRAFT.Skill.Ranks"), s.ranks],
-            abilTip(t.ability),
-            [loc`Attribute-based condition penalty`, s.abilityPenalties?.[t.ability] ?? 0],
-            [loc`Baffled/Incompetent`, t.conditionBonusAdjustment ?? 0],
-            [miscLabel, s.misc]
-          ],
-          `skills.${s.key}.misc`
-        )
-      }))
+        tip: skillTip(sys, s.key, [t.ability])
+      })),
+      // The Play tab's button shows every total at once.
+      playTip: skillTip(
+        sys,
+        s.key,
+        s.totals.map(t => t.ability)
+      )
     }));
 
     // Feats
@@ -1311,6 +1293,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }));
     for (const row of context.weapons) {
       row.untrained = row.attack?.trained === false;
+      row.attackTip = weaponAttackTip(row.attack);
       row.facts = weaponFacts(row.attack);
       row.threatLabel = formatRange("threat", row.attack?.threat);
       row.errorLabel = formatRange("error", row.attack?.error);
@@ -1894,7 +1877,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         key,
         label: game.i18n.localize(label),
         abbr: game.i18n.localize(`SPYCRAFT.AbilityAbbr.${key}`),
-        ...sys.abilities[key]
+        ...sys.abilities[key],
+        tip: abilityTip(sys, key, game.i18n.localize(label))
       })),
       saves: Object.entries(CONFIG.SPYCRAFT.saves).map(([key, s]) => ({
         key,
@@ -1910,7 +1894,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
           attack: this.actor.weaponAttack(w),
           shots: weaponShots(w)
         }))
-        .map(row => ({ ...row, facts: weaponFacts(row.attack) })),
+        .map(row => ({ ...row, facts: weaponFacts(row.attack), attackTip: weaponAttackTip(row.attack) })),
       playLabels: playLabels(),
       featPlay: npcFeatPlay(sys.featEffects),
       hazards: hazardsView(this.actor),
@@ -1990,7 +1974,12 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
           value: profile.grades[key],
           options: key === "wealth" ? { 0: loc`None`, ...gradeOptions } : gradeOptions
         })),
-      skills: profile.skills.map((s, index) => ({ ...s, index, resolved: result.skills?.[index] })),
+      skills: profile.skills.map((s, index) => ({
+        ...s,
+        index,
+        resolved: result.skills?.[index],
+        tip: npcSkillTip(result.skills?.[index])
+      })),
       equipment: NPC_CATEGORIES.map(category => ({
         category,
         picks: (profile.equipment[category] ?? []).map((caliber, index) => ({ caliber, index, category }))

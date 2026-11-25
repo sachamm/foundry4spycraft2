@@ -12,8 +12,8 @@
         <td class="edit-only">{{#if bonus}}{{signed bonus}}{{/if}}</td>
         <td class="edit-only">{{#if increase}}+{{increase}}{{/if}}</td>
         <td class="edit-only"><input type="number" name="system.abilities.{{key}}.misc" value="{{misc}}" class="w-2" aria-label="{{localize 'SPYCRAFT.Action.MiscModifierOf' name=label}}" /></td>
-        <td class="score"{{#if temporaryBonus}} data-tooltip="{{localize 'SPYCRAFT.Action.TemporaryAdjustment' value=(signed temporaryBonus)}}"{{/if}}>{{value}}</td>
-        <td class="mod"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}">{{signed mod}}</button></td>
+        <td class="score"><span {{sc2tip tip}}>{{value}}</span></td>
+        <td class="mod"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}>{{signed mod}}</button></td>
       </tr>
     {{/each}}
     </tbody>

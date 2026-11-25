@@ -29,6 +29,7 @@ import { resolveKnowledgeCheck } from "../../rules/knowledge.mjs";
 import { equipmentCategory, possessionUnavailable, cleanAndPolishedApplies } from "../../rules/gear.mjs";
 import { resolveSkillCheck } from "../../rules/skills.mjs";
 import { loc } from "../../i18n.mjs";
+import { knowledgeCheckBreakdown, skillCheckBreakdown } from "../../rules/bonus-breakdown.mjs";
 
 /** Plan fields a skill check records as the rules returned them. */
 const SKILL_PLAN_FIELDS = [
@@ -416,6 +417,7 @@ export const ActorSkillRolls = Base =>
           { total: fresh.total },
           {
             planModifiers: fresh.planModifiers,
+            breakdown: skillCheckBreakdown(this.system, key, fresh, input.modifier),
             flavor: `${esc(skill.name)} / ${esc(check.name)} (${fresh.ability.toUpperCase()})<br><small>${esc(fresh.notes)}</small>`,
             ...(Object.hasOwn(input, "oldSchool") ? { oldSchool: input.oldSchool } : {}),
             featReminders: input.featReminders,
@@ -793,6 +795,7 @@ export const ActorSkillRolls = Base =>
           { total: fresh.total },
           {
             planModifiers: fresh.planModifiers,
+            breakdown: knowledgeCheckBreakdown(this.system, fresh, input.modifier),
             featReminders: input.featReminders,
             photographicMemory: fresh.photographicMemory,
             cardSharkKnowledge: fresh.cardSharkKnowledge,

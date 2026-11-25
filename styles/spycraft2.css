@@ -465,6 +465,10 @@
 .spycraft2 [data-tooltip-html] {
   cursor: help;
 }
+/* A button with a breakdown still reads as a button. */
+.spycraft2 button[data-tooltip-html] {
+  cursor: pointer;
+}
 .spycraft2.browser .row-main .summary {
   font-size: 0.85em;
   opacity: 0.85;
