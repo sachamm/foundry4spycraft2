@@ -3,7 +3,7 @@
 ## Unreleased
 
 - **Dice bar under the chat log.** **Roll d20** rolls 1d20 straight away. The d4 to d20 buttons and the −/+
-  modifier write a roll such as `/r 1d8+2` in the chat box; press Enter there to roll it, or edit it first. Clicking
+  modifier write a roll such as `/r 1d8+2` in the chat box; press **Roll** or Enter to roll it, or edit it first. Clicking
   a die again adds another (`/r 2d6`), and the bar starts over once the chat box is sent or cleared. While
   another sidebar tab is open, the bar sits just above the chat box there.
 - **Second council, live part.** Four reviewers ran the GC side on a test build. Fixed from what they saw:

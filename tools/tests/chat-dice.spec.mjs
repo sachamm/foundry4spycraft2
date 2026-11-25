@@ -202,3 +202,19 @@ test("clicking the roll-building buttons leaves the cursor in the chat box; Roll
   expect(await page.evaluate(() => window.chatView.focused)).toBe(3);
   expect(await page.evaluate(() => window.chatView.text)).toBe("/r 1d6+1d8");
 });
+
+test("Roll sends the built roll and is off until a die is picked", async ({ page }) => {
+  await mount(page, 240);
+  const bar = page.getByRole("region", { name: "Dice" });
+  const roll = bar.getByRole("button", { name: "Roll the dice in the chat box" });
+  await expect(roll).toBeDisabled();
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click();
+  await expect(roll).toBeDisabled();
+  await bar.getByRole("button", { name: "Add a d12 to the roll in the chat box" }).click();
+  await expect(roll).toBeEnabled();
+  await roll.click();
+  expect(await page.evaluate(() => window.sent)).toEqual(["/r 1d12+1"]);
+  expect(await page.evaluate(() => window.chatView.text)).toBe("");
+  await expect(bar.locator("output")).toHaveText("+0");
+  await expect(roll).toBeDisabled();
+});

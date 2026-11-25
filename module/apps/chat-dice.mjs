@@ -88,12 +88,30 @@ function change(event, update) {
  */
 const keepChatFocus = node => node.addEventListener("mousedown", event => event.preventDefault());
 
+/** Send the chat box as Enter would, so the roll joins the chat history and the box clears. */
+async function sendRoll() {
+  const view = views.get(chatInput());
+  if (!view || !state.dice.size) return;
+  const plugin = globalThis.foundry?.prosemirror?.plugins?.chat?.ChatInputPlugin?.key?.get?.(view.state)?.spec
+    ?.instance;
+  if (plugin?.sendMessage) return plugin.sendMessage(view);
+  await ui.chat.processMessage(inputText(view));
+  state.dice.clear();
+  state.modifier = 0;
+  writeFormula(view);
+}
+
 function refreshBar() {
   if (!bar) return;
   const value = bar.querySelector(".sc2-chat-dice-modifier output");
   value.textContent = modifierLabel(state.modifier);
   bar.querySelector("[data-step='-1']").disabled = state.modifier <= -MODIFIER_LIMIT;
   bar.querySelector("[data-step='1']").disabled = state.modifier >= MODIFIER_LIMIT;
+  const send = bar.querySelector(".sc2-chat-dice-send");
+  send.disabled = !state.dice.size;
+  send.dataset.tooltip = state.dice.size
+    ? loc`Rolls the roll in the chat box, as Enter does.`
+    : loc`Pick a die first; this rolls what the dice buttons build in the chat box.`;
   for (const die of bar.querySelectorAll("[data-faces]")) {
     const count = state.dice.get(Number(die.dataset.faces)) ?? 0;
     die.setAttribute("aria-pressed", String(count > 0));
@@ -145,7 +163,16 @@ function buildBar() {
       change(event, () => (state.modifier = clampModifier(state.modifier + Number(step.dataset.step))))
     );
   modifier.append(down, value, up);
-  top.append(quick, modifier);
+  const send = button("sc2-action sc2-chat-dice-send", loc`Roll`, loc`Roll the dice in the chat box`);
+  send.addEventListener("click", async () => {
+    send.disabled = true;
+    try {
+      await sendRoll();
+    } finally {
+      refreshBar();
+    }
+  });
+  top.append(quick, modifier, send);
   const dice = make("div", "sc2-chat-dice-dice");
   for (const faces of CHAT_DICE) {
     const die = button(
