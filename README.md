@@ -85,7 +85,9 @@ The agent sheet calculates:
 - **Feats** — slots by level and by tree, prerequisite checking (with a compendium browser that shows what you qualify for).
 - **Training** — weapon proficiencies/fortes, focuses (Cultures, Drive, Profession, Science, generic), interests, contacts, subplots.
 - **Gear** — wealth split between lifestyle, possessions and spending cash; weapons with trained/untrained attack bonus;
-  armor affecting Defense, Reflex and Speed; mission gear picks by category.
+  armor affecting Defense, Reflex and Speed; mission gear picks by category. The gear browser hides anything newer
+  than the game clock's year (Show future gear lists it again) and filters by Caliber and restriction. Entries the
+  book leaves undated carry our own dates, and house items cover 1939–1949 where the book has nothing that early.
 - **Final totals** — vitality, wounds, stress/subdual thresholds, knowledge/request/gear checks, action dice, carrying capacity.
 
 Build problems are shown as warnings. Executable workflows also reject invalid actions, unavailable gear and insufficient resources. The [RAW review and residual implementation ledger](docs/archive/raw-character-review.md) distinguish verified mechanics from remaining manual rules. Personal gear classification, field acquisition, measured attacks and class resource controls are documented there; catalog presence alone does not establish complete automation.

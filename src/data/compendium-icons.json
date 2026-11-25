@@ -4992,6 +4992,11 @@
         "id": "0bJYB63KVJK1wHId",
         "name": "U.S. Arsenal M9A1 rocket launcher",
         "icon": "cannon"
+      },
+      {
+        "id": "XzLPBs3COhrcavyK",
+        "name": "U.S. M2 60mm mortar",
+        "icon": "cannon"
       }
     ],
     "armor": [
@@ -7333,6 +7338,86 @@
         "id": "SI68CkOpMojoN8MB",
         "name": "Gadget housing, Vast",
         "icon": "gears"
+      },
+      {
+        "id": "NW7jaLnqUedh2A0X",
+        "name": "Bug, audio (wired)",
+        "icon": "bug"
+      },
+      {
+        "id": "T4z2yEvdr5wMWwaC",
+        "name": "Homing beacon, radio",
+        "icon": "radar"
+      },
+      {
+        "id": "KBwPlLs28BemYE97",
+        "name": "Infrared viewer",
+        "icon": "goggles"
+      },
+      {
+        "id": "f1BsdfJs6P4QzoTB",
+        "name": "Microphone, parabolic (early)",
+        "icon": "microphone"
+      },
+      {
+        "id": "Z0NOm6bk8e5PNysl",
+        "name": "Police-band receiver",
+        "icon": "radio"
+      },
+      {
+        "id": "CsT6uzjNVls0rd15",
+        "name": "Radar unit, portable (early)",
+        "icon": "radar"
+      },
+      {
+        "id": "PbODQtupUVPpOD9O",
+        "name": "Tap, physical (early)",
+        "icon": "bug"
+      },
+      {
+        "id": "AO4FyLKaP9DXtZ85",
+        "name": "Polygraph",
+        "icon": "microphone"
+      },
+      {
+        "id": "L2LtAnAyG6ksOlGb",
+        "name": "Flare pistol",
+        "icon": "service-pistol"
+      },
+      {
+        "id": "RDjFWTIXS3fKHDe3",
+        "name": "Line-throwing gun",
+        "icon": "service-pistol"
+      },
+      {
+        "id": "Ladehb1H0fbD608z",
+        "name": "Medical gear, dried plasma",
+        "icon": "syringe"
+      },
+      {
+        "id": "eNqJczNnRf4UYOfP",
+        "name": "Medical gear, amphetamine tablets",
+        "icon": "syringe"
+      },
+      {
+        "id": "pFAF0bNpwBma9hmc",
+        "name": "Medical gear, sulfa and field dressing",
+        "icon": "syringe"
+      },
+      {
+        "id": "NRMpaKC6P9BlK7v4",
+        "name": "Camera, subminiature",
+        "icon": "camera"
+      },
+      {
+        "id": "1j2wKV9FQXSBaOq9",
+        "name": "Movie camera, 16mm",
+        "icon": "video-camera"
+      },
+      {
+        "id": "QlbIv1UkD6rCeF9r",
+        "name": "Wire recorder",
+        "icon": "microphone"
       }
     ],
     "vehicles": [
@@ -8390,6 +8475,11 @@
         "id": "lONMwSCvPLb0BlLm",
         "name": "Ballistic missile submarine",
         "icon": "submarine"
+      },
+      {
+        "id": "e9TpFb7qZapAn73u",
+        "name": "Helicopter, early",
+        "icon": "helicopter"
       }
     ],
     "vehicle-upgrades": [
@@ -9898,6 +9988,16 @@
       {
         "id": "ucQesuGxJxb8N0YY",
         "name": "Detonator, tripwire (booby trap)",
+        "icon": "remote"
+      },
+      {
+        "id": "bGevYt8q5I8VnCx8",
+        "name": "Sight, infrared (early)",
+        "icon": "scope"
+      },
+      {
+        "id": "jiLB0hmKbCKNjFtT",
+        "name": "Detonator, time pencil",
         "icon": "remote"
       }
     ],

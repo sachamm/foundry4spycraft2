@@ -144,7 +144,12 @@ test("rules refresh updates authoritative source options while preserving the pl
 const catalog = JSON.parse(await readFile(new URL("../src/data/ammunition.json", import.meta.url), "utf8"));
 test("the ammunition reference covers all sixty-three printed rows across all six families and survives generation into runtime tables", () => {
   assert.equal(catalog.length, 63);
-  assert.deepEqual(catalog, cfg.tables.ammunitionCatalog);
+  // The build adds each row's year of introduction (src/data/gear-years.json); the rest is the source as written.
+  assert.deepEqual(
+    catalog,
+    cfg.tables.ammunitionCatalog.map(({ year, ...row }) => row)
+  );
+  assert.ok(cfg.tables.ammunitionCatalog.every(row => typeof row.year === "string"));
   assert.equal(new Set(catalog.map(a => a.id)).size, 63);
   const counts = Object.fromEntries(
     ["arrowBolt", "bullet", "shell", "grenade", "mortar", "rocket"].map(f => [

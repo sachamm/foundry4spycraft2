@@ -6602,7 +6602,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "arrowBolt-low-explosive",
@@ -6626,7 +6627,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "bullet-armor-piercing",
@@ -6650,7 +6652,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1910s"
   },
   {
    "id": "bullet-armor-piercing-incendiary",
@@ -6674,7 +6677,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "bullet-blank",
@@ -6698,7 +6702,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "bullet-frangible",
@@ -6722,7 +6727,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "bullet-frangible-hot-loaded",
@@ -6746,7 +6752,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "∆",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "bullet-frangible-subsonic",
@@ -6770,7 +6777,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "bullet-full-metal-jacket-fmj",
@@ -6794,7 +6802,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "bullet-full-metal-jacket-hot-loaded",
@@ -6818,7 +6827,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "∆",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "bullet-full-metal-jacket-subsonic",
@@ -6842,7 +6852,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "∆",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "bullet-jacketed-hollow-point-jhp",
@@ -6866,7 +6877,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "bullet-jacketed-hollow-point-hot-loaded",
@@ -6890,7 +6902,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "∆",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "bullet-jacketed-hollow-point-subsonic",
@@ -6914,7 +6927,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "∆",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "bullet-match-grade",
@@ -6938,7 +6952,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "bullet-non-lethal",
@@ -6962,7 +6977,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "bullet-sabot",
@@ -6986,7 +7002,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "bullet-tracer",
@@ -7010,7 +7027,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1910s"
   },
   {
    "id": "shell-blank",
@@ -7034,7 +7052,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "shell-flechette",
@@ -7058,7 +7077,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "shell-gas",
@@ -7082,7 +7102,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "shell-rock-salt",
@@ -7106,7 +7127,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "shell-sabot",
@@ -7130,7 +7152,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1980s"
   },
   {
    "id": "shell-shot",
@@ -7154,7 +7177,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "shell-shot-non-lethal",
@@ -7178,7 +7202,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "shell-slug",
@@ -7202,7 +7227,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": ""
   },
   {
    "id": "shell-slug-non-lethal",
@@ -7226,7 +7252,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "weaponDependent",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "grenade-30mm-high-explosive",
@@ -7250,7 +7277,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "grenade-30mm-heat",
@@ -7274,7 +7302,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "grenade-37mm-flash-bang",
@@ -7298,7 +7327,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "flashBang",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "grenade-37mm-high-explosive",
@@ -7322,7 +7352,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "grenade-37mm-heat",
@@ -7346,7 +7377,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1980s"
   },
   {
    "id": "grenade-37mm-non-lethal",
@@ -7370,7 +7402,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1970s"
   },
   {
    "id": "grenade-37mm-smoke",
@@ -7394,7 +7427,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "smoke",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "grenade-37mm-tear-gas",
@@ -7418,7 +7452,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "contagion",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "grenade-40mm-beehive",
@@ -7442,7 +7477,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-flash-bang",
@@ -7466,7 +7502,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "flashBang",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-high-explosive",
@@ -7490,7 +7527,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-heat",
@@ -7514,7 +7552,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-illumination",
@@ -7538,7 +7577,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "illumination",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-non-lethal",
@@ -7562,7 +7602,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-smoke",
@@ -7586,7 +7627,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "smoke",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-tear-gas",
@@ -7610,7 +7652,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "contagion",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-40mm-white-phosphorus",
@@ -7634,7 +7677,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-66mm-high-explosive",
@@ -7658,7 +7702,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-66mm-heat",
@@ -7682,7 +7727,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-66mm-smoke",
@@ -7706,7 +7752,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "smoke",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "grenade-66mm-tear-gas",
@@ -7730,7 +7777,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "contagion",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "mortar-60mm-high-explosive",
@@ -7754,7 +7802,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "mortar-60mm-illumination",
@@ -7778,7 +7827,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "illumination",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "mortar-60mm-smoke",
@@ -7802,7 +7852,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "smoke",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "mortar-60mm-white-phosphorus",
@@ -7826,7 +7877,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "mortar-81mm-chemical",
@@ -7850,7 +7902,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "contagion",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "mortar-81mm-high-explosive",
@@ -7874,7 +7927,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "mortar-81mm-illumination",
@@ -7900,7 +7954,8 @@ export const TABLES = {
    "sourceMarkers": "Ω",
    "reviewNotes": [
     "Printed blast text is malformed: BLS 7550 ft., special). Preserve for source review before automating illumination radius."
-   ]
+   ],
+   "year": "1940s"
   },
   {
    "id": "mortar-81mm-smoke",
@@ -7924,7 +7979,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "smoke",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1930s"
   },
   {
    "id": "mortar-81mm-white-phosphorus",
@@ -7948,7 +8004,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "rocket-carl-gustav-high-explosive",
@@ -7972,7 +8029,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "rocket-carl-gustav-heat",
@@ -7996,7 +8054,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "rocket-carl-gustav-illumination",
@@ -8020,7 +8079,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "illumination",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "rocket-carl-gustav-smoke",
@@ -8044,7 +8104,8 @@ export const TABLES = {
    "explosive": false,
    "damageMode": "smoke",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1940s"
   },
   {
    "id": "rocket-rpg-7-high-explosive",
@@ -8068,7 +8129,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "Ω",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   },
   {
    "id": "rocket-rpg-7-heat",
@@ -8092,7 +8154,8 @@ export const TABLES = {
    "explosive": true,
    "damageMode": "ordinary",
    "sourceMarkers": "",
-   "reviewNotes": []
+   "reviewNotes": [],
+   "year": "1960s"
   }
  ]
 };
@@ -9916,6 +9979,12 @@ export const GEAR_RULES = {
     "search/perception"
    ],
    "note": "also adds range penalties"
+  },
+  "Polygraph": {
+   "checks": [
+    "senseMotive/detect-lie"
+   ],
+   "gearBonus": 1
   }
  }
 };

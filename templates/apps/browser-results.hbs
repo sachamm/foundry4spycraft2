@@ -1,10 +1,13 @@
+<div class="browser-results">
+{{#if era}}<p class="browser-era hint">{{era}}</p>{{/if}}
 <div class="browser-panes">
 <ul class="browser-list">
   {{#each rows}}
-    <li data-uuid="{{uuid}}" class="{{#unless qualified}}unqualified{{/unless}} {{#if owned}}owned{{/if}} {{#if selected}}selected{{/if}}">
+    <li data-uuid="{{uuid}}" class="{{#unless qualified}}unqualified{{/unless}} {{#if owned}}owned{{/if}} {{#if selected}}selected{{/if}} {{#if future}}future{{/if}}">
       <div class="row-main">
         <button type="button" data-action="select" class="name sc2-action sc2-text-action" data-sc2-display="text" aria-current="{{#if selected}}true{{else}}false{{/if}}">{{name}}</button>
         {{#unless qualified}}<span class="tag unqualified-tag">{{localize "SPYCRAFT.Browser.NotQualified"}}</span>{{/unless}}
+        {{#if future}}<span class="tag future-tag">{{localize "SPYCRAFT.Browser.NotYet"}}</span>{{/if}}
         <span class="muted">{{groupLabel}}{{#if extra}} · {{extra}}{{/if}}</span>
         {{#if prereq}}<div class="prereq {{#unless qualified}}bad{{/unless}}" data-tooltip="{{unmet}}">{{prereq}}{{#if notChecked}} <span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}</div>{{/if}}
       </div>
@@ -15,6 +18,7 @@
 <aside class="browser-preview" aria-live="polite" {{#if preview}}data-uuid="{{preview.uuid}}"{{/if}}>
   {{#if preview}}
     <header class="preview-head">{{#if preview.img}}<img src="{{preview.img}}" alt="" />{{/if}}<div><strong class="preview-name">{{preview.name}}</strong><span class="muted">{{preview.groupLabel}}{{#if preview.extra}} · {{preview.extra}}{{/if}}</span></div></header>
+    {{#if preview.future}}<p class="hint">{{localize "SPYCRAFT.Browser.NotYetHint"}}</p>{{/if}}
     {{#unless preview.qualified}}<p><span class="sc2-stamp">{{localize "SPYCRAFT.Browser.NotQualified"}}</span></p>{{/unless}}
     {{#if preview.prereq}}<p class="prereq {{#unless preview.qualified}}bad{{/unless}}">{{preview.prereq}}</p>{{/if}}
     <div class="preview-text sc2-prose">{{{preview.description}}}</div>
@@ -24,4 +28,5 @@
     </p>
   {{else}}<p class="sc2-empty">{{localize "SPYCRAFT.Browser.PreviewHint"}}</p>{{/if}}
 </aside>
+</div>
 </div>

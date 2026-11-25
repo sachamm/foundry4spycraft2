@@ -14,6 +14,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { weaponRanges } from "../../module/rules/gear.mjs";
+import { addPeriodGear, dateGear, gearYearIndex, markHouseItems } from "./period-gear.mjs";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -62,6 +63,9 @@ export function buildPacks() {
   const gearSummaries = read("gear-summaries.json").summaries;
   const contagions = read("contagions.json");
   const system = JSON.parse(readFileSync(join(ROOT, "system.json"), "utf8"));
+  const periodGear = read("period-gear.json");
+  const houseNames = addPeriodGear({ equipment, gear, gearSummaries, vehicles, upgrades }, periodGear);
+  dateGear({ equipment, gear, vehicles, upgrades, kits, ammunition }, read("gear-years.json"));
 
   const camel = s => {
     const parts = s
@@ -400,7 +404,8 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
           maxRangeIncrements: w.maxRangeIncrements ?? 0,
           sizeHands: String(w.sizeHands ?? ""),
           qualities: String(w.qualities ?? ""),
-          untrainedPenalty: w.untrainedPenalty ?? PENALTY[prof] ?? -4
+          untrainedPenalty: w.untrainedPenalty ?? PENALTY[prof] ?? -4,
+          year: w.year
         },
         packs.weapons.folders[wprofs.indexOf(w.proficiency)]._id,
         w.num
@@ -446,7 +451,8 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
           defensePenalty: Number(a.defensePenalty) || 0,
           armorCheck: Number(a.acp) || 0,
           speedPenalty: Number(a.speed) || 0,
-          notice: String(a.notice ?? "")
+          notice: String(a.notice ?? ""),
+          year: a.year
         },
         null,
         a.num
@@ -483,7 +489,8 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
         kitGrade: kit.grade,
         kitSize: kit.size,
         kitNonPortable: kit.nonPortable,
-        kitLocation: ""
+        kitLocation: "",
+        year: kit.year
       })
     );
 
@@ -543,7 +550,8 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
     noted: !!row.noted,
     footnotes: footnoteLabels(row, footnotesFor(row.sourceTable)),
     bundled: row.bundled ?? "",
-    perTeamMember: (row.notes ?? []).includes("teamIssue")
+    perTeamMember: (row.notes ?? []).includes("teamIssue"),
+    year: row.year ?? ""
   });
   /** Our one-line summary for a gear row; every row must have one. */
   const gearSummary = row => {
@@ -1037,5 +1045,7 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
       2
     )};\n`;
   packs["glass-wake"] = buildGlassWake(read("glass-wake.json"), packs, { stats });
+  markHouseItems(packs, houseNames, periodGear);
+  generated["module/data/gear-year-index.mjs"] = gearYearIndex(packs);
   return { packs, generated, system };
 }

@@ -1,6 +1,7 @@
 import { loc } from "../i18n.mjs";
 import { FEAT_REMINDERS } from "../rules/tables.mjs";
 import { companionRetargets, deltaIsEmpty, isPersonalCharacter } from "../rules/token-delta.mjs";
+import { GEAR_YEARS, PERIOD_ITEMS } from "../data/gear-year-index.mjs";
 /**
  * World data migrations.
  *
@@ -20,15 +21,22 @@ import { companionRetargets, deltaIsEmpty, isPersonalCharacter } from "../rules/
  * safe to run on data that already has the new shape, because a failed run is retried on the next start.
  *
  * Schema version each release writes, so a world from any of them is brought forward by the migrations above it:
- * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5. Add the new release here when SCHEMA_VERSION changes
+ * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5, 0.8.0 → 6. Add the new release here when SCHEMA_VERSION changes
  * (tools/test-migrations.mjs checks the list).
  */
 
 /** The data schema version this build of the system writes. */
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 /** The schema version each published release wrote (see above). */
-export const RELEASE_SCHEMAS = Object.freeze({ "0.4.0": 1, "0.5.0": 2, "0.5.2": 2, "0.6.0": 3, "0.7.0": 5 });
+export const RELEASE_SCHEMAS = Object.freeze({
+  "0.4.0": 1,
+  "0.5.0": 2,
+  "0.5.2": 2,
+  "0.6.0": 3,
+  "0.7.0": 5,
+  "0.8.0": 6
+});
 
 /**
  * Version 2: feats gained `system.reminder`. A feat already on a character or in the world takes the reminder its
@@ -106,6 +114,52 @@ export async function retargetTokenCompanions(world) {
   for (const { actor, update } of companionRetargets(actors, linked)) await actor.update(update);
 }
 
+const DATED_TYPES = new Set(["gear", "weapon", "armor", "vehicle"]);
+
+/** The compendium entry an item was copied from, as "pack.id", or null. */
+function compendiumKey(source) {
+  const uuid = source?._stats?.compendiumSource ?? source?.flags?.core?.sourceId ?? "";
+  const match = /^Compendium\.([^.]+\.[^.]+)\.(?:Item\.)?([^.]+)$/.exec(uuid);
+  return match ? `${match[1]}.${match[2]}` : null;
+}
+
+/**
+ * Version 6: gear, weapons, armor and vehicles carry the year they came out, so the browser can hide what did not
+ * exist yet in the game clock's year. An item with no year takes its compendium entry's, found by the entry it was
+ * copied from or else by type and name. A year someone has typed in is kept.
+ */
+export function gearYearUpdate(source, _parentSource, _context, index = GEAR_YEARS) {
+  if (!DATED_TYPES.has(source?.type) || source.system?.year) return null;
+  const key = compendiumKey(source);
+  const year = (key && index.byId[key]) || index.byName[`${source.type}|${source.name}`];
+  return year ? { "system.year": year } : null;
+}
+
+/**
+ * Also version 6: the house items for period games are in the system's compendiums, where every world sees them.
+ * A world that keeps its own copies of a gear compendium (world items imported from it) also gets copies of the new
+ * entries, in the folder that holds most of its copies, unless it already has an item of that name.
+ * @param {{items?: Iterable, createItems?: Function}} world
+ */
+export async function importPeriodGear(world, periodItems = PERIOD_ITEMS) {
+  if (typeof world?.createItems !== "function") return;
+  const items = [...(world.worldItems ?? world.items ?? [])].map(item =>
+    typeof item.toObject === "function" ? item.toObject() : item
+  );
+  const names = new Set(items.map(item => `${item.type}|${item.name}`));
+  const toCreate = [];
+  for (const entry of periodItems) {
+    if (names.has(`${entry.type}|${entry.name}`)) continue;
+    const copies = items.filter(item => compendiumKey(item)?.startsWith(`${entry.pack}.`));
+    if (!copies.length) continue;
+    const folders = new Map();
+    for (const copy of copies) folders.set(copy.folder ?? null, (folders.get(copy.folder ?? null) ?? 0) + 1);
+    const folder = [...folders].sort((a, b) => b[1] - a[1])[0][0];
+    toCreate.push({ uuid: `Compendium.${entry.pack}.Item.${entry.id}`, folder });
+  }
+  if (toCreate.length) await world.createItems(toCreate);
+}
+
 /** Ordered migrations. Version 1 is the first versioned schema, so the list starts at 2. */
 export const MIGRATIONS = [
   { version: 2, label: loc`feat reminders`, item: source => featReminderUpdate(source) },
@@ -117,7 +171,8 @@ export const MIGRATIONS = [
     actor: agentLinkUpdate,
     token: agentTokenLinkUpdate,
     world: retargetTokenCompanions
-  }
+  },
+  { version: 6, label: loc`gear dates for the game clock`, item: gearYearUpdate, world: importPeriodGear }
 ];
 
 /** Migrations still to run for a world at version `from`, oldest first. */
@@ -354,6 +409,16 @@ export async function runWorldMigrations() {
     tokens: [...(game.scenes ?? [])].flatMap(scene => [...(scene.tokens ?? [])]),
     scenes: game.scenes,
     settings: game.settings,
+    worldItems: game.items,
+    createItems: async entries => {
+      const data = [];
+      for (const { uuid, folder } of entries) {
+        const entry = await fromUuid(uuid);
+        if (!entry) continue;
+        data.push(foundry.utils.mergeObject(game.items.fromCompendium(entry), { folder }));
+      }
+      if (data.length) await Item.implementation.createDocuments(data);
+    },
     setVersion: version => game.settings.set("spycraft2", "schemaVersion", version),
     notify: message => {
       if (bar) return ui.notifications?.info(message);
