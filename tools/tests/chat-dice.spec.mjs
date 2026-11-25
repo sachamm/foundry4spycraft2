@@ -132,3 +132,21 @@ for (const [theme, ink] of [
     );
     expect(value).toBe(ink);
   });
+
+test("die labels stay inside their buttons with counts showing in a 240px sidebar", async ({ page }) => {
+  await mount(page, 240);
+  const bar = page.getByRole("region", { name: "Dice" });
+  for (const faces of [4, 6, 8, 10, 12, 20])
+    for (let i = 0; i < 12; i++)
+      await bar.getByRole("button", { name: `Add a d${faces} to the roll in the chat box` }).click();
+  expect(await page.evaluate(() => window.chatView.text)).toBe("/r 12d4+12d6+12d8+12d10+12d12+12d20");
+  const spills = await page.evaluate(() =>
+    [...document.querySelectorAll(".sc2-chat-dice-dice button")].map(button => {
+      const box = button.getBoundingClientRect();
+      const face = button.querySelector(".sc2-chat-dice-face").getBoundingClientRect();
+      return { faces: button.dataset.faces, inside: face.left >= box.left && face.right <= box.right };
+    })
+  );
+  for (const { faces, inside } of spills) expect(inside, `d${faces}`).toBe(true);
+  await expect(bar.getByRole("button", { name: "Add a d20 to the roll in the chat box" })).toContainText("×12");
+});

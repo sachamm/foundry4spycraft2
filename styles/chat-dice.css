@@ -1,6 +1,6 @@
-/* The dice bar under the chat log. It is a token root (tokens.css), so its spacing, type and borders come from the
- * system tokens and follow the sidebar's interface theme. Its buttons keep Foundry's own button look so they match
- * the chat mode buttons beside them. Every control is at least 28px tall, the compact size in style guide 5.5. */
+/* The dice bar under the chat log. It is a token root (tokens.css), so it follows the sidebar's interface theme,
+ * and its buttons take the shared roles of style guide 6.1: Roll d20 is the one primary, the rest are secondary.
+ * Every control is at least 28px tall, the compact size in style guide 5.5. */
 .sc2-chat-dice {
   flex: 0 0 auto;
   display: flex;
@@ -14,20 +14,53 @@
   align-items: stretch;
   gap: var(--sc2-space-1);
 }
-.sc2-chat-dice button {
+.sc2-chat-dice :is(.sc2-action, .sc2-primary-action) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
   min-height: 28px;
   height: auto;
   margin: 0;
   padding: 0 var(--sc2-space-1);
-  border-radius: var(--sc2-radius);
+  font: inherit;
   font-size: var(--sc2-text-m);
   line-height: 1;
   white-space: nowrap;
+  text-shadow: none;
+  color: var(--sc2-action);
+  background: var(--sc2-surface-raised);
+  border: 1px solid var(--sc2-rule-strong);
+  border-radius: var(--sc2-radius);
+  box-shadow: none;
+  cursor: pointer;
 }
-.sc2-chat-dice-quick {
+.sc2-chat-dice .sc2-action:hover {
+  color: var(--sc2-ink-strong);
+  background: var(--sc2-surface-sunk);
+  border-color: var(--sc2-action);
+}
+.sc2-chat-dice .sc2-primary-action {
   flex: 1 1 auto;
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--sc2-on-action);
+  background: var(--sc2-action);
+  border-color: var(--sc2-action);
+}
+.sc2-chat-dice .sc2-primary-action:hover {
+  color: var(--sc2-on-action);
+  background: var(--sc2-action-strong);
+  border-color: var(--sc2-action-strong);
+}
+.sc2-chat-dice button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.sc2-chat-dice button:focus-visible {
+  outline: 3px solid var(--sc2-focus-color, var(--sc2-action));
+  outline-offset: 3px;
+  box-shadow: none;
 }
 .sc2-chat-dice-modifier {
   flex: 0 0 auto;
@@ -45,6 +78,8 @@
   justify-content: center;
   min-width: 3.2em;
   padding: 0 var(--sc2-space-1);
+  color: var(--sc2-ink);
+  background: var(--sc2-surface);
   border: 1px solid var(--sc2-rule-strong);
   border-radius: var(--sc2-radius);
   font-family: var(--sc2-num);
@@ -54,22 +89,31 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--sc2-space-1);
+  /* Room for the count badges above the dice. */
+  margin-top: var(--sc2-space-2);
 }
 .sc2-chat-dice-dice button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
   font-family: var(--sc2-num);
 }
-/* A die already in the formula: bold, a heavier edge and, from the second, its count. Never colour alone. */
+/* A die already in the formula: tinted, bold, a heavier edge and, from the second, a count badge. Never colour
+ * alone. The badge sits on the corner, so a count never widens the button in a narrow sidebar. */
 .sc2-chat-dice-dice button[aria-pressed="true"] {
-  font-weight: bold;
-  border-width: 2px;
-  border-color: currentColor;
+  font-weight: 700;
+  background: var(--sc2-action-tint);
+  border: 2px solid var(--sc2-action);
 }
 .sc2-chat-dice-count {
+  position: absolute;
+  top: calc(-1 * var(--sc2-space-3));
+  right: calc(-1 * var(--sc2-space-1));
+  z-index: 1;
+  padding: 0 var(--sc2-space-1);
   font-size: var(--sc2-text-s);
+  line-height: 1.2;
+  color: var(--sc2-on-action);
+  background: var(--sc2-action);
+  border-radius: var(--sc2-radius);
+  pointer-events: none;
 }
 .sc2-chat-dice-count:empty {
   display: none;

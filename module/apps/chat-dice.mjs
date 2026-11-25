@@ -98,7 +98,7 @@ function buildBar() {
   root.setAttribute("aria-label", loc`Dice`);
   const top = make("div", "sc2-chat-dice-row");
   const quick = button(
-    "sc2-chat-dice-quick",
+    "sc2-primary-action",
     loc`Roll d20`,
     loc`Roll d20 now`,
     loc`Rolls 1d20 straight away, with no modifier, in the chat mode chosen below.`
@@ -115,7 +115,7 @@ function buildBar() {
   modifier.setAttribute("role", "group");
   modifier.setAttribute("aria-label", loc`Modifier`);
   const down = button(
-    "",
+    "sc2-action",
     "−",
     loc`Lower the modifier by 1`,
     loc`Takes 1 off the modifier on the roll in the chat box.`
@@ -124,7 +124,12 @@ function buildBar() {
   const value = make("output");
   value.setAttribute("aria-live", "polite");
   value.dataset.tooltip = loc`Modifier added to the roll in the chat box`;
-  const up = button("", "+", loc`Raise the modifier by 1`, loc`Adds 1 to the modifier on the roll in the chat box.`);
+  const up = button(
+    "sc2-action",
+    "+",
+    loc`Raise the modifier by 1`,
+    loc`Adds 1 to the modifier on the roll in the chat box.`
+  );
   up.dataset.step = "1";
   for (const step of [down, up])
     step.addEventListener("click", event =>
@@ -135,13 +140,13 @@ function buildBar() {
   const dice = make("div", "sc2-chat-dice-dice");
   for (const faces of CHAT_DICE) {
     const die = button(
-      "",
+      "sc2-action",
       undefined,
       loc`Add a d${faces} to the roll in the chat box`,
       loc`Adds a d${faces} to the /r roll in the chat box. Press Enter in the chat box to roll it.`
     );
     die.dataset.faces = String(faces);
-    die.append(make("span", "", `d${faces}`), make("span", "sc2-chat-dice-count"));
+    die.append(make("span", "sc2-chat-dice-face", `d${faces}`), make("span", "sc2-chat-dice-count"));
     die.addEventListener("click", event =>
       change(event, () => state.dice.set(faces, (state.dice.get(faces) ?? 0) + 1))
     );
