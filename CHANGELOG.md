@@ -5,7 +5,7 @@
 - **Gear by the game clock's year.** Every gear, weapon, armor and vehicle entry now has the year it came out: the
   book's Year column where it prints one, and our own dates (from public history) for the rest. The browser hides
   anything newer than the year on the game clock; **Show future gear** lists it again, marked "Not yet". With no
-  date on the clock nothing is hidden. The browser also filters by Caliber, and gear and vehicles by restriction.
+  date on the clock nothing is hidden and the box is greyed out, with a note to set a date. The browser also filters by Caliber, and gear and vehicles by restriction.
 - **Period gear.** Twenty house items fill gaps where a kind of gear had nothing from 1939–1949: a 60mm mortar,
   a wired bug, a radio homing beacon, an infrared viewer, an early parabolic microphone, a police-band receiver, an
   early portable radar, an early phone tap, a polygraph, a flare pistol, a line-throwing gun, dried plasma,

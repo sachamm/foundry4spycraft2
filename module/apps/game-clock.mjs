@@ -696,6 +696,9 @@ function refreshClock() {
   for (const span of document.querySelectorAll(".sc2-clock-badge span")) span.textContent = badgeText();
   if (clockWindow?.rendered) clockWindow.render();
   game.spycraft2?.gc?.console?.render?.(false);
+  // Open item browsers hide gear by the clock's year.
+  for (const app of foundry.applications.instances.values())
+    if (app.rendered && typeof app.refreshForClock === "function") app.refreshForClock();
 }
 
 /* -------------------------------------------- */

@@ -10,7 +10,7 @@
     {{#if showAcquisitionSources}}<label>{{localize "SPYCRAFT.Template.AppsBrowser.FeatSource"}} <select name="acquisitionSource">{{selectOptions acquisitionSources selected=filters.acquisitionSource}}</select></label>{{/if}}
     {{#if dated}}<select name="caliber" aria-label="{{localize 'SPYCRAFT.Browser.CaliberFilter'}}">{{selectOptions calibers selected=filters.caliber blank=(localize "SPYCRAFT.Browser.AnyCaliber")}}</select>{{/if}}
     {{#if restrictable}}<select name="restricted" aria-label="{{localize 'SPYCRAFT.Browser.RestrictedFilter'}}">{{selectOptions restrictedOptions selected=filters.restricted blank=(localize "SPYCRAFT.Browser.RestrictedShown")}}</select>{{/if}}
-    {{#if dated}}<label><input type="checkbox" name="showFuture" {{checked filters.showFuture}} /> {{localize "SPYCRAFT.Browser.ShowFuture"}}</label>{{/if}}
+    {{#if dated}}<label{{#if futureReason}} data-tooltip="{{futureReason}}"{{/if}}><input type="checkbox" name="showFuture" {{checked filters.showFuture}} {{disabled futureReason}} /> {{localize "SPYCRAFT.Browser.ShowFuture"}}</label>{{/if}}
     {{#if hasPrereqs}}<label><input type="checkbox" name="qualifiedOnly" {{checked filters.qualifiedOnly}} /> {{localize "SPYCRAFT.Browser.QualifiedOnly"}}</label>{{/if}}
   </div>
 </div>

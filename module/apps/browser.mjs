@@ -186,6 +186,11 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     return this.render({ parts: ["results"] });
   }
 
+  /** The game clock's date changed: gear newer than its year comes and goes. */
+  refreshForClock() {
+    if (DATED.has(this.itemType)) return this.renderResults();
+  }
+
   get title() {
     return game.i18n.format("SPYCRAFT.Browser.Title", { type: game.i18n.localize(`TYPES.Item.${this.itemType}`) });
   }
@@ -360,13 +365,22 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       restrictable: RESTRICTABLE.has(this.itemType),
       calibers: Object.fromEntries([1, 2, 3, 4, 5].map(n => [String(n), loc`Caliber ${cfg.calibers[n]}`])),
       restrictedOptions: { hide: loc`Hide restricted`, only: loc`Restricted only` },
-      era: dated ? eraStatus(year, later, this.filters.showFuture) : ""
+      era: dated ? eraStatus(year, later, this.filters.showFuture) : "",
+      // With no date on the clock nothing is newer than it, so the box could change nothing.
+      futureReason: dated && !Number.isSafeInteger(year) ? loc`Set a date on the game clock first.` : ""
     };
   }
 
   _onRender(context, options) {
     super._onRender(context, options);
     const html = this.element;
+    // Only the results part is redrawn on a search or a clock change, so keep the future-gear box in step here.
+    const future = html.querySelector("[name=showFuture]");
+    if (future) {
+      future.disabled = Boolean(context.futureReason);
+      if (context.futureReason) future.closest("label").dataset.tooltip = context.futureReason;
+      else delete future.closest("label").dataset.tooltip;
+    }
     // The filter controls are drawn once and keep their listeners; only a full draw replaces them.
     const search = html.querySelector("[name=search]");
     if (!search || search.dataset.sc2Wired) return;
