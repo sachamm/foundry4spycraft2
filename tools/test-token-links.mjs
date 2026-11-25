@@ -395,12 +395,18 @@ test("a token whose character was deleted holds enough to rebuild the agent, and
     null
   );
   assert.equal(orphanCharacterData({ _source: { delta: emptyDelta() } }), null);
-  // A companion is known by its owner.
-  assert.equal(
-    orphanCharacterData({ _source: { delta: { ...emptyDelta(), system: { companionOf: { ownerUuid: "Actor.a" } } } } })
-      .type,
-    "npc"
-  );
+  // A companion is known by its owner: an Animal Partner is an NPC, a Personal Lieutenant an agent.
+  const companionDelta = feat => ({
+    _source: { delta: { ...emptyDelta(), system: { companionOf: { ownerUuid: "Actor.a", feat } } } }
+  });
+  assert.equal(orphanCharacterData(companionDelta("Animal Partner")).type, "npc");
+  assert.equal(orphanCharacterData(companionDelta("Personal Lieutenant")).type, "agent");
+  // The deleted character's pool maximums are not carried over, and the rebuilt one remembers its token.
+  const pooled = orphanCharacterData({
+    uuid: "Scene.s.Token.t",
+    _source: { delta: { ...orphanDelta(), flags: { spycraft2: { poolMax: { vitality: 30 }, note: 1 } } } }
+  });
+  assert.deepEqual(pooled.flags, { spycraft2: { note: 1, rescuedFromToken: "Scene.s.Token.t" } });
 });
 
 /** A scene of unlinked tokens for the rescue, and the world it reads. */
@@ -473,6 +479,22 @@ test("version 7 copies a token's character into the Actors list and links the to
   second.token.flags = { spycraft2: { rescueLeftForReview: true } };
   assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 0, left: 1 });
   assert.equal(second.token.actorLink, false);
+});
+
+test("a retried orphan rescue reuses the character the earlier run built", async () => {
+  const orphan = {
+    id: "t4",
+    name: "Ben",
+    actorId: "deleted",
+    actorLink: false,
+    _source: { delta: orphanDelta() },
+    update: async data => Object.assign(orphan, data)
+  };
+  const earlier = { id: "built", flags: { spycraft2: { rescuedFromToken: "Scene.meeting.Token.t4" } } };
+  const { world: target, created } = rescueWorld([orphan], [earlier]);
+  assert.deepEqual(await rescueTokenCharacters(target), { linked: 0, created: 1, left: 0 });
+  assert.equal(created.length, 0);
+  assert.equal(orphan.actorId, "built");
 });
 
 test("a token that could not be rescued keeps the world's version, so the rescue runs again", async () => {

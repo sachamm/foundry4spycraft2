@@ -49,7 +49,8 @@ export class SpycraftActor extends ActorRolls(
       }
     }
     const type = data.type ?? this.type;
-    if (type === "agent" || type === "npc") {
+    // A character rebuilt from a token (module/apps/token-links.mjs) keeps the vitality, wounds and dice it had.
+    if ((type === "agent" || type === "npc") && !options?.spycraft2TokenLink) {
       // A new agent starts with full vitality, wounds and action dice, and a new NPC with full vitality and wounds
       // once it is a special character: empty maximums are recorded here, and the pool-max hooks
       // (module/apps/pool-max.mjs) then raise each empty pool to its maximum.

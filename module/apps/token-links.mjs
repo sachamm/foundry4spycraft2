@@ -28,12 +28,16 @@ import {
   isPersonalCharacter
 } from "../rules/token-delta.mjs";
 import { isResourceLock } from "../rules/resource-locks.mjs";
+import { PERSONAL_LIEUTENANT } from "../rules/companions.mjs";
+import { POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 
 const SYSTEM = "spycraft2";
 const DISMISSED_SETTING = "tokenLinkReviewDismissed";
 /** Token flag: the version 7 rescue left this token for the GC review because another token's changes went first. */
 const LEFT_FLAG = "rescueLeftForReview";
+/** Actor flag: the token a character was rebuilt from by the version 7 rescue. */
+const RESCUED_FLAG = "rescuedFromToken";
 
 /** A token of an agent or companion that is not linked to its character, with what linking it would copy, or null. */
 export function linkProposal(token, scene = token?.parent) {
@@ -126,9 +130,17 @@ export function orphanCharacterData(token) {
   for (const entry of [...items, ...effects]) delete entry._tombstone;
   // A delta records its type only when it differs from the character's, so an agent is known by its build.
   const looksLikeAgent = (system.progression?.length ?? 0) > 0 || items.some(item => item.type === "class");
-  const type = delta.type ?? (looksLikeAgent ? "agent" : system.companionOf?.ownerUuid ? "npc" : null);
+  // A Personal Lieutenant is an agent even before its build starts; an Animal Partner is an NPC.
+  const companion = system.companionOf?.ownerUuid ? system.companionOf : null;
+  const type =
+    delta.type ?? (looksLikeAgent || companion?.feat === PERSONAL_LIEUTENANT ? "agent" : companion ? "npc" : null);
   if (!isPersonalCharacter({ type, system })) return null;
   const img = delta.img ?? token.texture?.src;
+  // The recorded pool maximums belonged to the deleted character; the rebuilt one records its own on preparation,
+  // so its vitality, wounds and action dice stay where the token had them.
+  const flags = structuredClone(delta.flags ?? {});
+  if (flags[SYSTEM]) delete flags[SYSTEM][POOL_MAX_FLAG];
+  flags[SYSTEM] = { ...(flags[SYSTEM] ?? {}), [RESCUED_FLAG]: rescueKey(token) };
   return {
     name: delta.name || token.name || loc`Recovered agent`,
     type,
@@ -136,11 +148,14 @@ export function orphanCharacterData(token) {
     system,
     items,
     effects,
-    flags: structuredClone(delta.flags ?? {}),
+    flags,
     ...(delta.ownership ? { ownership: structuredClone(delta.ownership) } : {}),
     prototypeToken: { name: token.name ?? delta.name ?? "", actorLink: true, ...(img ? { texture: { src: img } } : {}) }
   };
 }
+
+/** What a character rebuilt from an orphan token records of that token, so a retry finds it again. */
+const rescueKey = token => token.uuid ?? `Scene.${token.parent?.id}.Token.${token.id}`;
 
 /** Scenes in the order the rescue walks them: the scene the GC is on first, then the active one, then the rest. */
 function scenesInOrder(scenes, first = []) {
@@ -186,9 +201,14 @@ export async function rescueTokenCharacters(world, options = { spycraft2TokenLin
         }
         const data = orphanCharacterData(token);
         if (!data || typeof world?.createActor !== "function") continue;
-        const created = await world.createActor(data, options);
-        if (!created?.id) throw new Error(loc`The rescued character ${data.name} was not created.`);
-        actors.push(created);
+        // A retry after a failed relink reuses the character the earlier run built, instead of building another.
+        const key = rescueKey(token);
+        let created = actors.find(actor => actor.flags?.[SYSTEM]?.[RESCUED_FLAG] === key);
+        if (!created) {
+          created = await world.createActor(data, options);
+          if (!created?.id) throw new Error(loc`The rescued character ${data.name} was not created.`);
+          actors.push(created);
+        }
         // Companions made from this token's sheet named its copy as their owner; they follow the new character.
         const ownerUuid = `Scene.${scene.id}.Token.${token.id}.Actor.`;
         for (const companion of actors)
