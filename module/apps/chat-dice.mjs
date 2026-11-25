@@ -200,6 +200,10 @@ function buildBar() {
       refreshBar();
     }
   });
+  // Neither roll button takes focus either: the chat box would shrink on mouse-down and move the bar out from under
+  // the pointer before the click lands.
+  keepChatFocus(quick);
+  keepChatFocus(send);
   top.append(quick, modifier, send);
   const dice = make("div", "sc2-chat-dice-dice");
   for (const faces of CHAT_DICE) {

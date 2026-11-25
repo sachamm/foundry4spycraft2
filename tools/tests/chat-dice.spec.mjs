@@ -196,10 +196,15 @@ test("clicking the roll-building buttons leaves the cursor in the chat box; Roll
   expect(await page.evaluate(() => document.activeElement.closest?.(".sc2-chat-dice") ?? null)).toBeNull();
   await bar.getByRole("button", { name: "Roll d20 now" }).click();
   expect(await page.evaluate(() => window.chatView.focused)).toBe(3);
+  // The roll buttons do not take focus on mouse-down either, so the chat box does not shrink under the pointer.
+  await bar.getByRole("button", { name: "Roll the dice in the chat box" }).click();
+  expect(await page.evaluate(() => document.activeElement.closest?.(".sc2-chat-dice") ?? null)).toBeNull();
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click();
+  expect(await page.evaluate(() => window.chatView.focused)).toBe(4);
   // From the keyboard, focus stays on the bar.
   await bar.getByRole("button", { name: "Add a d8 to the roll in the chat box" }).focus();
   await page.keyboard.press("Enter");
-  expect(await page.evaluate(() => window.chatView.focused)).toBe(3);
+  expect(await page.evaluate(() => window.chatView.focused)).toBe(4);
   expect(await page.evaluate(() => window.chatView.text)).toBe("/r 1d6+1d8");
 });
 
