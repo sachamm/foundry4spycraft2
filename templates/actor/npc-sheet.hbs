@@ -106,8 +106,8 @@
   </div>
   <div class="abilities-row">
     {{#each abilities}}
-      <div class="ability"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}"><span class="ability-name">{{label}}</span><span class="ability-abbr" data-tooltip="{{label}}">{{abbr}}</span></button>
-        <b class="sc2-value play-only">{{signed mod}}</b><small class="play-only">{{value}}</small>
+      <div class="ability"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}><span class="ability-name">{{label}}</span><span class="ability-abbr">{{abbr}}</span></button>
+        <b class="sc2-value play-only" {{sc2tip tip}}>{{signed mod}}</b><small class="play-only">{{value}}</small>
         <input name="system.abilities.{{key}}.value" type="number" value="{{value}}" class="w-2 edit-only" aria-label="{{localize 'SPYCRAFT.Action.ScoreOf' name=label}}" /> <span class="mod edit-only">{{signed mod}}</span></div>
     {{/each}}
   </div>

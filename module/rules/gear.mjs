@@ -48,6 +48,7 @@ import { specialistApplies } from "./weapon-specialist.mjs";
 import "./combat-actions.mjs";
 import { planTerms, planTotal } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { breakdownRows } from "./bonus-breakdown.mjs";
 import { possessionUnavailable, weaponGrip, weaponUnavailable } from "./weapon-use.mjs";
 export { possessionUnavailable, weaponGrip, weaponUnavailable };
 /** Actual equipment category, separate from the pick used to acquire it. Legacy typed items have known categories. */
@@ -725,6 +726,23 @@ export function weaponDamage(
   if (useFinesse && (melee || hurled)) bonus = system.abilities.dex?.mod ?? 0;
   else if (grip.strengthIncrease && (melee || hurled) && (!knuckle || u.usesStrength !== false))
     bonus += grip.strengthIncrease / 2;
+  // The damage bonus as labelled parts, for the damage card's breakdown tooltip. A knuckle weapon's unarmed bonus
+  // holds feat bonuses as well as Strength (and none of it when a feat swaps the attribute), so those are split.
+  const attributeBonus = bonus;
+  const finesseDamage = useFinesse && (melee || hurled);
+  const strengthPart = finesseDamage
+    ? 0
+    : knuckle
+      ? u.usesStrength === false
+        ? 0
+        : (u.strengthComponent ?? strength)
+      : melee || hurled
+        ? strength
+        : 0;
+  const gripPart =
+    !finesseDamage && grip.strengthIncrease && (melee || hurled) && (!knuckle || u.usesStrength !== false)
+      ? grip.strengthIncrease / 2
+      : 0;
   if (weapon.improvised) {
     if (!useFinesse && (melee || hurled))
       bonus -= Math.max(
@@ -736,6 +754,7 @@ export function weaponDamage(
     // Whatever's Handy, Brawler 1st: +1 damage with improvised weapons, +2 at 5th and +3 at 9th.
     bonus += whateversHandyBonus(system);
   }
+  const improvisedBonus = bonus - attributeBonus;
   const meleeArmorPiercing = meleeArmorPiercingPlan(system, weapon, { grip });
   if (meleeArmorPiercing.blockedReason) return { blocked: true, blockedReason: meleeArmorPiercing.blockedReason };
   const cqbRange = cqbRangePlan(system, weapon, options, "damage");
@@ -759,7 +778,26 @@ export function weaponDamage(
     hordeDamage +
     (options.attackDamageBonus ?? 0);
   const min = parsed.minimum;
+  const bonusRows = breakdownRows(
+    [
+      finesseDamage ? { label: "DEX", value: attributeBonus } : { label: "STR", value: strengthPart },
+      { label: loc`Grip`, value: gripPart },
+      { label: loc`Unarmed feats`, value: finesseDamage ? 0 : attributeBonus - strengthPart - gripPart },
+      { label: loc`Improvised weapon`, value: improvisedBonus },
+      { label: loc`Conditions`, value: conditionDamagePenalty },
+      { label: loc`CQB range`, value: cqbRange.damageBonus },
+      { label: loc`Mark`, value: markDamage.bonus },
+      { label: loc`Signature gear`, value: signatureDamage },
+      { label: loc`Kick`, value: kickDamage },
+      { label: loc`Closed stance`, value: closedDamage },
+      { label: loc`Unarmed trick`, value: trickDamage },
+      { label: loc`Feats`, value: hordeDamage },
+      { label: loc`Attack result`, value: options.attackDamageBonus ?? 0 }
+    ],
+    bonus
+  );
   return {
+    bonusRows,
     markDamage,
     deadToRights,
     meleeArmorPiercing,

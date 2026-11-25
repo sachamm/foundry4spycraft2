@@ -11,7 +11,7 @@
     {{#if system.conditionContext.incompetent}}<p class="npc-note bad">{{localize "SPYCRAFT.Template.ActorNpcBuilder.IncompetentSkillBonuses0"}}</p>{{else}}{{#if system.conditionContext.baffled}}<p class="npc-note bad">{{localize "SPYCRAFT.Template.ActorNpcBuilder.BaffledHalfSkillCompetenceBonusesRound"}}</p>{{/if}}{{/if}}{{#if system.conditionContext.baffled}}<p class="npc-note bad">{{localize "SPYCRAFT.Template.ActorNpcBuilder.8SavesResistingBaffled"}}</p>{{/if}}
   </div>
   {{#if npc.special}}<div class="resources"><label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.CurrentVitality"}} <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /></label><label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.CurrentWounds"}} <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /></label></div>{{/if}}
-  {{#if npc.skills.length}}<p class="npc-skill-line"><b>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Skills"}}</b> {{#each npc.skills}}<button type="button" class="sc2-action" data-action="rollNpcSkill" data-skill="{{key}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorNpcSheet.RollThisSkill'}}">{{lookup ../npc.skillOptions key}} {{signed resolved.bonus}}</button>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+  {{#if npc.skills.length}}<p class="npc-skill-line"><b>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Skills"}}</b> {{#each npc.skills}}<button type="button" class="sc2-action" data-action="rollNpcSkill" data-skill="{{key}}" {{sc2tip tip}}>{{lookup ../npc.skillOptions key}} {{signed resolved.bonus}}</button>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
   {{#if system.baffledApplicationReview.needsReview}}<p
     class="bad"><button type="button"
     class="sc2-action"

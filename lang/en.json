@@ -1294,8 +1294,7 @@
     "DoneEditing": "Done editing",
     "EditNPC": "Edit NPC",
     "Actions": "Actions",
-    "MoreActions": "More actions: takedown, cheap shot, Shaken",
-    "RollThisSkill": "Roll this skill now (Skill check opens the full dialog)"
+    "MoreActions": "More actions: takedown, cheap shot, Shaken"
    },
    "ActorVehicleSheet": {
     "Crash": "Crash",
@@ -1789,7 +1788,6 @@
    "RollAttackWith": "Roll attack with {name}",
    "RollDamageFor": "Roll damage for {name}",
    "MeasuredAttackWith": "Attack with {name} at a measured distance",
-   "TemporaryAdjustment": "Includes {value} temporary adjustment",
    "EquipNamed": "Equip {name}",
    "UnequipNamed": "Unequip {name}",
    "ShareNamed": "Share {name} in chat",

@@ -4,7 +4,7 @@
   <span class="sc2-weapon-attack"><button type="button"
     data-action="rollAttack"
     class="sc2-primary-action sc2-action"
-    aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith' name=item.name}}">{{localize "SPYCRAFT.Attack"}} {{signed attack.total}}</button>
+    aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith' name=item.name}}" {{sc2tip attackTip}}>{{localize "SPYCRAFT.Attack"}} {{signed attack.total}}</button>
   {{#if untrained}}<span
     class="sc2-untrained"
     data-tooltip="{{localize 'SPYCRAFT.Weapon.UntrainedHint'}}"><i

@@ -326,7 +326,7 @@ Motion is limited to colour transitions of 120ms or less, inside `@media (prefer
 
 A tile is a `.sc2-field`: caption above (`--sc2-text-s`, muted), value below (`--sc2-value-size`, monospace). A tile that rolls is a `button.sc2-field.sc2-stat-action`. A tile that does not roll is a `div` and never looks pressable. A tile whose value is changed by a condition shows a marker and names the condition in its breakdown ("Fatigued −2 Str"); it never silently drops.
 
-Every derived value has a breakdown tooltip that sums to the value. The `context.tips` pattern in `module/sheets/actor-sheet.mjs` is the model; extend it to weapon rows, skill error range and NPC graded values.
+Every derived value has a breakdown tooltip that sums to the value. A button that shows a roll bonus carries it on the button itself, at +0 and below as well: one part per line, then a bold total equal to the figure on the button. The parts come from `module/rules/bonus-breakdown.mjs` (which adds an "Other modifiers" row for anything it cannot name, so the lines always add up) and `module/sheets/bonus-tips.mjs` turns them into rows for the `sc2tip` helper. Attributes, saves, Initiative, skills, Knowledge and weapon Attack buttons use it; the other `context.tips` entries in `module/sheets/actor-sheet.mjs` (Defense, Speed, vitality, wounds) are the older form of the same pattern. Still to extend: skill error range and the NPC graded tiles (B-255).
 
 ### 6.3 Tabs and the rail
 
@@ -461,7 +461,7 @@ This holds for attributes, saves, skills, attacks, damage, initiative and knowle
 
 1. **Header bar:** who → whom · what ("Latch → Mercenary · Attack (Tonfa)"). One short display name per person: the code name when there is one, otherwise the name without the role a token name adds, with the full name as the tooltip (`shortSpeakerName()` in `module/rolls/chat-compact.mjs`); "(you)" after the viewer's own character. One line of what; no paragraphs in the header.
 2. **Outcome:** a stamp with word and icon (✓ HIT, ✗ MISS, SUCCESS, FAILURE, PENDING), never colour alone.
-3. **The number that matters:** the final total large, the natural die beside it, "16 → 25" when action dice changed it, and the comparison ("vs Defense 14: hit by 3"; "capped at 40" when a cap bit).
+3. **The number that matters:** the final total large, the natural die beside it, "16 → 25" when action dice changed it, and the comparison ("vs Defense 14: hit by 3"; "capped at 40" when a cap bit). Hovering or focusing the formula and total lists the die, each part of the bonus and the total (`renderCheckBreakdown()` in `module/rolls/chat-breakdown.mjs`); a roll records its parts as `breakdown` on the check. The parts add nothing to the card's height. An NPC's parts show only to someone who may open that NPC (7.2).
 4. **Next step:** exactly one primary button for it. The sentence saying who acts next is a hint (ⓘ) on the outcome title, not a paragraph.
 5. **Secondary actions** in one wrapping row at intrinsic width.
 6. **Why:** modifiers, ranges, feat notes and page cites, then what the system does and what the table decides, in one closed "Details" disclosure at the foot (`compactChatCard()` moves every flavor line after the first there).

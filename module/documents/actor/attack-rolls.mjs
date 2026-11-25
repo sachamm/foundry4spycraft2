@@ -44,6 +44,7 @@ import { inClosedStance } from "../../rules/boxing.mjs";
 import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
 import { spendWeaponShots, weaponAmmunition } from "../../apps/ammunition-use.mjs";
 import { loc } from "../../i18n.mjs";
+import { breakdownRows, weaponAttackBreakdown } from "../../rules/bonus-breakdown.mjs";
 
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
@@ -339,6 +340,11 @@ export const ActorAttackRolls = Base =>
         { total: atk.total - tripPenalty + situational },
         {
           planModifiers: atk.planModifiers,
+          breakdown: breakdownRows([
+            ...weaponAttackBreakdown(atk),
+            { label: loc`Trip final attack`, value: -tripPenalty },
+            { label: loc`Situational modifier`, value: situational }
+          ]),
           featReminders: options.featReminders,
           flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}${threatAgainstRole(atk.threat, targetRole) > 20 ? loc` This attack cannot threaten.` : ""}</small>` : ""}`,
           strikingLease: options.strikingLease,
@@ -815,6 +821,7 @@ export const ActorAttackRolls = Base =>
         : null;
       if (opportunistDamage) formula = halvedFormula(formula);
       return this.rollCheck(formula, this.getRollData(), {
+        breakdown: damage?.bonusRows,
         featReminders: options.featReminders,
         sourceAttack: options.sourceAttack ?? null,
         pummelDamage: pummel,

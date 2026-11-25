@@ -6,7 +6,7 @@
     <div class="pinned-tools tool-actions" aria-label="{{localize 'SPYCRAFT.Pins.Title'}}" hidden></div>
     <div class="ability-strip" aria-label="{{localize 'SPYCRAFT.Attributes'}}">
       <div class="stat-grid">
-        {{#each abilities}}<button type="button" class="stat sc2-stat-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}"{{#if temporaryBonus}} data-tooltip="{{localize 'SPYCRAFT.Action.TemporaryAdjustment' value=(signed temporaryBonus)}}"{{/if}}><span><span class="ability-name">{{label}}</span><span class="ability-abbr" data-tooltip="{{label}}">{{abbr}}</span></span><b>{{signed mod}}</b><small>{{value}}</small></button>{{/each}}
+        {{#each abilities}}<button type="button" class="stat sc2-stat-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}><span><span class="ability-name">{{label}}</span><span class="ability-abbr">{{abbr}}</span></span><b>{{signed mod}}</b><small>{{value}}</small></button>{{/each}}
       </div>
     </div>
     <div class="dashboard-weapons">      <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
@@ -22,7 +22,7 @@
         class="sc2-roll sc2-action"
         data-action="rollSkill"
         data-skill="{{key}}"
-        aria-label="{{rollLabel}}">{{name}} <b>{{totalsLabel}}</b></button>{{/each}}</div>{{else}}<p
+        aria-label="{{rollLabel}}" {{sc2tip playTip}}>{{name}} <b>{{totalsLabel}}</b></button>{{/each}}</div>{{else}}<p
         class="sc2-empty muted">{{localize "SPYCRAFT.Play.NoTrainedSkills"}}</p>{{/if}}
     </div>
     {{#if limitedUses.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Play.AbilitiesInPlay'}}">

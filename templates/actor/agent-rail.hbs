@@ -54,13 +54,13 @@
       aria-label="{{localize 'SPYCRAFT.Rail.CheckDefense'}}"><span
       class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b
       class="sc2-value" {{sc2tip tips.defense}}>{{system.defense.total}}</b></button>
-    <button type="button" class="sc2-field stat sc2-stat-action" data-action="rollInitiative" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.RollInitiative'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value" {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b></button>
+    <button type="button" class="sc2-field stat sc2-stat-action" data-action="rollInitiative" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.RollInitiative'}}" {{sc2tip tips.initiative}}><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value">{{signed system.initiative.total}}</b></button>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Speed"}}</span><b class="sc2-value" {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}?{{else}}{{system.speed}}{{/if}}</b></div>
     <p
       class="rail-defense-note"
      
         data-tooltip="{{localize 'SPYCRAFT.Rail.DefenseNote'}}">{{localize "SPYCRAFT.Rail.FlatFooted" value=flatFootedDefense}} · {{localize "SPYCRAFT.Rail.DamageReduction" melee=system.dr.melee other=system.dr.other}}</p>
-    {{#each saves}}<button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}"><span class="sc2-caption">{{label}}</span><b class="sc2-value" {{sc2tip tip}}>{{signed total}}</b></button>{{/each}}
+    {{#each saves}}<button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}><span class="sc2-caption">{{label}}</span><b class="sc2-value">{{signed total}}</b></button>{{/each}}
   </div>
 
   <div class="rail-block action-dice" data-sc2-display="both">
