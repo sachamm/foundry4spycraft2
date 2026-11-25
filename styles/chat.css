@@ -106,9 +106,15 @@
   font-size: 15px;
   font-weight: 700;
 }
-/* The next-step sentence, as a hint on the title. */
+/* The next-step sentence, as a hint on the title: a 28px target around a small glyph, without growing the row. */
 .spycraft2.sc2-result-guide .sc2-guide-hint {
-  margin-left: var(--sc2-space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  margin-block: -6px;
+  vertical-align: middle;
   font-size: var(--sc2-text-s);
   color: var(--sc2-ink-muted);
   cursor: help;

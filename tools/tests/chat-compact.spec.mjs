@@ -55,6 +55,8 @@ test("an attack card shows a short name and one header line, with the notes and 
   await expect(page.locator(".sc2-guide-title")).toHaveText(/Pending/);
   await expect(page.locator(".sc2-result-guide")).not.toContainText("Spend any action dice first");
   await expect(page.getByRole("img", { name: /Spend any action dice first/ })).toHaveAttribute("tabindex", "0");
+  const hint = await page.getByRole("img", { name: /Spend any action dice first/ }).boundingBox();
+  expect(Math.min(hint.width, hint.height)).toBeGreaterThanOrEqual(28);
   await expect(page.locator(".sc2-resolution-guide")).toHaveCount(0);
   const details = page.locator(".sc2-card-details");
   await expect(details).toHaveCount(1);
