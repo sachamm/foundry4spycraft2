@@ -40,8 +40,11 @@ export function actingBlock(combat) {
   const combatant = combat?.started ? combat.combatant : null,
     actor = combatant?.actor;
   if (!actor) return null;
-  const left = halfActionsLeft(combatant);
+  const left = halfActionsLeft(combatant),
+    // A combatant who is down has no actions to offer: the block names it and leaves Next turn.
+    defeated = !!combatant.isDefeated;
   return {
+    defeated,
     id: combatant.id,
     name: combatant.name,
     npc: actor.type === "npc",
@@ -49,8 +52,12 @@ export function actingBlock(combat) {
     defense: actor.system?.defense?.total ?? null,
     health: healthLine(actor),
     conditions: conditionNames(actor).join(", "),
-    halfActions: left === 1 ? loc`1 half action left` : loc`${left} half actions left`,
-    weapons: [...(actor.items ?? [])]
+    halfActions: defeated
+      ? loc`Defeated: pass the turn`
+      : left === 1
+        ? loc`1 half action left`
+        : loc`${left} half actions left`,
+    weapons: [...(defeated ? [] : (actor.items ?? []))]
       .filter(item => item.type === "weapon")
       .map(item => ({ id: item.id, name: item.name }))
   };

@@ -690,6 +690,19 @@ export async function delayCombatant(combatant, counts = null) {
   return quickFluidEvent(combatant, "delay", { times }, loc`Delay`);
 }
 
+/**
+ * Step back one turn. The first turn of round 1 is as far back as a fight goes: stepping past it would un-start the
+ * fight, and starting it again would mark everyone flat-footed a second time.
+ */
+export function stepBackTurn(combat) {
+  if (!combat?.started) return null;
+  if (combat.round <= 1 && !(combat.turn > 0)) {
+    ui.notifications.info(loc`This is the first turn of the fight.`);
+    return null;
+  }
+  return combat.previousTurn();
+}
+
 /** Mark a combatant as holding a readied action: a half action now, and a note on its tracker row. */
 export async function readyCombatant(combatant) {
   if (!combatant) return null;

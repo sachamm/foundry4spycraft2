@@ -90,7 +90,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
-      previousTurn: guard(() => game.combat?.previousTurn()),
+      previousTurn: guard(() => combat.stepBackTurn(game.combat)),
       nextTurn: guard(() => (game.combat?.started ? game.combat.nextTurn() : game.combat?.startCombat())),
       addComplication: guard(() => mission.addComplication()),
       entry: guard((event, target) =>
@@ -558,15 +558,12 @@ const inFight = actor =>
 
 /** Register before Foundry constructs its sidebar applications. */
 export function registerGCConsoleTab() {
-  for (const hook of [
-    "createCombat",
-    "deleteCombat",
-    "updateCombat",
-    "createCombatant",
-    "deleteCombatant",
-    "updateCombatant"
-  ])
-    Hooks.on(hook, refreshSoon);
+  for (const hook of ["createCombat", "deleteCombat"]) Hooks.on(hook, refreshSoon);
+  // Another scene's fight, run by another GC, does not redraw this console under the pointer.
+  const viewed = fight => !game.combat || !fight || fight.id === game.combat.id;
+  Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());
+  for (const hook of ["createCombatant", "deleteCombatant", "updateCombatant"])
+    Hooks.on(hook, combatant => viewed(combatant?.parent) && refreshSoon());
   Hooks.on("updateActor", actor => {
     if (inFight(actor)) refreshSoon();
   });

@@ -3,6 +3,7 @@
  * The actions that move a combat or spend GC action dice are for the GC only.
  */
 import { loc, locKey } from "../i18n.mjs";
+import { stepBackTurn } from "./gc/combat.mjs";
 
 /** The newest chat card on screen that holds a button matching the selector, and that button. */
 export function newestCardButton(root, selector) {
@@ -70,7 +71,9 @@ function gcBoostShortcut() {
 let turnChange = null;
 const changeTurn = step => {
   if (!game.combat?.started) return false;
-  turnChange = Promise.resolve(game.combat[step]()).catch(() => null);
+  turnChange = Promise.resolve(step === "previousTurn" ? stepBackTurn(game.combat) : game.combat[step]()).catch(
+    () => null
+  );
   return true;
 };
 let shortcutSheet = null;
