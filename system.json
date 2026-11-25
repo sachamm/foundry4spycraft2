@@ -26,7 +26,8 @@
     "styles/sheet-item.css",
     "styles/gc-console.css",
     "styles/chat.css",
-    "styles/chat-search.css"
+    "styles/chat-search.css",
+    "styles/chat-dice.css"
   ],
   "languages": [
     {

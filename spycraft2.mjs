@@ -8,6 +8,7 @@ import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-sce
 import { registerActorFolderSetup, setupActorFolders } from "./module/actor-folders.mjs";
 import { installDialogThemeHooks, registerTableTrustSetting } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
+import { installChatDiceHooks } from "./module/apps/chat-dice.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
 import { installPoolMaxHooks } from "./module/apps/pool-max.mjs";
 import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
@@ -22,6 +23,7 @@ import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs"
 import { installRoundReminders } from "./module/apps/round-reminders.mjs";
 import { installTargetNotices } from "./module/apps/target-response.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
+import { compactChatCard } from "./module/rolls/chat-compact.mjs";
 import {
   startUsagePeriod,
   refreshUsagePeriodActors,
@@ -138,6 +140,7 @@ Hooks.once("init", () => {
   registerErrorNotices();
   console.log("Field Agent's Handbook | Initializing system");
   installChatSearchHooks();
+  installChatDiceHooks();
   installDialogThemeHooks();
   installUITooltipHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;
@@ -323,6 +326,8 @@ Hooks.once("init", () => {
 
 // Buttons under posted checks come from roll pipeline contributors (module/rolls/chat-controls.mjs).
 Hooks.on("renderChatMessageHTML", renderCheckControls);
+// Then the card is shortened: code name in the header, rule notes behind "Details" (module/rolls/chat-compact.mjs).
+Hooks.on("renderChatMessageHTML", compactChatCard);
 
 // Recompute round-based bonuses and counters when combat progresses or ends. Changes arriving together (a round
 // advance updates many combatants) are gathered into one pass; a combat change only touches that combat's agents.

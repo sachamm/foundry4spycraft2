@@ -11,6 +11,16 @@
 - **Agent tokens stay linked.** An agent or companion token placed unlinked is linked as it is created when it holds
   nothing of its own, and Import Data on an agent keeps its token linked even when the file comes from an older
   version with unlinked tokens.
+- **Dice bar under the chat log.** **Roll d20** rolls 1d20 straight away. The d4 to d20 buttons and the −/+
+  modifier write a roll such as `/r 1d8+2` in the chat box; press **Roll** or Enter to roll it, or edit it first.
+  Clicking a die again adds another (`/r 2d6`) and right-clicking takes one away; a right-click on − or + steps the
+  other way. Ctrl-click (Cmd-click) on any of them adds the step and rolls at once. Shift-click on any roll
+  button rolls with advantage (each die twice, keep the highest) and Option-click (Alt) with disadvantage. The cursor stays in the chat box between clicks, and the bar starts over once the chat box is sent or
+  cleared. While another sidebar tab is open, the bar sits just above the chat box there.
+- **Shorter check cards.** The header names the roller by code name (or the name without the token's role), with
+  the full name as its tooltip, and keeps one line of what was rolled. Rule notes such as error and threat ranges,
+  and the System / You and GC reminder, move into a closed **Details** at the foot of the card. The next-step
+  sentence under Pending, Hit and the other states is now a hint on the ⓘ beside the title.
 - **Second council, live part.** Four reviewers ran the GC side on a test build. Fixed from what they saw:
   - Undoing subdual or stress damage on an agent no longer leaves a damaged record that blocked every later hit of
     that kind. Vitality and wounds that moved again since the step get back what the step took. A hit that could
