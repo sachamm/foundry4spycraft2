@@ -215,7 +215,7 @@
   color: var(--sc2-ink);
 }
 .chat-message .spycraft2.sc2-card-details > summary {
-  min-height: 28px;
+  min-height: 44px;
   align-content: center;
   cursor: pointer;
   color: var(--sc2-action);
