@@ -105,6 +105,13 @@ const confirmStep = (title, lines, yes = title) =>
     rejectClose: false
   });
 
+/** The running fights, named by scene and round, for a warning line; an empty string when there is none. */
+const runningFights = () =>
+  [...(game.combats ?? [])]
+    .filter(combat => combat.started)
+    .map(combat => loc`${combat.scene?.name ?? loc`no scene`}, round ${combat.round}`)
+    .join("; ");
+
 /**
  * Begin a play session in one step: start the session period (session uses and action dice reset), set up the GC
  * pool from the team and the mission's Caliber, and apply the Threat Level and campaign-quality starting dice.
@@ -114,7 +121,13 @@ export async function beginSession() {
   const mission = getMission(),
     players = teamActors(mission).length,
     caliber = mission.caliber;
+  const fights = runningFights(),
+    dice = gcDiceStatus();
   const ok = await confirmStep(loc`Begin a session`, [
+    ...(dice.current
+      ? [loc`A session has already begun. Beginning another refills the GC's action dice and resets every agent's.`]
+      : []),
+    ...(fights ? [loc`A fight is running (${fights}).`] : []),
     loc`Start a new session: abilities usable once per session come back and each agent's action dice reset.`,
     loc`GC action dice: ${players} player character(s) + 2 × Caliber ${caliber} = ${players + 2 * caliber}.`,
     loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
@@ -133,7 +146,9 @@ export async function beginSession() {
 export async function nextScene() {
   requireGC();
   const mission = getMission();
+  const fights = runningFights();
   const ok = await confirmStep(loc`Next scene`, [
+    ...(fights ? [loc`A fight is running (${fights}). Its standard NPCs lose their accumulated damage too.`] : []),
     loc`Abilities usable once per scene come back; a dramatic scene returns to standard; standard NPCs' accumulated damage clears.`,
     ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
   ]);
@@ -300,6 +315,22 @@ export async function addAntagonist() {
 /** Whether the mission's XP record already lists this NPC's type. */
 export const antagonistRecorded = actor =>
   !!actor && getMission().antagonists.some(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid);
+
+/**
+ * Mark the listed antagonists among these actors as faced: an NPC that is in a running fight has been met. Only an
+ * active mission is touched, and only rows that are not marked yet. Returns how many rows changed.
+ */
+export async function markAntagonistsFaced(actors) {
+  const uuids = new Set([...(actors ?? [])].filter(Boolean).map(actor => actor.uuid));
+  const open = entry => !entry.encountered && (uuids.has(entry.typeKey) || uuids.has(entry.uuid));
+  const mission = getMission();
+  if (!game.user?.isGM || !mission.active || !uuids.size || !mission.antagonists.some(open)) return 0;
+  let count = 0;
+  await updateMission(now => ({
+    antagonists: now.antagonists.map(entry => (open(entry) ? (count++, { ...entry, encountered: true }) : entry))
+  }));
+  return count;
+}
 
 /** Add an NPC actor to the mission's XP record without a dialog; a type already listed is left alone. */
 export async function recordAntagonist(actor, { encountered = false } = {}) {

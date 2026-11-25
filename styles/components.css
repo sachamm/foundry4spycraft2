@@ -976,6 +976,11 @@
 .spycraft2-roll-options select.sc2-pick-list option {
   padding: 2px 6px;
 }
+/* The chosen row shows whether or not the list has the keyboard: the search field usually has it. */
+.spycraft2-roll-options select.sc2-pick-list option:checked {
+  background: var(--sc2-teal);
+  color: var(--sc2-on-teal);
+}
 
 /* A field that belongs to another choice stays out of the way until that choice is made. */
 .spycraft2.application .spycraft2-roll-options [data-when][hidden],

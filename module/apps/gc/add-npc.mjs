@@ -8,7 +8,7 @@ import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
 import { cancellable, cancelButton, freeCancel } from "../dialog-kit.mjs";
-import { antagonistRecorded, recordAntagonist } from "./mission.mjs";
+import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
 import { getMission } from "./state.mjs";
 
 const kindLabel = type =>
@@ -113,6 +113,9 @@ function filterList(dialog) {
       option.hidden = !shown;
       if (shown && !first) first = option;
     }
+    // A source with no match does not leave its heading behind.
+    for (const group of list.querySelectorAll("optgroup"))
+      group.hidden = [...group.children].every(option => option.hidden);
     // With no match nothing stays selected, so the dialog cannot place an NPC the list no longer shows.
     if (!first) list.value = "";
     else if (list.selectedOptions[0]?.hidden !== false) list.value = first.value;
@@ -178,7 +181,7 @@ export async function addNpcToScene() {
       freeCancel(dialog?.element);
       return filterList(dialog);
     },
-    content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list">${[
+    content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" autofocus /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list">${[
       ...groups
     ]
       .map(
@@ -248,6 +251,8 @@ export async function addNpcToScene() {
     const entry = await recordAntagonist(actor, { encountered: joined });
     done.push(entry?.xp ? loc`recorded for mission XP` : loc`recorded for mission XP with 0 XP: enter its reward`);
   }
+  // A type already on the list is faced once it walks into a fight.
+  if (joined) await markAntagonistsFaced([actor]).catch(() => 0);
   ui.notifications.info(`${done.join("; ")}.`);
   return tokens.length === 1 ? tokens[0] : tokens;
 }

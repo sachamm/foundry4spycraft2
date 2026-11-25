@@ -410,7 +410,8 @@ export function consoleContext() {
     mission: m,
     diceCurrent: dice.current,
     npcActors: [...(game.actors ?? [])].filter(actor => actor.type === "npc").length,
-    combatSeen: !!combatNow || (m.scenesPlayed ?? 0) > 0
+    // Read from the world, not from the combat this client happens to view: another GC's fight does not count.
+    combatSeen: (m.scenesPlayed ?? 0) > 0 || (m.active && [...(game.combats ?? [])].some(c => c.started))
   });
   // Done once is done for good: a new mission or session does not bring the list back.
   if (readSetting("gcFirstSessionDone", false)) checklist.complete = true;
@@ -425,7 +426,11 @@ export function consoleContext() {
     ].map(entry => ({ ...entry, active: entry.id === view })),
     shown: Object.fromEntries(Object.keys(VIEW_SECTIONS).map(id => [id, id === view])),
     hiddenSections: Object.fromEntries(
-      [...new Set(Object.values(VIEW_SECTIONS).flat())].map(id => [id, !VIEW_SECTIONS[view].includes(id)])
+      // A running fight keeps Combat, and with it Next turn, on screen in every view.
+      [...new Set(Object.values(VIEW_SECTIONS).flat())].map(id => [
+        id,
+        !(VIEW_SECTIONS[view].includes(id) || (id === "combat" && !!combatNow?.started))
+      ])
     ),
     checklist,
     status: {

@@ -227,14 +227,17 @@ export async function npcDamageSave(actor, input = null) {
     );
     if (!input) return null;
   }
-  const roll = await new Roll("1d20").evaluate();
+  // The card's large number is the save's total, the one compared with the DC; the die is in the formula beside it.
+  const saveBonus = Number(input.bonus ?? state.bonus) || 0;
+  const roll = await new Roll(`1d20 ${saveBonus < 0 ? "-" : "+"} ${Math.abs(saveBonus)}`).evaluate(),
+    natural = roll.dice?.[0]?.total ?? roll.total - saveBonus;
   let result;
   try {
     result = resolveDamageSave(state.track, {
       damage: Number(input.damage),
       kind: input.kind,
-      bonus: Number(input.bonus ?? state.bonus),
-      roll: roll.total,
+      bonus: saveBonus,
+      roll: natural,
       blast: !!input.blast,
       criticalDice: Number(input.criticalDice) || 0,
       tough: state.tough

@@ -37,6 +37,7 @@ import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
+import { markAntagonistsFaced } from "./mission.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -519,6 +520,16 @@ export function installFluidInitiativeHooks() {
       for (const combatant of combat.combatants) await condition(combatant.actor, "flat-footed", "Flat-footed");
     })();
     return startPass;
+  });
+  // An NPC in a running fight has been faced: its row in the mission's XP list is marked, once, by the lead GM.
+  const faced = combatants =>
+    isLeadGM() &&
+    markAntagonistsFaced([...combatants].map(combatant => game.actors?.get?.(combatant.actorId))).catch(() => 0);
+  Hooks.on("updateCombat", (combat, changed, options) => {
+    if (changed?.round === 1 && !(options?.direction < 0)) faced(combat.combatants);
+  });
+  Hooks.on("createCombatant", combatant => {
+    if (combatant.combat?.started) faced([combatant]);
   });
   // Flat-footedness ends when the character acts (p.342): clear it as the combatant's turn begins.
   Hooks.on("updateCombat", (combat, changed) => {
