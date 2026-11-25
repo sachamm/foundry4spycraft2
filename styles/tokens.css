@@ -3,6 +3,7 @@
 .spycraft2,
 .spycraft2-roll-options,
 .chat-message.sc2-card,
+.sc2-chat-dice,
 [data-sc2-tooltip-scope] {
   /* Roles */
   --sc2-surface: #f2eee3;
@@ -85,6 +86,8 @@ body.theme-dark .spycraft2.application:not(.theme-light),
 .spycraft2.application.theme-dark,
 .theme-dark .chat-message.sc2-card:not(.theme-light .chat-message),
 .theme-light .theme-dark .chat-message.sc2-card,
+.theme-dark .sc2-chat-dice:not(.theme-light .sc2-chat-dice),
+.theme-light .theme-dark .sc2-chat-dice,
 .theme-dark .chat-message:not(.theme-light .chat-message) :is(.spycraft2, .spycraft2-roll-options),
 .theme-light .theme-dark .chat-message :is(.spycraft2, .spycraft2-roll-options),
 .theme-dark .spycraft2.gc-console:not(.theme-light),
