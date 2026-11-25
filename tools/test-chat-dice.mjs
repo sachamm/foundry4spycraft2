@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CHAT_DICE, chatDiceFormula, clampModifier, modifierLabel } from "../module/apps/chat-dice.mjs";
+import { CHAT_DICE, chatDiceFormula, clampModifier, modifierLabel, rollEdge } from "../module/apps/chat-dice.mjs";
 
 test("the bar offers the six standard dice", () => {
   assert.deepEqual(CHAT_DICE, [4, 6, 8, 10, 12, 20]);
@@ -32,4 +32,20 @@ test("the stepper shows a sign on every value and a true minus, and stays within
   assert.equal(clampModifier(120), 99);
   assert.equal(clampModifier(-120), -99);
   assert.equal(clampModifier(Number.NaN), 0);
+});
+
+test("advantage doubles each term and keeps the highest; disadvantage keeps the lowest", () => {
+  assert.equal(chatDiceFormula(new Map([[20, 1]]), 0, "advantage"), "/r 2d20kh");
+  assert.equal(chatDiceFormula(new Map([[20, 1]]), -1, "disadvantage"), "/r 2d20kl-1");
+  const dice = new Map([
+    [6, 2],
+    [8, 1]
+  ]);
+  assert.equal(chatDiceFormula(dice, 2, "advantage"), "/r 4d6kh2+2d8kh+2");
+});
+
+test("Shift picks advantage and Option or Alt picks disadvantage", () => {
+  assert.equal(rollEdge({ shiftKey: true }), "advantage");
+  assert.equal(rollEdge({ altKey: true }), "disadvantage");
+  assert.equal(rollEdge({}), "");
 });

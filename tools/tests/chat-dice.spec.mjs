@@ -243,3 +243,34 @@ test("right-click takes a die away and steps the modifier the other way", async 
   await d8.click({ button: "right" });
   expect(await page.evaluate(() => window.chatView.text)).toBe("");
 });
+
+test("Ctrl-click on a die or the modifier builds the roll and rolls it at once", async ({ page }) => {
+  await mount(page, 300);
+  const bar = page.getByRole("region", { name: "Dice" });
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click();
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click({ modifiers: ["Control"] });
+  expect(await page.evaluate(() => window.sent)).toEqual(["/r 2d6"]);
+  expect(await page.evaluate(() => window.chatView.text)).toBe("");
+  await expect(bar.locator("output")).toHaveText("+0");
+  await bar.getByRole("button", { name: "Add a d20 to the roll in the chat box" }).click();
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click({ modifiers: ["Control"] });
+  expect(await page.evaluate(() => window.sent)).toEqual(["/r 2d6", "/r 1d20+1"]);
+  // With no die picked, Ctrl-click on the modifier only steps it.
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click({ modifiers: ["Control"] });
+  expect(await page.evaluate(() => window.sent)).toHaveLength(2);
+  await expect(bar.locator("output")).toHaveText("+1");
+});
+
+test("Shift-click rolls with advantage and Alt-click with disadvantage", async ({ page }) => {
+  await mount(page, 300);
+  const bar = page.getByRole("region", { name: "Dice" });
+  await bar.getByRole("button", { name: "Roll d20 now" }).click({ modifiers: ["Shift"] });
+  await bar.getByRole("button", { name: "Roll d20 now" }).click({ modifiers: ["Alt"] });
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click();
+  await bar.getByRole("button", { name: "Add a d6 to the roll in the chat box" }).click({ modifiers: ["Shift"] });
+  await bar.getByRole("button", { name: "Add a d20 to the roll in the chat box" }).click();
+  await bar.getByRole("button", { name: "Raise the modifier by 1" }).click();
+  await bar.getByRole("button", { name: "Roll the dice in the chat box" }).click({ modifiers: ["Alt"] });
+  expect(await page.evaluate(() => window.sent)).toEqual(["/r 2d20kh", "/r 2d20kl", "/r 4d6kh2", "/r 2d20kl+1"]);
+  expect(await page.evaluate(() => window.chatView.text)).toBe("");
+});

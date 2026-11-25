@@ -9,9 +9,15 @@ import { loc } from "../i18n.mjs";
 export const CHAT_DICE = [4, 6, 8, 10, 12, 20];
 const MODIFIER_LIMIT = 99;
 
-/** "/r 2d6+1d8+2" from the dice in the order first clicked and a modifier. Empty when there are no dice. */
-export function chatDiceFormula(dice, modifier = 0) {
-  const terms = [...dice].filter(([, count]) => count > 0).map(([faces, count]) => `${count}d${faces}`);
+/**
+ * "/r 2d6+1d8+2" from the dice in the order first clicked and a modifier. Empty when there are no dice. With
+ * advantage each term rolls twice as many dice and keeps the highest ("2d20kh", "4d6kh2"); disadvantage keeps the
+ * lowest.
+ */
+export function chatDiceFormula(dice, modifier = 0, edge = "") {
+  const keep = { advantage: "kh", disadvantage: "kl" }[edge];
+  const term = (faces, count) => (keep ? `${count * 2}d${faces}${keep}${count > 1 ? count : ""}` : `${count}d${faces}`);
+  const terms = [...dice].filter(([, count]) => count > 0).map(([faces, count]) => term(faces, count));
   if (!terms.length) return "";
   const mod = Number(modifier) || 0;
   return `/r ${terms.join("+")}${mod > 0 ? `+${mod}` : mod < 0 ? `-${-mod}` : ""}`;
@@ -19,6 +25,9 @@ export function chatDiceFormula(dice, modifier = 0) {
 
 /** The modifier as shown on the stepper: a sign on every value and a true minus. */
 export const modifierLabel = modifier => (modifier < 0 ? `−${-modifier}` : `+${modifier}`);
+
+/** Shift-click rolls with advantage; Option-click (Alt on Windows and Linux) with disadvantage. */
+export const rollEdge = event => (event.shiftKey ? "advantage" : event.altKey ? "disadvantage" : "");
 
 export const clampModifier = value => Math.max(-MODIFIER_LIMIT, Math.min(MODIFIER_LIMIT, Math.trunc(value) || 0));
 
@@ -58,8 +67,8 @@ function syncWithInput(view) {
   refreshBar();
 }
 
-function writeFormula(view) {
-  const text = chatDiceFormula(state.dice, state.modifier);
+function writeFormula(view, edge = "") {
+  const text = chatDiceFormula(state.dice, state.modifier, edge);
   const { state: editor } = view;
   const paragraph = editor.schema.nodes.paragraph.create(null, text ? editor.schema.text(text) : null);
   state.seen = text;
@@ -81,6 +90,10 @@ function change(event, update) {
   // A mouse click leaves the cursor in the chat box; a key press keeps focus on the bar for keyboard users.
   if (view && event.detail > 0) view.focus();
   refreshBar();
+  // Ctrl-click (Cmd-click on a Mac) builds and rolls in one go; Shift and Option do too, with advantage or
+  // disadvantage.
+  const edge = rollEdge(event);
+  if (event.ctrlKey || event.metaKey || edge) return sendRoll(edge).finally(refreshBar);
 }
 
 /**
@@ -94,13 +107,17 @@ const onRightClick = (node, handler) =>
   node.addEventListener("contextmenu", event => {
     event.preventDefault();
     event.stopPropagation();
-    handler({ detail: 1 });
+    const { ctrlKey, metaKey, shiftKey, altKey } = event;
+    handler({ detail: 1, ctrlKey, metaKey, shiftKey, altKey });
   });
 
 /** Send the chat box as Enter would, so the roll joins the chat history and the box clears. */
-async function sendRoll() {
+async function sendRoll(edge = "") {
   const view = views.get(chatInput());
-  if (!view || !state.dice.size) return;
+  if (!view) return;
+  syncWithInput(view);
+  if (!state.dice.size) return;
+  if (edge) writeFormula(view, edge);
   const plugin = globalThis.foundry?.prosemirror?.plugins?.chat?.ChatInputPlugin?.key?.get?.(view.state)?.spec
     ?.instance;
   if (plugin?.sendMessage) return plugin.sendMessage(view);
@@ -119,7 +136,7 @@ function refreshBar() {
   const send = bar.querySelector(".sc2-chat-dice-send");
   send.disabled = !state.dice.size;
   send.dataset.tooltip = state.dice.size
-    ? loc`Rolls the roll in the chat box, as Enter does.`
+    ? loc`Rolls the roll in the chat box, as Enter does. Shift-click for advantage, Option-click (Alt) for disadvantage.`
     : loc`Pick a die first; this rolls what the dice buttons build in the chat box.`;
   for (const die of bar.querySelectorAll("[data-faces]")) {
     const count = state.dice.get(Number(die.dataset.faces)) ?? 0;
@@ -136,12 +153,12 @@ function buildBar() {
     "sc2-primary-action",
     loc`Roll d20`,
     loc`Roll d20 now`,
-    loc`Rolls 1d20 straight away, with no modifier, in the chat mode set by the chat buttons.`
+    loc`Rolls 1d20 straight away, with no modifier, in the chat mode set by the chat buttons. Shift-click for advantage, Option-click (Alt) for disadvantage.`
   );
-  quick.addEventListener("click", async () => {
+  quick.addEventListener("click", async event => {
     quick.disabled = true;
     try {
-      await ui.chat.processMessage("/r 1d20");
+      await ui.chat.processMessage(chatDiceFormula(new Map([[20, 1]]), 0, rollEdge(event)));
     } finally {
       quick.disabled = false;
     }
@@ -153,7 +170,7 @@ function buildBar() {
     "sc2-action",
     "−",
     loc`Lower the modifier by 1`,
-    loc`Takes 1 off the modifier on the roll in the chat box. Right-click adds 1.`
+    loc`Takes 1 off the modifier on the roll in the chat box. Right-click adds 1; Ctrl-click also rolls, Shift with advantage, Option (Alt) with disadvantage.`
   );
   down.dataset.step = "-1";
   const value = make("output");
@@ -163,7 +180,7 @@ function buildBar() {
     "sc2-action",
     "+",
     loc`Raise the modifier by 1`,
-    loc`Adds 1 to the modifier on the roll in the chat box. Right-click takes 1 off.`
+    loc`Adds 1 to the modifier on the roll in the chat box. Right-click takes 1 off; Ctrl-click also rolls, Shift with advantage, Option (Alt) with disadvantage.`
   );
   up.dataset.step = "1";
   for (const step of [down, up]) keepChatFocus(step);
@@ -175,10 +192,10 @@ function buildBar() {
   }
   modifier.append(down, value, up);
   const send = button("sc2-action sc2-chat-dice-send", loc`Roll`, loc`Roll the dice in the chat box`);
-  send.addEventListener("click", async () => {
+  send.addEventListener("click", async event => {
     send.disabled = true;
     try {
-      await sendRoll();
+      await sendRoll(rollEdge(event));
     } finally {
       refreshBar();
     }
@@ -190,7 +207,7 @@ function buildBar() {
       "sc2-action",
       undefined,
       loc`Add a d${faces} to the roll in the chat box`,
-      loc`Adds a d${faces} to the /r roll in the chat box; right-click takes one away. Press Roll or Enter to roll it.`
+      loc`Adds a d${faces} to the /r roll in the chat box; right-click takes one away. Ctrl-click adds it and rolls at once, Shift-click with advantage, Option-click (Alt) with disadvantage.`
     );
     die.dataset.faces = String(faces);
     die.append(make("span", "sc2-chat-dice-face", `d${faces}`), make("span", "sc2-chat-dice-count"));
