@@ -12,6 +12,20 @@ export function agentTokenDefaults(given = {}) {
 }
 
 /**
+ * Character data imported from a file (the sheet's Import Data), with the prototype token linked when it is an agent's
+ * or a companion's. An export from before linked tokens were the default would otherwise bring back an unlinked
+ * prototype, and every token placed from it would keep its own copy of the character. Null when nothing changes.
+ * @param {object} data   the parsed file
+ * @param {string} [type] the type of the character being imported into, when the file does not say
+ */
+export function linkedImport(data, type) {
+  if (!data || typeof data !== "object" || data.prototypeToken?.actorLink !== false) return null;
+  const kind = data.type ?? type;
+  if (kind !== "agent" && !(kind === "npc" && data.system?.companionOf?.ownerUuid)) return null;
+  return { ...data, prototypeToken: { ...data.prototypeToken, actorLink: true } };
+}
+
+/**
  * Whether a weapon added to an agent should arrive equipped: the agent has no equipped weapon yet, so a newly built
  * character's first weapon is ready to use. Compendium copies carry `equipped: false` as a stored default, so only
  * the agent's own items decide.
