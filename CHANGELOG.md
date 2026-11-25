@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 — 2026-11-25
 
 - **Characters kept on tokens move to the Actors list (world update, schema 7).** An agent or companion whose sheet
   was edited from an unlinked token kept those edits on the token only. The update now copies what each such token
@@ -36,8 +36,6 @@
     faced when it is in a started fight.
   - The Damage save card's large number is the save total. Add NPC to scene starts in the search field and shows
     the chosen row. Delay and Ready lines for NPCs go to the GCs only.
-
-## 0.8.0 — 2026-11-24
 
 - **Gear by the game clock's year.** Every gear, weapon, armor and vehicle entry now has the year it came out: the
   book's Year column where it prints one, and our own dates (from public history) for the rest. The browser hides
