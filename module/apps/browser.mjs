@@ -360,7 +360,9 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       restrictable: RESTRICTABLE.has(this.itemType),
       calibers: Object.fromEntries([1, 2, 3, 4, 5].map(n => [String(n), loc`Caliber ${cfg.calibers[n]}`])),
       restrictedOptions: { hide: loc`Hide restricted`, only: loc`Restricted only` },
-      era: dated ? eraStatus(year, later, this.filters.showFuture) : ""
+      era: dated ? eraStatus(year, later, this.filters.showFuture) : "",
+      // With no date on the clock nothing is newer than it, so the box could change nothing.
+      futureReason: dated && !Number.isSafeInteger(year) ? loc`Set a date on the game clock first.` : ""
     };
   }
 

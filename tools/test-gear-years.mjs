@@ -149,6 +149,7 @@ test("each browser part renders one root element, as Foundry's Handlebars parts 
   hb.registerHelper("localize", key => key);
   hb.registerHelper("selectOptions", () => "");
   hb.registerHelper("checked", value => (value ? "checked" : ""));
+  hb.registerHelper("disabled", value => (value ? "disabled" : ""));
   const VOID = new Set(["input", "img", "br", "hr", "meta", "link"]);
   const roots = html => {
     let depth = 0,
@@ -168,7 +169,8 @@ test("each browser part renders one root element, as Foundry's Handlebars parts 
     restrictable: true,
     rows: [{ name: "Luger P08 9mm", qualified: true, future: true }],
     preview: { name: "Luger P08 9mm", qualified: true, future: true },
-    filters: {}
+    filters: {},
+    futureReason: "Set a date on the game clock first."
   };
   for (const part of ["browser-filters", "browser-results"]) {
     const source = readFileSync(new URL(`../templates/apps/${part}.hbs`, import.meta.url), "utf8");
