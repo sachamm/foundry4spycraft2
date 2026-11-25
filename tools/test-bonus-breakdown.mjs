@@ -283,3 +283,27 @@ test("a damage card explains its flat bonus, and stays quiet without one", () =>
   ]);
   assert.equal(breakdownTipRows({ checkKind: "damage", rawTotal: 4 }), null);
 });
+
+test("a knuckle weapon's damage names Strength, grip and unarmed feats apart", () => {
+  const { system } = agents[0];
+  const knuckles = { name: "Brass knuckles", proficiency: "unarmed", damage: "1", qualities: "NKL" };
+  const swapped = {
+    ...system,
+    unarmed: { die: 4, extraDice: 0, damageBonus: 5, usesStrength: false, strengthComponent: 0 },
+    abilities: { ...system.abilities, str: { ...system.abilities.str, mod: 2 } }
+  };
+  const damage = weaponDamage(swapped, knuckles, {}, "agent");
+  assert.equal(sum(damage.bonusRows), damage.bonus);
+  assert.ok(!damage.bonusRows.some(row => row.label === "STR"), JSON.stringify(damage.bonusRows));
+  assert.deepEqual(damage.bonusRows[0], { label: "Unarmed feats", value: 5 });
+  const plain = weaponDamage(
+    { ...swapped, unarmed: { die: 4, extraDice: 0, damageBonus: 3, usesStrength: true, strengthComponent: 2 } },
+    knuckles,
+    {},
+    "agent"
+  );
+  assert.deepEqual(plain.bonusRows.slice(0, 2), [
+    { label: "STR", value: 2 },
+    { label: "Unarmed feats", value: 1 }
+  ]);
+});

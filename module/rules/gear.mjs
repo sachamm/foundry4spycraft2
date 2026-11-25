@@ -726,8 +726,23 @@ export function weaponDamage(
   if (useFinesse && (melee || hurled)) bonus = system.abilities.dex?.mod ?? 0;
   else if (grip.strengthIncrease && (melee || hurled) && (!knuckle || u.usesStrength !== false))
     bonus += grip.strengthIncrease / 2;
-  // The damage bonus as labelled parts, for the damage card's breakdown tooltip.
+  // The damage bonus as labelled parts, for the damage card's breakdown tooltip. A knuckle weapon's unarmed bonus
+  // holds feat bonuses as well as Strength (and none of it when a feat swaps the attribute), so those are split.
   const attributeBonus = bonus;
+  const finesseDamage = useFinesse && (melee || hurled);
+  const strengthPart = finesseDamage
+    ? 0
+    : knuckle
+      ? u.usesStrength === false
+        ? 0
+        : (u.strengthComponent ?? strength)
+      : melee || hurled
+        ? strength
+        : 0;
+  const gripPart =
+    !finesseDamage && grip.strengthIncrease && (melee || hurled) && (!knuckle || u.usesStrength !== false)
+      ? grip.strengthIncrease / 2
+      : 0;
   if (weapon.improvised) {
     if (!useFinesse && (melee || hurled))
       bonus -= Math.max(
@@ -765,7 +780,9 @@ export function weaponDamage(
   const min = parsed.minimum;
   const bonusRows = breakdownRows(
     [
-      { label: useFinesse && (melee || hurled) ? "DEX" : "STR", value: attributeBonus },
+      finesseDamage ? { label: "DEX", value: attributeBonus } : { label: "STR", value: strengthPart },
+      { label: loc`Grip`, value: gripPart },
+      { label: loc`Unarmed feats`, value: finesseDamage ? 0 : attributeBonus - strengthPart - gripPart },
       { label: loc`Improvised weapon`, value: improvisedBonus },
       { label: loc`Conditions`, value: conditionDamagePenalty },
       { label: loc`CQB range`, value: cqbRange.damageBonus },
