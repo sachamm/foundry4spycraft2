@@ -50,6 +50,15 @@ import {
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
+
+const halfSavePolicy = actor => ({
+  ignoreSuccessfulHalfSave: ignoresSuccessfulHalfSave(actor, currentCampaignRules().effects)
+});
+const ignoresHazard = (actor, save, succeeded) => succeeded === true && ignoresSuccessfulHalfSave(actor, save);
+const ignoredHazard = actor =>
+  post(actor, [loc`Blockbuster: the successful save prevents this damage and its effects.`]);
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -242,6 +251,7 @@ async function startAcid(actor, { amount, reduction, armor, halfActions }) {
     askContext: true,
     hazardSave: {
       kind: "acid",
+      ...halfSavePolicy(actor),
       label: DAMAGE_TYPE_LABELS.acid,
       dc: plan.dc,
       bonus: plan.bonus,
@@ -260,6 +270,7 @@ async function startExplosive(actor, input) {
   });
   const save = {
     kind: "explosiveReflex",
+    ...halfSavePolicy(actor),
     label: loc`Explosive (Reflex)`,
     dc: plan.dc,
     bonus: plan.bonus,
@@ -286,7 +297,14 @@ async function startVacuum(actor, { amount, firstRound, source }) {
     if (rolls.length) await post(actor, [loc`Vacuum: ${rolled} damage rolled.`], rolls);
     return actor.rollSave("fort", {
       askContext: true,
-      hazardSave: { kind: "vacuum", label: DAMAGE_TYPE_LABELS.vacuum, dc: VACUUM.saveDC, damage: rolled, source }
+      hazardSave: {
+        kind: "vacuum",
+        ...halfSavePolicy(actor),
+        label: DAMAGE_TYPE_LABELS.vacuum,
+        dc: VACUUM.saveDC,
+        damage: rolled,
+        source
+      }
     });
   }
   return applyVacuum(actor, rolled, source, rolls);
@@ -468,6 +486,7 @@ export async function endSurvivalHazard(actor, kind) {
 const total = check => Number(check?.effectiveTotal);
 
 async function resolveExplosiveReflex(actor, message, save, succeeded) {
+  if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
   const taken = Math.max(0, explosiveDamageTaken(save.damage, succeeded) - Math.max(0, save.reduction ?? 0)),
     result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive);
   result.lines.unshift(
@@ -521,6 +540,7 @@ const resolvers = {
     );
   },
   async acid(actor, message, save, succeeded) {
+    if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
     const first = acidFirstDamage(save.damage, succeeded),
       taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
       result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid);
@@ -542,6 +562,7 @@ const resolvers = {
     return post(actor, [rounds ? await condition(actor, "stun", rounds, loc`Stunned`) : loc`Explosive: no stun.`]);
   },
   async vacuum(actor, message, save, succeeded) {
+    if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
     const damage = vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
     return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum);
   },

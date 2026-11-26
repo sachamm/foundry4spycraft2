@@ -10509,7 +10509,8 @@ export const GC_DATA = {
    "gcDice": 2,
    "summary": "Explosion blast increments are tripled. A player character whose successful save would halve damage or an effect ignores it completely instead. Interrupted range increments no longer raise explosion damage.",
    "effects": {
-    "blastIncrementMultiplier": 3
+    "blastIncrementMultiplier": 3,
+    "ignoreSuccessfulHalfSave": true
    }
   },
   {
@@ -10531,7 +10532,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -25,
    "gcDice": 1,
-   "summary": "Weapons that normally hold 5 or more shots never run out of ammunition.",
+   "summary": "Weapons with a printed stockpile of at least 5 shots have unlimited ammunition.",
    "effects": {
     "bottomlessClip": true
    }

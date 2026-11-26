@@ -1,18 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ammunitionState, unlimitedAmmunition } from "../module/rules/ammunition-use.mjs";
+import { unlimitedAmmunition } from "../module/rules/ammunition-use.mjs";
 import { weaponAmmunition, spendWeaponShots, reloadWeapon } from "../module/apps/ammunition-use.mjs";
 
-test("Bottomless Clip applies at five shots, including an empty supply, but not small or uncoded weapons", () => {
+test("Bottomless Clip uses the five-shot printed stockpile threshold, including empty and single-shot weapons", () => {
   for (const [ammo, expected] of [
-    ["4M3", false],
+    ["4M1", false],
+    ["1S5", true],
+    ["4M3", true],
     ["5M3", true],
     ["6S2", true],
     ["—", false]
   ]) {
-    const state = ammunitionState({ ammo, shotsLoaded: 0, shotsSpare: 0 });
-    assert.equal(unlimitedAmmunition(state, { bottomlessClip: true }), expected);
-    assert.equal(unlimitedAmmunition(state), false);
+    const weapon = { ammo, shotsLoaded: 0, shotsSpare: 0 };
+    assert.equal(unlimitedAmmunition(weapon, { bottomlessClip: true }), expected);
+    assert.equal(unlimitedAmmunition(weapon), false);
   }
 });
 

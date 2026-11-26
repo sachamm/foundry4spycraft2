@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Bottomless Clip now bypasses ammunition limits for weapons holding at least five shots, for both PCs and NPCs.
+- Blockbuster now prevents acid, explosion and first-round vacuum damage after a successful saving throw,
+  including secondary effects. Pending hazard saves retain the campaign policy recorded when they began.
+
+- Bottomless Clip now bypasses ammunition limits for weapons supplied with at least five shots, for both PCs and NPCs.
   Activating or ending the quality preserves the weapon's saved ammunition counts.
 
 - Gunmen's doubled range increments and the campaign's CQB distances now affect PC and NPC calculations.

@@ -123,6 +123,59 @@ const reset = () => {
   warnings.length = 0;
 };
 
+test("Blockbuster hazard saves snapshot PC protection and ignore secondary effects after policy ends", async () => {
+  const { sufferTypedDamage } = await import("../module/apps/damage-types.mjs");
+  const settings = game.settings;
+  let active = true;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: active ? ["blockbuster"] : [] } : {}) };
+  try {
+    for (const type of ["acid", "explosive", "vacuum"]) {
+      active = true;
+      reset();
+      const saves = [];
+      const target = character(
+        `Blockbuster-${type}`,
+        { vitality: { value: 100, max: 100 }, wounds: { value: 12, max: 12 } },
+        {
+          async rollSave(key, options) {
+            saves.push(options.hazardSave);
+            return {};
+          },
+          async update() {
+            throw Error("Protected save must not change health, hazards, stress or conditions");
+          }
+        }
+      );
+      await sufferTypedDamage(target, { type, amount: 30, armor: "none", firstRound: true });
+      assert.equal(saves.length, 1);
+      assert.equal(saves[0].ignoreSuccessfulHalfSave, true);
+      active = false;
+      await hazardSaveResolvers.get(saves[0].kind)(target, {}, saves[0], true);
+      assert.equal(saves.length, 1, "No follow-up explosive stun save");
+      assert.match(posted.at(-1).content, /Blockbuster/);
+      assert.equal(target.system.vitality.value, 100);
+    }
+    active = true;
+    for (const extra of [{ type: "npc" }, { system: { companionOf: { ownerUuid: "Actor.owner" } } }]) {
+      let save;
+      const target = character(
+        "NotPC",
+        {},
+        {
+          ...extra,
+          async rollSave(_key, options) {
+            save = options.hazardSave;
+          }
+        }
+      );
+      await sufferTypedDamage(target, { type: "explosive", amount: 30 });
+      assert.equal(save.ignoreSuccessfulHalfSave, false);
+    }
+  } finally {
+    game.settings = settings;
+  }
+});
+
 test("Blockbuster's tripled blast distance reaches actual multi-target health application", async () => {
   reset();
   const before = game.settings;

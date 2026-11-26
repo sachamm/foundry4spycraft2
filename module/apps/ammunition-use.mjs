@@ -24,7 +24,7 @@ export function ammunitionCounted() {
 export function weaponAmmunition(item) {
   if (!ammunitionCounted() || item?.type !== "weapon" || typeof item.update !== "function" || !item.parent) return null;
   const state = ammunitionState(item.system);
-  if (unlimitedAmmunition(state, currentCampaignRules().effects)) return null;
+  if (unlimitedAmmunition(item.system, currentCampaignRules().effects)) return null;
   return state.tracked ? state : null;
 }
 
@@ -47,7 +47,7 @@ export async function spendWeaponShots(item, shots) {
 /** One Reload action (a half action, p.359). */
 export async function reloadWeapon(item) {
   if (!item?.isOwner) return null;
-  if (unlimitedAmmunition(ammunitionState(item.system), currentCampaignRules().effects))
+  if (unlimitedAmmunition(item.system, currentCampaignRules().effects))
     return refuse(loc`Bottomless Clip supplies this weapon without a Reload.`);
   let plan;
   try {
