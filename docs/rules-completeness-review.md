@@ -1,5 +1,10 @@
 # PC creation and combat rules review
 
+**Expanded-review checkpoint, 26 November 2026:** PC creation **8.7/10**;
+combat play **8.5/10**. The requested **9.9/10 target is not met**. The original
+8/10 review is preserved below; the expanded findings and required remaining work
+follow it. Current branch: `codex/rules-completeness-99`, based on `475afa5`.
+
 Reviewed 26 November 2026 on `codex/rules-completeness`, starting from `cf911e2`
 (v0.8.7). An upstream fetch confirmed that revision was current on `origin/main`.
 The integration checkout and other task worktrees were left alone.
@@ -132,3 +137,107 @@ a multiplayer play session was performed in this task.
 
 Live Foundry client behavior, multiple connected players and real campaign data
 remain untested. No release, deployment, merge or push was performed.
+
+## Expanded review: PC creation
+
+Current score: **8.7/10**, up from 8.1. Using the original five dimensions, the
+scores are attributes/health 1.9, origins/classes 1.7, skills 1.7, feats/training
+1.8 and gear/finalization 1.6, each out of 2. This remains an engineering judgment,
+not a measured percentage of all rulebook requirements satisfied.
+
+Implemented and re-reviewed:
+
+- Fast/Slow Attributes, Feats, Proficiencies, Interests and Growth now affect the
+  engine, sheet and level-up previews. The world policy provider ignores inactive
+  mission qualities and reports conflicting settings. Optional attribute
+  milestones survive native Foundry cleaning while preserving existing keys.
+- The user confirmed that Interest awards retain the first additional pick at
+  level 2; Fast/Slow Interests change only the subsequent spacing.
+- Campaign feat alternatives consume existing choices. A residual-capacity
+  matching algorithm handles combinations of alternative trees without granting
+  extra slots. Its allocations agree with exhaustive legal assignments for
+  1,296 small configurations. Class-source uniqueness, acquisition timing,
+  prerequisites and Scientist source allowances remain in force. Elite Ops does
+  not convert an Advanced Skill choice into Basic Skill; fixed grants are not
+  treated as discretionary choices.
+- Invalid saved vitality now has a working correction path. RNG refuses an
+  impossible value; Review vitality can repair it without healing or rerolling,
+  preserving the previous value in review history.
+- The user confirmed that Fragile replaces the later-level vitality die, then
+  adds Constitution normally. The PC engine and sheet apply that rule, retain
+  original saved rolls and suppress unnecessary roll prompts. Big Budget's four
+  Wealth and Soap's extra Subplot also affect their budgets.
+- Every previously fingerprinted property of every standard sample agent remained
+  unchanged. The golden fixture gained only the two new derived properties
+  `abilityIncreaseLevels` and `campaignEffects`.
+
+Required remaining recommendations before considering 9.9:
+
+1. Finish campaign creation rules beyond the implemented subset: gear Caliber
+   shifts, Feat Purchase's once-per-mission XP transaction, affiliation policy
+   constraints and the remaining qualities. Fragile's effect on special NPC
+   profiles is still outside this PC implementation (B-180).
+2. Complete the source-to-data audit for all class abilities, origin exceptions
+   and feat acquisition choices. Existing numerical fixtures do not establish
+   complete behavior or correct prose summaries (B-193).
+3. Verify legacy acquisition histories, inherited class choices and gear/contact
+   exceptions through native creation-to-play workflows. Retaining a GC warning
+   does not establish that every mechanical outcome is implemented (B-193 and
+   the existing option inventory).
+
+## Expanded review: combat play
+
+Current score: **8.5/10**, up from 8.0. The five dimensions are initiative/actions
+1.7, attacks/Defense 1.9, damage/recovery 1.9, conditions/resources 1.6 and
+conditional options/environments 1.4, each out of 2.
+
+Implemented and re-reviewed:
+
+- Bulletproof and Gritty now change the injury and massive-damage thresholds used
+  by applied damage, reports and pending saves. A pending save retains the policy
+  from its original hit. Conflicting injury policies stop lethal application
+  before health changes. This implements the injury bands, not every other
+  effect of either quality.
+- Laser attacks now ignore positive dodge while preserving Dexterity, and their
+  critical-hit discount reaches zero cost. The saved attack type participates in
+  roll-evidence checks. Incoming Defense previews and attack-card resolution use
+  the laser rule; explicit GC Defense overrides remain possible.
+- Laser damage removes base dice at measured range-increment boundaries and can
+  reach zero. Damage dispatch reuses the original attack's effective increment;
+  a direct roll requests missing distance, and cancellation rolls nothing.
+
+Required remaining recommendations before considering 9.9:
+
+1. Implement the remaining campaign effects in their actual workflows: skill DCs,
+   action-die modes, range/blast changes and other quality-specific rules. Merely
+   carrying metadata such as `criticalInjuryActivationCost` or
+   `blastIncrementMultiplier` is not execution (B-180).
+2. Complete the mechanically partial combat options. The inventory and current
+   code still show missing Mobile Defense Count-for-dodge behavior, Containment
+   Supremacy, This… is my Boomstick, Dirty Fighting Supremacy tricks, Vital Points
+   stances/tricks and Executioner benefits. Verify the applicable printing where
+   the local text lacks a heading; do not invent a rule from a feat name.
+3. Finish Grapple size restrictions and benefit damage, falling stress, special
+   NPC effects, cover interactions and other listed combat mechanics
+   (B-183, B-186, B-189–B-191).
+4. Move remaining once-per-trigger authority off deletable chat cards and validate
+   replay, reconnect and concurrent-client behavior (B-187). Add native
+   multiplayer play-through evidence for the completed paths.
+
+## Expanded validation and commits
+
+- Six focused implementation commits: `2342e17`, `a37c48e`, `d82aa1e`, `9a0e720`,
+  `571ad28` and `12d4d33`. The prior branch's seven commits are included unchanged.
+- All **3,943** Node regressions pass, including data validation, engine fixtures,
+  unchanged standard character fingerprints and the new workflow regressions.
+- All 13 rebuilt-pack tests pass. Native Foundry schema checks, sample actor
+  preparation, the release bundle, lint and formatting pass. Existing allowed
+  warning counts remain 28 JavaScript and 29 CSS.
+- The copy check passes its 12-word threshold; the shorter advisory matches remain
+  unchanged. Rules data and generated tables were rebuilt together.
+- All **219** browser layout tests pass using the standalone harness with an
+  installed Chromium path. No live campaign or credentials were copied and no
+  multiplayer Foundry session was run.
+
+The known gaps above prevent a defensible 9.9 score. This checkpoint does not
+claim completion of the requested higher target.
