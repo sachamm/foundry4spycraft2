@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Bottomless Clip now bypasses ammunition limits for weapons holding at least five shots, for both PCs and NPCs.
+  Activating or ending the quality preserves the weapon's saved ammunition counts.
+
 - Gunmen's doubled range increments and the campaign's CQB distances now affect PC and NPC calculations.
   Range multipliers combine with feats using the standard multiplier rule. Blockbuster's tripled blast
   increment now agrees between map previews and damage application.

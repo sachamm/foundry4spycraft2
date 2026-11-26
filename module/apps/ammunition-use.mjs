@@ -1,7 +1,14 @@
 /** Shots spent by attacks and restored by Reload actions; the rules are in module/rules/ammunition-use.mjs. */
 import { esc } from "../html.mjs";
 import { refuse } from "../error-notices.mjs";
-import { ammunitionState, reloadPlan, resupplyPlan, spendShotsPlan } from "../rules/ammunition-use.mjs";
+import {
+  ammunitionState,
+  reloadPlan,
+  resupplyPlan,
+  spendShotsPlan,
+  unlimitedAmmunition
+} from "../rules/ammunition-use.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { loc } from "../i18n.mjs";
 
 /** World setting "Count ammunition"; on unless turned off. */
@@ -17,6 +24,7 @@ export function ammunitionCounted() {
 export function weaponAmmunition(item) {
   if (!ammunitionCounted() || item?.type !== "weapon" || typeof item.update !== "function" || !item.parent) return null;
   const state = ammunitionState(item.system);
+  if (unlimitedAmmunition(state, currentCampaignRules().effects)) return null;
   return state.tracked ? state : null;
 }
 
@@ -39,6 +47,8 @@ export async function spendWeaponShots(item, shots) {
 /** One Reload action (a half action, p.359). */
 export async function reloadWeapon(item) {
   if (!item?.isOwner) return null;
+  if (unlimitedAmmunition(ammunitionState(item.system), currentCampaignRules().effects))
+    return refuse(loc`Bottomless Clip supplies this weapon without a Reload.`);
   let plan;
   try {
     plan = reloadPlan(ammunitionState(item.system));

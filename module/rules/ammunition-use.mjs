@@ -8,6 +8,10 @@
 import { ammunitionConfiguration } from "./ammunition.mjs";
 import { loc } from "../i18n.mjs";
 
+/** Bottomless Clip uses the selected weapon capacity, without changing its saved supply. */
+export const unlimitedAmmunition = (state, effects = {}) =>
+  state?.tracked === true && state.capacity >= 5 && effects.bottomlessClip === true;
+
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 /** A Reload refills a magazine, belt or drum; an internal supply takes up to 3 shots a Reload (p.359). */
 const SINGLE_FED_SHOTS = 3;

@@ -1,0 +1,50 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { ammunitionState, unlimitedAmmunition } from "../module/rules/ammunition-use.mjs";
+import { weaponAmmunition, spendWeaponShots, reloadWeapon } from "../module/apps/ammunition-use.mjs";
+
+test("Bottomless Clip applies at five shots, including an empty supply, but not small or uncoded weapons", () => {
+  for (const [ammo, expected] of [
+    ["4M3", false],
+    ["5M3", true],
+    ["6S2", true],
+    ["—", false]
+  ]) {
+    const state = ammunitionState({ ammo, shotsLoaded: 0, shotsSpare: 0 });
+    assert.equal(unlimitedAmmunition(state, { bottomlessClip: true }), expected);
+    assert.equal(unlimitedAmmunition(state), false);
+  }
+});
+
+test("campaign activation bypasses attack limits and writes for PC and NPC weapons; deactivation restores saved counts", async () => {
+  let active = true;
+  globalThis.game = {
+    settings: {
+      get: (_system, key) =>
+        key === "campaign" ? { qualities: active ? ["bottomless-clip"] : [] } : key === "mission" ? {} : true
+    }
+  };
+  globalThis.ui = { notifications: { warn() {} } };
+  for (const type of ["agent", "npc"]) {
+    const item = {
+      type: "weapon",
+      isOwner: true,
+      parent: { type },
+      system: { ammo: "5M2", shotsLoaded: 0, shotsSpare: 3 },
+      async update() {
+        throw Error("Supply must not change");
+      }
+    };
+    const before = structuredClone(item.system);
+    active = true;
+    assert.equal(weaponAmmunition(item), null);
+    assert.equal(await spendWeaponShots(item, 20), null);
+    assert.equal(await reloadWeapon(item), false);
+    active = false;
+    assert.equal(weaponAmmunition(item).loaded, 0);
+    assert.equal(weaponAmmunition(item).spare, 3);
+    assert.deepEqual(item.system, before);
+  }
+  delete globalThis.game;
+  delete globalThis.ui;
+});

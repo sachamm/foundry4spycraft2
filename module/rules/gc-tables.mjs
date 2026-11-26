@@ -10532,7 +10532,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Weapons that normally hold 5 or more shots never run out of ammunition.",
-   "effects": {}
+   "effects": {
+    "bottomlessClip": true
+   }
   },
   {
    "id": "bulletproof",
