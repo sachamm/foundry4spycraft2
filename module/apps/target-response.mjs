@@ -29,6 +29,7 @@ export function incomingFacts(check = {}) {
   const distance = Number(context.distanceFeet);
   return {
     ...(check.weaponProficiency ? { weaponProficiency: check.weaponProficiency } : {}),
+    ...(context.damageType ? { damageType: context.damageType } : {}),
     ranged: context.ranged === true,
     adjacent: context.reachAdjacent === true,
     distanceFeet: context.distanceFeet !== null && Number.isFinite(distance) && distance >= 0 ? distance : null

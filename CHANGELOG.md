@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Laser attacks now ignore positive dodge bonuses and receive their critical-hit discount. Laser weapon damage
+  uses the attack's measured range to remove base dice, reaching zero when all are lost. Direct damage rolls
+  ask for missing distance; cancelled distance entry rolls nothing.
 - Bulletproof and Gritty now change injury-save and massive-damage thresholds on damage cards. A pending save
   retains the thresholds used for its hit even if campaign policy changes before the save is rolled. Conflicting
   injury policies require a GC choice before lethal damage can be applied.

@@ -95,6 +95,10 @@ export function criticalPlan(
     }
   }
   if (kind === "success" && check.checkKind === "attack") {
+    if (check.attackContext?.damageType === "laser") {
+      adjustment--;
+      sources.push(loc`Laser damage –1`);
+    }
     const cleave = cleaveCriticalPlan(system, check, { legacyStandardTargetConfirmed });
     if (cleave.blocked) return reject(cleave.reason);
     if (cleave.discount) {

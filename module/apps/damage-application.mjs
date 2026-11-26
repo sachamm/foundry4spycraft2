@@ -101,12 +101,18 @@ export function targetChoices({ exclude = "", offScene = "always" } = {}) {
 }
 
 /** The Defense a target's sheet shows now, or null when it has none. */
-export function defenseOf(target, weaponProficiency = "") {
+export function defenseOf(target, weaponProficiency = "", { laser = false } = {}) {
   const system = target?.system ?? {};
   const value = target?.type === "vehicle" ? (system.defenseNow?.total ?? system.defense) : system.defense?.total;
   const dodge =
-    target?.type !== "vehicle" && !system.defense?.vulnerable ? specialistDefense(system, weaponProficiency).dodge : 0;
-  return Number.isSafeInteger(value) ? value + dodge : null;
+    target?.type !== "vehicle" && !system.defense?.vulnerable && !laser
+      ? specialistDefense(system, weaponProficiency).dodge
+      : 0;
+  const removed =
+    laser && target?.type !== "vehicle"
+      ? Math.max(0, (system.defense?.dodgeBonuses ?? 0) - (system.defense?.dodgeLost ?? 0))
+      : 0;
+  return Number.isSafeInteger(value) ? value + dodge - removed : null;
 }
 
 /**
@@ -222,7 +228,8 @@ export async function resolveAttack(message, options = {}) {
   if (target && target.uuid === attacker.uuid)
     return refuse(loc`${attacker.name} cannot be the target of its own attack. Choose another target.`);
   const entered = input.defense === "" || input.defense === null || input.defense === undefined;
-  const baseDefense = entered ? defenseOf(target, check.weaponProficiency) : Number(input.defense);
+  const laser = check.attackContext?.damageType === "laser";
+  const baseDefense = entered ? defenseOf(target, check.weaponProficiency, { laser }) : Number(input.defense);
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
   const cover = coverOnResolution(input.cover);
@@ -244,7 +251,7 @@ export async function resolveAttack(message, options = {}) {
     targetName: target?.name ?? "",
     defense,
     specialistDodge:
-      entered && target?.type !== "vehicle" && !target?.system?.defense?.vulnerable
+      entered && target?.type !== "vehicle" && !target?.system?.defense?.vulnerable && !laser
         ? specialistDefense(target?.system ?? {}, check.weaponProficiency).dodge
         : 0,
     total: check.effectiveTotal,

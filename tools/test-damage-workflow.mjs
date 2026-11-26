@@ -123,6 +123,28 @@ const reset = () => {
   warnings.length = 0;
 };
 
+test("laser attack cards ignore prepared dodge but retain a GC override", async () => {
+  reset();
+  const attacker = character("LaserAttacker", {});
+  const target = character("LaserDefender", {
+    defense: { total: 18, dodgeBonuses: 3, dodgeLost: 0 },
+    weaponSpecialist: { abilities: ["Foibles"], proficiencies: ["rifle"] }
+  });
+  const attack = id =>
+    card(id, {
+      actorUuid: attacker.uuid,
+      checkKind: "attack",
+      effectiveTotal: 16,
+      weaponProficiency: "rifle",
+      attackContext: { damageType: "laser" }
+    });
+  const result = await resolveAttack(attack("laser-target"), { targetUuid: target.uuid });
+  assert.equal(result.defense, 15);
+  assert.equal(result.hit, true);
+  assert.equal(result.specialistDodge, 0);
+  assert.equal((await resolveAttack(attack("laser-override"), { targetUuid: target.uuid, defense: 18 })).hit, false);
+});
+
 test("campaign injury thresholds reach damage cards and remain fixed when the campaign changes before the save", async () => {
   reset();
   const settings = game.settings;

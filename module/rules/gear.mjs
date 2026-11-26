@@ -19,6 +19,7 @@ import { disarmResponsePlan } from "./disarm-response.mjs";
 import { quirkyWeaponPlan } from "./quirky-weapon.mjs";
 import { superiorAccuracyWeaponPlan } from "./superior-accuracy-weapon.mjs";
 import { weaponDamageExpression, underwaterMeleeDamage } from "./weapon-damage-expression.mjs";
+import { laserWeaponDamage } from "./damage-types.mjs";
 import { trainedOnlyWeaponPlan } from "./trained-only-weapon.mjs";
 import { builtInQuality } from "./origins.mjs";
 import { accurizedWeaponPlan } from "./accurized-weapon.mjs";
@@ -701,7 +702,14 @@ export function weaponDamage(
       expression: parsed.expression,
       componentReview: true
     };
-  const expression = parsed.expression;
+  const laser = laserWeaponDamage(
+    text,
+    parsed.expression,
+    options.laserRangeIncrement ?? weaponRangeEffects(system, weapon).increment,
+    options.distanceFeet
+  );
+  if (laser?.blocked) return { blocked: true, blockedReason: laser.reason };
+  const expression = laser?.formula ?? parsed.expression;
   const knuckle = /(?:^|[,\s])NKL(?:[,\s]|$)/.test(weapon.qualities ?? "");
   const melee = ["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"].includes(weapon.proficiency);
   const hurled =
@@ -810,6 +818,7 @@ export function weaponDamage(
   });
   return {
     bonusRows,
+    ...(laser ? { laserDamage: laser } : {}),
     underwaterDamage: underwater.halved,
     markDamage,
     deadToRights,
@@ -821,9 +830,12 @@ export function weaponDamage(
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,
-    formula: underwater.halved
-      ? underwater.formula + rolledBonuses.map(dice => ` + ${dice}`).join("")
-      : `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
+    formula:
+      laser?.dice === 0
+        ? "0"
+        : underwater.halved
+          ? underwater.formula + rolledBonuses.map(dice => ` + ${dice}`).join("")
+          : `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
     damageText: text,
     ammunition: projectile.name ?? "",
     explosive: projectile.explosive,

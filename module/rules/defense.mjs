@@ -103,17 +103,18 @@ export function incomingDefensePlan(system, options = {}) {
       : invisibleAttacker && !uncanny.retainDexterity
         ? Math.min(0, system.abilities.dex.mod)
         : system.abilities.dex.mod;
-  const dodgeLost = vulnerable ? (system.defense.dodgeBonuses ?? 0) : 0;
+  const ignoreDodge = vulnerable || options.damageType === "laser";
+  const dodgeLost = ignoreDodge ? (system.defense.dodgeBonuses ?? 0) : 0;
   const securityBonus = securityDevice ? uncanny.securityBonus : 0;
   const triggerman = system.classLevels?.triggerman ?? 0,
     eyeOfStorm = adjacent && triggerman >= 4 ? 3 : 0;
   const foibles = specialistDefense(system, options.weaponProficiency);
-  const specialistDodge = vulnerable ? 0 : foibles.dodge;
-  const extraDodge = (vulnerable ? 0 : eyeOfStorm) + specialistDodge;
+  const specialistDodge = ignoreDodge ? 0 : foibles.dodge;
+  const extraDodge = (ignoreDodge ? 0 : eyeOfStorm) + specialistDodge;
   const circling = circlingDefensePlan({
     ...options.circling,
     ranged,
-    dodgeBonus: vulnerable ? 0 : (system.defense.dodgeBonuses ?? 0) + extraDodge
+    dodgeBonus: ignoreDodge ? 0 : (system.defense.dodgeBonuses ?? 0) + extraDodge
   });
   const cover = coverPlan({ ...options.cover, defenderSystem: system, ranged });
   const sharpshooter = sharpshooterDefensePlan(system, { ...options.cover, ranged }),
@@ -122,10 +123,10 @@ export function incomingDefensePlan(system, options = {}) {
     wrestling = wrestlingDefense(system, { adjacent, ranged }),
     // Whatever's Handy (Brawler): the same bonus to Defense while an improvised weapon is readied.
     whateversHandy = system.readiedImprovised === true ? whateversHandyBonus(system) : 0,
-    dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
+    dueling = ignoreDodge ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
     // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
     anticipate =
-      vulnerable || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
+      ignoreDodge || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
   const total =
     -circling.dodgeReduction -
     sharpshooter.sizeReduction +
@@ -189,7 +190,7 @@ export function incomingDefensePlan(system, options = {}) {
     dexterity,
     dodgeLost,
     securityBonus,
-    eyeOfStorm: vulnerable ? 0 : eyeOfStorm,
+    eyeOfStorm: ignoreDodge ? 0 : eyeOfStorm,
     vulnerable,
     helpless: state.helpless,
     flatFooted: !!(manual.flatFooted || flatFooted) && !uncanny.cannotBeFlatFooted,
@@ -209,6 +210,7 @@ export function incomingDefensePlan(system, options = {}) {
       (!system.armorFeatRules?.coupDeGraceRequiresHelpless || state.helpless),
     uncanny,
     notes: [
+      ...(options.damageType === "laser" ? [loc`Laser attacks ignore dodge bonuses to Defense (p.338).`] : []),
       ...(foibles.damageReduction
         ? [
             loc`Foibles: +${specialistDodge} dodge and 1 class damage reduction against this weapon; natural quality damage reduction remains an alternative (p.49).`

@@ -258,6 +258,7 @@ export function rollEvidence(check) {
       : []),
     ...(check.attackContext?.flanking?.whirling ? [{ whirlingFlanking: check.attackContext.flanking.whirling }] : []),
     ...(check.tripAttack ? [check.tripAttack] : []),
+    ...(check.attackContext?.damageType ? [{ weaponDamageType: check.attackContext.damageType }] : []),
     ...(check.meleeArmorPiercing
       ? [{ meleeArmorPiercing: check.meleeArmorPiercing, weaponQualities: check.weaponQualities }]
       : []),

@@ -34,7 +34,9 @@ const canReadSource = actor =>
  */
 export async function checkIncomingDefense(actor, known = {}) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
+  known = { ...known, laserAttack: known.damageType === "laser" };
   const fields = {
+    laserAttack: loc`This attack inflicts laser damage`,
     coupDeGraceException: loc`The GC confirms an actual character option permits Coup de Grace without helplessness`,
     ranged: loc`This is a ranged attack`,
     flatFooted: loc`The character is flat-footed against this attack`,
@@ -196,6 +198,7 @@ export async function checkIncomingDefense(actor, known = {}) {
     if (circlingSource && [source?.attacker, precision].some(a => a && a !== circlingSource))
       throw new Error(loc`The Circling Stance and cover-reduction declarations must name the same actual attacker.`);
     plan = incomingDefensePlan(actor.system, {
+      damageType: input.laserAttack === true ? "laser" : "",
       weaponProficiency: input.weaponProficiency ?? "",
       fromDuelingOpponent: input.fromDuelingOpponent === true,
       anticipateDodge: Math.max(

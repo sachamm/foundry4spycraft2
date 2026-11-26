@@ -238,6 +238,22 @@ export function laserDamage(formula, increment = 1) {
   return { formula: left ? `${left}d${match[2]}${match[3] ?? ""}` : "0", dice: left, removed };
 }
 
+/** Laser range loss belongs to the base weapon dice, before separately granted damage dice (pp.329,338). */
+export function laserWeaponDamage(text, expression, rangeIncrement, distanceFeet) {
+  if (!/\blaser\b/i.test(text)) return null;
+  if (!Number.isFinite(rangeIncrement) || rangeIncrement <= 0 || !Number.isFinite(distanceFeet) || distanceFeet < 0)
+    return {
+      blocked: true,
+      reason: loc`Enter the target's distance and a positive range increment before rolling laser damage.`
+    };
+  const increment = Math.max(1, Math.ceil(distanceFeet / rangeIncrement));
+  try {
+    return { ...laserDamage(expression, increment), increment, rangeIncrement, distanceFeet };
+  } catch (error) {
+    return { blocked: true, reason: error.message };
+  }
+}
+
 /* -------------------------------------------- */
 /*  Acid                                         */
 /* -------------------------------------------- */

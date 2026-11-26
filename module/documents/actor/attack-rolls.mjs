@@ -372,6 +372,7 @@ export const ActorAttackRolls = Base =>
           cleanAndPolished: cleanAndPolishedApplies(this.system, w),
           gearUuid: item.uuid,
           attackContext: {
+            ...(/\blaser\b/i.test(w.damage ?? "") ? { damageType: "laser" } : {}),
             ...(options.underwater === true ? { underwater: true } : {}),
             reach: atk.reach,
             reachAdjacent: options.reachAdjacent ?? null,
@@ -638,6 +639,25 @@ export const ActorAttackRolls = Base =>
         );
         if (recorded !== null) options = { ...options, distanceFeet: recorded };
       }
+      if (/\blaser\b/i.test(item.system.damage ?? "")) {
+        const source = options.sourceAttack?.uuid
+          ? fromUuidSync(options.sourceAttack.uuid)?.flags?.spycraft2?.attackContext
+          : null;
+        if (options.laserRangeIncrement === undefined && Number.isFinite(source?.rangeIncrement))
+          options = { ...options, laserRangeIncrement: source.rangeIncrement };
+        if (options.distanceFeet === undefined || options.distanceFeet === null || options.distanceFeet === "") {
+          const input = await systemDialog.input({
+            window: { title: loc`Laser damage — distance` },
+            rejectClose: false,
+            content: `<label>${loc`Target distance (ft.)`} <input name="distanceFeet" type="number" min="0" step="any" required /></label>`
+          });
+          if (!input) return null;
+          const distanceFeet = Number(input.distanceFeet);
+          if (input.distanceFeet === "" || !Number.isFinite(distanceFeet) || distanceFeet < 0)
+            return refuse(loc`Enter a nonnegative target distance before rolling laser damage.`);
+          options = { ...options, distanceFeet };
+        }
+      }
       const cqbPreview = cqbRangePlan(this.system, item.system, options, "damage");
       if (cqbPreview.active && cqbPreview.basics && !cqbPreview.known) {
         const input = await askFollowUp(systemDialog, "cqbDamageDistance", { actor: this, item, options });
@@ -846,7 +866,7 @@ export const ActorAttackRolls = Base =>
         finesseDamage,
         validateAttackContext: validateFinesseDamage,
         weaponQualities: damage.effectiveQualities,
-        flavor: `${damage.underwaterDamage ? loc`Underwater melee: half standard damage, rounded up (p.349).` + " " : ""}${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${options.kickTrick === "powerKick" ? loc` — Power Kick: armor-piercing (2), takedown` : ""}${options.doubleJab === true ? loc` — Double Jab: 2 fewer damage per die (minimum 1)` : ""}${options.brush === true ? loc` — Brush: 1d6 subdual; the target’s Initiative Count drops by this amount` : ""}${sneakHalved ? loc` — Dirty Fighting Basics: the target takes half the sneak attack damage, rounded up` : ""}${options.hordeSupremacy === true ? loc` — Horde Supremacy: +2 morale damage` : ""}${options.closedStanceTarget === true ? loc` — Closed Stance: +2 against the opponent in my square` : ""}${options.kickTrick === "guillotine" ? loc` — Guillotine Kick: the target makes a Fortitude save (DC 10 + this damage) or is sent reeling` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
+        flavor: `${damage.laserDamage ? loc`Laser: range increment ${damage.laserDamage.increment}, ${damage.laserDamage.removed} base damage dice removed (p.338).` + " " : ""}${damage.underwaterDamage ? loc`Underwater melee: half standard damage, rounded up (p.349).` + " " : ""}${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${options.kickTrick === "powerKick" ? loc` — Power Kick: armor-piercing (2), takedown` : ""}${options.doubleJab === true ? loc` — Double Jab: 2 fewer damage per die (minimum 1)` : ""}${options.brush === true ? loc` — Brush: 1d6 subdual; the target’s Initiative Count drops by this amount` : ""}${sneakHalved ? loc` — Dirty Fighting Basics: the target takes half the sneak attack damage, rounded up` : ""}${options.hordeSupremacy === true ? loc` — Horde Supremacy: +2 morale damage` : ""}${options.closedStanceTarget === true ? loc` — Closed Stance: +2 against the opponent in my square` : ""}${options.kickTrick === "guillotine" ? loc` — Guillotine Kick: the target makes a Fortitude save (DC 10 + this damage) or is sent reeling` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
         validateCQBRange,
         cqbRange: damage.cqbRange?.active ? damage.cqbRange : null,
         mortarOperation: damage.mortarOperation?.applicable ? damage.mortarOperation : null,
