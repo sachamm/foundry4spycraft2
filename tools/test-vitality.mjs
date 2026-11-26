@@ -342,3 +342,16 @@ test("impossible saved vitality refuses RNG but can be corrected through the nor
     assert.equal(rng, 0);
   }
 });
+
+test("Fragile returns its fixed die contribution without RNG, health changes or overwriting the stored original roll", async () => {
+  const a = actor();
+  a.system.progression[1].vitality = 9;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["fragile"] } : {}) };
+  const result = await rollCareerVitality(a, 1);
+  assert.equal(result.fixed, true);
+  assert.equal(result.total, 4);
+  assert.equal(a.system.progression[1].vitality, 9);
+  assert.equal(a.system.vitality.value, 4);
+  assert.equal(rng, 0);
+  assert.equal(game.messages.length, 0);
+});

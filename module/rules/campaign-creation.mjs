@@ -16,6 +16,10 @@ export function campaignProficiencyCount(level, standard, effects = {}) {
 export function campaignXP(value, effects = {}) {
   return Number.isFinite(value) ? Math.floor(value * (effects.xpToLevelFraction ?? 1)) : value;
 }
+export function campaignVitalityDie(die, effects = {}) {
+  const value = effects.fixedVitalityByDie?.[die];
+  return Number.isSafeInteger(value) && value >= 1 && value <= die ? value : null;
+}
 /** User ruling: the first additional Interest remains at level 2; the quality changes subsequent spacing. */
 export function campaignInterestCount(level, standard, effects = {}) {
   const interval = effects.interestInterval;

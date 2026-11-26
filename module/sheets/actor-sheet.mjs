@@ -113,6 +113,7 @@ import { checkIncomingDefense } from "../apps/incoming-defense.mjs";
 import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
+import { campaignVitalityDie } from "../rules/campaign-creation.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
 import { ACTION_COSTS, attackActionCost } from "../rules/combat-actions.mjs";
@@ -1033,6 +1034,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.canRecordVitality = this.actor.isOwner === true;
     context.progression = sys.progression.map((p, i) => {
       const ci = classById[p.classId];
+      const fixed = i > 0 ? campaignVitalityDie(ci?.system.vitalityDie, sys.campaignEffects) : null;
       const counts = sys.progression.slice(0, i + 1).filter(x => x.classId === p.classId).length;
       return {
         index: i,
@@ -1041,7 +1043,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         className: ci?.name ?? p.classId,
         classLevel: counts,
         vitalityDie: ci?.system.vitalityDie,
-        vitality: p.vitality,
+        vitality: fixed ?? p.vitality,
+        fixedVitality: fixed !== null,
+        fixedVitalityLabel: fixed !== null ? loc`Fragile: fixed class gain.` : "",
         first: i === 0,
         isLast: i === sys.progression.length - 1,
         skillPoints: sys.skillPoints?.[i]

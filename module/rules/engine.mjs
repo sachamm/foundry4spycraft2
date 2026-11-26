@@ -5,6 +5,7 @@ import {
   campaignProficiencyCount,
   campaignInterestCount,
   campaignFeatSlots,
+  campaignVitalityDie,
   campaignXP
 } from "./campaign-creation.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
@@ -1715,14 +1716,16 @@ function deriveFinalTotals(state) {
   progression.forEach((entry, idx) => {
     const ci = classAtLevel[idx];
     const die = ci?.system.vitalityDie ?? 0;
-    const valid = Number.isSafeInteger(entry.vitality) && entry.vitality >= 0 && entry.vitality <= die;
-    const roll = idx === 0 ? die : valid ? entry.vitality : 0;
+    const fixed = idx > 0 ? campaignVitalityDie(die, sys.campaignEffects) : null;
+    const valid =
+      fixed !== null || (Number.isSafeInteger(entry.vitality) && entry.vitality >= 0 && entry.vitality <= die);
+    const roll = idx === 0 ? die : (fixed ?? (valid ? entry.vitality : 0));
     if (idx > 0 && !valid) {
       const text = loc`Level ${idx + 1}: review vitality and enter a whole die result from 1 to ${die}.`;
       warnings.push(text);
       todo.push({ order: 15, error: true, tab: "classes", text });
     }
-    if (idx > 0 && !entry.vitality) vitMissing.push(idx + 1);
+    if (idx > 0 && !entry.vitality && fixed === null) vitMissing.push(idx + 1);
     vitalityBreakdown.dice += roll;
     vitalityBreakdown.constitution += abil.con.mod;
     vitalityBreakdown.minimumAdjustment += Math.max(0, 1 - roll - abil.con.mod);
@@ -2133,7 +2136,7 @@ function deriveProficiencies(state) {
     row => String(row.name ?? "").trim() || String(row.notes ?? "").trim()
   ).length;
   sys.subplotPicks = {
-    available: (lr?.subplots ?? 0) + B.get("subplots"),
+    available: (lr?.subplots ?? 0) + B.get("subplots") + (sys.campaignEffects.extraSubplots ?? 0),
     used: subplotsInPlay,
     minimum: minimumSubplots,
     inPlay: subplotsInPlay,
@@ -2152,7 +2155,12 @@ function deriveProficiencies(state) {
 /** Step 12: wealth and mission gear. */
 function deriveWealthAndGear(state) {
   const { sys, allItems, items, T, warnings, todo, plural, base, gearBase, abil, B, misc } = state;
-  const wealthTotal = base.wealth + B.get("wealth") + Math.max(0, abil.cha.mod) + (misc.wealth ?? 0);
+  const wealthTotal =
+    base.wealth +
+    B.get("wealth") +
+    Math.max(0, abil.cha.mod) +
+    (misc.wealth ?? 0) +
+    (sys.campaignEffects.startingWealth ?? 0);
   const alloc = sys.wealthAllocation ?? {};
   const allocated = (alloc.lifestyle ?? 0) + (alloc.possessions ?? 0) + (alloc.spendingCash ?? 0);
   const lifestyleRaw = 1 + B.get("lifestyle") + (alloc.lifestyle ?? 0);

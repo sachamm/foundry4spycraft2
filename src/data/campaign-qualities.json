@@ -8,7 +8,8 @@
     "gcDice": null,
     "summary": "Every gear pick for any character, NPCs included, rises 1 Caliber; a pick pushed past Caliber V also yields 1 extra Caliber I item of that type. Player and special characters start with +4 Wealth.",
     "effects": {
-      "gearCaliberShift": 1
+      "gearCaliberShift": 1,
+      "startingWealth": 4
     }
   },
   {
@@ -280,8 +281,14 @@
     "seasonOnly": true,
     "xp": 0,
     "gcDice": null,
-    "summary": "After Level 1, player and special characters gain fixed vitality per career level: 2 with a d8 vitality die, 3 with a d10, 4 with a d12.",
-    "effects": {}
+    "summary": "After the first Career Level, replace a d8 vitality roll with 2, a d10 with 3, or a d12 with 4. Constitution and other normal vitality modifiers still apply.",
+    "effects": {
+      "fixedVitalityByDie": {
+        "8": 2,
+        "10": 3,
+        "12": 4
+      }
+    }
   },
   {
     "id": "freelance",
@@ -578,7 +585,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Each character may be involved in 1 more Subplot at a time than normal.",
-    "effects": {}
+    "effects": {
+      "extraSubplots": 1
+    }
   },
   {
     "id": "speed-frame",

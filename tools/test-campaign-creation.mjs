@@ -82,3 +82,32 @@ test("the world provider applies only active mission qualities and reports confl
     globalThis.game = before;
   }
 });
+
+test("Fragile replaces only later dice, retains Constitution and level minimums, and suppresses missing-roll tasks", () => {
+  for (const [die, fixed] of [
+    [8, 2],
+    [10, 3],
+    [12, 4]
+  ])
+    for (const con of [2, 12, 18]) {
+      const s = agent(3);
+      s.abilities.con.base = con;
+      s.progression[1].vitality = 0;
+      s.progression[2].vitality = die;
+      const cls = structuredClone(items[0]);
+      cls.system.vitalityDie = die;
+      computeAgent(s, [cls], cfg, { campaignEffects: { fixedVitalityByDie: { 8: 2, 10: 3, 12: 4 } } });
+      const modifier = Math.floor((con - 10) / 2);
+      assert.equal(s.vitality.max, Math.max(1, die + modifier) + 2 * Math.max(1, fixed + modifier));
+      assert.ok(!s.todo.some(t => /Vitality not rolled/.test(t.text)));
+      assert.equal(s.progression[1].vitality, 0);
+      assert.equal(s.progression[2].vitality, die);
+    }
+});
+test("Big Budget adds four Wealth and Soap adds one open Subplot without changing class progression", () => {
+  const base = computeAgent(agent(3), items, cfg);
+  const changed = computeAgent(agent(3), items, cfg, { campaignEffects: { startingWealth: 4, extraSubplots: 1 } });
+  assert.equal(changed.wealth.total, base.wealth.total + 4);
+  assert.equal(changed.subplotPicks.available, base.subplotPicks.available + 1);
+  assert.deepEqual(changed.base, base.base);
+});

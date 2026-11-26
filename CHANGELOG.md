@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fragile now replaces later PC vitality dice with its fixed contributions, then applies Constitution and the
+  normal minimum. The sheet shows the fixed value; original saved rolls remain available if policy changes.
+  Big Budget adds its four Wealth and Soap adds its extra Subplot allowance.
 - Campaign qualities that allow alternate feat trees now reuse existing restricted choices, including explicit
   class bonus-feat sources, without creating extra slots. The sheet identifies replacements. Elite Ops does not
   turn an Advanced Skill choice into a Basic Skill choice; fixed granted feats remain grants.

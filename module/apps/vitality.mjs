@@ -8,6 +8,8 @@ import {
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "../rules/equal.mjs";
+import { campaignVitalityDie } from "../rules/campaign-creation.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 const owned = a => a?.type === "agent" && a.isOwner === true;
 const validIndex = (a, i) => Number.isSafeInteger(i) && i > 0 && i < (a.system.progression?.length ?? 0);
 const cloneProgression = a => a.system.progression.map(p => structuredClone(p));
@@ -80,7 +82,10 @@ export async function rollCareerVitality(actor, index) {
   if (!owned(actor) || !validIndex(actor, index)) return null;
   return queueResources([actor], async () => {
     if (!owned(actor)) throw new Error(loc`You must own the character before rolling vitality.`);
-    let source = vitalitySource(actor, index);
+    let source = vitalitySource(actor, index, { allowInvalidValue: true });
+    const fixed = campaignVitalityDie(source.die, currentCampaignRules().effects);
+    if (fixed !== null) return { total: fixed, fixed: true, levelId: source.levelId };
+    source = vitalitySource(actor, index);
     if (source.value > 0) {
       const record = source.levelId && actor.flags?.spycraft2?.vitalityRolls?.[source.levelId];
       if (record)

@@ -11,6 +11,7 @@ import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
 import { esc } from "../../html.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
+import { campaignVitalityDie } from "../../rules/campaign-creation.mjs";
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
@@ -27,7 +28,13 @@ export const ActorProgression = Base =>
         if (this.system.progression.length > before) level = this.system.progression.length;
         return result;
       });
-      if (level && promptVitality && level > 1 && cls?.system.vitalityDie) {
+      if (
+        level &&
+        promptVitality &&
+        level > 1 &&
+        cls?.system.vitalityDie &&
+        campaignVitalityDie(cls.system.vitalityDie, currentCampaignRules().effects) === null
+      ) {
         const roll = await systemDialog.confirm({
           window: { title: game.i18n.localize("SPYCRAFT.VitalityRoll") },
           content: `<p>${game.i18n.format("SPYCRAFT.VitalityPrompt", { level, name: esc(cls.name), die: esc(cls.system.vitalityDie) })}</p>`
