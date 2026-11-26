@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Underwater melee attacks now carry their declaration into damage. Weapons using Strength deal half standard
+  damage, rounded up; separate sneak attack dice retain their own rules. The damage card explains the reduction.
 - Foibles now adds its conditional dodge bonus when resolving an incoming attack and its damage reduction when
   applying lethal or subdual damage from a covered weapon. The incoming-attack preview offers the weapon's
   proficiency; attack cards carry it forward automatically. Vulnerability removes the dodge bonus, while

@@ -14,6 +14,12 @@ import { loc } from "../i18n.mjs";
 
 const MELEE = ["blunt", "exoticBlunt", "edged", "exoticEdged"];
 
+/** p.349: halve the standard damage of a melee weapon that applies Strength, before separate bonus dice. */
+export function underwaterMeleeDamage(formula, proficiency, { underwater = false, usesStrength = true } = {}) {
+  const halved = underwater === true && usesStrength && MELEE.includes(proficiency);
+  return { formula: halved ? `ceil((${formula}) / 2)` : formula, halved };
+}
+
 /**
  * @param {object} system
  * @param {object} weapon  the weapon as used ({proficiency})

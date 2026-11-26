@@ -8591,6 +8591,7 @@
    "UnderwaterCheckPenaltyWithAthleticsRanks_17s168h": "Underwater: {0} check penalty with {1} Athletics ranks (p.349).",
    "UnderwaterExplosiveAttackErrorRange2_11yeass": "Underwater explosive: attack {0}, error range +2 to set it; its blast increment doubles (p.349).",
    "UnderwaterMeleeAttackErrorRange2_036pfsu": "Underwater melee: attack {0}, error range +2; damage from a weapon that adds Strength is halved, rounded up (p.349).",
+   "UnderwaterMeleeHalfStandardDamageRounded_0zph6xq": "Underwater melee: half standard damage, rounded up (p.349).",
    "UnderwaterOnlyUnarmedMeleeAndExplosive_1hvmig5": "Underwater, only unarmed, melee and explosive attacks can be made without gear built for it (p.349).",
    "UnderwaterP349_1k794an": "Underwater (p.349)",
    "UnderwaterUnarmedAttacksTakeNoPenalty_1u2nhdx": "Underwater: unarmed attacks take no penalty (p.349).",

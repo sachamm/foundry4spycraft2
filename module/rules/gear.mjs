@@ -1,4 +1,5 @@
 import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
+import { underwaterMeleeDamage } from "./underwater-combat.mjs";
 import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
 import { unarmedTrickDamageBonus } from "./unarmed-tricks.mjs";
 import { hordeSupremacyDamage } from "./team-feats.mjs";
@@ -796,8 +797,14 @@ export function weaponDamage(
     ],
     bonus
   );
+  const underwater = underwaterMeleeDamage(
+    `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
+    weapon.proficiency,
+    { underwater: options.underwater, usesStrength: !finesseDamage }
+  );
   return {
     bonusRows,
+    underwaterDamage: underwater.halved,
     markDamage,
     deadToRights,
     meleeArmorPiercing,
@@ -808,7 +815,7 @@ export function weaponDamage(
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,
-    formula: `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
+    formula: underwater.formula,
     damageText: text,
     ammunition: projectile.name ?? "",
     explosive: projectile.explosive,
