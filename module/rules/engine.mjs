@@ -775,7 +775,9 @@ function deriveAttributes(state) {
     a.cost = T.abilityScores.find(r => r.score === a.base)?.cost;
     if (a.base < 8 || a.base > 18 || typeof a.cost !== "number") {
       a.cost = 0;
-      warnings.push(loc`${k.toUpperCase()} ${a.base} is outside the creation point-buy range (8–18).`);
+      const text = loc`${k.toUpperCase()} ${a.base} is outside the creation point-buy range (8–18).`;
+      warnings.push(text);
+      todo.push({ order: 9, always: true, error: true, tab: "main", text });
     }
     pointCost += a.cost;
   }
@@ -786,7 +788,7 @@ function deriveAttributes(state) {
     ])
   );
   const increasesDue = cfg.abilityIncreaseLevels.filter(l => l <= level);
-  const increasesMissing = increasesDue.filter(l => !increaseAt(l)).length;
+  const increasesMissing = increasesDue.filter(l => !ABILITIES.includes(increaseAt(l))).length;
   if (increasesMissing)
     todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
   sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
@@ -1689,7 +1691,13 @@ function deriveFinalTotals(state) {
   progression.forEach((entry, idx) => {
     const ci = classAtLevel[idx];
     const die = ci?.system.vitalityDie ?? 0;
-    const roll = idx === 0 ? die : Number(entry.vitality) || 0;
+    const valid = Number.isSafeInteger(entry.vitality) && entry.vitality >= 0 && entry.vitality <= die;
+    const roll = idx === 0 ? die : valid ? entry.vitality : 0;
+    if (idx > 0 && !valid) {
+      const text = loc`Level ${idx + 1}: review vitality and enter a whole die result from 1 to ${die}.`;
+      warnings.push(text);
+      todo.push({ order: 15, error: true, tab: "classes", text });
+    }
     if (idx > 0 && !entry.vitality) vitMissing.push(idx + 1);
     vitalityBreakdown.dice += roll;
     vitalityBreakdown.constitution += abil.con.mod;

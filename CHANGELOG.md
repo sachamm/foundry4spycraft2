@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Creation review now keeps invalid base attributes and unassigned attribute increases in the setup checklist.
+  Later vitality gains must be whole results within the class die; invalid saved gains need review and no longer
+  inflate maximum vitality. Saved choices remain available for correction.
+
 ## 0.8.7 — 2026-11-25
 
 - **Tooltips that show where a bonus comes from.** Every button on a character sheet that shows a roll bonus now
