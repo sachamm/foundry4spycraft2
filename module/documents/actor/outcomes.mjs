@@ -802,7 +802,7 @@ export const ActorOutcomes = Base =>
         let jinxReservation = null;
         const validateJinxCost = () => {
           const fresh = jinxCostPlan(
-            { ...payer.system, usagePeriods: payer.usagePeriods },
+            useGC ? {} : { ...payer.system, usagePeriods: payer.usagePeriods },
             quoteCritical(Number.MAX_SAFE_INTEGER),
             jinxOptions
           );
