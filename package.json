@@ -25,7 +25,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "@playwright/test": "1.65.1",
-    "classic-level": "1.4.1",
+    "classic-level": "3.0.0",
     "esbuild": "0.28.2",
     "eslint": "9.39.5",
     "globals": "17.14.0",
