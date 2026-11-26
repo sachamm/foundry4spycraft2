@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { campaignFeatReplacementAllowed } from "./campaign-creation.mjs";
 /** Explicit class bonus-feat sources, including Scientist Intense Study (p.42). */
 export function classFeatSources(items, progression) {
   const sources = [];
@@ -33,14 +34,15 @@ export function classFeatSources(items, progression) {
   return sources;
 }
 
-export function featAcquisition(feat, sources, items, { preview = false } = {}) {
+export function featAcquisition(feat, sources, items, { preview = false, campaignEffects = {} } = {}) {
   const key = feat.system.acquisitionSource;
   if (!key || feat.system.granted) return { ok: true, levelAllowance: 0 };
   const source = sources.find(s => s.id === key),
     career = feat.system.acquiredAtLevel || 1;
   if (!source)
     return { ok: false, levelAllowance: 0, reason: loc`The selected class bonus-feat source is unavailable.` };
-  if (source.tree !== "any" && source.tree !== feat.system.tree)
+  const replaced = campaignFeatReplacementAllowed(source.tree, feat.system.tree, campaignEffects);
+  if (source.tree !== "any" && source.tree !== feat.system.tree && !replaced)
     return {
       ok: false,
       levelAllowance: 0,
@@ -60,7 +62,8 @@ export function featAcquisition(feat, sources, items, { preview = false } = {}) 
       levelAllowance: 0,
       reason: loc`This class bonus-feat source is already assigned to another feat.`
     };
-  return { ok: true, source, levelAllowance: source.levelAllowance, effectiveLevel: career + source.levelAllowance };
+  const levelAllowance = source.levelAllowance;
+  return { ok: true, source, levelAllowance, effectiveLevel: career + levelAllowance };
 }
 
 const canonical = value =>

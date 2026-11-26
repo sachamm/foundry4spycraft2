@@ -4,6 +4,7 @@ import {
   campaignFeatCount,
   campaignProficiencyCount,
   campaignInterestCount,
+  campaignFeatSlots,
   campaignXP
 } from "./campaign-creation.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
@@ -1984,6 +1985,8 @@ function deriveFeatSlots(state) {
   for (const f of featItems)
     if (!f.system.granted && !["temporary", "virtual"].includes(f.system.featKind))
       spent[f.system.tree] = (spent[f.system.tree] ?? 0) + 1;
+  const campaignAllocation = campaignFeatSlots(slots, spent, sys.campaignEffects);
+  Object.assign(slots, campaignAllocation.slots);
   let overflow = 0;
   const trees = {};
   for (const t of Object.keys(cfg.featTrees)) {
@@ -1993,6 +1996,7 @@ function deriveFeatSlots(state) {
   }
   for (const [t, s] of Object.entries(spent)) if (!(t in cfg.featTrees)) overflow += s;
   sys.feats = { any: { slots: slots.any, spent: overflow, remaining: slots.any - overflow }, trees, replacementGrants };
+  if (campaignAllocation.replacements.length) sys.feats.campaignReplacements = campaignAllocation.replacements;
   if (overflow > slots.any) warnings.push(loc`${overflow - slots.any} more feat(s) taken than available.`);
   const unusedTree = Object.entries(trees)
     .filter(([, v]) => v.slots > v.spent)
@@ -2388,7 +2392,7 @@ function settlePrerequisites(state) {
     const trees = {};
     for (const other of [...usable, ...sys.virtualFeats.map(other => ({ system: other }))])
       trees[other.system.tree] = (trees[other.system.tree] ?? 0) + 1;
-    const acquisition = featAcquisition(f, sys.featAcquisitionSources, items),
+    const acquisition = featAcquisition(f, sys.featAcquisitionSources, items, { campaignEffects: sys.campaignEffects }),
       historical = historicalFeatEligibility(f.system),
       exempt = f.system.granted && f.system.featKind !== "temporary";
     const context = {

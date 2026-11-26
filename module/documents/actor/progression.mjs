@@ -360,7 +360,7 @@ export const ActorProgression = Base =>
           },
           this.system.featAcquisitionSources ?? [],
           this.items.filter(() => true),
-          { preview: true }
+          { preview: true, campaignEffects: currentCampaignRules().effects }
         );
         if (!acquisition.ok) return { ok: false, unmet: [acquisition.reason] };
         ctx.prerequisiteLevel = acquisition.effectiveLevel;

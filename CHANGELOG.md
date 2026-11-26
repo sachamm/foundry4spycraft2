@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Campaign qualities that allow alternate feat trees now reuse existing restricted choices, including explicit
+  class bonus-feat sources, without creating extra slots. The sheet identifies replacements. Elite Ops does not
+  turn an Advanced Skill choice into a Basic Skill choice; fixed granted feats remain grants.
 - Invalid saved vitality can now be corrected through Review vitality. Rolling refuses impossible saved values;
   a confirmed correction preserves the previous value in its review history and does not reroll or heal.
 - Laser attacks now ignore positive dodge bonuses and receive their critical-hit discount. Laser weapon damage

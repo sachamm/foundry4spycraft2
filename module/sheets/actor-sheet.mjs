@@ -1187,6 +1187,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.featTrees = Object.entries(sys.feats?.trees ?? {})
       .filter(([, v]) => v.slots || v.spent || v.owned)
       .map(([k, v]) => ({ key: k, label: cfg.featTrees[k], ...v }));
+    context.campaignFeatReplacements = (sys.feats?.campaignReplacements ?? []).map(
+      r => loc`Campaign feat replacement: ${cfg.featTrees[r.source]} → ${cfg.featTrees[r.target]}; ${r.count} used.`
+    );
     context.coreAbilities = sys.coreAbilities ?? [];
     context.criticalInjuryReviews = criticalInjuryReviews(this.actor);
     context.startedCharacterCombat = this.actor.participatingCombat?.started === true;
