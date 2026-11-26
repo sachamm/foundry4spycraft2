@@ -32,7 +32,7 @@ test("modules share these helpers instead of declaring their own copies", () => 
   const copy =
     /const (?:stable|same) = (?:\(a, b\) => JSON\.stringify\(a\) === JSON\.stringify\(b\)|v =>\s*JSON\.stringify\(v, \(_k, x\) =>\s*x && typeof x === "object" && !Array\.isArray\(x\)\s*\? Object\.fromEntries\(\s*Object\.keys\(x\))/;
   const offenders = sources(join(ROOT, "module")).filter(
-    file => !file.endsWith("rules/equal.mjs") && copy.test(readFileSync(file, "utf8"))
+    file => file !== join(ROOT, "module", "rules", "equal.mjs") && copy.test(readFileSync(file, "utf8"))
   );
   assert.deepEqual(offenders, []);
 });
