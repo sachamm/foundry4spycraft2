@@ -83,7 +83,7 @@ export async function applyAccumulatedDamage(actor, options = {}) {
   const subdualBefore = {};
   for (const kind of Object.keys(SUBDUAL_ATTACK_KINDS))
     try {
-      subdualBefore[kind] = subdualDefenseSourceSnapshot(actor.system, kind);
+      subdualBefore[kind] = subdualDefenseSourceSnapshot(actor.system, kind, input.weaponProficiency);
     } catch (error) {
       console.warn(`Field Agent's Handbook | Subdual defenses (${kind}) could not be prepared:`, error);
     }
@@ -140,8 +140,11 @@ export async function applyAccumulatedDamage(actor, options = {}) {
       );
     if (
       plan.record.defenseContext?.kind === "subdual" &&
-      subdualDefenseSourceSnapshot(actor.system, plan.record.defenseContext.attackKind) !==
-        subdualBefore[plan.record.defenseContext.attackKind]
+      subdualDefenseSourceSnapshot(
+        actor.system,
+        plan.record.defenseContext.attackKind,
+        plan.record.defenseContext.weaponProficiency
+      ) !== subdualBefore[plan.record.defenseContext.attackKind]
     )
       throw new Error(loc`Prepared subdual defenses changed while damage was being recorded. Review the amount again.`);
     await commit(

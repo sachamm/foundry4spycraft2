@@ -1,6 +1,7 @@
 import { preparedResistanceSource } from "./resistances.mjs";
 import { armorTrainingDRForAttack } from "./armor-training.mjs";
 import { loc } from "../i18n.mjs";
+import { specialistDRIncrement } from "./weapon-specialist.mjs";
 /** DR categories of an incoming attack. The labels are read when asked for, in the reader's language. */
 export const SUBDUAL_ATTACK_KINDS = {
   get unarmed() {
@@ -19,7 +20,7 @@ export const SUBDUAL_ATTACK_KINDS = {
     return loc`Other damage source`;
   }
 };
-export function subdualDefenseSource(system, attackKind) {
+export function subdualDefenseSource(system, attackKind, weaponProficiency = "") {
   if (!Object.hasOwn(SUBDUAL_ATTACK_KINDS, attackKind))
     throw new Error(loc`Choose the actual incoming attack’s DR category.`);
   const dr = system.armorDRByAttack?.[attackKind];
@@ -27,18 +28,27 @@ export function subdualDefenseSource(system, attackKind) {
     throw new Error(loc`Prepare and review the listed DR for this attack category.`);
   return {
     attackKind,
-    listedDR: dr,
+    listedDR: dr + specialistDRIncrement(system, attackKind, weaponProficiency),
+    ...(weaponProficiency ? { weaponProficiency } : {}),
     components: structuredClone(system.damageReductionComponents),
     armorTraining: structuredClone(system.armorFeatRules ?? null),
     armorItems: [...(system.armor?.items ?? [])].sort(),
     ...preparedResistanceSource(system, "subdual")
   };
 }
-export const subdualDefenseSourceSnapshot = (system, kind) => JSON.stringify(subdualDefenseSource(system, kind));
+export const subdualDefenseSourceSnapshot = (system, kind, weaponProficiency = "") =>
+  JSON.stringify(subdualDefenseSource(system, kind, weaponProficiency));
 /** pp.332–333,339: AP reduces DR, each remaining point absorbs two subdual, then resistance applies. */
 export function subdualDefensePlan(
   system,
-  { rawDamage, attackKind, armorPiercing = 0, armorPiercingAll = false, criticalHit = false } = {}
+  {
+    rawDamage,
+    attackKind,
+    weaponProficiency = "",
+    armorPiercing = 0,
+    armorPiercingAll = false,
+    criticalHit = false
+  } = {}
 ) {
   if (
     !Number.isSafeInteger(rawDamage) ||
@@ -49,7 +59,7 @@ export function subdualDefensePlan(
     typeof criticalHit !== "boolean"
   )
     throw new Error(loc`Confirm whole subdual damage/AP and the actual AP(all)/critical checkboxes.`);
-  const source = subdualDefenseSource(system, attackKind),
+  const source = subdualDefenseSource(system, attackKind, weaponProficiency),
     temporaryDR = armorPiercingAll ? 0 : Math.max(0, source.listedDR - armorPiercing),
     effectiveDR = temporaryDR * 2;
   if (!Number.isSafeInteger(effectiveDR)) throw new Error(loc`The doubled subdual DR cannot be represented safely.`);

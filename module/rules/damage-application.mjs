@@ -8,6 +8,7 @@
 import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
+import { specialistDRIncrement } from "./weapon-specialist.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 const int = value => Math.trunc(Number(value) || 0);
@@ -61,11 +62,14 @@ export function attackResolutionNote(check) {
   }
   const base = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
   const against = r.cover ? loc`${base} (with ${r.cover.label} cover, +${r.cover.bonus})` : base;
-  if (!r.hit && r.hitsCover) return loc`Against ${against}: a miss by ${-r.margin}. The shot hits the cover.`;
-  if (!r.hit) return loc`Against ${against}: a miss by ${-r.margin}.`;
-  return r.hits > 1
-    ? loc`Against ${against}: a hit by ${r.margin}; ${r.hits} shots hit.`
-    : loc`Against ${against}: a hit by ${r.margin}.`;
+  const note = r.specialistDodge ? " " + loc`Foibles adds 1 dodge to this Defense (p.49).` : "";
+  if (!r.hit && r.hitsCover) return loc`Against ${against}: a miss by ${-r.margin}. The shot hits the cover.` + note;
+  if (!r.hit) return loc`Against ${against}: a miss by ${-r.margin}.` + note;
+  return (
+    (r.hits > 1
+      ? loc`Against ${against}: a hit by ${r.margin}; ${r.hits} shots hit.`
+      : loc`Against ${against}: a hit by ${r.margin}.`) + note
+  );
 }
 
 /** Damage after damage reduction, which armor-piercing lowers first (p.332). */
@@ -195,13 +199,14 @@ export function lethalHitLines(name, plan) {
 }
 
 /** Which DR column an attack uses: armor lists one value against melee and another against everything else. */
-export function drForAttack(system = {}, attackKind = "other") {
+export function drForAttack(system = {}, attackKind = "other", weaponProficiency = "") {
+  const extra = specialistDRIncrement(system, attackKind, weaponProficiency);
   const listed = system.armorDRByAttack?.[attackKind];
-  if (whole(listed)) return listed;
+  if (whole(listed)) return listed + extra;
   const melee = ["unarmed", "meleeWeapon"].includes(attackKind);
   const fromArmor = melee ? system.dr?.melee : system.dr?.other;
-  if (whole(fromArmor)) return fromArmor;
-  return whole(system.qualityEffects?.damageReduction) ? system.qualityEffects.damageReduction : 0;
+  if (whole(fromArmor)) return fromArmor + extra;
+  return (whole(system.qualityEffects?.damageReduction) ? system.qualityEffects.damageReduction : 0) + extra;
 }
 
 /** The DR category of a weapon, from its proficiency and whether the attack was ranged. */

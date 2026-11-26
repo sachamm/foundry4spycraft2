@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Foibles now adds its conditional dodge bonus when resolving an incoming attack and its damage reduction when
+  applying lethal or subdual damage from a covered weapon. The incoming-attack preview offers the weapon's
+  proficiency; attack cards carry it forward automatically. Vulnerability removes the dodge bonus, while
+  armor piercing and subdual doubling apply to the damage reduction normally.
 - Creation review now keeps invalid base attributes and unassigned attribute increases in the setup checklist.
   Later vitality gains must be whole results within the class die; invalid saved gains need review and no longer
   inflate maximum vitality. Saved choices remain available for correction.

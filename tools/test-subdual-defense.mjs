@@ -168,6 +168,20 @@ const baseline = { stress: 0, subdual: 14, note: "GC verified actual totals", co
     armorPiercing: 0,
     confirmed: true
   };
+
+test("Foibles is applied and retained in a real subdual ledger event with its incoming proficiency", async () => {
+  const a = actor();
+  a.system.weaponSpecialist = { abilities: ["Foibles"], proficiencies: ["unarmed"] };
+  await reviewDamageLedger(a, baseline);
+  const input = { ...raw, weaponProficiency: "unarmed", armorPiercing: 1 };
+  const result = await applyAccumulatedDamage(a, input);
+  assert.equal(result.newDamage, 4);
+  assert.equal(result.defenseContext.listedDR, 4);
+  assert.equal(result.request.weaponProficiency, "unarmed");
+  a.system.weaponSpecialist.abilities = [];
+  assert.deepEqual(await applyAccumulatedDamage(a, input), result);
+  await assert.rejects(applyAccumulatedDamage(a, { ...input, weaponProficiency: "rifle" }), /different damage/);
+});
 test("actual ledger events use net subdual per hit and retain individual ordinary or critical saves without touching health or dice", async () => {
   const a = actor();
   await reviewDamageLedger(a, baseline);

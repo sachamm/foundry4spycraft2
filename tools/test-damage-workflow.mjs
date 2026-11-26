@@ -123,6 +123,40 @@ const reset = () => {
   warnings.length = 0;
 };
 
+test("Foibles changes the posted attack outcome only for covered weapons and respects a GC Defense override", async () => {
+  reset();
+  const attacker = character("FoiblesAttacker", {});
+  const target = character("FoiblesTarget", {
+    defense: { total: 15 },
+    weaponSpecialist: { abilities: ["Foibles"], proficiencies: ["rifle"] }
+  });
+  const attack = id =>
+    card(id, { actorUuid: attacker.uuid, checkKind: "attack", effectiveTotal: 15, weaponProficiency: "rifle" });
+  const result = await resolveAttack(attack("foibles-hit"), { targetUuid: target.uuid });
+  assert.equal(result.defense, 16);
+  assert.equal(result.hit, false);
+  assert.equal(result.specialistDodge, 1);
+  const override = await resolveAttack(attack("foibles-override"), { targetUuid: target.uuid, defense: 15 });
+  assert.equal(override.hit, true);
+  assert.equal(override.specialistDodge, 0);
+  target.system.defense.vulnerable = true;
+  assert.equal((await resolveAttack(attack("foibles-vulnerable"), { targetUuid: target.uuid })).defense, 15);
+});
+
+test("damage cards apply Foibles from the saved attack proficiency even without a surviving weapon item", async () => {
+  reset();
+  const target = character("FoiblesDamageTarget", {
+    vitality: { value: 20, max: 20 },
+    wounds: { value: 12, max: 12 },
+    dr: { melee: 0, other: 2 },
+    weaponSpecialist: { abilities: ["Foibles"], proficiencies: ["rifle"] }
+  });
+  const damage = card("foibles-damage", { checkKind: "damage", effectiveTotal: 10, weaponProficiency: "rifle" });
+  await applyDamage(damage, { targetUuid: target.uuid, damage: 10, kind: "lethal", attackKind: "rangedWeapon" });
+  assert.equal(target.system.vitality.value, 13);
+  assert.match(posted.at(-1).content, /Foibles/);
+});
+
 test("an attack is settled against the target's listed Defense and its outcome confirmed", async () => {
   reset();
   const attacker = character("Kevin", { activeFeatNames: [] });

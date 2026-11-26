@@ -54,6 +54,7 @@ import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from ".
 import { loc, locKey } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 import { COVER_GRADES } from "../rules/cover.mjs";
+import { specialistDefense } from "../rules/weapon-specialist.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -99,10 +100,12 @@ export function targetChoices({ exclude = "", offScene = "always" } = {}) {
 }
 
 /** The Defense a target's sheet shows now, or null when it has none. */
-export function defenseOf(target) {
+export function defenseOf(target, weaponProficiency = "") {
   const system = target?.system ?? {};
   const value = target?.type === "vehicle" ? (system.defenseNow?.total ?? system.defense) : system.defense?.total;
-  return Number.isSafeInteger(value) ? value : null;
+  const dodge =
+    target?.type !== "vehicle" && !system.defense?.vulnerable ? specialistDefense(system, weaponProficiency).dodge : 0;
+  return Number.isSafeInteger(value) ? value + dodge : null;
 }
 
 /**
@@ -218,7 +221,7 @@ export async function resolveAttack(message, options = {}) {
   if (target && target.uuid === attacker.uuid)
     return refuse(loc`${attacker.name} cannot be the target of its own attack. Choose another target.`);
   const entered = input.defense === "" || input.defense === null || input.defense === undefined;
-  const baseDefense = entered ? defenseOf(target) : Number(input.defense);
+  const baseDefense = entered ? defenseOf(target, check.weaponProficiency) : Number(input.defense);
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
   const cover = coverOnResolution(input.cover);
@@ -239,6 +242,10 @@ export async function resolveAttack(message, options = {}) {
     targetUuid: target?.uuid ?? "",
     targetName: target?.name ?? "",
     defense,
+    specialistDodge:
+      entered && target?.type !== "vehicle" && !target?.system?.defense?.vulnerable
+        ? specialistDefense(target?.system ?? {}, check.weaponProficiency).dodge
+        : 0,
     total: check.effectiveTotal,
     // Updates merge, so resolving again without cover clears what an earlier resolution recorded.
     cover: cover ?? null,
@@ -449,7 +456,14 @@ export function accumulatedDamageLines(name, kind, amount, record, system = {}) 
  * @returns {{lines: string[], pendingSave: object|null}}
  */
 async function nonLethalDamage(target, kind, amount, facts) {
-  const { source, attackKind, armorPiercing = 0, armorPiercingAll = false, critical = false } = facts;
+  const {
+    source,
+    attackKind,
+    weaponProficiency = "",
+    armorPiercing = 0,
+    armorPiercingAll = false,
+    critical = false
+  } = facts;
   if (target.type === "agent") {
     try {
       const record = await applyAccumulatedDamage(target, {
@@ -459,7 +473,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
         criticalHit: critical === true,
         confirmed: true,
         ...(kind === "subdual"
-          ? { damageMode: "subdualBeforeDefenses", attackKind, armorPiercing, armorPiercingAll }
+          ? { damageMode: "subdualBeforeDefenses", attackKind, weaponProficiency, armorPiercing, armorPiercingAll }
           : { damageMode: "stressBeforeResistance" })
       });
       return {
@@ -479,7 +493,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
   const plan = nonLethalHitPlan(target.system, nonLethalTotals(target), {
     kind,
     damage: amount,
-    dr: drForAttack(target.system, attackKind),
+    dr: drForAttack(target.system, attackKind, weaponProficiency),
     armorPiercing,
     armorPiercingAll,
     critical
@@ -738,7 +752,15 @@ export async function applyDamage(message, options = {}) {
   if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
   if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
   const source = loc`${weapon?.name ?? loc`Damage`} (${message.id ?? "roll"})`;
-  const hit = { damage, dr: drForAttack(target.system, attackKind), armorPiercing, armorPiercingAll, critical };
+  const weaponProficiency = check.weaponProficiency ?? attack?.weaponProficiency ?? weapon?.system?.proficiency ?? "";
+  const specialistDR = specialistDefense(target.system, weaponProficiency).damageReduction;
+  const hit = {
+    damage,
+    dr: drForAttack(target.system, attackKind, weaponProficiency),
+    armorPiercing,
+    armorPiercingAll,
+    critical
+  };
   let lines = [],
     pendingSave = null,
     failed = false,
@@ -819,6 +841,7 @@ export async function applyDamage(message, options = {}) {
       ({ lines, pendingSave, failed } = await nonLethalDamage(target, kind, damage, {
         source,
         attackKind,
+        weaponProficiency,
         armorPiercing,
         armorPiercingAll,
         critical
@@ -849,6 +872,10 @@ export async function applyDamage(message, options = {}) {
         : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
     );
   }
+  if (specialistDR && kind !== "stress" && target.type !== "vehicle")
+    lines.push(
+      loc`Foibles adds 1 damage reduction against this weapon before armor piercing and damage-type rules (p.49).`
+    );
   if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
   if (failed) return null;

@@ -281,7 +281,6 @@ own line on the card, and checked against the page first.
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
 | B-180 | Campaign qualities change no number in play beyond XP, action-die cost and starting dice; injury thresholds are fixed at 25/50, so the damage card can post the wrong save prompt under some qualities. Disposition modifiers are not added to rolls. (pp.406–407) | R-01 | M |
-| B-181 | Weapon Specialist +1 Defense / +1 damage reduction never applied. | R-02 | S |
 | B-182 | Laser: die loss per range increment is reminder text; its lower critical cost is not applied (the attack record does not carry the damage type). (p.338) | R-03, RW-286 | S |
 | B-183 | Falling stress not applied. (p.336) | R-04 | S |
 | B-184 | No control for persuading an NPC to join a fight. | R-05 | S |

@@ -1,5 +1,6 @@
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { armorTrainingDRForAttack } from "./armor-training.mjs";
 /** Soldier Weapon Specialist, pp.49–50. At 6 gain both; later gain one or the other. */
 export function weaponSpecialist(system, items, cfg) {
   const result = { fields: [], proficiencies: [], abilities: [], pending: [], warnings: [] };
@@ -54,13 +55,26 @@ export function weaponSpecialist(system, items, cfg) {
 export function specialistApplies(system, weapon, ability) {
   return (
     system.weaponSpecialist?.proficiencies?.includes(weapon.proficiency) &&
-    system.weaponSpecialist.abilities.includes(ability)
+    system.weaponSpecialist.abilities?.includes(ability)
   );
 }
 export function specialistDefense(system, proficiency) {
   return specialistApplies(system, { proficiency }, "Foibles")
     ? { dodge: 1, damageReduction: 1 }
     : { dodge: 0, damageReduction: 0 };
+}
+
+/** Foibles is class DR; quality natural DR remains an alternative to armor plus class DR (p.446). */
+export function specialistDRIncrement(system, attackKind, proficiency) {
+  const extra = specialistDefense(system, proficiency).damageReduction;
+  if (!extra || !system.damageReductionComponents) return extra;
+  const components = system.damageReductionComponents;
+  return (
+    armorTrainingDRForAttack(
+      { ...system, damageReductionComponents: { ...components, class: components.class + extra } },
+      attackKind
+    ) - armorTrainingDRForAttack(system, attackKind)
+  );
 }
 
 // Weapon Specialist "No Worries" as part of an attack plan.

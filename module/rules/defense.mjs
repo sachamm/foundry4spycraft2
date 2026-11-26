@@ -12,6 +12,7 @@ import { duelingChosenDodge } from "./dueling-basics.mjs";
 import { knownSneakAttackImmunity } from "./sneak-attack.mjs";
 import { attributeCollapsePlan, attributeDefensePlan } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
+import { specialistDefense, specialistDRIncrement } from "./weapon-specialist.mjs";
 /** pp.29,33,37–38,84: combine legacy grades, capped by the highest class offering. */
 export function uncannyDodgePlan(system) {
   const sources = [];
@@ -106,7 +107,9 @@ export function incomingDefensePlan(system, options = {}) {
   const securityBonus = securityDevice ? uncanny.securityBonus : 0;
   const triggerman = system.classLevels?.triggerman ?? 0,
     eyeOfStorm = adjacent && triggerman >= 4 ? 3 : 0;
-  const extraDodge = vulnerable ? 0 : eyeOfStorm;
+  const foibles = specialistDefense(system, options.weaponProficiency);
+  const specialistDodge = vulnerable ? 0 : foibles.dodge;
+  const extraDodge = (vulnerable ? 0 : eyeOfStorm) + specialistDodge;
   const circling = circlingDefensePlan({
     ...options.circling,
     ranged,
@@ -156,6 +159,8 @@ export function incomingDefensePlan(system, options = {}) {
     proneAttackerPenalty = manual.prone === true && ranged && !adjacent ? -2 : 0;
   return {
     circling,
+    specialistDodge,
+    specialistDR: foibles.damageReduction,
     whirling,
     sharpshooter,
     guard,
@@ -167,8 +172,13 @@ export function incomingDefensePlan(system, options = {}) {
     // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
     stickyFingersDR: stickyFingers ? 5 : 0,
     listedDR:
-      stickyFingers && system.armorDRByAttack
-        ? Object.fromEntries(Object.entries(system.armorDRByAttack).map(([k, v]) => [k, v + 5]))
+      (stickyFingers || foibles.damageReduction) && system.armorDRByAttack
+        ? Object.fromEntries(
+            Object.entries(system.armorDRByAttack).map(([k, v]) => [
+              k,
+              v + (stickyFingers ? 5 : 0) + specialistDRIncrement(system, k, options.weaponProficiency)
+            ])
+          )
         : (system.armorDRByAttack ?? null),
     coupDeGraceException,
     coupDeGraceExceptionSource: coupDeGraceException ? coupDeGraceExceptionSource.trim() : "",
@@ -179,7 +189,7 @@ export function incomingDefensePlan(system, options = {}) {
     dexterity,
     dodgeLost,
     securityBonus,
-    eyeOfStorm: extraDodge,
+    eyeOfStorm: vulnerable ? 0 : eyeOfStorm,
     vulnerable,
     helpless: state.helpless,
     flatFooted: !!(manual.flatFooted || flatFooted) && !uncanny.cannotBeFlatFooted,
@@ -199,6 +209,9 @@ export function incomingDefensePlan(system, options = {}) {
       (!system.armorFeatRules?.coupDeGraceRequiresHelpless || state.helpless),
     uncanny,
     notes: [
+      ...(foibles.damageReduction
+        ? [loc`Foibles: +${specialistDodge} dodge to Defense and +1 damage reduction against this weapon (p.49).`]
+        : []),
       ...(whirling.stance
         ? [
             loc`Whirling Stance: career level ${whirling.defenderLevel}; ${whirling.declared ? loc`this attacker level ` + whirling.attackerLevel + (whirling.prevented ? loc` cannot flank you.` : loc` retains ordinary flanking eligibility.`) : loc`review the actual attacker’s career level if flanking is declared.`} No unconditional Defense bonus (p.179).`

@@ -76,6 +76,18 @@ export async function checkIncomingDefense(actor, known = {}) {
     title: loc`Incoming attack — Defense`,
     intro: loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`,
     fields: [
+      raw(
+        actor.system.weaponSpecialist?.abilities?.includes("Foibles")
+          ? `<label>${loc`Incoming weapon proficiency`} <select name="weaponProficiency"><option value="">${loc`Unknown (no Foibles bonus)`}</option>${Object.entries(
+              CONFIG.SPYCRAFT.proficiencies
+            )
+              .map(
+                ([key, value]) =>
+                  `<option value="${key}"${key === known.weaponProficiency ? " selected" : ""}>${esc(value.label)}</option>`
+              )
+              .join("")}</select></label>`
+          : ""
+      ),
       raw(coverInput),
       raw(circlingInput),
       raw(ghostCoverContent(actor)),
@@ -184,6 +196,7 @@ export async function checkIncomingDefense(actor, known = {}) {
     if (circlingSource && [source?.attacker, precision].some(a => a && a !== circlingSource))
       throw new Error(loc`The Circling Stance and cover-reduction declarations must name the same actual attacker.`);
     plan = incomingDefensePlan(actor.system, {
+      weaponProficiency: input.weaponProficiency ?? "",
       fromDuelingOpponent: input.fromDuelingOpponent === true,
       anticipateDodge: Math.max(
         0,
