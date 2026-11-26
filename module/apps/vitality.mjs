@@ -135,21 +135,23 @@ export async function rollCareerVitality(actor, index) {
 }
 export async function reviewCareerVitality(actor, index, options = {}) {
   if (!owned(actor) || !validIndex(actor, index)) return null;
-  const expected = vitalitySourceEvidence(vitalitySource(actor, index)),
-    initial = vitalitySource(actor, index);
+  const reviewSource = () => vitalitySource(actor, index, { allowInvalidValue: true });
+  const expected = vitalitySourceEvidence(reviewSource()),
+    initial = reviewSource();
   let input = options;
   if (!Object.keys(input).length) {
     const esc = foundry.utils.escapeHTML;
+    const displayValue = Number.isFinite(initial.value) ? String(initial.value) : "";
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Record or review raw vitality` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Career Level ${index + 1}, ${esc(initial.className)}, d${initial.die}. Current raw value ${initial.value || loc`not recorded`}. Record an external result or correct the existing record; this does not reroll the die.`}</p><label>${loc`Actual raw die result`} <input name="value" type="number" min="1" max="${initial.die}" step="1" value="${initial.value || ""}" required /></label><label>${loc`Source/review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this actual raw result and review`}</label><p>${loc`Constitution and other vitality bonuses apply separately. Current vitality is not healed by this review. First-career vitality remains automatic maximum; action dice cannot boost vitality gains (pp.60–61).`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Career Level ${index + 1}, ${esc(initial.className)}, d${initial.die}. Current raw value ${displayValue || loc`not recorded`}. Record an external result or correct the existing record; this does not reroll the die.`}</p><label>${loc`Actual raw die result`} <input name="value" type="number" min="1" max="${initial.die}" step="1" value="${displayValue}" required /></label><label>${loc`Source/review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this actual raw result and review`}</label><p>${loc`Constitution and other vitality bonuses apply separately. Current vitality is not healed by this review. First-career vitality remains automatic maximum; action dice cannot boost vitality gains (pp.60–61).`}</p></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true) return null;
   return queueResources([actor], async () => {
-    if (!owned(actor) || vitalitySourceEvidence(vitalitySource(actor, index)) !== expected)
+    if (!owned(actor) || vitalitySourceEvidence(reviewSource()) !== expected)
       throw new Error(loc`The vitality source changed before review. Open it again.`);
     const parsed =
       typeof input.value === "number"
@@ -159,7 +161,7 @@ export async function reviewCareerVitality(actor, index, options = {}) {
           : NaN;
     // Validate everything before assigning an ID or changing a legacy row.
     const id = foundry.utils.randomID(),
-      source = vitalitySource(actor, index),
+      source = reviewSource(),
       withId = { ...source, levelId: source.levelId || foundry.utils.randomID() },
       record = vitalityReviewRecord(actor, withId, { ...input, value: parsed }, id, game.time.worldTime),
       progression = cloneProgression(actor);

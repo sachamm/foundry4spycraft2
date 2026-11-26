@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Invalid saved vitality can now be corrected through Review vitality. Rolling refuses impossible saved values;
+  a confirmed correction preserves the previous value in its review history and does not reroll or heal.
 - Laser attacks now ignore positive dodge bonuses and receive their critical-hit discount. Laser weapon damage
   uses the attack's measured range to remove base dice, reaching zero when all are lost. Direct damage rolls
   ask for missing distance; cancelled distance entry rolls nothing.

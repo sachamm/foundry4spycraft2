@@ -7790,6 +7790,7 @@
    "TheSavedTerrainCoverGradesChanged_1cmenrj": "The saved terrain cover grades changed.",
    "TheSavedTripOutcomeFieldsAre_1m9xx9q": "The saved Trip outcome fields are malformed; ask the GC to review.",
    "TheSavedTripPairHasConflicting_0mwkqrw": "The saved Trip pair has conflicting outcome records.",
+   "TheSavedVitalityResultIsOutside_0auw3uw": "The saved vitality result is outside its class die. Use Review vitality to enter the confirmed result before rolling.",
    "TheSavedWoundEventNeedsGC_0qkclij": "The saved wound event needs GC review before it can be used again.",
    "TheSceneChangedWhileTheDialog_0egew77": "The scene changed while the dialog was open. Nothing was added.",
    "TheSceneIsNowDramaticGC_1hsg1x3": "The scene is now dramatic: GC dice explode on 1 and maximum, opponents’ Initiative doubles (maximum 50), and up to 3 dice may boost one DC.",

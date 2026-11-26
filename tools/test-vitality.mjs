@@ -324,3 +324,21 @@ test("normalizing a wrong roll result cannot fabricate a class gain", async () =
   }
   assert.equal(game.messages.length, 0);
 });
+
+test("impossible saved vitality refuses RNG but can be corrected through the normal review workflow", async () => {
+  for (const value of [-2, 2.5, 99, "bad"]) {
+    const a = actor();
+    a.system.progression[1].vitality = value;
+    await assert.rejects(rollCareerVitality(a, 1), /Review vitality/);
+    assert.equal(rng, 0);
+    const result = await reviewCareerVitality(a, 1, {
+      value: 5,
+      note: "GC confirmed the external die",
+      confirmed: true
+    });
+    assert.equal(result.before, value);
+    assert.equal(a.system.progression[1].vitality, 5);
+    assert.equal(a.system.vitality.value, 4);
+    assert.equal(rng, 0);
+  }
+});

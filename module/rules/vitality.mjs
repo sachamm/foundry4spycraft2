@@ -1,14 +1,18 @@
 import { loc } from "../i18n.mjs";
 const validId = id =>
   typeof id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(id) && !["constructor", "prototype", "__proto__"].includes(id);
-export function vitalitySource(actor, index) {
+export function vitalitySource(actor, index, { allowInvalidValue = false } = {}) {
   if (!Number.isSafeInteger(index) || index < 1 || index >= (actor.system.progression?.length ?? 0))
     throw new Error(loc`Career Level 1 vitality is automatic maximum; choose an existing higher career level (p.60).`);
   const entry = actor.system.progression[index],
     cls = actor.items.find(i => i.type === "class" && (i.system.identifier || i.name) === entry.classId),
     die = cls?.system.vitalityDie;
-  if (!cls || !Number.isSafeInteger(die) || die < 2 || !Number.isSafeInteger(entry.vitality) || entry.vitality < 0)
+  if (!cls || !Number.isSafeInteger(die) || die < 2)
     throw new Error(loc`Review this career level and its class vitality die.`);
+  if (!allowInvalidValue && (!Number.isSafeInteger(entry.vitality) || entry.vitality < 0 || entry.vitality > die))
+    throw new Error(
+      loc`The saved vitality result is outside its class die. Use Review vitality to enter the confirmed result before rolling.`
+    );
   const levelId = entry.vitalityRollId ?? "",
     reviewId = entry.vitalityReviewId ?? "";
   if ((levelId && !validId(levelId)) || (reviewId && !validId(reviewId)))
