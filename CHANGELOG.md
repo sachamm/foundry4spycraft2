@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Critical-injury activation now applies Bulletproof/Gritty's cost modifier to ready-made injuries and explicitly
+  declared custom injuries. Payment rechecks the live campaign policy; ordinary wounds criticals keep their
+  normal cost.
 - Fragile now replaces later PC vitality dice with its fixed contributions, then applies Constitution and the
   normal minimum. The sheet shows the fixed value; original saved rolls remain available if policy changes.
   Big Budget adds its four Wealth and Soap adds its extra Subplot allowance.

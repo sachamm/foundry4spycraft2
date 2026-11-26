@@ -12,6 +12,29 @@ const success = {
   beforeDamage: true,
   available: 4
 };
+
+test("campaign injury costs apply only to injury effects, retain minimum zero, and combine with laser discounts", () => {
+  for (const [change, expected] of [
+    [1, 3],
+    [-1, 1]
+  ]) {
+    const s = { campaignEffects: { criticalInjuryActivationCost: change } };
+    assert.equal(criticalPlan(s, threat, { ...success, preset: "hit.ouch", baseCost: 2 }).cost, expected);
+    assert.equal(criticalPlan(s, threat, { ...success, preset: "hit.wounds" }).cost, 1);
+    assert.equal(criticalPlan(s, threat, { ...success, criticalInjuryConfirmed: true }).cost, Math.max(0, 1 + change));
+    assert.equal(criticalPlan(s, threat, { ...success, preset: "hit.wounds", criticalInjuryConfirmed: true }).cost, 1);
+  }
+  const laser = { ...threat, attackContext: { damageType: "laser" } };
+  assert.equal(
+    criticalPlan({ campaignEffects: { criticalInjuryActivationCost: -1 } }, laser, {
+      ...success,
+      preset: "hit.ouch",
+      baseCost: 2,
+      available: 0
+    }).cost,
+    0
+  );
+});
 test("RAW pp.62,329: only a confirmed threat can be activated, by its own character and before damage", () => {
   assert.equal(criticalPlan({}, threat, success).cost, 1);
   for (const patch of [{ threatConfirmed: false }, { resolved: true }, { superseded: true }, { criticalSuccess: true }])
@@ -108,6 +131,21 @@ test("document activation pays actual dice once, records the effect and prevents
   assert.equal(msg.flags.spycraft2.criticalActivation.cost, 1);
   await actor.activateCritical(msg, success);
   assert.equal(actor.system.actionDice.value, 3);
+});
+
+test("actual injury activation quotes the live campaign policy and records its paid modifier", async () => {
+  const before = game.settings;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["bulletproof"] } : {}) };
+  try {
+    const actor = new SpycraftActor(),
+      msg = message();
+    await actor.activateCritical(msg, { ...success, preset: "hit.ouch" });
+    assert.equal(msg.flags.spycraft2.criticalActivation.cost, 3);
+    assert.equal(actor.system.actionDice.value, 1);
+    assert.ok(msg.flags.spycraft2.criticalActivation.sources.some(s => s.includes("Campaign injury")));
+  } finally {
+    game.settings = before;
+  }
 });
 test("zero-cost Most Deadly activation works with an empty pool, and failed updates refund paid dice", async () => {
   const actor = new SpycraftActor();

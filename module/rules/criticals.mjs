@@ -20,7 +20,10 @@ export function criticalPlan(
     samePayer = true,
     available = 0,
     vehicleMountedConfirmed = false,
-    legacyStandardTargetConfirmed = false
+    legacyStandardTargetConfirmed = false,
+    preset = "",
+    criticalInjuryConfirmed = false,
+    campaignEffects = system.campaignEffects ?? {}
   } = {}
 ) {
   const reject = reason => ({ blocked: true, reason });
@@ -95,6 +98,15 @@ export function criticalPlan(
     }
   }
   if (kind === "success" && check.checkKind === "attack") {
+    if (
+      (["hit.ouch", "hit.ouchAtZero"].includes(preset) || (!preset && criticalInjuryConfirmed === true)) &&
+      campaignEffects.criticalInjuryActivationCost
+    ) {
+      const change = campaignEffects.criticalInjuryActivationCost;
+      if (!Number.isSafeInteger(change)) return reject(loc`Review the campaign's critical-injury activation cost.`);
+      adjustment += change;
+      sources.push(loc`Campaign injury policy ${change >= 0 ? "+" : ""}${change}`);
+    }
     if (check.attackContext?.damageType === "laser") {
       adjustment--;
       sources.push(loc`Laser damage –1`);

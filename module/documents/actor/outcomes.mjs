@@ -38,6 +38,7 @@ import { openingRound } from "../../rolls/chat-controls.mjs";
 import { finishGearAcquisition } from "../../apps/gear-acquisition.mjs";
 import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../services/gc-dice.mjs";
 import { criticalPlan } from "../../rules/criticals.mjs";
+import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { applyCriticalChoice, criticalHitChoices, criticalMissChoices } from "../../rules/critical-effects.mjs";
 import {
   checkCandidates,
@@ -691,6 +692,7 @@ export const ActorOutcomes = Base =>
         ${criticalPresetContent(check)}
         <label>${loc`Or describe the effect`} <textarea name="effect"></textarea></label>
         <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
+          ${check.checkKind === "attack" ? `<label><input type="checkbox" name="criticalInjuryConfirmed" /> ${loc`The custom effect inflicts a critical injury`}</label><p class="hint">${loc`Ready-made injury effects apply campaign costs automatically; use this box for a custom injury effect.`}</p>` : ""}
         <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
         ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage"${damageRolled ? "" : " checked"} /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
         <details${errorOnly ? " open" : ""}><summary>${check.checkKind === "attack" ? loc`Who pays for a critical miss` : loc`Who pays for a critical failure`}</summary>
@@ -783,7 +785,13 @@ export const ActorOutcomes = Base =>
         if (useGC) await refreshGCDiceTransaction(controller);
         const check = message.flags.spycraft2,
           base = { ...input, baseCost: Number(input.baseCost ?? 1), samePayer: !useGC && payer.uuid === this.uuid };
-        let plan = criticalPlan(this.system, check, { ...base, available: Number.MAX_SAFE_INTEGER });
+        const quoteCritical = available =>
+          criticalPlan(this.system, message.flags.spycraft2, {
+            ...base,
+            available,
+            campaignEffects: currentCampaignRules().effects
+          });
+        let plan = quoteCritical(Number.MAX_SAFE_INTEGER);
         if (plan.blocked) return refuseStep(plan.reason);
         const jinxOptions = {
           jinx: input.jinx ?? false,
@@ -795,7 +803,7 @@ export const ActorOutcomes = Base =>
         const validateJinxCost = () => {
           const fresh = jinxCostPlan(
             { ...payer.system, usagePeriods: payer.usagePeriods },
-            criticalPlan(this.system, message.flags.spycraft2, { ...base, available: Number.MAX_SAFE_INTEGER }),
+            quoteCritical(Number.MAX_SAFE_INTEGER),
             jinxOptions
           );
           if (JSON.stringify(fresh) !== JSON.stringify(plan))
@@ -810,7 +818,7 @@ export const ActorOutcomes = Base =>
             if (plan.cost > funding.balance)
               return refuseStep(loc`Not enough action dice remain in the paying character’s pool.`);
           } else {
-            plan = criticalPlan(this.system, check, { ...base, available: funding.balance });
+            plan = quoteCritical(funding.balance);
             if (plan.blocked) return refuseStep(plan.reason);
           }
         }
@@ -818,6 +826,7 @@ export const ActorOutcomes = Base =>
           globalThis.foundry?.utils?.randomID?.() ??
           "critical-" + (this._criticalReceiptSequence = (this._criticalReceiptSequence ?? 0) + 1);
         const perform = async (payment = null) => {
+          validateJinxCost();
           jinxReservation?.guard();
           const paidPlan = payment?.surcharge
             ? {
