@@ -123,6 +123,27 @@ const reset = () => {
   warnings.length = 0;
 };
 
+test("Blockbuster's tripled blast distance reaches actual multi-target health application", async () => {
+  reset();
+  const before = game.settings;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["blockbuster"] } : {}) };
+  try {
+    const target = character("BlockbusterTarget", {
+      vitality: { value: 100, max: 100 },
+      wounds: { value: 12, max: 12 }
+    });
+    const damage = card("blockbuster-blast", {
+      checkKind: "damage",
+      effectiveTotal: 40,
+      weaponQualities: "BLS (5 ft.)"
+    });
+    await applyBlast(damage, { targets: [{ uuid: target.uuid, distanceFeet: 15 }], kind: "lethal", type: "" });
+    assert.equal(target.system.vitality.value, 80);
+  } finally {
+    game.settings = before;
+  }
+});
+
 test("laser attack cards ignore prepared dodge but retain a GC override", async () => {
   reset();
   const attacker = character("LaserAttacker", {});

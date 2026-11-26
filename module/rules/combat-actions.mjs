@@ -264,9 +264,12 @@ export function blastProfile(damage, incrementFeet = 5) {
 }
 
 /** A blast increment in feet from a weapon's qualities ("BLS (25 ft.)"), or the default single square. */
-export function blastIncrementFeet(qualities = "") {
+export function blastIncrementFeet(qualities = "", campaignEffects = {}) {
   const match = String(qualities).match(/\bBLS\s*\((\d[\d,]*)\s*ft\.?/i);
-  return match ? Number(match[1].replace(/,/g, "")) : 5;
+  const multiplier = campaignEffects.blastIncrementMultiplier ?? 1;
+  if (!Number.isFinite(multiplier) || multiplier < 1)
+    throw new Error(loc`Review the campaign's blast-increment multiplier.`);
+  return (match ? Number(match[1].replace(/,/g, "")) : 5) * multiplier;
 }
 
 /* -------------------------------------------- */

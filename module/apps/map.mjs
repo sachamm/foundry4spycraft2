@@ -20,6 +20,7 @@ import {
   withinReach
 } from "../rules/map.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { loc } from "../i18n.mjs";
 
 const SETTING = "mapMeasure";
@@ -297,7 +298,7 @@ export async function blastOnMap(message) {
   if (!mapAvailable() || !Number.isFinite(total)) return null;
   const zero = targetedToken();
   if (!zero) return refuse(loc`Target the one token standing at Ground Zero, then try again.`);
-  const increment = blastIncrementFeet(check.weaponQualities),
+  const increment = blastIncrementFeet(check.weaponQualities, currentCampaignRules().effects),
     caught = blastCaught(total, increment) ?? [];
   drawBlast(zero, total, increment);
   const esc = foundry.utils.escapeHTML;

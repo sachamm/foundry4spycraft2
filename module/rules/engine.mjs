@@ -1,4 +1,5 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
+import { campaignCQBRange } from "./campaign-combat.mjs";
 import {
   campaignAttributeLevels,
   campaignFeatCount,
@@ -1770,7 +1771,7 @@ function deriveFinalTotals(state) {
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
   sys.combatMovement = combatMovementRules(sys);
   sys.senses = baseSensoryRanges(sys);
-  sys.cqbRange = sys.activeFeatNames.includes("Marksmanship Supremacy") ? 60 : 30;
+  sys.cqbRange = campaignCQBRange(sys.activeFeatNames, sys.campaignEffects);
   sys.actionDice.explodeAt = sys.activeFeatNames.includes("Lady Luck's Smile")
     ? sys.actionDice.die - 1
     : sys.actionDice.die;

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Gunmen's doubled range increments and the campaign's CQB distances now affect PC and NPC calculations.
+  Range multipliers combine with feats using the standard multiplier rule. Blockbuster's tripled blast
+  increment now agrees between map previews and damage application.
 - Critical-injury activation now applies Bulletproof/Gritty's cost modifier to ready-made injuries and explicitly
   declared custom injuries. Payment rechecks the live campaign policy; ordinary wounds criticals keep their
   normal cost.

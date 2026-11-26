@@ -55,7 +55,7 @@ import { loc, locKey } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 import { COVER_GRADES } from "../rules/cover.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
-import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
+import { currentInjuryEffects, currentCampaignRules } from "../rules/gc/campaign.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -1021,7 +1021,7 @@ registerRelay("applyDamageMany", {
 export async function applyBlast(message, options = {}) {
   const { check, rolled, profile, attackKind } = damageFacts(message);
   if (!message.flags?.spycraft2 || !Number.isFinite(rolled)) return null;
-  const increment = blastIncrementFeet(check.weaponQualities);
+  const increment = blastIncrementFeet(check.weaponQualities, currentCampaignRules().effects);
   let input = options;
   if (!Array.isArray(input.targets)) {
     const caught = blastCaught(rolled, increment),

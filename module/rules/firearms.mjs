@@ -2,6 +2,7 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignCQBRange } from "./campaign-combat.mjs";
 /** Weapon Basics Table 4.77, p.299; recoil table key, p.225. */
 export const FIRE_MODES = { single: "Single-Shot", burst: "Burst", auto: "Full Auto" };
 export const FIREARM_CATEGORIES = {
@@ -334,17 +335,23 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
     );
   }
   const multiplier = factors.length ? 1 + factors.reduce((n, f) => n + f - 1, 0) : 1;
-  let increment = ((Number(weapon.range) || 0) + flat) * multiplier;
+  const campaign = system.campaignEffects?.rangeIncrementMultiplier ?? 1;
+  if (!Number.isFinite(campaign) || campaign < 1)
+    throw new Error(loc`Review the campaign's range-increment multiplier.`);
+  const combinedMultiplier = multiplier + campaign - 1;
+  let increment = ((Number(weapon.range) || 0) + flat) * combinedMultiplier;
+  if (campaign !== 1)
+    notes.push(loc`Campaign range multiplier ×${campaign}; combined multiplier ×${combinedMultiplier}.`);
   if (roundToFive) increment = 5 * Math.ceil(increment / 5);
   // Fixed range benefits precede multipliers; carrying penalties reduce the resulting increment.
   increment = Math.max(0, increment + (hurled ? loadPenalty : 0));
   return {
     increment,
-    multiplier,
+    multiplier: combinedMultiplier,
     flat,
     errorReduction,
     notes,
-    cqbRange: feats.has("Marksmanship Supremacy") ? 60 : 30
+    cqbRange: campaignCQBRange([...feats], system.campaignEffects)
   };
 }
 

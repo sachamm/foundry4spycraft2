@@ -24,6 +24,7 @@ const missionThreatLevelSetting = () => {
 };
 import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
+import { campaignCQBRange } from "../rules/campaign-combat.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
 import {
@@ -155,6 +156,7 @@ function underminedCombatContext(system) {
 
 export class NpcData extends BaseActorData {
   prepareDerivedData() {
+    this.campaignEffects = currentCampaignRules().effects;
     this.worldTime = globalThis.game?.time?.worldTime;
     this.usagePeriods = globalThis.game?.settings?.get("spycraft2", "usagePeriods") ?? {};
     this.conditionContext = npcSkillConditionContext(this.parent);
@@ -163,6 +165,7 @@ export class NpcData extends BaseActorData {
     this.activeFeatNames = [
       ...new Set([...(this.parent?.items ?? [])].filter(item => item.type === "feat").map(item => ruleName(item)))
     ].filter(Boolean);
+    this.cqbRange = campaignCQBRange(this.activeFeatNames, this.campaignEffects);
     this.baffledApplicationReview = getBaffledReview(this.parent ?? {});
     // A mission's Threat Level scales every NPC that follows it (p.423); others keep their own number.
     const missionTL = this.followMission ? missionThreatLevelSetting() : null;
