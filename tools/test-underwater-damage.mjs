@@ -32,6 +32,13 @@ test("unarmed, ranged and Dexterity-substituted finesse damage retain their ordi
     assert.equal(weaponDamage(s, w, { ...options, underwater: true }).formula, weaponDamage(s, w, options).formula);
   }
 });
+test("rolled bonus damage is added after underwater halving, while flat Strength stays inside", () => {
+  const s = system();
+  s.weaponSpecialist = { abilities: ["Killer Instinct"], proficiencies: ["edged"] };
+  const wet = weaponDamage(s, weapon(), { underwater: true });
+  assert.equal(wet.formula, "ceil((max(1, 1d6 + (2))) / 2) + 1d4");
+  assert.equal(weaponDamage(s, weapon()).formula, "max(1, 1d6 + 1d4 + (2))");
+});
 test("the real damage workflow carries the attack's underwater declaration and permits an explicit correction", async () => {
   const item = { id: "blade", uuid: "Actor.swimmer.Item.blade", name: "Blade", type: "weapon", system: weapon() };
   const a = {

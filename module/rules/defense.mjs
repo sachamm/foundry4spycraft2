@@ -210,7 +210,9 @@ export function incomingDefensePlan(system, options = {}) {
     uncanny,
     notes: [
       ...(foibles.damageReduction
-        ? [loc`Foibles: +${specialistDodge} dodge to Defense and +1 damage reduction against this weapon (p.49).`]
+        ? [
+            loc`Foibles: +${specialistDodge} dodge and 1 class damage reduction against this weapon; natural quality damage reduction remains an alternative (p.49).`
+          ]
         : []),
       ...(whirling.stance
         ? [

@@ -717,10 +717,18 @@ export function weaponDamage(
   const useFinesse = !!finesse && trained && /\bFIN\b/.test(weapon.qualities ?? "");
   const u = system.unarmed ?? { die: 3, extraDice: 0, damageBonus: system.abilities.str.mod };
   let base = knuckle ? `${1 + (u.extraDice ?? 0)}d${u.die} + ${expression}` : expression;
+  const standardBase = base,
+    rolledBonuses = [];
   const ranged = !melee;
-  if (specialistApplies(system, weapon, "Killer Instinct") && (!ranged || options.withinCQB)) base += " + 1d4";
+  if (specialistApplies(system, weapon, "Killer Instinct") && (!ranged || options.withinCQB)) {
+    base += " + 1d4";
+    rolledBonuses.push("1d4");
+  }
   const deadToRights = deadToRightsDice(system, weapon);
-  if (deadToRights) base += ` + ${deadToRights}d4`;
+  if (deadToRights) {
+    base += ` + ${deadToRights}d4`;
+    rolledBonuses.push(`${deadToRights}d4`);
+  }
   const strength = system.abilities.str.mod;
   let bonus = knuckle ? u.damageBonus : melee || hurled ? strength : 0;
   if (useFinesse && (melee || hurled)) bonus = system.abilities.dex?.mod ?? 0;
@@ -796,11 +804,10 @@ export function weaponDamage(
     ],
     bonus
   );
-  const underwater = underwaterMeleeDamage(
-    `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
-    weapon.proficiency,
-    { underwater: options.underwater, usesStrength: !finesseDamage }
-  );
+  const underwater = underwaterMeleeDamage(`max(${min}, ${standardBase} + (${bonus}))`, weapon.proficiency, {
+    underwater: options.underwater,
+    usesStrength: !finesseDamage
+  });
   return {
     bonusRows,
     underwaterDamage: underwater.halved,
@@ -814,7 +821,9 @@ export function weaponDamage(
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,
-    formula: underwater.formula,
+    formula: underwater.halved
+      ? underwater.formula + rolledBonuses.map(dice => ` + ${dice}`).join("")
+      : `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
     damageText: text,
     ammunition: projectile.name ?? "",
     explosive: projectile.explosive,

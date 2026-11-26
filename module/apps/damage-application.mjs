@@ -874,7 +874,7 @@ export async function applyDamage(message, options = {}) {
   }
   if (specialistDR && kind !== "stress" && target.type !== "vehicle")
     lines.push(
-      loc`Foibles adds 1 damage reduction against this weapon before armor piercing and damage-type rules (p.49).`
+      loc`Foibles supplies 1 class damage reduction against this weapon; natural quality defenses, armor piercing and damage-type rules still apply (p.49).`
     );
   if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
