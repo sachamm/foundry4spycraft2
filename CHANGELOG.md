@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Bulletproof and Gritty now change injury-save and massive-damage thresholds on damage cards. A pending save
+  retains the thresholds used for its hit even if campaign policy changes before the save is rolled. Conflicting
+  injury policies require a GC choice before lethal damage can be applied.
 - Fast/Slow Attributes, Feats, Proficiencies, Interests and Growth now change character creation and level-up
   calculations. Interest awards keep their first additional pick at level 2, then use the campaign spacing.
   Attribute choices retain their saved level keys when campaign policy changes.

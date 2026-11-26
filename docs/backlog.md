@@ -280,7 +280,7 @@ own line on the card, and checked against the page first.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-180 | Campaign qualities change no number in play beyond XP, action-die cost and starting dice; injury thresholds are fixed at 25/50, so the damage card can post the wrong save prompt under some qualities. Disposition modifiers are not added to rolls. (pp.406–407) | R-01 | M |
+| B-180 | Campaign qualities still need workflow wiring for remaining DC, disposition, range/blast and action-die effects (pp.406–408). Fast/Slow creation cadences and Growth XP thresholds now execute; Bulletproof/Gritty injury thresholds reach damage cards and pending saves. | R-01, rules-completeness-99 | M |
 | B-182 | Laser: die loss per range increment is reminder text; its lower critical cost is not applied (the attack record does not carry the damage type). (p.338) | R-03, RW-286 | S |
 | B-183 | Falling stress not applied. (p.336) | R-04 | S |
 | B-184 | No control for persuading an NPC to join a fight. | R-05 | S |

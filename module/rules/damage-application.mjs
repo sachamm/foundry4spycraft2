@@ -9,6 +9,7 @@ import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
 import { specialistDRIncrement } from "./weapon-specialist.mjs";
+import { injuryThresholds } from "./gc/campaign.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 const int = value => Math.trunc(Number(value) || 0);
@@ -138,7 +139,8 @@ export function woundState(wounds, death = -10) {
  * @param {object} facts  { vitality, wounds, woundsMax }
  * @param {object} hit    { damage, dr, armorPiercing, armorPiercingAll, critical }
  */
-export function lethalHitPlan(facts = {}, hit = {}) {
+export function lethalHitPlan(facts = {}, hit = {}, campaignEffects = {}) {
+  const thresholds = injuryThresholds(campaignEffects);
   const vitality = Math.max(0, int(facts.vitality)),
     wounds = int(facts.wounds),
     woundsMax = int(facts.woundsMax),
@@ -167,7 +169,14 @@ export function lethalHitPlan(facts = {}, hit = {}) {
     // DR that stops a hit still bruises: 1 point of subdual damage (p.332).
     bruise: reduced.stopped ? 1 : 0,
     // One hit of 25 or more calls for a Fortitude save against a critical injury; 50 or more also threatens –9 wounds.
-    massive: net >= 25 ? { dc: Math.floor(net / 2), toMinusNine: net >= 50 } : null
+    massive:
+      net >= thresholds.criticalInjuryMin
+        ? {
+            dc: Math.floor(net / 2),
+            toMinusNine: net >= thresholds.massiveDamage,
+            ...(thresholds.criticalInjuryMin !== 25 || thresholds.massiveDamage !== 50 ? { thresholds } : {})
+          }
+        : null
   };
 }
 
@@ -189,11 +198,12 @@ export function lethalHitLines(name, plan) {
   if (plan.stateChanged && plan.state === "dying") lines.push(loc`Below 0 wounds: unconscious and dying.`);
   if (plan.stateChanged && plan.state === "dead") lines.push(loc`At –10 wounds or lower: dead.`);
   if (plan.stateChanged && plan.state === "destroyed") lines.push(loc`At –25 wounds or lower: the body is destroyed.`);
+  const thresholds = plan.massive?.thresholds ?? injuryThresholds();
   if (plan.massive)
     lines.push(
       plan.massive.toMinusNine
-        ? loc`A hit of 50 or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury and wounds drop to –9 (p.331).`
-        : loc`A hit of 25 or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury (p.331).`
+        ? loc`A hit of ${thresholds.massiveDamage} or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury and wounds drop to –9 (p.331).`
+        : loc`A hit of ${thresholds.criticalInjuryMin} or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury (p.331).`
     );
   return lines;
 }

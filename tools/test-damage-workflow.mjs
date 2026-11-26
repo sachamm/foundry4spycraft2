@@ -123,6 +123,33 @@ const reset = () => {
   warnings.length = 0;
 };
 
+test("campaign injury thresholds reach damage cards and remain fixed when the campaign changes before the save", async () => {
+  reset();
+  const settings = game.settings;
+  let quality = "bulletproof";
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: [quality] } : {}) };
+  try {
+    const target = character(
+      "CampaignInjuryTarget",
+      { vitality: { value: 100, max: 100 }, wounds: { value: 12, max: 12 } },
+      { type: "npc" }
+    );
+    // A special NPC has health pools and is recognised by the normal NPC helper.
+    target.system.npcType = "special";
+    const damage = card("campaign-injury", { checkKind: "damage", effectiveTotal: 61 });
+    await applyDamage(damage, { targetUuid: target.uuid, damage: 61, kind: "lethal" });
+    const save = posted.at(-1).flags.spycraft2.pendingSave;
+    assert.equal(save.thresholds.criticalInjuryMin, 36);
+    assert.equal(save.thresholds.massiveDamage, 61);
+    quality = "gritty";
+    await hazardSaveResolvers.get("massiveDamage")(target, { id: "campaign-save" }, save, false);
+    assert.match(posted.at(-1).content, /hit of 61 or more/);
+    assert.equal(target.system.wounds.value, -9);
+  } finally {
+    game.settings = settings;
+  }
+});
+
 test("Foibles changes the posted attack outcome only for covered weapons and respects a GC Defense override", async () => {
   reset();
   const attacker = character("FoiblesAttacker", {});

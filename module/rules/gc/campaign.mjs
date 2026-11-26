@@ -107,7 +107,17 @@ export function campaignEffects(active) {
 /** Critical-injury numbers after campaign qualities (default 25–49 to check, 50+ drops to −9 wounds; p.331). */
 export function injuryThresholds(effects = {}) {
   const [min, max] = effects.criticalInjuryRange ?? [25, 49];
-  return { criticalInjuryMin: min, criticalInjuryMax: max, massiveDamage: effects.massiveDamageThreshold ?? max + 1 };
+  const massiveDamage = effects.massiveDamageThreshold ?? max + 1;
+  if (![min, max, massiveDamage].every(Number.isSafeInteger) || min < 1 || max < min || massiveDamage <= max)
+    throw new Error(loc`Review the campaign's injury and massive-damage thresholds before applying damage.`);
+  return { criticalInjuryMin: min, criticalInjuryMax: max, massiveDamage };
+}
+
+export function currentInjuryEffects() {
+  const result = currentCampaignRules();
+  if (result.conflicts.some(c => ["criticalInjuryRange", "massiveDamageThreshold"].includes(c.key)))
+    throw new Error(loc`Choose one of the conflicting campaign injury policies before applying lethal damage.`);
+  return result.effects;
 }
 
 /** A skill DC after campaign qualities such as Cakewalk or Comedy of Errors. */

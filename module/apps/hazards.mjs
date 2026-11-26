@@ -31,6 +31,7 @@ import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { markCard } from "./gc-relay.mjs";
 import { setCondition, woundConditions } from "./wound-conditions.mjs";
 import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
+import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
@@ -118,7 +119,8 @@ export async function sufferLethal(actor, amount) {
         woundsMax: system.wounds?.max,
         deathThreshold: system.deathThreshold
       },
-      { damage: amount }
+      { damage: amount },
+      currentInjuryEffects()
     );
   await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
   // The same fatigue and wound conditions as any other lethal hit (p.331); notes report what was set.

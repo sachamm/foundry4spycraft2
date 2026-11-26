@@ -55,6 +55,7 @@ import { loc, locKey } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 import { COVER_GRADES } from "../rules/cover.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
+import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -531,7 +532,8 @@ async function lethalOnSpecial(target, hit, source) {
         woundsMax: system.wounds?.max,
         deathThreshold: system.deathThreshold
       },
-      hit
+      hit,
+      currentInjuryEffects()
     );
   if (plan.net) await target.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
   const lines = lethalHitLines(esc(target.name), plan);
@@ -553,6 +555,7 @@ async function lethalOnSpecial(target, hit, source) {
         label: loc`Massive damage`,
         damage: plan.net,
         toMinusNine: plan.massive.toMinusNine,
+        ...(plan.massive.thresholds ? { thresholds: plan.massive.thresholds } : {}),
         source
       }
     : null;
@@ -621,7 +624,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     const wounds = Math.min(-9, Math.trunc(Number(actor.system.wounds?.value) || 0));
     await actor.update({ "system.wounds.value": wounds });
     lines.push(
-      loc`A hit of 50 or more: wounds drop to ${wounds}.`,
+      loc`A hit of ${save.thresholds?.massiveDamage ?? 50} or more: wounds drop to ${wounds}.`,
       ...(await woundConditions(actor, woundState(wounds, actor.system.deathThreshold)))
     );
   }
