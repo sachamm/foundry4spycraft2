@@ -145,6 +145,44 @@ test("an expert class stops at its tenth level", async () => {
   assert.equal(updated, 0);
 });
 
+test("Fast Attributes level-up snapshots Intelligence from the campaign milestone before awarding new skill points", async () => {
+  const savedSettings = game.settings;
+  game.settings = { get: (_system, key) => (key === "campaign" ? { qualities: ["fast-attributes"] } : {}) };
+  try {
+    const actor = new SpycraftActor();
+    const c = classes.find(c => c.key === "soldier");
+    const cls = {
+      id: "soldier",
+      type: "class",
+      name: c.name,
+      system: { ...c, identifier: c.key, vitalityDie: c.vitality }
+    };
+    actor.items = [cls];
+    actor.system = {
+      abilities: Object.fromEntries(
+        ["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: k === "int" ? 13 : 10 }])
+      ),
+      abilityIncreases: { l3: "int" },
+      progression: Array.from({ length: 2 }, () => ({
+        classId: "soldier",
+        vitality: 1,
+        skills: {},
+        intelligenceModifier: 1
+      })),
+      skills: {},
+      focuses: {},
+      misc: {}
+    };
+    computeAgent(actor.system, actor.items, cfg, { campaignEffects: { attributeInterval: 3 } });
+    actor.syncGrantedFeats = async () => {};
+    await actor.addClassLevel(cls, { promptVitality: false });
+    assert.equal(actor.system.progression[2].intelligenceModifier, 2);
+    assert.equal(actor.system.progression[0].intelligenceModifier, 1);
+  } finally {
+    game.settings = savedSettings;
+  }
+});
+
 test("expert entry is blocked before item creation and cannot use its own BAB to qualify", async () => {
   const actor = new SpycraftActor();
   actor.items = [];

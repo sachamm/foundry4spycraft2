@@ -23,6 +23,7 @@ const missionThreatLevelSetting = () => {
   }
 };
 import { computeAgent } from "../rules/engine.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
 import {
@@ -326,8 +327,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     return {
       abilities: new SchemaField(abilities),
       pointBuyBudget: int(36, { min: 0 }),
-      /** Which attribute each level-based increase went to: { l4: "int", l8: "", … } */
-      abilityIncreases: new SchemaField(Object.fromEntries([4, 8, 12, 16, 20].map(l => [`l${l}`, str()]))),
+      /** Optional milestones cover campaign cadences too. Existing l4/l8/etc. choices retain their exact keys. */
+      abilityIncreases: new SchemaField(Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`l${i + 1}`, str()]))),
 
       /** One entry per career level, in order. */
       progression: new ArrayField(
@@ -745,7 +746,11 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         const actor = globalThis.game?.actors?.get?.(id);
         return { id, name: actor?.name ?? "Missing teammate", level: pointmanLevel(actor) };
       });
-    computeAgent(this, items, CONFIG.SPYCRAFT);
+    const campaign = currentCampaignRules();
+    computeAgent(this, items, CONFIG.SPYCRAFT, {
+      campaignEffects: campaign.effects,
+      campaignConflicts: campaign.conflicts
+    });
   }
 
   /** Data exposed to roll formulas (@level, @abilities.dex.mod, @skills.sneak.total …). */

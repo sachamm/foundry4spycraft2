@@ -1,4 +1,11 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
+import {
+  campaignAttributeLevels,
+  campaignFeatCount,
+  campaignProficiencyCount,
+  campaignInterestCount,
+  campaignXP
+} from "./campaign-creation.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "./cheap-shot-effects.mjs";
@@ -196,7 +203,13 @@ function startPass(state) {
   const shaken = shakenRules(sys);
   sys.shakenRules = shaken;
   const T = cfg.tables;
+  sys.campaignEffects = { ...(options.campaignEffects ?? sys.campaignEffects ?? {}) };
+  sys.abilityIncreaseLevels = campaignAttributeLevels(sys.campaignEffects, cfg.abilityIncreaseLevels);
   const warnings = [...shaken.warnings];
+  for (const conflict of options.campaignConflicts ?? [])
+    warnings.push(
+      loc`Campaign qualities ${conflict.qualities.join(", ")} conflict. Ask the GC which one applies before using their disputed benefits.`
+    );
   // Only granted or presently qualified feats may contribute effects.
   // Starting from grants prevents a feat from satisfying its own requirements.
   const legalFeatIds = new Set(),
@@ -673,9 +686,13 @@ function collectBonusSources(state) {
     t1: stepLookup(T.talentBonus.t1, level),
     t2: stepLookup(T.talentBonus.t2, level),
     t3: stepLookup(T.talentBonus.t3, level),
-    interestBase: stepLookup(
-      T.interests.map(r => [r[0], r[1]]),
-      level
+    interestBase: campaignInterestCount(
+      level,
+      stepLookup(
+        T.interests.map(r => [r[0], r[1]]),
+        level
+      ),
+      sys.campaignEffects
     ),
     interestTalent: stepLookup(
       T.interests.map(r => [r[0], r[2]]),
@@ -763,7 +780,7 @@ function deriveAttributes(state) {
   let pointCost = 0;
   for (const k of ABILITIES) {
     const a = sys.abilities[k];
-    a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
+    a.increase = sys.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
     // Where that bonus comes from, for the sheet's breakdown tooltip.
     a.bonusSources = abilityBonus.sources.get(k) ?? [];
@@ -787,7 +804,7 @@ function deriveAttributes(state) {
       sys.abilities[k].base + sys.abilities[k].increase + (sys.abilities[k].misc ?? 0) + nonCandidateBonus.get(k)
     ])
   );
-  const increasesDue = cfg.abilityIncreaseLevels.filter(l => l <= level);
+  const increasesDue = sys.abilityIncreaseLevels.filter(l => l <= level);
   const increasesMissing = increasesDue.filter(l => !ABILITIES.includes(increaseAt(l))).length;
   if (increasesMissing)
     todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
@@ -838,9 +855,13 @@ function deriveAttributes(state) {
       t1: stepLookup(T.talentBonus.t1, career),
       t2: stepLookup(T.talentBonus.t2, career),
       t3: stepLookup(T.talentBonus.t3, career),
-      interestBase: stepLookup(
-        T.interests.map(r => [r[0], r[1]]),
-        career
+      interestBase: campaignInterestCount(
+        career,
+        stepLookup(
+          T.interests.map(r => [r[0], r[1]]),
+          career
+        ),
+        sys.campaignEffects
       ),
       interestTalent: stepLookup(
         T.interests.map(r => [r[0], r[2]]),
@@ -871,7 +892,7 @@ function deriveAttributes(state) {
     const abilities = Object.fromEntries(
       ABILITIES.map(k => {
         const a = sys.abilities[k];
-        const inc = cfg.abilityIncreaseLevels.filter(x => x <= career && increaseAt(x) === k).length;
+        const inc = sys.abilityIncreaseLevels.filter(x => x <= career && increaseAt(x) === k).length;
         const value = a.base + inc + (a.misc ?? 0) + (sys.aging.modifiers[k] ?? 0) + bonusAt(`abilities.${k}`);
         return [k, { value, mod: mod(value) }];
       })
@@ -1299,7 +1320,9 @@ function deriveOtherBonuses(state) {
     sys,
     cfg,
     target => B.get(target),
-    (classAtLevel[0]?.system.proficiencies ?? 0) + (lr?.proficiencies ?? 0) + B.get("prof.generic")
+    (classAtLevel[0]?.system.proficiencies ?? 0) +
+      campaignProficiencyCount(sys.level, lr?.proficiencies ?? 0, sys.campaignEffects) +
+      B.get("prof.generic")
   );
   sys.proficiencyTotals = proficiency.totals;
   sys.proficiencyPicks = proficiency.picks;
@@ -1927,7 +1950,7 @@ function deriveSkillTotals(state) {
 function deriveFeatSlots(state) {
   const { sys, cfg, items, warnings, todo, plural, classItems, classLevels, inherited, lr, featItems, featTrees, B } =
     state;
-  const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") };
+  const slots = { any: campaignFeatCount(sys.level, lr?.feats ?? 0, sys.campaignEffects) + B.get("featSlots.any") };
   for (const t of Object.keys(cfg.featTrees)) slots[t] = B.get(`featSlots.${t}`);
   const classGrantCounts = new Map();
   const originGrantNames = new Set(
@@ -2288,10 +2311,10 @@ function deriveWealthAndGear(state) {
 /** Step 13: experience. */
 function deriveExperience(state) {
   const { sys, T, warnings, level } = state;
-  sys.xpNext = level < 20 ? (T.levels[level + 1]?.xp ?? null) : null;
+  sys.xpNext = level < 20 ? campaignXP(T.levels[level + 1]?.xp ?? null, sys.campaignEffects) : null;
   // Career levels follow XP thresholds (Table 1.3, p.27). A first-level character may start below its threshold,
   // so only later levels are checked; this is a reminder, as the GC may grant levels directly.
-  const xpForLevel = T.levels[level]?.xp;
+  const xpForLevel = campaignXP(T.levels[level]?.xp, sys.campaignEffects);
   if (level > 1 && Number.isFinite(xpForLevel) && (Number(sys.xp) || 0) < xpForLevel)
     warnings.push(loc`Career Level ${level} needs ${xpForLevel} XP; this character has ${Number(sys.xp) || 0}.`);
 
@@ -2345,7 +2368,8 @@ function settlePrerequisites(state) {
           conditionContext: sys.conditionContext
         }),
         items.filter(item => item.type !== "feat" || item.system.featKind !== "temporary"),
-        cfg
+        cfg,
+        { campaignEffects: sys.campaignEffects }
       )
     : sys;
   const permanentSkillRanks = Object.fromEntries(
@@ -2406,7 +2430,8 @@ function settlePrerequisites(state) {
           conditionContext: sys.conditionContext
         }),
         items.filter(item => item.type !== "feat" || !["temporary", "virtual"].includes(item.system.featKind)),
-        cfg
+        cfg,
+        { campaignEffects: sys.campaignEffects }
       )
     : permanentSystem;
   const classQualificationRanks = Object.fromEntries(

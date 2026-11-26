@@ -10,6 +10,7 @@ import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
 import { esc } from "../../html.mjs";
+import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
@@ -80,7 +81,8 @@ export const ActorProgression = Base =>
       computeAgent(
         preview,
         this.items.map(item => ({ id: item.id, name: item.name, type: item.type, system: item.system })),
-        CONFIG.SPYCRAFT
+        CONFIG.SPYCRAFT,
+        { campaignEffects: currentCampaignRules().effects }
       );
       progression.at(-1).intelligenceModifier = Math.floor(
         (preview.abilities.int.value -
@@ -307,7 +309,8 @@ export const ActorProgression = Base =>
                     (!classEntry || item.system.featKind !== "virtual")))
             )
             .map(item => ({ id: item.id, name: item.name, type: item.type, system: item.system })),
-          CONFIG.SPYCRAFT
+          CONFIG.SPYCRAFT,
+          { campaignEffects: currentCampaignRules().effects }
         );
         featNames.clear();
         for (const key of Object.keys(featTrees)) delete featTrees[key];

@@ -112,6 +112,7 @@ import { checkReflexDamage } from "../apps/reflex-damage.mjs";
 import { checkIncomingDefense } from "../apps/incoming-defense.mjs";
 import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
 import { ACTION_COSTS, attackActionCost } from "../rules/combat-actions.mjs";
@@ -895,7 +896,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ...sys.abilities[key],
       tip: abilityTip(sys, key, game.i18n.localize(label))
     }));
-    context.increaseLevels = cfg.abilityIncreaseLevels.map(l => ({
+    context.increaseLevels = (sys.abilityIncreaseLevels ?? cfg.abilityIncreaseLevels).map(l => ({
       level: l,
       key: `l${l}`,
       value: sys.abilityIncreases[`l${l}`],
@@ -1477,7 +1478,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       computeAgent(
         system,
         this.actor.items.map(i => ({ id: i.id, name: i.name, type: i.type, system: i.system })),
-        CONFIG.SPYCRAFT
+        CONFIG.SPYCRAFT,
+        { campaignEffects: currentCampaignRules().effects }
       );
       if (
         system.focusPicks.generic.unscopedRemaining <

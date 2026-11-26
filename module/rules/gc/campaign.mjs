@@ -4,9 +4,24 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { readSetting } from "../../settings.mjs";
 
 export const CAMPAIGN_QUALITIES = GC_DATA.campaignQualities;
 export const campaignQuality = id => CAMPAIGN_QUALITIES.find(quality => quality.id === id) ?? null;
+
+/** Resolve the same active season/mission policy for document preparation and ordinary roll workflows. */
+export function currentCampaignRules() {
+  const campaign = readSetting("campaign", {}),
+    mission = readSetting("mission", {});
+  const result = campaignEffects(
+    activeQualities(
+      Array.isArray(campaign?.qualities) ? campaign.qualities : [],
+      mission?.active === true && Array.isArray(mission.qualities) ? mission.qualities : []
+    )
+  );
+  for (const { key } of result.conflicts) delete result.effects[key];
+  return result;
+}
 
 /** Qualities in force: the season's, plus those scripted into or added to the current mission. */
 export function activeQualities(season = [], mission = []) {

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fast/Slow Attributes, Feats, Proficiencies, Interests and Growth now change character creation and level-up
+  calculations. Interest awards keep their first additional pick at level 2, then use the campaign spacing.
+  Attribute choices retain their saved level keys when campaign policy changes.
 - Underwater melee attacks now carry their declaration into damage. Weapons using Strength deal half standard
   damage, rounded up; separate sneak attack dice retain their own rules. The damage card explains the reduction.
 - Foibles now adds its conditional dodge bonus when resolving an incoming attack and its damage reduction when
