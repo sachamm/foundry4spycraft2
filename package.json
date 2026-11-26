@@ -23,7 +23,7 @@
     "release:check": "node tools/check-release.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.5",
+    "@eslint/js": "10.0.1",
     "@playwright/test": "1.65.1",
     "classic-level": "1.4.1",
     "esbuild": "0.28.2",
