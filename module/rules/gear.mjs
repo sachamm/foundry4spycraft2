@@ -1,5 +1,4 @@
 import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
-import { underwaterMeleeDamage } from "./underwater-combat.mjs";
 import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
 import { unarmedTrickDamageBonus } from "./unarmed-tricks.mjs";
 import { hordeSupremacyDamage } from "./team-feats.mjs";
@@ -19,7 +18,7 @@ import "./cheap-shot.mjs";
 import { disarmResponsePlan } from "./disarm-response.mjs";
 import { quirkyWeaponPlan } from "./quirky-weapon.mjs";
 import { superiorAccuracyWeaponPlan } from "./superior-accuracy-weapon.mjs";
-import { weaponDamageExpression } from "./weapon-damage-expression.mjs";
+import { weaponDamageExpression, underwaterMeleeDamage } from "./weapon-damage-expression.mjs";
 import { trainedOnlyWeaponPlan } from "./trained-only-weapon.mjs";
 import { builtInQuality } from "./origins.mjs";
 import { accurizedWeaponPlan } from "./accurized-weapon.mjs";

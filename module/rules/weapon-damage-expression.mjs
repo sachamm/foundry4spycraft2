@@ -34,3 +34,9 @@ export function weaponDamageExpression(value) {
     /^(?:subdual|stress|acid|cold|electrical|explosive|fire|flash|bang|heat|sonic|vacuum)\b/i.test(suffix);
   return { expression, minimum: /min\.?\s*0/i.test(text) ? 0 : 1, componentReview };
 }
+/** p.349: halve standard Strength-based melee weapon damage before separate bonus dice. */
+export function underwaterMeleeDamage(formula, proficiency, { underwater = false, usesStrength = true } = {}) {
+  const halved =
+    underwater === true && usesStrength && ["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(proficiency);
+  return { formula: halved ? `ceil((${formula}) / 2)` : formula, halved };
+}
