@@ -23,7 +23,7 @@ import { parseAmmunitionCode } from "../rules/ammunition.mjs";
 import { grappleTrickLines } from "../rules/grapple-tricks.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
-import { spendWeaponShots, weaponAmmunition } from "./ammunition-use.mjs";
+import { spendWeaponShots, weaponAmmunition, weaponHasUnlimitedAmmunition } from "./ammunition-use.mjs";
 import { recentResultsHint } from "./opposed-checks.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
@@ -49,7 +49,11 @@ export function fireActionContent(preview, item, actor = null) {
   if (!preview?.firearm) return "";
   const modes = preview.modes ?? [],
     counted = weaponAmmunition(item),
-    capacity = counted ? counted.loaded : (parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "");
+    capacity = weaponHasUnlimitedAmmunition(item)
+      ? ""
+      : counted
+        ? counted.loaded
+        : (parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "");
   const option = (value, label, show = true) => (show ? `<option value="${value}">${label}</option>` : "");
   return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="100" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}"${counted ? " readonly" : ""} /></label><p class="hint">${counted ? loc`Burst, Autofire and Strafe set the fire mode they need. The shots fired are taken from the weapon.` : loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
 }
@@ -122,7 +126,7 @@ export async function coverFire(actor, item, input = {}) {
     distance = Number(input.distanceFeet);
   if (preview.maximumRange && Number.isFinite(distance) && distance > Math.floor(preview.maximumRange / 2))
     return refuse(loc`Cover Fire reaches half the weapon's maximum range: ${Math.floor(preview.maximumRange / 2)} ft.`);
-  const shots = whole(input.shotsRemaining);
+  const shots = weaponHasUnlimitedAmmunition(item) ? null : whole(input.shotsRemaining);
   if (shots !== null && shots < COVER_FIRE.shots) return refuse(loc`Cover Fire takes 5 shots.`);
   const targets = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid),
     targeted = [...(game.user?.targets ?? [])],
@@ -150,7 +154,7 @@ export async function coverFire(actor, item, input = {}) {
 
 /** Suppressive Fire: no attack check now; final attacks follow as opponents cross the square. */
 export async function suppressiveFire(actor, item, input = {}) {
-  const shots = whole(input.shotsRemaining);
+  const shots = weaponHasUnlimitedAmmunition(item) ? null : whole(input.shotsRemaining);
   if (shots !== null && shots < SUPPRESSIVE_FIRE.shots) return refuse(loc`Suppressive Fire takes 5 shots.`);
   await post(actor, [
     loc`Suppressive Fire with ${esc(item.name)}: 5 shots into an empty square within maximum range. For a round, anyone hostile crossing the square draws a final attack at –4 (1 more shot each, no Aim) and takes –4 to attack and skill checks until the start of the attacker's next Initiative Count (p.361).`,

@@ -21,10 +21,13 @@ export function ammunitionCounted() {
 }
 
 /** A weapon item's ammunition state, or null when shots are not counted for it. */
+export const weaponHasUnlimitedAmmunition = item =>
+  item?.type === "weapon" && unlimitedAmmunition(item.system, currentCampaignRules().effects);
+
 export function weaponAmmunition(item) {
   if (!ammunitionCounted() || item?.type !== "weapon" || typeof item.update !== "function" || !item.parent) return null;
   const state = ammunitionState(item.system);
-  if (unlimitedAmmunition(item.system, currentCampaignRules().effects)) return null;
+  if (weaponHasUnlimitedAmmunition(item)) return null;
   return state.tracked ? state : null;
 }
 

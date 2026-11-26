@@ -15,6 +15,7 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { specialtyAttackAction, specialtyAttackBonus } from "./specialty-attacks.mjs";
+import { unlimitedAmmunition } from "./ammunition-use.mjs";
 
 /**
  * The time each sheet action takes, where the action table gives one (pp.352–353). Most sheet tools record or
@@ -115,7 +116,8 @@ function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares =
     if (!feats.includes(rule.feat)) return stop(loc`Two-Shot Burst needs Autofire Basics.`);
     if (!rule.modes.includes(facts.fireMode)) return stop(loc`A Two-Shot Burst is fired in Single-Shot or Burst mode.`);
     if (facts.attackAction !== "standard") return stop(loc`A Two-Shot Burst is a trick on a Standard Attack.`);
-    const left = shotsRemaining === null || shotsRemaining === "" ? null : count(Number(shotsRemaining));
+    const left =
+      facts.unlimitedShots || shotsRemaining === null || shotsRemaining === "" ? null : count(Number(shotsRemaining));
     if (left !== null && left < rule.shots) return stop(loc`A Two-Shot Burst needs 2 shots in the weapon.`);
     return {
       action,
@@ -135,7 +137,8 @@ function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares =
         ? loc`A Burst needs the weapon set to Burst mode.`
         : loc`This action needs the weapon set to Full Auto mode.`
     );
-  const remaining = shotsRemaining === null || shotsRemaining === "" ? null : count(Number(shotsRemaining));
+  const remaining =
+    facts.unlimitedShots || shotsRemaining === null || shotsRemaining === "" ? null : count(Number(shotsRemaining));
   if (remaining !== null && (!Number.isSafeInteger(remaining) || remaining < 0))
     return stop(loc`Enter the shots left in the weapon as a whole number.`);
   if (action === "burst") {
@@ -164,8 +167,10 @@ function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares =
       notes: [loc`Suppressive Fire: final attack at –4 on an opponent crossing the square; no Aim bonus (p.361).`]
     };
   }
-  if (remaining === null) return stop(loc`Enter the shots left in the weapon.`);
-  const limit = fireActionLimit(action, remaining, rule);
+  if (remaining === null && !facts.unlimitedShots) return stop(loc`Enter the shots left in the weapon.`);
+  const limit = facts.unlimitedShots
+    ? Math.min(rule.most, Math.floor(Number.MAX_SAFE_INTEGER / rule.shotsEach))
+    : fireActionLimit(action, remaining, rule);
   if (!limit)
     return stop(
       action === "autofire"
@@ -458,13 +463,14 @@ rollPipeline.register({
         fireMode: firing.firearm ? firing.fireMode : "burst",
         attackAction: stance.attackAction,
         feats: system.activeFeatNames ?? [],
-        recoilPenalty: firing.recoilPenalty
+        recoilPenalty: firing.recoilPenalty,
+        unlimitedShots: unlimitedAmmunition(weapon, system.campaignEffects)
       },
       {
         action: options.fireAction ?? "",
         volleys: options.fireVolleys ?? null,
         squares: options.fireSquares ?? null,
-        shotsRemaining: options.shotsRemaining ?? null
+        shotsRemaining: unlimitedAmmunition(weapon, system.campaignEffects) ? null : (options.shotsRemaining ?? null)
       }
     );
     const pummel = pummelPlan(

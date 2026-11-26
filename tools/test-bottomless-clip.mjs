@@ -2,6 +2,26 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { unlimitedAmmunition } from "../module/rules/ammunition-use.mjs";
 import { weaponAmmunition, spendWeaponShots, reloadWeapon } from "../module/apps/ammunition-use.mjs";
+import { planTerms } from "../module/rules/roll-pipeline.mjs";
+import "../module/rules/combat-actions.mjs";
+
+test("Bottomless Clip removes declared shot limits in the attack plan without removing firing-mode requirements", () => {
+  const context = {
+    system: { campaignEffects: { bottomlessClip: true } },
+    weapon: { ammo: "1S5" },
+    firing: { firearm: true, fireMode: "auto", recoilPenalty: 0 },
+    stance: { attackAction: "autofire" },
+    options: { fireAction: "autofire", fireVolleys: 4, shotsRemaining: 0 }
+  };
+  const term = () => planTerms("attack", context).list.find(t => t.key === "fireAction");
+  assert.equal(term().blocked, "");
+  assert.equal(term().plan.shots, 12);
+  context.system.campaignEffects = {};
+  assert.ok(term().blocked);
+  context.system.campaignEffects = { bottomlessClip: true };
+  context.firing.fireMode = "single";
+  assert.ok(term().blocked);
+});
 
 test("Bottomless Clip uses the five-shot printed stockpile threshold, including empty and single-shot weapons", () => {
   for (const [ammo, expected] of [
