@@ -17,7 +17,10 @@ Foundry already supplies scenes, tokens, journals, roll tables and the combat tr
   action dice left of the starting number.
 - **Begin session** (top of the console) starts the session's usage period, sets up the GC pool from the team and the
   mission's Caliber, and applies each agent's starting-dice adjustments in one step. **Next scene** starts a new scene
-  period and counts the scene on the active mission. **Start mission** also starts a mission period.
+  period and counts the scene on the active mission. **Start mission** also starts a mission period, and rolls the
+  liquidation check (p.440) for each agent whose standing is below −20 Reputation or −$1,000,000 Net Worth. An agent
+  below 0 is marked burned on the sheet and beside their name in the console, and cannot allocate reserves, make
+  Requests or Gear checks.
 - Until the GC action dice are set up the console offers **Set up GC action dice**, pre-filled with the players present and the Caliber.
 - On an open NPC card the GC gets **GC boost** and **GC: activate threat**, paid from the GC pool.
 - A player's request to change something they do not own (damage to an NPC, treating a teammate) arrives as a card in

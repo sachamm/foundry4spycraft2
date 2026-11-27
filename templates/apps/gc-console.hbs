@@ -44,7 +44,7 @@
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorth}}</span></div>
       {{#if mission.bonusDice}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingDice"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.StartingDiceValue" dice=mission.bonusDice}}</span></div>{{/if}}
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Team"}}</span><span class="sc2-value">{{#each mission.team}}{{name}} (L{{level}}){{#unless @last}}, {{/unless}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NoAgents"}}{{/each}}</span></div>
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Team"}}</span><span class="sc2-value">{{#each mission.team}}{{name}} (L{{level}}){{#if standingStatus}} <span class="bad">{{standingStatus}}</span>{{/if}}{{#unless @last}}, {{/unless}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NoAgents"}}{{/each}}</span></div>
     </div>
     <p class="controls">
       {{#if mission.active}}<button type="button" class="gc-primary" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button><button type="button" data-action="endMission" data-tooltip="{{localize 'SPYCRAFT.Console.EndMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.EndMission"}}</button>

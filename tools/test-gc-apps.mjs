@@ -1002,3 +1002,29 @@ test("a mission Caliber increase reaches the team's reserves, with an Undo, and 
     a2.system = before.a2;
   }
 });
+
+test("a mission's start rolls liquidation for each targeted agent and keeps the count, with an Undo (p.440)", async () => {
+  const a3 = actors.get("a3"),
+    a4 = actors.get("a4"),
+    before = { a3: a3.system.reputation, a4: a4.system.reputation, flags3: a3.flags, flags4: a4.flags };
+  try {
+    a3.system.reputation = -25;
+    a3.flags = { spycraft2: { liquidationMissions: 1 } };
+    a4.flags = { spycraft2: { liquidationMissions: 2 } };
+    const start = messages.length;
+    dice(6);
+    const results = await mission.rollLiquidations([a3, a4]);
+    assert.deepEqual(results, [{ actor: "a3", missions: 2, total: 6, target: 6, marked: true }]);
+    assert.equal(a3.flags.spycraft2.liquidationMissions, 2);
+    assert.equal(a4.flags.spycraft2.liquidationMissions, 0, "no longer targeted: the run of missions ends");
+    const posted = messages.slice(start);
+    assert.ok(posted.some(m => /Marked for Death: a3 is the target/.test(m.content)));
+    assert.ok(posted.some(m => m.flags?.spycraft2?.undo));
+    assert.deepEqual(await mission.rollLiquidations([a4]), [], "nothing to roll or clear");
+  } finally {
+    a3.system.reputation = before.a3;
+    a4.system.reputation = before.a4;
+    a3.flags = before.flags3;
+    a4.flags = before.flags4;
+  }
+});

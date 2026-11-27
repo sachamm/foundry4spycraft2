@@ -5,6 +5,7 @@ import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import { campaignGearCaliber } from "./campaign-rules.mjs";
 import { historicalCaliber } from "./gear-era.mjs";
+import { standingStatus } from "./standing.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -139,6 +140,8 @@ export function reserveInitialization(
     );
   if (provisional) validateProvisionalReserves(provisional);
   if (!intelComplete) throw new Error(loc`Choose reserves at the end of the Intel Phase.`);
+  if (standingStatus(system).burned)
+    throw new Error(loc`This agent is burned (negative standing, p.440): no mission reserves until it is above 0.`);
   if (!Number.isSafeInteger(caliber) || caliber < 1 || caliber > 5) throw new Error(loc`Mission Caliber must be I–V.`);
   // The GC sets the mission's Caliber (p.398); reserves take it from the mission record when there is one.
   if (Number.isSafeInteger(missionCaliber) && caliber !== missionCaliber)
@@ -222,6 +225,11 @@ export function gearAcquisitionPlan(
 ) {
   const existing = currentReserves(system),
     waiver = kind === "common" && usePersonalStash === true;
+  // A burned agent has no access to mission gear or resources (p.440); Personal Stash draws on the agent's own home.
+  if (!waiver && standingStatus(system).burned)
+    throw new Error(
+      loc`This agent is burned (negative standing, p.440): no Requests or Gear checks until it is above 0.`
+    );
   if ((!existing || existing.initialized === false) && !waiver)
     throw new Error(loc`Allocate reserves for the current mission first.`);
   const record = existing ?? provisionalReserves(system);

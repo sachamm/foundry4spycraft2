@@ -9,6 +9,7 @@ import { antagonistReward, threatLevel, threatBonusActionDice, missionStanding }
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
 import { campaignYear, periodMoney, periodMoneyModifier } from "../../rules/period-money.mjs";
+import { standingStatus } from "../../rules/standing.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
@@ -491,12 +492,17 @@ export function consoleContext() {
         ? "fixed"
         : `${live.base}${live.adjust ? ` ${signed(live.adjust)}` : ""}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
       bonusDice: threatBonusActionDice(tl, levels),
-      team: team.map(actor => ({
-        name: actor.name,
-        level: actor.system.level,
-        reputation: actor.system.reputation,
-        netWorth: actor.system.netWorth
-      })),
+      team: team.map(actor => {
+        const status = standingStatus(actor.system);
+        return {
+          name: actor.name,
+          level: actor.system.level,
+          reputation: actor.system.reputation,
+          netWorth: actor.system.netWorth,
+          // Negative standing (p.440): shown beside the name, so the GC sees who has lost mission gear.
+          standingStatus: status.liquidation ? loc`targeted for liquidation` : status.burned ? loc`burned` : ""
+        };
+      }),
       standing,
       canRaiseCaliber: m.caliber < 5,
       objectives: m.objectives.map(objective => ({ ...objective, xp: objective.grade * 25 })),

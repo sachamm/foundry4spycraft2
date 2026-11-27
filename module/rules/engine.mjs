@@ -19,6 +19,7 @@ import {
 import { periodMoney } from "./period-money.mjs";
 import { historicalCaliber } from "./gear-era.mjs";
 import { applyGearRestrictions, gearRestrictionsInForce } from "./gear-restrictions.mjs";
+import { standingStatus } from "./standing.mjs";
 import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
@@ -2291,6 +2292,19 @@ function deriveWealthAndGear(state) {
     picks[key].available = Math.max(0, picks[key].available - value);
     picks[key].remaining = picks[key].available - picks[key].spent;
     if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
+  }
+  // Negative standing (p.440): a burned agent keeps only personal Possessions, so no mission gear may be held.
+  sys.standingStatus = standingStatus(sys);
+  if (sys.standingStatus.burned) {
+    const held = items.filter(
+      i => ["weapon", "armor", "gear"].includes(i.type) && i.system?.pick && !i.system.possessionSource
+    ).length;
+    warnings.push(
+      sys.standingStatus.liquidation
+        ? loc`Targeted for liquidation (p.440): no mission gear, Requests or Gear checks, only personal Possessions.`
+        : loc`Burned (p.440): no mission gear, Requests or Gear checks, only personal Possessions, until standing is back above 0.`
+    );
+    if (held) warnings.push(loc`Burned: ${held} mission gear pick(s) are still on this sheet (p.440).`);
   }
   // Gear Restrictions (Table 7.8, p.437): the mission's lost picks, in the categories chosen at Intel, and any list of
   // allowed weapons or Mechanisms the GC keeps with the mission.

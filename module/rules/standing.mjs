@@ -9,6 +9,28 @@ import { periodMoney } from "./period-money.mjs";
  */
 export const VEHICLE_NET_WORTH_PER_REPUTATION = 50000;
 
+/**
+ * Negative standing (p.440), read from the standing the character's affiliation pays in (Reputation for a Faction
+ * character, Net Worth for a Freelancer). Below 0 the character is burned: no mission gear or resources, only
+ * personal Possessions. Below −20 Reputation or −$1,000,000 (scaled by Table 7.4 under Historical) the character is
+ * also targeted for liquidation, with a roll at each mission's start.
+ */
+export function standingStatus(system, moneyOptions) {
+  const currency = system?.affiliationType === "freelance" ? "netWorth" : "reputation",
+    value = Number(system?.[currency]) || 0,
+    floor = currency === "netWorth" ? periodMoney(-1000000, moneyOptions) : -20;
+  return { currency, value, burned: value < 0, liquidation: value < floor };
+}
+
+/**
+ * The liquidation roll at a mission's start (p.440): a Marked for Death event (p.399) on 1d20 ≤ 4 + the missions in
+ * a row the character has been targeted, this one included.
+ */
+export function liquidationCheck(missions, total) {
+  const target = 4 + Math.max(1, Math.trunc(Number(missions) || 1));
+  return { target, marked: Number.isFinite(total) && total <= target };
+}
+
 /** {reputation, netWorth} from a printed cost label, or null when the label is not a cost. */
 export function parseStandingCost(label) {
   const text = String(label ?? "").trim();

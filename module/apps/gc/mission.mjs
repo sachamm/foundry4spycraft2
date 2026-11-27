@@ -31,6 +31,7 @@ import {
 } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { withUndo } from "../undo.mjs";
+import { standingStatus, liquidationCheck } from "../../rules/standing.mjs";
 import { startUsagePeriod } from "../../services/periods.mjs";
 import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
@@ -236,9 +237,45 @@ export async function startMission() {
   await say(
     `<b>${loc`Mission ${esc(mission.name || "")} begins.`}</b> ${loc`Threat Level`} <b>${tl.value}</b>${loc`${tl.override ? " (fixed)" : ` (${tl.base}${tl.adjust ? ` ${signed(tl.adjust)}` : ""})`}, Caliber ${mission.caliber}.${tl.bonusDice ? loc` Each player character starts each session with ${tl.bonusDice} extra action di${tl.bonusDice === 1 ? "e" : "ce"} (p.61).` : ""} Base standing reward: Reputation ${standing.reputation} or Net Worth ${money(standing.netWorth)}. GC starting dice: ${teamActors(mission).length} + ${2 * mission.caliber}.`}`
   );
+  await rollLiquidations(teamActors(mission));
   // A session already under way began without this mission's Threat Level, so its bonus dice are given now (p.61).
   if (sessionStarted()) await applySessionDiceAdjustments({ quiet: true });
   return tl;
+}
+
+/**
+ * Targeted for liquidation (p.440): at each mission's start the GC rolls 1d20 for every such agent; a result of 4 +
+ * the missions in a row the agent has been targeted (this one included) or less brings a Marked for Death event
+ * (p.399). The count lives on the agent and drops back to 0 once the agent is no longer targeted. Undo puts the
+ * counts back; the rolls stay in the chat log.
+ */
+export async function rollLiquidations(team) {
+  const counted = actor => Number(actor.flags?.spycraft2?.liquidationMissions) || 0;
+  const targeted = team.filter(actor => standingStatus(actor.system).liquidation),
+    cleared = team.filter(actor => !targeted.includes(actor) && counted(actor) > 0);
+  if (!targeted.length && !cleared.length) return [];
+  return withUndo([...targeted, ...cleared], loc`Liquidation counts at the mission's start`, async () => {
+    for (const actor of cleared) await actor.update({ "flags.spycraft2.liquidationMissions": 0 });
+    const results = [];
+    for (const actor of targeted) {
+      const missions = counted(actor) + 1;
+      await actor.update({ "flags.spycraft2.liquidationMissions": missions });
+      const roll = await new Roll("1d20").evaluate(),
+        check = liquidationCheck(missions, roll.total);
+      results.push({ actor: actor.id, missions, total: roll.total, ...check });
+      await ChatMessage.create({
+        speaker: { alias: loc`Game Control` },
+        content: esc(
+          check.marked
+            ? loc`Liquidation check for ${actor.name}: ${roll.total} on 1d20, needing ${check.target} or less. Marked for Death: ${actor.name} is the target, and their former network the aggressors (pp.399, 440).`
+            : loc`Liquidation check for ${actor.name}: ${roll.total} on 1d20, needing ${check.target} or less. No Marked for Death event this mission (p.440).`
+        ),
+        rolls: [roll],
+        whisper: gm()
+      });
+    }
+    return results;
+  });
 }
 
 /** End the mission after asking: the record stays for the XP report, settlement and the standing payout. */
