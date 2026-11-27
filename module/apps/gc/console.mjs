@@ -34,8 +34,10 @@ import {
   VIEW_SECTIONS,
   consoleView,
   consoleSections,
+  effectLabel,
   firstSessionChecklist,
-  primaryAction
+  primaryAction,
+  qualityHandling
 } from "./console-view.mjs";
 import { npcDamageSaveWithUndo } from "./npc-play.mjs";
 import { withUndo } from "../undo.mjs";
@@ -120,6 +122,12 @@ function initiativeTip(combat) {
     .join(" ");
 }
 
+const QUALITY_HANDLING = {
+  auto: () => loc`applied by the system`,
+  partly: () => loc`partly by hand`,
+  hand: () => loc`by hand`
+};
+
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
 
@@ -170,6 +178,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       }),
       consoleWindow: guard(() => openGCConsole({ window: true })),
       addComplication: guard(() => mission.addComplication()),
+      editObjective: guard((event, target) => mission.editObjective(target.dataset.key)),
+      editAntagonist: guard((event, target) => mission.editAntagonist(target.dataset.key)),
+      editOtherComplication: guard((event, target) => mission.editOtherComplication(target.dataset.key)),
       entry: guard((event, target) =>
         mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change, { notify: true })
       ),
@@ -803,7 +814,12 @@ export function consoleContext() {
     scene,
     season: qualities
       .filter(quality => quality.source === "season")
-      .map(quality => ({ name: quality.name, xp: signed(quality.xp), summary: quality.summary })),
+      .map(quality => ({
+        name: quality.name,
+        xp: signed(quality.xp),
+        summary: quality.summary,
+        handling: QUALITY_HANDLING[qualityHandling(quality)]()
+      })),
     ruleLines: [
       ...campaignRuleLines(effects, { money: amount => periodMoney(amount, { effects }) }),
       ...(effects.historicalMoney
@@ -814,7 +830,7 @@ export function consoleContext() {
           ]
         : [])
     ],
-    effectConflicts,
+    effectConflicts: effectConflicts.map(row => ({ ...row, key: effectLabel(row.key) })),
     combat: combatNow
       ? {
           round: combatNow.round,

@@ -159,3 +159,34 @@ export function primaryAction({
   // Between fights a session moves scene by scene; the dice are spent from the turn bar or the dice section.
   return diceCurrent ? "nextScene" : "beginSession";
 }
+
+/**
+ * Effects the system only reminds the GC of: a call at the table, a subplot, a return from death, or a feat tree the
+ * sheets do not grant. Every other campaign effect is applied by the rolls, sheets or dice themselves.
+ */
+const BY_HAND = new Set([
+  "goodAndEvil",
+  "revolvingDoor",
+  "catchPhrase",
+  "noCrossroads",
+  "debtSubplot",
+  "subplotLimitBonus",
+  "bonusFeatTree",
+  "gearRules"
+]);
+
+/** How a campaign quality is handled: "auto", "partly" (some of it by hand) or "hand". */
+export function qualityHandling(quality) {
+  const keys = Object.keys(quality?.effects ?? {});
+  const hand = keys.filter(key => BY_HAND.has(key)).length;
+  return !keys.length || hand === keys.length ? "hand" : hand ? "partly" : "auto";
+}
+
+/** An effect's internal key as words for a GC ("gearCaliberShift" reads "gear Caliber shift"). */
+export const effectLabel = key =>
+  String(key ?? "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .replace(/\bcaliber\b/g, "Caliber")
+    .replace(/\bxp\b/g, "XP")
+    .replace(/\bcqb\b/g, "CQB");

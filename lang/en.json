@@ -262,7 +262,9 @@
    "PreviewXPHint": "Whispers the mission's planned XP to you, from the objectives, antagonists and complications on record",
    "OrganizationNpcs": "NPCs:",
    "UnlinkNamed": "Unlink {name} from this organization",
-   "DropLink": "Drop an NPC here to link it to this organization"
+   "DropLink": "Drop an NPC here to link it to this organization",
+   "EditRow": "Edit…",
+   "EditNamed": "Edit {name}"
   },
   "Ability": {
    "str": "Strength",

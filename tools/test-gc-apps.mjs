@@ -1568,3 +1568,40 @@ test("an NPC dropped on an organization row is linked once and can be unlinked",
   assert.deepEqual(state.getOrganizations()[id].npcs, []);
   await state.saveOrganization(id, null);
 });
+
+test("Edit on a mission row replaces that row in place and keeps its marks", async () => {
+  const objective = { id: "objEdit", name: "Old", grade: 1, critical: false, complete: true, scenes: 1 };
+  const row = {
+    id: "antEdit",
+    uuid: null,
+    typeKey: null,
+    name: "Thug",
+    xp: 10,
+    type: "standard",
+    full: false,
+    scenes: 1,
+    encountered: true
+  };
+  await state.updateMission(m => ({ objectives: [...m.objectives, objective], antagonists: [...m.antagonists, row] }));
+  answer({ sample: "", name: "Steal the plans", grade: 3, critical: true });
+  await mission.editObjective("objEdit");
+  const saved = state.getMission().objectives.find(entry => entry.id === "objEdit");
+  assert.deepEqual([saved.name, saved.grade, saved.critical, saved.complete], ["Steal the plans", 3, true, true]);
+  answer({ uuid: "", name: "Enforcer", xp: 40, type: "special", full: false, scenes: 1 });
+  await mission.editAntagonist("antEdit");
+  const edited = state.getMission().antagonists.find(entry => entry.id === "antEdit");
+  assert.deepEqual([edited.name, edited.xp, edited.type, edited.encountered], ["Enforcer", 40, "special", true]);
+  assert.equal(state.getMission().antagonists.filter(entry => entry.id === "antEdit").length, 1);
+  await state.updateMission(m => ({
+    objectives: m.objectives.filter(entry => entry.id !== "objEdit"),
+    antagonists: m.antagonists.filter(entry => entry.id !== "antEdit")
+  }));
+});
+
+test("campaign qualities say whether the system applies them, and effect keys read as words", async () => {
+  const { qualityHandling, effectLabel } = await import("../module/apps/gc/console-view.mjs");
+  assert.equal(qualityHandling({ effects: { gearCaliberShift: 1, wealthBonus: 4 } }), "auto");
+  assert.equal(qualityHandling({ effects: { goodAndEvil: true } }), "hand");
+  assert.equal(qualityHandling({ effects: { goodAndEvil: true, attackModifier: 1 } }), "partly");
+  assert.equal(effectLabel("gearCaliberShift"), "gear Caliber shift");
+});

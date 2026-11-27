@@ -136,6 +136,14 @@ export function numberedNames(name, count, existing = []) {
   return Array.from({ length: count }, () => `${name} ${next++}`);
 }
 
+/** The list is as tall as what it shows, up to ten rows: two matches do not sit in a ten-row box. */
+function fitList(list) {
+  const rows =
+    [...list.options].filter(option => !option.hidden).length +
+    [...list.querySelectorAll("optgroup")].filter(group => !group.hidden).length;
+  list.size = Math.max(2, Math.min(10, rows));
+}
+
 function filterList(dialog) {
   const root = dialog?.element;
   const search = root?.querySelector('[name="search"]'),
@@ -155,7 +163,9 @@ function filterList(dialog) {
     // With no match nothing stays selected, so the dialog cannot place an NPC the list no longer shows.
     if (!first) list.value = "";
     else if (list.selectedOptions[0]?.hidden !== false) list.value = first.value;
+    fitList(list);
   });
+  fitList(list);
   search.focus();
 }
 
@@ -231,8 +241,8 @@ export async function addNpcToScene({ uuid = null } = {}) {
       ...groups
     ]
       .map(
-        ([source, rows], g) =>
-          `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${(uuid ? row.uuid === uuid : g === 0 && i === 0) ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
+        ([source, rows]) =>
+          `<optgroup label="${esc(source)}">${rows.map(row => `<option value="${esc(row.uuid)}"${uuid && row.uuid === uuid ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
       )
       .join("")}</select></label>
       <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" placeholder="${esc(loc`1, or a Minion squad`)}" /></label>
@@ -296,8 +306,15 @@ export async function addNpcToScene({ uuid = null } = {}) {
       commanderIndex: squad?.commander && corners.length > 1 ? 0 : null
     })
   );
-  const done = [loc`${tokens.length} × ${actor.name} added to ${scene.name}`];
+  // Named as the map shows them: the tokens' own names, which can differ from the actor's.
+  const placedNames = tokens.map(token => token.name).filter(Boolean);
+  const done = [
+    placedNames.length && placedNames.length <= 3
+      ? loc`${placedNames.join(", ")} added to ${scene.name}`
+      : loc`${tokens.length} × ${placedNames[0] ?? actor.name} added to ${scene.name}`
+  ];
   if (!typed && squad) done.push(loc`a Minion squad the team's size`);
+  else if (!typed) done.push(loc`How many was blank, so one was placed`);
   if (squad?.commander && corners.length > 1) done.push(loc`led by its Commander at Threat Level +2`);
   let joined = false,
     combatants = null,

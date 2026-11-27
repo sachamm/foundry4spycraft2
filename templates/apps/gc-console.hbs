@@ -142,6 +142,8 @@
       {{#if @root.shown.prep}}
       <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}"
         data-change="critical" aria-pressed="{{#if critical}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Console.CriticalNamed' name=name}}">{{localize "SPYCRAFT.Console.CriticalToggle"}}</button>
+      <button type="button" class="sc2-action" data-action="editObjective" data-key="{{id}}"
+        aria-label="{{localize 'SPYCRAFT.Console.EditNamed' name=name}}">{{localize "SPYCRAFT.Console.EditRow"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="objectives" data-key="{{id}}"
         data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button>{{/if}}</span></li>{{else}}<li
         class="muted">{{localize "SPYCRAFT.Console.NoObjectives"}}</li>{{/each}}</ul>
@@ -163,6 +165,8 @@
       <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}"
         data-change="scenesDown" aria-label="{{localize 'SPYCRAFT.Console.RemoveSceneNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.RemoveAScene"}}</button>{{/if}}{{/if}}
       {{#if @root.shown.prep}}
+      <button type="button" class="sc2-action" data-action="editAntagonist" data-key="{{id}}"
+        aria-label="{{localize 'SPYCRAFT.Console.EditNamed' name=name}}">{{localize "SPYCRAFT.Console.EditRow"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="antagonists" data-key="{{id}}"
         data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button>{{/if}}</span></li>{{else}}<li
         class="muted">{{localize "SPYCRAFT.Console.NoAntagonists"}}</li>{{/each}}</ul>
@@ -197,6 +201,8 @@
       <button type="button" class="sc2-action" data-action="entry" data-list="otherComplications" data-key="{{key}}"
         data-change="ignored" aria-pressed="{{#if ignored}}true{{else}}false{{/if}}"
         aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button> 
+      <button type="button" class="sc2-action" data-action="editOtherComplication" data-key="{{key}}"
+        aria-label="{{localize 'SPYCRAFT.Console.EditNamed' name=name}}">{{localize "SPYCRAFT.Console.EditRow"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="otherComplications"
         data-key="{{key}}" data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
     </ul>
@@ -249,7 +255,8 @@
   <details class="gc-section" data-section="campaign" data-view-hidden="{{hiddenSections.campaign}}" data-state="{{sections.campaign.state}}" {{#if sections.campaign.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQualities"}}</span></summary>
     <p class="controls"><button type="button" data-action="seasonQualities">{{localize "SPYCRAFT.Template.AppsGcConsole.SeasonQualities"}}</button></p>
-    <ul data-sc2-display="icon">{{#each season}}<li data-tooltip="{{summary}}">{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP3"}} {{summary}}</li>{{else}}<li
+    <ul data-sc2-display="icon">{{#each season}}<li data-tooltip="{{summary}}">{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP3"}} <span
+      class="tag muted">{{handling}}</span> {{summary}}</li>{{else}}<li
       class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoSeasonLongQualities"}}</li>{{/each}}</ul>
     {{#if ruleLines.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.RulesInForce"}}</p>
     <ul data-sc2-display="icon">{{#each ruleLines}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
