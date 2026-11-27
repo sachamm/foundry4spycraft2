@@ -29,9 +29,9 @@ const parts = [
   [50, ({ actor, key }) => (key === "ref" ? saveCoverContent(actor.system) : "")],
   [
     60,
-    ({ key }) =>
+    ({ key, options }) =>
       key === "ref"
-        ? `<label><input type="checkbox" name="reflexReducesDamage" /> ${loc`The source allows this Reflex save to reduce damage`}</label><label><input type="checkbox" name="flatFooted" /> ${loc`I am flat-footed against this attack or event`}</label>`
+        ? `<label><input type="checkbox" name="reflexReducesDamage"${options?.reflexReducesDamage === true ? " checked disabled" : ""} /> ${loc`The source allows this Reflex save to reduce damage`}</label><label><input type="checkbox" name="flatFooted" /> ${loc`I am flat-footed against this attack or event`}</label>`
         : ""
   ],
   [

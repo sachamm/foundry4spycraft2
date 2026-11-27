@@ -567,10 +567,13 @@ export async function resolveHazardSave(actor, message) {
     save = check?.hazardSave;
     if (!check?.resolved || check.superseded || !save || save.resolved) return null;
   }
-  const succeeded =
+  let succeeded =
     typeof check.successConfirmed === "boolean" ? check.successConfirmed : check.effectiveTotal >= save.dc;
   const lease = await beginHazardResolution(actor, message);
   if (lease.alreadyComplete) return finishHazardResolution(actor, message, lease);
+  check = message.flags.spycraft2;
+  save = check.hazardSave;
+  succeeded = check.successConfirmed;
   if (hazardSaveResolvers.has(save.kind))
     await hazardSaveResolvers.get(save.kind)(actor, message, save, succeeded, check);
   else if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);

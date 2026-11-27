@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { evasionSaveContext } from "../module/rules/save-avoidance.mjs";
 
 /* Foundry stand-ins: enough for the attack, damage, ammunition and opposed-check workflows to run. */
 const registry = new Map();
@@ -836,6 +837,8 @@ test("standard NPC acid, explosive, vacuum and fire use actual Damage saves and 
       const save = card(`delayed-${type}`, {
         actorUuid: actor.uuid,
         checkKind: "save",
+        checkId: type === "vacuum" ? "fort" : "ref",
+        evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true }),
         rawTotal: 5,
         effectiveTotal: 5,
         resolved: true,
@@ -906,6 +909,8 @@ test("a delayed typed hit retains its activated critical size for standard and s
     const save = card(`critical-acid-save-${special}`, {
       actorUuid: actor.uuid,
       checkKind: "save",
+      checkId: "ref",
+      evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true }),
       rawTotal: 5,
       effectiveTotal: 5,
       resolved: true,
@@ -919,6 +924,38 @@ test("a delayed typed hit retains its activated critical size for standard and s
     } else {
       assert.equal(actor.system.damageTrack.last.failures, 2);
       assert.equal(actor.system.damageTrack.state, "dead");
+    }
+  }
+});
+
+test("typed Reflex damage uses recorded Evasion, retains earlier acid and preserves explosive secondary saves", async () => {
+  for (const [kind, grade, flatFooted, succeeded, impact] of [
+    ["acid", 1, false, true, 0],
+    ["acid", 1, true, true, 7],
+    ["acid", 2, false, false, 7],
+    ["explosiveReflex", 1, false, true, 0],
+    ["explosiveReflex", 2, false, false, 7]
+  ]) {
+    reset();
+    const actor = character(`Evasion-${kind}-${grade}-${flatFooted}`, {
+      vitality: { value: 100, max: 100 },
+      wounds: { value: 20, max: 20 },
+      hazards: { acid: { damage: 3, suffered: 2, startedAt: 0 } }
+    });
+    const saves = [];
+    actor.rollSave = async (id, options) => saves.push([id, options]);
+    const check = {
+      checkKind: "save",
+      checkId: "ref",
+      successConfirmed: succeeded,
+      evasionContext: { version: 1, grade, flatFooted, reflexReducesDamage: true }
+    };
+    await hazardSaveResolvers.get(kind)(actor, null, { damage: 14, reduction: 0, dc: 14 }, succeeded, check);
+    assert.equal(actor.system.vitality.value, 100 - impact);
+    if (kind === "acid") assert.equal(actor.system.hazards.acid.damage, impact || 3);
+    else {
+      assert.equal(saves[0][0], "fort", "Evasion does not remove the separate stun save");
+      assert.ok(posted.flatMap(m => m.rolls ?? []).some(r => r.formula === "1d4"));
     }
   }
 });

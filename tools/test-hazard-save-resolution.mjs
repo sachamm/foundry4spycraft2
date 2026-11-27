@@ -220,3 +220,38 @@ test("already finished but unapplied saves remain usable", async () => {
   assert.equal(await resolveHazardSave(f.actor, f.message), false);
   assert.deepEqual(f.calls, ["failure", "applied"]);
 });
+
+test("interrupted hazard evidence seals the original Evasion policy", async () => {
+  const f = fixture({
+    resolved: true,
+    successConfirmed: false,
+    evasionContext: { version: 1, grade: 1, flatFooted: false, reflexReducesDamage: true }
+  });
+  hazardSaveResolvers.set("resolution-test", async () => {
+    throw Error("interrupted");
+  });
+  await assert.rejects(resolveHazardSave(f.actor, f.message), /interrupted/);
+  assert.equal(f.actor.flags.spycraft2.hazardResolutions.hazard1.version, 2);
+  f.check.evasionContext.grade = 2;
+  await assert.rejects(
+    reviewHazardResolution(f.actor, f.message, { decision: "keep", note: "Changed policy" }),
+    /original hazard save/
+  );
+  f.check.evasionContext.grade = 1;
+  await reviewHazardResolution(f.actor, f.message, {
+    decision: "keep",
+    note: "Original policy restored; actual effects retained"
+  });
+  assert.equal(f.check.hazardSave.resolved, true);
+});
+
+test("legacy completed hazard receipts still repair cards without replaying effects", async () => {
+  const f = fixture({ resolved: true, successConfirmed: false });
+  await resolveHazardSave(f.actor, f.message);
+  const row = f.actor.flags.spycraft2.hazardResolutions.hazard1;
+  row.version = 1;
+  delete row.evidence.evasionContext;
+  delete f.check.hazardSave.resolved;
+  assert.equal(await resolveHazardSave(f.actor, f.message), false);
+  assert.equal(f.calls.filter(c => c === "failure").length, 1);
+});

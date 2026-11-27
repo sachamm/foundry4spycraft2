@@ -54,6 +54,7 @@ import {
   ANIMAL_PARTNER,
   PERSONAL_LIEUTENANT,
   animalPartnerReview,
+  animalPartnerBenefits,
   lieutenantReview,
   partnerThreatLevel
 } from "../rules/companions.mjs";
@@ -209,9 +210,16 @@ export class NpcData extends BaseActorData {
       this.companionOf?.feat === ANIMAL_PARTNER
         ? (globalThis.fromUuidSync?.(this.companionOf.ownerUuid) ?? null)
         : null;
-    this.animalPartner = !!partnerOwner;
-    if (partnerOwner) {
-      this.effectiveThreatLevel = partnerThreatLevel(partnerOwner.system?.level);
+    this.animalPartner = this.companionOf?.feat === ANIMAL_PARTNER;
+    this.companionOwnerResolved = !!partnerOwner;
+    const partnerWarnings =
+      this.animalPartner && !partnerOwner
+        ? [
+            loc`Animal Partner: the linked owner cannot be read. Review the saved Threat Level, health grade and XP allowance; special-character health is retained.`
+          ]
+        : [];
+    if (this.animalPartner) {
+      this.effectiveThreatLevel = partnerOwner ? partnerThreatLevel(partnerOwner.system?.level) : this.threatLevel;
       this.usesMissionThreatLevel = false;
     }
     // p.398: a promoted standard NPC is special until the mission ends.
@@ -222,6 +230,18 @@ export class NpcData extends BaseActorData {
       threatLevel: this.effectiveThreatLevel,
       abilities: this.abilities
     });
+    this.companionBenefits = animalPartnerBenefits({
+      active: this.animalPartner,
+      size: this.npcProfile?.enabled ? this.qualityEffects.size : null
+    });
+    this.activeFeatNames = [...new Set([...this.activeFeatNames, ...this.companionBenefits.feats])];
+    if (this.companionBenefits.note && !this.companionBenefits.needsReview)
+      this.qualityEffects.notes.push({
+        id: "animal-partner-size",
+        name: ANIMAL_PARTNER,
+        text: this.companionBenefits.note,
+        page: 201
+      });
     if (!this.npcProfile?.enabled) {
       super.prepareDerivedData();
       this.damageSave =
@@ -229,6 +249,10 @@ export class NpcData extends BaseActorData {
           ? this.manualDamageSave
           : null;
       this.applyFeatEffects({ health: false });
+      this.warnings.push(
+        ...partnerWarnings,
+        ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : [])
+      );
       this.warnings.push(
         ...campaignNpcHealthReview({
           special: ["special", "villain"].includes(this.npcType) || this.promoted || this.animalPartner,
@@ -271,7 +295,7 @@ export class NpcData extends BaseActorData {
         this.damageSave = null;
       }
     }
-    if (partnerOwner) {
+    if (this.animalPartner) {
       const grade = Math.min(10, (this.npcProfile.grades?.health ?? 1) + 1),
         health = npcTableValue("health", grade, result.effectiveLevel);
       if (Array.isArray(health)) {
@@ -283,6 +307,8 @@ export class NpcData extends BaseActorData {
     this.competence = result.competence;
     this.warnings = [
       ...(result.warnings ?? []),
+      ...partnerWarnings,
+      ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : []),
       ...campaignNpcHealthReview({
         special: result.type === "special" || this.promoted || this.animalPartner,
         profileEnabled: true,

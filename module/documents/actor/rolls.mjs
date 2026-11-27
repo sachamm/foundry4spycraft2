@@ -568,11 +568,12 @@ export const ActorRolls = Base =>
         input = await systemDialog.input({
           window: { title: game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) },
           rejectClose: false,
-          content: rollPipeline.dialog({ dialog: "save", actor: this, feats, key, stillStandingContent })
+          content: rollPipeline.dialog({ dialog: "save", actor: this, feats, key, stillStandingContent, options })
         });
         if (!input) return null;
       }
       input = rollPipeline.read({ dialog: "save", actor: this, key }, input);
+      if (options.reflexReducesDamage === true) input = { ...input, reflexReducesDamage: true };
       if (options.takedown) input = { ...input, resistingTakedown: true, takedownAttackConfirmed: true };
       // Each rule's part of the save (cover, Stone Cold, bracing, terrain, …) is a term it registers itself.
       const terms = planTerms("save", { actor: this, system: this.system, saveKey: key, input, options });

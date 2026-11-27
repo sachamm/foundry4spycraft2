@@ -166,6 +166,16 @@ function actor(level = 19) {
   return a;
 }
 
+test("a source-defined damage-reducing Reflex save survives a dialog that omits its disabled checkbox", async () => {
+  const a = actor(2);
+  input = { flatFooted: true };
+  const m = await a.rollSave("ref", { askContext: true, reflexReducesDamage: true });
+  assert.deepEqual(m.flags.spycraft2.evasionContext, context(1, true, true));
+  input = {};
+  const ordinary = await a.rollSave("ref", { askContext: true });
+  assert.equal(ordinary.flags.spycraft2.evasionContext.reflexReducesDamage, false);
+});
+
 test("actual saving throws retain Blockbuster policy independently of later campaign changes", async () => {
   const settings = game.settings;
   game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["blockbuster"] } : {}) };

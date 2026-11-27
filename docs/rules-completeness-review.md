@@ -1778,3 +1778,34 @@ and owner-funding behavior still need review. They are not claimed complete by
 the corrected health and XP workflow.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.
+
+## Pass 60: Companion size benefits and frozen Reflex damage policy
+
+PC creation remains **9.6/10** and combat **9.7/10**. Animal Partners now derive
+their free size benefit: Small or smaller receives Evasion I; Medium or larger
+receives the canonical Wolfpack Mastery benefit without buying another feat.
+Unknown Size requires GC review. A temporarily unreadable owner retains the
+saved Threat Level and special health, with an explicit review warning. New
+partners do not follow mission Threat Level.
+
+Acid and explosive Reflex saves now declare their damage-reducing purpose and
+settle against the Evasion policy recorded when the actual save was rolled.
+Successful Evasion avoids impact; Evasion II halves failed-save impact, with
+ordinary flat-footed restrictions. Earlier acid remains; explosive stress and
+the separate Fortitude save remain. Receipts seal the original Evasion policy,
+and legacy completed receipts can still repair their cards without replay.
+Unrecorded old Reflex policies require GC handling instead of silently using
+current abilities. Save-dialog omission of a disabled source checkbox cannot
+remove the known damage-reducing purpose.
+
+Native Foundry verified a complete owner and its existing legal partner at both
+Sizes, including an actual successful acid save (19 against 2). Changing Size
+between rolling and applying preserved Evasion and prevented damage. Removing
+and restoring owner readability preserved health and cleared the review warning.
+The Small build had verified XP 2 against allowance 40 with no build warnings.
+The run reported no browser errors or diagnostics. The full suite passed all
+**4,349** tests; the additional actual-save regression also passes. Focused
+coverage includes failed/flat-footed Evasion, secondary explosive effects,
+receipt-policy tampering and legacy receipt repair. Schema, lint, bundle and
+copy checks pass. Broader companion owner funding, recovery timing, source-data
+comparisons and the remaining backlog still prevent either 9.9 score.

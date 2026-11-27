@@ -12,7 +12,7 @@ const keyOf = message => {
     throw Error(loc`This hazard needs its original saved chat card before applying effects.`);
   return message.id;
 };
-const evidence = message => {
+const evidence = (message, { policy = true } = {}) => {
   const check = message.flags?.spycraft2 ?? {},
     { resolved, ...save } = check.hazardSave ?? {};
   return {
@@ -20,20 +20,21 @@ const evidence = message => {
     resolved: check.resolved,
     succeeded: check.successConfirmed,
     total: check.effectiveTotal,
-    save
+    save,
+    ...(policy ? { evasionContext: structuredClone(check.evasionContext ?? null) } : {})
   };
 };
 export const hazardResolution = (actor, message) => records(actor)[message?.id];
 const requireOriginal = (actor, message, row) => {
   if (
-    row.version !== 1 ||
+    ![1, 2].includes(row.version) ||
     typeof row.attempt !== "string" ||
     !row.attempt ||
     !owned(actor) ||
     (message.blind && !game.user?.isGM) ||
     row.actorUuid !== actor.uuid ||
     row.messageUuid !== (message.uuid ?? message.id) ||
-    !same(row.evidence, evidence(message))
+    !same(row.evidence, evidence(message, { policy: row.version >= 2 }))
   )
     throw Error(loc`The original hazard save or ownership changed. Preserve the actual effects for GC review.`);
 };
@@ -90,7 +91,7 @@ export async function beginHazardResolution(actor, message) {
       )
         throw Error(loc`Finish or review this character's pending damage application before applying a hazard save.`);
       const row = {
-        version: 1,
+        version: 2,
         actorUuid: actor.uuid,
         messageUuid: message.uuid ?? message.id,
         attempt: foundry.utils.randomID(),
@@ -137,7 +138,7 @@ export async function reviewHazardResolution(actor, message, options = {}) {
       window: { title: loc`Review interrupted hazard` },
       rejectClose: false,
       ok: { label: loc`Record review` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Review the actual conditions, health, attributes, dice and reports first. Keep the existing outcome without replaying it. Release only if nothing occurred.`}</p><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects and close this result`}</option><option value="release">${loc`Verified no effects and no dice; release this result`}</option></select></label><label><input name="noEffects" type="checkbox" /> ${loc`No effects occurred`}</label><label><input name="noDice" type="checkbox" /> ${loc`No dice were rolled`}</label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Review the actual conditions, health, attributes, dice and reports first. Keep the existing outcome without replaying it. Release only if applying this result produced no effects or dice.`}</p><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects and close this result`}</option><option value="release">${loc`Verified no effects and no dice; release this result`}</option></select></label><label><input name="noEffects" type="checkbox" /> ${loc`No effects of this result were applied`}</label><label><input name="noDice" type="checkbox" /> ${loc`No dice were rolled while applying this result`}</label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label></div>`
     });
     if (!input) return null;
   }

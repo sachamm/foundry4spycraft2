@@ -628,7 +628,7 @@ test("measured ranged flanking is limited to current CQB even for weapons with l
   const quick = weaponAttack(s, rifle, cfg, "agent", { targetFlanked: true });
   assert.equal(quick.blocked, false);
   assert.equal(quick.flanking.geometryConfirmed, true);
-  assert.match(quick.notes, /opposite-side\/adjacency/);
+  assert.match(quick.notes, /legal positioning, adjacency and ready-weapon/);
 });
 test("flanking and Wolfpack combine with independent Sniper and Game Hunter effects in the actual attack context", async () => {
   reset();

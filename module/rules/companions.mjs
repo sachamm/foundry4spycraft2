@@ -24,6 +24,23 @@ export const PERSONAL_LIEUTENANT = "Personal Lieutenant";
 
 const count = (system, name) => (system?.activeFeatSelections ?? []).filter(f => f?.name === name).length;
 
+/** Size grants are derived from the companion build, without purchasing another feat or ability. */
+export function animalPartnerBenefits({ active = false, size = null } = {}) {
+  const none = { version: 1, feats: [], evasion: 0, needsReview: false, note: null };
+  if (!active) return none;
+  const small = ["Nuisance", "Fine", "Diminutive", "Tiny", "Small"],
+    large = ["Medium", "Large", "Huge", "Gargantuan", "Colossal", "Enormous"];
+  if (![...small, ...large].includes(size))
+    return {
+      ...none,
+      needsReview: true,
+      note: loc`Animal Partner: verify the animal's Size before granting Wolfpack Mastery or Evasion I.`
+    };
+  return small.includes(size)
+    ? { ...none, evasion: 1, note: loc`Animal Partner grants Evasion I at this Size.` }
+    : { ...none, feats: ["Wolfpack Mastery"], note: loc`Animal Partner grants Wolfpack Mastery at this Size.` };
+}
+
 /** The highest XP reward an Animal Partner may have. */
 export const animalPartnerCap = ownerSystem =>
   35 + 5 * (ownerSystem?.activeFeatSelections ?? []).filter(f => ["style", "terrain"].includes(f?.tree)).length;

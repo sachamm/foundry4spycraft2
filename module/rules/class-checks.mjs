@@ -409,13 +409,17 @@ export function flankingAttackEffects(
     ranged,
     baseBonus,
     wolfpackBonus,
+    wolfpackMastery: has("Wolfpack Mastery"),
     attackBonus: baseBonus + wolfpackBonus,
     threatIncrease,
     blocked,
     reason: blocked ? loc`A ranged flanking opponent must be within CQB range (p.341).` : "",
     geometryConfirmed: true,
     notes: [
-      loc`Flanking: +${baseBonus + wolfpackBonus} attack (${ranged ? loc`ranged +1` : loc`unarmed/melee +2`}${wolfpackBonus ? loc`, Wolfpack Basics +2` : ""}). Confirm applicable opposite-side/adjacency and ready-weapon conditions (pp.176,341).`,
+      loc`Flanking: +${baseBonus + wolfpackBonus} attack (${ranged ? loc`ranged +1` : loc`unarmed/melee +2`}${wolfpackBonus ? loc`, Wolfpack Basics +2` : ""}). Confirm legal positioning, adjacency and ready-weapon conditions (pp.176,341).`,
+      ...(has("Wolfpack Mastery")
+        ? [loc`Wolfpack Mastery: any configuration qualifies when you and a teammate are adjacent to the opponent.`]
+        : []),
       ...(threatIncrease ? [loc`Wolfpack Supremacy: threat range +1 against this flanked opponent.`] : [])
     ]
   };

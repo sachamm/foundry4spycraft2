@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   animalPartnerCap,
+  animalPartnerBenefits,
   partnerThreatLevel,
   TRAINED_QUALITIES,
   animalPartnerReview,
@@ -12,6 +13,25 @@ import {
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { npcIsSpecial, spendProfile } from "../module/rules/gc/npc-state.mjs";
+import { evasionPlan } from "../module/rules/save-avoidance.mjs";
+
+test("Animal Partner grants its size benefit only to a declared partner of known size", () => {
+  for (const size of ["Nuisance", "Fine", "Diminutive", "Tiny", "Small"]) {
+    const companionBenefits = animalPartnerBenefits({ active: true, size });
+    assert.deepEqual(companionBenefits.feats, []);
+    assert.equal(companionBenefits.evasion, 1);
+    assert.equal(evasionPlan({ animalPartner: true, companionBenefits }).grade, 1);
+    assert.equal(evasionPlan({ animalPartner: true, companionBenefits }).canTake10, false);
+    assert.equal(evasionPlan({ companionBenefits }).grade, 0);
+  }
+  for (const size of ["Medium", "Large", "Huge", "Gargantuan", "Colossal", "Enormous"]) {
+    const benefit = animalPartnerBenefits({ active: true, size });
+    assert.deepEqual(benefit.feats, ["Wolfpack Mastery"]);
+    assert.equal(benefit.evasion, 0);
+  }
+  assert.equal(animalPartnerBenefits({ active: true }).needsReview, true);
+  assert.equal(animalPartnerBenefits({ size: "Small" }).evasion, 0);
+});
 
 const owner = (feats, extra = {}) => ({
   activeFeatNames: feats.map(f => f.name ?? f),

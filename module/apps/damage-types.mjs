@@ -54,6 +54,7 @@ import { postNonLethalDamage } from "./nonlethal-damage.mjs";
 import { drForAttack, reducedDamage } from "../rules/damage-application.mjs";
 import { npcDamageSave } from "./gc/npc-damage-save.mjs";
 import { npcIsSpecial } from "../rules/gc/npc-state.mjs";
+import { evasionSaveContext, reflexDamagePlan } from "../rules/save-avoidance.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
@@ -305,6 +306,7 @@ async function startAcid(actor, { amount, reduction, armor, halfActions, hitCont
   if (lines.length) await post(actor, lines, rolls);
   return actor.rollSave("ref", {
     askContext: true,
+    reflexReducesDamage: true,
     hazardSave: {
       kind: "acid",
       ...halfSavePolicy(actor),
@@ -338,9 +340,14 @@ async function startExplosive(actor, input) {
   };
   if (plan.reflexFails) {
     await post(actor, [loc`Explosive: no room to move and less than half cover, so the Reflex save fails (p.336).`]);
-    return resolveExplosiveReflex(actor, null, save, false);
+    return resolveExplosiveReflex(actor, null, save, false, {
+      checkKind: "save",
+      checkId: "ref",
+      successConfirmed: false,
+      evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true })
+    });
   }
-  return actor.rollSave("ref", { askContext: true, hazardSave: save });
+  return actor.rollSave("ref", { askContext: true, reflexReducesDamage: true, hazardSave: save });
 }
 
 async function startVacuum(actor, { amount, firstRound, source, hitContext }) {
@@ -557,17 +564,30 @@ export async function endSurvivalHazard(actor, kind) {
 
 const total = check => Number(check?.effectiveTotal);
 
-async function resolveExplosiveReflex(actor, message, save, succeeded) {
+function typedReflexDamage(save, succeeded, check, normalSuccessDamage) {
+  if (!check?.evasionContext)
+    throw Error(
+      loc`This Reflex result has no recorded Evasion policy. The GC must apply the verified original outcome by hand, then review and keep the actual effects.`
+    );
+  return reflexDamagePlan(check, { damage: save.damage, normalSuccessDamage, succeeded, confirmed: true });
+}
+
+async function resolveExplosiveReflex(actor, message, save, succeeded, check) {
   if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
-  const taken = Math.max(0, explosiveDamageTaken(save.damage, succeeded) - Math.max(0, save.reduction ?? 0)),
+  const adjustment = typedReflexDamage(save, succeeded, check, explosiveDamageTaken(save.damage, true)),
+    taken = Math.max(0, adjustment.total - Math.max(0, save.reduction ?? 0)),
     result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive, save.hitContext);
   result.lines.unshift(
-    succeeded
-      ? loc`The Reflex save succeeds: half damage, and the character moves to the next blast increment out.`
-      : loc`The Reflex save fails: full damage.`
+    adjustment.evaded
+      ? loc`Evasion prevents the explosive impact damage; successful Reflex movement still applies.`
+      : adjustment.halved
+        ? loc`Evasion halves the explosive damage despite the failed Reflex save.`
+        : succeeded
+          ? loc`The Reflex save succeeds: half damage, and the character moves to the next blast increment out.`
+          : loc`The Reflex save fails: full damage.`
   );
   // More than 20 points suffered, counted after the Reflex save but before damage reduction (p.302).
-  if (explosiveDamageTaken(save.damage, succeeded) > 20)
+  if (adjustment.total > 20)
     result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
   await post(actor, result.lines, result.rolls);
   return actor.rollSave("fort", {
@@ -611,13 +631,20 @@ const resolvers = {
       [stress.roll]
     );
   },
-  async acid(actor, message, save, succeeded) {
+  async acid(actor, message, save, succeeded, check) {
     if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
-    const first = acidFirstDamage(save.damage, succeeded),
+    const adjustment = typedReflexDamage(save, succeeded, check, acidFirstDamage(save.damage, true)),
+      first = adjustment.total,
       taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
       result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid, save.hitContext);
     result.lines.unshift(
-      succeeded ? loc`The Reflex save succeeds: the acid is halved.` : loc`The Reflex save fails: full acid damage.`
+      adjustment.evaded
+        ? loc`Evasion prevents this acid damage; any earlier acid remains.`
+        : adjustment.halved
+          ? loc`Evasion halves the acid despite the failed Reflex save.`
+          : succeeded
+            ? loc`The Reflex save succeeds: the acid is halved.`
+            : loc`The Reflex save fails: full acid damage.`
     );
     const next = applyAcid(hazardState(actor.system), { damage: first, suffered: taken, worldTime: now() });
     await writeHazards(actor, next);
