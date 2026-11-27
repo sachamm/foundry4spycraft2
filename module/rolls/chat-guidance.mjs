@@ -8,6 +8,12 @@ export function checkGuidance(check) {
   if (check.superseded)
     return { title: loc`Replaced result`, note: loc`Use the newer roll to continue.`, tone: "neutral" };
   if (!Number.isFinite(check.rawTotal)) return null;
+  if (check.npcDefensePending)
+    return {
+      tone: "pending",
+      title: loc`GC Defense decision`,
+      note: loc`The NPC was hit. The GC may raise its Defense before final settlement. Damage and on-hit effects wait; this attack result is fixed.`
+    };
   if (check.checkKind === "damage") {
     const applied = appliedDamageEntries(check).length;
     return applied

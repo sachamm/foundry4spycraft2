@@ -659,6 +659,7 @@ export function rerollEligibility(spec, check, { failed = false, criticalFailure
     check.naturalDie == null ||
     check.checkKind === "damage" ||
     check.resolved ||
+    check.npcDefensePending ||
     check.superseded
   )
     return false;

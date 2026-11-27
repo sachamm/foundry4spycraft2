@@ -11,6 +11,11 @@ export function actionDieBoostPlan(
   check,
   { count = 1, openingRound = false, calculating = false, errorDeclined = false } = {}
 ) {
+  if (check.npcDefensePending || check.gcPostHitDefense)
+    return {
+      blocked: true,
+      reason: loc`The attack has reached the GC's NPC Defense decision; its result is fixed.`
+    };
   const shaken = shakenRules(system);
   if (shaken.needsReview || shaken.spendingForbidden)
     return {

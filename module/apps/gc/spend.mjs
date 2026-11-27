@@ -20,6 +20,7 @@ import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from ".
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { boostNpcDefense } from "./npc-defense.mjs";
+import { spendPostHitDefenseForNPC } from "./post-hit-defense.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -102,6 +103,7 @@ export async function spendGCDice(input = {}) {
   const actor = spend.needsNpc ? input.actor : null;
   if (spend.needsNpc && actor?.type !== "npc") return refuse(loc`Choose the NPC this applies to.`);
   if (input.id === "boostDefense") return boostNpcDefense(actor, input);
+  if (input.id === "boostDefenseAfterHit") return spendPostHitDefenseForNPC(actor, input);
   const quality = input.id === "campaignQuality" ? campaignQuality(input.qualityId) : null;
   let plan;
   try {
@@ -185,12 +187,6 @@ export async function spendGCDice(input = {}) {
         }
         break;
       }
-      case "boostDefense":
-        lines.push(loc`+2 Defense for ${die.total} round(s).`);
-        break;
-      case "boostDefenseAfterHit":
-        lines.push(loc`+${die.total} Defense against that attack only; it may now miss.`);
-        break;
       case "boostDC":
         lines.push(loc`The DC rises by ${die.total}.`);
         break;

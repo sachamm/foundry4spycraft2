@@ -15,20 +15,27 @@ import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
 import { npcDefenseDeliveryControls } from "./npc-defense.mjs";
+import { npcHitDeliveryControls } from "./post-hit-defense.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
   ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind) || !!check.npcSkill;
 rollPipeline.register({ id: "npcDefenseDeliveryControl", order: 9998.5, chatControls: npcDefenseDeliveryControls });
+rollPipeline.register({ id: "npcPostHitDefenseDeliveryControl", order: 9998.6, chatControls: npcHitDeliveryControls });
 /** An activated critical failure can no longer be boosted (the same rule as an agent's boost). */
 export const gcBoostable = check =>
-  Number.isFinite(check?.rawTotal) && !check.resolved && !check.superseded && !check.criticalFailure;
+  Number.isFinite(check?.rawTotal) &&
+  !check.resolved &&
+  !check.superseded &&
+  !check.criticalFailure &&
+  !check.npcDefensePending;
 const npcOpen = ({ check, actor, user }) =>
   user?.isGM === true &&
   actor?.type === "npc" &&
   Number.isFinite(check.rawTotal) &&
   !check.resolved &&
   !check.superseded &&
+  !check.npcDefensePending &&
   npcCheckKind(check);
 
 /**
@@ -62,6 +69,8 @@ export async function gcBoostCard(message, actor) {
 
 /** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */
 export async function gcActivateThreat(message, actor) {
+  if (message.flags?.spycraft2?.npcDefensePending)
+    throw Error(loc`Finish the NPC Defense decision before activating a critical hit.`);
   const check = message.flags.spycraft2;
   const result = await spendGCDice({
     id: "activateThreat",

@@ -7,6 +7,7 @@ import { loc } from "../i18n.mjs";
 import { esc } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { readSetting } from "../settings.mjs";
+import { queueResources } from "../services/transactions.mjs";
 
 // An empty record is a value too: without it, a record the step created could not be told from one it filled.
 const leaf = value => value === null || typeof value !== "object" || Array.isArray(value) || !Object.keys(value).length;
@@ -207,7 +208,11 @@ export async function withUndo(actors, label, work, extra = {}) {
 }
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
-export function postUndo(label, entries, { gcDice = 0, damageCard = null, gcDiceSession, gcDefenseDeliveryUuid } = {}) {
+export function postUndo(
+  label,
+  entries,
+  { gcDice = 0, damageCard = null, gcDiceSession, gcDefenseDeliveryUuid, npcHitDefenseUndo } = {}
+) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
     // The GC sees every note, so a step a player took can be undone by the GC too.
@@ -224,7 +229,8 @@ export function postUndo(label, entries, { gcDice = 0, damageCard = null, gcDice
           ...(gcDice > 0
             ? { gcDiceSession: gcDiceSession ?? String(readSetting("usagePeriods", {})?.session ?? "initial") }
             : {}),
-          ...(gcDefenseDeliveryUuid ? { gcDefenseDeliveryUuid } : {})
+          ...(gcDefenseDeliveryUuid ? { gcDefenseDeliveryUuid } : {}),
+          ...(npcHitDefenseUndo ? { npcHitDefenseUndo } : {})
         }
       }
     }
@@ -232,6 +238,37 @@ export function postUndo(label, entries, { gcDice = 0, damageCard = null, gcDice
 }
 
 const running = new Set();
+const chatDocument = uuid => {
+  try {
+    return globalThis.fromUuidSync?.(uuid) ?? game.messages?.get?.(String(uuid).split(".").at(-1));
+  } catch {
+    return null;
+  }
+};
+export function npcHitDefenseUndoReason(record) {
+  const change = record?.npcHitDefenseUndo;
+  if (!change) return "";
+  if (!game.user?.isGM) return loc`The GC reviews a pending NPC Defense die.`;
+  const attack = chatDocument(change.attackUuid),
+    check = attack?.flags?.spycraft2,
+    pending = check?.npcDefensePending;
+  return !attack?.isOwner ||
+    check.resolved ||
+    pending?.state !== "pending" ||
+    pending.id !== change.reviewId ||
+    !same(pending, change.after)
+    ? loc`Only the latest Defense die on this still-pending attack can be undone. Undo later dice first; completed outcomes need GC review.`
+    : "";
+}
+function updateNpcUndoButtons() {
+  for (const button of globalThis.document?.querySelectorAll?.("[data-npc-hit-undo-note]") ?? []) {
+    const record = chatDocument(button.dataset.npcHitUndoNote)?.flags?.spycraft2?.undo;
+    const reason = record?.done ? loc`Already undone.` : npcHitDefenseUndoReason(record);
+    button.disabled = !!reason;
+    button.dataset.tooltip =
+      reason || loc`Undo this pending Defense die and return its GC payment when it belongs to the current session.`;
+  }
+}
 /** Put everything on a note back. Returns the names restored, or null when the GC backs out. */
 export async function applyUndo(message) {
   const record = message?.flags?.spycraft2?.undo;
@@ -241,6 +278,20 @@ export async function applyUndo(message) {
   if (running.has(key)) return null;
   running.add(key);
   try {
+    if (record.npcHitDefenseUndo) {
+      if (!game.user?.isGM) throw Error(loc`The GC reviews a pending NPC Defense die.`);
+      const npc = await fromUuid(record.npcHitDefenseUndo.actorUuid),
+        attack = await fromUuid(record.npcHitDefenseUndo.attackUuid);
+      if (!npc?.isOwner || !attack) throw Error(loc`The original NPC or attack is unavailable for Undo.`);
+      return await queueResources(
+        [npc],
+        () => {
+          const fresh = message.flags?.spycraft2?.undo;
+          return fresh?.done ? null : undoRecord(message, fresh);
+        },
+        { messages: [message, attack] }
+      );
+    }
     return await undoRecord(message, record);
   } finally {
     running.delete(key);
@@ -248,6 +299,24 @@ export async function applyUndo(message) {
 }
 
 async function undoRecord(message, record) {
+  let hitAttack = null;
+  if (record.npcHitDefenseUndo) {
+    const change = record.npcHitDefenseUndo;
+    hitAttack = await fromUuid(change.attackUuid);
+    const check = hitAttack?.flags?.spycraft2,
+      pending = check?.npcDefensePending;
+    if (
+      !game.user?.isGM ||
+      !hitAttack?.isOwner ||
+      check.resolved ||
+      pending?.state !== "pending" ||
+      pending.id !== change.reviewId ||
+      !same(pending, change.after)
+    )
+      throw Error(
+        loc`Only the latest Defense die on this still-pending attack can be undone. Undo later dice first; completed outcomes need GC review.`
+      );
+  }
   const targets = [];
   for (const entry of record.entries ?? []) {
     const actor = await fromUuid(entry.uuid);
@@ -275,6 +344,7 @@ async function undoRecord(message, record) {
   }
   // Marked first, so a failure half way cannot lead to dice being given back twice on a retry.
   await message.update({ "flags.spycraft2.undo.done": true });
+  if (hitAttack) await hitAttack.update({ "flags.spycraft2.npcDefensePending": record.npcHitDefenseUndo.before });
   for (const [entry, actor] of targets) {
     const update = restoreUpdate(entry);
     Object.assign(update, poolsGivenBack(entry, actor));
@@ -340,6 +410,13 @@ export function renderUndo(message, html) {
     // Several notes each carry a button: its name says which step it takes back.
     button.setAttribute("aria-label", loc`Undo: ${record.label}`);
     button.dataset.tooltip = loc`Puts back what this step changed${record.gcDice ? loc` and returns ${record.gcDice} GC action di${record.gcDice === 1 ? "e" : "ce"}` : ""}`;
+    if (record.npcHitDefenseUndo) {
+      button.dataset.npcHitUndoNote = message.uuid;
+      const reason = npcHitDefenseUndoReason(record);
+      button.disabled = !!reason;
+      button.dataset.tooltip =
+        reason || loc`Undo this pending Defense die and return its GC payment when it belongs to the current session.`;
+    }
     button.addEventListener("click", async () => {
       button.disabled = true;
       try {
@@ -358,4 +435,5 @@ export function renderUndo(message, html) {
 
 export function installUndo() {
   Hooks.on("renderChatMessageHTML", renderUndo);
+  Hooks.on("updateChatMessage", updateNpcUndoButtons);
 }

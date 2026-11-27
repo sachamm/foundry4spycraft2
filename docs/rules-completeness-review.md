@@ -1156,3 +1156,40 @@ The dramatic post-hit spend must still integrate before damage/on-hit
 settlements; DC boosts still need an actual declared-DC workflow. Neither is
 credited as complete. Omni-Competent penalty rounding is also still awaiting
 the requested GC ruling. Scores remain **PC creation 9.4/10 and combat 9.5/10**.
+
+## Review 40 — dramatic post-hit NPC Defense
+
+An actual hit against an NPC in a dramatic scene now waits for the GC's
+Defense decision before outcome confirmation, damage controls or on-hit
+effects. The GC may finalize without spending, or spend successive actual
+role dice while the attack still hits. Saved natural results include both
+dramatic explosion faces. Each paid result increases only this attack's saved
+Defense; live NPC Defense is unchanged. Cover-only misses and multiple-hit
+results are recomputed against the new threshold.
+
+The decision records the original attack, target, scene, session and feats.
+Only the GC can spend or finalize. Players can request the decision without
+reading private NPC rules. Stale simultaneous decisions reject before payment.
+An interrupted delivery retains the die and payment for GC recovery without
+rerolling or charging again. Pending dice can be undone in reverse order with
+same-session refunds; finalized effects cannot be rewound through that receipt.
+A failed final cleanup resumes the saved outcome without confirming it twice.
+Finalization preserves the later critical and damage steps, while preventing
+ordinary re-resolution or a later action-die boost from invalidating the saved
+decision. A confirmed result must match the finalized outcome.
+
+Native Foundry exercised the actual weapon attack and GC dialogs. A paid die
+turned a hit into a miss, retained the target's flat-footed state and removed
+damage entitlement. Undo refunded the die; another actual die was paid and
+finalized. A second attack finalized with zero dice, ended flat-footedness and
+offered its weapon damage control. Browser errors and diagnostics were empty.
+The four new 720px dialog states pass, along with all **252** layout checks.
+Focused mechanics and application tests cover exploding dice, cover, burst
+hits, stale decisions, private targets, recovery and finalization retries.
+All **4,230** Node tests and **988** fixture assertions pass. Lint,
+formatting, bundling, native schemas and copy checks also pass with the
+existing lint warnings.
+
+PC creation remains **9.4/10** and combat remains **9.5/10**. Declared DC
+boosts, later rerolls/GC corrections of finalized Defense, the remaining
+campaign mechanics and the documented source-data audits are still open.

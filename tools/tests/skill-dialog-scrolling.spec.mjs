@@ -28,6 +28,12 @@ import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
 import { manageSceneDisposition } from "../../module/apps/scene-disposition.mjs";
 import { reviewSkillPurchasePolicy } from "../../module/apps/skill-purchase-policy.mjs";
 import { boostNpcDefense, recoverNpcDefense } from "../../module/apps/gc/npc-defense.mjs";
+import { reviewNpcHitDefense } from "../../module/apps/gc/post-hit-defense.mjs";
+import {
+  beginNpcHitDefense,
+  addNpcHitDefenseDie,
+  npcHitDefenseOutcome
+} from "../../module/rules/gc/post-hit-defense.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -226,7 +232,7 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
-for (const stage of ["boost", "rolling", "reserved"])
+for (const stage of ["boost", "rolling", "reserved", "postHit"])
   test(`NPC Defense ${stage} controls remain reachable at720px`, async ({ page }) => {
     const prior = content,
       oldGame = globalThis.game;
@@ -244,16 +250,30 @@ for (const stage of ["boost", "rolling", "reserved"])
       };
       if (stage === "boost") await boostNpcDefense(actor);
       else
-        await recoverNpcDefense(actor, {
-          flags: { spycraft2: { gcDefenseDelivery: { state: stage, actorUuid: actor.uuid, rolls: [4] } } }
-        });
+        await recoverNpcDefense(
+          actor,
+          {
+            flags: {
+              spycraft2: {
+                gcDefenseDelivery: {
+                  state: stage === "postHit" ? "rolling" : stage,
+                  kind: stage === "postHit" ? "postHit" : undefined,
+                  actorUuid: actor.uuid,
+                  rolls: [4]
+                }
+              }
+            }
+          },
+          {},
+          stage === "postHit" ? { kind: "postHit" } : {}
+        );
       await render(page, 720);
       await page.setViewportSize({ width: 1280, height: 720 });
       if (stage === "boost") {
         await page.getByRole("combobox", { name: "Combat", exact: true }).selectOption("combat");
         await page.locator('[name="atStartOfRound"]').check();
       } else {
-        if (stage === "rolling")
+        if (["rolling", "postHit"].includes(stage))
           await page.getByLabel("Actual die results (comma separated)", { exact: true }).fill("4, 2");
         await page.getByLabel("GC review note", { exact: true }).fill("Actual source reviewed");
         await page.locator('[name="confirmed"]').check();
@@ -265,6 +285,70 @@ for (const stage of ["boost", "rolling", "reserved"])
     } finally {
       content = prior;
       globalThis.game = oldGame;
+    }
+  });
+
+for (const stage of ["hit", "miss", "finalizing"])
+  test(`post-hit NPC Defense ${stage} decision remains reachable at720px`, async ({ page }) => {
+    const prior = content,
+      oldGame = globalThis.game,
+      oldFromUuid = globalThis.fromUuid;
+    try {
+      const npc = { uuid: "Actor.npc", name: "NPC decision", type: "npc", isOwner: true },
+        attacker = { uuid: "Actor.attacker", isOwner: true },
+        check = { actorUuid: attacker.uuid, checkKind: "attack", rawTotal: 18, effectiveTotal: 18, attackContext: {} },
+        original = {
+          targetUuid: npc.uuid,
+          targetName: npc.name,
+          defense: 15,
+          total: 18,
+          hit: true,
+          hits: 1,
+          margin: 3
+        };
+      let review = beginNpcHitDefense(check, original, {
+        id: "review",
+        attackerUuid: attacker.uuid,
+        targetUuid: npc.uuid,
+        session: "session",
+        scene: "scene"
+      });
+      if (stage === "miss")
+        review = addNpcHitDefenseDie(review, check, {
+          id: "die",
+          sourceUuid: "ChatMessage.die",
+          die: 6,
+          rolls: [4],
+          total: 4
+        });
+      if (stage === "finalizing")
+        review = { ...review, state: "finalizing", final: npcHitDefenseOutcome(review, check) };
+      const attack = { uuid: "ChatMessage.attack", flags: { spycraft2: { ...check, npcDefensePending: review } } };
+      globalThis.fromUuid = async uuid => [npc, attacker, attack].find(doc => doc.uuid === uuid);
+      globalThis.game = {
+        user: { id: "gc", isGM: true },
+        messages: [attack],
+        settings: {
+          get: (_scope, key) =>
+            ({
+              usagePeriods: { session: "session", scene: "scene" },
+              sceneState: { scene: "scene", dramatic: true },
+              gcActionDice: { session: "session", value: 5 }
+            })[key]
+        }
+      };
+      await reviewNpcHitDefense(attack);
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      await expect(page.getByRole("combobox", { name: "Decision", exact: true })).toBeVisible();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+      globalThis.fromUuid = oldFromUuid;
     }
   });
 

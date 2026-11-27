@@ -27,8 +27,8 @@ import { appliedDamageEntries } from "../rules/damage-application.mjs";
 const ownsResult = ({ message, check, user }) => Number.isFinite(check.rawTotal) && (message.isAuthor || user.isGM);
 /** Damage that has been applied is settled: boosting or confirming it any further would change nothing. */
 const settledDamage = check => check.checkKind === "damage" && appliedDamageEntries(check).length > 0;
-const open = ctx => ownsResult(ctx) && !ctx.check.resolved && !settledDamage(ctx.check);
-const resolved = ctx => ownsResult(ctx) && !!ctx.check.resolved;
+const open = ctx => ownsResult(ctx) && !ctx.check.resolved && !ctx.check.npcDefensePending && !settledDamage(ctx.check);
+const resolved = ctx => ownsResult(ctx) && !!ctx.check.resolved && !ctx.check.npcDefensePending;
 const card = (label, run, emphasis) => [{ label, run, placement: "card", ...(emphasis ? { emphasis } : {}) }];
 const content = (label, run) => [{ label, run, placement: "content" }];
 const manualAdjustment = ({ actor, check }) =>

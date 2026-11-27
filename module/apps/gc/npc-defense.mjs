@@ -19,6 +19,65 @@ const requireGC = actor => {
   if (!game.user?.isGM || actor?.type !== "npc" || !actor.isOwner)
     throw Error(loc`The owning GC boosts an NPC's Defense.`);
 };
+export { writeDelivery as writeNpcDefenseDelivery };
+
+/** Caller holds the NPC/result transaction; every natural is durable before the next roll. */
+export async function deliverNpcDefenseDie(actor, message, record, { beforeRoll, apply, receipt: postReceipt } = {}) {
+  requireGC(actor);
+  let started = false;
+  try {
+    const result = await payGC(
+      1,
+      async () => {
+        try {
+          const paid = gcDiceStatus().settlementReview;
+          if (paid?.session !== record.session)
+            throw Error(loc`The GC session changed before this Defense die could be rolled.`);
+          await beforeRoll();
+          await writeDelivery(message, { ...record, state: "rolling", paymentId: paid.id });
+          const rolls = [],
+            objects = [];
+          for (let i = 0; i < 100; i++) {
+            started = true;
+            const die = await new Roll(`1d${record.die}`).evaluate();
+            rolls.push(die.total);
+            objects.push(die);
+            const current = { ...recordOf(message), rolls: [...rolls] };
+            await writeDelivery(message, current, { rolls: objects });
+            if (actionDieTotal(record.die, rolls, { explodeLow: record.explodeLow }).complete) {
+              await writeDelivery(message, { ...current, state: "rolled" });
+              return await apply(rolls);
+            }
+          }
+          throw Error(loc`Review the interrupted exploding Defense die before continuing.`);
+        } catch (cause) {
+          const error = cause instanceof Error ? cause : new Error(String(cause));
+          if (started) error.actionDiceSettlementReview = true;
+          throw error;
+        }
+      },
+      { purpose: loc`NPC Defense boost ${record.id}`, messageUuid: message.uuid }
+    );
+    await postReceipt?.();
+    return result;
+  } catch (cause) {
+    const error = cause instanceof Error ? cause : new Error(String(cause));
+    if (started) {
+      error.actionDiceSettlementReview = true;
+      try {
+        await message.update({
+          content: `<p class="bad">${loc`NPC Defense boost interrupted. Recover this delivery before continuing.`}</p>`
+        });
+      } catch {}
+    } else
+      await writeDelivery(
+        message,
+        { ...record, state: "cancelled" },
+        { content: `<p>${loc`NPC Defense reservation cancelled before rolling.`}</p>` }
+      );
+    throw error;
+  }
+}
 async function writeDelivery(message, record, extra = {}) {
   try {
     await message.update({ "flags.spycraft2.gcDefenseDelivery": record, ...extra });
@@ -227,11 +286,21 @@ export async function boostNpcDefense(actor, input = {}) {
   );
 }
 
-export async function recoverNpcDefense(actor, message, input = {}) {
+export async function recoverNpcDefense(actor, message, input = {}, handlers = {}) {
   requireGC(actor);
   const initial = recordOf(message);
+  if (initial?.kind === "postHit" && handlers.kind !== "postHit")
+    throw Error(loc`Use this attack's post-hit Defense recovery.`);
   if (!initial || initial.actorUuid !== actor.uuid || initial.state === "cancelled")
     throw Error(loc`Choose this NPC's interrupted Defense delivery.`);
+  const recoveryHelp =
+      initial.kind === "postHit"
+        ? loc`Use the actual natural results from this die, including explosions, in their original order. Recovery changes only the saved attack's Defense. It rolls no die and makes no new payment. Review the corresponding GC payment as spent.`
+        : loc`Use the actual natural results from this one die, including explosions. Saved results must stay in order. No die is rolled and no new payment is made. The boost keeps its original combat round; review the corresponding GC payment as spent.`,
+    recoveryConfirmation =
+      initial.kind === "postHit"
+        ? loc`The GC confirms the actual die, saved attack and paid pool`
+        : loc`The GC confirms the actual die, original round and paid pool`;
   if (input.confirmed !== true) {
     input = await systemDialog.input({
       window: { title: loc`Recover NPC Defense boost` },
@@ -240,12 +309,12 @@ export async function recoverNpcDefense(actor, message, input = {}) {
       content:
         initial.state === "reserved"
           ? `<p>${loc`This reservation never reached the die roll. Release it and return its held payment to the same session's pool, if any. No die is rolled.`}</p><label>${loc`GC review note`} <input name="note" required /></label><label><input type="checkbox" name="confirmed" /> ${loc`The GC confirms this reservation is unrolled`}</label>`
-          : `<p>${loc`Use the actual natural results from this one die, including explosions. Saved results must stay in order. No die is rolled and no new payment is made. The boost keeps its original combat round; review the corresponding GC payment as spent.`}</p><label>${loc`Actual die results (comma separated)`} <input name="results" value="${esc((initial.rolls ?? []).join(", "))}" /></label><label>${loc`GC review note`} <input name="note" required /></label><label><input type="checkbox" name="confirmed" /> ${loc`The GC confirms the actual die, original round and paid pool`}</label>`
+          : `<p>${recoveryHelp}</p><label>${loc`Actual die results (comma separated)`} <input name="results" value="${esc((initial.rolls ?? []).join(", "))}" /></label><label>${loc`GC review note`} <input name="note" required /></label><label><input type="checkbox" name="confirmed" /> ${recoveryConfirmation}</label>`
     });
   }
   if (!input) return null;
   return queueResources(
-    [actor],
+    [actor, ...(handlers.actors ?? [])],
     async () => {
       requireGC(actor);
       if (recordOf(message)?.state === "reserved") {
@@ -282,7 +351,7 @@ export async function recoverNpcDefense(actor, message, input = {}) {
         (record.rolls ?? []).some((value, idx) => value !== rolls[idx])
       )
         throw Error(loc`Review the current delivery and preserve every saved natural result.`);
-      npcDefenseResult(record, rolls);
+      (handlers.validate ?? npcDefenseResult)(record, rolls);
       const pool = gcDiceStatus(),
         payment = pool.settlementReview;
       if (pool.session !== record.session)
@@ -297,19 +366,22 @@ export async function recoverNpcDefense(actor, message, input = {}) {
         throw Error(loc`The held GC payment does not match this Defense delivery.`);
       if (!payment?.needsReview && record.state !== "complete")
         throw Error(loc`Review the missing or changed GC payment before completing this delivery.`);
-      const result = await applyResult(actor, message, rolls, { recovering: true, note: String(input.note).trim() });
+      const result = await (handlers.apply ?? applyResult)(actor, message, rolls, {
+        recovering: true,
+        note: String(input.note).trim()
+      });
       if (payment?.needsReview)
         await reviewGCDiceSettlement({ value: pool.value, resolution: input.note, confirmed: true });
-      await receipt(actor, message);
+      await (handlers.receipt ?? receipt)(actor, message);
       return result;
     },
-    { workflow: "npcDefenseRecovery", messages: [message] }
+    { workflow: "npcDefenseRecovery", messages: [message, ...(handlers.messages ?? [])] }
   );
 }
 
 export function npcDefenseDeliveryControls({ check, actor, message, user }) {
   const source = check?.gcDefenseDelivery;
-  if (!user?.isGM || actor?.type !== "npc" || !source) return [];
+  if (!user?.isGM || actor?.type !== "npc" || !source || source.kind === "postHit") return [];
   const held = gcDiceStatus().settlementReview;
   return ["reserved", "rolling", "rolled", "complete"].includes(source?.state) &&
     (source.state !== "complete" || !hasReceipt(message) || (held?.needsReview && held.messageUuid === message.uuid))

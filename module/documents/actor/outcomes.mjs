@@ -558,6 +558,12 @@ export const ActorOutcomes = Base =>
 
     async confirmCheckOutcome(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
+      const defenseReview = message.flags.spycraft2.npcDefensePending;
+      if (
+        defenseReview &&
+        (!game.user?.isGM || defenseReview.state !== "finalizing" || options.npcDefenseReviewId !== defenseReview.id)
+      )
+        return refuse(loc`The GC must finish the NPC Defense decision before confirming this attack.`);
       if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let succeeded = options.succeeded,
@@ -579,6 +585,15 @@ export const ActorOutcomes = Base =>
       const work = async () => {
         const check = message.flags?.spycraft2;
         if (!Number.isFinite(check?.rawTotal)) return refuseStep(loc`Choose a recorded check result.`);
+        if (check.gcPostHitDefense && succeeded !== check.attackResolution?.hit)
+          return refuseStep(loc`The outcome must match the finalized GC Defense decision.`);
+        if (
+          check.npcDefensePending &&
+          (!game.user?.isGM ||
+            check.npcDefensePending.state !== "finalizing" ||
+            options.npcDefenseReviewId !== check.npcDefensePending.id)
+        )
+          return refuseStep(loc`The NPC Defense decision changed before settlement.`);
         if (check.resolved || check.superseded)
           return refuseStep(loc`This check has already been resolved or replaced.`);
         if (rollEvidence(check) !== expected)
@@ -652,6 +667,8 @@ export const ActorOutcomes = Base =>
 
     /** The GC can resolve an owned opponent's payment; cross-client authority remains a separate workflow. */
     async activateCritical(message, options = {}) {
+      if (message.flags?.spycraft2?.npcDefensePending)
+        return refuse(loc`Finish the NPC Defense decision before critical activation.`);
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
       if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
@@ -1343,6 +1360,8 @@ export const ActorOutcomes = Base =>
 
     async rerollCheck(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
+      if (message.flags.spycraft2.npcDefensePending)
+        return refuse(loc`The attack result is fixed during the NPC Defense decision.`);
       if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;

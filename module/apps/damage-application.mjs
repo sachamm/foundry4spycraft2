@@ -57,6 +57,7 @@ import { COVER_GRADES } from "../rules/cover.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
 import { currentInjuryEffects, currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { applyShaken } from "./shaken-application.mjs";
+import { beginNpcDefenseReview, reviewNpcHitDefense } from "./gc/post-hit-defense.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -188,6 +189,12 @@ export async function resolveAttack(message, options = {}) {
   const check = message.flags?.spycraft2,
     attacker = check?.actorUuid ? fromUuidSync(check.actorUuid) : null;
   if (!attacker?.isOwner || check.checkKind !== "attack" || !Number.isFinite(check.effectiveTotal)) return null;
+  if (check.npcDefensePending)
+    return reviewNpcHitDefense(message, {
+      finalize: (resolution, target, id) =>
+        settleAttackResolution(message, attacker, target, resolution, { npcDefenseReviewId: id })
+    });
+  if (check.gcPostHitDefense) return refuse(loc`This attack already has a finalized GC Defense decision.`);
   if (check.resolved || check.superseded) return refuse(loc`This attack has already been resolved or replaced.`);
   let input = options;
   const declared = check.attackContext?.targetActorUuid || "";
@@ -246,7 +253,6 @@ export async function resolveAttack(message, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  const before = check.attackResolution ?? null;
   const resolution = {
     targetUuid: target?.uuid ?? "",
     targetName: target?.name ?? "",
@@ -263,14 +269,56 @@ export async function resolveAttack(message, options = {}) {
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
   };
-  await message.update({ "flags.spycraft2.attackResolution": resolution });
-  try {
-    await attacker.confirmCheckOutcome(message, { succeeded: outcome.hit, difficultyClass: defense });
-  } catch (error) {
-    await message.update(
-      before ? { "flags.spycraft2.attackResolution": before } : { "flags.spycraft2.-=attackResolution": null }
-    );
-    return refuse(error.message);
+  const review = await beginNpcDefenseReview(message, attacker, target, resolution);
+  if (review) return review;
+  return settleAttackResolution(message, attacker, target, resolution);
+}
+
+export async function settleAttackResolution(message, attacker, target, resolution, { npcDefenseReviewId = "" } = {}) {
+  const check = message.flags.spycraft2,
+    pending = check.npcDefensePending,
+    outcome = resolution,
+    defense = resolution.defense,
+    before = check.attackResolution ?? null,
+    beforeBoost = check.gcPostHitDefense;
+  if (
+    pending &&
+    (!game.user?.isGM ||
+      pending.id !== npcDefenseReviewId ||
+      pending.state !== "finalizing" ||
+      pending.targetUuid !== target?.uuid ||
+      JSON.stringify(pending.final) !== JSON.stringify(resolution))
+  )
+    return refuse(loc`The GC must finalize the saved NPC Defense decision.`);
+  const alreadySettled =
+    npcDefenseReviewId &&
+    check.successConfirmed === outcome.hit &&
+    check.gcPostHitDefense?.reviewId === npcDefenseReviewId &&
+    JSON.stringify(check.attackResolution) === JSON.stringify(resolution);
+  if (check.resolved && !alreadySettled) return refuse(loc`This attack has already been settled.`);
+  if (!alreadySettled) {
+    await message.update({
+      "flags.spycraft2.attackResolution": resolution,
+      ...(npcDefenseReviewId ? { "flags.spycraft2.gcPostHitDefense": resolution.gcDefenseBoost } : {})
+    });
+    try {
+      await attacker.confirmCheckOutcome(message, {
+        succeeded: outcome.hit,
+        difficultyClass: defense,
+        ...(npcDefenseReviewId ? { npcDefenseReviewId } : {})
+      });
+    } catch (error) {
+      await message.update({
+        ...(before ? { "flags.spycraft2.attackResolution": before } : { "flags.spycraft2.-=attackResolution": null }),
+        ...(npcDefenseReviewId
+          ? beforeBoost
+            ? { "flags.spycraft2.gcPostHitDefense": beforeBoost }
+            : { "flags.spycraft2.-=gcPostHitDefense": null }
+          : {})
+      });
+      return refuse(error.message);
+    }
+    if (npcDefenseReviewId && message.flags.spycraft2.successConfirmed !== outcome.hit) return null;
   }
   // Gunplay: each handgun hit moves the triggerman up the order, once per attack card.
   const gunplay = gunplayCountGain(attacker.system, check.weaponProficiency, outcome.hits);
@@ -287,6 +335,7 @@ export async function resolveAttack(message, options = {}) {
     } catch {
       /* supplied by another source: left for the GC */
     }
+  if (npcDefenseReviewId) await message.update({ "flags.spycraft2.-=npcDefensePending": null });
   return resolution;
 }
 
@@ -354,8 +403,19 @@ rollPipeline.register({
   order: 9165,
   chatControls({ message, check, actor, user }) {
     if (!Number.isFinite(check.rawTotal) || check.superseded || !(message.isAuthor || user.isGM)) return null;
+    if (check.npcDefensePending)
+      return user?.isGM
+        ? [
+            {
+              label: loc`GC: finish NPC Defense decision`,
+              placement: "card",
+              emphasis: "primary",
+              run: () => resolveAttack(message)
+            }
+          ]
+        : [];
     const controls = [];
-    if (!check.resolved && check.attackContext?.fireAction?.action !== "strafe") {
+    if (!check.resolved && !check.gcPostHitDefense && check.attackContext?.fireAction?.action !== "strafe") {
       // A target recorded with the attack: one click settles it against that target's listed Defense.
       const known = !check.attackResolution ? declaredTarget(check) : null;
       if (known)
