@@ -1,4 +1,9 @@
-import { beginNpcHitDefense, npcHitDefenseOutcome, addNpcHitDefenseDie } from "../../rules/gc/post-hit-defense.mjs";
+import {
+  beginNpcHitDefense,
+  npcHitDefenseOutcome,
+  addNpcHitDefenseDie,
+  npcDefenseRerollProof
+} from "../../rules/gc/post-hit-defense.mjs";
 import { rollEvidence } from "../../rules/outcomes.mjs";
 import { actionDieTotal, gcDieType } from "../../rules/gc/gc-spend.mjs";
 import { spendProfile } from "./npc-play.mjs";
@@ -67,13 +72,25 @@ export async function beginNpcDefenseReview(message, attacker, target, resolutio
         targetUuid: target.uuid,
         ...periods(),
         combat: check.rollCombat ?? null,
-        feats: attacker.system.activeFeatNames ?? []
+        feats: check.npcDefenseReroll?.feats ?? attacker.system.activeFeatNames ?? []
       });
       await writeReview(message, review);
       return review;
     },
     { messages: [message] }
   );
+}
+
+export async function validateNpcDefenseReroll({ actor, options, checkKind }) {
+  const proof = options?.npcDefenseReroll;
+  if (!proof) return;
+  const source = options.rerollOf ? await fromUuid(options.rerollOf) : null;
+  if (
+    checkKind !== "attack" ||
+    source?.flags?.spycraft2?.actorUuid !== actor.uuid ||
+    !sameValues(npcDefenseRerollProof(source.flags.spycraft2, source.uuid), proof)
+  )
+    throw Error(loc`A replacement attack must retain its original paid NPC Defense and target.`);
 }
 
 function actualDie(record, rolls) {

@@ -1,12 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { beginNpcHitDefense, npcHitDefenseOutcome, addNpcHitDefenseDie } from "../module/rules/gc/post-hit-defense.mjs";
+import {
+  beginNpcHitDefense,
+  npcHitDefenseOutcome,
+  addNpcHitDefenseDie,
+  npcDefenseRerollProof,
+  npcDefenseRerollOutcome
+} from "../module/rules/gc/post-hit-defense.mjs";
 import { attackOutcome } from "../module/rules/damage-application.mjs";
 import {
   beginNpcDefenseReview,
   boostNpcHitDefense,
   reviewNpcHitDefense,
-  recoverNpcHitDefense
+  recoverNpcHitDefense,
+  validateNpcDefenseReroll
 } from "../module/apps/gc/post-hit-defense.mjs";
 import { applyUndo } from "../module/apps/undo.mjs";
 import { actionDieBoostPlan } from "../module/rules/action-dice.mjs";
@@ -76,6 +83,55 @@ test("actual exploding dice are validated and a saved receipt cannot contribute 
   for (const invalid of [boost("b", [4]), boost("b", [2, 3]), boost("b", [0]), { ...b, total: 99 }, { ...b, die: 3 }])
     assert.throws(() => addNpcHitDefenseDie(review, c, invalid));
   assert.throws(() => addNpcHitDefenseDie(next, c, { ...b, rolls: [3], total: 3 }), /conflicts/);
+});
+
+test("failed attack rerolls retain paid Defense, including cumulative dice across further misses", () => {
+  const c = check(18),
+    r = npcHitDefenseOutcome(addNpcHitDefenseDie(start(c), c, boost("first", [4], 6)), c),
+    source = { ...c, attackResolution: r, gcPostHitDefense: r.gcDefenseBoost, successConfirmed: false },
+    proof = npcDefenseRerollProof(source, "ChatMessage.original");
+  assert.equal(proof.resolution.defense, 19);
+  assert.equal(proof.boost.total, 4);
+  assert.equal(npcDefenseRerollOutcome(proof, check(20)).hit, true);
+  const failed = {
+      ...check(18),
+      npcDefenseReroll: proof,
+      successConfirmed: false,
+      attackResolution: npcDefenseRerollOutcome(proof, check(18))
+    },
+    again = npcDefenseRerollProof(failed, "ChatMessage.reroll");
+  assert.equal(again.boost.total, 4, "the earlier die is retained once");
+  const nextCheck = { ...check(20), npcDefenseReroll: again },
+    nextReview = beginNpcHitDefense(nextCheck, npcDefenseRerollOutcome(again, nextCheck), {
+      id: "next",
+      attackerUuid: c.actorUuid,
+      targetUuid: "Actor.npc",
+      session: "s1",
+      scene: "scene1"
+    }),
+    nextResult = npcHitDefenseOutcome(addNpcHitDefenseDie(nextReview, nextCheck, boost("second", [2])), nextCheck),
+    third = npcDefenseRerollProof(
+      {
+        ...nextCheck,
+        attackResolution: nextResult,
+        gcPostHitDefense: nextResult.gcDefenseBoost,
+        successConfirmed: false
+      },
+      "ChatMessage.second"
+    );
+  assert.equal(third.resolution.defense, 21);
+  assert.equal(third.boost.total, 6);
+  assert.equal(third.boost.sources.length, 2);
+  assert.throws(() => npcDefenseRerollProof({ ...source, successConfirmed: true }, "ChatMessage.source"));
+  assert.throws(
+    () =>
+      npcDefenseRerollProof(
+        { ...source, gcPostHitDefense: { ...r.gcDefenseBoost, feats: undefined } },
+        "ChatMessage.legacy"
+      ),
+    /snapshot needs GC review/
+  );
+  assert.throws(() => npcDefenseRerollOutcome({ ...proof, targetUuid: "Actor.other" }, c));
 });
 
 test("increased Defense recalculates burst hits and whether cover alone caused the miss", () => {
@@ -377,4 +433,53 @@ test("players may request the initial decision without reading a private NPC's r
   assert.equal(appSettings.gcActionDice.value, 10);
   assert.equal(appRng, 0);
   Object.defineProperty(ctx.npc, "system", { configurable: true, value: system });
+});
+
+test("replacement attacks ignore live Defense changes, keep the original payment and allow only new reaction dice", async () => {
+  const ctx = appContext(),
+    { resolveAttack } = await import("../module/apps/damage-application.mjs");
+  await beginNpcDefenseReview(ctx.attack, ctx.attacker, ctx.npc, ctx.original);
+  await boostNpcHitDefense(ctx.attack);
+  await finish(ctx);
+  const proof = npcDefenseRerollProof(ctx.attack.flags.spycraft2, ctx.attack.uuid),
+    options = { npcDefenseReroll: proof, rerollOf: ctx.attack.uuid };
+  await validateNpcDefenseReroll({ actor: ctx.attacker, options, checkKind: "attack" });
+  await assert.rejects(
+    validateNpcDefenseReroll({
+      actor: ctx.attacker,
+      options: { ...options, npcDefenseReroll: { ...proof, resolution: { ...proof.resolution, defense: 1 } } },
+      checkKind: "attack"
+    }),
+    /retain its original/
+  );
+  const makeReplacement = (id, total, p) => ({
+    id,
+    uuid: `ChatMessage.${id}`,
+    isAuthor: true,
+    isOwner: true,
+    flags: { spycraft2: { ...check(total), npcDefenseReroll: p } },
+    async update(change) {
+      patchDoc(this, change);
+    }
+  });
+  const first = makeReplacement("replacement", 12, proof);
+  game.messages.push(first);
+  ctx.npc.system.defense.total = 99;
+  await resolveAttack(first);
+  assert.equal(first.flags.spycraft2.attackResolution.defense, 13);
+  assert.equal(first.flags.spycraft2.attackResolution.hit, false);
+  assert.equal(appSettings.gcActionDice.value, 9);
+  const nextProof = npcDefenseRerollProof(first.flags.spycraft2, first.uuid),
+    second = makeReplacement("next", 14, nextProof);
+  game.messages.push(second);
+  await resolveAttack(second);
+  assert.equal(second.flags.spycraft2.npcDefensePending.original.defense, 13);
+  appValues = [2];
+  await boostNpcHitDefense(second);
+  await finish({ ...ctx, attack: second });
+  assert.equal(second.flags.spycraft2.attackResolution.defense, 15);
+  assert.equal(second.flags.spycraft2.attackResolution.hit, false);
+  assert.equal(appSettings.gcActionDice.value, 8);
+  assert.equal(appRng, 2);
+  assert.equal(npcDefenseRerollProof(second.flags.spycraft2, second.uuid).boost.total, 5);
 });

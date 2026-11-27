@@ -15,14 +15,20 @@ import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
 import { npcDefenseDeliveryControls } from "./npc-defense.mjs";
-import { npcHitDeliveryControls } from "./post-hit-defense.mjs";
+import { npcHitDeliveryControls, validateNpcDefenseReroll } from "./post-hit-defense.mjs";
 import { acquireDeclaredDC, validateDeclaredDC, declaredDCControls } from "./declared-skill-dc.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
   ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind) || !!check.npcSkill;
 rollPipeline.register({ id: "npcDefenseDeliveryControl", order: 9998.5, chatControls: npcDefenseDeliveryControls });
-rollPipeline.register({ id: "npcPostHitDefenseDeliveryControl", order: 9998.6, chatControls: npcHitDeliveryControls });
+rollPipeline.register({
+  id: "npcPostHitDefenseDeliveryControl",
+  order: 9998.6,
+  chatControls: npcHitDeliveryControls,
+  validate: validateNpcDefenseReroll,
+  flags: ({ options }) => (options?.npcDefenseReroll ? { npcDefenseReroll: options.npcDefenseReroll } : {})
+});
 rollPipeline.register({
   id: "declaredSkillDC",
   order: 9998.7,

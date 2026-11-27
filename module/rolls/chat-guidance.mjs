@@ -14,6 +14,12 @@ export function checkGuidance(check) {
       title: loc`GC Defense decision`,
       note: loc`The NPC was hit. The GC may raise its Defense before final settlement. Damage and on-hit effects wait; this attack result is fixed.`
     };
+  if (check.npcDefenseReroll && !check.attackResolution)
+    return {
+      tone: "pending",
+      title: loc`Replacement attack rolled`,
+      note: loc`Resolve against the recorded NPC Defense. The original target and previously paid GC dice still apply.`
+    };
   if (check.checkKind === "damage") {
     const applied = appliedDamageEntries(check).length;
     return applied

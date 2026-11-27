@@ -1252,3 +1252,34 @@ formatting, bundling and copy checks. Existing lint warnings remain.
 Scores remain **PC creation 9.4/10 and combat 9.6/10**. Remaining partial
 Undo failures and event-specific once guards stay in B-187; this closes the
 unscoped legacy-refund path without claiming that the wider audit is done.
+
+## Review 43 — paid NPC Defense across legal rerolls
+
+Perfect Skill Mastery can replace a failed attack (p.200). That replacement
+now retains its actual original target, recorded Defense, cover and cumulative
+GC dice paid against the same attack. It validates the original failed card
+before and after RNG and saves the attack's feat snapshot. Live NPC Defense
+changes cannot replace that threshold. Further failed replacements retain the
+same payment once; a replacement that hits can enter a new dramatic reaction
+before its outcome or on-hit effects settle. Newly paid dice add to the prior
+history, without charging or counting the earlier dice again.
+
+The card offers resolution against the recorded Defense and preserves hidden
+Defense. A manual outcome cannot skip that resolution. The original card is
+superseded through the existing reroll workflow, and the actual class/feat
+resource is consumed normally. Legacy finalized Defense cards without the
+feat snapshot need GC history review; that remaining path and broader GC
+corrections stay in B-188.
+
+Native Foundry used a level-18 Soldier with the Scholar mastery chain and its
+real Perfect Skill Mastery resource. After an actual paid NPC miss, a legal
+reroll consumed one of three uses and resolved against recorded Defense
+**31**, while the NPC's live Defense was **128**. The GC pool stayed at
+**19**, preserving the original paid die without another charge. Browser
+errors and diagnostics were empty. This is a partial high-level combat
+fixture, not another completed character-creation acceptance test.
+All **4,250** Node tests and **988** fixture assertions pass, along with
+lint, formatting, bundling and copy checks. Existing lint warnings remain.
+
+Scores remain **PC creation 9.4/10 and combat 9.6/10** while the remaining
+backlog and source audits are addressed.

@@ -53,6 +53,7 @@ import { rerollEligibility } from "../../rules/limited-uses.mjs";
 import { betterLuckSettlement, betterLuckNote } from "../../rules/better-luck.mjs";
 import { actionDieBoostPlan, actionDieBoostResult, generousBoostPlan } from "../../rules/action-dice.mjs";
 import { declaredDCOutcome } from "../../rules/gc/declared-skill-dc.mjs";
+import { npcDefenseRerollProof } from "../../rules/gc/post-hit-defense.mjs";
 import { loc } from "../../i18n.mjs";
 import { same } from "../../rules/equal.mjs";
 
@@ -594,6 +595,10 @@ export const ActorOutcomes = Base =>
         }
         if (check.gcPostHitDefense && succeeded !== check.attackResolution?.hit)
           return refuseStep(loc`The outcome must match the finalized GC Defense decision.`);
+        if (check.npcDefenseReroll && (!check.attackResolution || succeeded !== check.attackResolution.hit))
+          return refuseStep(
+            loc`Resolve this replacement against its recorded NPC Defense before confirming its outcome.`
+          );
         if (
           check.npcDefensePending &&
           (!game.user?.isGM ||
@@ -1443,6 +1448,9 @@ export const ActorOutcomes = Base =>
           try {
             replacement = await this.rollCheck(check.formula, check.rollData, {
               ...check,
+              ...(check.gcPostHitDefense || check.npcDefenseReroll
+                ? { npcDefenseReroll: npcDefenseRerollProof(check, message.uuid) }
+                : {}),
               rerollSource,
               validateRerollContext,
               preRollFunding: null,

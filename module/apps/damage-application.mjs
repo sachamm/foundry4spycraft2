@@ -17,6 +17,7 @@ import { snapshot, undoEntry, postUndo } from "./undo.mjs";
 import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { npcDefenseRerollOutcome } from "../rules/gc/post-hit-defense.mjs";
 import { enhanceDamageDialog } from "./dialog-sections.mjs";
 import {
   attackKindOf,
@@ -196,6 +197,18 @@ export async function resolveAttack(message, options = {}) {
     });
   if (check.gcPostHitDefense) return refuse(loc`This attack already has a finalized GC Defense decision.`);
   if (check.resolved || check.superseded) return refuse(loc`This attack has already been resolved or replaced.`);
+  if (check.npcDefenseReroll) {
+    try {
+      const resolution = npcDefenseRerollOutcome(check.npcDefenseReroll, check),
+        target = await fromUuid(check.npcDefenseReroll.targetUuid);
+      if (target?.type !== "npc")
+        return refuse(loc`The original NPC target is unavailable; ask the GC to review this replacement attack.`);
+      const review = await beginNpcDefenseReview(message, attacker, target, resolution);
+      return review ?? settleAttackResolution(message, attacker, target, resolution);
+    } catch (error) {
+      return refuse(error.message);
+    }
+  }
   let input = options;
   const declared = check.attackContext?.targetActorUuid || "";
   if (input.defense === undefined && input.targetUuid === undefined) {
@@ -415,7 +428,17 @@ rollPipeline.register({
           ]
         : [];
     const controls = [];
-    if (!check.resolved && !check.gcPostHitDefense && check.attackContext?.fireAction?.action !== "strafe") {
+    if (!check.resolved && !check.gcPostHitDefense && check.npcDefenseReroll)
+      controls.push({
+        label: check.npcDefenseReroll.resolution.defenseHidden
+          ? loc`Resolve vs recorded NPC Defense`
+          : loc`Resolve vs recorded NPC Defense ${check.npcDefenseReroll.resolution.defense}`,
+        hint: loc`Keeps the original target and previously paid GC Defense dice for this replacement attack.`,
+        placement: "card",
+        emphasis: typeof check.successConfirmed === "boolean" ? "quiet" : "primary",
+        run: () => resolveAttack(message)
+      });
+    else if (!check.resolved && !check.gcPostHitDefense && check.attackContext?.fireAction?.action !== "strafe") {
       // A target recorded with the attack: one click settles it against that target's listed Defense.
       const known = !check.attackResolution ? declaredTarget(check) : null;
       if (known)

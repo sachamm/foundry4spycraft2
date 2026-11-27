@@ -84,6 +84,14 @@ export function checkFlavor(check) {
   if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
   notes.push(...cooperativeNotes(check).map(esc));
   if (attackResolutionNote(check)) notes.push(esc(attackResolutionNote(check)));
+  if (check.npcDefenseReroll)
+    notes.push(
+      esc(
+        check.npcDefenseReroll.resolution.defenseHidden
+          ? loc`Replacement attack: the original target and paid NPC Defense are retained.`
+          : loc`Replacement attack: recorded Defense ${check.npcDefenseReroll.resolution.defense}, including ${check.npcDefenseReroll.boost.total} from previously paid GC dice.`
+      )
+    );
   if (check.declaredSkillDC)
     notes.push(
       esc(
@@ -261,6 +269,7 @@ const rollEvidenceFields = check => [
 ];
 export function rollEvidence(check) {
   return JSON.stringify([
+    ...(check.npcDefenseReroll ? [check.npcDefenseReroll] : []),
     ...(check.declaredSkillDC ? [check.declaredSkillDC] : []),
     ...(check.gcPostHitDefense ? [check.gcPostHitDefense] : []),
     ...(check.attackContext?.reach
@@ -406,6 +415,7 @@ export function rollEvidence(check) {
 export function rollEvidenceMatches(evidence, check) {
   if (evidence === rollEvidence(check)) return true;
   if (
+    check.npcDefenseReroll ||
     check.declaredSkillDC ||
     check.gcPostHitDefense ||
     check.attackContext?.reach ||

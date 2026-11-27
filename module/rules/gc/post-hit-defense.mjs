@@ -119,8 +119,92 @@ export function npcHitDefenseOutcome(review, check) {
       version: 1,
       reviewId: review.id,
       total: boost,
+      feats: [...review.feats],
       sources: review.boosts.map(row => ({ id: row.id, sourceUuid: row.sourceUuid }))
     }
+  };
+}
+
+/** A legal failed-attack reroll keeps every paid Defense increase against that same attack. */
+export function npcDefenseRerollProof(check, sourceAttackUuid) {
+  const previous = check?.npcDefenseReroll,
+    current = check?.gcPostHitDefense,
+    resolution = check?.attackResolution;
+  if (
+    check?.checkKind !== "attack" ||
+    check.resolved ||
+    check.superseded ||
+    check.criticalFailure ||
+    check.successConfirmed !== false ||
+    resolution?.hit !== false ||
+    !sourceAttackUuid ||
+    (!previous && !current)
+  )
+    throw Error(loc`Resolve the original failed attack and its paid NPC Defense before rerolling.`);
+  const feats = current?.feats ?? previous?.feats;
+  if (!Array.isArray(feats) || feats.some(name => typeof name !== "string"))
+    throw Error(loc`The original NPC Defense feat snapshot needs GC review before this legacy attack can reroll.`);
+  const sources = [...(previous?.boost?.sources ?? []), ...(current?.sources ?? [])],
+    total = (previous?.boost?.total ?? 0) + (current?.total ?? 0);
+  const { gcDefenseBoost: _lastBoost, ...original } = resolution;
+  const proof = {
+    version: 1,
+    sourceAttackUuid,
+    attackerUuid: check.actorUuid,
+    targetUuid: resolution.targetUuid,
+    resolution: structuredClone(original),
+    feats: [...feats],
+    boost: { total, sources: structuredClone(sources) }
+  };
+  npcDefenseRerollOutcome(proof, check);
+  return proof;
+}
+
+export function npcDefenseRerollOutcome(proof, check) {
+  const saved = proof?.resolution,
+    boost = proof?.boost;
+  if (
+    proof?.version !== 1 ||
+    typeof proof.sourceAttackUuid !== "string" ||
+    !proof.sourceAttackUuid ||
+    typeof proof.attackerUuid !== "string" ||
+    proof.attackerUuid !== check?.actorUuid ||
+    typeof proof.targetUuid !== "string" ||
+    !proof.targetUuid ||
+    saved?.targetUuid !== proof.targetUuid ||
+    !Number.isSafeInteger(saved.defense) ||
+    saved.defense < 0 ||
+    !Number.isSafeInteger(boost?.total) ||
+    boost.total < 0 ||
+    boost.total > saved.defense ||
+    !Array.isArray(boost.sources) ||
+    !Array.isArray(proof.feats) ||
+    proof.feats.some(name => typeof name !== "string") ||
+    boost.sources.some(
+      row => typeof row.id !== "string" || !row.id || typeof row.sourceUuid !== "string" || !row.sourceUuid
+    ) ||
+    new Set(boost.sources.map(row => row.id)).size !== boost.sources.length ||
+    check?.checkKind !== "attack" ||
+    !Number.isFinite(check.effectiveTotal) ||
+    (saved.cover &&
+      (!Number.isSafeInteger(saved.cover.grade) ||
+        saved.cover.grade < 1 ||
+        saved.cover.grade > 3 ||
+        saved.cover.bonus !== saved.cover.grade * 2 ||
+        saved.defense < saved.cover.bonus))
+  )
+    throw Error(loc`Review the original target, Defense and paid dice before resolving this replacement attack.`);
+  const result = attackOutcome({
+    total: check.effectiveTotal,
+    defense: saved.defense,
+    fireAction: check.attackContext?.fireAction ?? null,
+    feats: proof.feats
+  });
+  return {
+    ...structuredClone(saved),
+    total: check.effectiveTotal,
+    ...result,
+    hitsCover: !!saved.cover && !result.hit && check.effectiveTotal >= saved.defense - saved.cover.bonus
   };
 }
 
