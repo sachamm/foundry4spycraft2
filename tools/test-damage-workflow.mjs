@@ -960,6 +960,76 @@ test("typed Reflex damage uses recorded Evasion, retains earlier acid and preser
   }
 });
 
+test("an acid weapon rolls actual coverage and preserves non-armor DR after its original AP", async () => {
+  reset();
+  const actor = character("Acid-armor", {
+    vitality: { value: 100, max: 100 },
+    wounds: { value: 20, max: 20 },
+    armor: { armorType: "P" },
+    dr: { other: 13 },
+    damageReductionComponents: { natural: 6, class: 3, armorMelee: 8, armorOther: 8, feat: 2 }
+  });
+  let retained;
+  actor.rollSave = async (_key, options) => ((retained = options.hazardSave), { flags: {} });
+  const hit = card("acid-armor-hit", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+  await applyDamage(hit, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type: "acid", armorPiercing: 4 });
+  assert.equal(retained.reduction, 4, "5 on coverage hits clothing; natural DR 6 + independent 2 - AP 4 remain");
+  assert.ok(posted.flatMap(m => m.rolls ?? []).some(r => r.formula === "1d6"));
+  const save = card("acid-armor-save", {
+    actorUuid: actor.uuid,
+    checkKind: "save",
+    checkId: "ref",
+    rawTotal: 5,
+    effectiveTotal: 5,
+    resolved: true,
+    successConfirmed: false,
+    evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true }),
+    hazardSave: retained
+  });
+  await resolveHazardSave(actor, save);
+  assert.equal(actor.system.vitality.value, 90);
+});
+
+test("acid armor removal and unknown protection are declared before dice", async () => {
+  const { sufferTypedDamage } = await import("../module/apps/damage-types.mjs");
+  const actor = character("Acid-removal", {});
+  let saves = [];
+  actor.rollSave = async (_key, options) => (saves.push(options.hazardSave), { flags: {} });
+  for (const input of [
+    { unarmoredReduction: undefined },
+    { unarmoredReduction: "" },
+    { unarmoredReduction: 10 },
+    { halfActions: 0.5 },
+    { removeArmor: true },
+    { removeArmor: true, halfActions: 0 }
+  ]) {
+    reset();
+    saves = [];
+    await sufferTypedDamage(actor, {
+      type: "acid",
+      amount: 14,
+      armor: "partial",
+      reduction: 9,
+      unarmoredReduction: 4,
+      ...input
+    });
+    assert.equal(saves.length, 0);
+    assert.equal(posted.length, 0, "invalid declarations cannot roll coverage or post a result");
+  }
+  reset();
+  await sufferTypedDamage(actor, {
+    type: "acid",
+    amount: 14,
+    armor: "partial",
+    reduction: 9,
+    unarmoredReduction: 4,
+    removeArmor: true,
+    halfActions: 1
+  });
+  assert.equal(saves[0].reduction, 4);
+  assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0, "removed armor needs no random coverage check");
+});
+
 test("typed electrical subdual retains its original melee DR column and tracks only net exposure", async () => {
   for (const special of [false, true]) {
     reset();

@@ -26,6 +26,7 @@ import {
   criticalDamageDefaults,
   damageProfile,
   drForAttack,
+  drWithoutWornArmor,
   blastDamageAt,
   knockoutDuration,
   lethalHitLines,
@@ -937,6 +938,14 @@ export async function applyDamage(message, options = {}) {
                 type,
                 amount: damage,
                 reduction,
+                ...(type === "acid"
+                  ? {
+                      armor: { P: "partial", M: "moderate", F: "full" }[target.system.armor?.armorType] ?? "none",
+                      unarmoredReduction: armorPiercingAll
+                        ? 0
+                        : Math.max(0, drWithoutWornArmor(target.system, attackKind, weaponProficiency) - armorPiercing)
+                    }
+                  : {}),
                 source: weapon?.name ?? "",
                 review: input.reviewType === true,
                 hitContext

@@ -9,6 +9,7 @@ import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
 import { specialistDRIncrement } from "./weapon-specialist.mjs";
+import { armorTrainingDRForAttack } from "./armor-training.mjs";
 import { injuryThresholds } from "./gc/campaign.mjs";
 import { campaignStressDamage, campaignStressPolicy } from "./campaign-combat.mjs";
 import { DAMAGE_TYPES } from "./damage-types.mjs";
@@ -227,6 +228,24 @@ export function drForAttack(system = {}, attackKind = "other", weaponProficiency
   const fromArmor = melee ? system.dr?.melee : system.dr?.other;
   if (whole(fromArmor)) return fromArmor + extra;
   return (whole(system.qualityEffects?.damageReduction) ? system.qualityEffects.damageReduction : 0) + extra;
+}
+
+/** Acid bypasses worn armor, not natural, class or independent feat protection (p.333). */
+export function drWithoutWornArmor(system = {}, attackKind = "other", weaponProficiency = "") {
+  if (!system.damageReductionComponents) {
+    if (system.armor) throw new Error(loc`Review the non-armor DR components before applying acid.`);
+    return drForAttack(system, attackKind, weaponProficiency);
+  }
+  const unarmored = {
+    ...system,
+    damageReductionComponents: { ...system.damageReductionComponents, armorMelee: 0, armorOther: 0 },
+    armorFeatRules: {}
+  };
+  return (
+    armorTrainingDRForAttack(unarmored, attackKind) +
+    specialistDRIncrement(unarmored, attackKind, weaponProficiency) +
+    (["unarmed", "meleeWeapon"].includes(attackKind) ? (system.notTheFaceDR ?? 0) : 0)
+  );
 }
 
 /** The DR category of a weapon, from its proficiency and whether the attack was ranged. */

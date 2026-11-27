@@ -1809,3 +1809,27 @@ coverage includes failed/flat-footed Evasion, secondary explosive effects,
 receipt-policy tampering and legacy receipt repair. Schema, lint, bundle and
 copy checks pass. Broader companion owner funding, recovery timing, source-data
 comparisons and the remaining backlog still prevent either 9.9 score.
+
+## Pass 61: Acid armor coverage and independent protection
+
+PC creation remains **9.6/10** and combat **9.7/10**. Typed weapon damage now
+reads the actual equipped body armor's coverage and rolls the acid coverage die.
+A clothing hit bypasses worn armor while retaining the correct natural/class
+maximum, independent feat protection and applicable class defenses. AP is
+applied to that remaining protection. Armor-training bonuses disappear with the
+armor. Explicitly removing armor uses the non-armor amount and retains a clear
+next-Count action/unequip instruction. Standalone declarations cannot silently
+discard unknown non-armor DR, use fractional actions or remove armor for free.
+Item Damage saves and action expenditure remain table responsibilities.
+
+Native Foundry equipped an actual Corrections vest, rolled coverage 1, and
+captured DR 3 after AP 1. The actual Reflex result 13 halved six damage to three;
+the captured protection stopped it, retaining 36 vitality. Regression coverage
+also proves a clothing hit retains natural/independent DR after AP, and validates
+armor removal before any dice. All **4,353** Node tests and **988** reference
+assertions pass. The golden update was checked across every row: only the armor
+fingerprint changed, for the added coverage field. Schema, lint, formatting,
+bundle and copy checks pass; the native run had no errors or diagnostics.
+
+Continue with initial fire scarring/recovery timing, orphaned hazard recovery,
+broader NPC resistance delivery and the outstanding source-data/build audits.

@@ -8,6 +8,7 @@ import {
   armorTypeChoice
 } from "../module/rules/armor-training.mjs";
 import { armorTotals } from "../module/rules/gear.mjs";
+import { drWithoutWornArmor } from "../module/rules/damage-application.mjs";
 import { resolveFeatChoices } from "../module/rules/feats.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
@@ -30,6 +31,25 @@ const armor = (type = "P", patch = {}) => ({
     notice: "12",
     ...patch
   }
+});
+
+test("acid removes worn-armor DR while retaining the natural/class maximum and independent protection", () => {
+  const system = {
+    damageReductionComponents: { natural: 6, class: 3, armorMelee: 8, armorOther: 8, feat: 2 },
+    armorFeatRules: { meleeWeaponDR: 2, rangedWeaponDR: 2 },
+    notTheFaceDR: 4
+  };
+  assert.equal(drWithoutWornArmor(system, "other"), 8);
+  assert.equal(drWithoutWornArmor(system, "meleeWeapon"), 12);
+  assert.equal(
+    drWithoutWornArmor(
+      { ...system, damageReductionComponents: { ...system.damageReductionComponents, class: 9 } },
+      "rangedWeapon"
+    ),
+    11
+  );
+  assert.equal(armorTotals([armor("M")]).armor.armorType, "M");
+  assert.equal(armorTotals([armor("P", { armorSlot: "helmet" })]).armor.armorType, null);
 });
 const feat = (name, choice = "") => ({ id: name, name, type: "feat", system: { choice, granted: true, bonuses: [] } }),
   basics = choice => feat("Armor Basics", choice),

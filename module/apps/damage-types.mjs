@@ -213,8 +213,10 @@ export async function sufferTypedDamage(actor, preset = {}) {
         )}</select></label>
         <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" required /></label>
         <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
-        <label>${loc`Armor worn (acid, heat)`} <select name="armor">${options(ARMORS())}</select></label>
+        <label>${loc`Armor worn (acid, heat)`} <select name="armor">${mark(options(ARMORS()), known.armor)}</select></label>
+        <label>${loc`Acid: DR remaining without worn armor, after armor-piercing`} <input type="number" name="unarmoredReduction" min="0" step="1" value="${Number.isSafeInteger(known.unarmoredReduction) ? known.unarmoredReduction : ""}" /></label>
         <label>${loc`Acid: half actions given up next Count to shed armor or an item (+1 each)`} <input type="number" name="halfActions" min="0" max="2" step="1" value="0" /></label>
+        <label><input type="checkbox" name="removeArmor" /> ${loc`Acid: those actions remove the worn armor`}</label>
         <label>${loc`Explosive: moved during the last Count`} <select name="moved">${options([
           ["none", loc`No`],
           ["half", loc`Half action move (+4)`],
@@ -254,11 +256,32 @@ export async function sufferTypedDamage(actor, preset = {}) {
         if (has(actor, "blind")) return post(actor, [loc`Flash: a blinded character is not affected (p.338).`]);
         return actor.rollSave("fort", { askContext: true, hazardSave: { kind: "flash", label, dc: amount } });
       case "acid":
+        if (
+          !Number.isSafeInteger(Number(input.halfActions ?? 0)) ||
+          Number(input.halfActions ?? 0) < 0 ||
+          Number(input.halfActions ?? 0) > 2
+        )
+          return refuse(loc`Declare zero, one or two half actions for the acid save.`);
+        if (!["none", "partial", "moderate", "full"].includes(input.armor ?? "none"))
+          return refuse(loc`Choose the armor coverage before applying acid.`);
+        if (
+          (input.armor ?? "none") !== "none" &&
+          (!Number.isSafeInteger(Number(input.unarmoredReduction)) ||
+            Number(input.unarmoredReduction) < 0 ||
+            input.unarmoredReduction === "" ||
+            input.unarmoredReduction == null ||
+            Number(input.unarmoredReduction) > reduction)
+        )
+          return refuse(loc`Enter the remaining non-armor DR after armor-piercing, no greater than the armored DR.`);
+        if (input.removeArmor === true && ((input.armor ?? "none") === "none" || Number(input.halfActions ?? 0) < 1))
+          return refuse(loc`Removing armor requires worn armor and at least one declared half action.`);
         return startAcid(actor, {
           amount,
           reduction,
           armor: input.armor ?? "none",
           halfActions: input.halfActions,
+          unarmoredReduction: (input.armor ?? "none") === "none" ? reduction : Number(input.unarmoredReduction),
+          removeArmor: input.removeArmor === true,
           hitContext
         });
       case "explosive":
@@ -288,17 +311,25 @@ export async function sufferTypedDamage(actor, preset = {}) {
   }
 }
 
-async function startAcid(actor, { amount, reduction, armor, halfActions, hitContext }) {
+async function startAcid(
+  actor,
+  { amount, reduction, armor, halfActions, unarmoredReduction, removeArmor, hitContext }
+) {
   const lines = [],
     rolls = [];
   let dr = reduction;
-  if (armor !== "none") {
+  if (removeArmor) {
+    dr = unarmoredReduction;
+    lines.push(
+      loc`The declared next-Count actions remove the armor; other DR remains. Record those actions and unequip the armor.`
+    );
+  } else if (armor !== "none") {
     const roll = await rollTotal("1d6");
     rolls.push(roll.roll);
     const hit = acidHitsArmor(armor, roll.total);
     if (hit) lines.push(loc`Acid strikes the armor (1d6: ${roll.total}): the armor makes a Damage save against it.`);
     else {
-      dr = 0;
+      dr = unarmoredReduction;
       lines.push(loc`Acid strikes the clothes (1d6: ${roll.total}): the armor's damage reduction does not apply.`);
     }
   }

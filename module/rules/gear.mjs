@@ -138,6 +138,7 @@ export function armorTotals(
   return {
     armor: {
       name: selected.map(i => i.name).join(" + "),
+      armorType: selected.find(i => armorSlot(i) === "body")?.system.armorType ?? null,
       items: selected.map(i => i.id),
       dr: sum("damageReduction"),
       drRanged: sum("damageReductionSubdual"),
