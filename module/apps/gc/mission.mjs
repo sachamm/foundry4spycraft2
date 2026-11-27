@@ -11,7 +11,7 @@ import {
   defaultMission,
   sessionDiceApplied
 } from "../../rules/gc/mission.mjs";
-import { qualityAddition, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
+import { qualityAddition, qualityClash, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { gearRestrictionNames } from "../../rules/gear-restrictions.mjs";
@@ -790,9 +790,9 @@ export async function editSeasonQualities() {
     loc`Save qualities`
   );
   if (!input) return null;
-  await setCampaign({
-    ...campaign,
-    qualities: GC_DATA.campaignQualities.filter(quality => input[`q-${quality.id}`]).map(quality => quality.id)
-  });
+  const qualities = GC_DATA.campaignQualities.filter(quality => input[`q-${quality.id}`]).map(quality => quality.id);
+  const clash = qualityClash(qualities);
+  if (clash) return refuse(clash);
+  await setCampaign({ ...campaign, qualities });
   return getCampaign();
 }

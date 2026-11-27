@@ -11405,6 +11405,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "All player characters serve one large organization and use the Faction gear rules. They earn only Reputation, never Net Worth. Cannot be combined with Freelance.",
+   "excludes": [
+    "freelance"
+   ],
    "effects": {
     "gearRules": "faction"
    }
@@ -11501,6 +11504,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "PCs are independents backed by a web of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
+   "excludes": [
+    "faction"
+   ],
    "effects": {
     "gearRules": "freelance"
    }

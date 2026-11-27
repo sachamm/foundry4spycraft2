@@ -594,6 +594,7 @@
    "AnalysisThreatRange_0gs8pq4": "Analysis threat range",
    "Analysis_03b6blv": "Analysis",
    "AndCalculating_1eu8mu7": " and Calculating",
+   "AndCannotBeInForceTogether_1stjj5o": "{0} and {1} cannot be in force together (p.{2}). Keep one of them.",
    "AndIAcceptTheFullRound_0hm84bb": " and I accept the full-round penalty",
    "AndMustBeRepairedBeforeUse_1rbv6jm": " and must be repaired before use",
    "AndReturnsGCActionDi_1rspefj": " and returns {0} GC action di{1}",
