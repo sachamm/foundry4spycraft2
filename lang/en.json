@@ -1176,7 +1176,12 @@
     "NetworkingMilestone": "Networking milestone",
     "ContactFeat": "Contact feat",
     "MatchingTheme": "Matching theme",
-    "GCConfirmsThisNewContactWas": "GC confirms this new contact was gained through Networking after taking the feat and has its matching theme"
+    "GCConfirmsThisNewContactWas": "GC confirms this new contact was gained through Networking after taking the feat and has its matching theme",
+    "ContactPeople": "Consultants and specialists",
+    "ContactPeopleHint": "Introduce the consultants and specialists this contact knows: one per grade (p.458).",
+    "CalledThisMission": "called this mission",
+    "Summon": "Summon",
+    "SummonHint": "After a successful Contact check: this person helps once this mission (p.459)."
    },
    "ActorNpcBuilder": {
     "NPCCreation": "NPC creation",

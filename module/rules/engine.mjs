@@ -1,5 +1,6 @@
 import { campaignActionDice, campaignRules } from "./campaign-rules.mjs";
 import { periodMoney } from "./period-money.mjs";
+import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
@@ -2094,6 +2095,8 @@ function deriveProficiencies(state) {
   sys.contactPicks = { available: contactsAvail, used: contactsUsed, remaining: contactsAvail - contactsUsed };
   if (contactsUsed > contactsAvail)
     warnings.push(loc`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`);
+  // Consultants and specialists each contact knows (pp.458–459).
+  for (const contact of sys.contacts ?? []) warnings.push(...reviewContactPeople(contact).problems);
   if (contactsUsed < contactsAvail)
     todo.push({
       order: 53,

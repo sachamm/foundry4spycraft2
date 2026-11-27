@@ -148,6 +148,7 @@ import { loc } from "../i18n.mjs";
 import { featActions } from "./feat-actions.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
+import { contactPeopleRows, editContactPeople, summonContactPerson } from "../apps/contact-people.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -520,6 +521,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       reviewLimitedUseCounter(event, target) {
         return this.actor.reviewLimitedUseCounter(target.dataset.resource);
+      },
+      editContactPeople(event, target) {
+        return editContactPeople(this.actor, Number(target.dataset.index));
+      },
+      summonContactPerson(event, target) {
+        return summonContactPerson(this.actor, Number(target.dataset.index), Number(target.dataset.person));
       },
       chooseTemporaryFocuses(event, target) {
         return this.actor.chooseTemporaryFocuses({ featId: target.dataset.itemId });
@@ -1279,6 +1286,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ...[...contactMilestones].sort((a, b) => a - b).map(n => [n, "Networking " + n + " purchased ranks"])
     ]);
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
+    context.contactPeople = contactPeopleRows(sys);
 
     // Gear
     context.weapons = byType("weapon").map(w => ({

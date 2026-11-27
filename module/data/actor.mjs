@@ -433,7 +433,17 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           networkingMilestone: int(0, { min: 0 }),
           networkingFeat: str(),
           networkingTheme: str(),
-          networkingFeatConfirmed: new BooleanField()
+          networkingFeatConfirmed: new BooleanField(),
+          // Consultants and specialists this contact knows (pp.458–459); "summoned" holds the mission period used.
+          people: new ArrayField(
+            new SchemaField({
+              kind: str("consultant"),
+              grade: int(1, { min: 1, max: 4 }),
+              skill: str(),
+              ability: str(),
+              summoned: str()
+            })
+          )
         })
       ),
       subplots: new ArrayField(new SchemaField({ name: str(), notes: str(), complete: new BooleanField() })),
