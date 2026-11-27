@@ -79,27 +79,5 @@ export function targetSkillEffectPlan(
   };
 }
 
-/** Initial Faceless timing scope: a rolled check with no other time changes.
- * Combined timing remains explicitly unavailable pending the p.329/Cross-Check ruling. */
-export function targetSkillTimingPlan(timing, target) {
-  if (target.timeMultiplier !== 3) return { ...timing, blockedReason: "" };
-  if (
-    timing.timeMultiplier !== 1 ||
-    timing.minimumTimeSeconds !== 0 ||
-    timing.timeReduction !== "none" ||
-    timing.timeRounding
-  )
-    return {
-      ...timing,
-      blockedReason: loc`Faceless combined with taking, Cross-Check or another timing effect requires the pending GC multiplier ruling. Use an ordinary rolled check with no time reduction for this implemented path.`
-    };
-  return {
-    ...timing,
-    timeMultiplier: 3,
-    notes: loc`${timing.notes} Faceless triples the required information-gathering time (p.195).`.trim(),
-    blockedReason: ""
-  };
-}
-
 // Recorded on the posted check as the roll was given them.
 rollPipeline.register({ id: "targetSkillEffectsRecord", order: 9770, record: ["targetSkillEffect"] });

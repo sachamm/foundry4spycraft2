@@ -34,10 +34,12 @@ function influenceTimingPlan(
       duration,
       baseSeconds
     },
-    timeChoices: [{ id, name: feat, multiplier: 0.1, minimum: 0, rounding: null }],
+    timeChoices: [
+      { id, name: feat, multiplier: 0, fixedSeconds: duration === "quick" ? 6 : 60, minimum: 0, rounding: null }
+    ],
     blockedReason: "",
     notes: [
-      loc`${feat}: GC-confirmed ${disposition} NPC ${target.trim()}; ${duration === "quick" ? loc`quick Influence (scene duration), 1 minute → 1 full action` : loc`slow Influence (mission duration), 10 minutes → 1 minute`} before check-method multipliers; only one time reduction applies (pp.132,${page}).`
+      loc`${feat}: GC-confirmed ${disposition} NPC ${target.trim()}; ${duration === "quick" ? loc`quick Influence (scene duration), 1 minute → 1 full action` : loc`slow Influence (mission duration), 10 minutes → 1 minute`}. This fixed base uses additive timing modifiers; only one time reduction applies (pp.132,${page}).`
     ]
   };
 }

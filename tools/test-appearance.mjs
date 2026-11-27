@@ -232,7 +232,7 @@ test("Simply Irresistible timing has the exact half-time minimum/rounding, metho
   assert.equal(forced.hardCore.applied, false);
   for (const method of ["take10", "take20"]) {
     const p = check(s, "impress", "influence", { method, safeToTake: true });
-    assert.equal(p.timeMultiplier, method === "take10" ? 1 : 10);
+    assert.equal(p.timeMultiplier, method === "take10" ? 1.5 : 19.5);
     assert.equal(p.minimumTimeSeconds, 6);
   }
   assert.equal(check(s, "blend", "stealth").timeReduction, "none");

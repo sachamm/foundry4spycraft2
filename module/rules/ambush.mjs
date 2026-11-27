@@ -37,7 +37,8 @@ export function ambushCheckPlan(system, key, check, { ambushPreparation = "slow"
             {
               id: "ambushMastery",
               name: loc`Ambush Mastery (quick ambush)`,
-              multiplier: 0.1,
+              multiplier: 0,
+              fixedSeconds: 6,
               minimum: 0,
               rounding: null,
               errorIncrease: 2,
@@ -49,7 +50,8 @@ export function ambushCheckPlan(system, key, check, { ambushPreparation = "slow"
               {
                 id: "ambushSupremacy",
                 name: loc`Ambush Supremacy (slow ambush)`,
-                multiplier: 0.1,
+                multiplier: 0,
+                fixedSeconds: 60,
                 minimum: 0,
                 rounding: null,
                 errorIncrease: 2,

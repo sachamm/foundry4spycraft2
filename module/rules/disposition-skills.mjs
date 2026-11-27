@@ -102,25 +102,4 @@ export function dispositionSkillPlan(system, key, check, target = null) {
   };
 }
 
-/** Keep the first timing scope explicit rather than silently stacking an unreviewed combination. */
-export function dispositionTimingPlan(timing, plan) {
-  if (plan.priority === 1) return timing;
-  if (
-    timing.timeMultiplier !== 1 ||
-    timing.minimumTimeSeconds !== 0 ||
-    timing.timeReduction !== "none" ||
-    timing.timeRounding
-  )
-    return {
-      ...timing,
-      blockedReason: loc`Disposition timing combined with taking, Cross-Check or another timing effect requires GC review. Use an ordinary rolled check without another time reduction for this path.`
-    };
-  return {
-    ...timing,
-    timeMultiplier: plan.priority,
-    timeBaseMultiplier: plan.priority,
-    timeRounding: plan.priority < 1 ? "up" : null,
-    notes: `${timing.notes} ${loc`Use the target's disposition time multiplier; reduced times round up.`}`
-  };
-}
 rollPipeline.register({ id: "dispositionSkillsRecord", order: 9771.5, record: ["dispositionSkill"] });

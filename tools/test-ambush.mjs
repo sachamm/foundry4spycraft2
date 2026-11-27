@@ -81,7 +81,7 @@ test("Mastery’s quick reduction is explicit, preserves the base quick penalty 
   assert.equal(fast.timeMultiplier, 0.1);
   assert.equal(fast.error, 5);
   assert.equal(fast.ambush.baseSeconds * fast.timeMultiplier, 6);
-  assert.equal(fast.minimumTimeSeconds, 0);
+  assert.equal(fast.minimumTimeSeconds, 6);
   assert.equal(fast.ambush.requiredPreparationSeconds, 6);
   assert.equal(
     resolveSkillCheck(s, "tactics", check, { gearStatus: "available", timingReduction: "ambushMastery" }).blocked,

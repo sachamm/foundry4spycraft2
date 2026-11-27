@@ -29,7 +29,7 @@ const state = () => ({
 });
 test("settlement evidence binds disposition and campaign skill facts and cannot fall back to older evidence without them", () => {
   const base = { checkKind: "skill", rawTotal: 20, effectiveTotal: 20, naturalDie: 10, error: 1, threat: 20, cap: 30 };
-  for (const field of ["dispositionSkill", "campaignSkillChecks"]) {
+  for (const field of ["dispositionSkill", "campaignSkillChecks", "skillTiming"]) {
     const c = { ...base, [field]: { version: 1, skillKey: "impress", modifier: 2 } },
       evidence = rollEvidence(c);
     assert.equal(rollEvidenceMatches(evidence, c), true);
@@ -256,7 +256,9 @@ test("the actual skill planner applies result, ranges, exact priority and roundi
     safeToTake: true,
     dispositionTarget: target("friendly")
   });
-  assert.ok(taking.blockedReason.includes("Disposition timing combined"));
+  assert.equal(taking.timeMultiplier, 1.5);
+  assert.equal(taking.skillTiming.policy, "additive-one-reduction");
+  assert.doesNotMatch(taking.blockedReason, /Disposition timing combined/);
   assert.ok(plan(s, "impress", c, { ...target("friendly"), confirmed: false }).blockedReason);
   assert.ok(plan(s, "impress", c, target("unknown")).blockedReason);
   assert.ok(plan(s, "athletics", check("athletics", "climb"), target("friendly")).blockedReason);

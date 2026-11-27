@@ -317,6 +317,7 @@ export function rollEvidence(check) {
     ...(check.attributeDamage ? [check.attributeDamage] : []),
     ...(check.targetSkillEffect ? [check.targetSkillEffect] : []),
     ...(check.dispositionSkill ? [check.dispositionSkill] : []),
+    ...(check.skillTiming ? [check.skillTiming] : []),
     ...(check.campaignSkillChecks ? [check.campaignSkillChecks] : []),
     ...(check.rankSynergyFeats ? [check.rankSynergyFeats] : []),
     ...(check.stoneCold ? [check.stoneCold] : []),
@@ -427,6 +428,7 @@ export function rollEvidenceMatches(evidence, check) {
     check.attributeDamage ||
     check.targetSkillEffect ||
     check.dispositionSkill ||
+    check.skillTiming ||
     check.campaignSkillChecks ||
     check.rankSynergyFeats ||
     check.stoneCold ||

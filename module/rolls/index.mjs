@@ -123,6 +123,7 @@ import "../rules/revolver-intimidate.mjs";
 import "../rules/senses.mjs";
 import "../rules/side-stance.mjs";
 import "../rules/skill-conditions.mjs";
+import "../rules/timing.mjs";
 import "../rules/disposition-skills.mjs";
 import "../rules/campaign-skills.mjs";
 import "../rules/skill-feat-terms.mjs";

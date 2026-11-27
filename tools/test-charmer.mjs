@@ -82,7 +82,7 @@ test("take 10/20 and Cross-Check multiply the single selected reduction, never c
       assert.equal(p.timeReduction, "charmer");
       assert.equal(
         p.charmer.requiredSeconds,
-        (charmerDuration === "quick" ? 6 : 60) * { roll: 1, take10: 2, take20: 20 }[method] * 3
+        (charmerDuration === "quick" ? 6 : 60) * { roll: 3, take10: 4, take20: 22 }[method]
       );
       assert.equal(p.crossCheckMultiplier, 3);
       assert.equal(p.timeReductionOptions.filter(c => c.id === "charmer").length, 1);
@@ -97,7 +97,7 @@ test("take 10/20 and Cross-Check multiply the single selected reduction, never c
       assert.equal(other.charmer.applied, false);
       assert.equal(
         other.charmer.requiredSeconds,
-        (charmerDuration === "quick" ? 60 : 600) * { roll: 1, take10: 2, take20: 20 }[method] * 0.5
+        (charmerDuration === "quick" ? 60 : 600) * { roll: 0.5, take10: 1.5, take20: 19.5 }[method]
       );
     }
 });

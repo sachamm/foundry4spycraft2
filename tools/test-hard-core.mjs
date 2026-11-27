@@ -82,7 +82,7 @@ test("take 10/20 and Cross-Check multiply the single selected reduction, never c
       assert.equal(p.timeReduction, "hardCore");
       assert.equal(
         p.hardCore.requiredSeconds,
-        (influenceDuration === "quick" ? 6 : 60) * { roll: 1, take10: 2, take20: 20 }[method] * 3
+        (influenceDuration === "quick" ? 6 : 60) * { roll: 3, take10: 4, take20: 22 }[method]
       );
       assert.equal(p.crossCheckMultiplier, 3);
       assert.equal(p.timeReductionOptions.filter(c => c.id === "hardCore").length, 1);
@@ -97,7 +97,7 @@ test("take 10/20 and Cross-Check multiply the single selected reduction, never c
       assert.equal(other.hardCore.applied, false);
       assert.equal(
         other.hardCore.requiredSeconds,
-        (influenceDuration === "quick" ? 60 : 600) * { roll: 1, take10: 2, take20: 20 }[method] * 0.5
+        (influenceDuration === "quick" ? 60 : 600) * { roll: 0.5, take10: 1.5, take20: 19.5 }[method]
       );
     }
 });

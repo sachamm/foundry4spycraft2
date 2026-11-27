@@ -1,7 +1,7 @@
 // These fixtures supply required gear unless a case explicitly overrides gearStatus; absence/kit boundaries are tested in test-skill-gear.mjs.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { skillTimingPlan } from "../module/rules/timing.mjs";
+import { skillTimingPlan, requiredSkillSeconds } from "../module/rules/timing.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 const analysis = {
   timeMultiplier: 0.5,
@@ -9,6 +9,90 @@ const analysis = {
   minimumTimeSeconds: 60,
   timeRounding: "up"
 };
+test("user timing matrix adds all increases but applies only one reducing effect", () => {
+  for (const [method, base] of [
+    ["roll", 1],
+    ["take10", 2],
+    ["take20", 20]
+  ]) {
+    const p = skillTimingPlan({
+      method,
+      crossCheck: true,
+      time: "1 Hour",
+      professional: true,
+      classEffect: { timeMultiplier: 0.25, timeSource: "Quarter-time option" },
+      timeEffects: [
+        { id: "faceless", multiplier: 3 },
+        { id: "disposition", multiplier: 0.5, rounding: "up" }
+      ]
+    });
+    assert.equal(p.timeMultiplier, base + 3.25);
+    assert.equal(p.timeReduction, "class");
+    assert.equal(p.skillTiming.policy, "additive-one-reduction");
+  }
+  assert.equal(skillTimingPlan({ method: "take10", crossCheck: true }).timeMultiplier, 4);
+  assert.equal(skillTimingPlan({ method: "take20", crossCheck: true }).timeMultiplier, 22);
+});
+test("rounding happens after additive timing; fixed-time overrides and floors retain their own duration", () => {
+  const p = skillTimingPlan({
+    crossCheck: true,
+    timeEffects: [{ id: "disposition", multiplier: 0.5, rounding: "up" }]
+  });
+  assert.equal(p.timeMultiplier, 2.5);
+  assert.equal(requiredSkillSeconds(11, p), 28);
+  const fixed = skillTimingPlan({
+    classEffect: { timeMultiplier: 0, minimumTimeSeconds: 6 },
+    crossCheck: true,
+    timeEffects: [{ id: "faceless", multiplier: 3 }]
+  });
+  assert.equal(fixed.timeMultiplier, 0);
+  assert.equal(fixed.minimumTimeSeconds, 30);
+  assert.equal(requiredSkillSeconds(3600, fixed), 30);
+  assert.doesNotMatch(fixed.notes, /0×/);
+  assert.equal(
+    skillTimingPlan({ timeEffects: [{ id: "supportive", multiplier: 1 / 3, rounding: "up" }] }).timeMultiplier,
+    1 / 3
+  );
+});
+test("printed fixed durations form the base for taking and Cross-Check without stacking reductions", () => {
+  for (const [method, multiplier] of [
+    ["roll", 3],
+    ["take10", 4],
+    ["take20", 22]
+  ]) {
+    const p = skillTimingPlan({
+      method,
+      time: "1 Minute",
+      crossCheck: true,
+      professional: true,
+      classEffect: { timeChoices: [{ id: "fixed", name: "Fixed duration", multiplier: 0, fixedSeconds: 6 }] }
+    });
+    assert.equal(p.timeReduction, "fixed");
+    assert.equal(requiredSkillSeconds(60, p), 6 * multiplier);
+    assert.equal(p.skillTiming.reduction.fixedSeconds, 6);
+    assert.equal(p.skillTiming.fixedMultiplier, multiplier);
+    assert.equal(p.minimumTimeSeconds, 6 * multiplier);
+  }
+});
+
+test("invalid source factors, duplicate effects, rounding and overflowing durations stop timing before a result is used", () => {
+  for (const input of [
+    { timeEffects: [{ id: "bad", multiplier: NaN }] },
+    { timeEffects: [{ id: "bad", multiplier: -1 }] },
+    {
+      timeEffects: [
+        { id: "same", multiplier: 3 },
+        { id: "same", multiplier: 3 }
+      ]
+    },
+    { timeEffects: [{ id: "bad", multiplier: 0.5, rounding: "sideways" }] },
+    { classEffect: { timeMultiplier: NaN } },
+    { classEffect: { timeChoices: {} } }
+  ])
+    assert.throws(() => skillTimingPlan(input), /Review/);
+  assert.throws(() => requiredSkillSeconds(Number.MAX_VALUE, { timeMultiplier: 2 }), /Review/);
+  assert.throws(() => requiredSkillSeconds(10, { timeMultiplier: 1, timeRounding: "sideways" }), /Review/);
+});
 test("p.102 permits one reduction: two halves never become a quarter, and the selected source owns its minimum and rounding", () => {
   const input = { professional: true, classEffect: analysis, time: "1 Hour" };
   const auto = skillTimingPlan(input);
@@ -41,8 +125,8 @@ test("take-10 normalization, forte, False Start and half-time benefits compete i
     classEffect: analysis,
     time: "1 Minute"
   });
-  assert.equal(taking.timeMultiplier, 10);
-  assert.equal(taking.timeReduction, "professional");
+  assert.equal(taking.timeMultiplier, 15);
+  assert.equal(taking.timeReduction, "falseStart");
   assert.equal(
     skillTimingPlan({ method: "take20", falseStart: true, professional: true, reduction: "falseStart" }).timeMultiplier,
     15
@@ -56,26 +140,26 @@ test("automatic selection compares actual minima for fixed listed times, while v
   assert.equal(short.timeMultiplier, 15);
   assert.equal(short.minimumTimeSeconds, 0);
   const long = skillTimingPlan({ ...input, time: "1 Minute" });
-  assert.equal(long.timeReduction, "class");
-  assert.equal(long.timeMultiplier, 10);
+  assert.equal(long.timeReduction, "falseStart");
+  assert.equal(long.timeMultiplier, 15);
   assert.match(skillTimingPlan({ ...input, time: "Varies per challenge" }).notes, /Variable time/);
   assert.throws(() => skillTimingPlan({ reduction: "professional" }), /not available/);
   assert.throws(() => skillTimingPlan({ method: "roll", falseStart: true, reduction: "falseStart" }), /not available/);
 });
-test("Cross-Check triples the selected required time, including its minimum, without providing another reduction", () => {
+test("user ruling combines Cross-Check with one reduction and retains scaled minimum durations", () => {
   const a = skillTimingPlan({ professional: true, crossCheck: true });
-  assert.equal(a.timeMultiplier, 1.5);
+  assert.equal(a.timeMultiplier, 2.5);
   assert.equal(a.minimumTimeSeconds, 18);
   assert.equal(a.minimumTime, "3 rounds");
   const b = skillTimingPlan({ classEffect: analysis, crossCheck: true });
-  assert.equal(b.timeMultiplier, 1.5);
+  assert.equal(b.timeMultiplier, 2.5);
   assert.equal(b.minimumTimeSeconds, 180);
   assert.equal(b.minimumTime, "3 minutes");
   assert.equal(b.timeRounding, "up");
   assert.equal(b.timeBaseMultiplier, 0.5);
   assert.equal(b.crossCheckMultiplier, 3);
-  assert.equal(b.timeRoundingBeforeCrossCheck, true);
-  assert.match(b.notes, /Round up before tripling/);
+  assert.equal(b.timeRoundingBeforeCrossCheck, false);
+  assert.match(b.notes, /Round up after combining/);
   const trap = skillTimingPlan({
     classEffect: { timeMultiplier: 0.5, timeSource: "Booby Trap", minimumTimeSeconds: 3, timeRounding: "down" },
     crossCheck: true
@@ -113,16 +197,16 @@ test("skill resolver honors explicit eligible reductions, blocks unavailable sou
   };
   const options = { usingComputer: true, unopposed: true, method: "take20", safeToTake: true };
   const r = resolveSkillCheck(system, "investigation", check, { gearStatus: "available", ...options });
-  assert.equal(r.timeMultiplier, 10);
+  assert.equal(r.timeMultiplier, 15);
   assert.doesNotMatch(r.notes, /Intelligence Analysis: half/);
-  assert.match(r.notes, /Mark of a Professional/);
+  assert.match(r.notes, /False Start/);
   const chosen = resolveSkillCheck(system, "investigation", check, {
     gearStatus: "available",
     ...options,
     timingReduction: "class",
     crossCheckActive: true
   });
-  assert.equal(chosen.timeMultiplier, 30);
+  assert.equal(chosen.timeMultiplier, 21.5);
   assert.equal(chosen.minimumTimeSeconds, 180);
   assert.equal(chosen.timeRounding, "up");
   assert.equal(
@@ -231,7 +315,7 @@ test("Professional timing requires a strict unopposed declaration and respects v
       unopposed: true,
       timingReduction: "professional"
     });
-    assert.equal(r.timeMultiplier, { roll: 1, take10: 2, take20: 20 }[method] * 0.5);
+    assert.equal(r.timeMultiplier, { roll: 0.5, take10: 1.5, take20: 19.5 }[method]);
     assert.equal(r.minimumTimeSeconds, 6);
   }
   assert.equal(

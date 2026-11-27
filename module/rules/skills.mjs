@@ -17,8 +17,8 @@ import { balanceSurfacePlan } from "./balance.mjs";
 import { hideCircumstancePlan } from "./hide-circumstances.mjs";
 import { detectionObserverPlan } from "./detection-observer.mjs";
 import { hideMovementPlan } from "./hide-movement.mjs";
-import { targetSkillEffectPlan, targetSkillTimingPlan } from "./target-skill-effects.mjs";
-import { dispositionSkillPlan, dispositionTimingPlan } from "./disposition-skills.mjs";
+import { targetSkillEffectPlan } from "./target-skill-effects.mjs";
+import { dispositionSkillPlan } from "./disposition-skills.mjs";
 import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
 import "./threaten.mjs";
@@ -59,7 +59,7 @@ import { terrainSkillPlan, localHeroOppositionPlan } from "./terrain.mjs";
 import { trackingSkillPlan, trackingFeatEvidence } from "./tracking.mjs";
 import { ambushCheckPlan } from "./ambush.mjs";
 import { fogSmokePlan, ambientLightPlan, sensorySkillEffects, sensorySkillConditionPlan } from "./senses.mjs";
-import { falseStartRestart, skillTimingPlan } from "./timing.mjs";
+import { falseStartRestart, skillTimingPlan, requiredSkillSeconds } from "./timing.mjs";
 import {
   classCheckEffects,
   tenSecondSolutionEligible,
@@ -740,6 +740,19 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       falseStart: hasFeat("False Start"),
       professional,
       classEffect: classEffects,
+      timeEffects: [
+        ...(targetSkillEffect.timeMultiplier === 3 ? [{ id: "faceless", name: "Faceless", multiplier: 3 }] : []),
+        ...(disposition.priority !== 1
+          ? [
+              {
+                id: "disposition",
+                name: loc`Target disposition`,
+                multiplier: disposition.priority,
+                rounding: disposition.priority < 1 ? "up" : null
+              }
+            ]
+          : [])
+      ],
       time: listedTime,
       reduction: restraint.timeLocked ? "none" : wheel.selected ? "oneHandManeuver" : timingReduction,
       minimumRequired: tenSecondSolution ? 6 : 0,
@@ -749,13 +762,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     blockedReasons.push(error.message);
     timing = skillTimingPlan({ method, time: listedTime, take10Base: campaign.take10Base ?? 2 });
   }
-  timing = targetSkillTimingPlan(timing, targetSkillEffect);
-  timing = dispositionTimingPlan(timing, disposition);
-  if (timing.blockedReason) blockedReasons.push(timing.blockedReason);
   const { timeMultiplier, minimumTimeSeconds, minimumTime } = timing;
-  const requiredPreparationSeconds = ambush.applicable
-    ? Math.round(Math.max(ambush.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6
-    : null;
+  const requiredPreparationSeconds = ambush.applicable ? requiredSkillSeconds(ambush.baseSeconds, timing) : null;
   let error = Math.max(
     0,
     Math.max(
@@ -935,7 +943,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [
       280,
       contactFeat.evidence
-        ? loc`Contact ${contactFeat.evidence.contact.name}: DC ${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table 2.35, p.144; response/outcomes resolved separately). `
+        ? loc`Contact ${contactFeat.evidence.contact.name}: DC ${contactFeat.evidence.dc}, summon ${contactTimeLabel(requiredSkillSeconds(contactFeat.baseSeconds, timing))}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table 2.35, p.144; response/outcomes resolved separately). `
         : ""
     ],
     [
@@ -1028,13 +1036,13 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [
       670,
       charmerPlan.evidence
-        ? loc`Required Influence time: ${Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. `
+        ? loc`Required Influence time: ${requiredSkillSeconds(charmerPlan.baseSeconds, timing)} seconds. `
         : ""
     ],
     [
       680,
       hardCorePlan.evidence
-        ? loc`Required Influence time: ${Math.round(Math.max(hardCorePlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. `
+        ? loc`Required Influence time: ${requiredSkillSeconds(hardCorePlan.baseSeconds, timing)} seconds. `
         : ""
     ],
     [690, armor ? loc`Armor/load check penalty ${armor}. ` : ""],
@@ -1070,6 +1078,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     detectionObserver: detectionObserver.evidence,
     hideMovement: hideMovementPlanResult.evidence,
     targetSkillEffect: targetSkillEffect.evidence,
+    skillTiming: timing.skillTiming,
     dispositionSkill: disposition.evidence,
     stoneCold: stoneCold.evidence,
     analysisTask: analysisTask.context,
@@ -1127,8 +1136,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       ? {
           ...contactFeat.evidence,
           errorReduction: contactFeat.errorReduction,
-          requiredSeconds:
-            Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6,
+          requiredSeconds: requiredSkillSeconds(contactFeat.baseSeconds, timing),
           timing: {
             applied: timing.timeReduction === "contactFeat",
             source: timing.timeReduction,
@@ -1143,8 +1151,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
           applied: timing.timeReduction === "charmer",
           reduction: timing.timeReduction,
           timeMultiplier,
-          requiredSeconds:
-            Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6
+          requiredSeconds: requiredSkillSeconds(charmerPlan.baseSeconds, timing)
         }
       : null,
     appearanceModifiers: appearancePlan.evidence
@@ -1168,8 +1175,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
           applied: timing.timeReduction === "hardCore",
           reduction: timing.timeReduction,
           timeMultiplier,
-          requiredSeconds:
-            Math.round(Math.max(hardCorePlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6
+          requiredSeconds: requiredSkillSeconds(hardCorePlan.baseSeconds, timing)
         }
       : null,
     weaponFocusWork: weaponFocusWork.applicable ? weaponFocusWork : null,

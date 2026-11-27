@@ -985,3 +985,34 @@ layout checks pass. Lint, formatting, bundling and copy checks pass with existin
 warnings. Scores remain **PC creation 9.4/10 and combat 9.5/10**; combined timing,
 temporary PC/villain scene effects and the broader documented gaps still need
 completion and review.
+
+### Additive skill timing review — 27 November 2026
+
+The user confirmed additive multipliers under p.329 and one time-reducing
+effect under p.102. Ordinary PC skill checks now combine taking, Cross-Check,
+Faceless and disposition using that policy. Competing reductions remain
+alternatives. Automatic selection compares the resulting duration, including
+the selected source's minimum and rounding. False Start can therefore beat a
+percentage reduction when taking 20. Rounding follows the combined factors.
+
+The source audit distinguishes percentage reductions from replacement times.
+Charmer, Hard Core and the ambush feats establish fixed duration bases; taking
+and other increases apply to those bases. For example, six seconds with taking
+10 and Cross-Check becomes 24 seconds, whereas a half-time effect with taking
+10 becomes 1.5 times listed time. Ambush Supremacy retains the earlier user
+ruling for the standard slow preparation. A saved timing proof records the
+policy, chosen reduction, fixed duration when applicable, factors and floor.
+Posting and settlement guards bind it without rewriting completed cards.
+
+Native Foundry checks used legal named checks: Athletics/Bind with taking 10
+and Cross-Check saved ×4; Impress/Persuasion gathering a Faceless target's past
+with taking 10 saved ×4; Friendly NPC priority with taking 10 saved ×1.5.
+The Faceless target had actual Con Artist 1 and Blend 3. It is a focused fixture,
+not an additional completed-PC creation test. Browser errors and diagnostics
+were empty. The broader combination matrix is covered by rule tests.
+
+All **4,189** Node tests and **988** independent fixture assertions pass.
+All **243** layout checks also pass. Lint, formatting, bundling and copy checks pass with existing warnings.
+Scores remain **PC creation 9.4/10 and combat 9.5/10**. Whole-Complex-Task
+timing scope, temporary PC/villain effects and the broader documented creation
+and combat gaps still require implementation and review.

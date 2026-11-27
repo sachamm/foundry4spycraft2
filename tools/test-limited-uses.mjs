@@ -165,8 +165,9 @@ test("RAW p.200: False Start and Mark of a Professional timing apply to covered 
     safeToTake: true,
     unopposed: true
   });
-  assert.equal(result.timeMultiplier, 10);
-  assert.equal(result.minimumTime, "1 round");
+  assert.equal(result.timeMultiplier, 15);
+  assert.equal(result.timeReduction, "falseStart");
+  assert.equal(result.minimumTime, null);
   assert.equal(result.practiceMakesPerfect, true);
   assert.equal(result.criticalFailureCostIncrease, 1);
   sys.skillFeatRules = [{ name: "False Start", skill: "analysis", focuses: ["Other"] }];
@@ -354,7 +355,7 @@ test("RAW p.101: Cross-Check triples time and changes secrecy only when the tag 
       { ...check, tags: "" },
       { gearStatus: "available", crossCheckActive: true, method: "take20", safeToTake: true }
     ).timeMultiplier,
-    60
+    22
   );
 });
 test("source-derived targeted effects reject invalid mastery chains and retain both Field of Expertise Profession focuses", () => {

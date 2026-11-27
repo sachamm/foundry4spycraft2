@@ -1,11 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
-import {
-  targetSkillEffectPlan,
-  targetSkillEffectApplicable,
-  targetSkillTimingPlan
-} from "../module/rules/target-skill-effects.mjs";
+import { targetSkillEffectPlan, targetSkillEffectApplicable } from "../module/rules/target-skill-effects.mjs";
+import { skillTimingPlan } from "../module/rules/timing.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
@@ -311,25 +308,22 @@ test("Faceless never infers research from a skill name or applies without its ac
   assert.equal(r.timeMultiplier, 3);
   assert.equal(r.evidence.sources.length, 2);
 });
-test("Faceless ordinary timing is idempotent and combined timing is explicitly blocked while the multiplier ruling is pending", () => {
-  const timing = { timeMultiplier: 1, minimumTimeSeconds: 0, timeReduction: "none", timeRounding: null, notes: "" },
-    target = { timeMultiplier: 3 };
-  const r = targetSkillTimingPlan(timing, target);
-  assert.equal(r.timeMultiplier, 3);
-  assert.equal(timing.timeMultiplier, 1);
-  assert.deepEqual(targetSkillTimingPlan(timing, target), r);
-  for (const patch of [
-    { timeMultiplier: 2 },
-    { timeMultiplier: 20 },
-    { timeMultiplier: 0.5 },
-    { minimumTimeSeconds: 6 },
-    { timeReduction: "class" },
-    { timeRounding: "up" }
-  ])
-    assert.match(targetSkillTimingPlan({ ...timing, ...patch }, target).blockedReason, /pending GC multiplier ruling/);
-  const unchanged = targetSkillTimingPlan({ ...timing, timeMultiplier: 20 }, { timeMultiplier: 1 });
-  assert.equal(unchanged.timeMultiplier, 20);
-  assert.equal(unchanged.blockedReason, "");
+test("user ruling combines Faceless, taking, Cross-Check and one reduction additively without mutating the request", () => {
+  const input = { timeEffects: [{ id: "faceless", name: "Faceless", multiplier: 3 }] };
+  assert.equal(skillTimingPlan(input).timeMultiplier, 3);
+  assert.deepEqual(input, { timeEffects: [{ id: "faceless", name: "Faceless", multiplier: 3 }] });
+  for (const [method, expected] of [
+    ["roll", 3],
+    ["take10", 4],
+    ["take20", 22]
+  ]) {
+    assert.equal(skillTimingPlan({ ...input, method }).timeMultiplier, expected);
+    assert.equal(skillTimingPlan({ ...input, method, crossCheck: true }).timeMultiplier, expected + 2);
+    assert.equal(
+      skillTimingPlan({ ...input, method, professional: true, time: "1 Hour" }).timeMultiplier,
+      expected - 0.5
+    );
+  }
 });
 test("Faceless purpose enters actual skill calls, replacement evidence and current source guards without changing old error-only proofs", async () => {
   const t = target(faceless()),
@@ -347,7 +341,9 @@ test("Faceless purpose enters actual skill calls, replacement evidence and curre
     r = await a.rollSkill("investigation", null, o);
   assert.equal(r.options.targetSkillEffect.purpose, "location");
   assert.equal(r.options.targetSkillEffect.timeMultiplier, 3);
-  assert.match(r.options.flavor, /Faceless triples/);
+  assert.match(r.options.flavor, /Faceless/);
+  assert.equal(r.options.skillTiming.multiplier, 3);
+  assert.match(r.options.flavor, /Time multipliers combine additively/);
   r.options.validateSkillContext();
   validateTargetSkillEffectProof(r.options.targetSkillEffect, {
     checkKind: "skill",

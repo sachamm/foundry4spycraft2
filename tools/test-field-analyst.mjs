@@ -67,7 +67,7 @@ test("Questions competes with other time reductions, applies error before reduct
     usingComputer: true,
     crossCheckActive: true
   });
-  assert.equal(r.timeMultiplier, 0.75);
+  assert.equal(r.timeMultiplier, 2.25);
   assert.equal(r.error, 3);
   assert.equal(r.minimumTimeSeconds, 18);
   assert.doesNotMatch(r.notes, /Mark of a Professional: the single/);
