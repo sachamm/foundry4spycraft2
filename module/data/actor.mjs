@@ -25,6 +25,9 @@ const missionThreatLevelSetting = () => {
 import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { campaignCQBRange, campaignNpcHealthReview } from "../rules/campaign-combat.mjs";
+import { characterCampaignPolicy } from "../rules/creation-policy.mjs";
+import { startingAttributeReview } from "../rules/starting-attributes.mjs";
+import { loc } from "../i18n.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
 import {
@@ -156,7 +159,13 @@ function underminedCombatContext(system) {
 
 export class NpcData extends BaseActorData {
   prepareDerivedData() {
-    this.campaignEffects = currentCampaignRules().effects;
+    const policy = characterCampaignPolicy(
+      this,
+      currentCampaignRules().effects,
+      this.parent?.flags?.spycraft2?.creationPolicy
+    );
+    this.campaignEffects = policy.effects;
+    this.creationPolicyStatus = { recorded: policy.recorded, needsReview: policy.needsReview };
     this.worldTime = globalThis.game?.time?.worldTime;
     this.usagePeriods = globalThis.game?.settings?.get("spycraft2", "usagePeriods") ?? {};
     this.conditionContext = npcSkillConditionContext(this.parent);
@@ -199,6 +208,7 @@ export class NpcData extends BaseActorData {
           effects: this.campaignEffects
         })
       );
+      this.reviewCreationRules();
       return;
     }
     const result = conditionNpcProfile(
@@ -245,6 +255,33 @@ export class NpcData extends BaseActorData {
       }),
       ...(partnerOwner ? animalPartnerReview(partnerOwner.system, this).warnings : [])
     ];
+    this.reviewCreationRules();
+  }
+
+  reviewCreationRules() {
+    if (this.creationPolicyStatus.needsReview)
+      this.warnings.push(
+        loc`The GC must review which creation-only campaign qualities applied when this character was created.`
+      );
+    const cap = this.campaignEffects.startingAttributeCap;
+    if (!cap) {
+      delete this.startingAttributeReview;
+      return;
+    }
+    this.startingAttributeReview = startingAttributeReview(
+      this,
+      [...(this.parent?.items ?? [])],
+      this.parent?.flags?.spycraft2?.creationAttributes,
+      cap
+    );
+    if (this.startingAttributeReview.needsReview)
+      this.warnings.push(
+        loc`Small Screen: the GC must review the original starting attribute scores; current scores may include later gains.`
+      );
+    for (const row of this.startingAttributeReview.violations)
+      this.warnings.push(
+        loc`Small Screen: ${row.ability.toUpperCase()} starts at ${row.score}; the limit including Origin benefits is ${row.cap}.`
+      );
   }
 
   /**
@@ -764,7 +801,9 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     computeAgent(this, items, CONFIG.SPYCRAFT, {
       campaignEffects: campaign.effects,
       campaignConflicts: campaign.conflicts,
-      featPurchases: this.parent?.flags?.spycraft2?.featPurchases
+      featPurchases: this.parent?.flags?.spycraft2?.featPurchases,
+      creationAttributes: this.parent?.flags?.spycraft2?.creationAttributes,
+      creationPolicy: this.parent?.flags?.spycraft2?.creationPolicy
     });
   }
 

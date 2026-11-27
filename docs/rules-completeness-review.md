@@ -296,7 +296,25 @@ extra choice through schema cleaning. The complete Node run now passes **3,973**
 tests; all 219 layout checks pass again. Formatting and lint pass after correcting
 one file's formatting; the existing warnings remain unchanged.
 
-The next implementation work is campaign gear Caliber handling.
+Campaign gear now transforms Wealth Possessions and mission allowances, including
+vehicles, class limits and Big Budget overflow picks linked to a funded source.
+Reserve acquisitions and NPC equipment allowances still need separate review.
+Companions no longer receive PC-only cadence or alternate feat-tree benefits, or
+count as PCs in mission team payouts.
+
+Small Screen now applies its 32-point PC budget and checks the starting attribute
+cap after Origin benefits. Historical starting scores have an explicit GC review;
+later increases do not make a legal original score illegal. Both manual and
+graded NPCs use that review. New blank agents record their original creation-only
+campaign policy. Existing history can be reviewed by the GC, and recorded rules
+survive later season changes without changing current attributes or health.
+This uses the stated creation-only interpretation while the history ruling is
+pending. The full Node run passes **3,994** tests; native schema preparation,
+formatting, lint and the copied-text check pass.
+
+The next implementation work includes Modular creation trades and the Growth
+limit on level gains between missions. These source-verified gaps keep the
+scores below the requested threshold; the scores remain **8.8/10** and **8.9/10**.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,

@@ -3,9 +3,10 @@ import { campaignCQBRange } from "./campaign-combat.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import { purchasedFeatSources } from "./feat-purchase.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
+import { startingAttributeReview } from "./starting-attributes.mjs";
+import { characterCampaignPolicy, CREATION_POLICY_KEYS } from "./creation-policy.mjs";
 import {
   campaignAttributeLevels,
-  campaignCharacterEffects,
   campaignFeatCount,
   campaignProficiencyCount,
   campaignInterestCount,
@@ -210,10 +211,30 @@ function startPass(state) {
   const shaken = shakenRules(sys);
   sys.shakenRules = shaken;
   const T = cfg.tables;
-  sys.campaignEffects = campaignCharacterEffects(sys, options.campaignEffects ?? sys.campaignEffects ?? {});
+  if (Object.hasOwn(options, "creationPolicy")) {
+    if (options.creationPolicy) sys.creationPolicy = options.creationPolicy;
+    else delete sys.creationPolicy;
+  }
+  const creationPolicy = characterCampaignPolicy(
+    sys,
+    options.campaignEffects ?? sys.campaignEffects ?? {},
+    sys.creationPolicy
+  );
+  sys.campaignEffects = creationPolicy.effects;
+  if (
+    sys.creationPolicy ||
+    creationPolicy.needsReview ||
+    CREATION_POLICY_KEYS.some(k => Object.hasOwn(sys.campaignEffects, k))
+  )
+    sys.creationPolicyStatus = { recorded: creationPolicy.recorded, needsReview: creationPolicy.needsReview };
+  else delete sys.creationPolicyStatus;
   if (Object.hasOwn(options, "featPurchases")) {
     if (options.featPurchases && Object.keys(options.featPurchases).length) sys.featPurchases = options.featPurchases;
     else delete sys.featPurchases;
+  }
+  if (Object.hasOwn(options, "creationAttributes")) {
+    if (options.creationAttributes) sys.creationAttributes = options.creationAttributes;
+    else delete sys.creationAttributes;
   }
   sys.abilityIncreaseLevels = campaignAttributeLevels(sys.campaignEffects, cfg.abilityIncreaseLevels);
   const warnings = [...shaken.warnings];
@@ -284,6 +305,11 @@ function startPass(state) {
   );
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   const todo = [];
+  if (creationPolicy.needsReview) {
+    const text = loc`The GC must review which creation-only campaign qualities applied when this character was created.`;
+    warnings.push(text);
+    todo.push({ order: 1, always: true, error: true, tab: "main", text });
+  }
   const affiliationProblem = campaignAffiliationProblem(sys, sys.campaignEffects);
   if (affiliationProblem) {
     warnings.push(affiliationProblem);
@@ -830,7 +856,28 @@ function deriveAttributes(state) {
   const increasesMissing = increasesDue.filter(l => !ABILITIES.includes(increaseAt(l))).length;
   if (increasesMissing)
     todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
-  sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
+  sys.pointBuy = {
+    budget: sys.campaignEffects.creationPointBuy ?? sys.pointBuyBudget ?? cfg.pointBuy,
+    spent: pointCost
+  };
+  if (sys.campaignEffects.startingAttributeCap) {
+    sys.startingAttributeReview = startingAttributeReview(
+      sys,
+      items,
+      sys.creationAttributes,
+      sys.campaignEffects.startingAttributeCap
+    );
+    if (sys.startingAttributeReview.needsReview) {
+      const text = loc`Small Screen: the GC must review the original starting attribute scores; current scores may include later gains.`;
+      warnings.push(text);
+      todo.push({ order: 9, always: true, error: true, tab: "main", text });
+    }
+    for (const row of sys.startingAttributeReview.violations) {
+      const text = loc`Small Screen: ${row.ability.toUpperCase()} starts at ${row.score}; the limit including Origin benefits is ${row.cap}.`;
+      warnings.push(text);
+      todo.push({ order: 9, always: true, error: true, tab: "main", text });
+    }
+  } else delete sys.startingAttributeReview;
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
   if (sys.pointBuy.remaining < 0) {
     warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
@@ -2425,7 +2472,12 @@ function settlePrerequisites(state) {
         }),
         items.filter(item => item.type !== "feat" || item.system.featKind !== "temporary"),
         cfg,
-        { campaignEffects: sys.campaignEffects, featPurchases: sys.featPurchases }
+        {
+          campaignEffects: sys.campaignEffects,
+          featPurchases: sys.featPurchases,
+          creationAttributes: sys.creationAttributes,
+          creationPolicy: sys.creationPolicy
+        }
       )
     : sys;
   const permanentSkillRanks = Object.fromEntries(
@@ -2487,7 +2539,12 @@ function settlePrerequisites(state) {
         }),
         items.filter(item => item.type !== "feat" || !["temporary", "virtual"].includes(item.system.featKind)),
         cfg,
-        { campaignEffects: sys.campaignEffects, featPurchases: sys.featPurchases }
+        {
+          campaignEffects: sys.campaignEffects,
+          featPurchases: sys.featPurchases,
+          creationAttributes: sys.creationAttributes,
+          creationPolicy: sys.creationPolicy
+        }
       )
     : permanentSystem;
   const classQualificationRanks = Object.fromEntries(

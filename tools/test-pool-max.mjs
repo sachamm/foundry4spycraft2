@@ -119,6 +119,31 @@ globalThis.ui = { notifications: { warn: () => null } };
 const { SpycraftActor } = await import("../module/documents/actor.mjs");
 const { followPoolMax } = await import("../module/apps/pool-max.mjs");
 
+test("blank agents capture original campaign creation rules while imports, played characters and supplied history are preserved", async () => {
+  const settings = game.settings;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["small-screen", "big-budget"] } : {}) };
+  try {
+    const a = new SpycraftActor();
+    await a._preCreate({ type: "agent", system: { progression: [] } }, {}, { id: "creator" });
+    assert.deepEqual(a.source.flags.spycraft2.creationPolicy.effects, {
+      creationPointBuy: 32,
+      startingAttributeCap: 18,
+      startingWealth: 4
+    });
+    assert.equal(a.source.flags.spycraft2.creationPolicy.reviewedBy, "creator");
+    for (const data of [{ system: { progression: [{}] } }, { _stats: { compendiumSource: "Compendium.old.Agent" } }]) {
+      const imported = new SpycraftActor();
+      await imported._preCreate({ type: "agent", ...data }, {}, {});
+      assert.equal(imported.source.flags.spycraft2.creationPolicy, undefined);
+    }
+    const copy = new SpycraftActor();
+    await copy._preCreate({ type: "agent", flags: { spycraft2: { creationPolicy: { keep: 1 } } } }, {}, {});
+    assert.deepEqual(copy.source.flags.spycraft2.creationPolicy, { keep: 1 });
+  } finally {
+    game.settings = settings;
+  }
+});
+
 test("new/imported agent creation records empty pools, preserves other flags and strips copied resource locks in the same source update", async () => {
   const a = new SpycraftActor(),
     data = {

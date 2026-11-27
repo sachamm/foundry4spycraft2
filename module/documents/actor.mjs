@@ -14,6 +14,8 @@ import { agentTokenDefaults, linkedImport, renamedTokenName } from "../rules/cre
 import { newAgentPoolMax, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
+import { creationPolicyRecord, creationRole } from "../rules/creation-policy.mjs";
+import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 
 export class SpycraftActor extends ActorRolls(
   ActorSkillRolls(
@@ -61,6 +63,21 @@ export class SpycraftActor extends ActorRolls(
           [POOL_MAX_FLAG]: newAgentPoolMax(this._source?.system ?? data.system, poolRules(type).pools)
         }
       };
+      const creationSystem = data.system ?? this.system ?? {};
+      if (
+        type === "agent" &&
+        !creationSystem.progression?.length &&
+        !flags.spycraft2.creationPolicy &&
+        !data._stats?.compendiumSource
+      ) {
+        flags.spycraft2.creationPolicy = creationPolicyRecord(currentCampaignRules().effects, {
+          role: creationRole(type, creationSystem),
+          confirmed: true,
+          note: "Campaign creation rules captured for a new character",
+          at: Date.now(),
+          reviewedBy: user?.id ?? globalThis.game?.user?.id ?? "creator"
+        });
+      }
       data.flags = flags;
       updates.flags = flags;
     }

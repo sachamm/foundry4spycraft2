@@ -17,6 +17,9 @@
  },
  "SPYCRAFT": {
   "CampaignGear": {
+   "CreationRules": "Campaign creation rules",
+   "ReviewCreationRules": "Review original creation rules",
+   "ReviewStartingAttributes": "Review starting attribute scores",
    "ExtraCount": "Extra Caliber I picks",
    "ExtraMissionRemaining": "Unassigned extra Caliber I mission items: {count}.",
    "PersonalSource": "Personal gear source",

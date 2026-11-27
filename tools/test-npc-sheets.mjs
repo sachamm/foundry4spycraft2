@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { defaultNpcProfile } from "../module/rules/npcs.mjs";
 import { SPYCRAFT } from "../module/config.mjs";
+import { creationPolicyRecord } from "../module/rules/creation-policy.mjs";
+import { startingAttributeRecord } from "../module/rules/starting-attributes.mjs";
 class StubSheet {
   constructor(actor) {
     this.actor = actor;
@@ -46,6 +48,41 @@ const make = () => ({
   saves: { fort: { base: 0 }, ref: { base: 0 }, will: { base: 0 } },
   defense: { bonus: 0 },
   initiative: { bonus: 0 }
+});
+
+test("both graded and manual NPCs retain their recorded creation cap across seasons and require unknown history review", () => {
+  globalThis.game = { settings: { get: (_id, key) => (key === "campaign" ? { qualities: ["small-screen"] } : {}) } };
+  try {
+    for (const enabled of [false, true]) {
+      const model = Object.assign(new NpcData(), make());
+      model.npcProfile.enabled = enabled;
+      model.parent = { items: [], flags: {} };
+      model.prepareDerivedData();
+      assert.equal(model.creationPolicyStatus.needsReview, true);
+      assert.equal(model.startingAttributeReview.needsReview, true);
+      const creationPolicy = creationPolicyRecord(
+        { creationPointBuy: 32, startingAttributeCap: 18 },
+        { role: "standard", confirmed: true, note: "Original season checked" }
+      );
+      const creationAttributes = startingAttributeRecord(model, [], {
+        cap: 18,
+        confirmed: true,
+        note: "Original NPC record checked",
+        scores: Object.fromEntries(Object.entries(model.abilities).map(([k, a]) => [k, a.value]))
+      });
+      model.parent.flags.spycraft2 = { creationPolicy, creationAttributes };
+      game.settings = { get: () => ({}) };
+      model.abilities.str.value = 22;
+      model.prepareDerivedData();
+      assert.equal(model.campaignEffects.startingAttributeCap, 18);
+      assert.equal(model.startingAttributeReview.needsReview, false);
+      assert.deepEqual(model.startingAttributeReview.violations, []);
+      assert.equal(model.abilities.str.value, 22);
+      game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["small-screen"] } : {}) };
+    }
+  } finally {
+    delete globalThis.game;
+  }
 });
 test("NPC sheet persists skills, quality parameters and equipment arrays without mutating source", () => {
   const sys = make();

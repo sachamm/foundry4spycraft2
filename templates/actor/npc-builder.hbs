@@ -1,4 +1,12 @@
 <section class="npc-builder">
+  {{#if isGM}}{{#if editable}}
+  <details><summary>{{localize "SPYCRAFT.CampaignGear.CreationRules"}}</summary>
+    <button type="button" data-action="reviewCreationPolicy">{{localize "SPYCRAFT.CampaignGear.ReviewCreationRules"}}</button>
+    {{#if system.startingAttributeReview}}
+    <button type="button" data-action="reviewStartingAttributes">{{localize "SPYCRAFT.CampaignGear.ReviewStartingAttributes"}}</button>
+    {{/if}}
+  </details>
+  {{/if}}{{/if}}
   <div class="npc-builder-title"><h2>{{localize "SPYCRAFT.Template.ActorNpcBuilder.NPCCreation"}}</h2>{{#if editable}}<button type="button" data-action="npcEnable">{{#if system.npcProfile.enabled}}{{localize "SPYCRAFT.Template.ActorNpcBuilder.UseManualStatBlock"}}{{else}}{{localize "SPYCRAFT.Template.ActorNpcBuilder.UseGradedNPCCreation"}}{{/if}}</button>{{/if}}</div>
   {{#if system.npcProfile.enabled}}
   {{#if npcPackages}}

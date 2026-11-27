@@ -1,6 +1,28 @@
 <div class="col">
   <h3 class="edit-only">{{localize "SPYCRAFT.Attributes"}}
-    <span class="points edit-only {{#if (sc2lt system.pointBuy.remaining 0)}}bad{{/if}}">{{localize "SPYCRAFT.PointBuy"}}: {{system.pointBuy.spent}} / <input type="number" name="system.pointBuyBudget" value="{{system.pointBuyBudget}}" class="w-2" aria-label="{{localize 'SPYCRAFT.Action.PointBuyBudget'}}" /></span></h3>
+    <span class="points edit-only {{#if (sc2lt system.pointBuy.remaining 0)}}bad{{/if}}">
+      {{localize "SPYCRAFT.PointBuy"}}: {{system.pointBuy.spent}} /
+      {{#if system.campaignEffects.creationPointBuy}}
+        <b>{{system.pointBuy.budget}}</b>
+      {{else}}
+        <input type="number" name="system.pointBuyBudget" value="{{system.pointBuyBudget}}" class="w-2"
+          aria-label="{{localize 'SPYCRAFT.Action.PointBuyBudget'}}" />
+      {{/if}}
+    </span>
+  </h3>
+  {{#if isGM}}
+    <details class="reference-panel edit-only">
+      <summary>{{localize "SPYCRAFT.CampaignGear.CreationRules"}}</summary>
+      <p><button type="button" class="sc2-action" data-action="reviewCreationPolicy">
+        {{localize "SPYCRAFT.CampaignGear.ReviewCreationRules"}}
+      </button></p>
+      {{#if system.startingAttributeReview}}
+        <p><button type="button" class="sc2-action" data-action="reviewStartingAttributes">
+          {{localize "SPYCRAFT.CampaignGear.ReviewStartingAttributes"}}
+        </button></p>
+      {{/if}}
+    </details>
+  {{/if}}
   <table class="abilities edit-only">
     <thead><tr><th></th><th class="edit-only">{{localize "SPYCRAFT.Base"}}</th><th class="edit-only">{{localize "SPYCRAFT.Cost"}}</th><th class="edit-only">{{localize "SPYCRAFT.Origin.Label"}}</th><th class="edit-only">{{localize "SPYCRAFT.Increase"}}</th><th class="edit-only">{{localize "SPYCRAFT.Misc"}}</th><th>{{localize "SPYCRAFT.Score"}}</th><th>{{localize "SPYCRAFT.Mod"}}</th></tr></thead>
     <tbody>

@@ -14,9 +14,124 @@ import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { campaignVitalityDie, campaignCharacterEffects } from "../../rules/campaign-creation.mjs";
 import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
 import { same } from "../../rules/equal.mjs";
+import {
+  CREATION_ABILITIES,
+  startingAttributeSignature,
+  startingAttributeRecord
+} from "../../rules/starting-attributes.mjs";
+import {
+  CREATION_QUALITIES,
+  creationEffectsForQualities,
+  creationPolicyRecord,
+  creationRole,
+  characterCampaignPolicy
+} from "../../rules/creation-policy.mjs";
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
+    async reviewCreationPolicy(options = {}) {
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
+      if (!game.user?.isGM) throw new Error(loc`The GC reviews original campaign creation rules.`);
+      const current = () => this.flags?.spycraft2?.creationPolicy ?? null;
+      const previous = structuredClone(current());
+      let input = options;
+      if (!Array.isArray(input.qualityIds)) {
+        input = await systemDialog.input({
+          window: { title: loc`Review original creation rules` },
+          rejectClose: false,
+          ok: { label: loc`Record creation rules` },
+          content: `<div class="spycraft2-roll-options"><p>${loc`Select the qualities and character type that applied at creation. Creation allowances follow this record across seasons. Current campaign rules govern advancement and play.`}</p>${CREATION_QUALITIES.map(q => `<label><input type="checkbox" name="quality-${q.id}"${previous?.qualityIds?.includes(q.id) ? " checked" : ""} /> ${esc(q.name)}</label>`).join("")}<label>${loc`Character type at creation`} <select name="role">${[
+            ["pc", loc`Player character`],
+            ["special", loc`Special NPC`],
+            ["standard", loc`Standard NPC`]
+          ]
+            .map(
+              ([value, label]) =>
+                `<option value="${value}"${(previous?.role ?? creationRole(this.type, this.system)) === value ? " selected" : ""}>${label}</option>`
+            )
+            .join(
+              ""
+            )}</select></label><label>${loc`Source or review note`} <input name="note" required /></label><label><input type="checkbox" name="confirmed" /> ${loc`The GC confirms the character's original creation rules`}</label></div>`
+        });
+        if (!input) return null;
+        input.qualityIds = CREATION_QUALITIES.filter(q => input[`quality-${q.id}`] === true).map(q => q.id);
+      }
+      return queueResources([this], async () => {
+        if (!game.user?.isGM || !this.isOwner || !same(current(), previous))
+          throw new Error(loc`The creation-rule review or permissions changed. Review the current record again.`);
+        const record = creationPolicyRecord(creationEffectsForQualities(input.qualityIds), {
+          ...input,
+          role: input.role ?? creationRole(this.type, this.system),
+          at: Date.now(),
+          reviewedBy: game.user.id ?? "GC"
+        });
+        try {
+          await this.update({ "flags.spycraft2.creationPolicy": record });
+        } catch (error) {
+          if (!same(current(), record)) throw error;
+        }
+        return record;
+      });
+    }
+
+    async reviewStartingAttributes(options = {}) {
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
+      if (!game.user?.isGM) throw new Error(loc`The GC reviews original starting attribute scores.`);
+      const currentCap = () =>
+        characterCampaignPolicy(this.system, currentCampaignRules().effects, this.flags?.spycraft2?.creationPolicy)
+          .effects.startingAttributeCap;
+      const cap = currentCap();
+      if (!cap) throw new Error(loc`No campaign starting-attribute cap is active.`);
+      const items = () => [...this.items];
+      const current = () => this.flags?.spycraft2?.creationAttributes ?? null;
+      const previous = structuredClone(current());
+      const expected = startingAttributeSignature(this.system, items());
+      let input = options;
+      if (!input.scores) {
+        const values =
+          this.system.startingAttributeReview?.scores ??
+          previous?.scores ??
+          Object.fromEntries(CREATION_ABILITIES.map(k => [k, this.system.abilities[k].value]));
+        const historical =
+          this.system.level === 1
+            ? `<label><input type="checkbox" name="alreadyInPlay" /> ${loc`This Career Level 1 character is already in play; these are reconstructed original scores`}</label>`
+            : "";
+        input = await systemDialog.input({
+          window: { title: loc`Review starting attribute scores` },
+          rejectClose: false,
+          ok: { label: loc`Record starting scores` },
+          content: `<div class="spycraft2-roll-options"><p>${loc`Record the original scores including Origin benefits, before later increases, damage or temporary effects. This review changes no current attribute or health value.`}</p>${CREATION_ABILITIES.map(k => `<label>${loc`${k.toUpperCase()} starting score`} <input type="number" name="${k}" min="1" max="${cap}" step="1" value="${Number(values[k])}" required /></label>`).join("")}${historical}<label>${loc`Source or review note`} <input name="note" required /></label><label><input type="checkbox" name="confirmed" /> ${loc`The GC confirms these original starting scores`}</label></div>`
+        });
+        if (!input) return null;
+        input.scores = Object.fromEntries(
+          CREATION_ABILITIES.map(k => [k, String(input[k] ?? "").trim() === "" ? NaN : Number(input[k])])
+        );
+      }
+      return queueResources([this], async () => {
+        if (!game.user?.isGM || !this.isOwner)
+          throw new Error(loc`The GC must own the character to record starting scores.`);
+        if (
+          startingAttributeSignature(this.system, items()) !== expected ||
+          !same(current(), previous) ||
+          currentCap() !== cap
+        )
+          throw new Error(
+            loc`The character's creation choices, prior review or campaign cap changed. Review the current data again.`
+          );
+        const record = startingAttributeRecord(this.system, items(), {
+          ...input,
+          cap,
+          reviewedBy: game.user.id ?? "GC",
+          at: Date.now()
+        });
+        try {
+          await this.update({ "flags.spycraft2.creationAttributes": record });
+        } catch (error) {
+          if (!same(current(), record)) throw error;
+        }
+        return record;
+      });
+    }
     /** One permanent extra choice bought from post-mission XP; the existing Feats workflow selects it. */
     async purchaseFeatChoice(options = {}) {
       if (this.type !== "agent" || !this.isOwner || this.system.companionOf?.ownerUuid) return null;
@@ -140,7 +255,12 @@ export const ActorProgression = Base =>
         preview,
         this.items.map(item => ({ id: item.id, name: item.name, type: item.type, system: item.system })),
         CONFIG.SPYCRAFT,
-        { campaignEffects: currentCampaignRules().effects, featPurchases: this.flags?.spycraft2?.featPurchases }
+        {
+          campaignEffects: currentCampaignRules().effects,
+          featPurchases: this.flags?.spycraft2?.featPurchases,
+          creationAttributes: this.flags?.spycraft2?.creationAttributes,
+          creationPolicy: this.flags?.spycraft2?.creationPolicy
+        }
       );
       progression.at(-1).intelligenceModifier = Math.floor(
         (preview.abilities.int.value -
@@ -368,7 +488,12 @@ export const ActorProgression = Base =>
             )
             .map(item => ({ id: item.id, name: item.name, type: item.type, system: item.system })),
           CONFIG.SPYCRAFT,
-          { campaignEffects: currentCampaignRules().effects, featPurchases: this.flags?.spycraft2?.featPurchases }
+          {
+            campaignEffects: currentCampaignRules().effects,
+            featPurchases: this.flags?.spycraft2?.featPurchases,
+            creationAttributes: this.flags?.spycraft2?.creationAttributes,
+            creationPolicy: this.flags?.spycraft2?.creationPolicy
+          }
         );
         featNames.clear();
         for (const key of Object.keys(featTrees)) delete featTrees[key];

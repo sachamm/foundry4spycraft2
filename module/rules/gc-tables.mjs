@@ -11051,7 +11051,10 @@ export const GC_DATA = {
    "xp": 25,
    "gcDice": null,
    "summary": "Player characters get 32 points for starting attributes instead of 36, and no starting attribute may exceed 18, Origin benefits included.",
-   "effects": {}
+   "effects": {
+    "creationPointBuy": 32,
+    "startingAttributeCap": 18
+   }
   },
   {
    "id": "soap",
