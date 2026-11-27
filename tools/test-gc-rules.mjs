@@ -40,6 +40,7 @@ import {
   loyaltyDecision,
   joinsCombat,
   persuadeToJoin,
+  persuadeJoinPlan,
   dispositionToward,
   DISPOSITIONS
 } from "../module/rules/gc/disposition.mjs";
@@ -795,4 +796,35 @@ test("transcribed mission tables are complete", () => {
     t.reputation.byCaliber.map(r => r.reputation),
     GC_DATA.core.mission.reputationByCaliber.map(r => r.reputation)
   );
+});
+
+test("each side may try once per combat to talk an NPC into the fight, until one succeeds (p.458)", () => {
+  assert.equal(persuadeJoinPlan(null, { combatId: "", side: "a", gradeId: "neutral", result: 40 }).allowed, false);
+  const miss = persuadeJoinPlan(null, { combatId: "c1", side: "a", gradeId: "neutral", result: 20 });
+  assert.deepEqual([miss.allowed, miss.success, miss.dc], [true, false, 30]);
+  assert.match(
+    persuadeJoinPlan(miss.record, { combatId: "c1", side: "a", gradeId: "neutral", result: 40 }).reason,
+    /already tried/
+  );
+  const won = persuadeJoinPlan(miss.record, { combatId: "c1", side: "b", gradeId: "friendly", result: 20 });
+  assert.equal(won.success, true);
+  assert.match(
+    persuadeJoinPlan(won.record, { combatId: "c1", side: "c", gradeId: "neutral", result: 40 }).reason,
+    /already won/
+  );
+  assert.equal(
+    persuadeJoinPlan(won.record, { combatId: "c2", side: "a", gradeId: "neutral", result: 40 }).success,
+    true
+  );
+  assert.equal(
+    persuadeJoinPlan(null, { combatId: "c1", side: "a", gradeId: "adversarial", result: 99, triumph: true }).success,
+    true
+  );
+});
+
+test("Delay counts toward the round's ±10 limit; Press does not (p.324)", () => {
+  const delayed = endOfRound(12, [fluidModifier("finalAttack", { times: 3 })], { alreadyApplied: -8 });
+  assert.equal(delayed.delta, -2);
+  assert.equal(delayed.capped, true);
+  assert.equal(endOfRound(12, [fluidModifier("finalAttack", { times: 3 })]).delta, -6);
 });

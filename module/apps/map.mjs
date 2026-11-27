@@ -102,7 +102,7 @@ const boxCentre = box => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 
  * What the scene shows about an attack by this character on the targeted token.
  * @returns {object|null} null when it cannot be measured
  */
-export function measureAttack(actor) {
+export function measureAttack(actor, { melee = false, reachFeet = 5 } = {}) {
   const attacker = actorToken(actor),
     target = targetedToken();
   if (!attacker || !target || attacker === target) return null;
@@ -140,7 +140,8 @@ export function measureAttack(actor) {
     targetActorUuid: target.actor?.uuid ?? "",
     distanceFeet: distance,
     adjacent: isAdjacent,
-    flanked: distance <= cqb && partners.length > 0,
+    // A melee attacker flanks only from within Reach; a ranged one from within CQB Range (p.341).
+    flanked: (melee ? withinReach(a, t, reachFeet) : distance <= cqb) && partners.length > 0,
     flankers: partners.map(token => token.name),
     cover,
     coverId: COVER[cover].id,
@@ -217,10 +218,10 @@ export function applyMeasurement(element, m) {
 }
 
 /** A dialog `render` callback that fills in what the scene shows for this character's attack. */
-export function measureInto(actor) {
+export function measureInto(actor, reach = {}) {
   return (event, dialog) => {
     try {
-      const measurement = measureAttack(actor);
+      const measurement = measureAttack(actor, reach);
       if (measurement) applyMeasurement(dialog?.element ?? event?.target, measurement);
     } catch (error) {
       console.warn("Field Agent's Handbook | The map could not be measured for this roll.", error);

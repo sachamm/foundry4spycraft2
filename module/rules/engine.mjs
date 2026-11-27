@@ -1259,7 +1259,7 @@ function deriveOtherBonuses(state) {
   );
   rd.actionDice.max +=
     miscActionDice(sys) +
-    (cfg.tables.crossroads?.[sys.crossroadsTitle]?.level <= level
+    (crossroadsAllowed() && cfg.tables.crossroads?.[sys.crossroadsTitle]?.level <= level
       ? cfg.tables.crossroads[sys.crossroadsTitle].actionDice
       : 0);
   for (const source of sources)
@@ -1772,6 +1772,8 @@ function deriveFinalTotals(state) {
     if (sys.actionDice.die === 12) {
       sys.actionDice.die = 6;
       sys.actionDice.max *= 2;
+      // Each die gained from now on arrives as two d6 (p.181), session adjustments included.
+      sys.actionDice.gainMultiplier = 2;
     } else sys.actionDice.die += 2;
   }
   // Personal Lieutenant (p.204): always exactly 1 action die.

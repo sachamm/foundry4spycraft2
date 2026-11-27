@@ -13,6 +13,7 @@ import {
   shiftDisposition,
   loyaltyDecision,
   joinsCombat,
+  persuadeJoinPlan,
   dispositionCheckModifier
 } from "../../rules/gc/disposition.mjs";
 import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
@@ -347,7 +348,8 @@ export async function manageDisposition(actor) {
         ["shift", loc`Shift by grades`],
         ["set", loc`Set a grade (GC ruling)`],
         ["loyalty", loc`Roll a Loyalty decision`],
-        ["combat", loc`Roll whether the NPC joins a fight`]
+        ["combat", loc`Roll whether the NPC joins a fight`],
+        ["persuade", loc`A side tries to talk the NPC into the fight (once per combat)`]
       ],
       "show"
     )}</select></label>
@@ -357,6 +359,8 @@ export async function manageDisposition(actor) {
       DISPOSITIONS.map(grade => [grade.id, grade.name]),
       "neutral"
     )}</select></label>
+    <label data-when="action=persuade">${loc`That side's Impress/Persuasion result (standard or cooperative)`} <input type="number" name="persuasion" min="0" /></label>
+    <label data-when="action=persuade"><input type="checkbox" name="triumph" /> ${loc`The check was a Triumph (an Adversarial NPC needs one)`}</label>
     <label data-when="action=loyalty|combat">${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`,
     loc`Apply`
   );
@@ -397,6 +401,26 @@ export async function manageDisposition(actor) {
           flavor: loc`Loyalty (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${step.total} against ${step.target} — ${step.success ? loc`sides with them` : loc`sides against them`}.`
         },
         messageModeOption("gmroll")
+      );
+    }
+    if (input.action === "persuade") {
+      const combatId = game.combat?.started ? game.combat.id : "";
+      const plan = persuadeJoinPlan(actor.flags?.spycraft2?.persuadedJoin ?? null, {
+        combatId,
+        side: targetId,
+        gradeId: gradeNow,
+        result: input.persuasion === "" || input.persuasion === null ? NaN : Number(input.persuasion),
+        triumph: input.triumph === true
+      });
+      if (!plan.allowed) return refuse(plan.reason);
+      await actor.setFlag("spycraft2", "persuadedJoin", plan.record);
+      const against = plan.needsTriumph ? loc`a Triumph` : loc`DC ${plan.dc}`;
+      return say(
+        actor,
+        plan.success
+          ? loc`${esc(actor.name)} (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}) is won over against ${against} and joins ${esc(name)}'s side for this fight. No other side may try (p.458).`
+          : loc`${esc(actor.name)} (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}) is not won over against ${against}. That side cannot try again this fight (p.458).`,
+        { whisper: true }
       );
     }
     if (input.action === "combat") {

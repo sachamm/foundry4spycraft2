@@ -403,6 +403,27 @@ test("dice that could not be taken at 0 are not handed back when the change goes
   else delete a1.flags.spycraft2.sessionDiceAdjusted;
 });
 
+test("an agent whose dice convert gains or loses the converted number (Fortune Favors the Bold)", async () => {
+  const a1 = actors.get("a1"),
+    kept = {
+      value: a1.system.actionDice.value,
+      max: a1.system.actionDice.max,
+      flag: a1.flags.spycraft2?.sessionDiceAdjusted
+    };
+  Object.assign(a1.system.actionDice, { value: 6, max: 6, gainMultiplier: 2 });
+  a1.flags.spycraft2 ??= {};
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 2, "two d6 for each die Bleak takes");
+  await state.setCampaign({ qualities: [] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  delete a1.system.actionDice.gainMultiplier;
+  Object.assign(a1.system.actionDice, { value: kept.value, max: kept.max });
+  if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
+  else delete a1.flags.spycraft2.sessionDiceAdjusted;
+});
+
 test("starting-dice adjustments apply once per session", async () => {
   await state.setCampaign({ qualities: ["bleak"] });
   await mission.applySessionDiceAdjustments();

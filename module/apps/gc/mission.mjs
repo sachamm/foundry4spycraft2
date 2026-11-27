@@ -283,7 +283,8 @@ export async function resumeMission() {
 
 const sessionStarted = () => {
   try {
-    return !!game.settings.get("spycraft2", "usagePeriods")?.session && gcDiceStatus().current;
+    // The session period alone: a Begin session that stopped before the GC dice were set still counts.
+    return !!game.settings.get("spycraft2", "usagePeriods")?.session;
   } catch {
     return false;
   }
@@ -583,8 +584,11 @@ export async function applySessionDiceAdjustments({ quiet = false } = {}) {
   }
   const lines = [];
   for (const actor of team) {
-    const starting = actor.system.actionDice?.max ?? 0,
-      target = adjustedStartingDice(starting, effects, bonus),
+    // An agent whose dice convert as they are gained (Fortune Favors the Bold at d12: two d6 for each) gains or
+    // loses the converted number.
+    const per = actor.system.actionDice?.gainMultiplier ?? 1,
+      starting = actor.system.actionDice?.max ?? 0,
+      target = per === 1 ? adjustedStartingDice(starting, effects, bonus) : Math.max(0, starting + delta * per),
       change = target - starting,
       before = applied(actor);
     if (before && (before.change === null || before.change === change)) {
@@ -599,11 +603,17 @@ export async function applySessionDiceAdjustments({ quiet = false } = {}) {
       step = wanted > 0 ? Math.max(0, wanted - Math.max(0, really - earlier)) : wanted;
     const current = actor.system.actionDice?.value ?? 0,
       value = Math.max(0, current + step);
-    await actor.update({
-      "system.actionDice.value": value,
-      "flags.spycraft2.sessionDiceAdjusted": { session, change, applied: really + (value - current) }
-    });
-    lines.push(`${esc(actor.name)}: ${signed(step)} → ${value}`);
+    // The dice and the record of them are written together, one agent at a time, so a failure leaves the others
+    // to be adjusted on the next run.
+    try {
+      await actor.update({
+        "system.actionDice.value": value,
+        "flags.spycraft2.sessionDiceAdjusted": { session, change, applied: really + (value - current) }
+      });
+      lines.push(`${esc(actor.name)}: ${signed(step)} → ${value}`);
+    } catch (error) {
+      lines.push(loc`${esc(actor.name)}: not adjusted (${esc(error.message)}). Run the adjustment again.`);
+    }
   }
   if (quiet && !lines.some(line => line.includes("→"))) return delta;
   await say(

@@ -23,7 +23,7 @@ import {
   observedAttackTargetChoices
 } from "../../apps/character-target.mjs";
 import { validateFinalRoundReservation } from "../../rules/final-round.mjs";
-import { cqbRangePlan, recordedAttackDistance } from "../../rules/cqb.mjs";
+import { cqbRangePlan, cqbRangedWeapon, recordedAttackDistance } from "../../rules/cqb.mjs";
 import { damageTargetChoices, resolveDamageTarget, sneakAttackTargetSnapshot } from "../../apps/damage-target.mjs";
 import { unnervingGrade, unnervingEligible, unnervingPlan } from "../../rules/unnerving.mjs";
 import { hasSneakAttackSource, sneakAttackDamagePlan } from "../../rules/sneak-attack.mjs";
@@ -138,7 +138,10 @@ export const ActorAttackRolls = Base =>
           ok: { label: loc`Roll attack` },
           render: (event, dialog) => {
             restoreChoices(choiceKey("attack", this, item.id), dialog?.element ?? event?.target);
-            measureInto(this)(event, dialog);
+            measureInto(this, {
+              melee: !cqbRangedWeapon(item.system),
+              reachFeet: 5 + (reachIncreaseFeet(item.system.qualities ?? "") || 0)
+            })(event, dialog);
             enhanceAttackDialog(event, dialog);
           },
           content: rollPipeline.dialog({

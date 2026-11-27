@@ -336,7 +336,8 @@ export async function applyEndOfRound(combat, endedRound) {
   for (const combatant of combat.combatants) {
     const state = fluid(combatant);
     if (state.round !== endedRound || !Number.isFinite(combatant.initiative)) continue;
-    const result = endOfRound(combatant.initiative, state.modifiers);
+    // Delay this round counts toward the ±10 limit with the end-of-round modifiers; only Press is outside it (p.324).
+    const result = endOfRound(combatant.initiative, state.modifiers, { alreadyApplied: -(Number(state.delayed) || 0) });
     const pieces = result.rows.map(row => `${row.label} ${row.amount > 0 ? "+" : ""}${row.amount}`);
     if (!result.delta && !result.reeling && !result.mustPress) {
       if (state.modifiers.length || state.delayed || state.pressed)
