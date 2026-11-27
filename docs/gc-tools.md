@@ -1,6 +1,6 @@
 # Game Control tools
 
-Open the **GC Console** from the first sidebar tab, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
+Open the **GC Console** with Alt+G (it opens as a window beside the chat log), from the sidebar tab after Combat, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
 
 New to the console? Start with [gc-quickstart.md](gc-quickstart.md).
 
@@ -40,9 +40,10 @@ World settings that change the flow:
 One mission is stored per world.
 
 - **Threat Level** — sum of the team's career levels ÷ 5, rounded up, with an optional −2…+2 adjustment or a fixed value for published missions. It is calculated when you press **Start mission** and stays fixed until you recalculate it.
-- **Caliber** — I–V. **Caliber +1** also gives the GC pool its 2 dice (p.398).
+- **Caliber** — I–V. **Raise Caliber to …** (under More mission tools) also gives the GC pool its 2 dice (p.398).
 - **Objectives** — grade × 25 XP, counted when marked complete. Table 7.6's samples are offered when adding one. One critical objective is free; each extra is +25 XP; none is −50 XP.
 - **Antagonists** — pick an NPC actor to read its XP reward. Each NPC type counts once; special NPCs count ×4; a ‘full’ or promoted special NPC earns 300 XP per scene. An antagonist counts once it is marked as faced.
+- Each objective, antagonist and other complication has **Edit…**, which opens its dialog filled in and replaces the row in place, keeping its Done or Faced mark.
 - **Complications** — scripted dramatic scenes (first free, +100 XP each extra, −50 XP for none), time limit (+50), campaign qualities, security devices (XP from the device's Power Rating), gear restrictions (Table 7.8), exposure objectives (Table 7.7), mission bundle picks (−10 XP per Caliber, −1 per Common Item) and free-form entries. Marking one **ignored** halves it, rounded up. While the mission runs, a gear restriction takes its picks off every agent's sheet, where the player (or the GC, as the row says) records which categories lose them; for the two list restrictions, enter the allowed weapons or Mechanisms one per line and the sheet flags picks that are not on the list.
 - **XP report** — posts the base reward and each character's total: (base + 25 per awarded action die, capped at 25 × level) × the lower of career level and Threat Level. The agent sheet's **Settle mission XP** dialog is pre-filled from the record; settlement itself is unchanged.
 - **Exposure** — recording an infraction immediately lowers that agent's Reputation or Net Worth; committing it to prevent an equal or worse one costs half, rounded up.
@@ -110,13 +111,19 @@ These shortcuts are listed under Configure Controls, where each can be changed o
 | --------- | -------------------------------------------------- | --- |
 | Alt+N     | Next turn                                          | GC  |
 | Alt+P     | Previous turn                                      | GC  |
-| Alt+G     | Open the GC Console                                | GC  |
+| Alt+G     | Open the GC Console (as a window, by default)      | GC  |
 | Alt+S     | Open the sheet of the combatant whose turn it is   | GC  |
-| Alt+Enter | Press the main button on the newest chat card      | All |
-| Alt+B     | GC boost on the card under the pointer, else your newest NPC card | GC  |
+| Alt+Enter | Press the main button on the acting combatant's newest card during a fight (when they have none, a second press within 3 s takes your own newest card), else on the newest card | All |
+| Alt+B     | GC boost on the card under the pointer, else your newest NPC card; press twice (the first press marks the card) | GC  |
+| Alt+D     | Spend GC action dice, with the acting NPC chosen   | GC  |
+| Alt+M | Mob attack for the acting NPC's group | GC |
+| Alt+1, Alt+2 | Attack with the acting NPC's first or second weapon | GC |
 
 A button clicked with the mouse lets go of the focus, so the shortcuts keep working after a click. Alt+S follows the
 turn: the sheet it opened last closes when it opens the next one.
+
+On Linux and Windows some browsers use Alt with a digit to switch tabs. If Alt+1 or Alt+2 changes the tab instead,
+rebind them under Configure Controls (the button sits in the console's Reference section).
 
 Every control is also reachable with Tab; Enter submits a dialog and Esc cancels it.
 
@@ -151,7 +158,7 @@ The qualities in force change the rolls themselves: threat and attack modifiers 
 
 ## Organizations (pp.389–395)
 
-**Add organization** records the Agency or a rival with its five Power Ratings, goals, turning points, Image facets, Sites and Tools. The console shows each one's total and what is over or under its Ratings; **Post summary** whispers its Ratings, the Canvass and Research levels of each facet, the cover and immunity bonuses its people carry, and its goal dice. Marking one as the Agency puts its Sites on the Request dialog (+4 and half the delivery time in the categories each Site serves), and either side of a Dramatic Conflict can take its Ratings from a recorded organization. An NPC built from grades can name its organization; its Tools then cap the Caliber of each equipment pick.
+**Add organization** records the Agency or a rival with its five Power Ratings, goals, turning points, Image facets, Sites and Tools. The console shows each one's total and what is over or under its Ratings; **Post summary** whispers its Ratings, the Canvass and Research levels of each facet, the cover and immunity bonuses its people carry, and its goal dice. Marking one as the Agency puts its Sites on the Request dialog (+4 and half the delivery time in the categories each Site serves), and either side of a Dramatic Conflict can take its Ratings from a recorded organization. An NPC built from grades can name its organization; its Tools then cap the Caliber of each equipment pick. Drop an NPC from the Actors directory on an organization's row to link it as one of its people; the row lists linked NPCs, each opening its sheet, with × to unlink.
 
 ## Reference
 

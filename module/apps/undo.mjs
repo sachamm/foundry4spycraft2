@@ -108,20 +108,53 @@ export function snapshot(actor) {
       defeated: !!combatant.defeated,
       initiative: combatant.initiative ?? null,
       // Damage can record a fluid initiative event on the combatant; Undo takes that back too.
-      fluid: structuredClone(combatant.flags?.spycraft2?.fluid ?? null)
+      fluid: structuredClone(combatant.flags?.spycraft2?.fluid ?? null),
+      // The turn's half actions and a readied action, so a mistaken Spend, Ready or Delay can be taken back.
+      actions: structuredClone(combatant.flags?.spycraft2?.actions ?? null),
+      readied: structuredClone(combatant.flags?.spycraft2?.readied ?? null)
     }))
   };
 }
+
+const COMBATANT_FIELDS = ["defeated", "initiative", "fluid", "actions", "readied"];
+const combatantNow = (combatant, key) =>
+  key === "defeated"
+    ? !!combatant.defeated
+    : key === "initiative"
+      ? (combatant.initiative ?? null)
+      : (combatant.flags?.spycraft2?.[key] ?? null);
 
 /** The undo record for one character, or null when the step left it as it was. */
 export function undoEntry(actor, before, after) {
   const { restore, unset, expect, whole } = differences(before.data, after.data);
   const created = [...after.effects.keys()].filter(id => !before.effects.has(id)),
     removed = [...before.effects].filter(([id]) => !after.effects.has(id)).map(([, data]) => data);
-  const combatants = before.combatants.filter(was => {
-    const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat);
-    return now && (now.defeated !== was.defeated || now.initiative !== was.initiative || !same(now.fluid, was.fluid));
-  });
+  const combatants = before.combatants
+    .filter(was => {
+      const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat);
+      return (
+        now &&
+        (now.defeated !== was.defeated ||
+          now.initiative !== was.initiative ||
+          !same(now.fluid, was.fluid) ||
+          !same(now.actions ?? null, was.actions ?? null) ||
+          !same(now.readied ?? null, was.readied ?? null))
+      );
+    })
+    // Only the fields this step changed are kept, with what it left them at: Undo puts back those alone, and only while
+    // nothing changed them since, so a later Spend, Count change or defeat stays.
+    .map(was => {
+      const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat),
+        entry = { combat: was.combat, id: was.id },
+        left = {};
+      for (const key of COMBATANT_FIELDS)
+        if (!same(now?.[key] ?? null, was[key] ?? null)) {
+          entry[key] = was[key] ?? null;
+          left[key] = structuredClone(now?.[key] ?? null);
+        }
+      entry.left = left;
+      return entry;
+    });
   if (!Object.keys(restore).length && !unset.length && !created.length && !removed.length && !combatants.length)
     return null;
   // Stored as pairs: a chat message expands dotted keys in its flags, which would turn each path into a nest.
@@ -220,13 +253,19 @@ export function postUndo(
     dcBoost = null,
     standingPaid = null,
     cardMarks = null,
-    addedInfractions = null
+    addedInfractions = null,
+    missionRow = null,
+    placedTokens = null,
+    combatSurprise = null
   } = {}
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
-    // The GC sees every note, so a step a player took can be undone by the GC too.
-    whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
+    // A player's note also goes to the GC, who can undo it too; a GC's note stays with that GC, so in a world with two
+    // GCs neither is offered the other's steps.
+    whisper: game.user.isGM
+      ? [game.user.id]
+      : [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
     flags: {
       spycraft2: {
@@ -240,6 +279,9 @@ export function postUndo(
           standingPaid,
           cardMarks,
           addedInfractions,
+          missionRow,
+          placedTokens,
+          combatSurprise,
           done: false
         }
       }
@@ -302,9 +344,23 @@ async function undoRecord(message, record) {
     for (const was of entry.combatants ?? []) {
       const combatant = game.combats?.get(was.combat)?.combatants.get(was.id);
       if (!combatant) continue;
-      const change = { defeated: was.defeated, initiative: was.initiative };
-      if ("fluid" in was) change[was.fluid ? "flags.spycraft2.==fluid" : "flags.spycraft2.-=fluid"] = was.fluid;
-      await combatant.update(change);
+      const change = {};
+      let moved = false;
+      for (const key of COMBATANT_FIELDS) {
+        if (!(key in was)) continue;
+        // Changed again since the step (a later spend, Count change or defeat): putting the old value back would erase it.
+        if (was.left && key in was.left && !same(combatantNow(combatant, key), was.left[key])) {
+          moved = true;
+          continue;
+        }
+        if (key === "defeated" || key === "initiative") change[key] = was[key];
+        else change[was[key] ? `flags.spycraft2.==${key}` : `flags.spycraft2.-=${key}`] = was[key];
+      }
+      if (moved)
+        ui.notifications.warn(
+          loc`${combatant.name} changed again in the fight since, so those later changes were kept.`
+        );
+      if (Object.keys(change).length) await combatant.update(change);
     }
   }
   if (record.gcDice > 0 && game.user.isGM) {
@@ -322,7 +378,9 @@ async function undoRecord(message, record) {
       mine = entry => entry.id === id;
     if (period !== undefined && period !== missionEpoch())
       ui.notifications.warn(
-        loc`The NPC was put back, but a later mission has begun, so its antagonist row was left as it is.`
+        record.placedTokens
+          ? loc`The placed tokens were taken off, but a later mission has begun, so the antagonist row was kept.`
+          : loc`The NPC was put back, but a later mission has begun, so its antagonist row was left as it is.`
       );
     else if ((getMission().antagonists ?? []).some(mine))
       await updateMission(now => ({
@@ -360,6 +418,48 @@ async function undoRecord(message, record) {
         infractions: (now.infractions ?? []).filter(entry => !added.ids.includes(entry?.id))
       })).catch(error => ui.notifications.warn(loc`The exposure rows were not taken off: ${error.message}`));
   }
+  // A row taken off the mission record goes back where it was, within the run of the mission that removed it.
+  const row = record.missionRow;
+  if (row?.list && row.entry && game.user.isGM) {
+    const { updateMission, missionEpoch } = await import("./gc/state.mjs");
+    const same = entry => (entry?.key ?? entry?.id) === row.key;
+    if (row.period !== missionEpoch())
+      ui.notifications.warn(loc`A later mission has begun, so the removed row was not put back.`);
+    else
+      await updateMission(now => {
+        const rows = [...(now[row.list] ?? [])];
+        if (rows.some(same)) return {};
+        rows.splice(Math.min(Number(row.index) || 0, rows.length), 0, row.entry);
+        return { [row.list]: rows };
+      }).catch(error => ui.notifications.warn(loc`The mission row was not put back: ${error.message}`));
+  }
+  // A surprise round set from the console: the fight's mark goes back to what it was.
+  const surprise = record.combatSurprise;
+  if (surprise?.combat && game.user.isGM) {
+    const fight = game.combats?.get(surprise.combat);
+    if (!fight) ui.notifications.warn(loc`That fight has ended, so its surprise round was left as it is.`);
+    else
+      await fight
+        .update({ "flags.spycraft2.surprise": surprise.was ?? null })
+        .catch(error => ui.notifications.warn(loc`The surprise round was not put back: ${error.message}`));
+  }
+  // Tokens Add NPC placed come off their scene, and with them the combatants they joined as; other tokens stay.
+  const placed = record.placedTokens;
+  if (placed?.ids?.length && game.user.isGM) {
+    const scene = game.scenes?.get(placed.scene),
+      fight = placed.combat ? game.combats?.get(placed.combat) : null;
+    const joinedNow = (placed.combatants ?? []).filter(id => fight?.combatants?.get(id));
+    if (joinedNow.length)
+      await fight
+        .deleteEmbeddedDocuments("Combatant", joinedNow)
+        .catch(error => ui.notifications.warn(loc`The combatants were not taken off: ${error.message}`));
+    const there = placed.ids.filter(id => scene?.tokens?.get(id));
+    if (!there.length) ui.notifications.warn(loc`Those tokens are no longer on the scene.`);
+    else
+      await scene
+        .deleteEmbeddedDocuments("Token", there)
+        .catch(error => ui.notifications.warn(loc`The tokens were not taken off: ${error.message}`));
+  }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {
     const { getSceneState, setSceneState } = await import("./gc/state.mjs");
@@ -396,9 +496,16 @@ async function undoRecord(message, record) {
 /** The Undo button on a note (the `renderChatMessageHTML` hook). */
 export function renderUndo(message, html) {
   const record = message.flags?.spycraft2?.undo;
-  if (!record || !(message.isAuthor || game.user?.isGM)) return;
+  if (!record || !(message.isAuthor || (game.user?.isGM && !message.author?.isGM))) return;
   const row = document.createElement("div");
   row.className = "spycraft2 roll-controls";
+  if (!message.isAuthor && message.author?.name) {
+    // A GC looking at a player's note: say whose step it was.
+    const by = document.createElement("p");
+    by.className = "hint";
+    by.textContent = loc`Step taken by ${message.author.name}.`;
+    row.append(by);
+  }
   if (record.done) {
     const note = document.createElement("p");
     note.className = "hint";

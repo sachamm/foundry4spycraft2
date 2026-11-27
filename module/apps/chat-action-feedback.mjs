@@ -28,6 +28,9 @@ export async function runChatAction(button, run) {
     if (refusalCount() > refusedBefore) status.textContent = loc`Not done: ${lastRefusalMessage()}`;
     else if (result === false) status.textContent = loc`Not done: see the notice.`;
     else if (result === null) status.remove();
+    // A step that posted a card of its own (Roll damage) continues there, not on this card.
+    else if (result?.documentName === "ChatMessage" && result.id !== messageId)
+      status.textContent = loc`Done. The next step is on the new card below.`;
     else status.textContent = loc`Done. The next step is at the top of this card.`;
   } catch (error) {
     if (!status) throw error;

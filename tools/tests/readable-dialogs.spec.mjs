@@ -107,3 +107,29 @@ test("search narrows large groups to matching fields and reveals a filtered inva
   await expect(page.locator('[name="confirmation"]')).toBeVisible();
   await expect(page.locator('[name="fog"]')).toBeVisible();
 });
+
+test("a refused entry keeps the dialog open with the reason inside it, and what was typed stays", async ({ page }) => {
+  await page.setContent(`<dialog open><form>
+    <label>Check <input name="check" /></label>
+    <footer class="form-footer"><button type="submit" data-action="ok">Spend dice</button>
+    <button type="submit" data-action="cancel">Cancel</button></footer></form></dialog>`);
+  await page.evaluate(async url => {
+    const { holdUntilValid } = await import(url);
+    window.submitted = [];
+    // Foundry's own handler, on the form: it must only see an entry that passed.
+    document.querySelector("form").addEventListener("submit", event => {
+      event.preventDefault();
+      window.submitted.push(event.submitter?.dataset.action);
+    });
+    holdUntilValid(document.querySelector("dialog"), values => (values.check ? "" : "Name the check."));
+  }, uiModuleUrl("module/apps/dialog-kit.mjs"));
+  await page.getByRole("button", { name: "Spend dice" }).click();
+  await expect(page.getByRole("alert")).toHaveText("Name the check.");
+  expect(await page.evaluate(() => window.submitted)).toEqual([]);
+  await page.getByLabel("Check").fill("vault door");
+  await page.getByRole("button", { name: "Spend dice" }).click();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.submitted)).toEqual(["ok"]);
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect.poll(() => page.evaluate(() => window.submitted)).toEqual(["ok", "cancel"]);
+});

@@ -69,6 +69,13 @@
 .gc-console-body h3 {
   margin: 0.6em 0 0.2em;
 }
+/* In the pop-out the sheets' section bar would box every console heading like a field; here they are plain text. */
+.spycraft2.application .gc-console-body h3 {
+  color: inherit;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
 .gc-console-body h2 button,
 .gc-console-body h3 button {
   width: auto;
@@ -122,6 +129,9 @@
   overflow-y: auto;
   overflow-wrap: anywhere;
   padding: 0 0.6rem 0.75rem;
+  /* The sticky turn bar never covers the control that keyboard focus moves to. */
+  scroll-padding-top: 104px;
+  container-type: inline-size;
 }
 .gc-console-body .controls button {
   max-width: 100%;
@@ -290,15 +300,27 @@
 /* What is true right now, before any section is opened. */
 .gc-console-body .gc-now {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  margin: 0.6rem 0;
+  gap: 2px;
+  margin: 0.5rem 0;
 }
+/* Caption, value and note on one line; a long mission name wraps under its caption instead of growing a tile. */
 .gc-console-body .gc-now .sc2-field {
-  padding: 4px 8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  min-height: 0;
+  column-gap: 6px;
+  align-items: baseline;
+  padding: 1px 8px;
+}
+.gc-console-body .gc-now .sc2-caption {
+  flex: 0 0 auto;
+  min-width: 7.5em;
+  white-space: nowrap;
 }
 .gc-console-body .gc-now .sc2-value {
-  font-size: 15px;
+  font-size: var(--sc2-text-m);
   overflow-wrap: anywhere;
 }
 /* Section headings are bars, as on the sheets. */
@@ -383,13 +405,14 @@
 /* Prep, Play and Wrap-up: one console, three views. A search looks through every section whatever the view. */
 .gc-console-body .gc-views {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 32px;
   gap: 4px;
   margin: 0.4rem 0;
 }
 .gc-console-body .gc-views button {
   width: 100%;
   min-height: 32px;
+  white-space: nowrap;
 }
 .gc-console-body .gc-views button[aria-pressed="true"] {
   color: var(--sc2-on-bar);
@@ -399,9 +422,12 @@
 .gc-console-body details.gc-section[data-view-hidden="true"]:not([data-tool-search-active="true"]) {
   display: none;
 }
+/* The note follows its value on the same line: "Cold Open · active". */
 .gc-console-body .gc-now .gc-note {
-  display: block;
   font-size: var(--sc2-text-s);
+}
+.gc-console-body .gc-now .gc-note::before {
+  content: "· ";
 }
 /* The first-session steps, the wrap-up steps and the acting combatant are raised panels above the sections. */
 .gc-console-body :is(.gc-checklist, .gc-wrap, .gc-acting) {
@@ -474,4 +500,292 @@
 }
 .gc-console-body .gc-row-count {
   font-family: var(--sc2-num);
+}
+
+/* ---------- Fight layout: the turn bar first, the acting combatant compact, the order as a two-column list ---------- */
+/* Next turn stays in view while the console scrolls, so it never has to be looked for. */
+.gc-console-body .gc-turn-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 6px 0;
+  padding: 4px 0;
+  background: var(--sc2-surface);
+}
+.gc-console-body .gc-turn-bar button {
+  width: 100%;
+  min-height: 32px;
+  margin: 0;
+  white-space: normal;
+}
+.gc-console-body .gc-turn-bar button.gc-primary {
+  grid-column: 1 / -1;
+}
+.gc-console-body .gc-acting-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 10px;
+  margin: 0 0 4px;
+}
+.gc-console-body .gc-acting-facts > div {
+  min-width: 0;
+}
+.gc-console-body .gc-acting-facts .gc-wide {
+  grid-column: 1 / -1;
+}
+.gc-console-body .gc-acting-facts dt {
+  display: inline;
+  color: var(--sc2-ink-muted);
+  font-size: var(--sc2-text-s);
+}
+.gc-console-body .gc-acting-facts dt::after {
+  content: ": ";
+}
+.gc-console-body .gc-acting-facts dd {
+  display: inline;
+  margin: 0;
+  font-weight: 600;
+}
+/* The weapons are the acting combatant's main choices: drawn heavier than the bookkeeping buttons. */
+/* One weapon per row: its name, then its bonus and damage under it. */
+.gc-console-body details.gc-section .controls.gc-weapons {
+  grid-template-columns: minmax(0, 1fr);
+}
+.gc-console-body .gc-weapons button {
+  display: block;
+  font-weight: 700;
+  border-color: var(--sc2-rule-strong);
+}
+.gc-console-body .gc-weapons button .gc-note {
+  font-weight: 400;
+  margin-inline-start: 0.4em;
+}
+.gc-console-body ul.gc-combat-rows .gc-row-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: baseline;
+  color: var(--sc2-ink);
+}
+.gc-console-body .gc-combat-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 0 7px;
+  color: var(--sc2-ink-muted);
+  font-size: var(--sc2-text-s);
+}
+.gc-console-body .gc-row-count {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  min-width: 2ch;
+}
+.gc-console-body .gc-current-turn .gc-row-button {
+  background: var(--sc2-action-tint);
+  border-color: var(--sc2-action);
+}
+.gc-console-body [data-defeated="true"] .gc-row-name {
+  text-decoration: line-through;
+}
+/* Mission rows: the text, then its buttons on their own line, with Remove set apart. */
+.gc-console-body ul.gc-rows {
+  padding: 0;
+  list-style: none;
+}
+.gc-console-body .gc-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 25%, transparent));
+}
+.gc-console-body .gc-row-text {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.gc-console-body .gc-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.gc-console-body .gc-row-actions .gc-danger {
+  margin-inline-start: 12px;
+}
+.gc-console-body button[aria-pressed="true"].sc2-action {
+  background: var(--sc2-action-tint);
+  border-color: var(--sc2-action);
+}
+.gc-console-body .gc-row-actions button[aria-pressed="true"].sc2-action::before,
+.gc-console-body li > button[aria-pressed="true"].sc2-action::before {
+  content: "✓ ";
+}
+.gc-console-body button.gc-danger {
+  color: var(--sc2-danger);
+  border-color: var(--sc2-danger);
+}
+.gc-console-body button.gc-danger:hover {
+  background: var(--sc2-danger-tint);
+}
+.gc-console-body .gc-views .gc-window-link {
+  min-width: 0;
+  padding: 0;
+}
+
+/* A dialog's refusal stays inside the dialog, beside the button, and what was typed is kept. */
+.sc2-dialog-refusal {
+  margin: 6px 0 0;
+  padding: 4px 8px;
+  color: var(--sc2-danger, #a3262f);
+  background: var(--sc2-danger-tint, rgba(163, 38, 47, 0.08));
+  border-inline-start: 3px solid currentColor;
+}
+.gc-console-body .gc-checklist-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0.4rem 0;
+  padding: 4px 8px;
+  border-inline-start: 3px solid var(--sc2-action);
+  background: var(--sc2-surface-raised);
+}
+.gc-console-body .gc-checklist-next button {
+  width: auto;
+}
+
+/* Before the fight: Begin combat takes its own row under the Initiative buttons, so it never wraps across the fold. */
+.gc-console-body details.gc-section .controls.gc-turn-controls {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Read by a screen reader, not drawn: the turn announced once when it changes (console.mjs _announceTurn). */
+.gc-console .gc-live.sc2-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* An NPC dragged over the console: the body is outlined and says what a drop here does. */
+.gc-console-body[data-drop-action] {
+  outline: 2px dashed var(--sc2-action);
+  outline-offset: -2px;
+}
+.gc-console-body[data-drop-action]::before {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: block;
+  padding: 4px 8px;
+  color: var(--sc2-on-action);
+  background: var(--sc2-action);
+  font-weight: 700;
+}
+.gc-console-body[data-drop-action="record"]::before {
+  content: attr(data-drop-record);
+}
+.gc-console-body[data-drop-action="place"]::before {
+  content: attr(data-drop-place);
+}
+.gc-console-body[data-drop-action="link"]::before {
+  content: attr(data-drop-link);
+}
+
+/* A combatant's token beside its name, as in Foundry's tracker. */
+.gc-console-body .gc-row-img {
+  width: 20px;
+  height: 20px;
+  margin-inline-end: 6px;
+  vertical-align: middle;
+  object-fit: cover;
+  border: 0;
+  border-radius: 2px;
+}
+
+/* Damage waiting on this combatant's card: its button leads the row at full width. */
+.gc-console-body details.gc-section .controls .gc-apply-first {
+  grid-column: 1 / -1;
+  font-weight: 700;
+}
+.gc-console-body .gc-acting h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+}
+.gc-console-body .gc-next-up {
+  font-size: var(--sc2-text-s);
+  font-weight: normal;
+}
+/* The acting name opens the sheet but reads as a heading, not a field. */
+.gc-console-body .gc-acting h3 .gc-row-button {
+  width: auto;
+  background: none;
+  border-color: transparent;
+}
+.gc-console-body .gc-acting h3 .gc-row-button:hover {
+  text-decoration: underline;
+}
+
+/* Combat row states as short coloured tags between the name and the Count. */
+.gc-console-body .gc-row-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 4px;
+}
+.gc-console-body ul.gc-combat-rows .gc-row-count {
+  grid-column: 3;
+}
+.gc-console-body .gc-tag-bad {
+  color: var(--sc2-bad);
+}
+.gc-console-body .gc-tag-warn {
+  color: var(--sc2-warn);
+}
+.gc-console-body .gc-tag-muted {
+  color: var(--sc2-ink-muted);
+}
+/* During a fight End combat closes the Combat section; the session row below it starts a group of its own. */
+.gc-console-body .gc-fight-end {
+  margin-bottom: 16px;
+}
+/* The quickstart opens in the browser; it reads as a button, like the console's other actions. */
+.gc-console-body .gc-quickstart a.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  text-decoration: none;
+}
+/* At sidebar width the session time moves into the dice value's tooltip (still read out), so the strip keeps to one
+   line per row; each Wrap-up fact sits under its button, all three alike. */
+@container (max-width: 360px) {
+  .gc-console-body .gc-now .gc-session-note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .gc-console-body .gc-wrap li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+/* With damage waiting the card button leads; the mob attack then takes a full row so Delay and Ready pair up. */
+.gc-console-body details.gc-section .controls .gc-apply-first ~ [data-action="mobAttack"] {
+  grid-column: 1 / -1;
 }

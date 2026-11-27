@@ -55,9 +55,20 @@ export function registerGCSettings() {
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
   game.settings.register(SYSTEM, "gcConsoleView", { scope: "client", config: false, type: Object, default: {} });
-  // Set once every first-session step has been done, so the list does not return with each new mission.
+  game.settings.register(SYSTEM, "gcConsoleWindow", {
+    name: locKey`GC Console in its own window`,
+    hint: locKey`Alt+G opens the GC Console as a window beside the chat log, instead of in the chat's place in the sidebar.`,
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+  // Where this GC last left the console's window.
+  game.settings.register(SYSTEM, "gcConsolePosition", { scope: "client", config: false, type: Object, default: {} });
+  // Set once every first-session step has been done, so the list does not return with each new mission. Each GC
+  // keeps their own: a second GC joining a world still sees the list until they have done the steps.
   game.settings.register(SYSTEM, "gcFirstSessionDone", {
-    scope: "world",
+    scope: "user",
     config: false,
     type: Boolean,
     default: false
@@ -175,7 +186,12 @@ export function missionXP({ planned = false } = {}) {
 /** Scene state follows the system's scene usage period: a new scene is standard until made dramatic. */
 export const sceneEpoch = () => String(read("usagePeriods", {})?.scene ?? "initial");
 /** The current mission usage period, which names the mission a payout or other per-mission record belongs to. */
-export const missionEpoch = () => String(read("usagePeriods", {})?.mission ?? "initial");
+// The usage period and the record's own id: planning the next mission is a new record before Start mission runs.
+export const missionEpoch = () => {
+  const period = String(read("usagePeriods", {})?.mission ?? "initial"),
+    record = read("mission", {})?.recordId;
+  return record ? `${period}:${record}` : period;
+};
 export function getSceneState() {
   const saved = read("sceneState", {}),
     scene = sceneEpoch();

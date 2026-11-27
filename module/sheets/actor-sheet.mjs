@@ -1896,7 +1896,17 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack),
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
-      itemDelete: SpycraftNpcSheet.#onItemDelete
+      itemDelete: SpycraftNpcSheet.#onItemDelete,
+      // The Weapons heading's Browse and Add, as on the agent's Gear tab: a new NPC gets its gun from here.
+      browse(event, target) {
+        return new SpycraftBrowser({ actor: this.actor, itemType: target.dataset.type }).render(true);
+      },
+      createItem(event, target) {
+        const type = target.dataset.type;
+        return this.actor.createEmbeddedDocuments("Item", [
+          { name: game.i18n.format("DOCUMENT.New", { type: game.i18n.localize(`TYPES.Item.${type}`) }), type }
+        ]);
+      }
     }
   };
 
@@ -1906,6 +1916,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       templates: [
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/gear-heading.hbs`,
         `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/npc-graded-play.hbs`,
         `${TPL}/npc-builder.hbs`,
@@ -1976,7 +1987,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       manualRoles: { "": loc`None`, minion: loc`Minion`, henchman: loc`Henchman`, mastermind: loc`Mastermind` },
       healthChip: npcIsSpecial(this.actor)
         ? loc`vitality ${sys.vitality?.value ?? 0}/${sys.vitality?.max ?? 0} · wounds ${sys.wounds?.value ?? 0}/${sys.wounds?.max ?? 0}`
-        : loc`Damage save: ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
+        : loc`damage track ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
       // The conditions set on the token or the actor, by their Spycraft names.
       conditionStamps: [...(this.actor.statuses ?? [])]
         .map(id => CONFIG.statusEffects?.find(effect => effect.id === id)?.name)

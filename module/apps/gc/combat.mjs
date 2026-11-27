@@ -39,8 +39,9 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 import { markAntagonistsFaced } from "./mission.mjs";
+import { postUndo, withUndo } from "../undo.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -129,6 +130,37 @@ export function fluidCombatClass(Base) {
       );
     }
   };
+}
+
+/**
+ * What recordFluidEvent would refuse for these values, worked out without writing anything, so the dialog can say it
+ * and stay open with the choices kept. "" when the event can be recorded.
+ */
+export function fluidEventRefusal(combatant, id, input = {}) {
+  if (!combatant) return loc`Choose a combatant.`;
+  if (!combatant.isOwner) return loc`You do not control that combatant.`;
+  const count = combatant.initiative;
+  if (!Number.isFinite(count)) return loc`${combatant.name} has not rolled Initiative yet: roll it first.`;
+  const state = fluidForRound(combatant, combatant.parent?.round);
+  try {
+    if (id === "delay")
+      delay(count, Number(input.times) || 1, { initiativeBonus: bonusOf(combatant), usedThisRound: state.delayed });
+    else if (id === "press") press(count, { pressedThisRound: state.pressed });
+    else if (id === "ready") readyTrigger(count, Number(input.triggerCount));
+    else {
+      const modifier = fluidModifier(id, {
+        times: Number(input.times) || 1,
+        amount: input.amount === undefined || input.amount === "" ? null : Number(input.amount),
+        weapon: input.weapon ?? "",
+        intBonus: Math.max(0, combatant.actor?.system?.abilities?.int?.mod ?? 0)
+      });
+      const added = addFluidModifier(state.modifiers, modifier);
+      if (!added.added) return added.reason;
+    }
+  } catch (error) {
+    return error.message;
+  }
+  return "";
 }
 
 /** Record one Table 5.2 event against a combatant for the current round; immediate ones change the Count now. */
@@ -222,15 +254,38 @@ export function registerAutomaticFluidSetting() {
 }
 
 /** Dialog: choose a combatant and an event. */
+/**
+ * Each combatant's name as the console shows it: a name several combatants share gets "#1", "#2"… in turn order, so
+ * three "Guard" rows, the acting heading and a notice can be told apart.
+ */
+export function combatantLabels(combat) {
+  const turns = [...(combat?.turns ?? [])],
+    totals = new Map(),
+    seen = new Map();
+  for (const combatant of turns) totals.set(combatant.name, (totals.get(combatant.name) ?? 0) + 1);
+  return new Map(
+    turns.map(combatant => {
+      if (totals.get(combatant.name) < 2) return [combatant.id, combatant.name];
+      const number = (seen.get(combatant.name) ?? 0) + 1;
+      seen.set(combatant.name, number);
+      return [combatant.id, `${combatant.name} #${number}`];
+    })
+  );
+}
+
 export async function fluidEventDialog(combat = game.combat, preset = null) {
   if (!combat?.started) return refuse(loc`Start the combat first.`);
-  const mine = combat.combatants.filter(combatant => combatant.isOwner);
+  // The acting combatant first, then the rest in turn order, numbered when they share a name.
+  const labels = combatantLabels(combat),
+    mine = (combat.turns ?? [...combat.combatants])
+      .filter(combatant => combatant.isOwner)
+      .sort((a, b) => (b.id === combat.combatant?.id) - (a.id === combat.combatant?.id));
   if (!mine.length) return refuse(loc`You control no combatant in this fight.`);
   const rows = mine.map(combatant => {
     const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
     return [
       combatant.id,
-      `${combatant.name} — Count ${combatant.initiative ?? "—"}${pending ? ` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
+      `${labels.get(combatant.id) ?? combatant.name} — Count ${combatant.initiative ?? "—"}${pending ? ` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
     ];
   });
   const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
@@ -250,13 +305,26 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
     <label data-when="id=unproficient">${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
     <label data-when="id=ready">${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`,
-    loc`Record event`
+    loc`Record event`,
+    // Refused inside the dialog, so the combatant and event chosen stay chosen.
+    values => {
+      if (values.id === "diversion" && !(Number(values.amount) >= 1))
+        return loc`Enter the rolled Count loss for Diversion.`;
+      const timed = !/^(press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup)$/.test(
+        values.id
+      );
+      if (timed && !(Number(values.times) >= 1)) return loc`Times it applies must be 1 or more.`;
+      return fluidEventRefusal(combat.combatants.get(values.combatantId), values.id, values);
+    }
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
   try {
-    const result = await recordFluidEvent(combatant, input.id, input);
-    const label = FLUID_EVENTS.find(event => event.id === input.id).label;
+    // The Undo note puts the Count and the round's fluid record back, as long as nothing changed them since.
+    const label = FLUID_EVENTS.find(event => event.id === input.id)?.label ?? input.id;
+    const result = await withUndo([combatant.actor], loc`Fluid initiative: ${combatant.name}, ${label}`, () =>
+      recordFluidEvent(combatant, input.id, input)
+    );
     await say(
       `${esc(combatant.name)}: ${esc(label)} — ${result.pending === undefined ? `${loc`Initiative Count is now`} <b>${result.count}</b>.` : loc`${result.pending > 0 ? "+" : ""}${result.pending} pending at the end of the round.`}${result.note ? ` ${esc(result.note)}` : ""}`
     );
@@ -492,9 +560,12 @@ export async function surpriseRoundDialog(combat = game.combat) {
   } catch (error) {
     return refuse(error.message);
   }
+  const was = combat.flags?.spycraft2?.surprise ?? null;
   await combat.update({
     "flags.spycraft2.surprise": result.occurs ? { winners: result.winners, round: combat.round } : null
   });
+  // Undo sets the fight's surprise mark back to what it was before.
+  await postUndo(loc`Surprise round set`, [], { combatSurprise: { combat: combat.id, was } }).catch(() => null);
   await say(
     result.occurs
       ? `<b>${loc`Surprise round:`}</b> ${loc`${result.winners[0] === "players" ? "the player characters" : "the opponents"} act — 1 free, half or full action each, in Initiative order. Everyone else waits for round 1.`}`
@@ -734,6 +805,10 @@ export function stepBackTurn(combat) {
     ui.notifications.info(loc`This is the first turn of the fight.`);
     return null;
   }
+  // A defeated combatant takes no turn, so stepping back passes over it to the one who acted before.
+  const turns = combat.turns ?? [];
+  for (let index = (combat.turn ?? 0) - 1; index >= 0; index--)
+    if (!turns[index]?.isDefeated) return combat.update({ turn: index }, { direction: -1 });
   return combat.previousTurn();
 }
 
@@ -917,4 +992,40 @@ export async function combatReferenceDialog() {
       : loc`${SURFACE_LABELS[input.surface]}: a ${Number(input.speed) || 0} ft. move covers ${move.feet} ft.${move.bonusStep ? "" : loc` No bonus 5-ft. step across it.`}`,
     { whisper: true }
   );
+}
+
+/**
+ * Put the selected tokens into a fight on this scene, starting one when there is none: the console's way into a fight,
+ * so the GC does not need Foundry's tracker for it. Tokens already in that fight are left alone.
+ */
+export async function addSelectedToFight() {
+  const scene = globalThis.canvas?.scene,
+    tokens = [...(globalThis.canvas?.tokens?.controlled ?? [])].map(token => token.document).filter(Boolean);
+  if (!scene) return refuse(loc`Open a scene first.`);
+  if (!tokens.length) return refuse(loc`Select the tokens to add on the map first (click, or drag a box round them).`);
+  // The fight the GC is viewing comes first, linked to a scene or not; only with none is one looked for or made here.
+  let fight =
+    game.combat ?? [...(game.combats ?? [])].find(entry => entry.scene?.id === scene.id && entry.active) ?? null;
+  fight ??= await CONFIG.Combat.documentClass.create({ scene: scene.id, active: true });
+  if (!fight) return null;
+  const present = new Set([...(fight.combatants ?? [])].map(combatant => combatant.tokenId));
+  const fresh = tokens.filter(token => !present.has(token.id));
+  if (!fresh.length) {
+    ui.notifications.info(loc`Every selected token is already in the fight.`);
+    return fight;
+  }
+  await fight.createEmbeddedDocuments(
+    "Combatant",
+    fresh.map(token => ({ tokenId: token.id, sceneId: scene.id, actorId: token.actorId, hidden: token.hidden }))
+  );
+  ui.notifications.info(
+    fresh.length === 1 ? loc`${fresh[0].name} joins the fight.` : loc`${fresh.length} tokens join the fight.`
+  );
+  return fight;
+}
+
+/** End the fight the console runs; Foundry's own end-combat question confirms it. */
+export async function endFight(fight = game.combat) {
+  if (!fight) return refuse(loc`No fight is running.`);
+  return fight.endCombat();
 }

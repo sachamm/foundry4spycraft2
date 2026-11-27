@@ -53,6 +53,9 @@ export function targetResponseControls({ message, check, user }) {
     if (check.resolved || check.attackResolution) return [];
     const target = respondent(check.attackContext?.targetActorUuid, check, user);
     if (!target) return [];
+    // Whoever also owns the attacker has Resolve as the card's main step; Check Defense then stays a plain button,
+    // so the card keeps one filled button.
+    const ownsAttacker = !!(check.actorUuid && fromUuidSync(check.actorUuid)?.isOwner);
     // An action-die Defense boost is declared at the start of a round (p.62), never against one attack already
     // made, so it is not offered here; the sheet keeps it for the round start.
     return [
@@ -60,7 +63,7 @@ export function targetResponseControls({ message, check, user }) {
         id: "targetCheckDefense",
         label: loc`Check Defense for ${target.name}`,
         hint: loc`${target.name} is the target: work out Defense against this attack`,
-        emphasis: "primary",
+        ...(ownsAttacker ? {} : { emphasis: "primary" }),
         run: () => checkIncomingDefense(target, incomingFacts(check))
       }
     ];

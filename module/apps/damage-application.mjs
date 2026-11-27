@@ -94,7 +94,12 @@ export function targetChoices({ exclude = "", offScene = "always" } = {}) {
   const add = actor => {
     if (allowed(actor) && canSee(actor) && !actors.has(actor.uuid)) actors.set(actor.uuid, actor);
   };
-  for (const combat of values(game.combats)) for (const turn of combat.turns ?? []) add(turn.actor);
+  // The fight in view, then any other fight on the scene in view: a fight on another scene is not offered.
+  const sceneId = globalThis.canvas?.scene?.id ?? null;
+  for (const turn of game.combat?.turns ?? []) add(turn.actor);
+  for (const combat of values(game.combats))
+    if (!sceneId || !combat.scene || combat.scene.id === sceneId)
+      for (const turn of combat.turns ?? []) add(turn.actor);
   // Tokens on the scene in view, then characters with no token there, which are marked as not on the scene.
   for (const token of values(globalThis.canvas?.scene?.tokens)) add(token.actor);
   if (offScene === "always" || !actors.size) for (const actor of values(game.actors)) add(actor);
@@ -1069,7 +1074,7 @@ export function damageCardTarget(check) {
 }
 
 /** Characters targeted on the canvas that damage can be applied to (this user's own, or any through the GC). */
-const targetedForDamage = () =>
+export const targetedForDamage = () =>
   values(game.user?.targets)
     .map(token => token.actor)
     .filter(actor => actor && TARGET_TYPES.includes(actor.type) && (actor.isOwner || gcAvailable()));

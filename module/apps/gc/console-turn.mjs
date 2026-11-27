@@ -7,9 +7,12 @@ import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { quickAttackHasTarget, quickAttackOptions, skipDialog } from "../remembered-choices.mjs";
-import { resolveQuickAttack } from "../damage-application.mjs";
+import { damageCardTarget, resolveQuickAttack, targetedForDamage } from "../damage-application.mjs";
+import { appliedDamageEntries } from "../../rules/damage-application.mjs";
 import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
-import { halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
+import { combatantLabels, halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
+
+export { combatantLabels };
 import { attackActionCost } from "../../rules/combat-actions.mjs";
 
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
@@ -56,6 +59,34 @@ export const ACTING_OUTCOMES = Object.freeze([
   ["cancelReady", "CancelAReadiedAction", combatOptions]
 ]);
 
+/** One line each on what an outcome button settles, shown as its tooltip. */
+const OUTCOME_HINTS = {
+  get manageTripOutcomes() {
+    return loc`Settle what follows a trip this combatant made or suffered`;
+  },
+  get manageFeintOutcomes() {
+    return loc`Settle what follows a feint this combatant made`;
+  },
+  get settleGrapple() {
+    return loc`Settle the grapple check this combatant is part of`;
+  },
+  get recordAnticipate() {
+    return loc`Record the result of an Anticipate Action check (p.354)`;
+  },
+  get standOff() {
+    return loc`Start a Stand Off, its round's stress, or a surrender (p.359)`;
+  },
+  get tireResult() {
+    return loc`Settle a Tire action once both Resolve checks are rolled (p.361)`;
+  },
+  get coupDeGraceSave() {
+    return loc`Roll the Fortitude save after surviving a Coup de Grace (p.355)`;
+  },
+  get cancelReady() {
+    return loc`Drop this combatant's readied action`;
+  }
+};
+
 /** Settle one of the combat outcomes for the acting combatant's actor. */
 export async function actingOutcome(actor, step) {
   const row = ACTING_OUTCOMES.find(([name]) => name === step);
@@ -75,7 +106,7 @@ export function actingBlock(combat) {
   return {
     defeated,
     id: combatant.id,
-    name: combatant.name,
+    name: combatantLabels(combat).get(combatant.id) ?? combatant.name,
     npc: actor.type === "npc",
     standard: actor.type === "npc" && !npcIsSpecial(actor),
     defense: actor.system?.defense?.total ?? null,
@@ -88,31 +119,131 @@ export function actingBlock(combat) {
         : loc`${left} half actions left`,
     weapons: [...(defeated ? [] : (actor.items ?? []))]
       .filter(item => item.type === "weapon")
-      .map(item => ({ id: item.id, name: item.name })),
-    outcomes: ACTING_OUTCOMES.map(([step, label]) => ({ step, label: `${OUTCOME_KEY}${label}` }))
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+      .map(item => weaponButton(actor, item)),
+    // The newest card about this combatant is its damage, not yet applied: the next-step button says so.
+    applyTarget: defeated ? "" : pendingDamageTarget(combatant),
+    // Who acts after this one, so the GC can look ahead without scrolling to the order.
+    next: nextUp(combat),
+    outcomes: ACTING_OUTCOMES.map(([step, label]) => ({
+      step,
+      label: `${OUTCOME_KEY}${label}`,
+      hint: OUTCOME_HINTS[step]
+    }))
   };
+}
+
+/** The next combatant in the order who is not defeated, as "Name (Count)"; "" when there is none. */
+function nextUp(combat) {
+  const turns = [...(combat?.turns ?? [])],
+    at = turns.findIndex(entry => entry.id === combat?.combatant?.id);
+  if (at < 0) return "";
+  const labels = combatantLabels(combat);
+  for (let step = 1; step < turns.length; step++) {
+    const entry = turns[(at + step) % turns.length];
+    if (entry.isDefeated) continue;
+    const name = labels.get(entry.id) ?? entry.name;
+    return Number.isFinite(entry.initiative) ? loc`${name} · count ${entry.initiative}` : name;
+  }
+  return "";
+}
+
+/** The target named on this combatant's newest card when that card is damage nobody has applied yet; else "". */
+const SKIP_CONFIRM_MS = 3000;
+let skipArmed = null;
+/**
+ * Next turn while the acting combatant's newest card still has damage nobody applied: the first press says so and
+ * stays, a second press within three seconds moves on. Returns whether the turn may change.
+ */
+export function nextTurnAllowed(combat = globalThis.game?.combat) {
+  const acting = combat?.started ? combat.combatant : null,
+    target = acting && !acting.isDefeated ? pendingDamageTarget(acting) : "";
+  if (!target) {
+    skipArmed = null;
+    return true;
+  }
+  const key = `${combat.id}:${acting.id}:${combat.round}`;
+  if (skipArmed?.key === key && Date.now() - skipArmed.at < SKIP_CONFIRM_MS) {
+    skipArmed = null;
+    return true;
+  }
+  skipArmed = { key, at: Date.now() };
+  ui.notifications.warn(
+    loc`Damage to ${target} is not applied yet. Press Next turn again within 3 seconds to move on anyway.`
+  );
+  return false;
+}
+
+export function pendingDamageTarget(combatant) {
+  const tokenId = combatant?.tokenId ?? combatant?.token?.id,
+    actorId = combatant?.actor?.id;
+  const about = message =>
+    (tokenId && message.speaker?.token === tokenId) ||
+    (!message.speaker?.token && actorId && message.speaker?.actor === actorId);
+  const newest = [...(globalThis.game?.messages ?? [])].reverse().find(about);
+  const check = newest?.flags?.spycraft2;
+  if (check?.checkKind !== "damage" || check.superseded) return "";
+  // The same choice the card's own main button makes: several targeted tokens get one press each, else the named one.
+  try {
+    const targeted = targetedForDamage();
+    const applied = appliedDamageEntries(check);
+    if (targeted.length > 1) {
+      const left = targeted.filter(actor => !applied.some(entry => entry.targetUuid === actor.uuid));
+      if (left.length > 1) return loc`${left.length} targets`;
+      return left.length ? left[0].name : "";
+    }
+    const named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
+    return named && !applied.some(entry => entry.targetUuid === named.uuid) ? named.name : "";
+  } catch {
+    return "";
+  }
+}
+
+/** One attack button's facts: the bonus and damage the GC would otherwise open the sheet to read. */
+function weaponButton(actor, item) {
+  let total = null;
+  try {
+    total = actor.weaponAttack?.(item)?.total ?? null;
+  } catch {
+    total = null;
+  }
+  const facts = [Number.isFinite(total) ? signed(total) : "", item.system?.damage ?? ""].filter(Boolean).join(" · ");
+  return { id: item.id, name: item.name, facts };
 }
 
 /** The combat list, one row per combatant, with the words a GC reads at a glance. */
 export function combatRows(combat) {
   if (!combat) return [];
+  const labels = combatantLabels(combat);
   return combat.turns.map(combatant => {
     const fluid = combatant.flags?.spycraft2?.fluid,
       pending = fluid?.round === combat.round ? fluid.modifiers.reduce((sum, entry) => sum + entry.amount, 0) : 0,
       current = combat.started && combat.combatant?.id === combatant.id;
-    const notes = [];
-    if (combatant.isDefeated) notes.push(loc`defeated`);
-    if (combatant.flags?.spycraft2?.readied) notes.push(loc`readied action`);
-    notes.push(...trackerRowStates(combatant.actor, { health: true }));
-    if (pending) notes.push(loc`${signed(pending)} at round end`);
-    if (combatant.flags?.spycraft2?.mustPress) notes.push(loc`must Press`);
+    // Short tags, coloured by what they mean: out of the fight, hurt, or a plain reminder.
+    const tags = [];
+    if (combatant.isDefeated) tags.push({ text: loc`defeated`, tone: "bad" });
+    tags.push(...trackerRowStates(combatant.actor, { health: true }).map(text => ({ text, tone: "warn" })));
+    if (combatant.flags?.spycraft2?.readied) tags.push({ text: loc`readied`, tone: "muted" });
+    if (pending) tags.push({ text: loc`${signed(pending)} at round end`, tone: "muted" });
+    if (combatant.flags?.spycraft2?.mustPress) tags.push({ text: loc`must Press`, tone: "warn" });
+    const notes = tags.map(tag => tag.text);
     return {
       id: combatant.id,
-      name: combatant.name,
+      name: labels.get(combatant.id) ?? combatant.name,
+      // A video token image cannot sit in an <img>: the actor's portrait stands in.
+      img:
+        [combatant.img, combatant.token?.texture?.src, combatant.actor?.img].find(
+          src => src && !/\.(webm|mp4|m4v|ogv)$/i.test(src)
+        ) ?? "",
+      // Hidden from the players in the tracker: marked here, so the GC knows the table cannot see it.
+      hidden: !!combatant.hidden,
       current,
       defeated: !!combatant.isDefeated,
       count: Number.isFinite(combatant.initiative) ? loc`Count ${combatant.initiative}` : loc`not rolled`,
+      // The number alone, for the list's Count column; "—" until rolled.
+      countValue: Number.isFinite(combatant.initiative) ? String(combatant.initiative) : "—",
       notes: notes.join(", "),
+      tags,
       // Kept for callers that read the older fields.
       pending: pending ? signed(pending) : "",
       mustPress: !!combatant.flags?.spycraft2?.mustPress
@@ -143,16 +274,33 @@ export function mobGroups(combat) {
 }
 
 /** Show a combatant: centre the map on its token, select it and open its sheet. */
-export async function openCombatant(combat, id) {
+/**
+ * A combat row works as the tracker's does: a press selects the token and pans to it; a double press (or the acting
+ * name) opens the sheet as well, so a run of quick looks does not stack sheets.
+ */
+export async function openCombatant(combat, id, { sheet = false } = {}) {
   const combatant = combat?.combatants?.get(id);
   if (!combatant) return null;
   const token = combatant.token?.object;
   if (token && globalThis.canvas?.ready) {
     token.control?.({ releaseOthers: true });
-    await canvas.animatePan?.({ x: token.center.x, y: token.center.y, duration: 250 });
+    // Not awaited: the sheet does not wait for the camera.
+    canvas.animatePan?.({ x: token.center.x, y: token.center.y, duration: 250 });
   }
-  combatant.actor?.sheet?.render(true);
+  if (sheet || !token) combatant.actor?.sheet?.render(true);
   return combatant;
+}
+
+/** Light up a row's token on the map while the pointer is over the row, as the tracker does. */
+export function hoverCombatant(combat, id, on) {
+  const token = combat?.combatants?.get(id)?.token?.object;
+  if (!token?.visible) return;
+  try {
+    if (on) token._onHoverIn?.(new PointerEvent("pointerenter"), { hoverOutOthers: true });
+    else token._onHoverOut?.(new PointerEvent("pointerleave"));
+  } catch {
+    /* a token mid-redraw */
+  }
 }
 
 /** Attack with one of the acting character's weapons: straight to hit or miss with one target, else the dialog. */

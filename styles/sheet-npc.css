@@ -143,23 +143,14 @@
 .spycraft2 .sc2-track i.on:is(.mark-broken, .mark-destroyed) {
   background: var(--sc2-danger);
 }
-/* Figures first: attributes and statistics sit directly under the name, ahead of the action lists. */
+/* Figures first: the template puts attributes and statistics directly under the name (after the builder in Edit),
+   so what is seen first is also what Tab reaches first. */
 .spycraft2.sheet.npc .spycraft2-sheet.npc {
   display: flex;
   flex-direction: column;
 }
 .spycraft2.sheet.npc .spycraft2-sheet.npc > * {
   flex: 0 0 auto;
-  order: 3;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .sheet-header {
-  order: 0;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .abilities-row {
-  order: 1;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > :is(.npc-graded-play, .stat-grid) {
-  order: 2;
 }
 .spycraft2.sheet.npc .npc-results .sc2-caption {
   letter-spacing: 0.02em;
@@ -212,21 +203,34 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(5.5em, 1fr));
-  gap: 2px 8px;
+  /* Caption and value side by side, wrapping whole: two short lines at most, so the builder keeps the room. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  max-height: 4.2em;
+  overflow-y: auto;
   margin: 4px 0;
-  padding: 4px 8px;
+  padding: 3px 8px;
+  font-size: var(--sc2-text-s);
   background: var(--sc2-surface-raised);
   border: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 30%, transparent));
   border-radius: var(--sc2-radius);
 }
 .spycraft2.sheet.npc .npc-pinned .sc2-field {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
   min-width: 0;
+  white-space: nowrap;
+}
+.spycraft2.sheet.npc .npc-pinned .sc2-caption {
+  font-size: var(--sc2-text-s);
 }
 .spycraft2.sheet.npc .npc-pinned .sc2-value {
   font-family: var(--sc2-num);
-  overflow-wrap: anywhere;
+  font-size: var(--sc2-text-m);
+}
+/* Keyboard focus never lands on a field hidden under the pinned strip. */
+.spycraft2.sheet.npc .window-content {
+  scroll-padding-top: 5em;
 }
