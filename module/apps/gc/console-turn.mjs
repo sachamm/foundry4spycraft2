@@ -7,7 +7,8 @@ import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { quickAttackHasTarget, quickAttackOptions, skipDialog } from "../remembered-choices.mjs";
-import { resolveQuickAttack } from "../damage-application.mjs";
+import { damageCardTarget, resolveQuickAttack } from "../damage-application.mjs";
+import { appliedDamageEntries } from "../../rules/damage-application.mjs";
 import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
 import { combatantLabels, halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
 
@@ -120,12 +121,31 @@ export function actingBlock(combat) {
       .filter(item => item.type === "weapon")
       .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
       .map(item => weaponButton(actor, item)),
+    // The newest card about this combatant is its damage, not yet applied: the next-step button says so.
+    applyTarget: defeated ? "" : pendingDamageTarget(combatant),
     outcomes: ACTING_OUTCOMES.map(([step, label]) => ({
       step,
       label: `${OUTCOME_KEY}${label}`,
       hint: OUTCOME_HINTS[step]
     }))
   };
+}
+
+/** The target named on this combatant's newest card when that card is damage nobody has applied yet; else "". */
+export function pendingDamageTarget(combatant) {
+  const tokenId = combatant?.tokenId ?? combatant?.token?.id,
+    actorId = combatant?.actor?.id;
+  const about = message =>
+    (tokenId && message.speaker?.token === tokenId) ||
+    (!message.speaker?.token && actorId && message.speaker?.actor === actorId);
+  const newest = [...(globalThis.game?.messages ?? [])].reverse().find(about);
+  const check = newest?.flags?.spycraft2;
+  if (check?.checkKind !== "damage" || check.superseded || appliedDamageEntries(check).length) return "";
+  try {
+    return damageCardTarget(check)?.name ?? "";
+  } catch {
+    return "";
+  }
 }
 
 /** One attack button's facts: the bonus and damage the GC would otherwise open the sheet to read. */

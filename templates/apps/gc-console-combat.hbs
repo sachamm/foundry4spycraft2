@@ -36,7 +36,7 @@
         aria-keyshortcuts="{{@root.shortcuts.mobAttack}}"{{/if}}
         data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button
           type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
-          aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button>{{#unless defeated}}
+          aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{#if applyTarget}}{{localize "SPYCRAFT.Console.ApplyDamageTo" target=applyTarget}}{{else}}{{localize "SPYCRAFT.Console.CardNextStep"}}{{/if}}</button>{{#unless defeated}}
         <button type="button" data-action="actingDelay" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DelayHint'}}">{{localize "SPYCRAFT.Console.Delay"}}</button>
         <button type="button" data-action="actingReady" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.ReadyHint'}}">{{localize "SPYCRAFT.Console.Ready"}}</button>{{/unless}}</p>
       {{#unless defeated}}<details class="gc-more">

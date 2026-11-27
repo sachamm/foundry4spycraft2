@@ -1090,6 +1090,23 @@ test("Undo after Add NPC takes the placed tokens and their combatants off, and n
   }
 });
 
+test("the acting block names damage only when its newest card is damage nobody applied", async () => {
+  const { pendingDamageTarget } = await import("../module/apps/gc/console-turn.mjs");
+  const previous = game.messages;
+  const combatant = { tokenId: "t1", actor: { id: "guard" } };
+  const card = flags => ({ speaker: { token: "t1" }, flags: { spycraft2: flags } });
+  try {
+    game.messages = [card({ checkKind: "attack" })];
+    assert.equal(pendingDamageTarget(combatant), "", "an attack card is not damage");
+    game.messages = [card({ checkKind: "damage", damageApplied: { a: { amount: 4 } }, superseded: true })];
+    assert.equal(pendingDamageTarget(combatant), "", "a replaced card is passed over");
+    game.messages = [card({ checkKind: "damage" }), { speaker: { token: "t1" }, flags: {} }];
+    assert.equal(pendingDamageTarget(combatant), "", "only the newest card counts");
+  } finally {
+    game.messages = previous;
+  }
+});
+
 test("each view has one filled button, chosen from the state", async () => {
   const { primaryAction } = await import("../module/apps/gc/console-view.mjs");
   const base = { checklistShown: false, missionActive: true, missionEnded: false, diceCurrent: true, combat: null };

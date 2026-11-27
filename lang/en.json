@@ -253,7 +253,8 @@
    "DoneHint": "Marks the objective met, or clears the mark",
    "FightTools": "Fight tools",
    "HiddenCombatant": "Hidden from the players",
-   "OpenControls": "Configure Controls…"
+   "OpenControls": "Configure Controls…",
+   "ApplyDamageTo": "Card: apply damage to {target}"
   },
   "Ability": {
    "str": "Strength",
