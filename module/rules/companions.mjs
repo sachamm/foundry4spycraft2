@@ -12,7 +12,8 @@
  * Personal Lieutenant (p.204), an agent:
  * - Career level half the owner's (rounded down); attributes from 32 points; at most 1 action die; never the Animal
  *   Partner or Personal Lieutenant feats; no Wealth, contacts, Interests or Subplots of their own.
- * - Requires the owner's career level 6+; one lieutenant.
+ * - Ordinary acquisition requires owner Career Level 6+; Origin grants can bypass that prerequisite.
+ * - Gains one level for each two owner levels after acquisition; one lieutenant.
  *
  * If either dies, the owner loses Reputation equal to their career level, or that × $50,000 in Net Worth.
  */
@@ -78,14 +79,28 @@ export function animalPartnerReview(ownerSystem, npc) {
   return { warnings, cap, xp: Number.isFinite(xp) ? xp - free : null };
 }
 
-/** Review a Personal Lieutenant agent against the owner's career level. */
+/** Preserve the two-level cadence from the original feat acquisition, including odd owner levels. */
+export function lieutenantAdvancement(system, ownerSystem) {
+  const acquired = system.companionOf?.ownerLevelAtAcquisition,
+    current = ownerSystem?.level;
+  if (!Number.isSafeInteger(acquired) || acquired < 1 || !Number.isSafeInteger(current) || current < acquired)
+    return { level: null, needsReview: true };
+  return { level: Math.floor(acquired / 2) + Math.floor((current - acquired) / 2), needsReview: false };
+}
+
+/** Review a Personal Lieutenant agent against its recorded advancement history. */
 export function lieutenantReview(system, ownerSystem) {
   const warnings = [],
-    level = Math.floor((Number(ownerSystem?.level) || 0) / 2);
+    advancement = lieutenantAdvancement(system, ownerSystem),
+    level = advancement.level;
   if (!ownerSystem?.activeFeatNames?.includes(PERSONAL_LIEUTENANT))
     warnings.push(loc`Personal Lieutenant: the owner no longer has the feat.`);
-  if ((system.level ?? 0) > level)
-    warnings.push(loc`Personal Lieutenant: career level ${system.level} exceeds half the owner’s (${level}).`);
+  if (advancement.needsReview)
+    warnings.push(loc`Personal Lieutenant: the GC must verify the owner's Career Level when the feat was gained.`);
+  else if ((system.level ?? 0) !== level)
+    warnings.push(
+      loc`Personal Lieutenant: recorded advancement calls for Career Level ${level}; the saved build is level ${system.level ?? 0}.`
+    );
   if (system.pointBuyBudget !== 32) warnings.push(loc`Personal Lieutenant: attributes are bought with 32 points.`);
   for (const feat of [ANIMAL_PARTNER, PERSONAL_LIEUTENANT])
     if (system.activeFeatNames?.includes(feat)) warnings.push(loc`Personal Lieutenant: may not take ${feat}.`);

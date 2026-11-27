@@ -11,6 +11,10 @@ import {
 import { defaultNpcProfile } from "../rules/npcs.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { ruleName } from "../rules/rule-name.mjs";
+import { queueResources } from "../services/transactions.mjs";
+import { same } from "../rules/equal.mjs";
+import { esc } from "../html.mjs";
 
 /** The companions linked to this owner. */
 export const linkedCompanions = owner =>
@@ -39,6 +43,7 @@ export function companionsContext(owner) {
 
 export async function createCompanion(owner, feat) {
   if (!owner.isOwner) return null;
+  if (![ANIMAL_PARTNER, PERSONAL_LIEUTENANT].includes(feat)) return refuse(loc`Choose a companion feat.`);
   const slots = companionSlots(owner.system, linkedCompanions(owner));
   if (feat === ANIMAL_PARTNER && !slots.animalPartner)
     return refuse(loc`Each Animal Partner selection grants one animal; all are linked.`);
@@ -48,6 +53,12 @@ export async function createCompanion(owner, feat) {
     );
   const ownership = { ...owner.ownership },
     companionOf = { ownerUuid: owner.uuid, feat };
+  if (feat === PERSONAL_LIEUTENANT) {
+    const source = [...owner.items].find(item => item.type === "feat" && ruleName(item) === feat),
+      acquired = source?.system.acquiredAtLevel;
+    if (Number.isSafeInteger(acquired) && acquired >= 1 && acquired <= owner.system.level)
+      companionOf.ownerLevelAtAcquisition = acquired;
+  }
   const data =
     feat === ANIMAL_PARTNER
       ? {
@@ -87,6 +98,43 @@ export async function createCompanion(owner, feat) {
   });
   actor.sheet?.render(true);
   return actor;
+}
+
+/** The GC verifies unknown or corrected acquisition history without rebuilding the lieutenant. */
+export async function reviewLieutenantHistory(actor) {
+  if (!actor?.isOwner || !game.user?.isGM || actor.system.companionOf?.feat !== PERSONAL_LIEUTENANT) return null;
+  const original = structuredClone(actor.system.companionOf);
+  const input = await systemDialog.input({
+    window: { title: loc`Review lieutenant advancement` },
+    rejectClose: false,
+    ok: { label: loc`Record review` },
+    content: `<p>${loc`Verify when the owner gained Personal Lieutenant. Keep the lieutenant's existing build and original dice; correct any level difference through normal advancement.`}</p><label>${loc`Owner UUID`} <input name="ownerUuid" value="${esc(original.ownerUuid)}" required /></label><label>${loc`Owner Career Level when the feat was gained`} <input type="number" name="ownerLevelAtAcquisition" min="1" max="20" step="1" value="${original.ownerLevelAtAcquisition ?? ""}" required /></label><label>${loc`Reason for this history correction`} <textarea name="note" maxlength="500" required></textarea></label>`
+  });
+  if (!input) return null;
+  const owner = fromUuidSync(String(input.ownerUuid).trim());
+  if (!owner || owner.type !== "agent")
+    return refuse(loc`Choose the actual owner character before recording this history.`);
+  return queueResources([actor, owner], async () => {
+    if (!same(actor.system.companionOf, original)) throw Error(loc`The companion link changed. Reopen the review.`);
+    const acquired = Number(input.ownerLevelAtAcquisition),
+      note = String(input.note ?? "").trim();
+    if (
+      !Number.isSafeInteger(acquired) ||
+      acquired < 1 ||
+      acquired > owner.system.level ||
+      !note ||
+      !owner.system.activeFeatNames?.includes(PERSONAL_LIEUTENANT)
+    )
+      throw Error(loc`Verify the owner's active feat, its original Career Level and the correction reason.`);
+    const next = {
+      ...original,
+      ownerUuid: owner.uuid,
+      ownerLevelAtAcquisition: acquired,
+      historyReview: { reviewer: game.user.id, at: game.time.worldTime, note }
+    };
+    await actor.update({ "system.==companionOf": next });
+    return next;
+  });
 }
 
 /** The GC records a companion's death: the owner loses Reputation, or Net Worth for a freelancer (pp.201,204). */

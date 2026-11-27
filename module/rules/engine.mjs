@@ -34,7 +34,7 @@ import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { notTheFaceDR } from "./not-the-face.mjs";
 import { underminedState } from "./taunt.mjs";
-import { PERSONAL_LIEUTENANT, lieutenantReview } from "./companions.mjs";
+import { PERSONAL_LIEUTENANT, lieutenantReview, lieutenantAdvancement } from "./companions.mjs";
 import { activeIdentity, identityReview, professionFocusesWithIdentity } from "./flawless-identity.mjs";
 import { intenseStanceState } from "./intense-stance.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
@@ -450,7 +450,10 @@ function deriveCareerLevels(state) {
       });
     }
   }
-  if (!level)
+  if (
+    !level &&
+    !(sys.companionOf?.feat === PERSONAL_LIEUTENANT && lieutenantAdvancement(sys, sys.lieutenantOwner).level === 0)
+  )
     todo.push({
       order: 3,
       always: true,
@@ -2839,7 +2842,9 @@ function settlePrerequisites(state) {
   sys.rollDataExtras = rd;
   sys.warnings = warnings;
   // Before the first class level only the opening steps are worth listing.
-  sys.todo = (level ? todo : todo.filter(t => t.always)).sort((a, b) => a.order - b.order);
+  sys.todo = (level || sys.companionOf?.feat === PERSONAL_LIEUTENANT ? todo : todo.filter(t => t.always)).sort(
+    (a, b) => a.order - b.order
+  );
   return sys;
 }
 

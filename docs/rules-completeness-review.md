@@ -2162,3 +2162,27 @@ nine focused companion cases also verify the final producer guards. Lint and
 format checks pass. Advancement cadence, Career Level 0 readiness, companion
 death/replacement safety and native lieutenant creation still need completion;
 these remain reasons to withhold either requested 9.9 score.
+
+## Pass 73: Captured lieutenant advancement and early Origin creation
+
+Both scores remain **9.8/10**. A lieutenant now uses the owner's recorded Career
+Level at feat acquisition for its initial level and subsequent two-level cadence.
+For example, acquisition at owner level 7 produces lieutenant level 3 through
+owner level 8, then level 4 at owner level 9. Under-level builds also receive a
+setup task. New companions capture known feat history; unknown legacy history
+requires the GC's review rather than a guessed acquisition level. The actual
+review form preserves the existing class build and rejects stale links, invalid
+levels and an owner without the active feat.
+
+Known early Origin grants permit a Career Level 0 lieutenant with six vitality.
+Such characters retain their real Origin-choice setup tasks instead of hiding
+them behind the ordinary first-class prompt. Native Foundry verified a complete
+Brainy/Playboy Scientist 1 owner and a complete 32-point Brainy/Celebrity level 0
+lieutenant. Both had no remaining setup tasks. The actual GC history form repaired
+an intentionally unknown acquisition record, and the build and review survived
+reload at 1280×720. This is an additional Origin variant, not another class build.
+Other early Origin feat/skill choices still need a separate review.
+
+All **4,403** Node tests, **988** engine checks and **269** layout cases pass.
+Continue companion death/replacement safety and the other recorded rules gaps
+before awarding either requested 9.9 score.

@@ -7,6 +7,7 @@ import {
   TRAINED_QUALITIES,
   animalPartnerReview,
   lieutenantReview,
+  lieutenantAdvancement,
   companionSlots,
   companionLoss
 } from "../module/rules/companions.mjs";
@@ -91,7 +92,15 @@ test("Animal Partner review: an animal with 2 trained qualities within the cap",
 
 test("Personal Lieutenant review, slots and the cost of losing a companion", () => {
   const boss = owner(["Personal Lieutenant", "Animal Partner", "Animal Partner"], { level: 9 });
-  const ok = { level: 4, pointBuyBudget: 32, activeFeatNames: [], contacts: [], subplots: [], interests: "" };
+  const ok = {
+    level: 4,
+    companionOf: { ownerLevelAtAcquisition: 7 },
+    pointBuyBudget: 32,
+    activeFeatNames: [],
+    contacts: [],
+    subplots: [],
+    interests: ""
+  };
   assert.deepEqual(lieutenantReview(ok, boss).warnings, []);
   const bad = lieutenantReview(
     { ...ok, level: 5, pointBuyBudget: 36, activeFeatNames: ["Animal Partner"] },
@@ -152,6 +161,58 @@ test("a Personal Lieutenant retains class progression with one action die and no
   assert.ok(Object.values(lieutenant.wealth.possessions.budget.available).every(n => n === 0));
   assert.ok(Object.values(lieutenant.gearPicks).every(row => row.available === 0));
   assert.equal(lieutenant.classLevels.test, 1, "owned class progression is preserved");
+});
+
+test("lieutenant advancement follows the original acquisition cadence and never invents unknown history", () => {
+  for (const [acquired, current, expected] of [
+    [7, 7, 3],
+    [7, 8, 3],
+    [7, 9, 4],
+    [6, 7, 3],
+    [6, 8, 4],
+    [1, 1, 0],
+    [1, 2, 0],
+    [1, 3, 1]
+  ]) {
+    assert.deepEqual(
+      lieutenantAdvancement({ companionOf: { ownerLevelAtAcquisition: acquired } }, { level: current }),
+      { level: expected, needsReview: false }
+    );
+  }
+  for (const acquired of [undefined, 0, -1, 4.5, 10])
+    assert.deepEqual(lieutenantAdvancement({ companionOf: { ownerLevelAtAcquisition: acquired } }, { level: 9 }), {
+      level: null,
+      needsReview: true
+    });
+  assert.match(
+    lieutenantReview({ pointBuyBudget: 32 }, owner(["Personal Lieutenant"])).warnings.join(" "),
+    /when the feat was gained/
+  );
+});
+
+test("an early Origin lieutenant can stay at Career Level 0 while actual origin choices remain visible", () => {
+  const base = {
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(key => [key, { base: 12 }])),
+    companionOf: { feat: "Personal Lieutenant", ownerLevelAtAcquisition: 1 },
+    lieutenantOwner: owner(["Personal Lieutenant"], { level: 1 }),
+    pointBuyBudget: 32,
+    progression: []
+  };
+  const specialty = {
+    id: "researcher",
+    type: "origin",
+    name: "Researcher",
+    system: { originType: "specialty", bonuses: [{ target: "featSlots.advancedSkill", value: "1" }] }
+  };
+  const sys = computeAgent(base, [specialty], cfg);
+  assert.equal(sys.vitality.max, 6);
+  assert.ok(!sys.todo.some(task => /first class level/.test(task.text)));
+  assert.ok(
+    sys.todo.some(task => /feat/i.test(task.text)),
+    "classless origin choices must not disappear from readiness"
+  );
+  const unknown = computeAgent({ ...base, companionOf: { feat: "Personal Lieutenant" } }, [], cfg);
+  assert.ok(unknown.todo.some(task => /when the feat was gained/.test(task.text) && task.error));
 });
 
 test("lieutenants cannot request free gear, receive ordinary awards or spend extra saved dice", () => {

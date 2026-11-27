@@ -21,6 +21,7 @@
     {{#each system.temporaryFocusGrants}}<p>{{name}} <button type="button" class="sc2-action" data-action="chooseTemporaryFocuses" data-item-id="{{itemId}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.ChooseTemporaryFocuses"}}</button></p>{{/each}}
   </div>
   {{#if canManageSceneDisposition}}<p><button type="button" class="sc2-action" data-action="manageSceneDisposition">{{sceneDispositionLabel}}</button></p>{{/if}}
+  {{#if isGM}}{{#if lieutenantProvisioning}}<p><button type="button" class="sc2-action" data-action="reviewLieutenantHistory">{{localize "SPYCRAFT.Lieutenant.ReviewHistory"}}</button></p>{{/if}}{{/if}}
   {{#if isGM}}{{#if system.crossroadsTitle}}
     <p>
       <button type="button" class="sc2-action" data-action="reviewCrossroadsMissionXP">{{crossroadsXPReviewLabel}}</button>

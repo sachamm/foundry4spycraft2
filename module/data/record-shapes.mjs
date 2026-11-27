@@ -364,7 +364,9 @@ export const RECORD_SHAPES = {
   companionOf: {
     $also: "null",
     feat: "string",
-    ownerUuid: "string"
+    ownerUuid: "string",
+    ownerLevelAtAcquisition: "number",
+    historyReview: { reviewer: "string", note: "string", at: "number" }
   },
   identities: [
     {

@@ -98,7 +98,12 @@ import { takeFireTeamSupremacy } from "../apps/team-final-attack.mjs";
 import { declareDuelingBasics } from "../apps/dueling-basics.mjs";
 import { declareFightDefensively, declareIntenseStance } from "../apps/fight-defensively.mjs";
 import { declareSnakeStrike } from "../apps/snake-strike.mjs";
-import { companionsContext, createCompanion, recordCompanionDeath } from "../apps/companions.mjs";
+import {
+  companionsContext,
+  createCompanion,
+  recordCompanionDeath,
+  reviewLieutenantHistory
+} from "../apps/companions.mjs";
 import { editIdentity, removeIdentity, enterIdentity, leaveIdentity } from "../apps/flawless-identity.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
@@ -503,6 +508,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       companionDied(event, target) {
         return recordCompanionDeath(this.actor, target.dataset.uuid);
+      },
+      reviewLieutenantHistory() {
+        return reviewLieutenantHistory(this.actor);
       },
       editIdentity(event, target) {
         return editIdentity(this.actor, target.dataset.id ?? "");
