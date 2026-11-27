@@ -9,7 +9,6 @@ import {
   campaignSubplotBonus,
   crossroadsAllowed,
   campaignPointBuy,
-  campaignRules,
   campaignFeatTrees,
   campaignGearCaliber,
   campaignInterestBase,
