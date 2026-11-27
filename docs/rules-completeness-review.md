@@ -2254,3 +2254,24 @@ adds only the new retained-Training field: every prior property of all 64 sample
 agent/level cases is unchanged. The isolated catalog keyboard fixture now loads
 the actual new rules dependency and passes. Continue ongoing acid protection,
 secondary effects, Drained and remaining conditional creation-option auditing.
+
+## Pass 76: Acid's minimum armor penetration
+
+Both scores remain **9.8/10**. Printed pp.333–334 confirm that acid always has
+at least AP 1. A generic or older damage profile could instead supply AP 0.
+Profiles now show the minimum, and the final application enforces it before
+capturing the damage receipt and pending save. Stronger declared AP remains.
+
+Workflow tests now verify the corrected reduction through standard NPC Damage
+saves, special/agent vitality, activated critical wounds and delayed resistance
+changes. For the retained-resistance cases, damage 14 against DR 3 becomes 12
+after AP 1, then 4 after the original resistance 8. The original resistance is
+still used even when current gear changes. Explicit AP 0 is recorded as AP 1.
+
+Native Foundry used a special NPC with natural DR 3 and no worn armor. A legacy
+zero-AP card and explicit zero input produced a receipt with AP 1 and retained
+DR 2. Its actual Reflex result of 17 halved six damage to three; vitality then
+fell 75→74. All **4,419** Node tests and **988** engine checks pass, alongside
+lint, formatting and bundle checks. The latest **269** layout cases and native
+schema checks remain applicable; no layout or schema changed in this pass.
+Ongoing acid still needs per-attack protection, timing and injury history.

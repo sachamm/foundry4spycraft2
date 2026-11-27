@@ -81,6 +81,10 @@ test("a printed damage entry gives its kind, special type, armor-piercing and bl
   assert.equal(damageProfile("3d6 explosive", "BLS (10 ft.)").type, "explosive");
   assert.equal(damageProfile("3d6 explosive", "BLS (10 ft.)").blast, true);
   assert.equal(damageProfile("2d6 fire (AP 5)").type, "fire");
+  assert.equal(damageProfile("2d6 acid").armorPiercing, 1);
+  assert.equal(damageProfile("2d6 acid", "AP (0)").armorPiercing, 1);
+  assert.equal(damageProfile("2d6 acid", "AP (6)").armorPiercing, 6);
+  assert.equal(reducedDamage({ damage: 10, dr: 4, armorPiercing: damageProfile("2d6 acid").armorPiercing }).net, 7);
   for (const type of [
     "acid",
     "cold",

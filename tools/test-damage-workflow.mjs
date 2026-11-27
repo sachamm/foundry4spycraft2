@@ -924,11 +924,11 @@ test("standard NPC acid, explosive, vacuum and fire use actual Damage saves and 
       assert.equal(posted.length, before);
     }
     const reports = posted.filter(m => m.flags?.spycraft2?.npcDamageSave).map(m => m.flags.spycraft2.npcDamageSave);
-    const net = type === "vacuum" ? 14 : 11;
+    const net = type === "vacuum" ? 14 : type === "acid" ? 12 : 11;
     assert.deepEqual([reports[0].kind, reports[0].damage], ["lethal", net]);
     assert.equal(reports[1].kind, "stress");
     if (type === "acid") {
-      assert.equal(reports[1].damage, 5);
+      assert.equal(reports[1].damage, 6, "acid AP 1 leaves DR 2: 14 - 2 = 12, then half as stress");
       assert.equal(actor.system.hazards.acid.damage, 14);
     }
     if (type === "vacuum") {
@@ -992,7 +992,7 @@ test("a delayed typed hit retains its activated critical size for standard and s
     await resolveHazardSave(actor, save);
     if (special) {
       assert.equal(actor.system.vitality.value, 40);
-      assert.equal(actor.system.wounds.value, 9);
+      assert.equal(actor.system.wounds.value, 8, "the delayed acid hit retains its critical routing and minimum AP 1");
     } else {
       assert.equal(actor.system.damageTrack.last.failures, 2);
       assert.equal(actor.system.damageTrack.state, "dead");
@@ -1198,7 +1198,13 @@ test("pending acid and explosive damage retain resistance from the original hit 
         checkKind: "damage",
         effectiveTotal: 14
       });
-      await applyDamage(hit, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type, armorPiercing: 0 });
+      if (type === "acid")
+        assert.equal(
+          JSON.parse(Object.values(actor.flags.spycraft2.damageApplications)[0].signature)[10],
+          1,
+          "an explicit legacy AP 0 is normalized before the damage receipt"
+        );
       const first = pending.shift();
       actor.system.survivalStats.resistances[code] = 0;
       const result = card(`frozen-resistance-save-${role}-${type}`, {
@@ -1213,10 +1219,16 @@ test("pending acid and explosive damage retain resistance from the original hit 
         hazardSave: first.save
       });
       await resolveHazardSave(actor, result);
+      const net = type === "acid" ? 4 : 3; // Acid AP 1 leaves DR 2; the original resistance remains 8.
       if (role === "standard")
-        assert.equal(posted.find(m => m.flags?.spycraft2?.npcDamageSave)?.flags.spycraft2.npcDamageSave.damage, 3);
-      else assert.equal(actor.system.vitality.value, 97, "14 - DR 3 - original resistance 8");
-      if (type === "acid") assert.equal(actor.system.hazards.acid.suffered, 3);
+        assert.equal(posted.find(m => m.flags?.spycraft2?.npcDamageSave)?.flags.spycraft2.npcDamageSave.damage, net);
+      else
+        assert.equal(
+          actor.system.vitality.value,
+          100 - net,
+          "apply type-specific AP before DR and the original resistance"
+        );
+      if (type === "acid") assert.equal(actor.system.hazards.acid.suffered, net);
     }
 });
 

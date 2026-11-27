@@ -58,7 +58,7 @@ export function damageProfile(damageText = "", qualities = "") {
           ? "stress"
           : "lethal",
     type: type ?? "",
-    armorPiercing: piercing ? Number(piercing[1]) : 0,
+    armorPiercing: Math.max(DAMAGE_TYPES[type]?.minimumArmorPiercing ?? 0, piercing ? Number(piercing[1]) : 0),
     blast: /\bBLS\b/.test(tags)
   };
 }

@@ -56,6 +56,7 @@ export const DAMAGE_TYPES = {
   acid: {
     page: 333,
     damage: "lethal",
+    minimumArmorPiercing: 1,
     stress: { share: 1 / 2, round: "down" },
     injuries: [{ at: 25, ability: "cha" }],
     convertible: false

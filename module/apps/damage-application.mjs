@@ -862,6 +862,7 @@ export async function applyDamage(message, options = {}) {
     armorPiercing = Math.max(
       0,
       Math.trunc(Number(input.armorPiercing) || 0),
+      DAMAGE_TYPES[type]?.minimumArmorPiercing ?? 0,
       DAMAGE_TYPES[type]?.armorPiercing === "damage" ? damage : 0
     ),
     armorPiercingAll =
