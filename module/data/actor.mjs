@@ -24,7 +24,7 @@ const missionThreatLevelSetting = () => {
 };
 import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
-import { campaignCQBRange } from "../rules/campaign-combat.mjs";
+import { campaignCQBRange, campaignNpcHealthReview } from "../rules/campaign-combat.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
 import {
@@ -193,6 +193,12 @@ export class NpcData extends BaseActorData {
       super.prepareDerivedData();
       if (!["special", "villain"].includes(this.npcType) && !this.promoted) this.damageSave = this.manualDamageSave;
       this.applyFeatEffects({ health: false });
+      this.warnings.push(
+        ...campaignNpcHealthReview({
+          special: ["special", "villain"].includes(this.npcType) || this.promoted,
+          effects: this.campaignEffects
+        })
+      );
       return;
     }
     const result = conditionNpcProfile(
@@ -232,6 +238,11 @@ export class NpcData extends BaseActorData {
     this.competence = result.competence;
     this.warnings = [
       ...(result.warnings ?? []),
+      ...campaignNpcHealthReview({
+        special: result.type === "special" || this.promoted || this.animalPartner,
+        profileEnabled: true,
+        effects: this.campaignEffects
+      }),
       ...(partnerOwner ? animalPartnerReview(partnerOwner.system, this).warnings : [])
     ];
   }

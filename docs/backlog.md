@@ -280,7 +280,7 @@ own line on the card, and checked against the page first.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-180 | Campaign qualities still need workflow wiring for remaining DC, disposition, range/blast, gear Caliber, Feat Purchase, special-NPC Fragile and action-die effects (pp.406–408). Fast/Slow creation cadences, Growth XP, alternate feat choices, PC Fragile vitality, Big Budget Wealth and Soap Subplots now execute; Bulletproof/Gritty injury thresholds reach damage cards and pending saves. | R-01, rules-completeness-99 | M |
+| B-180 | Campaign qualities still need workflow wiring for remaining DC, disposition, gear Caliber, Feat Purchase and action-die effects (pp.406–408). Creation cadences, Growth XP, alternate feat choices, PC Fragile vitality, Big Budget Wealth, Soap Subplots, campaign affiliation/standing, range/CQB/blast, Bottomless Clip, Blockbuster hazard/recorded-save protection and injury thresholds/costs now execute. User ruling: Fragile retains grade-built NPC Health-table vitality, with GC review notices for class-die exceptions. | R-01, rules-completeness-99 | M |
 | B-183 | Falling stress not applied. (p.336) | R-04 | S |
 | B-184 | No control for persuading an NPC to join a fight. | R-05 | S |
 | B-185 | Standard NPC Damage save is not adjusted automatically for vitality or wound changes; a manual field exists. *GC to confirm.* (p.452) | R-06 | S |

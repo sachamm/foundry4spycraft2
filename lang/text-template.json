@@ -3138,6 +3138,8 @@
    "ForwardStanceInitiativeCount1_1bp97fb": "Forward Stance: Initiative Count +1",
    "ForwardStanceMoveOnlyWithAcrobatics_13ksegk": "Forward Stance: move only with Acrobatics/Jump checks or your bonus 5-ft. step (p.187).",
    "FragileFixedClassGain_0eb8sui": "Fragile: fixed class gain.",
+   "FragileTheGCMustReviewThis_1nyq559": "Fragile: the GC must review this special character's entered vitality. Class vitality dice use the campaign's fixed later-level gains, plus Constitution.",
+   "FragileThisNPCRetainsHealthTable_0ypvedj": "Fragile: this NPC retains Health-table vitality. The GC must review any exception based on class vitality dice.",
    "FreeActionAtTheStartOf_03c3k6j": "Free action at the start of your Initiative Count: −4 to every attack and skill check and +2 dodge to Defense for 1 full round (p.357).",
    "FreeActionOnYourOwnInitiative_1c6lj7u": "Free action on your own Initiative Count: take a penalty on every attack and skill check and gain the same amount as a dodge bonus to Defense until the start of your next Initiative Count. The penalty remains even when vulnerability removes the dodge bonus.",
    "FreeActionOncePerSceneUp_1pyjfjc": "Free action, once per scene: up to {0} opponents in line of sight (one per Chance feat). Their checks’ error ranges increase by 2 until the end of the scene. No character carries more than one Black Cat (p.189).",

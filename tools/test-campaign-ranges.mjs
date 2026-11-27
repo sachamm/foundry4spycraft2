@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { campaignCQBRange } from "../module/rules/campaign-combat.mjs";
+import { campaignCQBRange, campaignNpcHealthReview } from "../module/rules/campaign-combat.mjs";
 import { weaponRangeEffects, rangedAttackContext } from "../module/rules/firearms.mjs";
 import { blastIncrementFeet } from "../module/rules/combat-actions.mjs";
 import { blastDamageAt } from "../module/rules/damage-application.mjs";
@@ -13,6 +13,17 @@ test("campaign range multipliers combine additively with feat multipliers, after
   const hurled = { proficiency: "hurled", range: 20 };
   assert.equal(weaponRangeEffects(s, hurled, { loadPenalty: -5 }).increment, 75);
   assert.equal(rangedAttackContext(base, w, { distanceFeet: 150, rangeIncrement: 100 }).incrementsUsed, 2);
+});
+
+test("the confirmed Fragile NPC ruling retains grade health and flags class-die exceptions for GC review", () => {
+  const effects = { fixedVitalityByDie: { 8: 2, 10: 3, 12: 4 } };
+  assert.match(
+    campaignNpcHealthReview({ special: true, profileEnabled: true, effects })[0],
+    /retains Health-table vitality/
+  );
+  assert.match(campaignNpcHealthReview({ special: true, effects })[0], /entered vitality/);
+  assert.deepEqual(campaignNpcHealthReview({ effects }), []);
+  assert.deepEqual(campaignNpcHealthReview({ special: true }), []);
 });
 test("campaign CQB constants retain a more specific Marksmanship Supremacy extension", () => {
   assert.equal(campaignCQBRange(), 30);

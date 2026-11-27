@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Under the confirmed Fragile ruling, grade-built special NPCs retain Health-table vitality. Special NPC
+  sheets now flag class-die health exceptions for GC review instead of inventing a grade conversion.
+
 - Faction, Freelance and Hybrid campaign qualities now validate PC affiliation and block incompatible reserve
   setup or field acquisition. Standing rewards and exposure use the character's campaign currency; Hybrid
   teams receive separate Reputation and Net Worth awards in one payout.
