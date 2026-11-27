@@ -186,9 +186,13 @@ export function pendingDamageTarget(combatant) {
   // The same choice the card's own main button makes: several targeted tokens get one press each, else the named one.
   try {
     const targeted = targetedForDamage();
-    if (targeted.length > 1) return loc`${targeted.length} targets`;
-    const named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
     const applied = appliedDamageEntries(check);
+    if (targeted.length > 1) {
+      const left = targeted.filter(actor => !applied.some(entry => entry.targetUuid === actor.uuid));
+      if (left.length > 1) return loc`${left.length} targets`;
+      return left.length ? left[0].name : "";
+    }
+    const named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
     return named && !applied.some(entry => entry.targetUuid === named.uuid) ? named.name : "";
   } catch {
     return "";

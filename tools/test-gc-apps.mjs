@@ -1102,6 +1102,23 @@ test("the acting block names damage only when its newest card is damage nobody a
     assert.equal(pendingDamageTarget(combatant), "", "a replaced card is passed over");
     game.messages = [card({ checkKind: "damage" }), { speaker: { token: "t1" }, flags: {} }];
     assert.equal(pendingDamageTarget(combatant), "", "only the newest card counts");
+    // Several targeted tokens: those already hit on the card drop out, and none left means nothing pending.
+    const a = { uuid: "Actor.ta", name: "Guard A", type: "npc", isOwner: true };
+    const b = { uuid: "Actor.tb", name: "Guard B", type: "npc", isOwner: true };
+    const keepTargets = game.user.targets;
+    game.user.targets = new Set([{ actor: a }, { actor: b }]);
+    try {
+      game.messages = [card({ checkKind: "damage" })];
+      assert.equal(pendingDamageTarget(combatant), "2 targets");
+      game.messages = [card({ checkKind: "damage", damageAppliedBy: { x: { targetUuid: "Actor.ta" } } })];
+      assert.equal(pendingDamageTarget(combatant), "Guard B");
+      game.messages = [
+        card({ checkKind: "damage", damageAppliedBy: { x: { targetUuid: "Actor.ta" }, y: { targetUuid: "Actor.tb" } } })
+      ];
+      assert.equal(pendingDamageTarget(combatant), "", "every target already took the damage");
+    } finally {
+      game.user.targets = keepTargets;
+    }
   } finally {
     game.messages = previous;
   }
@@ -1592,9 +1609,16 @@ test("Edit on a mission row replaces that row in place and keeps its marks", asy
   const edited = state.getMission().antagonists.find(entry => entry.id === "antEdit");
   assert.deepEqual([edited.name, edited.xp, edited.type, edited.encountered], ["Enforcer", 40, "special", true]);
   assert.equal(state.getMission().antagonists.filter(entry => entry.id === "antEdit").length, 1);
+  // A row recorded from a compendium NPC keeps its link through a name-only edit.
+  const linked = { ...row, id: "antPack", uuid: "Compendium.x.npcs.Actor.p1", typeKey: "Compendium.x.npcs.Actor.p1" };
+  await state.updateMission(m => ({ antagonists: [...m.antagonists, linked] }));
+  answer({ uuid: "", name: "Renamed", xp: 10, type: "", full: false, scenes: 1 });
+  await mission.editAntagonist("antPack");
+  const kept = state.getMission().antagonists.find(entry => entry.id === "antPack");
+  assert.deepEqual([kept.name, kept.uuid, kept.typeKey], ["Renamed", linked.uuid, linked.typeKey]);
   await state.updateMission(m => ({
     objectives: m.objectives.filter(entry => entry.id !== "objEdit"),
-    antagonists: m.antagonists.filter(entry => entry.id !== "antEdit")
+    antagonists: m.antagonists.filter(entry => !["antEdit", "antPack"].includes(entry.id))
   }));
 });
 

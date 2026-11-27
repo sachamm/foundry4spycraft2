@@ -621,16 +621,20 @@ export async function addObjective({ another = false, edit = null } = {}) {
 }
 
 /** Edit one antagonist row in place: the same dialog as Record for XP, filled in, replacing the row by its id. */
-export const editAntagonist = id => {
+export async function editAntagonist(id) {
   const row = getMission().antagonists.find(entry => entry.id === id);
-  return addAntagonist({ uuid: row?.uuid ?? "", edit: row });
-};
+  // A row recorded from a compendium NPC is offered in the list again, so a save keeps its link.
+  const dropped = row?.uuid ? await fromUuid(row.uuid).catch(() => null) : null;
+  return addAntagonist({ uuid: row?.uuid ?? "", edit: row, dropped });
+}
 
 export async function addAntagonist({ uuid = "", another = false, dropped = null, edit = null } = {}) {
   requireGC();
   const npcs = [...game.actors].filter(actor => actor.type === "npc");
   // A compendium NPC dropped on the console is listed and chosen, though it is not in the world.
   if (dropped?.type === "npc" && !npcs.some(actor => actor.uuid === dropped.uuid)) npcs.unshift(dropped);
+  // An edited row whose NPC cannot be listed keeps its link unless the GC picks another NPC.
+  const unlisted = !!edit?.uuid && !npcs.some(actor => actor.uuid === edit.uuid);
   const input = await ask(
     edit ? loc`Edit ${edit.name} (p.452)` : loc`Add an antagonist (p.452)`,
     `
@@ -660,14 +664,21 @@ export async function addAntagonist({ uuid = "", another = false, dropped = null
   );
   if (!input) return null;
   const actor = input.uuid ? await fromUuid(input.uuid) : null;
+  const keep = !!edit?.uuid && (input.uuid === edit.uuid || (unlisted && !input.uuid)) && !actor;
   const antagonist = {
     ...(edit ?? {}),
     id: edit?.id ?? foundry.utils.randomID(),
-    uuid: actor?.uuid ?? null,
-    typeKey: actor ? typeKeyOf(actor) : null,
+    uuid: actor?.uuid ?? (keep ? edit.uuid : null),
+    typeKey: actor ? typeKeyOf(actor) : keep ? (edit.typeKey ?? null) : null,
     name: String(input.name || "").trim() || actor?.name || "Antagonist",
     xp: Number.isFinite(actor?.system.npcBuild?.xp) ? actor.system.npcBuild.xp : Number(input.xp) || 0,
-    type: input.type || (["special", "villain"].includes(actor?.system.npcType) ? "special" : "standard"),
+    type:
+      input.type ||
+      (["special", "villain"].includes(actor?.system.npcType)
+        ? "special"
+        : keep
+          ? (edit.type ?? "standard")
+          : "standard"),
     full: !!input.full,
     scenes: Math.max(1, Number(input.scenes) || 1),
     encountered: edit?.encountered ?? false
