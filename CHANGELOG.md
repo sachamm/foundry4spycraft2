@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Faction, Freelance and Hybrid campaign qualities now validate PC affiliation and block incompatible reserve
+  setup or field acquisition. Standing rewards and exposure use the character's campaign currency; Hybrid
+  teams receive separate Reputation and Net Worth awards in one payout.
+
 - The recorded-save damage tool now accepts Fortitude and Will as well as Reflex saves, and applies
   Blockbuster when the GC confirms that the source normally allows a save for half. Evasion retains its
   own Reflex eligibility and failed-save reduction.

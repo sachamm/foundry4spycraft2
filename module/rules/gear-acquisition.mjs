@@ -4,6 +4,7 @@ import { priorityRequestBonus, localHeroRequestBonus, requestBenefitContext } fr
 import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
 /** Delivery for a Request that is immediately available (Political Clout, Favors and Immunity). */
@@ -112,6 +113,8 @@ export function reserveInitialization(
   items,
   { picks = {}, charismaPicks = {}, common = 0, caliber = 1, intelComplete = false, procureAtIntel = false } = {}
 ) {
+  const affiliationProblem = campaignAffiliationProblem(system, system.campaignEffects);
+  if (affiliationProblem) throw new Error(affiliationProblem);
   const provisional = currentReserves(system);
   if (provisional && provisional.initialized !== false)
     throw new Error(
@@ -195,6 +198,8 @@ export function gearAcquisitionPlan(
 ) {
   const existing = currentReserves(system),
     waiver = kind === "common" && usePersonalStash === true;
+  const affiliationProblem = campaignAffiliationProblem(system, system.campaignEffects);
+  if (affiliationProblem) throw new Error(affiliationProblem);
   if ((!existing || existing.initialized === false) && !waiver)
     throw new Error(loc`Allocate reserves for the current mission first.`);
   const record = existing ?? provisionalReserves(system);

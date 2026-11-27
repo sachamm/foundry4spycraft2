@@ -11,6 +11,7 @@ import {
   sessionDiceApplied
 } from "../../rules/gc/mission.mjs";
 import { qualityAddition, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
+import { campaignStandingCurrency } from "../../rules/campaign-affiliation.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
@@ -476,11 +477,13 @@ export async function recordInfraction() {
     <label>${loc`Character`} <select name="actor">${options(team.map(actor => [actor.id, actor.name]))}</select></label>
     <label>${loc`Infraction`} <select name="infraction">${options(rows)}</select></label>
     <label>${loc`Paid in`} <select name="currency">${options(
-      [
-        ["reputation", loc`Reputation (Faction)`],
-        ["netWorth", loc`Net Worth (Freelance)`]
-      ],
-      rules === "freelance" ? "netWorth" : "reputation"
+      rules
+        ? [["automatic", loc`Use the character's campaign affiliation`]]
+        : [
+            ["reputation", loc`Reputation (Faction)`],
+            ["netWorth", loc`Net Worth (Freelance)`]
+          ],
+      rules ? "automatic" : "reputation"
     )}</select></label>
     <label><input type="checkbox" name="preventing" /> ${loc`Committed to prevent an equal or worse infraction (half, rounded up)`}</label>
     <label><input type="checkbox" name="honor" /> ${loc`Honor-code violation under the Corrupt campaign quality (half, rounded down)`}</label>`,
@@ -491,7 +494,17 @@ export async function recordInfraction() {
     [objectiveId, index] = String(input.infraction).split("|");
   const infraction = T.exposure.find(row => row.id === objectiveId)?.infractions[Number(index)];
   if (!actor || !infraction) return refuse(loc`Choose a character and an infraction.`);
-  const penalty = exposurePenalty(infraction, { preventing: !!input.preventing, halve: !!input.honor })[input.currency];
+  let currency;
+  try {
+    const policy = currentCampaignEffects();
+    if (policy.conflicts.some(c => c.key === "gearRules"))
+      throw Error(loc`Resolve the campaign's conflicting affiliation rules first.`);
+    currency = campaignStandingCurrency(actor.system, policy.effects, input.currency);
+  } catch (error) {
+    return refuse(error.message);
+  }
+  input.currency = currency;
+  const penalty = exposurePenalty(infraction, { preventing: !!input.preventing, halve: !!input.honor })[currency];
   const path = `system.${input.currency}`,
     before = actor.system[input.currency] ?? 0;
   await actor.update({ [path]: before + penalty });
@@ -626,11 +639,13 @@ export async function awardStanding() {
     <p>${loc`Each character earns this for completing the mission whether or not it succeeded; failed critical objectives are exposure infractions recorded separately. A Profession/Accomplishment check may raise it.`}</p>
     <ul>${rows || `<li>${loc`No agents are on the team.`}</li>`}</ul>
     <label>${loc`Paid in`} <select name="currency">${options(
-      [
-        ["reputation", `Reputation ${signed(standing.reputation)}`],
-        ["netWorth", `Net Worth +${money(standing.netWorth)}`]
-      ],
-      effects.gearRules === "freelance" ? "netWorth" : "reputation"
+      effects.gearRules
+        ? [["automatic", loc`Use each character's campaign affiliation`]]
+        : [
+            ["reputation", `Reputation ${signed(standing.reputation)}`],
+            ["netWorth", `Net Worth +${money(standing.netWorth)}`]
+          ],
+      effects.gearRules ? "automatic" : "reputation"
     )}</select></label>
     ${anyPaid ? `<label><input type="checkbox" name="again" /> ${loc`Correction: pay everyone the full reward again, including those already paid`}</label>` : ""}`)
     ]
@@ -641,25 +656,51 @@ export async function awardStanding() {
   const amount = standing[input.currency],
     due = team.filter(actor => input.again || !paidNow()[actor.id]);
   if (!due.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
+  const plans = new Map();
+  try {
+    const policy = currentCampaignEffects();
+    if (policy.conflicts.some(c => c.key === "gearRules"))
+      throw Error(loc`Resolve the campaign's conflicting affiliation rules first.`);
+    for (const actor of due) {
+      const currency = campaignStandingCurrency(actor.system, policy.effects, input.currency);
+      plans.set(actor.id, { currency, amount: standing[currency] });
+    }
+  } catch (error) {
+    return refuse(error.message);
+  }
   if (payingStanding) return decline(loc`A standing payout is already running.`);
   payingStanding = true;
   const done = [];
   try {
     for (const actor of due) {
       if (!input.again && paidNow()[actor.id]) continue;
+      const reward = plans.get(actor.id);
       // Recorded before the agent is paid, so an interrupted payout can never pay the same agent twice.
       await updateMission(m => ({
-        standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: { currency: input.currency, amount } }
+        standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: reward }
       }));
-      await actor.update({ [`system.${input.currency}`]: (actor.system[input.currency] ?? 0) + amount });
-      done.push(actor.name);
+      await actor.update({ [`system.${reward.currency}`]: (actor.system[reward.currency] ?? 0) + reward.amount });
+      done.push(actor);
     }
   } finally {
     payingStanding = false;
   }
   if (!done.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
+  if (input.currency === "automatic" || [...plans.values()].some(reward => reward.currency !== input.currency)) {
+    await say(
+      loc`Mission standing awarded by affiliation: ${esc(
+        done
+          .map(actor => {
+            return `${actor.name}: ${label(plans.get(actor.id))}`;
+          })
+          .join(", ")
+      )}.`,
+      false
+    );
+    return Object.fromEntries(plans);
+  }
   await say(
-    loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(done.join(", "))}.`,
+    loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(done.map(actor => actor.name).join(", "))}.`,
     false
   );
   return amount;

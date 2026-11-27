@@ -1,5 +1,6 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
+import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import {
   campaignAttributeLevels,
   campaignFeatCount,
@@ -276,6 +277,11 @@ function startPass(state) {
   );
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   const todo = [];
+  const affiliationProblem = campaignAffiliationProblem(sys, sys.campaignEffects);
+  if (affiliationProblem) {
+    warnings.push(affiliationProblem);
+    todo.push({ order: 1, always: true, tab: "main", text: affiliationProblem });
+  }
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const levelRow = l => T.levels[clamp(l, 0, 20)];
   Object.assign(state, { allItems, items, shaken, T, warnings, legalFeatIds, activeFeatIds, todo, plural, levelRow });

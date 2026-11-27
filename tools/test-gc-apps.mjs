@@ -331,6 +331,57 @@ test("the standing award pays each agent once per mission; a correction pays aga
   for (const id of ["a2", "a3", "a4"]) await actors.get(id).update({ "system.reputation": 14 });
 });
 
+test("Hybrid standing pays each affiliation's currency and conflicting Faction selections stop the whole payout", async () => {
+  const savedMission = structuredClone(state.getMission()),
+    savedCampaign = structuredClone(state.getCampaign());
+  const a = actors.get("a1"),
+    b = actors.get("a2");
+  const before = [structuredClone(a.system), structuredClone(b.system)];
+  try {
+    await state.setCampaign({ qualities: ["hybrid"] });
+    await state.setMission({ ...savedMission, team: [a.id, b.id], standingPaid: {} });
+    Object.assign(a.system, { affiliationType: "faction", reputation: 0, netWorth: 0 });
+    Object.assign(b.system, { affiliationType: "freelance", reputation: 0, netWorth: 0 });
+    answer({ currency: "automatic" });
+    await mission.awardStanding();
+    assert.ok(a.system.reputation > 0);
+    assert.equal(a.system.netWorth, 0);
+    assert.ok(b.system.netWorth > 0);
+    assert.equal(b.system.reputation, 0);
+    assert.equal(state.getMission().standingPaid[a.id].currency, "reputation");
+    assert.equal(state.getMission().standingPaid[b.id].currency, "netWorth");
+    const freelancerMoney = b.system.netWorth;
+    answer({
+      actor: b.id,
+      infraction: "adhere-to-honor-code|0",
+      currency: "reputation",
+      preventing: false,
+      honor: false
+    });
+    await mission.recordInfraction();
+    assert.ok(b.system.netWorth < freelancerMoney, "Exposure uses the same affiliation policy");
+    assert.equal(b.system.reputation, 0);
+    await state.setCampaign({ qualities: ["faction"] });
+    await state.updateMission({ standingPaid: {} });
+    const aRep = a.system.reputation;
+    answer({ currency: "automatic" });
+    assert.equal(await mission.awardStanding(), false);
+    assert.equal(a.system.reputation, aRep, "All affiliations are checked before paying anyone");
+    assert.deepEqual(state.getMission().standingPaid, {});
+    assert.match(warnings.at(-1), /requires Faction/);
+    b.system.affiliationType = "faction";
+    await state.setCampaign({ qualities: ["faction", "freelance"] });
+    answer({ currency: "automatic" });
+    assert.equal(await mission.awardStanding(), false);
+    assert.match(warnings.at(-1), /conflicting affiliation/);
+  } finally {
+    a.system = before[0];
+    b.system = before[1];
+    await state.setCampaign(savedCampaign);
+    await state.setMission(savedMission);
+  }
+});
+
 test("End mission asks first, keeps the record for settlement, and Resume reopens it unchanged", async () => {
   confirmAnswers.push(false);
   assert.equal(await mission.endMission(), null);
