@@ -19,9 +19,12 @@ import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
 import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { campaignSkillChecks, moraleSkillPenalty } from "../../rules/campaign-skills.mjs";
 import { shakenSkillPenalty } from "../../rules/shaken.mjs";
+import { dispositionSkillContext, dispositionTargetContent } from "../target-skill-effects.mjs";
+import { dispositionSkillPlan } from "../../rules/disposition-skills.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
+import { readSetting } from "../../settings.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { manageCombatPersuasion } from "./combat-persuasion.mjs";
@@ -69,6 +72,10 @@ export function npcSkillPlan(actor, key) {
   const bonus = listed?.bonus ?? system.competence ?? 0;
   return { key, bonus, listed: !!listed, cap: stepLookup(TABLES.skillCap, bonus) };
 }
+const npcNamedChecks = skill =>
+  skill.checks.filter(
+    check => !check.optionalRule || (check.optionalRule === "linguistics" && readSetting("linguistics", false) === true)
+  );
 
 /** The part of the NPC skill check dialog that comes from its qualities. */
 export function qualityCheckContent(effects) {
@@ -121,20 +128,42 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       loc`${actor.name}: skill check`,
       `
       <p>${loc`An NPC uses the higher of Competence and its skilled bonus, which also sets the result cap (p.452). The key attribute modifier is added.`}</p>
-      <label>${loc`Skill`} <select name="key">${options(skillRows)}</select></label>
+      ${context.combatPersuasion ? `<p>${loc`This is the side's reserved Impress/Persuasion attempt. Its target and attitude were confirmed before this roll.`}</p>` : ""}
+      <label>${loc`Skill`} <select name="key">${
+        context.combatPersuasion
+          ? options(skillRows)
+          : SKILLS.map(
+              skill =>
+                `<optgroup label="${esc(skillRows.find(row => row[0] === skill.key)[1])}"><option value="${skill.key}">${esc(skill.name)} — ${loc`General skill check`}</option>${npcNamedChecks(
+                  skill
+                )
+                  .map(check => `<option value="${skill.key}/${check.id}">${esc(check.name)}</option>`)
+                  .join("")}</optgroup>`
+            ).join("")
+      }</select></label>
       <label>${loc`Attribute`} <select name="ability">${options([["", loc`First listed for the skill`], ...abilityRows], "")}</select></label>
       ${graded ? "" : `<label>${loc`Skill bonus (manual stat block)`} <input type="number" name="manualBonus" value="0" /></label>`}
       <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
-      <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" value="1" /></label>
+      <label>${loc`Error range (blank uses the named check's range)`} <input type="number" name="error" min="0" max="19" value="" /></label>
       ${qualityCheckContent(actor.system.qualityEffects)}
       ${actor.system.campaignEffects?.socialCheckMorale ? `<label><input type="checkbox" name="surprise" /> ${loc`Paranoid: Blend/Stealth or Sneak/Hide to determine surprise`}</label><label><input type="checkbox" name="shiftingDisposition" /> ${loc`Paranoid: this check shifts a target's disposition`}</label><label><input type="checkbox" name="persuadingAction" /> ${loc`Paranoid: this check persuades a target to take an action`}</label>` : ""}
+      ${context.combatPersuasion ? "" : dispositionTargetContent("impress")}
       <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`,
       loc`Roll`
     );
     if (!input) return null;
   }
-  const skill = SKILLS.find(entry => entry.key === input.key);
+  const [skillKey, chosenCheck] = typeof input.key === "string" ? input.key.split("/") : [],
+    skill = SKILLS.find(entry => entry.key === skillKey);
   if (!skill) return refuse(loc`Choose a skill.`);
+  if (input.key.split("/").length > 2) throw Error(loc`Choose one listed skill and named check.`);
+  const namedCheck = context.combatPersuasion
+    ? skill.checks.find(c => c.id === "persuasion")
+    : chosenCheck
+      ? npcNamedChecks(skill).find(c => c.id === chosenCheck)
+      : null;
+  if ((chosenCheck && !namedCheck) || (context.combatPersuasion && chosenCheck && chosenCheck !== "persuasion"))
+    throw Error(loc`Choose a valid named check for this skill and combat attempt.`);
   if (context.combatPersuasion && (skill.key !== "impress" || (input.ability && input.ability !== "cha")))
     return refuse(loc`Combat persuasion requires Impress/Persuasion with Charisma.`);
   if (
@@ -150,11 +179,11 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     ? "cha"
     : skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
       ? input.ability
-      : skill.abilities[0];
+      : (namedCheck?.attributes[0] ?? skill.abilities[0]);
   // Qualities: Fearless, Meek and Strong-Minded by the kind of check, the rest by the boxes ticked.
   const quality = npcSkillQualityPlan(actor.system.qualityEffects ?? { skillOptions: [] }, {
     skillKey: skill.key,
-    checkId: input.qualityCheck ?? "",
+    checkId: namedCheck?.id ?? input.qualityCheck ?? "",
     chosen: Object.keys(input)
       .filter(key => key.startsWith("quality-") && input[key] === true)
       .map(key => key.slice("quality-".length))
@@ -164,21 +193,36 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
   if (featBonus) quality.rows.push({ label: loc`Feats`, value: featBonus });
   if (input.surprise === true && !["blend", "sneak"].includes(skill.key))
     throw Error(loc`Choose Blend/Stealth or Sneak/Hide for the confirmed surprise check.`);
-  const checkId = context.combatPersuasion
-      ? "persuasion"
-      : input.surprise === true
-        ? skill.key === "blend"
-          ? "stealth"
-          : "hide"
-        : (input.qualityCheck ?? ""),
+  if (
+    input.surprise === true &&
+    namedCheck &&
+    !((skill.key === "blend" && namedCheck.id === "stealth") || (skill.key === "sneak" && namedCheck.id === "hide"))
+  )
+    throw Error(loc`The selected named check does not determine surprise with Blend/Stealth or Sneak/Hide.`);
+  const checkId =
+      namedCheck?.id ??
+      (context.combatPersuasion
+        ? "persuasion"
+        : input.surprise === true
+          ? skill.key === "blend"
+            ? "stealth"
+            : "hide"
+          : (input.qualityCheck ?? "")),
+    targetContext = () =>
+      dispositionSkillContext({ ...input, combatPersuasion: context.combatPersuasion }, skill.key, actor)
+        .dispositionTarget,
+    disposition = dispositionSkillPlan(actor.system, skill.key, namedCheck ?? { id: checkId }, targetContext()),
     campaignChecks = campaignSkillChecks(actor.system, skill.key, { id: checkId }, input),
     shakenPenalty = shakenSkillPenalty(actor.system, ability),
     campaignModifier = campaignChecks.bonuses.filter(row => row.value > 0).reduce((n, row) => n + row.value, 0),
     moralePenalty = moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty);
+  if (disposition.blockedReason) throw Error(disposition.blockedReason);
   quality.rows.push(
     ...campaignChecks.bonuses.filter(row => row.value > 0).map(row => ({ label: row.source, value: row.value }))
   );
   if (moralePenalty) quality.rows.push({ label: loc`Morale penalty (strongest applies)`, value: moralePenalty });
+  if (disposition.bonus || disposition.penalty)
+    quality.rows.push({ label: loc`Target disposition`, value: disposition.bonus + disposition.penalty });
   const total =
     plan.bonus +
     (actor.system.abilities[ability]?.mod ?? 0) +
@@ -186,7 +230,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     quality.modifier +
     featBonus +
     campaignModifier +
-    moralePenalty;
+    moralePenalty +
+    disposition.bonus +
+    disposition.penalty;
   return actor.rollCheck(
     "1d20 + @total",
     { total },
@@ -196,6 +242,8 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
         (input.secret
           ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`
           : loc`${skill.name} (${ability.toUpperCase()})`) +
+        (namedCheck ? ` / ${esc(namedCheck.name)}` : "") +
+        (input.secret && disposition.evidence ? `<br><small>${esc(disposition.notes.join(" "))}</small>` : "") +
         (input.secret && (quality.rows.length || quality.errorIncrease)
           ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
           : ""),
@@ -211,19 +259,30 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
         total
       ),
       cap: plan.cap,
-      error: Math.max(0, Number(input.error) || 0) + quality.errorIncrease,
+      error:
+        (input.error == null || input.error === "" ? (namedCheck?.error ?? 1) : Math.max(0, Number(input.error) || 0)) +
+        quality.errorIncrease +
+        disposition.errorIncrease,
+      ...(disposition.threatIncrease ? { threat: Math.max(1, 20 - disposition.threatIncrease) } : {}),
       npcSkill: skill.key,
       checkKind: "skill",
       skillKey: skill.key,
       ...(checkId ? { checkId } : {}),
       campaignSkillChecks: campaignChecks.evidence,
+      dispositionSkill: disposition.evidence,
       validateSkillContext: () => {
         const live = campaignSkillChecks(actor.system, skill.key, { id: checkId }, input);
         if (
           JSON.stringify(live.evidence) !== JSON.stringify(campaignChecks.evidence) ||
-          shakenSkillPenalty(actor.system, ability) !== shakenPenalty
+          shakenSkillPenalty(actor.system, ability) !== shakenPenalty ||
+          (namedCheck?.optionalRule && !npcNamedChecks(skill).some(c => c.id === namedCheck.id)) ||
+          JSON.stringify(
+            dispositionSkillPlan(actor.system, skill.key, namedCheck ?? { id: checkId }, targetContext()).evidence
+          ) !== JSON.stringify(disposition.evidence)
         )
-          throw Error(loc`The campaign modifiers or Shaken changed before posting this NPC skill check.`);
+          throw Error(
+            loc`The named check, campaign modifiers, Shaken or target disposition changed before posting this NPC skill check.`
+          );
       },
       ...(context.combatPersuasion
         ? {

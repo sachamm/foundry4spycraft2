@@ -4,6 +4,7 @@ import { loc } from "../i18n.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 import { dispositionSkillPlan, hasDispositionCheck } from "../rules/disposition-skills.mjs";
 import { npcUsesSceneDisposition } from "../rules/gc/disposition.mjs";
+import { persuasionKey } from "../rules/gc/combat-persuasion.mjs";
 const actors = () =>
     Array.isArray(game.actors?.contents)
       ? game.actors.contents
@@ -14,6 +15,33 @@ const actors = () =>
           : [],
   readable = a =>
     a?.isOwner === true || game.user?.isGM === true || a?.testUserPermission?.(game.user, "OBSERVER") === true;
+const documents = collection =>
+  Array.isArray(collection?.contents)
+    ? collection.contents
+    : typeof collection?.values === "function"
+      ? [...collection.values()]
+      : Array.isArray(collection)
+        ? collection
+        : [];
+const readableScene = scene => game.user?.isGM === true || scene?.testUserPermission?.(game.user, "OBSERVER") === true;
+function dispositionActors() {
+  const all = [...actors()],
+    liveScenes = new Set([
+      globalThis.canvas?.scene?.id,
+      ...documents(game.combats)
+        .filter(c => c.started)
+        .map(c => c.scene?.id)
+    ]);
+  for (const scene of documents(game.scenes)) {
+    if (!(scene.active || liveScenes.has(scene.id)) || !readableScene(scene)) continue;
+    for (const token of documents(scene.tokens))
+      if (token.actorLink === false) {
+        const actor = token.actor;
+        if (actor) all.push(actor);
+      }
+  }
+  return [...new Map(all.map(actor => [actor.uuid, actor])).values()];
+}
 export function targetSkillEffectCandidates(key) {
   return actors().filter(
     a => ["agent", "npc"].includes(a.type) && readable(a) && targetSkillEffectApplicable(a.system, key)
@@ -22,18 +50,58 @@ export function targetSkillEffectCandidates(key) {
 
 export function dispositionTargetCandidates(key) {
   if (!hasDispositionCheck(key)) return [];
-  return actors().filter(a => a.type === "npc" && readable(a) && !npcUsesSceneDisposition(a.system));
+  return dispositionActors().filter(a => a.type === "npc" && readable(a) && !npcUsesSceneDisposition(a.system));
 }
 /** Read target state only after permission checks and bind the acting character from its document. */
 export function dispositionSkillContext(input, key, acting) {
-  const uuid = input.dispositionTargetUuid ?? "";
+  const binding = input.combatPersuasion,
+    uuid = binding?.npcUuid ?? input.dispositionTargetUuid ?? "";
   if (!uuid) return { dispositionTarget: null };
-  const target = actors().find(a => a.uuid === uuid);
-  if (typeof uuid !== "string" || !target || target.type !== "npc" || !readable(target))
+  let target = typeof uuid === "string" ? dispositionActors().find(a => a.uuid === uuid) : null;
+  if (!target && typeof uuid === "string")
+    try {
+      target = globalThis.fromUuidSync?.(uuid);
+    } catch {}
+  if (
+    typeof uuid !== "string" ||
+    !target ||
+    target.uuid !== uuid ||
+    target.type !== "npc" ||
+    !readable(target) ||
+    (target.isToken && !readableScene(target.token?.parent))
+  )
     throw Error(loc`The disposition target is unavailable or private. Ask the GC to resolve this check.`);
   if (npcUsesSceneDisposition(target.system)) throw Error(loc`Villain disposition uses its separate scene effects.`);
   if (input.targetSkillActorUuid && input.targetSkillActorUuid !== uuid)
     throw Error(loc`Choose the same actual target for disposition and target feat effects.`);
+  let disposition = target.system.disposition,
+    frozen = null;
+  if (binding) {
+    const record = target.flags?.spycraft2?.combatPersuasion?.[persuasionKey(String(binding.combatId))],
+      claim = record?.attempts?.[persuasionKey(String(binding.side))],
+      combat = game.combats?.get?.(binding.combatId);
+    if (
+      key !== "impress" ||
+      (input.dispositionTargetUuid && input.dispositionTargetUuid !== uuid) ||
+      record?.version !== 1 ||
+      record.combatId !== binding.combatId ||
+      claim?.id !== binding.id ||
+      claim.actorUuid !== acting?.uuid ||
+      claim.side !== binding.side ||
+      !combat?.started ||
+      !documents(combat.combatants).some(c => c.actor?.uuid === acting?.uuid) ||
+      !["rolling", "complete"].includes(claim.state)
+    )
+      throw Error(loc`Review the reserved combat-persuasion target and acting side before rolling.`);
+    disposition = { base: claim.grade, toward: {} };
+    frozen = {
+      id: claim.id,
+      npcUuid: target.uuid,
+      combatId: binding.combatId,
+      side: claim.side,
+      targetId: claim.targetId ?? ""
+    };
+  }
   return {
     dispositionTarget: {
       actorUuid: target.uuid,
@@ -43,12 +111,13 @@ export function dispositionSkillContext(input, key, acting) {
       sceneEffects: npcUsesSceneDisposition(target.system),
       actingActorId: acting?.id,
       actingActorUuid: acting?.uuid,
-      disposition: target.system.disposition,
-      confirmed: input.dispositionTargetConfirmed === true
+      disposition,
+      ...(frozen ? { combatPersuasion: frozen } : {}),
+      confirmed: !!frozen || input.dispositionTargetConfirmed === true
     }
   };
 }
-function dispositionTargetContent(key) {
+export function dispositionTargetContent(key) {
   const candidates = dispositionTargetCandidates(key);
   if (!candidates.length) return "";
   const esc = foundry.utils.escapeHTML;
@@ -58,7 +127,11 @@ export function validateDispositionSkillProof(proof, { actor, checkKind, skillKe
   if (!proof) return;
   const check = SKILLS.find(s => s.key === skillKey)?.checks.find(c => c.id === checkId),
     target = dispositionSkillContext(
-      { dispositionTargetUuid: proof.targetActorUuid, dispositionTargetConfirmed: proof.targetConfirmed },
+      {
+        dispositionTargetUuid: proof.targetActorUuid,
+        dispositionTargetConfirmed: proof.targetConfirmed,
+        ...(proof.combatPersuasion ? { combatPersuasion: proof.combatPersuasion } : {})
+      },
       skillKey,
       actor
     ).dispositionTarget,
@@ -157,8 +230,13 @@ rollPipeline.register({
 rollPipeline.register({
   id: "targetSkillEffectContent:skill",
   dialogs: ["skill"],
-  dialog: ({ key }) => [
+  dialog: ({ key, combatPersuasion }) => [
     { at: 220, html: targetSkillEffectContent(key) },
-    { at: 221, html: dispositionTargetContent(key) }
+    {
+      at: 221,
+      html: combatPersuasion
+        ? `<p class="hint">${loc`Combat persuasion uses the target and attitude confirmed for this side's attempt.`}</p>`
+        : dispositionTargetContent(key)
+    }
   ]
 });

@@ -30,6 +30,8 @@ export function dispositionSkillPlan(system, key, check, target = null) {
     blockedReason: ""
   };
   if (!target) return empty;
+  if (target.combatPersuasion && (key !== "impress" || check?.id !== "persuasion"))
+    return { ...empty, blockedReason: loc`The reserved combat attempt requires Impress/Persuasion.` };
   const name = dispositionCheckName(key, check),
     actual = SKILLS.find(s => s.key === key)?.checks.find(c => c.id === check?.id),
     applicable =
@@ -83,7 +85,8 @@ export function dispositionSkillPlan(system, key, check, target = null) {
       diplomatic,
       errorIncrease: effect.error,
       threatIncrease: effect.threat,
-      priority
+      priority,
+      ...(target.combatPersuasion ? { combatPersuasion: { ...target.combatPersuasion } } : {})
     };
   return {
     evidence,
@@ -120,4 +123,4 @@ export function dispositionTimingPlan(timing, plan) {
     notes: `${timing.notes} ${loc`Use the target's disposition time multiplier; reduced times round up.`}`
   };
 }
-rollPipeline.register({ id: "dispositionSkillsRecord", order: 9771, record: ["dispositionSkill"] });
+rollPipeline.register({ id: "dispositionSkillsRecord", order: 9771.5, record: ["dispositionSkill"] });

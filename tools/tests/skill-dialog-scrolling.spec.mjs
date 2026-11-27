@@ -266,7 +266,20 @@ test("Paranoid NPC skill circumstances and roll confirmation remain reachable at
   const prior = content,
     oldGame = game;
   try {
-    globalThis.game = { ...oldGame, user: { id: "gc", isGM: true }, i18n: { localize: String } };
+    globalThis.game = {
+      ...oldGame,
+      user: { id: "gc", isGM: true },
+      i18n: { localize: String },
+      actors: [
+        {
+          uuid: "Actor.npc-target",
+          name: "Actual NPC target",
+          type: "npc",
+          isOwner: true,
+          system: { npcType: "special", disposition: { base: "friendly" } }
+        }
+      ]
+    };
     await rollNpcSkill({
       name: "QA special NPC",
       isOwner: true,
@@ -280,7 +293,11 @@ test("Paranoid NPC skill circumstances and roll confirmation remain reachable at
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.locator('select[name="key"]').selectOption("blend");
     await page.locator('[name="surprise"]').check();
+    await page.locator('select[name="key"]').selectOption("impress/persuasion");
+    await page.locator('[name="surprise"]').uncheck();
     await page.locator('[name="persuadingAction"]').check();
+    await page.locator('[name="dispositionTargetUuid"]').selectOption("Actor.npc-target");
+    await page.locator('[name="dispositionTargetConfirmed"]').check();
     await page.locator("#confirm").scrollIntoViewIfNeeded();
     const rect = await page.locator("#confirm").boundingBox();
     expect(rect.y).toBeGreaterThanOrEqual(0);
@@ -288,6 +305,43 @@ test("Paranoid NPC skill circumstances and roll confirmation remain reachable at
   } finally {
     content = prior;
     globalThis.game = oldGame;
+  }
+});
+
+test("reserved combat persuasion shows its fixed target guidance and no unrelated disposition selector at720px", async ({
+  page
+}) => {
+  const prior = content;
+  try {
+    const a = new SpycraftActor();
+    a.items = [];
+    a.system = {
+      skillTotals: {
+        impress: { name: "Impress", ability: "cha", totals: [{ ability: "cha", total: 3 }] }
+      }
+    };
+    await a.rollSkill("impress", "cha", {
+      initialCheck: "persuasion",
+      combatPersuasion: {
+        id: "claim",
+        npcUuid: "Actor.target",
+        combatId: "combat",
+        side: "team"
+      }
+    });
+    await render(page, 720);
+    expect(await page.locator('[name="dispositionTargetUuid"]').count()).toBe(0);
+    await expect(
+      page.getByText("Combat persuasion uses the target and attitude confirmed for this side's attempt.", {
+        exact: true
+      })
+    ).toBeVisible();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
   }
 });
 

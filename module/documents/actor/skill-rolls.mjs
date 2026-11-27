@@ -213,6 +213,7 @@ export const ActorSkillRolls = Base =>
             choices,
             esc,
             key,
+            combatPersuasion: options.combatPersuasion,
             restraintRollSource,
             skill
           })
@@ -262,7 +263,7 @@ export const ActorSkillRolls = Base =>
           ...tripAttackTargetInput(input, this, { key, check }),
           ...tripDefenseTargetInput(input, this, { key, check }),
           ...targetSkillContext(input, key),
-          ...dispositionSkillContext(input, key, this),
+          ...dispositionSkillContext({ ...input, combatPersuasion: options.combatPersuasion }, key, this),
           ...detectionObserverContext(input),
           gearItem: gear,
           weaponWorkItem: workTarget(),

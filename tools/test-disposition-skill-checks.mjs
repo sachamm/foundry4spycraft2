@@ -4,6 +4,8 @@ import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { dispositionSkillPlan as plan, hasDispositionCheck } from "../module/rules/disposition-skills.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { campaignEffects, activeQualities } from "../module/rules/gc/campaign.mjs";
+import { rollNpcSkill } from "../module/apps/gc/npc-play.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
 import {
   dispositionSkillContext,
   dispositionTargetCandidates,
@@ -24,6 +26,171 @@ const state = () => ({
       }
     ])
   )
+});
+test("settlement evidence binds disposition and campaign skill facts and cannot fall back to older evidence without them", () => {
+  const base = { checkKind: "skill", rawTotal: 20, effectiveTotal: 20, naturalDie: 10, error: 1, threat: 20, cap: 30 };
+  for (const field of ["dispositionSkill", "campaignSkillChecks"]) {
+    const c = { ...base, [field]: { version: 1, skillKey: "impress", modifier: 2 } },
+      evidence = rollEvidence(c);
+    assert.equal(rollEvidenceMatches(evidence, c), true);
+    assert.equal(rollEvidenceMatches(evidence, { ...c, [field]: { ...c[field], modifier: 999 } }), false);
+    assert.equal(rollEvidenceMatches(rollEvidence(base), c), false);
+  }
+});
+
+function npcContext() {
+  globalThis.CONFIG = { SPYCRAFT: cfg };
+  const actor = {
+      id: "acting",
+      uuid: "Actor.acting",
+      name: "Acting NPC",
+      type: "npc",
+      isOwner: true,
+      system: {
+        ...state(),
+        npcType: "special",
+        competence: 5,
+        npcProfile: { enabled: true },
+        campaignEffects: campaignEffects(activeQualities(["diplomatic"])).effects
+      },
+      rollCheck: async (_f, data, options) => ({ data, options })
+    },
+    npc = {
+      id: "target",
+      uuid: "Actor.target",
+      name: "Target NPC",
+      type: "npc",
+      isOwner: true,
+      system: { npcType: "special", disposition: { base: "adversarial", toward: { acting: { grade: "friendly" } } } },
+      flags: {}
+    };
+  globalThis.game = { user: { id: "gc", isGM: true }, actors: [actor, npc] };
+  return { actor, npc };
+}
+test("actual NPC named checks apply target disposition and role-scoped Diplomatic with saved ranges and identity", async () => {
+  const { actor, npc } = npcContext(),
+    input = {
+      key: "impress/persuasion",
+      ability: "cha",
+      dispositionTargetUuid: npc.uuid,
+      dispositionTargetConfirmed: true
+    };
+  let r = await rollNpcSkill(actor, input);
+  assert.equal(r.data.total, 9);
+  assert.equal(r.options.checkId, "persuasion");
+  assert.equal(r.options.threat, 19);
+  assert.equal(r.options.error, 1);
+  assert.equal(r.options.dispositionSkill.actingActorId, actor.id);
+  r.options.validateSkillContext();
+  actor.system.npcType = "standard";
+  r = await rollNpcSkill(actor, input);
+  assert.equal(r.data.total, 8);
+  assert.equal(r.options.dispositionSkill.diplomatic, 0);
+  npc.system.disposition.toward.acting.grade = "helpful";
+  r = await rollNpcSkill(actor, { ...input, key: "impress/influence" });
+  assert.equal(r.data.total, -2);
+  assert.equal(r.options.error, 4);
+  assert.equal(r.options.dispositionSkill.priority, 0.25);
+  await assert.rejects(rollNpcSkill(actor, { ...input, key: "impress/invented" }), /valid named check/);
+  await assert.rejects(rollNpcSkill(actor, { ...input, key: "impress" }), /unrelated skill use/);
+});
+function frozenContext(actor, npc) {
+  game.combats = new Map([["combat", { id: "combat", started: true, combatants: [{ actor }] }]]);
+  const binding = { id: "claim", npcUuid: npc.uuid, combatId: "combat", side: "team" };
+  npc.flags.spycraft2 = {
+    combatPersuasion: {
+      combat: {
+        version: 1,
+        combatId: "combat",
+        attempts: {
+          team: {
+            id: "claim",
+            side: "team",
+            actorUuid: actor.uuid,
+            targetId: "group",
+            state: "rolling",
+            grade: "friendly"
+          }
+        }
+      }
+    }
+  };
+  return binding;
+}
+test("unlinked combat targets resolve to their actual actor and private scenes stay unread before target preparation", () => {
+  const { actor, npc } = npcContext(),
+    tokenActor = { ...npc, uuid: "Scene.scene.Token.token.Actor.target", isToken: true },
+    scene = {
+      id: "scene",
+      active: true,
+      testUserPermission: () => true,
+      tokens: [{ actorLink: false, actor: tokenActor }]
+    };
+  tokenActor.token = { parent: scene };
+  game.scenes = [scene];
+  game.actors = [actor];
+  const binding = frozenContext(actor, tokenActor);
+  assert.ok(dispositionTargetCandidates("impress").some(a => a.uuid === tokenActor.uuid));
+  const input = { combatPersuasion: binding };
+  assert.equal(dispositionSkillContext(input, "impress", actor).dispositionTarget.actorUuid, tokenActor.uuid);
+  game.combats.get("combat").combatants = [];
+  assert.throws(() => dispositionSkillContext(input, "impress", actor), /reserved combat-persuasion/);
+  game.user.isGM = false;
+  scene.testUserPermission = () => false;
+  Object.defineProperty(tokenActor, "system", {
+    get() {
+      throw Error("Private scene target read");
+    }
+  });
+  assert.equal(
+    dispositionTargetCandidates("impress").some(a => a.uuid === tokenActor.uuid),
+    false
+  );
+  const prior = globalThis.fromUuidSync;
+  globalThis.fromUuidSync = uuid => (uuid === tokenActor.uuid ? tokenActor : null);
+  try {
+    assert.throws(() => dispositionSkillContext(input, "impress", actor), /unavailable or private/);
+  } finally {
+    globalThis.fromUuidSync = prior;
+  }
+});
+test("NPC named optional checks stay unavailable until their rule is enabled and are rechecked before posting", async () => {
+  const { actor } = npcContext(),
+    optional = Object.entries(cfg.skills).flatMap(([key, s]) =>
+      s.checks.filter(c => c.optionalRule === "linguistics").map(c => ({ key, check: c }))
+    )[0];
+  assert.ok(optional);
+  const input = { key: `${optional.key}/${optional.check.id}` };
+  game.settings = { get: () => false };
+  await assert.rejects(rollNpcSkill(actor, input), /valid named check/);
+  game.settings.get = () => true;
+  const r = await rollNpcSkill(actor, input);
+  assert.equal(r.options.checkId, optional.check.id);
+  game.settings.get = () => false;
+  assert.throws(() => r.options.validateSkillContext(), /changed before posting/);
+});
+test("combat disposition uses its real reserved actor, group and frozen grade even after the NPC's live attitude changes", async () => {
+  const { actor, npc } = npcContext(),
+    binding = frozenContext(actor, npc);
+  npc.system.disposition.toward.acting.grade = "adversarial";
+  const r = await rollNpcSkill(actor, { key: "impress", ability: "cha" }, { combatPersuasion: binding });
+  assert.equal(r.data.total, 9);
+  assert.equal(r.options.dispositionSkill.grade, "friendly");
+  assert.equal(r.options.dispositionSkill.combatPersuasion.targetId, "group");
+  npc.system.disposition.toward.acting.grade = "helpful";
+  r.options.validateSkillContext();
+  validateDispositionSkillProof(r.options.dispositionSkill, {
+    actor,
+    checkKind: "skill",
+    skillKey: "impress",
+    checkId: "persuasion"
+  });
+  await assert.rejects(
+    rollNpcSkill(actor, { key: "impress/influence", ability: "cha" }, { combatPersuasion: binding }),
+    /valid named check/
+  );
+  npc.flags.spycraft2.combatPersuasion.combat.attempts.team.actorUuid = "Actor.other";
+  assert.throws(() => r.options.validateSkillContext(), /reserved combat-persuasion/);
 });
 const check = (key, id) => cfg.skills[key].checks.find(c => c.id === id),
   target = grade => ({
@@ -150,4 +317,42 @@ test("target access precedes private reads; invented target records are replaced
   npc.system.manualRole = "";
   npc.system.npcProfile = { enabled: true, qualities: [{ id: "henchman" }] };
   assert.deepEqual(dispositionTargetCandidates("impress"), []);
+});
+
+test("actual PC combat roll automatically binds the reserved NPC and frozen attitude without trusting a supplied target record", async () => {
+  globalThis.Actor = class {
+    constructor() {
+      this.id = "pc";
+      this.uuid = "Actor.pc";
+      this.type = "agent";
+      this.isOwner = true;
+      this.items = [];
+      this.system = state();
+      this.system.campaignEffects = campaignEffects(activeQualities(["diplomatic"])).effects;
+    }
+  };
+  globalThis.CONFIG = { SPYCRAFT: cfg };
+  const { npc } = npcContext();
+  globalThis.game.settings = { get: () => false };
+  globalThis.game.i18n = { localize: String };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.ui = { notifications: { warn: () => null } };
+  const { SpycraftActor } = await import("../module/documents/actor.mjs"),
+    actor = new SpycraftActor(),
+    binding = frozenContext(actor, npc);
+  game.actors = [actor, npc];
+  actor.rollCheck = async (_f, data, options) => ({ data, options });
+  const r = await actor.rollSkill("impress", "cha", {
+    check: "persuasion",
+    ...opts,
+    combatPersuasion: binding,
+    dispositionTarget: target("helpful")
+  });
+  assert.equal(r.data.total, 11);
+  assert.equal(r.options.dispositionSkill.grade, "friendly");
+  assert.equal(r.options.dispositionSkill.combatPersuasion.id, binding.id);
+  npc.system.disposition.base = "hostile";
+  r.options.validateSkillContext();
+  npc.flags.spycraft2.combatPersuasion.combat.attempts.team.side = "different";
+  assert.throws(() => r.options.validateSkillContext(), /reserved combat-persuasion/);
 });

@@ -950,3 +950,38 @@ Lint, formatting, bundling and copy checks pass with existing warnings. Scores
 remain **PC creation 9.4/10 and combat 9.5/10**. NPC acting checks, the frozen
 combat-persuasion target handoff, combined timing and PC/villain scene effects
 remain explicit B-180 work. This pass does not claim those paths are complete.
+
+### Continuing pass: named NPC checks and reserved combat disposition
+
+The NPC skill dialog now offers specific named uses alongside general checks.
+Named choices apply their default error range, resolve applicable quality and
+campaign effects, and can use a confirmed NPC disposition target. Disposition
+changes the actual result, threat and error figures; the receipt retains its
+priority. Optional Linguistics uses are hidden and rejected while that rule is
+off, with another check before posting.
+
+Reserved combat persuasion automatically uses its actual NPC target and saved
+attitude, including a recorded group scope. Neither PC nor NPC actors can
+substitute a later live attitude or a different target. A changed claim, acting
+side, combat or participant roster stops the roll. Unlinked targets resolve to
+their synthetic actor; target selection includes readable live-scene actors,
+while private scenes are checked before their token data is read.
+
+Disposition and campaign skill facts now belong to settlement evidence. A
+changed proof cannot reuse an earlier approval or fall back to an older record
+without those facts. The existing safe optional-setting reader handles early
+hooks, and the disposition record has a stable place in roll registration.
+
+Native dialogs rolled a special NPC's named Persuasion at `1d20 + 9`, error 1,
+threat 19, with Friendly attitude and Diplomatic. Separate PC and NPC combat
+flows used actual unlinked targets. Both retained their saved Helpful +6 despite
+the targets changing to Adversarial before the roll, settled the saved attempt,
+and blocked further attempts after success. Browser errors and diagnostics were
+empty. The ordinary PC and NPC target paths and the reserved-target guidance
+remain usable at 720px.
+
+All **4,185** Node tests, **988** independent fixture assertions and **243**
+layout checks pass. Lint, formatting, bundling and copy checks pass with existing
+warnings. Scores remain **PC creation 9.4/10 and combat 9.5/10**; combined timing,
+temporary PC/villain scene effects and the broader documented gaps still need
+completion and review.
