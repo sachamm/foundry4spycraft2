@@ -240,7 +240,13 @@
    "IgnoredNamed": "{name} ignored (half XP)",
    "AddSceneNamed": "Add a scene for {name}",
    "RemoveSceneNamed": "Remove a scene for {name}",
-   "ToggleHint": "Press again to clear"
+   "ToggleHint": "Press again to clear",
+   "StartFight": "Start a fight with the selected tokens",
+   "StartFightHint": "Makes a fight on this scene and adds the tokens selected on the map; then roll Initiative here",
+   "AddSelected": "Add selected tokens",
+   "AddSelectedHint": "Adds the tokens selected on the map to this fight; tokens already in it are skipped",
+   "EndFight": "End combat…",
+   "EndFightHint": "Ends this fight after Foundry asks to confirm"
   },
   "Ability": {
    "str": "Strength",
@@ -1553,7 +1559,7 @@
     "Count": "— Count",
     "Pending": "pending)",
     "MustPress": "· must Press",
-    "NoActiveCombat": "No combat yet. Add tokens to the combat tracker, then roll Initiative here.",
+    "NoActiveCombat": "No combat yet. Select the tokens on the map and start a fight here, then roll Initiative.",
     "SurpriseRound2": "Surprise round",
     "RollNPCInitiativeByType": "Roll NPC Initiative by type",
     "OneRollForAllNPCs": "One roll for all NPCs",

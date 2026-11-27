@@ -400,6 +400,17 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
   assert.ok(!corners.some(c => (c.x === 200 && c.y === 200) || (c.x === 100 && c.y === 100)), "taken squares skipped");
   assert.deepEqual(spreadCorners({ origin: { x: 0, y: 0 }, count: 1, gridSize: 100 }), [{ x: 0, y: 0 }]);
   assert.ok(spreadCorners({ origin: { x: 0, y: 0 }, count: 5, gridSize: 100 }).every(c => c.x >= 0 && c.y >= 0));
+  // The scene's rectangle bounds the spread, and a square behind a wall is skipped.
+  const bounded = spreadCorners({
+    origin: { x: 200, y: 200 },
+    count: 6,
+    gridSize: 100,
+    bounds: { x: 200, y: 200, width: 300, height: 300 },
+    blocked: point => point.x === 300 && point.y === 200
+  });
+  assert.equal(bounded.length, 6);
+  assert.ok(bounded.every(c => c.x >= 200 && c.y >= 200 && c.x + 100 <= 500 && c.y + 100 <= 500), "inside the scene");
+  assert.ok(!bounded.some(c => c.x === 300 && c.y === 200), "not behind the wall");
 
   assert.deepEqual(numberedNames("Guard", 1), ["Guard"]);
   assert.deepEqual(numberedNames("Guard", 3), ["Guard 1", "Guard 2", "Guard 3"]);

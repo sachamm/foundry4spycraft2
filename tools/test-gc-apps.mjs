@@ -996,6 +996,49 @@ test("planning the next mission files the ended one in a journal entry and keeps
   }
 });
 
+test("the console starts a fight with the selected tokens and adds late arrivals once", async () => {
+  const { addSelectedToFight } = await import("../module/apps/gc/combat.mjs");
+  const previous = { canvas: globalThis.canvas, Combat: CONFIG.Combat, combats: game.combats };
+  const created = [];
+  const fight = {
+    scene: { id: "s1" },
+    active: true,
+    combatants: [],
+    async createEmbeddedDocuments(type, rows) {
+      created.push(...rows);
+      this.combatants.push(...rows);
+      return rows;
+    }
+  };
+  CONFIG.Combat = { documentClass: { create: async () => fight } };
+  game.combats = [];
+  const token = id => ({ document: { id, name: `Token ${id}`, actorId: "guard", hidden: false } });
+  try {
+    globalThis.canvas = { scene: { id: "s1" }, tokens: { controlled: [] } };
+    warnings.length = 0;
+    assert.equal(await addSelectedToFight(), false, "nothing selected");
+    assert.match(warnings.at(-1), /Select the tokens/);
+    globalThis.canvas.tokens.controlled = [token("t1"), token("t2")];
+    assert.equal(await addSelectedToFight(), fight);
+    assert.deepEqual(
+      created.map(row => row.tokenId),
+      ["t1", "t2"]
+    );
+    game.combats = [fight];
+    globalThis.canvas.tokens.controlled = [token("t2"), token("t3")];
+    await addSelectedToFight();
+    assert.deepEqual(
+      created.map(row => row.tokenId),
+      ["t1", "t2", "t3"],
+      "a token already in the fight is not added twice"
+    );
+  } finally {
+    globalThis.canvas = previous.canvas;
+    CONFIG.Combat = previous.Combat;
+    game.combats = previous.combats;
+  }
+});
+
 test("each view has one filled button, chosen from the state", async () => {
   const { primaryAction } = await import("../module/apps/gc/console-view.mjs");
   const base = { checklistShown: false, missionActive: true, missionEnded: false, diceCurrent: true, combat: null };

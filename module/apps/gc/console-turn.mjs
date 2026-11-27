@@ -9,7 +9,9 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { quickAttackHasTarget, quickAttackOptions, skipDialog } from "../remembered-choices.mjs";
 import { resolveQuickAttack } from "../damage-application.mjs";
 import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
-import { halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
+import { combatantLabels, halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
+
+export { combatantLabels };
 import { attackActionCost } from "../../rules/combat-actions.mjs";
 
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
@@ -103,25 +105,6 @@ function weaponButton(actor, item) {
   }
   const facts = [Number.isFinite(total) ? signed(total) : "", item.system?.damage ?? ""].filter(Boolean).join(" · ");
   return { id: item.id, name: item.name, facts };
-}
-
-/**
- * Each combatant's name as the console shows it: a name several combatants share gets "#1", "#2"… in turn order, so
- * three "Guard" rows, the acting heading and a notice can be told apart.
- */
-export function combatantLabels(combat) {
-  const turns = [...(combat?.turns ?? [])],
-    totals = new Map(),
-    seen = new Map();
-  for (const combatant of turns) totals.set(combatant.name, (totals.get(combatant.name) ?? 0) + 1);
-  return new Map(
-    turns.map(combatant => {
-      if (totals.get(combatant.name) < 2) return [combatant.id, combatant.name];
-      const number = (seen.get(combatant.name) ?? 0) + 1;
-      seen.set(combatant.name, number);
-      return [combatant.id, `${combatant.name} #${number}`];
-    })
-  );
 }
 
 /** The combat list, one row per combatant, with the words a GC reads at a glance. */

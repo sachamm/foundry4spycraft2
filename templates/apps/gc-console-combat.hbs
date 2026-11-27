@@ -66,17 +66,22 @@
         <button type="button" data-action="groupInitiative" data-single="true">{{localize "SPYCRAFT.Template.AppsGcConsole.OneRollForAllNPCs"}}</button>
         <button type="button" data-action="surprise">{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound2"}}</button>
         <button type="button" data-action="fluidEvent">{{localize "SPYCRAFT.Template.AppsGcConsole.FluidInitiativeEvent"}}</button>
-        <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button></p>
+        <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button>
+        <button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.AddSelectedHint'}}">{{localize "SPYCRAFT.Console.AddSelected"}}</button>
+        <button type="button" class="gc-danger" data-action="fightEnd" data-tooltip="{{localize 'SPYCRAFT.Console.EndFightHint'}}">{{localize "SPYCRAFT.Console.EndFight"}}</button></p>
     </details>
     {{else}}
     <p class="controls gc-turn-controls">
       <button type="button" class="{{#if (eq @root.primary "nextTurn")}}gc-primary{{/if}}" data-action="nextTurn"
         data-tooltip="{{localize 'SPYCRAFT.Console.BeginCombatHint'}}">{{#if combat.unrolled}}{{localize "SPYCRAFT.Console.BeginCombatWaiting" count=combat.unrolled}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.BeginCombat"}}{{/if}}</button>
-      <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button></p>
+      <button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.AddSelectedHint'}}">{{localize "SPYCRAFT.Console.AddSelected"}}</button>
+      <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button>
+      <button type="button" class="gc-danger" data-action="fightEnd" data-tooltip="{{localize 'SPYCRAFT.Console.EndFightHint'}}">{{localize "SPYCRAFT.Console.EndFight"}}</button></p>
     {{/if}}
     {{else}}
     <p class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoActiveCombat"}}</p>
-    <p class="controls"><button type="button" data-action="surprise">{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound2"}}</button>
+    <p class="controls"><button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.StartFightHint'}}">{{localize "SPYCRAFT.Console.StartFight"}}</button>
+      <button type="button" data-action="surprise">{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound2"}}</button>
       <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button></p>
     {{/if}}
   </details>

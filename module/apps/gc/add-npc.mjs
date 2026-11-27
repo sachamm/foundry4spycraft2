@@ -61,9 +61,19 @@ export function viewCentreCorner({ centre, gridSize, width = 1, height = 1, snap
  * Top-left corners for a number of tokens, starting at the origin square and working outward ring by ring, skipping
  * squares something already stands on. All values are in pixels; the origin is already on the grid.
  * @param {{origin: {x:number,y:number}, count: number, gridSize: number, width?: number, height?: number,
- *   occupied?: {x:number,y:number,width?:number,height?:number}[]}} facts
+ *   occupied?: {x:number,y:number,width?:number,height?:number}[], bounds?: {x:number,y:number,width:number,
+ *   height:number}, blocked?: (point: {x:number,y:number}) => boolean}} facts
  */
-export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, occupied = [] }) {
+export function spreadCorners({
+  origin,
+  count,
+  gridSize,
+  width = 1,
+  height = 1,
+  occupied = [],
+  bounds = null,
+  blocked = () => false
+}) {
   const stepX = width * gridSize,
     stepY = height * gridSize;
   const taken = occupied.map(token => ({
@@ -83,10 +93,33 @@ export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, 
         if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
         const point = { x: origin.x + dx * stepX, y: origin.y + dy * stepY };
         if (point.x < 0 || point.y < 0 || !free(point)) continue;
+        // Inside the scene's own rectangle, not its padding, and not behind a wall from the centre of the view.
+        if (
+          bounds &&
+          (point.x < bounds.x ||
+            point.y < bounds.y ||
+            point.x + stepX > bounds.x + bounds.width ||
+            point.y + stepY > bounds.y + bounds.height)
+        )
+          continue;
+        if (ring && blocked(point)) continue;
         placed.push(point);
         taken.push({ x: point.x, y: point.y, w: stepX, h: stepY });
       }
   return placed;
+}
+
+/** Whether a wall stands between the first square and another, for spreadCorners; never true without walls. */
+function wallBetween(origin, gridSize, width = 1, height = 1) {
+  const centre = point => ({ x: point.x + (width * gridSize) / 2, y: point.y + (height * gridSize) / 2 });
+  const backend = globalThis.CONFIG?.Canvas?.polygonBackends?.move;
+  return point => {
+    try {
+      return !!backend?.testCollision?.(centre(origin), centre(point), { type: "move", mode: "any" });
+    } catch {
+      return false;
+    }
+  };
 }
 
 /**
@@ -239,7 +272,9 @@ export async function addNpcToScene({ uuid = null } = {}) {
     gridSize: canvas.grid.size,
     width: prototype.width,
     height: prototype.height,
-    occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height }))
+    occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height })),
+    bounds: canvas.dimensions?.sceneRect ?? null,
+    blocked: wallBetween(origin, canvas.grid.size, prototype.width, prototype.height)
   });
   if (!corners.length) return refuse(loc`There is no free square near the centre of the view.`);
   const names = numberedNames(
@@ -247,9 +282,12 @@ export async function addNpcToScene({ uuid = null } = {}) {
     corners.length,
     others.filter(token => token.actorId === actor.id).map(token => token.name)
   );
+  // A linked NPC already on the scene would share one health record with the new copy: the copy is its own person.
+  const source = prototype.toObject();
+  if (source.actorLink && others.some(token => token.actorId === actor.id)) source.actorLink = false;
   const tokens = await scene.createEmbeddedDocuments(
     "Token",
-    placementData(prototype.toObject(), {
+    placementData(source, {
       corners,
       names,
       disposition: input.disposition,

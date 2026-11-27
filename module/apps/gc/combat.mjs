@@ -222,15 +222,38 @@ export function registerAutomaticFluidSetting() {
 }
 
 /** Dialog: choose a combatant and an event. */
+/**
+ * Each combatant's name as the console shows it: a name several combatants share gets "#1", "#2"… in turn order, so
+ * three "Guard" rows, the acting heading and a notice can be told apart.
+ */
+export function combatantLabels(combat) {
+  const turns = [...(combat?.turns ?? [])],
+    totals = new Map(),
+    seen = new Map();
+  for (const combatant of turns) totals.set(combatant.name, (totals.get(combatant.name) ?? 0) + 1);
+  return new Map(
+    turns.map(combatant => {
+      if (totals.get(combatant.name) < 2) return [combatant.id, combatant.name];
+      const number = (seen.get(combatant.name) ?? 0) + 1;
+      seen.set(combatant.name, number);
+      return [combatant.id, `${combatant.name} #${number}`];
+    })
+  );
+}
+
 export async function fluidEventDialog(combat = game.combat, preset = null) {
   if (!combat?.started) return refuse(loc`Start the combat first.`);
-  const mine = combat.combatants.filter(combatant => combatant.isOwner);
+  // The acting combatant first, then the rest in turn order, numbered when they share a name.
+  const labels = combatantLabels(combat),
+    mine = (combat.turns ?? [...combat.combatants])
+      .filter(combatant => combatant.isOwner)
+      .sort((a, b) => (b.id === combat.combatant?.id) - (a.id === combat.combatant?.id));
   if (!mine.length) return refuse(loc`You control no combatant in this fight.`);
   const rows = mine.map(combatant => {
     const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
     return [
       combatant.id,
-      `${combatant.name} — Count ${combatant.initiative ?? "—"}${pending ? ` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
+      `${labels.get(combatant.id) ?? combatant.name} — Count ${combatant.initiative ?? "—"}${pending ? ` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
     ];
   });
   const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
@@ -917,4 +940,38 @@ export async function combatReferenceDialog() {
       : loc`${SURFACE_LABELS[input.surface]}: a ${Number(input.speed) || 0} ft. move covers ${move.feet} ft.${move.bonusStep ? "" : loc` No bonus 5-ft. step across it.`}`,
     { whisper: true }
   );
+}
+
+/**
+ * Put the selected tokens into a fight on this scene, starting one when there is none: the console's way into a fight,
+ * so the GC does not need Foundry's tracker for it. Tokens already in that fight are left alone.
+ */
+export async function addSelectedToFight() {
+  const scene = globalThis.canvas?.scene,
+    tokens = [...(globalThis.canvas?.tokens?.controlled ?? [])].map(token => token.document).filter(Boolean);
+  if (!scene) return refuse(loc`Open a scene first.`);
+  if (!tokens.length) return refuse(loc`Select the tokens to add on the map first (click, or drag a box round them).`);
+  let fight = [...(game.combats ?? [])].find(entry => entry.scene?.id === scene.id && entry.active) ?? null;
+  fight ??= await CONFIG.Combat.documentClass.create({ scene: scene.id, active: true });
+  if (!fight) return null;
+  const present = new Set([...(fight.combatants ?? [])].map(combatant => combatant.tokenId));
+  const fresh = tokens.filter(token => !present.has(token.id));
+  if (!fresh.length) {
+    ui.notifications.info(loc`Every selected token is already in the fight.`);
+    return fight;
+  }
+  await fight.createEmbeddedDocuments(
+    "Combatant",
+    fresh.map(token => ({ tokenId: token.id, sceneId: scene.id, actorId: token.actorId, hidden: token.hidden }))
+  );
+  ui.notifications.info(
+    fresh.length === 1 ? loc`${fresh[0].name} joins the fight.` : loc`${fresh.length} tokens join the fight.`
+  );
+  return fight;
+}
+
+/** End the fight the console runs; Foundry's own end-combat question confirms it. */
+export async function endFight(fight = game.combat) {
+  if (!fight) return refuse(loc`No fight is running.`);
+  return fight.endCombat();
 }

@@ -198,6 +198,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         combat.rollGroupInitiative(game.combat, { single: target.dataset.single === "true" })
       ),
       surprise: guard(() => combat.surpriseRoundDialog()),
+      fightAddSelected: guard(() => combat.addSelectedToFight()),
+      fightEnd: guard(() => combat.endFight()),
       combatReference: guard(() => combat.combatReferenceDialog()),
       openCombatant: guard((event, target) =>
         turn.openCombatant(game.combat, target.dataset.id, { sheet: target.dataset.sheet === "true" || event.shiftKey })
