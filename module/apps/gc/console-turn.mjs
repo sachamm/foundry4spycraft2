@@ -35,6 +35,35 @@ export function healthLine(actor) {
   return loc`Vitality ${system.vitality?.value ?? 0}/${system.vitality?.max ?? 0}, wounds ${system.wounds?.value ?? 0}/${system.wounds?.max ?? 0}`;
 }
 
+const OUTCOME_KEY = "SPYCRAFT.Template.ActorAgentMain.";
+// Loaded when pressed; each import names its file, so the release bundle keeps it.
+const tripOutcomes = () => import("../trip-outcomes.mjs"),
+  feintOutcomes = () => import("../feint-outcomes.mjs"),
+  combatActions = () => import("../combat-actions.mjs"),
+  combatOptions = () => import("../combat-options.mjs");
+/**
+ * The combat outcomes the sheets offer (templates/actor/parts/combat-outcome-buttons.hbs), for the acting combatant:
+ * step (the function's name), label key, and the module that settles it.
+ */
+export const ACTING_OUTCOMES = Object.freeze([
+  ["manageTripOutcomes", "TripOutcomes", tripOutcomes],
+  ["manageFeintOutcomes", "FeintOutcomes", feintOutcomes],
+  ["settleGrapple", "SettleAGrapple", combatActions],
+  ["recordAnticipate", "AnticipateResult", combatOptions],
+  ["standOff", "StandOff", combatOptions],
+  ["tireResult", "TireResult", combatOptions],
+  ["coupDeGraceSave", "SurviveACoupDeGrace", combatOptions],
+  ["cancelReady", "CancelAReadiedAction", combatOptions]
+]);
+
+/** Settle one of the combat outcomes for the acting combatant's actor. */
+export async function actingOutcome(actor, step) {
+  const row = ACTING_OUTCOMES.find(([name]) => name === step);
+  if (!actor || !row) return null;
+  const settle = (await row[2]())[row[0]];
+  return settle(actor);
+}
+
 /** What the console shows for the combatant whose turn it is; null before the fight starts. */
 export function actingBlock(combat) {
   const combatant = combat?.started ? combat.combatant : null,
@@ -59,7 +88,8 @@ export function actingBlock(combat) {
         : loc`${left} half actions left`,
     weapons: [...(defeated ? [] : (actor.items ?? []))]
       .filter(item => item.type === "weapon")
-      .map(item => ({ id: item.id, name: item.name }))
+      .map(item => ({ id: item.id, name: item.name })),
+    outcomes: ACTING_OUTCOMES.map(([step, label]) => ({ step, label: `${OUTCOME_KEY}${label}` }))
   };
 }
 

@@ -212,6 +212,12 @@ export async function sufferTypedDamage(actor, preset = {}) {
     return refuse(loc`Choose a listed damage type.`);
   if (!Number.isSafeInteger(amount) || amount < 0) return refuse(loc`Enter the damage as a whole number.`);
   const label = DAMAGE_TYPE_LABELS[type];
+  // A damage card that routes its hit here keeps its own Undo (`undo: false`); otherwise this step leaves one.
+  const take = () => takeTypedDamage(actor, { input, type, amount, reduction, source, label });
+  return preset.undo === false ? take() : withUndo([actor], loc`${label}: ${actor.name}`, take);
+}
+
+async function takeTypedDamage(actor, { input, type, amount, reduction, source, label }) {
   try {
     switch (type) {
       case "bang":

@@ -28,3 +28,15 @@ test("recorded outcomes and replacement take precedence over pending instruction
   assert.equal(checkGuidance({ rawTotal: 9, checkKind: "damage", resolved: true }).title, "Finished");
   assert.equal(checkGuidance({ rawTotal: 9, checkKind: "damage", damageApplied: [{}] }).title, "Damage applied");
 });
+
+test("a result cap that bit is named with its page, apart from an action die's change (U3)", () => {
+  const capped = checkGuidance({ rawTotal: 45, effectiveTotal: 40, cap: 40, capped: true });
+  assert.equal(capped.change, "45 → 40");
+  assert.equal(capped.capped, "Result capped at 40 (p.88).");
+  // A boost's own cap is the one that bit after action dice.
+  assert.equal(
+    checkGuidance({ rawTotal: 38, effectiveTotal: 45, cap: 40, boostCap: 45, capped: true }).capped,
+    "Result capped at 45 (p.88)."
+  );
+  assert.equal(checkGuidance({ rawTotal: 16, effectiveTotal: 25, cap: 40, capped: false }).capped, "");
+});

@@ -121,6 +121,25 @@ export function grappleCheckPlan(
   };
 }
 
+/**
+ * What settling a grapple needs from a posted check: its total, its activated criticals and the Size bonus already
+ * inside the total (p.357), so the bonus is never added a second time.
+ */
+export function grappleCardFacts(check) {
+  if (!check || !Number.isFinite(check.effectiveTotal)) return null;
+  const difference = Math.trunc(Number(check.grappleFeats?.sizeDifference) || 0);
+  return {
+    total: check.effectiveTotal,
+    critical: check.criticalSuccess === true,
+    criticalFailure: check.criticalFailure === true,
+    grapple: check.checkId === "grapple",
+    sizeBonus: check.checkId === "grapple" && difference < 0 ? 4 * -difference : 0
+  };
+}
+
+// The Grapple feats' record, Size included, goes on the check card for the grapple to be settled from it.
+rollPipeline.register({ id: "grappleRecord", order: 9238, record: ["grappleFeats"] });
+
 rollPipeline.register({
   id: "grappleChecks",
   order: 5058,

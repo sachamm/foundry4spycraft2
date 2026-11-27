@@ -34,6 +34,7 @@ import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { campaignStress } from "../rules/campaign-rules.mjs";
+import { withUndo } from "./undo.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -258,17 +259,19 @@ export async function exposeToContagion(actor, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  await writeHazards(actor, plan.hazards);
-  await post(
-    actor,
-    [
-      plan.added
-        ? loc`Exposed to ${esc(plan.entry.label)}: Fortitude save DC ${plan.entry.primary.saveDC} in ${rolled.total} ${onset.unit}(s).`
-        : loc`Another dose of ${esc(plan.entry.label)}: ${plan.entry.doses} doses, saves at ${dosePenalty(plan.entry.doses)}.`
-    ],
-    plan.added ? [rolled.roll] : []
-  );
-  return plan.entry;
+  return withUndo([actor], loc`Contagion: ${actor.name}`, async () => {
+    await writeHazards(actor, plan.hazards);
+    await post(
+      actor,
+      [
+        plan.added
+          ? loc`Exposed to ${esc(plan.entry.label)}: Fortitude save DC ${plan.entry.primary.saveDC} in ${rolled.total} ${onset.unit}(s).`
+          : loc`Another dose of ${esc(plan.entry.label)}: ${plan.entry.doses} doses, saves at ${dosePenalty(plan.entry.doses)}.`
+      ],
+      plan.added ? [rolled.roll] : []
+    );
+    return plan.entry;
+  });
 }
 
 /** Roll the Fortitude save a contagion calls for. The posted save carries a button that applies its result. */
@@ -296,9 +299,11 @@ export async function cureHazard(actor, id) {
   const state = hazardState(actor.system),
     entry = state.contagions[id];
   if (!entry) return null;
-  await writeHazards(actor, cureContagion(state, id));
-  await post(actor, [loc`${esc(entry.label)} ended (antidote or GC ruling).`]);
-  return true;
+  return withUndo([actor], loc`Contagion ended: ${actor.name}`, async () => {
+    await writeHazards(actor, cureContagion(state, id));
+    await post(actor, [loc`${esc(entry.label)} ended (antidote or GC ruling).`]);
+    return true;
+  });
 }
 
 async function resolveContagionSave(actor, message, save, succeeded) {
@@ -400,10 +405,15 @@ export async function exposeToFire(actor, options = {}) {
   }
   if (!Number.isSafeInteger(input.damage) || input.damage < 1)
     return refuse(loc`Enter the fire's damage as a whole number.`);
-  const state = hazardState(actor.system),
-    result = await sufferFire(actor, state, input.damage, input.reduction ?? 0, loc`Fire (AP ${input.ap ?? 0})`);
-  if (result.fire) await writeHazards(actor, { ...state, fire: result.fire });
-  await post(actor, result.lines);
+  // A damage card that routes its hit here keeps its own Undo (`undo: false`); otherwise this step leaves one.
+  const burn = async () => {
+    const state = hazardState(actor.system),
+      result = await sufferFire(actor, state, input.damage, input.reduction ?? 0, loc`Fire (AP ${input.ap ?? 0})`);
+    if (result.fire) await writeHazards(actor, { ...state, fire: result.fire });
+    await post(actor, result.lines);
+  };
+  if (options.undo === false) await burn();
+  else await withUndo([actor], loc`Fire: ${actor.name}`, burn);
   if (input.save === false || input.damage < 10) return true;
   return actor.rollSave("ref", {
     askContext: true,
@@ -426,14 +436,16 @@ export async function burningRound(actor, options = {}) {
     if (!input) return null;
     reduction = Math.trunc(Number(input.reduction) || 0);
   }
-  const plan = burningRoundPlan(state),
-    result = await sufferFire(actor, state, plan.damage, reduction, loc`Burning (AP ${state.fire.ap})`);
-  await writeHazards(actor, { ...state, fire: result.fire });
-  result.lines.push(
-    loc`To do anything but leave the fire, drop prone and roll, make a Will save against DC ${state.fire.damage} (p.337).`
-  );
-  await post(actor, result.lines);
-  return result.fire;
+  return withUndo([actor], loc`Burning: ${actor.name}`, async () => {
+    const plan = burningRoundPlan(state),
+      result = await sufferFire(actor, state, plan.damage, reduction, loc`Burning (AP ${state.fire.ap})`);
+    await writeHazards(actor, { ...state, fire: result.fire });
+    result.lines.push(
+      loc`To do anything but leave the fire, drop prone and roll, make a Will save against DC ${state.fire.damage} (p.337).`
+    );
+    await post(actor, result.lines);
+    return result.fire;
+  });
 }
 
 /** Fight the fire on a character: roll on the ground, or take dice off it with water, a blanket or an extinguisher. */
@@ -455,13 +467,15 @@ export async function fightFire(actor, method) {
     next = reduceFire(state, rolled.total);
     line = loc`The fire is fought (${reduction.formula}): −${rolled.total}.`;
   }
-  await writeHazards(actor, next);
-  await post(
-    actor,
-    [line, next.fire ? loc`The fire now does ${next.fire.damage} damage.` : loc`The fire is out.`],
-    [roll]
-  );
-  return next.fire;
+  return withUndo([actor], loc`Fire fought: ${actor.name}`, async () => {
+    await writeHazards(actor, next);
+    await post(
+      actor,
+      [line, next.fire ? loc`The fire now does ${next.fire.damage} damage.` : loc`The fire is out.`],
+      [roll]
+    );
+    return next.fire;
+  });
 }
 
 /** The Will save a burning character needs to act freely, or the Fortitude save against scarring. */
@@ -485,9 +499,11 @@ export async function extinguish(actor) {
   if (!owned(actor)) return null;
   const state = hazardState(actor.system);
   if (!state.fire) return null;
-  await writeHazards(actor, { ...state, fire: null });
-  await post(actor, [loc`The fire is out.`]);
-  return true;
+  return withUndo([actor], loc`Fire put out: ${actor.name}`, async () => {
+    await writeHazards(actor, { ...state, fire: null });
+    await post(actor, [loc`The fire is out.`]);
+    return true;
+  });
 }
 
 /* -------------------------------------------- */
@@ -507,6 +523,17 @@ export async function resolveHazardSave(actor, message) {
   if (!save || save.resolved || !owned(actor)) return null;
   const succeeded =
     typeof check.successConfirmed === "boolean" ? check.successConfirmed : check.effectiveTotal >= save.dc;
+  // One Undo note for whatever the result wrote (contagion, fire, survival, massive damage…); Undo also lets the
+  // save's button be pressed again.
+  return withUndo(
+    [actor],
+    loc`${save.label || loc`Save result`}: ${actor.name}`,
+    () => applyHazardSave(actor, message, check, save, succeeded),
+    { cardMarks: [{ messageId: message.id, key: "hazardSave.resolved" }] }
+  );
+}
+
+async function applyHazardSave(actor, message, check, save, succeeded) {
   if (hazardSaveResolvers.has(save.kind))
     await hazardSaveResolvers.get(save.kind)(actor, message, save, succeeded, check);
   else if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);

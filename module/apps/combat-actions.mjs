@@ -24,10 +24,12 @@ import { grappleTrickLines } from "../rules/grapple-tricks.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { spendWeaponShots, weaponAmmunition } from "./ammunition-use.mjs";
-import { recentResultsHint } from "./opposed-checks.mjs";
+import { recentResults, recentResultsHint } from "./opposed-checks.mjs";
+import { grappleCardFacts } from "../rules/grapple-check.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { withUndo } from "./undo.mjs";
 
 const post = (actor, lines) =>
   ChatMessage.create({
@@ -398,14 +400,53 @@ async function grappleBenefitsChosen(actor, input, outcome) {
 }
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */
+/** Recent check cards a grapple can be settled from: this character's Grapple checks, and everyone else's results. */
+function grappleCards(actor) {
+  const rows = recentResults().filter(row => row.check),
+    grappleFirst = (a, b) => Number(b.check.checkId === "grapple") - Number(a.check.checkId === "grapple");
+  return {
+    mine: rows.filter(row => row.check.actorUuid === actor.uuid && row.check.skillKey === "athletics"),
+    theirs: rows.filter(row => row.check.actorUuid !== actor.uuid).sort(grappleFirst)
+  };
+}
+
+const cardOption = row =>
+  `<option value="${esc(row.uuid)}">${esc(row.name)} — ${row.total}${row.title ? ` (${esc(row.title)})` : ""}</option>`;
+
+/**
+ * Fill the totals, criticals and opponent from the picked check cards (U7). A card's total already holds its Size
+ * bonus (p.357), so the bonus is reported, never added again. Typed fields stand in for a side with no card.
+ */
+export function grappleInputFromCards(input, rows) {
+  const card = uuid => (uuid ? rows.find(row => row.uuid === uuid) : null),
+    mine = card(input.cardUuid),
+    theirs = card(input.opponentCardUuid),
+    own = grappleCardFacts(mine?.check),
+    other = grappleCardFacts(theirs?.check);
+  const typed = value => (value === "" || value === null || value === undefined ? NaN : Number(value));
+  return {
+    ...input,
+    total: own ? own.total : typed(input.total),
+    opponentTotal: other ? other.total : typed(input.opponentTotal),
+    critical: own ? own.critical : input.critical === true,
+    criticalFailure: own ? own.criticalFailure : input.criticalFailure === true,
+    opponentCritical: other ? other.critical : input.opponentCritical === true,
+    opponentCriticalFailure: other ? other.criticalFailure : input.opponentCriticalFailure === true,
+    opponentUuid: input.opponentUuid || theirs?.check?.actorUuid || "",
+    sizeDifference: Number(input.sizeDifference) || 0,
+    cardSizeBonus: own || other ? Math.max(own?.sizeBonus ?? 0, other?.sizeBonus ?? 0) : null
+  };
+}
+
 export async function settleGrapple(actor, options = {}) {
   let input = options;
-  if (input.total === undefined) {
+  if (input.total === undefined && input.cardUuid === undefined) {
+    const cards = grappleCards(actor);
     input = await systemDialog.input({
       window: { title: loc`Grapple: settle the opposed check` },
       rejectClose: false,
       ok: { label: loc`Settle` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Both sides roll Athletics (Str); the Grasp tag and the Armor Check Penalty tag apply. The bigger character adds +4 for each Size category of difference (p.356). Enter the two results.`}</p><p class="hint">${recentResultsHint()}</p><label>${loc`Opponent (to set conditions on a character you own)`} <select name="opponentUuid"><option value="">${loc`Not listed`}</option>${attackCharacterTargetChoices()
+      content: `<div class="spycraft2-roll-options"><p>${loc`Pick the two Grapple check cards. Their totals, criticals and Size bonus are read from the cards (p.357).`}</p><label>${loc`Your Grapple check`} <select name="cardUuid">${cards.mine.map(cardOption).join("")}<option value="">${loc`Not on a card: type it below`}</option></select></label><label>${loc`Opponent's check`} <select name="opponentCardUuid">${cards.theirs.map(cardOption).join("")}<option value="">${loc`Not on a card: type it below`}</option></select></label><label>${loc`Opponent (to set conditions on a character you own)`} <select name="opponentUuid"><option value="">${loc`The one on the opponent's card`}</option>${attackCharacterTargetChoices()
         .filter(a => a.uuid !== actor.uuid)
         .map(
           a =>
@@ -413,23 +454,31 @@ export async function settleGrapple(actor, options = {}) {
         )
         .join(
           ""
-        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size categories you are bigger by (negative when smaller), for reference`} <input type="number" name="sizeDifference" value="0" step="1" /></label></div>`
+        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><details><summary>${loc`Results not on a card`}</summary><p class="hint">${recentResultsHint()}</p><label>${loc`Your result`} <input type="number" name="total" step="1" /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size categories you are bigger by (negative when smaller), for reference`} <input type="number" name="sizeDifference" value="0" step="1" /></label><p class="hint">${loc`A typed result already includes the bigger side's +4 per Size category; do not add it again.`}</p></details></div>`
     });
     if (!input) return null;
+  }
+  if (input.cardUuid !== undefined || input.opponentCardUuid !== undefined)
+    input = grappleInputFromCards(
+      input,
+      recentResults().filter(row => row.check)
+    );
+  else
     input = {
       ...input,
       total: Number(input.total),
       opponentTotal: Number(input.opponentTotal),
       sizeDifference: Number(input.sizeDifference) || 0
     };
-  }
   let outcome;
   try {
     outcome = grappleOutcome(input);
   } catch (error) {
     return refuse(error.message);
   }
-  const sizeBonus = grappleSizeBonus(Math.abs(input.sizeDifference ?? 0));
+  const sizeBonus = Number.isFinite(input.cardSizeBonus)
+    ? input.cardSizeBonus
+    : grappleSizeBonus(Math.abs(input.sizeDifference ?? 0));
   const benefits = outcome.benefits
     ? [
         loc`Grapple benefits to choose from:`,
@@ -441,14 +490,18 @@ export async function settleGrapple(actor, options = {}) {
   const tricks = grappleTrickLines(actor.system);
   if (tricks.length)
     benefits.push(loc`Your grapple tricks:`, `<ul>${tricks.map(line => `<li>${esc(line)}</li>`).join("")}</ul>`);
-  await post(actor, [
-    loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
-    ...outcome.effects.map(esc),
-    sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
-    ...benefits,
-    ...(await grappleConditions(actor, input, outcome))
-  ]);
-  const taken = await grappleBenefitsChosen(actor, input, outcome);
-  if (taken.length) await post(actor, taken);
-  return outcome;
+  // Both wrestlers' conditions go on one Undo note.
+  const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+  return withUndo([actor, opponent], loc`Grapple: ${actor.name}`, async () => {
+    await post(actor, [
+      loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
+      ...outcome.effects.map(esc),
+      sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
+      ...benefits,
+      ...(await grappleConditions(actor, input, outcome))
+    ]);
+    const taken = await grappleBenefitsChosen(actor, input, outcome);
+    if (taken.length) await post(actor, taken);
+    return outcome;
+  });
 }

@@ -408,10 +408,34 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     groups.set(key, [...(groups.get(key) ?? []), combatant]);
   }
   const lines = [];
-  for (const members of groups.values()) {
-    const roll = await new Roll("1d20").evaluate();
-    for (const combatant of members) await combatant.update({ initiative: roll.total + bonusOf(combatant) });
-    lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${roll.total}`);
+  let rolled = 0;
+  for (const group of groups.values()) {
+    // Each member's own Initiative roll is asked for first, so a Shaken source waiting for review holds that member
+    // back, as it would on a roll of its own.
+    const members = [],
+      held = [];
+    for (const combatant of group) {
+      try {
+        combatant.getInitiativeRoll?.();
+        members.push(combatant);
+      } catch (error) {
+        held.push(loc`${esc(combatant.name)}: not rolled (${esc(error.message)})`);
+      }
+    }
+    lines.push(...held);
+    if (!members.length) continue;
+    // The group's d20 comes from the first member's own roll, so Lightning Reflexes (roll twice, keep one) applies.
+    let roll;
+    try {
+      roll = await (members[0].getInitiativeRoll?.() ?? new Roll("1d20")).evaluate();
+    } catch (error) {
+      lines.push(loc`${esc(members.map(member => member.name).join(", "))}: not rolled (${esc(error.message)})`);
+      continue;
+    }
+    const d20 = Number.isFinite(roll.dice?.[0]?.total) ? roll.dice[0].total : roll.total - bonusOf(members[0]);
+    for (const combatant of members) await combatant.update({ initiative: d20 + bonusOf(combatant) });
+    lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${d20}`);
+    rolled += 1;
   }
   if (left.length)
     lines.push(
@@ -419,7 +443,7 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     );
   if (lines.length) await say(`<b>${loc`Group Initiative`}</b><br>${lines.join("<br>")}`, { whisper: true });
   else ui.notifications?.info(loc`Every NPC in this fight already has an Initiative Count.`);
-  return lines.length - (left.length ? 1 : 0);
+  return rolled;
 }
 
 /** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */

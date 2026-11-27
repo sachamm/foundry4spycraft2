@@ -55,7 +55,9 @@ const makeActor = (id, type, system, extra = {}) => ({
       const keys = path.split(".");
       let target = this;
       for (const key of keys.slice(0, -1)) target = target[key] ??= {};
-      target[keys.at(-1)] = value;
+      const last = keys.at(-1);
+      if (last.startsWith("-=")) delete target[last.slice(2)];
+      else target[last.replace(/^==/, "")] = value;
     }
     return this;
   },
@@ -405,6 +407,18 @@ test("dice that could not be taken at 0 are not handed back when the change goes
   await state.setCampaign({ qualities: [] });
   await mission.applySessionDiceAdjustments({ quiet: true });
   assert.equal(a1.system.actionDice.value, 1, "only the one die really taken comes back");
+  // A wrong adjustment is undone from its note: the dice and the adjusted mark go back, so it can run again (U5).
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 0);
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo);
+  assert.equal(note.flags.spycraft2.undo.label, "Starting action dice adjusted");
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  await applyUndo({ id: "dice-undo", flags: structuredClone(note.flags), update: async () => null });
+  assert.equal(a1.system.actionDice.value, 1);
+  assert.equal(a1.flags.spycraft2.sessionDiceAdjusted, undefined);
+  await state.setCampaign({ qualities: [] });
   a1.system.actionDice.value = kept.value;
   if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
   else delete a1.flags.spycraft2.sessionDiceAdjusted;
@@ -639,6 +653,23 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   assert.equal(state.isDramaticScene(), false);
 });
 
+test("a GC spend heals a special NPC's vitality or 2 wounds on the sheet, under the spend's Undo (U9)", async () => {
+  await initializeGCDice({ playersPresent: 4, caliber: 3, replaceExisting: true });
+  const kept = { vitality: boss.system.vitality, wounds: boss.system.wounds };
+  boss.system.vitality = { value: 5, max: 30 };
+  boss.system.wounds = { value: 9, max: 10 };
+  dice(6);
+  await spend.spendGCDice({ id: "healNpc", actor: boss });
+  assert.equal(boss.system.vitality.value, 11, "vitality equal to the die by default");
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo).flags.spycraft2.undo;
+  assert.ok(note.entries[0].restore.some(([path, value]) => path === "system.vitality.value" && value === 5));
+  dice(3);
+  await spend.spendGCDice({ id: "healNpc", actor: boss, healAs: "wounds" });
+  assert.equal(boss.system.wounds.value, 10, "2 wounds, never past the maximum");
+  assert.equal(boss.system.vitality.value, 11);
+  Object.assign(boss.system, kept);
+});
+
 const makeCombat = list => {
   const combatants = new Map();
   const fight = {
@@ -741,6 +772,31 @@ test("group initiative rolls NPCs only and names an agent nobody owns instead of
   assert.equal(await combat.rollGroupInitiative(fight), 1);
   assert.equal(fight.combatants.get("x").initiative, null);
   assert.match(lastMessage(), /Not rolled, no player owns them: Absent/);
+});
+
+test("group initiative takes its d20 from the first member's own roll and holds back a member under Shaken review (F5)", async () => {
+  const twin = makeActor("guard-twin", "npc", npcSystem({ initiative: { total: 5 } }), { name: "Guard twin" });
+  const fight = makeCombat([
+    ["g1", guard, null, false],
+    ["g2", twin, null, false],
+    ["g3", twin, null, false]
+  ]);
+  let asked = 0;
+  // The first member's roll stands in for Combatant#getInitiativeRoll: a kept d20 of 14 (as Lightning Reflexes may
+  // choose), plus its own bonus.
+  fight.combatants.get("g1").getInitiativeRoll = () => ({
+    evaluate: async () => (asked++, { total: 14 + 3, dice: [{ total: 14 }] })
+  });
+  fight.combatants.get("g2").getInitiativeRoll = () => ({ evaluate: async () => ({ total: 0, dice: [] }) });
+  fight.combatants.get("g3").getInitiativeRoll = () => {
+    throw new Error("Review the Shaken sources before rolling Initiative.");
+  };
+  assert.equal(await combat.rollGroupInitiative(fight, { single: true }), 1);
+  assert.equal(asked, 1, "one roll for the group");
+  assert.equal(fight.combatants.get("g1").initiative, 14 + 3);
+  assert.equal(fight.combatants.get("g2").initiative, 14 + 5, "each member adds its own bonus");
+  assert.equal(fight.combatants.get("g3").initiative, null);
+  assert.match(lastMessage(), /Guard twin: not rolled \(Review the Shaken sources/);
 });
 
 test("the tracker menu entries use the Foundry 14 shape and act on the clicked row", async () => {
@@ -927,6 +983,12 @@ test("the Combat section names the acting combatant, words each row and finds th
   assert.equal(acting.name, "a1");
   assert.equal(acting.halfActions, "2 half actions left");
   assert.equal(acting.npc, false);
+  // The combat outcomes the sheets offer, each settled by a function of that name (U2).
+  assert.deepEqual(
+    acting.outcomes.map(row => row.step),
+    turnTools.ACTING_OUTCOMES.map(([step]) => step)
+  );
+  for (const [step, , load] of turnTools.ACTING_OUTCOMES) assert.equal(typeof (await load())[step], "function", step);
   const rows = turnTools.combatRows(fight);
   assert.deepEqual(
     rows.map(row => [row.id, row.count, row.current]),

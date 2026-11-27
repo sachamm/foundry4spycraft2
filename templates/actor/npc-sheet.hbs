@@ -50,6 +50,7 @@
     <div class="npc-action-buttons">
       <button type="button" class="sc2-action" data-action="manageTakedown">{{localize "SPYCRAFT.Template.ActorNpcSheet.TakedownSavesOutcomes"}}</button>
       <button type="button" class="sc2-action" data-action="manageCheapShots">{{localize "SPYCRAFT.Template.ActorNpcSheet.CheapShotOutcomesRecovery"}}</button>
+      {{> "systems/spycraft2/templates/actor/parts/combat-outcome-buttons.hbs"}}
       <button type="button" class="sc2-action" data-action="applyShaken">{{localize "SPYCRAFT.Template.ActorNpcSheet.ApplyANewShakenSource"}}</button>
       {{#if system.npcProfile.enabled}}<button type="button" class="sc2-action" data-action="applyBaffled">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ApplyNewBaffledEffect"}}</button>
       {{#unless system.conditionContext.baffled}}<button type="button"

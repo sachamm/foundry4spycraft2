@@ -2,6 +2,7 @@
 import { campaignTriumphXPPercent } from "../../rules/campaign-rules.mjs";
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
+import { undoHook } from "../undo-hook.mjs";
 import { missionSettlementDefaults } from "../../apps/gc/mission-defaults.mjs";
 import {
   mixedHealingFundingControl,
@@ -1171,6 +1172,13 @@ export const ActorActionDice = Base =>
         });
         if (!input) return null;
       }
+      // Undo takes the XP and this mission's reward record back off, so a wrong settlement can be settled again.
+      return undoHook.run([this], loc`Mission XP settled: ${this.name}`, () =>
+        this.#settleMissionXP(input, settlementContext, expectedContext)
+      );
+    }
+
+    #settleMissionXP(input, settlementContext, expectedContext) {
       return queueResources([this], async () => {
         if (!game.user?.isGM) throw new Error(loc`Only the GC can settle mission XP.`);
         if (this.flags?.spycraft2?.missionXPReview?.needsReview)
