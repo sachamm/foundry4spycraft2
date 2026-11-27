@@ -11737,7 +11737,8 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "Every gear pick for any character, NPCs included, drops 1 Caliber; a pick pushed below Caliber I is lost. Each PC starts with a Debt Subplot.",
    "effects": {
-    "gearCaliberShift": -1
+    "gearCaliberShift": -1,
+    "debtSubplot": true
    }
   },
   {

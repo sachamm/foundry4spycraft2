@@ -7,6 +7,7 @@ import {
   campaignLevelRow,
   campaignStartingAttributeCap,
   campaignSubplotBonus,
+  campaignDebtSubplot,
   crossroadsAllowed,
   campaignPointBuy,
   campaignFeatTrees,
@@ -2187,6 +2188,13 @@ function deriveProficiencies(state) {
     warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);
     todo.push({ order: 54, tab: "training", text: loc`Trouble Magnet: keep at least one unfinished Subplot in play.` });
   }
+  // Shoe String Budget (p.408): each agent begins with a Debt Subplot (p.55); remind until one is recorded.
+  if (campaignDebtSubplot() && !(sys.subplots ?? []).some(row => /\bdebt\b/i.test(String(row.name ?? ""))))
+    todo.push({
+      order: 54,
+      tab: "training",
+      text: loc`Shoe String Budget: record the Debt Subplot every agent starts with (pp.55, 408).`
+    });
   if (sys.subplotPicks.used > sys.subplotPicks.available)
     warnings.push(
       loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`

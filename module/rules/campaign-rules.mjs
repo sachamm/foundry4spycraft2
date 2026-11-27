@@ -220,6 +220,7 @@ export function campaignRuleLines(effects = campaignRules(), { money = amount =>
   if (effects.featPurchase) lines.push(loc`After a mission an agent may buy a feat for 1,000 XP per career level.`);
   if (effects.modularFeats) lines.push(loc`At creation a feat costs 2 attribute points, or gives 2 when given up.`);
   if (effects.noCrossroads) lines.push(loc`No Crossroads Subplots, so no Crossroads Titles.`);
+  if (campaignDebtSubplot(effects)) lines.push(loc`Every agent starts with a Debt Subplot (p.55).`);
   if (campaignSubplotBonus(effects))
     lines.push(loc`Each agent may have ${campaignSubplotBonus(effects)} more Subplot(s) in play.`);
   if (effects.closedStandOffs) lines.push(loc`Nobody may interrupt or join a Stand Off.`);
@@ -500,6 +501,9 @@ export function featPurchasePlan(system, levelRow, effects = campaignRules()) {
 }
 
 /** Soap (p.408): extra Subplots each character may have in play. */
+/** Shoe String Budget (p.408): every player character starts with a Debt Subplot (p.55). */
+export const campaignDebtSubplot = (effects = campaignRules()) => effects.debtSubplot === true;
+
 export const campaignSubplotBonus = (effects = campaignRules()) =>
   Number.isSafeInteger(effects.subplotLimitBonus) ? effects.subplotLimitBonus : 0;
 
