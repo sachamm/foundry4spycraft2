@@ -1193,3 +1193,41 @@ existing lint warnings.
 PC creation remains **9.4/10** and combat remains **9.5/10**. Declared DC
 boosts, later rerolls/GC corrections of finalized Defense, the remaining
 campaign mechanics and the documented source-data audits are still open.
+
+## Review 41 — declared skill DC boosts
+
+The GC spend menu now declares an actual character and exact skill/Knowledge
+check before paying or rolling. It fixes the source DC and campaign policy,
+then rolls actual d12s: one ordinarily, up to three in a dramatic scene. Each
+natural and explosion sequence is saved before another roll. Incomplete
+delivery retains its payment and known results for GC recovery without
+rerolling or paying again.
+
+The next matching check reserves the declaration on its actual actor before
+RNG. The claim persists beyond deleted cards and lost responses, rejects
+duplicate use and survives legal rerolls with the original DC. A result card
+resolves against that saved DC, including any later check boost. It cannot be
+recast as an opposed check or confirmed against a different threshold. An
+unused declaration has session-scoped Undo; a claimed one requires review of
+the actual roll. Uncertain claims remain consumed until the GC reconciles a
+posted check, confirms no roll happened or retains the unposted result's
+consumption. Private declarations block player rolls and force the GC's
+replacement check to GM visibility.
+
+Native Foundry used the real declaration dialog, an actual PC skill, a
+three-die dramatic NPC skill and a private Knowledge check. Injected final
+application failure retained the actual dice and GC payment; recovery did not
+roll or charge again. Undo refunded only the unused declaration. A separate
+player client claimed and resolved an active check, synchronized its result
+with the GC and was blocked from rolling against a private declaration. The
+GC's private check excluded the player. Browser errors and diagnostics were
+empty. All **255** layout checks pass.
+All **4,244** Node tests and **988** fixture assertions pass. Lint,
+formatting, bundling, native schemas and copy checks pass with existing
+warnings and no copied run reaching the repository's rejection threshold.
+
+PC creation remains **9.4/10**. Combat advances to **9.6/10**: attacks/Defense
+now scores **1.95/2** and conditions/resources **1.90/2**, with the other
+dimensions unchanged. Finalized Defense rerolls/corrections, legacy unscoped
+GC refunds, the remaining campaign mechanics and source-data audits still
+prevent a 9.9 score.

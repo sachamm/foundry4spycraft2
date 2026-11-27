@@ -20,6 +20,7 @@ rollPipeline.register({
   chatControls({ actor, check, message }) {
     if (
       !actor?.isOwner ||
+      check.declaredSkillDC ||
       !check.campaignSkillDCPolicy ||
       check.superseded ||
       check.resolved ||
@@ -48,7 +49,12 @@ export function recentResults({ exclude = null, limit = RECENT } = {}) {
   for (const message of messages) {
     if (message === exclude || !visible(message)) continue;
     const check = message.flags?.spycraft2,
-      own = check && Number.isFinite(check.effectiveTotal) && check.checkKind !== "damage" && !check.superseded;
+      own =
+        check &&
+        Number.isFinite(check.effectiveTotal) &&
+        check.checkKind !== "damage" &&
+        !check.superseded &&
+        !check.declaredSkillDC;
     const total = own ? check.effectiveTotal : message.rolls?.[0]?.total;
     if (!Number.isFinite(total) || (check && !own)) continue;
     rows.push({
@@ -89,6 +95,7 @@ export async function compareOpposed(message, options = {}) {
   const check = message.flags?.spycraft2,
     actor = check?.actorUuid ? fromUuidSync(check.actorUuid) : null;
   if (!actor?.isOwner || !Number.isFinite(check.effectiveTotal)) return null;
+  if (check.declaredSkillDC) return refuse(loc`Resolve this check against its recorded declared DC.`);
   if (check.resolved || check.superseded) return refuse(loc`This check has already been resolved or replaced.`);
   const rows = recentResults({ exclude: message }).filter(row => row.check?.actorUuid !== check.actorUuid);
   let input = options;
@@ -179,7 +186,7 @@ rollPipeline.register({
   kinds: ["skill"],
   order: 9155,
   chatControls({ message, check, user }) {
-    if (!Number.isFinite(check.rawTotal) || check.resolved || check.superseded) return null;
+    if (!Number.isFinite(check.rawTotal) || check.resolved || check.superseded || check.declaredSkillDC) return null;
     // Neither side of an opposed check may take 10 or 20.
     if ((check.checkMethod ?? "roll") !== "roll") return null;
     if (!(message.isAuthor || user.isGM) || check.opposed?.outcome === "won" || check.opposed?.outcome === "lost")

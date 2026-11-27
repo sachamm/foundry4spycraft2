@@ -84,6 +84,12 @@ export function checkFlavor(check) {
   if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
   notes.push(...cooperativeNotes(check).map(esc));
   if (attackResolutionNote(check)) notes.push(esc(attackResolutionNote(check)));
+  if (check.declaredSkillDC)
+    notes.push(
+      esc(
+        loc`Declared DC ${check.declaredSkillDC.campaignDC} + ${check.declaredSkillDC.boost} = ${check.declaredSkillDC.dc}; ${check.declaredSkillDC.count} GC d12 recorded before this check.`
+      )
+    );
   if (check.npcDefensePending && !check.resolved)
     notes.push(
       esc(loc`Waiting for the GC's post-hit NPC Defense decision; damage and on-hit effects are not settled yet.`)
@@ -255,6 +261,7 @@ const rollEvidenceFields = check => [
 ];
 export function rollEvidence(check) {
   return JSON.stringify([
+    ...(check.declaredSkillDC ? [check.declaredSkillDC] : []),
     ...(check.gcPostHitDefense ? [check.gcPostHitDefense] : []),
     ...(check.attackContext?.reach
       ? [
@@ -399,6 +406,7 @@ export function rollEvidence(check) {
 export function rollEvidenceMatches(evidence, check) {
   if (evidence === rollEvidence(check)) return true;
   if (
+    check.declaredSkillDC ||
     check.gcPostHitDefense ||
     check.attackContext?.reach ||
     check.attackContext?.flanking?.whirling ||

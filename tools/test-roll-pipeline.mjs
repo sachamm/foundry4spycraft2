@@ -690,7 +690,8 @@ const EXPECTED_ORDER = [
   "weaponWorkRecord",
   "featReminders",
   "npcDefenseDeliveryControl",
-  "npcPostHitDefenseDeliveryControl"
+  "npcPostHitDefenseDeliveryControl",
+  "declaredSkillDC"
 ];
 
 test("every contributor is registered once, in the documented order", () => {
@@ -745,7 +746,8 @@ const EXPECTED_CHAT_CONTROLS = [
   "medicalAidControl",
   "reportedSaveControl",
   "npcDefenseDeliveryControl",
-  "npcPostHitDefenseDeliveryControl"
+  "npcPostHitDefenseDeliveryControl",
+  "declaredSkillDC"
 ];
 
 test("chat-card controls keep their order", () => {

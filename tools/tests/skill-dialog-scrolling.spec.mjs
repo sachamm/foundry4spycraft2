@@ -29,6 +29,7 @@ import { manageSceneDisposition } from "../../module/apps/scene-disposition.mjs"
 import { reviewSkillPurchasePolicy } from "../../module/apps/skill-purchase-policy.mjs";
 import { boostNpcDefense, recoverNpcDefense } from "../../module/apps/gc/npc-defense.mjs";
 import { reviewNpcHitDefense } from "../../module/apps/gc/post-hit-defense.mjs";
+import { declareSkillDC, recoverDeclaredDC, reviewDeclaredDCClaim } from "../../module/apps/gc/declared-skill-dc.mjs";
 import {
   beginNpcHitDefense,
   addNpcHitDefenseDie,
@@ -276,6 +277,45 @@ for (const stage of ["boost", "rolling", "reserved", "postHit"])
         if (["rolling", "postHit"].includes(stage))
           await page.getByLabel("Actual die results (comma separated)", { exact: true }).fill("4, 2");
         await page.getByLabel("GC review note", { exact: true }).fill("Actual source reviewed");
+        await page.locator('[name="confirmed"]').check();
+      }
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+    }
+  });
+
+for (const stage of ["declare", "recover", "claim"])
+  test(`declared DC ${stage} controls remain reachable at720px`, async ({ page }) => {
+    const prior = content,
+      oldGame = globalThis.game;
+    try {
+      const actor = {
+          uuid: "Actor.dc-layout",
+          name: "Declared DC character",
+          type: "agent",
+          isOwner: true,
+          flags: { spycraft2: { declaredDCs: { dc: { state: "needsReview", claimId: "claim" } } } }
+        },
+        source = {
+          uuid: "ChatMessage.dc",
+          flags: { spycraft2: { declaredDC: { id: "dc", actorUuid: actor.uuid, state: "rolling", dice: [[12, 4]] } } }
+        };
+      globalThis.game = { user: { id: "gc", isGM: true }, actors: [actor], settings: { get: () => false } };
+      if (stage === "declare") await declareSkillDC();
+      if (stage === "recover") await recoverDeclaredDC(actor, source);
+      if (stage === "claim") await reviewDeclaredDCClaim(actor, source);
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      if (stage === "declare") {
+        await page.getByRole("combobox", { name: "Character", exact: true }).selectOption(actor.uuid);
+        await page.getByLabel("Source DC before campaign modifiers", { exact: true }).fill("20");
+      } else {
+        await page.getByLabel("GC review note", { exact: true }).fill("Actual native result reviewed");
         await page.locator('[name="confirmed"]').check();
       }
       await page.locator("#confirm").scrollIntoViewIfNeeded();

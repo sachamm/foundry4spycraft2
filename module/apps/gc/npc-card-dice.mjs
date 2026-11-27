@@ -16,18 +16,29 @@ import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
 import { npcDefenseDeliveryControls } from "./npc-defense.mjs";
 import { npcHitDeliveryControls } from "./post-hit-defense.mjs";
+import { acquireDeclaredDC, validateDeclaredDC, declaredDCControls } from "./declared-skill-dc.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
   ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind) || !!check.npcSkill;
 rollPipeline.register({ id: "npcDefenseDeliveryControl", order: 9998.5, chatControls: npcDefenseDeliveryControls });
 rollPipeline.register({ id: "npcPostHitDefenseDeliveryControl", order: 9998.6, chatControls: npcHitDeliveryControls });
+rollPipeline.register({
+  id: "declaredSkillDC",
+  order: 9998.7,
+  kinds: ["skill", "knowledge", "gcDeclaredDC"],
+  acquire: acquireDeclaredDC,
+  validate: validateDeclaredDC,
+  chatControls: declaredDCControls,
+  flags: ({ options }) => (options.declaredSkillDC ? { declaredSkillDC: options.declaredSkillDC } : {})
+});
 /** An activated critical failure can no longer be boosted (the same rule as an agent's boost). */
 export const gcBoostable = check =>
   Number.isFinite(check?.rawTotal) &&
   !check.resolved &&
   !check.superseded &&
   !check.criticalFailure &&
+  !check.gcPostHitDefense &&
   !check.npcDefensePending;
 const npcOpen = ({ check, actor, user }) =>
   user?.isGM === true &&

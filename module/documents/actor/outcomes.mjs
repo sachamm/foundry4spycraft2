@@ -52,6 +52,7 @@ import {
 import { rerollEligibility } from "../../rules/limited-uses.mjs";
 import { betterLuckSettlement, betterLuckNote } from "../../rules/better-luck.mjs";
 import { actionDieBoostPlan, actionDieBoostResult, generousBoostPlan } from "../../rules/action-dice.mjs";
+import { declaredDCOutcome } from "../../rules/gc/declared-skill-dc.mjs";
 import { loc } from "../../i18n.mjs";
 import { same } from "../../rules/equal.mjs";
 
@@ -585,6 +586,12 @@ export const ActorOutcomes = Base =>
       const work = async () => {
         const check = message.flags?.spycraft2;
         if (!Number.isFinite(check?.rawTotal)) return refuseStep(loc`Choose a recorded check result.`);
+        if (check.declaredSkillDC) {
+          const declared = declaredDCOutcome(check);
+          if (succeeded !== declared.succeeded || (difficultyClass !== undefined && difficultyClass !== declared.dc))
+            return refuseStep(loc`The outcome must match the check's recorded declared DC.`);
+          difficultyClass = declared.dc;
+        }
         if (check.gcPostHitDefense && succeeded !== check.attackResolution?.hit)
           return refuseStep(loc`The outcome must match the finalized GC Defense decision.`);
         if (

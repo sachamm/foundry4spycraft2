@@ -211,7 +211,7 @@ export async function withUndo(actors, label, work, extra = {}) {
 export function postUndo(
   label,
   entries,
-  { gcDice = 0, damageCard = null, gcDiceSession, gcDefenseDeliveryUuid, npcHitDefenseUndo } = {}
+  { gcDice = 0, damageCard = null, gcDiceSession, gcDefenseDeliveryUuid, npcHitDefenseUndo, declaredDCUndo } = {}
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
@@ -230,7 +230,8 @@ export function postUndo(
             ? { gcDiceSession: gcDiceSession ?? String(readSetting("usagePeriods", {})?.session ?? "initial") }
             : {}),
           ...(gcDefenseDeliveryUuid ? { gcDefenseDeliveryUuid } : {}),
-          ...(npcHitDefenseUndo ? { npcHitDefenseUndo } : {})
+          ...(npcHitDefenseUndo ? { npcHitDefenseUndo } : {}),
+          ...(declaredDCUndo ? { declaredDCUndo } : {})
         }
       }
     }
@@ -260,6 +261,23 @@ export function npcHitDefenseUndoReason(record) {
     ? loc`Only the latest Defense die on this still-pending attack can be undone. Undo later dice first; completed outcomes need GC review.`
     : "";
 }
+export function declaredDCUndoReason(record) {
+  const change = record?.declaredDCUndo;
+  if (!change) return "";
+  if (!game.user?.isGM) return loc`Only the GC can undo a declared DC.`;
+  const actor = chatDocument(change.actorUuid),
+    source = chatDocument(change.sourceUuid),
+    marker = actor?.flags?.spycraft2?.declaredDCs?.[change.id],
+    dc = source?.flags?.spycraft2?.declaredDC;
+  return !actor?.isOwner ||
+    !source?.isOwner ||
+    marker?.sourceUuid !== change.sourceUuid ||
+    marker?.state !== "available" ||
+    dc?.id !== change.id ||
+    dc.state !== "ready"
+    ? loc`Only an unused DC declaration can be undone. A claimed check needs GC review.`
+    : "";
+}
 function updateNpcUndoButtons() {
   for (const button of globalThis.document?.querySelectorAll?.("[data-npc-hit-undo-note]") ?? []) {
     const record = chatDocument(button.dataset.npcHitUndoNote)?.flags?.spycraft2?.undo;
@@ -267,6 +285,12 @@ function updateNpcUndoButtons() {
     button.disabled = !!reason;
     button.dataset.tooltip =
       reason || loc`Undo this pending Defense die and return its GC payment when it belongs to the current session.`;
+  }
+  for (const button of globalThis.document?.querySelectorAll?.("[data-declared-dc-undo-note]") ?? []) {
+    const record = chatDocument(button.dataset.declaredDcUndoNote)?.flags?.spycraft2?.undo,
+      reason = !record || record.done ? loc`Already undone or unavailable.` : declaredDCUndoReason(record);
+    button.disabled = !!reason;
+    button.dataset.tooltip = reason || loc`Undo this unused DC declaration and refund its same-session payment.`;
   }
 }
 /** Put everything on a note back. Returns the names restored, or null when the GC backs out. */
@@ -278,6 +302,20 @@ export async function applyUndo(message) {
   if (running.has(key)) return null;
   running.add(key);
   try {
+    if (record.declaredDCUndo) {
+      if (!game.user?.isGM) throw Error(loc`Only the GC can undo a declared DC.`);
+      const actor = await fromUuid(record.declaredDCUndo.actorUuid),
+        source = await fromUuid(record.declaredDCUndo.sourceUuid);
+      if (!actor?.isOwner || !source) throw Error(loc`The DC's original character or source is unavailable for Undo.`);
+      return await queueResources(
+        [actor],
+        () => {
+          const fresh = message.flags?.spycraft2?.undo;
+          return fresh?.done ? null : undoRecord(message, fresh);
+        },
+        { messages: [message, source] }
+      );
+    }
     if (record.npcHitDefenseUndo) {
       if (!game.user?.isGM) throw Error(loc`The GC reviews a pending NPC Defense die.`);
       const npc = await fromUuid(record.npcHitDefenseUndo.actorUuid),
@@ -300,6 +338,14 @@ export async function applyUndo(message) {
 
 async function undoRecord(message, record) {
   let hitAttack = null;
+  let dcSource = null,
+    dcActor = null;
+  if (record.declaredDCUndo) {
+    const reason = declaredDCUndoReason(record);
+    if (reason) throw Error(reason);
+    dcSource = await fromUuid(record.declaredDCUndo.sourceUuid);
+    dcActor = await fromUuid(record.declaredDCUndo.actorUuid);
+  }
   if (record.npcHitDefenseUndo) {
     const change = record.npcHitDefenseUndo;
     hitAttack = await fromUuid(change.attackUuid);
@@ -344,6 +390,11 @@ async function undoRecord(message, record) {
   }
   // Marked first, so a failure half way cannot lead to dice being given back twice on a retry.
   await message.update({ "flags.spycraft2.undo.done": true });
+  if (dcSource) {
+    const id = record.declaredDCUndo.id;
+    await dcSource.update({ "flags.spycraft2.declaredDC.state": "cancelled" });
+    await dcActor.update({ [`flags.spycraft2.declaredDCs.${id}.state`]: "cancelled" });
+  }
   if (hitAttack) await hitAttack.update({ "flags.spycraft2.npcDefensePending": record.npcHitDefenseUndo.before });
   for (const [entry, actor] of targets) {
     const update = restoreUpdate(entry);
@@ -417,6 +468,12 @@ export function renderUndo(message, html) {
       button.dataset.tooltip =
         reason || loc`Undo this pending Defense die and return its GC payment when it belongs to the current session.`;
     }
+    if (record.declaredDCUndo) {
+      button.dataset.declaredDcUndoNote = message.uuid;
+      const reason = declaredDCUndoReason(record);
+      button.disabled = !!reason;
+      button.dataset.tooltip = reason || loc`Undo this unused DC declaration and refund its same-session payment.`;
+    }
     button.addEventListener("click", async () => {
       button.disabled = true;
       try {
@@ -436,4 +493,5 @@ export function renderUndo(message, html) {
 export function installUndo() {
   Hooks.on("renderChatMessageHTML", renderUndo);
   Hooks.on("updateChatMessage", updateNpcUndoButtons);
+  Hooks.on("updateActor", updateNpcUndoButtons);
 }

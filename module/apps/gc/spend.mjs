@@ -21,6 +21,7 @@ import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { boostNpcDefense } from "./npc-defense.mjs";
 import { spendPostHitDefenseForNPC } from "./post-hit-defense.mjs";
+import { declareSkillDC } from "./declared-skill-dc.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -100,6 +101,7 @@ export async function spendGCDice(input = {}) {
   }
   const spend = GC_SPENDS.find(entry => entry.id === input.id);
   if (!spend) return refuse(loc`Choose a use for the action dice.`);
+  if (input.id === "boostDC") return declareSkillDC(input);
   const actor = spend.needsNpc ? input.actor : null;
   if (spend.needsNpc && actor?.type !== "npc") return refuse(loc`Choose the NPC this applies to.`);
   if (input.id === "boostDefense") return boostNpcDefense(actor, input);
@@ -187,9 +189,6 @@ export async function spendGCDice(input = {}) {
         }
         break;
       }
-      case "boostDC":
-        lines.push(loc`The DC rises by ${die.total}.`);
-        break;
       case "event":
         if (event) lines.push(esc(event.summary));
         break;

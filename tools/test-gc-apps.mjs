@@ -55,7 +55,9 @@ const makeActor = (id, type, system, extra = {}) => ({
       const keys = path.split(".");
       let target = this;
       for (const key of keys.slice(0, -1)) target = target[key] ??= {};
-      target[keys.at(-1)] = value;
+      const key = keys.at(-1);
+      if (key.startsWith("-=")) delete target[key.slice(2)];
+      else target[key.replace(/^==/, "")] = structuredClone(value);
     }
     return this;
   },
@@ -131,8 +133,24 @@ globalThis.ui = {
 globalThis.Roll = Roll;
 globalThis.ChatMessage = {
   create: async data => {
-    messages.push(data);
-    return data;
+    const message = {
+      ...data,
+      id: `message${++idCounter}`,
+      uuid: `ChatMessage.message${idCounter}`,
+      isOwner: true,
+      async update(change) {
+        for (const [path, value] of Object.entries(change)) {
+          const keys = path.split(".");
+          let target = this;
+          for (const key of keys.slice(0, -1)) target = target[key] ??= {};
+          const key = keys.at(-1);
+          if (key.startsWith("-=")) delete target[key.slice(2)];
+          else target[key.replace(/^==/, "")] = structuredClone(value);
+        }
+      }
+    };
+    messages.push(message);
+    return message;
   },
   getSpeaker: () => ({}),
   getWhisperRecipients: () => [{ id: "gm" }]
@@ -547,8 +565,9 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   await spend.spendGCDice({ id: "saveNpc", actor: boss });
   assert.match(warnings.at(-1), /dramatic scene cannot be saved/);
   dice(1, 12, 5);
-  result = await spend.spendGCDice({ id: "boostDC" });
-  assert.equal(result.die.total, 18, "dramatic scene: a natural 1 explodes too");
+  result = await spend.spendGCDice({ id: "boostDC", actor: boss, skillKey: "notice", baseDC: 15 });
+  assert.deepEqual(result.dice, [[1, 12, 5]], "dramatic scene: a natural 1 explodes too");
+  assert.equal(result.state, "ready", "the actual declared DC waits for its matching check");
   await spend.spendGCDice({ id: "saveNpc", actor: boss, fromCapture: true });
   assert.match(warnings.at(-1), /costs 2 action dice; the GC has 1/);
   await spend.setDramaticScene(false);
