@@ -52,6 +52,10 @@ export function animalPartnerReview(ownerSystem, npc) {
   if (trained.length < 2) warnings.push(loc`Animal Partner: choose its 2 trained qualities.`);
   const xp = npc?.npcBuild?.xp,
     cap = animalPartnerCap(ownerSystem);
+  if (!Number.isFinite(xp))
+    warnings.push(
+      loc`Animal Partner: finish the NPC build so its XP reward can be checked against the owner's allowance.`
+    );
   if (Number.isFinite(xp) && xp - free > cap)
     warnings.push(loc`Animal Partner: XP reward ${xp - free} (without its 2 free trained qualities) exceeds ${cap}.`);
   return { warnings, cap, xp: Number.isFinite(xp) ? xp - free : null };

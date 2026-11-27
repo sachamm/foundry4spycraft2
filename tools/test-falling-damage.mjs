@@ -198,6 +198,10 @@ test("Wire Fu covers PCs, special characters and current promotions; ordinary NP
     assert.equal(campaignFallingDamageDivisor({ type: "npc", system: { npcType } }, effects), 2);
   for (const npcType of ["standard", "animal"])
     assert.equal(campaignFallingDamageDivisor({ type: "npc", system: { npcType } }, effects), 1);
+  assert.equal(
+    campaignFallingDamageDivisor({ type: "npc", system: { npcType: "animal", animalPartner: true } }, effects),
+    2
+  );
   const npc = {
     type: "npc",
     system: { npcType: "standard", promotion: { mission: "m" }, usagePeriods: { mission: "m" } }

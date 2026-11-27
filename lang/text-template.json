@@ -606,6 +606,7 @@
    "AndReturnsGCActionDi_1rspefj": " and returns {0} GC action di{1}",
    "AnimalMount_1ofw2cw": "animal mount",
    "AnimalPartnerChooseIts2Trained_057775g": "Animal Partner: choose its 2 trained qualities.",
+   "AnimalPartnerFinishTheNPCBuild_1roe5fg": "Animal Partner: finish the NPC build so its XP reward can be checked against the owner's allowance.",
    "AnimalPartnerGainsBuildItAs_00035a1": "Animal Partner: {0} gains {1}. Build it as an animal with an XP reward up to {2}, plus 2 free trained qualities; it uses Threat Level {3}, special-character health one grade higher, no action dice of its own, and is Helpful to {4} (p.201).",
    "AnimalPartnerMakeThisNPCAn_04uqetb": "Animal Partner: make this NPC an animal.",
    "AnimalPartnerTheOwnerNoLonger_1n5b2zu": "Animal Partner: the owner no longer has the feat.",

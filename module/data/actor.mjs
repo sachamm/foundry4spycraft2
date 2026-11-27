@@ -224,14 +224,25 @@ export class NpcData extends BaseActorData {
     });
     if (!this.npcProfile?.enabled) {
       super.prepareDerivedData();
-      this.damageSave = !["special", "villain"].includes(this.npcType) && !this.promoted ? this.manualDamageSave : null;
+      this.damageSave =
+        !["special", "villain"].includes(this.npcType) && !this.promoted && !this.animalPartner
+          ? this.manualDamageSave
+          : null;
       this.applyFeatEffects({ health: false });
       this.warnings.push(
         ...campaignNpcHealthReview({
-          special: ["special", "villain"].includes(this.npcType) || this.promoted,
+          special: ["special", "villain"].includes(this.npcType) || this.promoted || this.animalPartner,
           effects: this.campaignEffects
         })
       );
+      if (partnerOwner)
+        this.warnings.push(
+          ...animalPartnerReview(partnerOwner.system, {
+            npcType: this.npcType,
+            npcProfile: this.npcProfile,
+            npcBuild: null
+          }).warnings
+        );
       this.reviewCreationRules();
       return;
     }

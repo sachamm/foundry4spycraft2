@@ -1747,5 +1747,34 @@ across both NPC health models. Drained, typed secondary-effect/recovery timing,
 remaining resistance/ability interactions, grapple, cover and coordinated-action
 gaps still prevent 9.9. Character source/gear audits and additional complete
 native builds remain necessary for the creation score.
+
+## Pass 59: Animal Partner construction and special-character health
+
+PC creation remains **9.6/10** and combat **9.7/10**. The Animal Partner creator
+used the animal NPC type and special health table, while combat classified that
+same creature as standard. Shared classification, spend context and Wire Fu
+scope now recognize its actual derived owner link. Ordinary and typed hits use
+vitality/wounds; standard Damage saves are refused. The animal type is retained.
+
+The creation path also inherited human INT and ordinary equipment picks, making
+its XP reward unverifiable. It now starts with animal INT 2 and no ordinary
+equipment picks. Trained qualities remain actual GC choices. An uncomputed XP
+reward produces a review warning. Manually entered partners retain special
+health and explicitly require XP review instead of silently passing validation.
+
+Native Foundry used a complete Soldier 1/Advocate 2 owner variant with a legal
+Survival 4 purchase and Animal Partner in its career-level-3 feat slot. Its
+20/20, 6/6 and 6/6 skill budgets and recorded creation policy persisted, with no
+setup tasks. The actual companion creator produced an animal; two selected
+trained qualities yielded verified XP 5 against allowance 40, without warnings.
+An actual 2-point hit reduced vitality from 4 to 2 and retained 14 wounds, with
+no standard Damage save. Manual-profile review and Wire Fu classification pass.
+The run had no browser errors or diagnostics. All **4,345** Node tests and **988**
+fixture assertions pass, as do schema, lint, formatting, bundling and copy checks.
+This is additional feat-choice evidence for an existing complete class build.
+
+Size-dependent Wolf Pack Mastery/Evasion delivery and broader companion ability
+and owner-funding behavior still need review. They are not claimed complete by
+the corrected health and XP workflow.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.

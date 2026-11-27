@@ -11,12 +11,23 @@ import {
 } from "../module/rules/companions.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { npcIsSpecial, spendProfile } from "../module/rules/gc/npc-state.mjs";
 
 const owner = (feats, extra = {}) => ({
   activeFeatNames: feats.map(f => f.name ?? f),
   activeFeatSelections: feats.map(f => (typeof f === "string" ? { name: f, tree: "" } : f)),
   level: 9,
   ...extra
+});
+
+test("an Animal Partner uses special-character combat and spend classification while remaining an animal", () => {
+  const animal = { system: { npcType: "animal", animalPartner: true, npcProfile: { enabled: true, qualities: [] } } };
+  assert.equal(npcIsSpecial(animal), true);
+  assert.equal(spendProfile(animal).type, "special");
+  assert.equal(spendProfile(animal).baseType, "animal");
+  animal.system.animalPartner = false;
+  assert.equal(npcIsSpecial(animal), false);
+  assert.equal(spendProfile(animal).type, "animal");
 });
 
 test("Animal Partner: XP cap from Style and Terrain feats, Threat Level from career level", () => {
@@ -38,6 +49,7 @@ test("Animal Partner review: an animal with 2 trained qualities within the cap",
   const trained = [{ id: "attack-on-command" }, { id: "guard-on-command" }];
   assert.deepEqual(animalPartnerReview(sys, npc(39, trained)).warnings, [], "4 XP of trained qualities are free");
   assert.match(animalPartnerReview(sys, npc(40, trained)).warnings[0], /exceeds 35/);
+  assert.match(animalPartnerReview(sys, npc(null, trained)).warnings.join(" "), /XP reward can be checked/);
   assert.match(animalPartnerReview(sys, npc(20, [{ id: "attack-on-command" }])).warnings.join(" "), /2 trained/);
   assert.match(animalPartnerReview(sys, { ...npc(20, trained), npcType: "standard" }).warnings.join(" "), /animal/);
 });

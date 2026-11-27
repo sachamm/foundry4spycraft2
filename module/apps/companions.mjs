@@ -57,8 +57,9 @@ export async function createCompanion(owner, feat) {
           system: {
             companionOf,
             npcType: "animal",
+            abilities: { int: { value: 2 } },
             threatLevel: partnerThreatLevel(owner.system.level),
-            npcProfile: { ...defaultNpcProfile(), enabled: true }
+            npcProfile: { ...defaultNpcProfile(), enabled: true, equipment: { weapons: [], gear: [], vehicles: [] } }
           }
         }
       : {

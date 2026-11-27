@@ -978,6 +978,35 @@ test("typed damage rejects fractional inputs and zero vacuum impact never create
   }
 });
 
+test("Animal Partner weapon and typed hits consume vitality instead of standard NPC Damage saves", async () => {
+  for (const type of ["", "laser"]) {
+    reset();
+    const actor = character(`Partner-health-${type}`, {
+      npcType: "animal",
+      animalPartner: true,
+      vitality: { value: 40, max: 40 },
+      wounds: { value: 10, max: 10 },
+      abilities: { con: { value: 10 }, wis: { value: 10 } }
+    });
+    actor.type = "npc";
+    const damage = card(`partner-health-${type}`, {
+      actorUuid: "Actor.Kevin",
+      checkKind: "damage",
+      effectiveTotal: 14
+    });
+    await applyDamage(damage, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type });
+    assert.equal(actor.system.vitality.value, 26);
+    assert.equal(actor.system.wounds.value, 10);
+    assert.equal(
+      posted.some(m => m.flags?.spycraft2?.npcDamageSave),
+      false
+    );
+    const { damageSaveState, npcDamageSave } = await import("../module/apps/gc/npc-play.mjs");
+    assert.equal(damageSaveState(actor).applies, false);
+    assert.equal(await npcDamageSave(actor, { damage: 14, kind: "lethal" }), false);
+  }
+});
+
 test("grapple benefits the winner takes change conditions on both sides", async () => {
   reset();
   const kevin = character("Grappler", { activeFeatNames: [] });

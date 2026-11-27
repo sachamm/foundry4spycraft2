@@ -59,7 +59,8 @@ export function campaignFallingDamageDivisor(actor, effects = {}) {
       system.promoted === true || system.promotion?.mission === String(system.usagePeriods?.mission ?? "initial");
   return divisor === 2 &&
     (actor?.type === "agent" ||
-      (actor?.type === "npc" && (["special", "villain"].includes(system.npcType) || promoted)))
+      (actor?.type === "npc" &&
+        (system.animalPartner === true || ["special", "villain"].includes(system.npcType) || promoted)))
     ? 2
     : 1;
 }
