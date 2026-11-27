@@ -228,15 +228,18 @@ export function conditionAbilityPenalty(system, ability) {
   return system.conditionContext?.drunk === true && ["dex", "wis"].includes(ability) ? -2 : 0;
 }
 export function conditionSkillPenalty(system, ability) {
-  return (
-    -twoWeaponStyleState(system).skillPenalty -
-    combatExpertiseState(system).penalty -
-    superiorCoverState(system).penalty -
-    fightDefensivelyState(system).penalty -
-    underminedState(system).penalty -
-    dartingStyleState(system).penalty +
-    (ability === "dex" ? conditionRollPenalties(system).dexSkill : 0) +
-    conditionAbilityPenalty(system, ability) +
-    shakenSkillPenalty(system, ability)
-  );
+  return conditionSkillPenaltyEntries(system, ability).reduce((n, row) => n + row.value, 0);
+}
+export function conditionSkillPenaltyEntries(system, ability) {
+  return [
+    { label: loc`Two-weapon fighting`, value: -twoWeaponStyleState(system).skillPenalty },
+    { label: loc`Combat Expertise`, value: -combatExpertiseState(system).penalty },
+    { label: loc`Superior Cover`, value: -superiorCoverState(system).penalty },
+    { label: loc`Fight Defensively`, value: -fightDefensivelyState(system).penalty },
+    { label: loc`Undermined`, value: -underminedState(system).penalty },
+    { label: loc`Darting Weapon`, value: -dartingStyleState(system).penalty },
+    { label: loc`Entangled/Bound`, value: ability === "dex" ? conditionRollPenalties(system).dexSkill : 0 },
+    { label: loc`Drunk`, value: conditionAbilityPenalty(system, ability) },
+    { label: loc`Shaken`, key: "shaken", value: shakenSkillPenalty(system, ability) }
+  ];
 }

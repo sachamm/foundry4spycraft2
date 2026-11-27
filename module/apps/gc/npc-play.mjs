@@ -18,6 +18,7 @@ import {
 import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
 import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { campaignSkillChecks, campaignSkillPolicy, moraleSkillPenalty } from "../../rules/campaign-skills.mjs";
+import { skillPenaltyValue, skillPenaltyEntries, skillPenaltyNotes } from "../../rules/skill-penalties.mjs";
 import { shakenSkillPenalty } from "../../rules/shaken.mjs";
 import { dispositionSkillContext, dispositionTargetContent } from "../target-skill-effects.mjs";
 import { dispositionSkillPlan } from "../../rules/disposition-skills.mjs";
@@ -196,7 +197,13 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       .map(key => key.slice("quality-".length))
   });
   // Feat items on the NPC that add a plain number to this skill.
-  const featBonus = Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0);
+  const featBonus = skillPenaltyValue(
+    actor.system,
+    Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0)
+  );
+  const rawQualityRows = quality.rows;
+  quality.rows = skillPenaltyEntries(actor.system, rawQualityRows);
+  quality.modifier = quality.rows.reduce((n, row) => n + row.value, 0);
   if (featBonus) quality.rows.push({ label: loc`Feats`, value: featBonus });
   if (input.surprise === true && !["blend", "sneak"].includes(skill.key))
     throw Error(loc`Choose Blend/Stealth or Sneak/Hide for the confirmed surprise check.`);
@@ -222,24 +229,37 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     campaignChecks = campaignSkillChecks(actor.system, skill.key, { id: checkId }, input),
     shakenPenalty = shakenSkillPenalty(actor.system, ability),
     campaignModifier = campaignChecks.bonuses.filter(row => row.value > 0).reduce((n, row) => n + row.value, 0),
-    moralePenalty = moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty);
+    moralePenalty = skillPenaltyValue(actor.system, moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty));
   if (disposition.blockedReason) throw Error(disposition.blockedReason);
   quality.rows.push(
     ...campaignChecks.bonuses.filter(row => row.value > 0).map(row => ({ label: row.source, value: row.value }))
   );
   if (moralePenalty) quality.rows.push({ label: loc`Morale penalty (strongest applies)`, value: moralePenalty });
   if (disposition.bonus || disposition.penalty)
-    quality.rows.push({ label: loc`Target disposition`, value: disposition.bonus + disposition.penalty });
+    quality.rows.push({
+      label: loc`Target disposition`,
+      value: disposition.bonus + skillPenaltyValue(actor.system, disposition.penalty)
+    });
+  const abilityModifier = skillPenaltyValue(actor.system, actor.system.abilities[ability]?.mod ?? 0),
+    situationalModifier = skillPenaltyValue(actor.system, Number(input.modifier) || 0);
+  plan.bonus = skillPenaltyValue(actor.system, plan.bonus);
+  const penaltyNote = skillPenaltyNotes(actor.system, [
+    ...rawQualityRows,
+    { label: loc`Attribute modifier`, value: actor.system.abilities[ability]?.mod ?? 0 },
+    { label: loc`Situational modifier`, value: Number(input.modifier) || 0 },
+    { label: loc`Morale penalty`, value: moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty) },
+    { label: loc`Target disposition`, value: disposition.penalty }
+  ]);
   const total =
     plan.bonus +
-    (actor.system.abilities[ability]?.mod ?? 0) +
-    (Number(input.modifier) || 0) +
+    abilityModifier +
+    situationalModifier +
     quality.modifier +
     featBonus +
     campaignModifier +
     moralePenalty +
     disposition.bonus +
-    disposition.penalty;
+    skillPenaltyValue(actor.system, disposition.penalty);
   return actor.rollCheck(
     "1d20 + @total",
     { total },
@@ -253,14 +273,15 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
         (input.secret && disposition.evidence ? `<br><small>${esc(disposition.notes.join(" "))}</small>` : "") +
         (input.secret && (quality.rows.length || quality.errorIncrease)
           ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
-          : ""),
+          : "") +
+        (input.secret && penaltyNote ? `<br><small>${esc(penaltyNote)}</small>` : ""),
       ability,
       // The card shows these parts only to someone who may open the NPC (module/rolls/chat-breakdown.mjs).
       breakdown: breakdownRows(
         [
           { label: loc`Skill bonus`, value: plan.bonus, keep: true },
-          { label: ability.toUpperCase(), value: actor.system.abilities[ability]?.mod, keep: true },
-          { label: loc`Situational modifier`, value: Number(input.modifier) || 0 },
+          { label: ability.toUpperCase(), value: abilityModifier, keep: true },
+          { label: loc`Situational modifier`, value: situationalModifier },
           ...quality.rows
         ],
         total

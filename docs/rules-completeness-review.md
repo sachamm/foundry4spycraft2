@@ -1486,3 +1486,32 @@ the retained boost and exhaustion while blocking new activations. The user also
 confirmed that Delay keeps its own limits while other round modifiers share
 the ten-Count cap, matching the retained behavior. The wider source audit,
 remaining combat workflows and legacy histories still prevent a 9.9 score.
+
+## Pass 49: Omni-Competent penalty reduction
+
+Both areas remain **9.6/10**. Omni-Competent now reduces each skill-check
+penalty separately using the confirmed magnitude ruling: −3 becomes −1,
+with a minimum penalty of −1. Positive bonuses, purchased ranks and other
+roll types are unchanged. Named-bonus stacking still selects the strongest
+applicable morale penalty. Baffled/Incompetent continue to affect the skill
+bonus separately from check penalties and synergy; missing-focus rank
+calculations retain their own rule.
+
+The change covers named PC checks, Knowledge, NPC skill rolls, current sheet
+figures and individual plan-contributor modifiers. Conditions are decomposed
+before reduction so unrelated penalties are not rounded as one aggregate.
+Saved campaign policy includes the reduction, and source notes show original
+and reduced values. Changing the quality during a roll requires review;
+completed checks retain their actual result after the quality ends.
+
+Native Foundry exercised actual PC, Knowledge and private NPC rolls. The PC
+check recorded a −5 check adjustment separately from its −3 skill bonus;
+the Knowledge check recorded −2 of check adjustments. The NPC's declared
+−3 situation became −1. Saved results remained unchanged after removal of
+the quality, with no browser errors or diagnostics. Regression cases cover
+odd penalties, independent rounding, ability/gear/misc modifiers, stacked
+conditions, morale selection, conditioning and agreement between derived
+figures and actual rolls. All **4,315** Node tests, **988** fixture assertions,
+**265** layouts and **13** pack checks pass; schemas, lint, formatting,
+bundling and copy checks also pass. Remaining source auditing and the combat
+workflows listed in the backlog continue to prevent the requested 9.9 score.

@@ -1,13 +1,20 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { skillPenaltyDivisor } from "./skill-penalties.mjs";
 
 export function campaignSkillPolicy(system) {
   const effects = system.campaignEffects ?? {};
+  const penaltyDivisor = skillPenaltyDivisor(system);
   for (const key of ["uncappedSkills", "activeSkillChecks"])
     if (![undefined, 0, 1].includes(effects[key]))
       throw Error(loc`Review the campaign's skill cap and active-check rules.`);
-  return effects.uncappedSkills === 1 || effects.activeSkillChecks === 1
-    ? { version: 1, uncapped: effects.uncappedSkills === 1, active: effects.activeSkillChecks === 1 }
+  return effects.uncappedSkills === 1 || effects.activeSkillChecks === 1 || penaltyDivisor === 2
+    ? {
+        version: 1,
+        uncapped: effects.uncappedSkills === 1,
+        active: effects.activeSkillChecks === 1,
+        ...(penaltyDivisor === 2 ? { penaltyDivisor } : {})
+      }
     : null;
 }
 

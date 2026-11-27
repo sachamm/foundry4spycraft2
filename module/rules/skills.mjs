@@ -44,7 +44,18 @@ import { weaponFocusWorkPlan } from "./weapon-work.mjs";
 import { combatExpertiseState } from "./combat-expertise.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { restraintActionBlock, restraintSkillContext } from "./restraints.mjs";
-import { skillBonusCondition, skillConditionEntries, skillConditionCheckPenalty } from "./skill-conditions.mjs";
+import {
+  skillBonusCondition,
+  skillConditionEntries,
+  skillConditionCheckPenalty,
+  skillConditionCheckPenaltyEntries
+} from "./skill-conditions.mjs";
+import {
+  skillPenaltyValue,
+  skillPenaltyEntries,
+  intrinsicSkillPenaltyDelta,
+  skillPenaltyNotes
+} from "./skill-penalties.mjs";
 import { possessedActionDice } from "./bonus-pools.mjs";
 import { attributeActionBlock, conditionAbilityPenalty, conditionRollPenalties } from "./attributes.mjs";
 import { underwaterCheckPlan } from "./environment.mjs";
@@ -813,38 +824,49 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   }
   // pp.87,92,101: distinguish the substituted skill bonus from modifiers on this named check.
   const baseSkillEntries = skillConditionEntries(system, skill.bonusEntries ?? []),
-    allSkillEntries = [...baseSkillEntries, ...misc],
-    allCheckEntries = [...classEffects.bonuses, ...synergyValues],
+    allSkillEntries = skillPenaltyEntries(system, [...baseSkillEntries, ...misc]),
+    allCheckEntries = skillPenaltyEntries(system, [...classEffects.bonuses, ...synergyValues]),
     skillBonusEntries = allSkillEntries.filter(e => !isMoralePenalty(e)),
     checkBonusEntries = allCheckEntries.filter(e => !isMoralePenalty(e)),
-    shakenPenalty = shakenSkillPenalty(conditionSystem, selected),
+    shakenPenalty = skillPenaltyValue(system, shakenSkillPenalty(conditionSystem, selected)),
     moralePenalty = moraleSkillPenalty([...allSkillEntries, ...allCheckEntries], shakenPenalty);
-  const normalSkillBonus = total + rankAdjustment + stacked(skillBonusEntries) - stacked(baseSkillEntries),
+  const normalSkillBonus =
+      total +
+      rankAdjustment +
+      stacked(skillBonusEntries) -
+      stacked(baseSkillEntries) +
+      intrinsicSkillPenaltyDelta(
+        system,
+        selected,
+        system.skills?.[key]?.misc ?? 0,
+        ["cultures", "impress", "networking", "profession"].includes(key) ? (system.lifestyleAppearance ?? 0) : 0
+      ),
     skillBonus = skillBonusCondition(system, normalSkillBonus).total;
   const nonSynergy = checkBonusEntries.filter(e => e.type !== "synergy"),
     skillExtra = stacked([...skillBonusEntries, ...nonSynergy]) - stacked(skillBonusEntries),
     synergyExtra =
       stacked([...skillBonusEntries, ...checkBonusEntries]) - stacked([...skillBonusEntries, ...nonSynergy]),
     condition = skillBonusCondition(system, normalSkillBonus + skillExtra);
+  const checkPenaltyRows = [
+    ...skillConditionCheckPenaltyEntries(conditionSystem, selected).filter(row => row.key !== "shaken"),
+    { label: loc`Target disposition`, value: disposition.penalty },
+    { label: loc`Size (Hide)`, value: isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0 },
+    { label: loc`Forte`, value: hasForte ? 1 : 0 },
+    { label: loc`Armor/load`, value: armor },
+    { label: loc`Vision`, value: vision },
+    { label: loc`Situational modifier`, value: Number(modifier) || 0 },
+    { label: loc`Hands`, value: skillTags.handPenalty },
+    { label: loc`Light`, value: light.skillModifier },
+    { label: loc`Fog/smoke`, value: fogSmoke.skillModifier },
+    { label: loc`Underwater`, value: underwaterContext.penalty },
+    { label: loc`Sensory conditions`, value: sensoryConditions.skillModifier },
+    { label: loc`Restraint Size`, value: restraint.sizeBonus },
+    { label: loc`Hide movement`, value: hideMovementPlanResult.penalty },
+    { label: loc`Observer distance`, value: detectionObserver.penalty },
+    ...terms.all("adjustment").map(value => ({ label: loc`Named check adjustment`, value }))
+  ];
   const checkAdjustment =
-    skillConditionCheckPenalty(conditionSystem, selected) +
-    moralePenalty -
-    shakenPenalty +
-    disposition.penalty +
-    (isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0) +
-    (hasForte ? 1 : 0) +
-    armor +
-    vision +
-    (Number(modifier) || 0) +
-    skillTags.handPenalty +
-    light.skillModifier +
-    fogSmoke.skillModifier +
-    underwaterContext.penalty +
-    sensoryConditions.skillModifier +
-    restraint.sizeBonus +
-    hideMovementPlanResult.penalty +
-    detectionObserver.penalty +
-    terms.sum("adjustment");
+    moralePenalty + skillPenaltyEntries(system, checkPenaltyRows).reduce((n, row) => n + row.value, 0);
   const terrainFeat =
     terrainPlan.homeTurf ||
     terrainPlan.bonuses.length ||
@@ -1048,6 +1070,18 @@ export function resolveSkillCheck(system, key, check, input = {}) {
         : ""
     ],
     [690, armor ? loc`Armor/load check penalty ${armor}. ` : ""],
+    [
+      695,
+      skillPenaltyNotes(system, [
+        ...checkPenaltyRows,
+        ...baseSkillEntries.map(row => ({ label: row.source ?? row.type ?? loc`Skill modifier`, value: row.value })),
+        ...misc.map(row => ({ label: row.source ?? loc`Conditional skill modifier`, value: row.value })),
+        ...classEffects.bonuses.map(row => ({ label: row.source ?? loc`Class check modifier`, value: row.value })),
+        { label: loc`Attribute modifier`, value: system.abilities?.[selected]?.mod ?? 0 },
+        { label: loc`Skill misc.`, value: system.skills?.[key]?.misc ?? 0 },
+        { label: loc`Shaken`, value: shakenSkillPenalty(conditionSystem, selected) }
+      ])
+    ],
     [700, vision ? loc`Vision ${vision}. ` : ""],
     [710, hasForte ? loc`Forte +1. ` : ""],
     [720, Number(modifier) ? loc`Situational modifier ${Number(modifier) >= 0 ? "+" : ""}${Number(modifier)}. ` : ""],

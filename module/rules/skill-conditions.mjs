@@ -1,6 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { cheapShotPenalty } from "./cheap-shot-effects.mjs";
-import { conditionSkillPenalty, conditionRollPenalties } from "./attributes.mjs";
+import { conditionSkillPenalty, conditionRollPenalties, conditionSkillPenaltyEntries } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
 /** pp.87,340,342: change the skill bonus, keeping check penalties and synergy separate. */
 export function skillBonusCondition(system, normal) {
@@ -16,6 +16,11 @@ export const skillConditionEntries = (system, entries = []) =>
     : entries;
 export const skillConditionCheckPenalty = (system, ability) =>
   cheapShotPenalty(system, ability) + conditionRollPenalties(system).skill + conditionSkillPenalty(system, ability);
+export const skillConditionCheckPenaltyEntries = (system, ability) => [
+  { label: loc`Cheap Shot`, value: cheapShotPenalty(system, ability) },
+  { label: loc`Sickened`, value: conditionRollPenalties(system).skill },
+  ...conditionSkillPenaltyEntries(system, ability)
+];
 export function substituteConditionedBonus(source, result, normal, preservedSkill, preservedCheck) {
   const state = result.skillBonusCondition?.state || source.skillBonusCondition?.state || "",
     context = { conditionContext: { [state]: true } },

@@ -6,7 +6,13 @@ import { twoWeaponStyleState, twoWeaponSkillNote } from "./two-weapon-state.mjs"
 import { combatExpertiseState } from "./combat-expertise.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
-import { skillBonusCondition, skillConditionEntries, skillConditionCheckPenalty } from "./skill-conditions.mjs";
+import {
+  skillBonusCondition,
+  skillConditionEntries,
+  skillConditionCheckPenalty,
+  skillConditionCheckPenaltyEntries
+} from "./skill-conditions.mjs";
+import { skillPenaltyEntries, intrinsicSkillPenaltyDelta, skillPenaltyNotes } from "./skill-penalties.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { underwaterCheckPlan } from "./environment.mjs";
 import { tenSecondSolutionEligible, cunningPlanEffect } from "./class-checks.mjs";
@@ -113,11 +119,19 @@ export function resolveKnowledgeCheck(
     effect => effect.skill === skill && (!effect.focus || normal(effect.focus) === normal(focus))
   );
   const base = skillConditionEntries(system, system.knowledgeBonusEntries ?? []),
-    bonus = stackedBonuses([...base, ...effects.filter(effect => effect.kind === "misc")]) - stackedBonuses(base);
+    skillBonusEntries = skillPenaltyEntries(system, [...base, ...effects.filter(effect => effect.kind === "misc")]),
+    bonus =
+      stackedBonuses(skillBonusEntries) -
+      stackedBonuses(base) +
+      intrinsicSkillPenaltyDelta(system, "int", system.misc?.knowledge ?? 0);
   const underwaterContext = underwaterCheckPlan(system, { underwater, kind: "knowledge" });
-  const skillBonusEntries = [...base, ...effects.filter(effect => effect.kind === "misc")],
-    checkBonusEntries = [{ type: "synergy", value: synergy }],
-    checkAdjustment = (Number(modifier) || 0) + underwaterContext.penalty + skillConditionCheckPenalty(system, "int");
+  const checkBonusEntries = [{ type: "synergy", value: synergy }],
+    penaltyRows = [
+      { label: loc`Situational modifier`, value: Number(modifier) || 0 },
+      { label: loc`Underwater`, value: underwaterContext.penalty },
+      ...skillConditionCheckPenaltyEntries(system, "int")
+    ],
+    checkAdjustment = skillPenaltyEntries(system, penaltyRows).reduce((n, row) => n + row.value, 0);
   const normalSkillBonus =
       (system.knowledgeStandardBonus ?? (system.knowledge ?? 0) - skillConditionCheckPenalty(system, "int")) + bonus,
     condition = skillBonusCondition(system, normalSkillBonus),
@@ -167,7 +181,14 @@ export function resolveKnowledgeCheck(
     timeRounding: tenSecondSolution ? "down" : null,
     actionDiceAllowed: !taking && active,
     rollMode: active ? undefined : "blindroll",
-    notes: loc`${cardShark.active ? loc`Card Shark: this confirmed gambling Knowledge question is active (pp.201–202). ` : ""}${dartingStyleState(system).active ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""}${twoWeaponSkillNote(system)}${combatExpertiseState(system).active ? loc`Combat Expertise: skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: Knowledge bonus ${condition.normal} → ${condition.total}; synergy/check modifiers remain. ` : ""}${underwaterContext.notes.length ? underwaterContext.notes.join(" ") + " " : ""}${cunning ? loc`Cunning Plan: free action; error range 1 → ${cunning.error}. ` : ""}${tenSecondSolution ? loc`10-Second Solution: half standard time, rounded down, minimum 1 full action` : method === "take10" ? loc`1 round` : method === "take20" ? loc`1 minute` : loc`Free action`}. ${active ? loc`Active` : loc`Passive`}. Related skill: ${related.name ?? skill}; synergy +${synergy}${owned ? "" : loc`; no rank synergy without the applicable focus`}. Rules p.99.`
+    notes:
+      skillPenaltyNotes(system, [
+        ...penaltyRows,
+        ...base.map(row => ({ label: row.source ?? loc`Knowledge modifier`, value: row.value })),
+        { label: loc`Intelligence modifier`, value: system.abilities?.int?.mod ?? 0 },
+        { label: loc`Knowledge misc.`, value: system.misc?.knowledge ?? 0 }
+      ]) +
+      loc`${cardShark.active ? loc`Card Shark: this confirmed gambling Knowledge question is active (pp.201–202). ` : ""}${dartingStyleState(system).active ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""}${twoWeaponSkillNote(system)}${combatExpertiseState(system).active ? loc`Combat Expertise: skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: Knowledge bonus ${condition.normal} → ${condition.total}; synergy/check modifiers remain. ` : ""}${underwaterContext.notes.length ? underwaterContext.notes.join(" ") + " " : ""}${cunning ? loc`Cunning Plan: free action; error range 1 → ${cunning.error}. ` : ""}${tenSecondSolution ? loc`10-Second Solution: half standard time, rounded down, minimum 1 full action` : method === "take10" ? loc`1 round` : method === "take20" ? loc`1 minute` : loc`Free action`}. ${active ? loc`Active` : loc`Passive`}. Related skill: ${related.name ?? skill}; synergy +${synergy}${owned ? "" : loc`; no rank synergy without the applicable focus`}. Rules p.99.`
   };
   return {
     ...result,

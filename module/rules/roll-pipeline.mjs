@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { skillPenaltyEntries, skillPenaltyDivisor } from "./skill-penalties.mjs";
 /**
  * Roll pipeline: one registry that rule modules join instead of being wired into the Actor document by hand.
  *
@@ -312,6 +313,15 @@ export function planTotal(kind, context, entries, pipeline = rollPipeline) {
     if (value) modifiers.push({ label, value });
   }
   const added = pipeline.modifiers({ ...context, checkKind: kind, stage: "plan" });
+  if (kind === "skill" && skillPenaltyDivisor(context.system) === 2) {
+    const rows = skillPenaltyEntries(context.system, added.rows);
+    added.total += rows.reduce((n, row, i) => n + row.value - added.rows[i].value, 0);
+    added.rows = rows.map(row =>
+      row.originalValue !== undefined
+        ? { ...row, label: loc`${row.label} (Omni-Competent: ${row.originalValue} → ${row.value})` }
+        : row
+    );
+  }
   return { total: total + added.total, modifiers: [...modifiers, ...added.rows], planModifiers: added.rows };
 }
 

@@ -51,7 +51,9 @@ import { combatMovementRules } from "./combat-movement.mjs";
 import { combatExpertiseState } from "./combat-expertise.mjs";
 import { armorTrainingRules, armorTrainingDRForAttack } from "./armor-training.mjs";
 import { shakenRules, shakenStateFromContext } from "./shaken.mjs";
-import { skillBonusCondition, skillConditionCheckPenalty } from "./skill-conditions.mjs";
+import { skillBonusCondition, skillConditionCheckPenaltyEntries, skillConditionEntries } from "./skill-conditions.mjs";
+import { skillPenaltyEntries, skillPenaltyValue, intrinsicSkillPenaltyDelta } from "./skill-penalties.mjs";
+import { stackedBonuses } from "./knowledge.mjs";
 import { adrenalineSource } from "./adrenaline.mjs";
 import { unrestrictedBonusPools } from "./bonus-pools.mjs";
 import { drunkRepositionHistory } from "./condition-movement.mjs";
@@ -1789,8 +1791,15 @@ function deriveFinalTotals(state) {
   ];
   sys.knowledgeStandardBonus =
     level + abil.int.mod + B.get("knowledge") + (misc.knowledge ?? 0) - sys.conditionPenalties.skill;
-  sys.knowledgeSkillBonusCondition = skillBonusCondition(sys, sys.knowledgeStandardBonus);
-  sys.knowledge = sys.knowledgeSkillBonusCondition.total + sys.conditionPenalties.skill;
+  const knowledgeRawEntries = skillConditionEntries(sys, sys.knowledgeBonusEntries);
+  sys.knowledgeSkillBonusCondition = skillBonusCondition(
+    sys,
+    sys.knowledgeStandardBonus +
+      stackedBonuses(skillPenaltyEntries(sys, knowledgeRawEntries)) -
+      stackedBonuses(knowledgeRawEntries) +
+      intrinsicSkillPenaltyDelta(sys, "int", misc.knowledge ?? 0)
+  );
+  sys.knowledge = sys.knowledgeSkillBonusCondition.total + skillPenaltyValue(sys, sys.conditionPenalties.skill);
   sys.requestCheck = level + abil.cha.mod + (misc.request ?? 0);
   sys.gearCheck = level + abil.wis.mod + (misc.gearCheck ?? 0);
   sys.fleetSpeed = fleetSpeedPlan(sys, {
@@ -2003,8 +2012,23 @@ function deriveSkillTotals(state) {
       (["cultures", "impress", "networking", "profession"].includes(sd.key) ? sys.lifestyleAppearance : 0);
     const totals = sd.abilities.map(a => {
       const normalSkillBonus = ranks + bonus + abil[a].mod - sys.conditionPenalties.skill,
-        condition = skillBonusCondition(sys, normalSkillBonus),
-        checkPenalty = skillConditionCheckPenalty(sys, a);
+        rawEntries = skillConditionEntries(sys, B.entries.get(`skills.${sd.key}.misc`) ?? []),
+        condition = skillBonusCondition(
+          sys,
+          normalSkillBonus +
+            stackedBonuses(skillPenaltyEntries(sys, rawEntries)) -
+            stackedBonuses(rawEntries) +
+            intrinsicSkillPenaltyDelta(
+              sys,
+              a,
+              stored.misc ?? 0,
+              ["cultures", "impress", "networking", "profession"].includes(sd.key) ? sys.lifestyleAppearance : 0
+            )
+        ),
+        checkPenalty = skillPenaltyEntries(sys, skillConditionCheckPenaltyEntries(sys, a)).reduce(
+          (n, row) => n + row.value,
+          0
+        );
       return {
         ability: a,
         normalSkillBonus,
