@@ -144,6 +144,8 @@ export class GearData extends BaseItemData {
     const item = this.parent,
       actor = item?.parent;
     if (actor?.type !== "agent") return "";
+    const invalid = actor.system.favoredGear?.invalid?.[item.id];
+    if (invalid) return invalid;
     return favoredGearAccess(
       {
         usagePeriods: actor.system.usagePeriods,

@@ -346,6 +346,12 @@ function deriveCareerLevels(state) {
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id))
     .map(i => ({ name: ruleName(i), choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
   sys.activeFeatNames = sys.activeFeatSelections.map(i => i.name);
+  const favoredValidation = favoredGearState(sys, items);
+  sys.favoredGear = favoredValidation;
+  state.items = items.map(item => {
+    const reason = favoredValidation.invalid?.[item.id ?? item._id];
+    return reason ? { ...item, system: { ...item.system, favoredGearUnavailableReason: reason } } : item;
+  });
 
   sys.details ??= {};
   sys.details.level = level;
@@ -1581,6 +1587,8 @@ function deriveFinalTotals(state) {
   sys.swordBasics = swordBasicsPlan(sys, items);
   sys.favoredGear = favoredGearState(sys, items);
   warnings.push(...sys.favoredGear.warnings, ...featPossessionWarnings(sys, items));
+  for (const text of sys.favoredGear.warnings) todo.push({ order: 60, tab: "gear", error: true, always: true, text });
+  for (const text of sys.favoredGear.pending ?? []) todo.push({ order: 60, tab: "gear", always: true, text });
   const heldReview = sys.guardWeapons.blockedReason || sys.disarmWeapons.blockedReason;
   if (heldReview) {
     warnings.push(heldReview);

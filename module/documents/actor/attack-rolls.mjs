@@ -699,6 +699,7 @@ export const ActorAttackRolls = Base =>
       };
       const damageWeaponSource = current => ({
         ...styleOverCaliberWeapon(this.system, current.system, options),
+        favoredGearUnavailableReason: current.system.favoredGearUnavailableReason,
         ...(options.kick === true ? { kick: true } : {}),
         ...(options.closedStanceTarget === true ? { closedStanceTarget: true } : {}),
         ...(options.unarmedTrick ? { unarmedTrick: options.unarmedTrick } : {}),

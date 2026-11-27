@@ -770,7 +770,12 @@ export const ActorRolls = Base =>
     weaponAttack(item, options = {}) {
       return weaponAttack(
         this.system,
-        { ...item.system, id: item.id ?? item._id, name: item.name },
+        {
+          ...item.system,
+          favoredGearUnavailableReason: item.system.favoredGearUnavailableReason,
+          id: item.id ?? item._id,
+          name: item.name
+        },
         CONFIG.SPYCRAFT,
         this.type,
         this.weaponContext(item, options)

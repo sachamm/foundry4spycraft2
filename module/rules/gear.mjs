@@ -259,8 +259,9 @@ export function vehicleWeaponOperationPlan(system, { vehicleMounted = false, wea
 }
 export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) {
   const sourceWeapon = weapon;
+  const favoredUnavailable = weapon.favoredGearUnavailableReason || system.favoredGear?.invalid?.[weapon.id] || "";
   const finesseBasic = finesseWeaponPlan(system, weapon);
-  weapon = { ...weapon, qualities: finesseBasic.effectiveQualities };
+  weapon = { ...weapon, favoredGearUnavailableReason: favoredUnavailable, qualities: finesseBasic.effectiveQualities };
   const massive = massiveWeaponPlan(system, weapon);
   const mortarOperation = mortarOperationPlan(weapon, options);
   const launcherOperation = launcherOperationPlan(weapon, options);
@@ -689,8 +690,9 @@ export function weaponDamage(
   { finesse = weapon.useFinesse ?? false, ...options } = {},
   type = "agent"
 ) {
+  const favoredUnavailable = weapon.favoredGearUnavailableReason || system.favoredGear?.invalid?.[weapon.id] || "";
   const finesseBasic = finesseWeaponPlan(system, weapon);
-  weapon = { ...weapon, qualities: finesseBasic.effectiveQualities };
+  weapon = { ...weapon, favoredGearUnavailableReason: favoredUnavailable, qualities: finesseBasic.effectiveQualities };
   const mortarOperation = mortarOperationPlan(weapon, options);
   if (mortarOperation.blocked) return { blocked: true, blockedReason: mortarOperation.reason };
   const launcherOperation = launcherOperationPlan(weapon, options);

@@ -753,3 +753,28 @@ rises to 1.90; attributes/health 1.95, origins/classes 1.85, skill purchases 1.9
 feats/training 1.75 remain. B-193 continues the wider source audit and other
 class/origin/feat/contact history cases. Both areas remain below 9.9/10, so the
 implementation/review cycle continues.
+
+### Continuing pass: invalid and unassigned favored-item choices
+
+Favored Gear now exposes unassigned Favored, Signature and Trademark choices on
+the Gear setup checklist. Invalid Calibers, too many favored items, missing
+approval and conflicting acquisition sources retain their saved values and an
+explicit correction task. They supply no Signature/Trademark bonus or doubled
+boost dice. Invalid favored armor is excluded from derived armor defenses.
+Correcting an item immediately restores its valid benefits.
+
+Native testing also found a runtime bypass: copying a Foundry DataModel into the
+attack/damage planner omitted its computed favored-item availability reason.
+The document adapters and pure planners now retain that reason through weapon
+copies, so a held or forfeited weapon cannot attack or roll damage through those
+paths. Regression coverage uses an inherited computed property, matching the
+native DataModel behavior. Unaffected sample-agent golden results remain stable.
+
+Native armor DR changed from 7 to 1 when its favored Caliber was invalid, retaining
+class DR, then returned to 7 after correction. An excess favored item removed
+Trademark bonuses and blocked the weapon; deleting it restored the valid
+assignment. Unassigned choices appeared and cleared on correction. Native checks
+reported no browser errors. All **4,136** Node tests and **988** independent
+fixture assertions pass; lint, formatting, bundling and text-copy checks pass
+with the existing warnings. Review scores remain **PC creation 9.4/10 and
+combat 9.5/10**. The broader source audit in B-193 remains open.
