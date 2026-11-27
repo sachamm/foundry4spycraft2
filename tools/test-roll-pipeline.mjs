@@ -364,6 +364,7 @@ const { rollPipeline } = await import("../module/rolls/index.mjs");
 
 // The order contributors run in, phase by phase. Validation order decides which failure a player is shown first.
 const EXPECTED_ORDER = [
+  "drainedBuildReview",
   "grappleContent:skill",
   "meleeFireContextContent:rangedAttack",
   "detectionObserverContent:skill",
@@ -522,6 +523,7 @@ const EXPECTED_ORDER = [
   "bullRushAttackChecks",
   "conveyanceBullRushChecks",
   "tripCounterCheck",
+  "drainedRecoveryCheck",
   "restraintEscapeControl",
   "meleeTradeoffAttackTerm",
   "gearAcquisitionControl",
@@ -826,6 +828,23 @@ test("roll options named by `record` are copied onto every posted check, null wh
   // Computed fields still come from the roll itself and are not overwritten by a same-named option.
   assert.equal(check.checkKind, "check");
   assert.equal(check.actorUuid, "Actor.pipeline");
+});
+
+test("the real skill workflow hands the reserved Drained identity to the final roll boundary", async () => {
+  const actor = new SpycraftActor(),
+    recovery = { attempt: "original", mission: "mission", levels: 1, dc: 20, mode: "Passive" };
+  actor.rollCheck = async (_formula, _data, options) => ({ flags: { spycraft2: options } });
+  const message = await actor.rollSkill("resolve", "wis", {
+    check: "drained-recovery",
+    askContext: false,
+    method: "roll",
+    gearStatus: "available",
+    synergySkill: "none",
+    drainedRecovery: recovery
+  });
+  assert.equal(message.flags.spycraft2.checkId, "drained-recovery");
+  assert.equal(message.flags.spycraft2.ability, "wis");
+  assert.deepEqual(message.flags.spycraft2.drainedRecovery, recovery);
 });
 
 test("named skill checks match the original fixed composition for every skill", () => {

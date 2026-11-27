@@ -6,7 +6,13 @@ export function damageEventEvidence(record) {
   const { state, settlement, ...event } = record;
   return JSON.stringify(event);
 }
-export function damageSettlementPlan(record, message, { confirmed, selfInflicted, outcomeHandled } = {}, id, at) {
+export function damageSettlementPlan(
+  record,
+  message,
+  { confirmed, selfInflicted, outcomeHandled, drainedApplied } = {},
+  id,
+  at
+) {
   const check = message?.flags?.spycraft2;
   if (
     confirmed !== true ||
@@ -48,6 +54,8 @@ export function damageSettlementPlan(record, message, { confirmed, selfInflicted
       grade = record.save.tier;
       if (typeof selfInflicted !== "boolean")
         throw new Error(loc`Declare whether this stress source was caused by the character’s own action.`);
+    } else if (listed && record.kind === "stress" && record.save.tier === 5 && drainedApplied === true) {
+      // The runtime verifies the matching durable Drained application before completing this settlement.
     } else if (outcomeHandled === true) handledByGC = true;
     else if (!listed)
       throw new Error(
@@ -74,6 +82,9 @@ export function damageSettlementPlan(record, message, { confirmed, selfInflicted
     // Only present when they apply, so settlements prepared by earlier versions still validate.
     ...(unconscious ? { unconscious, knockout } : {}),
     ...(handledByGC ? { handledByGC } : {}),
+    ...(!succeeded && record.kind === "stress" && record.save.tier === 5 && drainedApplied === true
+      ? { drainedApplied: true }
+      : {}),
     at,
     state: "prepared"
   };
@@ -92,7 +103,12 @@ export function validateDamageSettlement(record, message, plan) {
   const expected = damageSettlementPlan(
     record,
     message,
-    { confirmed: true, selfInflicted: plan.selfInflicted, outcomeHandled: plan.handledByGC },
+    {
+      confirmed: true,
+      selfInflicted: plan.selfInflicted,
+      outcomeHandled: plan.handledByGC,
+      drainedApplied: plan.drainedApplied
+    },
     plan.id,
     plan.at
   );

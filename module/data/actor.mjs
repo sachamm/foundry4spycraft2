@@ -907,7 +907,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       featPurchases: this.parent?.flags?.spycraft2?.featPurchases,
       creationAttributes: this.parent?.flags?.spycraft2?.creationAttributes,
       creationPolicy: this.parent?.flags?.spycraft2?.creationPolicy,
-      modularTrade: this.parent?.flags?.spycraft2?.modularTrade
+      modularTrade: this.parent?.flags?.spycraft2?.modularTrade,
+      drained: this.parent?.flags?.spycraft2?.drained
     });
   }
 

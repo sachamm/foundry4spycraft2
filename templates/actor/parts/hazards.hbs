@@ -1,5 +1,23 @@
 {{!-- Contagions, fire and the other damage types at work on a character; shared by the agent and NPC sheets. --}}
 <div class="hazards">
+  {{#if drained}}
+    <section class="hazard">
+      <h4>{{localize "SPYCRAFT.Drained.Title"}}</h4>
+      {{#if drained.levels}}
+        {{#if drained.needsReview}}<p class="hint">{{localize "SPYCRAFT.Drained.NeedsReview"}}</p>
+        {{else}}<p>{{localize "SPYCRAFT.Drained.Levels" levels=drained.levels level=drained.effectiveLevel}}</p>{{/if}}
+        {{#if drained.canReview}}<button type="button" class="sc2-action" data-action="reviewDrainedBuild">{{localize "SPYCRAFT.Drained.Review"}}</button>{{/if}}
+        {{#if drained.canRoll}}<button type="button" class="sc2-action" data-action="rollDrainedRecovery">{{localize "SPYCRAFT.Drained.RollRecovery"}}</button>{{/if}}
+      {{/if}}
+      {{#if drained.recoveryState}}<p>{{localize "SPYCRAFT.Drained.Recovery" state=drained.recoveryState dc=drained.recoveryDC}}</p>{{/if}}
+      {{#each drained.pending}}
+        <p>{{localize "SPYCRAFT.Drained.Pending" mission=mission dc=dc}}</p>
+        <button type="button" class="sc2-action" data-action="settleDrainedRecoveryCheck" data-mission="{{mission}}">{{localize "SPYCRAFT.Drained.Settle"}}</button>
+        <button type="button" class="sc2-action" data-action="reviewDrainedRecovery" data-mission="{{mission}}">{{localize "SPYCRAFT.Drained.ReviewRecovery"}}</button>
+      {{/each}}
+      {{#if drained.canApply}}<button type="button" class="sc2-action" data-action="applyDrained">{{localize "SPYCRAFT.Drained.Apply"}}</button>{{/if}}
+    </section>
+  {{/if}}
   {{#each hazards.interrupted}}
     <p class="hazard due"><b>{{label}}</b> — {{localize "SPYCRAFT.Hazards.InterruptedResult"}}
       {{#if sourceMissing}}{{localize "SPYCRAFT.Hazards.SourceMissing"}}{{/if}}

@@ -1937,6 +1937,18 @@
    "WhenAppliedDamageCostsACombatant_1f1i4d1": "When applied damage costs a combatant wounds, the matching end-of-round Initiative change is recorded for you.",
    "WhenOffPlayersStillSetTimers_0seh8gb": "When off, players still set timers and see the time each has left, but not the time of day.",
    "WhenTheWorldLoadsAndWhen_0n73eup": "When the world loads, and when a character is created, renamed or assigned to a player, offer the GC any missing ownership: the default player access above, and Owner for the player the character is assigned to or whose user name appears in its name. Nothing changes until the GC confirms."
+  },
+  "Drained": {
+   "Settle": "GC: settle original recovery",
+   "NeedsReview": "The GC must review retained choices before checks or abilities.",
+   "RollRecovery": "Roll mission-end recovery",
+   "Review": "GC: review retained build",
+   "Title": "Drained",
+   "Apply": "GC: apply Drained",
+   "Levels": "{levels} level(s) Drained; active Career Level {level}.",
+   "Recovery": "Recovery: {state}, DC {dc}.",
+   "Pending": "Unfinished recovery for {mission}: DC {dc}.",
+   "ReviewRecovery": "GC: review original recovery"
   }
  }
 }

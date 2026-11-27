@@ -291,6 +291,8 @@ own line on the card, and checked against the page first.
 
 | B-194 | Companion restrictions, acquisition cadence, loss/replacement recovery and sparse Undo have native coverage, including failures and persistence. Explicit Origin-only Career Level 0 creation now supports a complete Researcher with a chosen Training feat and a complete Playboy owner/lieutenant pair. Known zero-level feat history survives first-class advancement and reload; legacy numeric zero remains unknown without the explicit record. Training retains its five points until ranks become available instead of exceeding the level-0 cap. Review further imported classless histories and conditional Origin choices as part of B-193; do not infer a past level-0 game from the ordinary unknown-level value. | Rules pp.27,201,204; rules-completeness-99 | M |
 
+| B-195 | Drained PCs now use a non-destructive reduced build with GC-reviewed retained choices, original advancement/feat preservation, tier-five stress handoff, original mission-end recovery dice, interrupted/past-mission GC review, sparse Undo and native reload. Check category is provisionally Passive pending the asked table ruling. Standard NPC quality/grade loss, grade-built special NPCs, advancement while Drained, and existing item/timed-benefit review remain assisted or unimplemented. Do not delete original career history to simulate forfeiture. | Rules pp.340–341; rules-completeness-99 | L |
+
 ## Code health (code council, 2026-11-23)
 
 Do these when touching the area. The council's conditions still apply: equality tests first, one family per PR.

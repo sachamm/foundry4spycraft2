@@ -474,6 +474,10 @@ export const ActorProgression = Base =>
     }
 
     async _addClassLevel(classData) {
+      if (this.flags?.spycraft2?.drained?.levels)
+        return refuseStep(
+          loc`The GC must review advancement while Drained. Restore the owned build before changing its career history.`
+        );
       if (this.type !== "agent") return;
       const sys = this.system;
       if (sys.skillPurchaseIssues?.length)
@@ -616,6 +620,10 @@ export const ActorProgression = Base =>
     }
 
     async _removeLastLevel() {
+      if (this.flags?.spycraft2?.drained?.levels)
+        return refuseStep(
+          loc`Drained temporarily suspends levels. Restore the owned build before deleting a career level.`
+        );
       const progression = [...this.system.progression];
       const last = progression.pop();
       if (!last) return;
@@ -693,6 +701,8 @@ export const ActorProgression = Base =>
     /** Create/remove "granted" feat items so they match origins & class levels (calls are serialized). */
     syncGrantedFeats() {
       if (this.type !== "agent" || !this.isOwner) return Promise.resolve();
+      // Temporary forfeiture must never delete an owned grant from the original career.
+      if (this.flags?.spycraft2?.drained?.levels) return Promise.resolve();
       this._grantSync = (this._grantSync ?? Promise.resolve())
         .then(() => this.#syncGrantedFeats())
         .catch(err => console.error(err));

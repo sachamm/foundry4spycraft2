@@ -2312,3 +2312,61 @@ at 669.5px in a 720px viewport.
 All **4,435** Node tests, **988** engine checks and **275** layout cases pass,
 with schema, lint, formatting, bundle and copy checks. Continue Drained,
 secondary-effect timing and the remaining conditional creation-option audit.
+
+## Pass 78: Drained PC benefits, original career preservation and recovery
+
+Both scores remain **9.8/10**. Printed pp.340–341 require forfeiting the newest
+career levels and their benefits, with a floor of Career Level 1. Agents now
+prepare a temporary reduced build. Their original advancement entries, owned
+feat items and saved choices remain intact. GC-selected retained proficiencies,
+focuses, fortes, Interests, contacts and Wealth allocations resolve acquisition
+history that older records cannot establish. The ordinary engine computes the
+reduced attacks, saves, skills, attributes, class features, active feats and
+health limits. Grant synchronization cannot delete temporarily forfeited feats.
+
+A changed owned build requires fresh GC review before checks or limited abilities.
+Malformed imported counts remain loadable and have an explicit count-correction
+form. Automatic advancement and career deletion are held while Drained; this is
+a limitation requiring GC handling, not a claim that the book forbids advancement.
+The live rules for new levels gained during forfeiture still need a reviewed
+history model. Existing timed effects and item-supplied benefits require the GC's
+separate review when confirming the temporary build.
+
+Failed tier-five stress saves now enter the actual Drained review, with source
+receipts preventing a second loss after interrupted settlement. Inconsistent
+finished saves are refused before changing benefits. An open review cannot apply
+an outcome after its original save or ledger changes. Older explicit manual
+settlements remain supported.
+
+Mission-end recovery reserves one original Resolve (Wis) check before RNG, at
+DC 15 + 5 per lost level. Success restores one level; failure consumes that
+mission's opportunity. The named recovery and final skill roll retain the same
+identity. Lost posting responses reuse actual dice. Interrupted and earlier
+mission attempts have GC outcome/release review; known dice cannot be released
+as unused. Undo retains the original attempt and cannot permit replacement dice.
+These writes preserve unrelated action-die and ability use. Normal pool tracking
+maintains damage and spent dice when a maximum changes.
+
+The check category is **provisionally Passive**, based on involuntary condition
+recovery. The source does not expressly classify it; a question was sent and no
+answer was yet received. This is an implementation assumption, not a user ruling.
+Its category is saved with the original attempt. Passive handling requires a GC,
+uses Wisdom, and prevents ordinary synergies, action-die boosts and taking 10/20.
+
+Native Foundry verified actual retained-choice confirmation, active level 5→4,
+vitality maximum 48→37, all five original career entries, all owned feats, grant
+synchronization, a reachable final control at 669.5px, and reload. A controlled
++50 Resolve modifier produced an actual capped result 40 against DC 20. Original
+settlement restored level 5 and maximum 48; Undo, reuse of the same roll and
+settlement again retained exactly one original check. A separate native run used
+actual Undo and a controlled interrupted-receipt state, then the actual GC review
+form. Its last control ended at 637.6px; completion, review note and the original
+career survived reload without new dice. Native testing found and fixed a missing
+check-tag field and a missing identity handoff to the final skill roll; meaningful
+integration tests now cover both boundaries. Resource refusal also stops before
+RNG even when no reservation callback ran.
+
+All **4,455** Node tests, **988** engine checks and **283** layout cases pass,
+alongside schema, lint, formatting, bundle and copy checks. Standard NPC quality/
+grade forfeiture, grade-built special characters and further conditional creation
+cases remain before another score increase.

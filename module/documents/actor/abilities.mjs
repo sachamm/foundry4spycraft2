@@ -397,6 +397,8 @@ export const ActorAbilities = Base =>
       const expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem));
       const work = async () => {
         if (!this.isOwner) throw new Error(loc`You must own this actor.`);
+        if (this.system.drainedState?.needsReview)
+          throw Error(loc`The GC must review the changed Drained build before using an ability.`);
         const mastery =
           workflow === "improvisedSearch" ? improvisedMasterySpec(this.system, this.participatingCombat?.id) : null;
         const spec = this.system.limitedUses?.find(entry => entry.id === id) ?? (mastery?.id === id ? mastery : null);

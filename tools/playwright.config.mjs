@@ -20,7 +20,8 @@ export default defineConfig({
     "keep-place.spec.mjs",
     "attribute-abbreviations.spec.mjs",
     "chat-dice.spec.mjs",
-    "acid-sources.spec.mjs"
+    "acid-sources.spec.mjs",
+    "drained.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

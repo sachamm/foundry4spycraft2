@@ -95,6 +95,10 @@ function actor() {
       const keys = path.split(".");
       let o = a;
       for (const key of keys.slice(0, -1)) o = o[key] ??= {};
+      if (keys.at(-1).startsWith("==")) {
+        o[keys.at(-1).slice(2)] = structuredClone(value);
+        continue;
+      }
       o[keys.at(-1)] =
         value && typeof value === "object" && !Array.isArray(value)
           ? merge(o[keys.at(-1)], value)
@@ -257,10 +261,14 @@ test("a failed subdual save knocks the agent out for the band's unit times half 
     delete globalThis.CONFIG;
   }
 });
-test("Drained and below-threshold critical outcomes stay pending until the GC settles them as applied by hand", async () => {
+test("cancelled Drained review and unresolved critical outcomes stay pending; legacy GC manual settlement remains", async () => {
   for (const opts of [{ damage: 61 }, { damage: 1, criticalHit: true }]) {
     const { a } = pending(opts);
-    await assert.rejects(settlePendingDamageSave(a, confirm), /by hand/);
+    if (opts.damage === 61) {
+      a.items = [];
+      a.system.progression = [{ classId: "test" }];
+      assert.equal(await settlePendingDamageSave(a, confirm), null);
+    } else await assert.rejects(settlePendingDamageSave(a, confirm), /by hand/);
     assert.equal(a.effects.length, 0);
     assert.equal(a.flags.spycraft2.damageEvents.event1.state, "pending");
     assert.equal(a.system.accumulatedDamage.pending.length, 1);
@@ -270,6 +278,63 @@ test("Drained and below-threshold critical outcomes stay pending until the GC se
     assert.equal(a.effects.length, 0);
     assert.deepEqual(a.system.accumulatedDamage.pending, []);
   }
+});
+
+test("a tier-five stress settlement applies one retained Drained build and resumes without losing another level", async () => {
+  const { a } = pending({ damage: 61 });
+  globalThis.ChatMessage = { create: async data => data, getSpeaker: () => ({}) };
+  a.items = [];
+  a.system.progression = [{ classId: "test" }, { classId: "test" }];
+  foundry.applications.api.DialogV2.input = async () => ({
+    confirmed: true,
+    source: "Actual stress event",
+    note: "Confirmed retained options and other effects",
+    lifestyle: 0,
+    possessions: 0,
+    spendingCash: 0
+  });
+  const result = await settlePendingDamageSave(a, confirm);
+  assert.equal(result.state, "settled");
+  assert.equal(result.settlement.drainedApplied, true);
+  assert.equal(a.flags.spycraft2.drained.levels, 1);
+  assert.equal(a.flags.spycraft2.drained.applications["damage-event1"].applied, 1);
+  assert.equal(a.system.progression.length, 2);
+  await settlePendingDamageSave(a, { ...confirm, eventId: "event1" });
+  assert.equal(a.flags.spycraft2.drained.levels, 1);
+});
+
+test("a changed actual stress save invalidates its open Drained form before any level is suspended", async () => {
+  const { a, m: message } = pending({ damage: 61 });
+  a.items = [];
+  a.system.progression = [{ classId: "test" }, { classId: "test" }];
+  foundry.applications.api.DialogV2.input = async () => {
+    message.flags.spycraft2.effectiveTotal += 1;
+    return {
+      confirmed: true,
+      source: "Actual stress event",
+      note: "Stale original save",
+      lifestyle: 0,
+      possessions: 0,
+      spendingCash: 0
+    };
+  };
+  await assert.rejects(settlePendingDamageSave(a, confirm), /original stress save/);
+  assert.equal(a.flags.spycraft2.drained, undefined);
+});
+
+test("an inconsistent finished stress outcome is refused before offering or applying Drained", async () => {
+  const { a, m } = pending({ damage: 61 });
+  a.items = [];
+  a.system.progression = [{ classId: "test" }, { classId: "test" }];
+  m.flags.spycraft2.effectiveTotal = 40;
+  let forms = 0;
+  foundry.applications.api.DialogV2.input = async () => {
+    forms++;
+    return null;
+  };
+  await assert.rejects(settlePendingDamageSave(a, confirm), /disagrees/);
+  assert.equal(forms, 0);
+  assert.equal(a.flags.spycraft2.drained, undefined);
 });
 test("an interrupted final ledger commit resumes the exact Shaken application without applying the grade twice", async () => {
   const { a } = pending();

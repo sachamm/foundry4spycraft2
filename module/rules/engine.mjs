@@ -1,4 +1,5 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
+import { computeDrainedAgent } from "./drained.mjs";
 import { classFeatureLevels, expertClassQualification } from "./class-features.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
 import { subplotPlan } from "./subplots.mjs";
@@ -191,6 +192,9 @@ const LEVEL_ZERO_VITALITY = 6;
  * @param {object} cfg     CONFIG.SPYCRAFT
  */
 export function computeAgent(sys, givenItems, cfg, options = {}) {
+  if (options.drained?.levels && !options.drainedProjection)
+    return computeDrainedAgent(sys, givenItems, cfg, options, computeAgent);
+  if (!options.drainedProjection) delete sys.drainedState;
   const state = { sys, givenItems, cfg, options };
   startPass(state);
   deriveCareerLevels(state);

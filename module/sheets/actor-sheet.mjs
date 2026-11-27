@@ -61,6 +61,14 @@ import { settlePendingDamageSave } from "../apps/damage-settlement.mjs";
 import { rollPendingDamageSave } from "../apps/damage-saves.mjs";
 import { reviewDamageLedger, applyAccumulatedDamage } from "../apps/damage-ledger.mjs";
 import { reviewHazardResolution } from "../apps/hazard-resolution-records.mjs";
+import {
+  applyDrained,
+  reviewDrainedBuild,
+  rollDrainedRecovery,
+  settleDrainedRecoveryCheck,
+  reviewDrainedRecovery,
+  drainedView
+} from "../apps/drained.mjs";
 import { checkAccumulatedDamage } from "../apps/accumulated-damage.mjs";
 import { nonLethalMeters } from "../rules/accumulated-damage.mjs";
 import { settleGrapple } from "../apps/combat-actions.mjs";
@@ -561,6 +569,21 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       reviewHazardResolution(event, target) {
         return reviewHazardResolution(this.actor, target.dataset.hazard);
+      },
+      applyDrained() {
+        return applyDrained(this.actor);
+      },
+      reviewDrainedBuild() {
+        return reviewDrainedBuild(this.actor);
+      },
+      rollDrainedRecovery() {
+        return rollDrainedRecovery(this.actor);
+      },
+      settleDrainedRecoveryCheck(event, target) {
+        return settleDrainedRecoveryCheck(this.actor, { mission: target.dataset.mission });
+      },
+      reviewDrainedRecovery(event, target) {
+        return reviewDrainedRecovery(this.actor, { mission: target.dataset.mission });
       },
       rollFireSave(event, target) {
         return rollFireSave(this.actor, target.dataset.kind, target.dataset.fireSource);
@@ -1353,6 +1376,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.favoredGearLevelLabel = loc`Record new-level favored items`;
     if (context.canRecordFavoredLevelChoices && !favoredReceipt) context.canSettleFavoredGear = false;
     context.hazards = hazardsView(this.actor);
+    context.drained = drainedView(this.actor);
     context.fallTiming = fallTimingView(this.actor);
     context.canReviewFallTiming = game.user.isGM && this.actor.isOwner;
     context.professor = sys.coreClassIds?.includes("scientist");

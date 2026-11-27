@@ -8,6 +8,8 @@ import { conditionDuration } from "../rules/timers.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "../rules/equal.mjs";
+import { applyDrained } from "./drained.mjs";
+import { rollEvidence } from "../rules/outcomes.mjs";
 async function write(actor, patch, proof) {
   try {
     await actor.update(patch);
@@ -38,13 +40,46 @@ export async function settlePendingDamageSave(actor, options = {}) {
           : ""
       }<label><input name="confirmed" type="checkbox" /> ${
         record.kind === "stress"
-          ? loc`The GC confirmed the finished result and source. Settle success, or apply the failed stress save’s Shaken grade once`
+          ? loc`The GC confirmed the finished result and source. Settle success, or apply the failed stress save’s listed condition once`
           : loc`The GC confirmed the finished result. Settle success, or knock the character out on a failed save`
       }</label><label><input name="outcomeHandled" type="checkbox" /> ${loc`A Drained or GC-decided outcome has been applied by hand`}</label><p>${loc`Accumulated damage remains until separately recovered. An interrupted settlement resumes its original recorded details.`}</p></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true) return null;
+  if (
+    record.kind === "stress" &&
+    record.state !== "settling" &&
+    record.save.tier === 5 &&
+    !record.save.needsOutcomeReview &&
+    message.flags.spycraft2.resolved === true &&
+    message.flags.spycraft2.successConfirmed === false &&
+    input.outcomeHandled !== true
+  ) {
+    // Reject an inconsistent or unsupported finished save before changing the character's active build.
+    damageSettlementPlan(record, message, { ...input, drainedApplied: true }, "drained-review", game.time.worldTime);
+    const id = "damage-" + record.id;
+    if (!actor.flags?.spycraft2?.drained?.applications?.[id]) {
+      const evidence = rollEvidence(message.flags.spycraft2);
+      const applied = await applyDrained(actor, {
+        id,
+        source: "Stress damage: " + record.source,
+        levels: 1,
+        validateSource: () => {
+          const current = actor.flags?.spycraft2?.damageEvents?.[record.id],
+            actual = current && currentDamageSaveMessage(actor, current, game.messages ?? []);
+          if (
+            !same(damageLedgerSnapshot(actor), expected) ||
+            actual?.id !== message.id ||
+            rollEvidence(actual?.flags?.spycraft2 ?? {}) !== evidence
+          )
+            throw Error(loc`The original stress save or ledger changed during Drained review. Reopen settlement.`);
+        }
+      });
+      if (!applied) return null;
+    }
+    input = { ...input, drainedApplied: true };
+  }
   return queueResources(
     [actor],
     async () => {
@@ -72,6 +107,8 @@ export async function settlePendingDamageSave(actor, options = {}) {
         current = staged;
       }
       validateDamageSettlement(current, actual, plan);
+      if (plan.drainedApplied && !actor.flags?.spycraft2?.drained?.applications?.["damage-" + record.id])
+        throw Error(loc`Review the missing Drained application before completing this stress save.`);
       if (plan.grade)
         await applyShakenLocked(actor, shakenApplicationSnapshot(actor), {
           id: plan.applicationId,

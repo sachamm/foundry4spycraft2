@@ -483,6 +483,7 @@ export const ActorSkillRolls = Base =>
             skillKey: key,
             checkId: check.id,
             ...(options.combatPersuasion ? { combatPersuasion: options.combatPersuasion } : {}),
+            ...(options.drainedRecovery ? { drainedRecovery: options.drainedRecovery } : {}),
             focus: input.focus || checkFocus(key, check),
             cleanAndPolished: cleanAndPolishedApplies(this.system, currentGear?.system),
             gearUuid: currentGear?.uuid ?? "",
