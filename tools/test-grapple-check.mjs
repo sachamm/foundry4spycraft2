@@ -261,8 +261,36 @@ test("a Grapple check records its Size on the card, and the card's facts give th
       grappleFeats: bigger.grappleFeats,
       criticalSuccess: true
     }),
-    { total: 25, critical: true, criticalFailure: false, grapple: true, sizeBonus: 8 }
+    { total: 25, critical: true, criticalFailure: false, grapple: true, convertDamage: false, sizeBonus: 8 }
   );
   assert.equal(grappleCardFacts({ effectiveTotal: 14, checkId: "grapple" }).sizeBonus, 0);
   assert.equal(grappleCardFacts({ checkId: "grapple" }), null);
+});
+
+test("Injure and Throw may switch between lethal and subdual for −4 on the Grapple check (p.345)", async () => {
+  const { grappleBenefitDamage, grappleCheckPlan, grappleCardFacts } =
+    await import("../module/rules/grapple-check.mjs");
+  const str = { abilities: { str: { mod: 1 } } };
+  assert.equal(grappleBenefitDamage(str, "injure", { convert: true }).kind, "lethal");
+  assert.equal(grappleBenefitDamage(str, "throw", { proficient: true, convert: true }).kind, "subdual");
+  assert.equal(grappleBenefitDamage(str, "sprawl", { proficient: true, convert: true }).kind, "subdual");
+  const plan = grappleCheckPlan(
+    { activeFeatNames: [] },
+    "athletics",
+    { id: "grapple" },
+    { grappleConvertDamage: true }
+  );
+  assert.deepEqual(plan.bonuses, [{ source: "Switching lethal and subdual damage", value: -4 }]);
+  assert.equal(plan.evidence.convertDamage, true);
+  const escape = grappleCheckPlan(
+    { activeFeatNames: [] },
+    "athletics",
+    { id: "restraint-escape" },
+    { grappleConvertDamage: true }
+  );
+  assert.deepEqual(escape.bonuses, [], "only on the Grapple check itself");
+  assert.equal(
+    grappleCardFacts({ checkId: "grapple", effectiveTotal: 15, grappleFeats: { convertDamage: true } }).convertDamage,
+    true
+  );
 });

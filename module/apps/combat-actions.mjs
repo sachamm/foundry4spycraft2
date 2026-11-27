@@ -306,7 +306,10 @@ registerRelay("grappleCondition", {
     if (!who || !GRAPPLE_CONDITIONS.includes(id)) throw new Error(loc`A grapple cannot change that condition.`);
     // The label is free text from the player's client: keep it only when it is a short plain name.
     const plain = typeof label === "string" && /^[\p{L}\p{N} '’-]{1,60}$/u.test(label) ? label : id;
-    await setConditionStatus(who, id, active === true, { label: plain });
+    // The GC's client leaves its own Undo note: the player's note covers only the characters that player owns.
+    await withUndo([who], loc`Grapple: ${who.name} ${active === true ? plain : loc`no longer ${plain}`}`, () =>
+      setConditionStatus(who, id, active === true, { label: plain })
+    );
     return true;
   }
 });
@@ -396,7 +399,9 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     if (!change.active && who && !who.statuses?.has(change.id)) continue;
     lines.push(await changeGrappleCondition(who, change.id, change.active, label));
   }
-  for (const id of chosen) lines.push(...(await grappleBenefitHit(winner, loser, id)));
+  // The winner's own Grapple check says whether it switched its damage kind at −4 (p.345).
+  const convert = outcome.winner === "actor" ? input.convertDamage === true : input.opponentConvertDamage === true;
+  for (const id of chosen) lines.push(...(await grappleBenefitHit(winner, loser, id, { convert })));
   if (chosen.includes("useWeapon")) lines.push(loc`Use Weapon: roll the damage from the weapon's card and apply it.`);
   return lines;
 }
@@ -409,7 +414,11 @@ async function grappleBenefitsChosen(actor, input, outcome) {
  */
 const unarmedProficient = actor => {
   if (actor?.type === "agent") return actor.system?.proficiencyTotals?.unarmed?.proficient === true;
-  const ids = (actor?.system?.npcProfile?.qualities ?? []).map(quality => quality?.id ?? quality);
+  // Qualities count only while the profile is on, as for the GC's spends (spendProfile). A hand-built animal (profile
+  // off) is taken to fight with its own natural weapons.
+  const profile = actor?.system?.npcProfile;
+  if (!profile?.enabled) return true;
+  const ids = (profile.qualities ?? []).map(quality => quality?.id ?? quality);
   if (ids.includes("non-combatant")) return false;
   return actor?.system?.npcType === "animal" ? ids.includes("natural-attack") : true;
 };
@@ -426,7 +435,7 @@ export async function applyGrappleHit(loser, { amount, kind, name }) {
   const withSaveCard = async ({ lines, pendingSave }) => {
     if (!pendingSave) return lines;
     await postDamageReport(loser, lines, { pendingSave });
-    return [loc`${esc(loser.name)}: the save it calls for is on the card below.`];
+    return [loc`${esc(loser.name)}: roll the save it calls for from its own damage card.`];
   };
   if (kind === "subdual" && (loser.type === "agent" || npcIsSpecial(loser)))
     return withSaveCard(await nonLethalDamage(loser, "subdual", amount, { source: name, attackKind: "unarmed" }));
@@ -465,8 +474,10 @@ registerRelay("grappleDamage", {
  * Roll a damaging grapple benefit (Injure, Throw, Sprawl, pp.357–358) and apply it to the loser, inside the grapple's
  * Undo note when this user owns the loser, otherwise through the GC's client.
  */
-async function grappleBenefitHit(winner, loser, id) {
-  const damage = winner ? grappleBenefitDamage(winner.system, id, { proficient: unarmedProficient(winner) }) : null;
+async function grappleBenefitHit(winner, loser, id, { convert = false } = {}) {
+  const damage = winner
+    ? grappleBenefitDamage(winner.system, id, { proficient: unarmedProficient(winner), convert })
+    : null;
   if (!damage) return [];
   const [name] = grappleBenefitText(id),
     { total } = await rollTotal(damage.formula),
@@ -524,7 +535,9 @@ export function grappleInputFromCards(input, rows) {
     opponentCriticalFailure: other ? other.criticalFailure : input.opponentCriticalFailure === true,
     opponentUuid: input.opponentUuid || theirs?.check?.actorUuid || "",
     sizeDifference: Number(input.sizeDifference) || 0,
-    cardSizeBonus: own || other ? Math.max(own?.sizeBonus ?? 0, other?.sizeBonus ?? 0) : null
+    cardSizeBonus: own || other ? Math.max(own?.sizeBonus ?? 0, other?.sizeBonus ?? 0) : null,
+    convertDamage: own ? own.convertDamage : input.convertDamage === true,
+    opponentConvertDamage: other ? other.convertDamage : input.opponentConvertDamage === true
   };
 }
 

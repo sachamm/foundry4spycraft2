@@ -248,6 +248,12 @@ function button(control) {
   element.setAttribute("data-tooltip", full);
   element.dataset.rollControl = control.id;
   if (control.key) element.dataset.rollKey = control.key;
+  // A control that is not legal now is shown disabled with its reason (style guide 8.6), and does nothing.
+  if (control.disabled) {
+    element.disabled = true;
+    element.setAttribute("data-tooltip", `${full}: ${control.disabled}`);
+    return element;
+  }
   element.addEventListener("click", () => runChatAction(element, () => control.run()));
   return element;
 }

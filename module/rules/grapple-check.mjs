@@ -40,14 +40,16 @@ export function grappleDamageNote(system) {
  * with the Unarmed proficiency, otherwise 1d3 subdual, plus Strength (p.329). Throw adds the Strength modifier again
  * (at least 1). Sprawl is 1d4 + Strength subdual. Null for any other benefit, and for Use Weapon, whose damage comes
  * from the weapon's own card. `proficient` overrides the sheet's Unarmed proficiency (an NPC has no such record).
+ * `convert` switches Injure and Throw between lethal and subdual (p.345); Sprawl stays subdual.
  */
-export function grappleBenefitDamage(system, id, { proficient } = {}) {
+export function grappleBenefitDamage(system, id, { proficient, convert = false } = {}) {
   const str = Number(system?.abilities?.str?.mod) || 0,
     trained = proficient ?? system?.proficiencyTotals?.unarmed?.proficient === true,
     unarmed = system?.unarmed ?? { die: trained ? 4 : 3, extraDice: 0, damageBonus: str },
     dice = `${1 + (unarmed.extraDice ?? 0)}d${unarmed.die ?? (trained ? 4 : 3)}`,
     bonus = unarmed.damageBonus ?? str,
-    kind = trained ? "lethal" : "subdual",
+    // p.345: an unarmed attack may deal the other kind of damage at −4 on the check, taken on the Grapple check.
+    kind = (trained ? !convert : convert) ? "lethal" : "subdual",
     term = n => (n ? `${n < 0 ? "-" : "+"} ${Math.abs(n)}` : "");
   if (id === "injure") return { formula: `${dice} ${term(bonus)}`.trim(), kind, minimum: 1 };
   if (id === "throw") return { formula: `${dice} ${term(bonus + Math.max(1, str))}`.trim(), kind, minimum: 1 };
@@ -66,7 +68,8 @@ export function grappleCheckPlan(
     grappleOpponentSize = 0,
     grappleSecondOpponent = false,
     grappleMute = false,
-    grappleOthers = 0
+    grappleOthers = 0,
+    grappleConvertDamage = false
   } = {}
 ) {
   const empty = { evidence: null, bonuses: [], blockedReason: "", notes: [], threatIncrease: 0 };
@@ -96,14 +99,17 @@ export function grappleCheckPlan(
   const sizeBonus = check.id === "grapple" && sizeDifference < 0 ? 4 * -sizeDifference : 0,
     // Grapple Second Opponent and Mute (pp.357–358): −4 while taking on or holding two, −2 with a hand over a mouth.
     secondOpponent = grappleSecondOpponent === true,
-    mute = grappleMute === true;
+    mute = grappleMute === true,
+    // p.345: Injure or Throw deals the other kind of damage (lethal or subdual) for −4 on this check.
+    convertDamage = check.id === "grapple" && grappleConvertDamage === true;
   const bonuses = [
       ...(proneStance ? [{ source: "Prone Stance (Grapple)", value: 1 }] : []),
       ...(horde ? [{ source: "Horde Mastery (Grapple)", type: "morale", value: 1 }] : []),
       ...(jointLock ? [{ source: "Joint Lock", value: -4 }] : []),
       ...(sizeBonus ? [{ source: loc`Bigger than the opponent`, value: sizeBonus }] : []),
       ...(secondOpponent ? [{ source: loc`Second grapple opponent`, value: -4 }] : []),
-      ...(mute ? [{ source: loc`Hand over the opponent's mouth`, value: -2 }] : [])
+      ...(mute ? [{ source: loc`Hand over the opponent's mouth`, value: -2 }] : []),
+      ...(convertDamage ? [{ source: loc`Switching lethal and subdual damage`, value: -4 }] : [])
     ],
     notes = [
       ...(proneStance ? [loc`Prone Stance: +1 on this Grapple check (p.188).`] : []),
@@ -118,12 +124,15 @@ export function grappleCheckPlan(
         : []),
       ...(secondOpponent ? [loc`Second opponent: −4 while grappling or holding two (p.357).`] : []),
       ...(mute ? [loc`Mute: −2 on Athletics checks while the hand stays over the mouth (p.358).`] : []),
+      ...(convertDamage
+        ? [loc`Injure or Throw deals the other kind of damage, lethal or subdual: −4 on this check (p.345).`]
+        : []),
       ...(check.id === "grapple" ? [grappleDamageNote(system)] : [])
     ];
   return {
     ...empty,
     evidence:
-      bonuses.length || garrote
+      bonuses.length || garrote || convertDamage
         ? {
             version: 1,
             proneStance,
@@ -133,6 +142,7 @@ export function grappleCheckPlan(
             sizeDifference,
             secondOpponent,
             mute,
+            convertDamage,
             checkId: check.id
           }
         : null,
@@ -154,6 +164,7 @@ export function grappleCardFacts(check) {
     critical: check.criticalSuccess === true,
     criticalFailure: check.criticalFailure === true,
     grapple: check.checkId === "grapple",
+    convertDamage: check.checkId === "grapple" && check.grappleFeats?.convertDamage === true,
     sizeBonus: check.checkId === "grapple" && difference < 0 ? 4 * -difference : 0
   };
 }
@@ -177,7 +188,7 @@ rollPipeline.register({
     return [
       {
         at: 207,
-        html: `<details><summary>${loc`Grapple`}</summary><label>${loc`Opponent's Size compared with mine`} <select name="grappleOpponentSize"><option value="0">${loc`The same`}</option><option value="-1">${loc`1 smaller`}</option><option value="-2">${loc`2 smaller`}</option><option value="-3">${loc`3 smaller`}</option><option value="1">${loc`1 bigger`}</option><option value="2">${loc`2 or more bigger (no Grapple)`}</option></select></label><label>${loc`Others already grappling this opponent`} <input name="grappleOthers" type="number" min="0" max="7" step="1" value="0" class="w-2" /></label><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`I am grappling or holding a second opponent (−4)`}</label><label><input name="grappleMute" type="checkbox" /> ${loc`My hand is over an opponent's mouth (−2)`}</label><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
+        html: `<details><summary>${loc`Grapple`}</summary><label>${loc`Opponent's Size compared with mine`} <select name="grappleOpponentSize"><option value="0">${loc`The same`}</option><option value="-1">${loc`1 smaller`}</option><option value="-2">${loc`2 smaller`}</option><option value="-3">${loc`3 smaller`}</option><option value="1">${loc`1 bigger`}</option><option value="2">${loc`2 or more bigger (no Grapple)`}</option></select></label><label>${loc`Others already grappling this opponent`} <input name="grappleOthers" type="number" min="0" max="7" step="1" value="0" class="w-2" /></label><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`I am grappling or holding a second opponent (−4)`}</label><label><input name="grappleMute" type="checkbox" /> ${loc`My hand is over an opponent's mouth (−2)`}</label><label><input name="grappleConvertDamage" type="checkbox" /> ${loc`Injure or Throw: switch between lethal and subdual damage (−4)`}</label><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
       }
     ];
   }

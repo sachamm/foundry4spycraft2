@@ -279,6 +279,12 @@ test("the GC spends the session pool from an NPC's card; the NPC's own threat is
   assert.deepEqual(labels(message({ checkKind: "attack" }), gc).slice(0, 1), ["card:GC boost (+1d4)"]);
   const threat = labels(message({ checkKind: "attack", threatConfirmed: true }), gc);
   assert.deepEqual(threat.slice(0, 2), ["card:Activate threat (GC dice)", "card:GC boost (+1d4)"]);
+  // A standard NPC without treacherous may not activate it: the button is shown disabled with the reason (p.452).
+  const threatCard = message({ checkKind: "attack", threatConfirmed: true });
+  const activate = rollPipeline
+    .chatControls({ message: threatCard, check: threatCard.flags.spycraft2, actor, user: gc, checkKind: "attack" })
+    .find(c => c.label === "Activate threat (GC dice)");
+  assert.match(activate.disabled, /treacherous/);
   assert.equal(
     threat.some(label => label.startsWith("card:Activate critical")),
     false

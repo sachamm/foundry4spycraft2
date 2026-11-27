@@ -348,3 +348,36 @@ test("round-3 council: NPC critical prices, Feat Purchase mid-mission, the whole
   assert.equal(villain.characterType, "special");
   assert.equal(villain.standard, false);
 });
+
+test("an NPC's critical price matches an agent's for the same check (round-4 council)", async () => {
+  const { npcCriticalPrice } = await import("../module/rules/critical-effects.mjs");
+  const { criticalPlan } = await import("../module/rules/criticals.mjs");
+  const role = { label: "Henchman", extraDiceToActivate: 1 };
+  for (const laser of [false, true])
+    for (const toughLuck of [false, true])
+      for (const targetRole of [null, role])
+        for (const baseCost of [1, 2, 3, 4]) {
+          const check = {
+            checkKind: "attack",
+            threatConfirmed: true,
+            attackContext: { laser, ...(targetRole ? { targetRole } : {}) },
+            ...(toughLuck ? { blackCat: { toughLuck: true } } : {})
+          };
+          const agent = criticalPlan({}, check, {
+            baseCost,
+            effect: "test",
+            effectConfirmed: true,
+            beforeDamage: true,
+            available: 10
+          });
+          assert.ok(!agent.blocked, agent.reason);
+          assert.equal(npcCriticalPrice(check, baseCost, { laser }).cost, agent.cost, JSON.stringify(check));
+        }
+});
+
+test("the leader's card prints the helpers' worked-out DC, with the campaign shift (round-4 council)", async () => {
+  const { cooperativeNotes } = await import("../module/rules/cooperative.mjs");
+  const leader = { effectiveTotal: 40, cooperative: { role: "leader", max: 2, setDC: false } };
+  withQualities(["comedy-of-errors"], () => assert.match(cooperativeNotes(leader)[0], /DC 35/));
+  withQualities(["cakewalk"], () => assert.match(cooperativeNotes(leader)[0], /DC 25/));
+});

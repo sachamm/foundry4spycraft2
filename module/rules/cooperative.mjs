@@ -118,7 +118,9 @@ export function cooperativeNotes(check) {
   const notes = [
     coop.setDC
       ? loc`Cooperative check, leader: ${limit}; each helper rolls against DC ${helperBaseDC()} (p.91).`
-      : loc`Cooperative check, leader: ${limit}; each helper rolls against this result less 10, at least ${helperBaseDC()} (p.91).`
+      : Number.isFinite(check.effectiveTotal)
+        ? loc`Cooperative check, leader: ${limit}; each helper rolls against DC ${helperDC({ leaderResult: check.effectiveTotal })} (p.91).`
+        : loc`Cooperative check, leader: ${limit}; each helper rolls against this result less 10, at least ${helperBaseDC()} (p.91).`
   ];
   const result = coop.result;
   if (result?.ruined) notes.push(loc`A helper's critical failure ruined the task; it has to be started again.`);

@@ -83,6 +83,26 @@ const attackCriticalAllowed = actor => {
   }
 };
 
+/**
+ * Why this NPC may not have this card's critical activated, or "" when it may (p.452): a standard NPC needs the
+ * treacherous quality for an attack and the prodigy quality for a skill check. Bloodbath makes a special
+ * character's attack critical on its own.
+ */
+function criticalRefusal(check, actor) {
+  let profile;
+  try {
+    profile = spendProfile(actor);
+  } catch {
+    return "";
+  }
+  if (profile.type === "special") return "";
+  const attack = check.checkKind === "attack";
+  if (attack ? profile.treacherous === true : profile.prodigy === true) return "";
+  return attack
+    ? loc`A standard NPC needs the treacherous quality for a critical hit (p.452)`
+    : loc`A standard NPC needs the prodigy quality for a critical success (p.452)`;
+}
+
 /** The price of each critical hit on the p.329 list for this NPC's attack, after its discounts and surcharges. */
 const pricedChoices = (check, terms) =>
   criticalHitChoices(check).map(choice => ({ ...choice, price: npcCriticalPrice(check, choice.cost, terms) }));
@@ -191,6 +211,7 @@ rollPipeline.register({
       controls.unshift({
         label: loc`Activate threat (GC dice)`,
         placement: "card",
+        disabled: criticalRefusal(check, actor),
         run: () => gcActivateThreat(message, actor)
       });
     return controls.length ? controls : null;

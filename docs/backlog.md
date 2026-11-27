@@ -293,7 +293,6 @@ own line on the card, and checked against the page first.
 | B-265 | Blast in a confined space (p.343): the extra damage for each cut-off blast increment is not modelled, so Blockbuster's exemption from it has nothing to act on. | N3 (council-rules-2026-11-27, round 2) | S |
 | B-266 | Triumph (p.331): its effect on witnesses (stress and Morale checks) is only a note on the card. | R10 (council-rules-2026-11-27, round 2) | S |
 | B-267 | The settlement's Triumph default reads the chat cards the settling client can see, so a player misses whispered or blind Triumphs; record them on the mission instead. | N5 (council-rules-2026-11-27, round 2) | S |
-| B-268 | Grapple Injure and Throw (pp.345, 357): switching between lethal and subdual damage at the conversion penalty is not offered. | N1 (council-rules-2026-11-27, round 2) | S |
 | B-269 | Animals (p.445): the list of combat actions an animal may take is not checked when it acts. | rules seat (council-rules-2026-11-27, round 2) | S |
 
 ## Code health (code council, 2026-11-23)

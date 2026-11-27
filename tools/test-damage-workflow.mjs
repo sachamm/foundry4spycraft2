@@ -948,8 +948,8 @@ test("round-3 council: an NPC's grapple damage follows its profile, a special lo
       opponentUuid: loser.uuid,
       benefits: ["injure"]
     });
-  const npc = (name, npcType, qualities = []) => {
-    const who = character(name, { npcType, npcProfile: { enabled: true, qualities }, activeFeatNames: [] });
+  const npc = (name, npcType, qualities = [], enabled = true) => {
+    const who = character(name, { npcType, npcProfile: { enabled, qualities }, activeFeatNames: [] });
     who.type = "npc";
     return who;
   };
@@ -961,6 +961,8 @@ test("round-3 council: an NPC's grapple damage follows its profile, a special lo
   assert.match(posted.at(-1).content, /1d3 = \d+ subdual damage/, "an animal with no natural attack");
   await injure(npc("Wolf", "animal", [{ id: "natural-attack" }]), victim);
   assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/);
+  await injure(npc("Hound", "animal", [{ id: "non-combatant" }], false), victim);
+  assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/, "a profile that is off has no qualities");
   await injure(npc("Thug", "standard"), victim);
   assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/);
 
