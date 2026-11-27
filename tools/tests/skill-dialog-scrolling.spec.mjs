@@ -33,6 +33,7 @@ import { declareSkillDC, recoverDeclaredDC, reviewDeclaredDCClaim } from "../../
 import { reviewLegacyGCRefund } from "../../module/apps/undo.mjs";
 import { recoverShare, withdrawShare } from "../../module/documents/actor/shared-feats.mjs";
 import { reviewDamageHitDialog, reviewTargetDamageDialog } from "../../module/apps/damage-application.mjs";
+import { reviewCountDialog } from "../../module/apps/dueling.mjs";
 import {
   beginNpcHitDefense,
   addNpcHitDefenseDie,
@@ -1173,6 +1174,47 @@ async function render(page, height, markup = content) {
     })
   );
 }
+test("Count history review remains reachable at720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    const actor = {
+      uuid: "Actor.count-layout",
+      name: "Count recovery character",
+      isOwner: true,
+      flags: {
+        spycraft2: {
+          countShifts: {
+            "trigger-kickCount": {
+              sourceUuid: "ChatMessage.count",
+              actorUuid: "Actor.count-layout",
+              label: "Kick",
+              amount: -2,
+              round: 3,
+              state: "recorded"
+            }
+          }
+        }
+      }
+    };
+    globalThis.game = { user: { id: "gc", isGM: true }, actors: [actor], settings: { get: () => false } };
+    await reviewCountDialog({ uuid: "ChatMessage.count", flags: { spycraft2: {} } });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page
+      .getByLabel("Actual history and later actions", { exact: true })
+      .fill("Recorded original round and later initiative order");
+    await page.getByLabel("Reviewed current Count", { exact: true }).fill("27");
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 for (const stage of ["legacy", "hits", "target"])
   test(`damage ${stage} recovery controls remain reachable at720px`, async ({ page }) => {
     const prior = content,

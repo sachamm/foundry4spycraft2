@@ -61,6 +61,7 @@ import { applyShaken } from "./shaken-application.mjs";
 import { beginNpcDefenseReview, reviewNpcHitDefense } from "./gc/post-hit-defense.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { damageApplicationKey } from "../rules/attack-damage-hits.mjs";
+import { countContextFor } from "../documents/actor/count-shifts.mjs";
 import {
   acquireDamageHit,
   validateDamageHit,
@@ -432,12 +433,17 @@ rollPipeline.register({
   record: ["sourceAttack"],
   acquire: acquireDamageHit,
   validate: validateDamageHit,
-  flags: ({ checkKind, options, weaponQualities }) =>
+  flags: ({ actor, checkKind, options, weaponQualities }) =>
     checkKind === "attack"
-      ? { damageHitsVersion: 1 }
+      ? {
+          damageHitsVersion: 1,
+          countContext: options.rerollOf ? (options.countContext ?? null) : countContextFor(actor)
+        }
       : checkKind === "damage" && options.weaponDamageText
         ? { damageProfile: damageProfile(options.weaponDamageText, weaponQualities) }
-        : {}
+        : checkKind === "skill"
+          ? { countContext: options.rerollOf ? (options.countContext ?? null) : countContextFor(actor) }
+          : {}
 });
 
 rollPipeline.register({

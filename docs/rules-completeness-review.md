@@ -1368,3 +1368,46 @@ PC creation remains **9.5/10** and combat **9.6/10**. This closes a material
 damage-delivery gap, but does not close the remaining Count, finalized-Defense
 correction, environment/grapple, campaign and broad source-audit gaps. The
 9.9 target has not yet been reached.
+
+## Review 46: Count modifiers share round-end settlement
+
+The Count review found that Gunplay, Dueling, Forward Stance, Called Shot,
+Kick, Brush and Diversion used a direct initiative update. That bypassed the
+shared round-end limit, and a source-card write followed by a failed combatant
+write could lose the change. Close or concurrent requests could also race.
+
+These changes now queue in fluid initiative. New checks retain their actual
+combat, combatant, round and trigger identity; replacement checks retain the
+same trigger. Actor-held claims and atomic combatant delivery receipts retain
+positive history after a missing source mark or lost response. A duplicate
+trigger cannot add another modifier. Its pending modifier can be withdrawn by
+the GC without refilling the trigger. Settled or uncertain history instead
+uses a reviewed absolute current Count, with an explanation of later actions.
+That correction persists its intent before writes, applies once and can finish
+missing conditions without repeating the Count change. Copied actor history
+cannot operate on the original character's combatant.
+
+Round settlement now shares the actor lock with pending modifiers, marks
+delivery receipts settled in the Count update and retries only unfinished
+zero-Count conditions after an interruption. A Count initially at 50 or more
+is noticed even without queued modifiers, and actually Pressing clears its
+pending Press flag. Player requests use an authenticated GC review before
+delivery; this review checks the actual rule, amount and original round.
+
+Native Foundry exercised actual Called Shot attacks, an injected response loss
+after the combatant write, repeated requests, withdrawal and round-end
+settlement. Three remaining penalties totalled **−15** and changed Count
+**49 → 39** once. The actual GC review dialog corrected Count to the zero
+threshold, producing **20**, Reeling and Flat-footed. A separate real player
+client queued one modifier only after the GC allowed its request; it settled
+**20 → 15** once. Both completed runs had no browser errors or diagnostics.
+All **4,287** Node tests, **988** fixture assertions and **262** layouts pass.
+Native schemas, lint, formatting, bundling and copy checks pass with existing
+warnings.
+
+PC creation remains **9.5/10** and combat **9.6/10**. The source text's general
+cap and its Delay example disagree about Delay exceeding ten Counts; the
+existing Delay behavior remains while that ruling is pending. Malformed and
+older Count histories, remaining once-per-trigger paths, broader action
+timing, finalized-Defense correction and the other documented source and
+combat gaps remain under review. The 9.9 target is still open.

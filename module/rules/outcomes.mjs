@@ -269,6 +269,7 @@ const rollEvidenceFields = check => [
 ];
 export function rollEvidence(check) {
   return JSON.stringify([
+    ...(check.countContext !== undefined ? [check.countContext] : []),
     ...(check.sourceAttack?.claimId
       ? [check.sourceAttack, check.damageProfile ?? null, check.damageApplicationStarted ?? null]
       : []),

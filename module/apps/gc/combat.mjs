@@ -38,6 +38,8 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 import { markAntagonistsFaced } from "./mission.mjs";
+import { queueResources } from "../../services/transactions.mjs";
+import { settledCountEvents } from "../../documents/actor/count-shifts.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -132,6 +134,15 @@ export function fluidCombatClass(Base) {
 
 /** Record one Table 5.2 event against a combatant for the current round; immediate ones change the Count now. */
 export async function recordFluidEvent(combatant, id, input = {}) {
+  return queueResources(
+    [combatant?.actor],
+    () => recordFluidEventLocked(combatant.parent?.combatants.get?.(combatant.id) ?? combatant, id, input),
+    { messages: [combatant?.parent].filter(Boolean) }
+  );
+}
+async function recordFluidEventLocked(combatant, id, input = {}) {
+  if (combatant?.flags?.spycraft2?.fluidSettlement?.state === "effectsPending")
+    throw Error(loc`Finish this combatant's recorded end-of-round conditions from Fluid initiative event first.`);
   if (!combatant?.isOwner) throw new Error(loc`You do not control that combatant.`);
   const combat = combatant.parent,
     round = combat.round,
@@ -161,7 +172,11 @@ export async function recordFluidEvent(combatant, id, input = {}) {
   }
   if (id === "press") {
     const result = press(count, { pressedThisRound: state.pressed });
-    await combatant.update({ initiative: result.count, "flags.spycraft2.fluid": { ...state, pressed: true } });
+    await combatant.update({
+      initiative: result.count,
+      "flags.spycraft2.fluid": { ...state, pressed: true },
+      "flags.spycraft2.mustPress": false
+    });
     return { count: result.count, note: loc`Gains 1 extra half action now; other actions happen at the new Count.` };
   }
   if (id === "ready") {
@@ -222,6 +237,15 @@ export function registerAutomaticFluidSetting() {
 
 /** Dialog: choose a combatant and an event. */
 export async function fluidEventDialog(combat = game.combat, preset = null) {
+  const pendingRounds = [
+    ...new Set(
+      [...(combat?.combatants ?? [])]
+        .map(c => c.flags?.spycraft2?.fluidSettlement)
+        .filter(s => s?.state === "effectsPending")
+        .map(s => s.round)
+    )
+  ];
+  for (const round of pendingRounds) await applyEndOfRound(combat, round);
   if (!combat?.started) return refuse(loc`Start the combat first.`);
   const mine = combat.combatants.filter(combatant => combatant.isOwner);
   if (!mine.length) return refuse(loc`You control no combatant in this fight.`);
@@ -333,31 +357,62 @@ export const costsAction = (kind, handler) =>
 /** Apply every combatant's recorded modifiers for the round that just ended. */
 export async function applyEndOfRound(combat, endedRound) {
   const lines = [];
-  for (const combatant of combat.combatants) {
-    const state = fluid(combatant);
-    if (state.round !== endedRound || !Number.isFinite(combatant.initiative)) continue;
-    const result = endOfRound(combatant.initiative, state.modifiers);
-    const pieces = result.rows.map(row => `${row.label} ${row.amount > 0 ? "+" : ""}${row.amount}`);
-    if (!result.delta && !result.reeling && !result.mustPress) {
-      if (state.modifiers.length || state.delayed || state.pressed)
-        await combatant.update({ "flags.spycraft2.fluid": { round: null, modifiers: [], delayed: 0, pressed: false } });
-      continue;
-    }
-    await combatant.update({
-      initiative: result.count,
-      "flags.spycraft2.fluid": { round: null, modifiers: [], delayed: 0, pressed: false },
-      "flags.spycraft2.mustPress": result.mustPress
-    });
-    if (result.reeling) {
-      await condition(combatant.actor, "reeling", "Reeling");
-      await condition(combatant.actor, "flat-footed", "Flat-footed");
-    }
-    lines.push(
-      `${esc(combatant.name)}: ${combatant.initiative}${pieces.length ? ` (${esc(pieces.join(", "))}${result.capped ? loc`; limited to ±10` : ""})` : ""}${result.reeling ? ` — <b>${loc`reeling and flat-footed`}</b>${loc`: Count was 0 or less, +20`}` : ""}${result.mustPress ? ` — <b>${loc`must Press`}</b> ${loc`as the first action (Count 50+)`}` : ""}`
+  for (const candidate of [...combat.combatants]) {
+    await queueResources(
+      [candidate.actor],
+      async () => {
+        const combatant = combat.combatants.get?.(candidate.id) ?? candidate;
+        const prior = combatant.flags?.spycraft2?.fluidSettlement;
+        if (prior?.round === endedRound && prior.state === "effectsPending") {
+          await finishFluidConditions(combatant, prior);
+          return;
+        }
+        if (prior?.round === endedRound && prior.state === "complete") return;
+        const state = fluid(combatant);
+        if ((state.round !== null && state.round !== endedRound) || !Number.isFinite(combatant.initiative)) return;
+        const result = endOfRound(combatant.initiative, state.round === endedRound ? state.modifiers : []);
+        const pieces = result.rows.map(row => `${row.label} ${row.amount > 0 ? "+" : ""}${row.amount}`);
+        if (!result.delta && !result.reeling && !result.mustPress) {
+          if (state.modifiers.length || state.delayed || state.pressed)
+            await combatant.update({
+              "flags.spycraft2.fluid": { round: null, modifiers: [], delayed: 0, pressed: false },
+              ...settledCountEvents(combatant, endedRound)
+            });
+          return;
+        }
+        await combatant.update({
+          initiative: result.count,
+          "flags.spycraft2.fluid": { round: null, modifiers: [], delayed: 0, pressed: false },
+          "flags.spycraft2.mustPress": result.mustPress,
+          "flags.spycraft2.fluidSettlement": {
+            round: endedRound,
+            result,
+            state: result.reeling ? "effectsPending" : "complete"
+          },
+          ...settledCountEvents(combatant, endedRound)
+        });
+        if (result.reeling) await finishFluidConditions(combatant, { round: endedRound, result });
+        lines.push(
+          `${esc(combatant.name)}: ${combatant.initiative}${pieces.length ? ` (${esc(pieces.join(", "))}${result.capped ? loc`; limited to ±10` : ""})` : ""}${result.reeling ? ` — <b>${loc`reeling and flat-footed`}</b>${loc`: Count was 0 or less, +20`}` : ""}${result.mustPress ? ` — <b>${loc`must Press`}</b> ${loc`as the first action (Count 50+)`}` : ""}`
+        );
+      },
+      { messages: [combat] }
     );
   }
   if (lines.length) await say(`<b>${loc`Fluid initiative — end of round ${endedRound}`}</b><br>${lines.join("<br>")}`);
   return lines;
+}
+
+async function finishFluidConditions(combatant, settlement) {
+  for (const [id, label] of [
+    ["reeling", loc`Reeling`],
+    ["flat-footed", loc`Flat-footed`]
+  ])
+    await setConditionStatus(combatant.actor, id, true, {
+      label,
+      operationId: `fluid-${combatant.id}-${settlement.round}-${id}`
+    });
+  await combatant.update({ "flags.spycraft2.fluidSettlement.state": "complete" });
 }
 
 /** Break remaining ties (same Count and bonus) with a d20 roll-off stored on the combatants. */
