@@ -47,8 +47,8 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
    rolled, the button says how many have not.
 3. The **turn bar** at the top of the fight holds **Next turn** (Alt+N), **Previous turn** (Alt+P) and **Spend GC
    dice** with the acting NPC already chosen (Alt+D).
-4. On an NPC's turn, the acting block under it has an **Attack** button for each weapon (Shift-click with one target
-   goes straight to hit or miss), then **Next step on this combatant's card**, which presses the main button of the
+4. On an NPC's turn, the acting block under it has an **Attack** button for each weapon, with its bonus and damage
+   (Shift-click with one target goes straight to hit or miss; Alt+1 and Alt+2 attack with the first two), then **Next step on this combatant's card**, which presses the main button of the
    newest card about that combatant and says which one. Spend, Delay, Ready and the Damage save are under **Turn
    actions**. A player's turn is rolled from their own sheet; the card's top line names its state and its main button
    is the next step. During a fight Alt+Enter presses the acting combatant's newest card, or the newest card when that

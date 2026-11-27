@@ -1,7 +1,7 @@
-<section class="spycraft2 gc-console-body">
+<section class="spycraft2 gc-console-body" data-drop-record="{{localize 'SPYCRAFT.Console.DropRecord'}}" data-drop-place="{{localize 'SPYCRAFT.Console.DropPlace'}}">
   {{!-- One line each, caption beside value: the mission, the scene and the GC's dice. The turn is in the turn bar and the
        Threat Level in the Mission section, so neither is repeated here. --}}
-  <div class="gc-now" role="status">
+  <div class="gc-now">
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}</span><b
       class="sc2-value">{{status.mission}}</b><span class="gc-note">{{status.missionState}}</span></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.ScenePeriod"}}</span><b class="sc2-value">{{status.scene}}</b></div>

@@ -313,10 +313,28 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       row.addEventListener("pointerleave", () => turn.hoverCombatant(game.combat, row.dataset.id, false));
     }
     this._wireActorDrops();
+    this._announceTurn(context);
     installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
     restoreConsoleState(this.element, this._kept);
     this._kept = null;
+  }
+
+  /**
+   * Say a new turn once, politely, from a region the redraw leaves in place: the status strip is drawn afresh each
+   * time, so a screen reader would hear all of it, or nothing, on every redraw.
+   */
+  _announceTurn(context) {
+    let live = this.element.querySelector(":scope > .gc-live");
+    if (!live) {
+      live = document.createElement("p");
+      live.className = "gc-live sc2-visually-hidden";
+      live.setAttribute("aria-live", "polite");
+      this.element.append(live);
+    }
+    const acting = context.combat?.started ? context.combat.acting : null;
+    const text = acting ? loc`Round ${context.combat.round}: ${acting.name}'s turn.` : "";
+    if (live.textContent !== text) live.textContent = text;
   }
 
   /**
@@ -326,8 +344,18 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   _wireActorDrops() {
     const body = this.element.querySelector(".gc-console-body");
     if (!body) return;
+    // While something is dragged over the console, the place it would go says what a drop there does.
+    const mark = target => {
+      const section = target?.closest?.("details[data-section]")?.dataset.section;
+      body.dataset.dropAction = section === "antagonists" ? "record" : "place";
+    };
     body.addEventListener("dragover", event => {
-      if ([...(event.dataTransfer?.types ?? [])].includes("text/plain")) event.preventDefault();
+      if (![...(event.dataTransfer?.types ?? [])].includes("text/plain")) return;
+      event.preventDefault();
+      mark(event.target);
+    });
+    body.addEventListener("dragleave", event => {
+      if (!body.contains(event.relatedTarget)) delete body.dataset.dropAction;
     });
     body.addEventListener("drop", async event => {
       let data = null;
@@ -336,6 +364,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       } catch {
         return;
       }
+      delete body.dataset.dropAction;
       if (data?.type !== "Actor" || !data.uuid) return;
       event.preventDefault();
       const actor = await fromUuid(data.uuid);
@@ -355,6 +384,17 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     await super._onFirstRender(context, options);
     if (!this.isPopout) game.spycraft2.gc.console = this;
   }
+}
+
+/** The first two weapons carry their keys (Alt+1, Alt+2), in the tooltip and for assistive technology. */
+function withWeaponKeys(acting) {
+  if (!acting?.weapons) return acting;
+  acting.weapons = acting.weapons.map((weapon, index) => {
+    const key = index < 2 ? shortcutLabel(`actingWeapon${index + 1}`) : "",
+      hint = game.i18n.localize("SPYCRAFT.Console.AttackHint");
+    return { ...weapon, key, tip: key ? `${hint} (${key})` : hint };
+  });
+  return acting;
 }
 
 /** How a control is found again after a redraw: its action and the data that tells it from its neighbours. */
@@ -495,7 +535,7 @@ export function consoleContext() {
     conflictList = conflicts.conflictRows();
   const state = combatNow ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning",
     view = consoleView(state, readSetting(VIEW_SETTING, null), viewKey());
-  const acting = turn.actingBlock(combatNow),
+  const acting = withWeaponKeys(turn.actingBlock(combatNow)),
     started = !!combatNow?.started,
     // Only receipts for the agents on the team now: one who left does not stand in for one who joined.
     paid = team.filter(actor => m.standingPaid?.[actor.id]).length;

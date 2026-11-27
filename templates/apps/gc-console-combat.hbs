@@ -24,7 +24,7 @@
         {{#if conditions}}<div class="gc-wide"><dt>{{localize "SPYCRAFT.Console.Conditions"}}</dt><dd>{{conditions}}</dd></div>{{/if}}
       </dl>
       {{#if weapons.length}}<p class="controls gc-weapons">{{#each weapons}}
-        <button type="button" data-action="actingAttack" data-id="{{id}}" data-combatant="{{../id}}" data-tooltip="{{localize 'SPYCRAFT.Console.AttackHint'}}">{{localize "SPYCRAFT.Console.AttackWith" weapon=name}}{{#if facts}} <span class="gc-note">{{facts}}</span>{{/if}}</button>{{/each}}
+        <button type="button" data-action="actingAttack" data-id="{{id}}" data-combatant="{{../id}}" data-tooltip="{{tip}}"{{#if key}} aria-keyshortcuts="{{key}}"{{/if}}>{{localize "SPYCRAFT.Console.AttackWith" weapon=name}}{{#if facts}} <span class="gc-note">{{facts}}</span>{{/if}}</button>{{/each}}
         </p>{{/if}}
       <p class="controls">{{#each @root.combat.mobs}}<button type="button" data-action="mobAttack" data-key="{{key}}"
         data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}} aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button></p>

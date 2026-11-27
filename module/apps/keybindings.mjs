@@ -175,6 +175,22 @@ const changeTurn = step => {
   return true;
 };
 let shortcutSheet = null;
+/** Attack with one weapon of the acting combatant, by its place on the sheet (0 for the first). */
+function actingWeapon(index) {
+  const combatant = game.combat?.started ? game.combat.combatant : null,
+    actor = combatant?.actor;
+  if (!actor) return false;
+  const weapon = [...(actor.items ?? [])].filter(item => item.type === "weapon")[index];
+  if (!weapon) {
+    ui.notifications.info(loc`${combatant.name} has no weapon ${index + 1} on its sheet.`);
+    return true;
+  }
+  import("./gc/console-turn.mjs")
+    .then(module => module.attackWith(actor, weapon.id, null, combatant))
+    .catch(error => ui.notifications.warn(error.message));
+  return true;
+}
+
 function openActingSheet() {
   if (!game.combat?.combatant) return false;
   Promise.resolve(turnChange).then(() => {
@@ -263,6 +279,16 @@ const bindings = ({ openConsole }) => [
       return true;
     }
   ],
+  ...[1, 2].map(number => [
+    `actingWeapon${number}`,
+    number === 1
+      ? locKey`Attack with the acting NPC's first weapon`
+      : locKey`Attack with the acting NPC's second weapon`,
+    locKey`Opens the attack for that weapon of the combatant whose turn it is, as its button in the GC Console does.`,
+    [{ key: `Digit${number}`, modifiers: ["Alt"] }],
+    true,
+    () => actingWeapon(number - 1)
+  ]),
   [
     "gcBoost",
     locKey`GC boost on your newest NPC card`,

@@ -246,7 +246,9 @@
    "AddSelected": "Add selected tokens",
    "AddSelectedHint": "Adds the tokens selected on the map to this fight; tokens already in it are skipped",
    "EndFight": "End combat…",
-   "EndFightHint": "Ends this fight after Foundry asks to confirm"
+   "EndFightHint": "Ends this fight after Foundry asks to confirm",
+   "DropRecord": "Drop to record this NPC for XP",
+   "DropPlace": "Drop to place this NPC on the scene"
   },
   "Ability": {
    "str": "Strength",
@@ -1925,6 +1927,8 @@
    "AltGOpensTheGCConsole_1mzfhnr": "Alt+G opens the GC Console as a window beside the chat log, instead of in the chat's place in the sidebar.",
    "ApplyPlayersRequestsWithoutAsking_1mikvyn": "Apply players' requests without asking",
    "ApplyRecordedTable52Modifiers_13queou": "Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).",
+   "AttackWithTheActingNPCS_1rydsvt": "Attack with the acting NPC's first weapon",
+   "AttackWithTheActingNPCS_1u0aexh": "Attack with the acting NPC's second weapon",
    "AttacksTakeTheirShotsFromThe_1qrwt0l": "Attacks take their shots from the weapon, a weapon that is empty must be reloaded, and Reload draws on the loads its ammunition code supplies.",
    "CountAmmunition_16vo7br": "Count ammunition",
    "DefaultPlayerAccessToNewCharacters_0fqrj0e": "Default player access to new characters",
@@ -1944,6 +1948,7 @@
    "OpenTheActingCharacterSSheet_10837hg": "Open the acting character's sheet",
    "OpenTheGCConsole_0mdn64t": "Open the GC Console",
    "OpensSpendDiceWithTheActing_00bsjzr": "Opens Spend dice, with the acting NPC chosen when one is acting.",
+   "OpensTheAttackForThatWeapon_1fw6wmu": "Opens the attack for that weapon of the combatant whose turn it is, as its button in the GC Console does.",
    "OpensTheGCConsoleOrBrings_024as2i": "Opens the GC Console, or brings it to the front.",
    "OpensTheSheetOfTheCombatant_0pjrtm7": "Opens the sheet of the combatant whose turn it is.",
    "OptionalLinguisticsChecks_16jqdy0": "Optional Linguistics checks",

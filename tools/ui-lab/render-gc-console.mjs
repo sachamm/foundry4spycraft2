@@ -95,8 +95,14 @@ function fight(context, { started = true } = {}) {
           conditions: "flat-footed",
           halfActions: "2 half actions left",
           weapons: [
-            { id: "w1", name: "Service pistol", facts: "+4 · 2d6" },
-            { id: "w2", name: "Truncheon", facts: "+3 · 1d6" }
+            {
+              id: "w1",
+              name: "Service pistol",
+              facts: "+4 · 2d6",
+              key: "Alt+1",
+              tip: "Opens the attack dialog (Alt+1)"
+            },
+            { id: "w2", name: "Truncheon", facts: "+3 · 1d6", key: "Alt+2", tip: "Opens the attack dialog (Alt+2)" }
           ],
           outcomes: ["TripOutcomes", "FeintOutcomes", "SettleAGrapple", "AnticipateResult", "StandOff"].map(key => ({
             step: key,
