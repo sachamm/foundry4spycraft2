@@ -32,6 +32,7 @@ import { reviewNpcHitDefense } from "../../module/apps/gc/post-hit-defense.mjs";
 import { declareSkillDC, recoverDeclaredDC, reviewDeclaredDCClaim } from "../../module/apps/gc/declared-skill-dc.mjs";
 import { reviewLegacyGCRefund } from "../../module/apps/undo.mjs";
 import { recoverShare, withdrawShare } from "../../module/documents/actor/shared-feats.mjs";
+import { reviewDamageHitDialog, reviewTargetDamageDialog } from "../../module/apps/damage-application.mjs";
 import {
   beginNpcHitDefense,
   addNpcHitDefenseDie,
@@ -1172,6 +1173,49 @@ async function render(page, height, markup = content) {
     })
   );
 }
+for (const stage of ["legacy", "hits", "target"])
+  test(`damage ${stage} recovery controls remain reachable at720px`, async ({ page }) => {
+    const prior = content,
+      oldGame = globalThis.game;
+    try {
+      const actor = {
+        uuid: "Actor.damage-layout",
+        name: "Damage recovery target",
+        type: "agent",
+        isOwner: true,
+        flags: { spycraft2: {} }
+      };
+      const message = {
+        id: "attack",
+        flags: {
+          spycraft2: { actorUuid: actor.uuid, attackResolution: { hits: 3 }, sourceAttack: { claimId: "savedhit" } }
+        }
+      };
+      globalThis.game = { user: { id: "gc", isGM: true }, actors: [actor], settings: { get: () => false } };
+      if (stage === "hits")
+        actor.flags.spycraft2.attackDamageHits = {
+          attack: { slots: [{ claimId: "savedhit", index: 1, state: "needsReview" }] }
+        };
+      if (stage === "target") {
+        actor.flags.spycraft2.damageApplications = { "hit-savedhit": { state: "needsReview" } };
+        await reviewTargetDamageDialog(message);
+      } else await reviewDamageHitDialog(actor, message);
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      if (stage === "legacy") await page.getByLabel("Hits already rolled", { exact: true }).fill("2");
+      else await expect(page.getByRole("combobox", { name: "Decision", exact: true })).toBeVisible();
+      if (stage === "target")
+        await page.getByLabel("What actually happened", { exact: true }).fill("Actual effects reviewed");
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+    }
+  });
+
 for (const height of [800, 1000])
   test(`all expanded skill options scroll while confirmation remains reachable at ${height}px`, async ({ page }) => {
     await render(page, height);

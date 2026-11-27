@@ -8,6 +8,7 @@ import { esc } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { readSetting } from "../settings.mjs";
 import { queueResources } from "../services/transactions.mjs";
+import { setDamageUndo } from "../documents/actor/damage-applications.mjs";
 
 // An empty record is a value too: without it, a record the step created could not be told from one it filled.
 const leaf = value => value === null || typeof value !== "object" || Array.isArray(value) || !Object.keys(value).length;
@@ -101,8 +102,11 @@ const combatantsOf = actor =>
 /** A picture of everything a step may change about one character. */
 export function snapshot(actor) {
   const source = actor.toObject?.() ?? { system: actor.system, flags: actor.flags };
+  const undoFlags = { ...source.flags?.spycraft2 };
+  delete undoFlags.damageApplications;
+  delete undoFlags.attackDamageHits;
   return {
-    data: flatten({ system: source.system ?? {}, flags: { spycraft2: source.flags?.spycraft2 ?? {} } }),
+    data: flatten({ system: source.system ?? {}, flags: { spycraft2: undoFlags } }),
     effects: new Map([...(actor.effects ?? [])].map(effect => [effect.id, effect.toObject?.() ?? { ...effect }])),
     combatants: combatantsOf(actor).map(combatant => ({
       combat: combatant.parent?.id,
@@ -212,7 +216,15 @@ export async function withUndo(actors, label, work, extra = {}) {
 export function postUndo(
   label,
   entries,
-  { gcDice = 0, damageCard = null, gcDiceSession, gcDefenseDeliveryUuid, npcHitDefenseUndo, declaredDCUndo } = {}
+  {
+    gcDice = 0,
+    damageCard = null,
+    gcDiceSession,
+    gcDefenseDeliveryUuid,
+    npcHitDefenseUndo,
+    declaredDCUndo,
+    damageApplicationUndo
+  } = {}
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
@@ -226,6 +238,7 @@ export function postUndo(
           entries,
           gcDice,
           damageCard,
+          ...(damageApplicationUndo ? { damageApplicationUndo } : {}),
           done: false,
           ...(gcDice > 0
             ? { gcDiceSession: gcDiceSession ?? String(readSetting("usagePeriods", {})?.session ?? "initial") }
@@ -303,6 +316,20 @@ export async function applyUndo(message) {
   if (running.has(key)) return null;
   running.add(key);
   try {
+    if (record.damageApplicationUndo) {
+      const receipt = record.damageApplicationUndo;
+      const actor = await fromUuid(receipt.actorUuid);
+      if (!actor?.isOwner) throw Error(loc`Own the damage target to undo its application.`);
+      return await queueResources(
+        [actor],
+        async () => {
+          const fresh = message.flags?.spycraft2?.undo;
+          if (fresh?.done) return null;
+          return undoRecord(message, fresh);
+        },
+        { messages: [message] }
+      );
+    }
     if (record.declaredDCUndo) {
       if (!game.user?.isGM) throw Error(loc`Only the GC can undo a declared DC.`);
       const actor = await fromUuid(record.declaredDCUndo.actorUuid),
@@ -390,6 +417,10 @@ async function undoRecord(message, record) {
     if (!ok) return null;
   }
   // Marked first, so a failure half way cannot lead to dice being given back twice on a retry.
+  if (record.damageApplicationUndo) {
+    const receipt = record.damageApplicationUndo;
+    await setDamageUndo(await fromUuid(receipt.actorUuid), receipt, "undoing");
+  }
   await message.update({ "flags.spycraft2.undo.done": true });
   if (dcSource) {
     const id = record.declaredDCUndo.id;
@@ -434,6 +465,10 @@ async function undoRecord(message, record) {
     await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>
       ui.notifications.warn(loc`The GC action dice were not given back: ${error.message}`)
     );
+  }
+  if (record.damageApplicationUndo) {
+    const receipt = record.damageApplicationUndo;
+    await setDamageUndo(await fromUuid(receipt.actorUuid), receipt, "undone");
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;

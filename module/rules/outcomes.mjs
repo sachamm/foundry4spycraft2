@@ -269,6 +269,9 @@ const rollEvidenceFields = check => [
 ];
 export function rollEvidence(check) {
   return JSON.stringify([
+    ...(check.sourceAttack?.claimId
+      ? [check.sourceAttack, check.damageProfile ?? null, check.damageApplicationStarted ?? null]
+      : []),
     ...(check.npcDefenseReroll ? [check.npcDefenseReroll] : []),
     ...(check.declaredSkillDC ? [check.declaredSkillDC] : []),
     ...(check.gcPostHitDefense ? [check.gcPostHitDefense] : []),

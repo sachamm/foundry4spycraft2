@@ -2,8 +2,10 @@ import { actionDieBoostResult } from "../rules/action-dice.mjs";
 import { rollEvidence, checkFlavor } from "../rules/outcomes.mjs";
 import { boostPaymentQuote, boostPaymentSignature } from "../rules/boost-payments.mjs";
 import { loc } from "../i18n.mjs";
+import { rememberDamageBoost, assertDamageNotStarted } from "../documents/actor/damage-hits.mjs";
 /** Caller owns the actor/result transaction. Only plan.rolls dice contribute; surcharge dice are payment only. */
 export async function applyPaidCheckBoost(actor, message, { check, expected, input, plan, roll, quote }) {
+  assertDamageNotStarted(actor, message);
   const fresh = boostPaymentQuote(actor, message, { ...input, count: plan.count });
   if (
     boostPaymentSignature(fresh) !== boostPaymentSignature(quote) ||
@@ -75,6 +77,7 @@ export async function applyPaidCheckBoost(actor, message, { check, expected, inp
           throw error;
         }
       }
+      await rememberDamageBoost(actor, message, next);
       return result;
     },
     {

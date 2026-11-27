@@ -36,6 +36,7 @@ import {
   cunningPlanCheck
 } from "../../rules/class-checks.mjs";
 import { queueResources } from "../../services/transactions.mjs";
+import { assertDamageNotStarted } from "./damage-hits.mjs";
 import { openingRound } from "../../rolls/chat-controls.mjs";
 import { finishGearAcquisition } from "../../apps/gear-acquisition.mjs";
 import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../services/gc-dice.mjs";
@@ -75,6 +76,7 @@ export const ActorOutcomes = Base =>
     /** Spend action dice on a recorded result, preserving the original roll and its cap. */
     boostCheck(message, options = {}) {
       const work = async () => {
+        assertDamageNotStarted(this, message);
         if (!this.isOwner) return refuseStep(loc`You must own the actor spending action dice.`);
         let check = message.flags?.spycraft2;
         if (!check || check.actorUuid !== this.uuid) return refuseStep(loc`Choose a recorded roll made by this actor.`);
@@ -335,6 +337,7 @@ export const ActorOutcomes = Base =>
       const work = async () => {
         if (rollEvidence(message.flags.spycraft2) !== expected)
           return refuseStep(loc`This result changed while Generous was being prepared. Review the current result.`);
+        assertDamageNotStarted(this, message);
         if (
           JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken ||
           paidBoostSurcharge(this, message) !== expectedPaid
@@ -587,6 +590,7 @@ export const ActorOutcomes = Base =>
       const work = async () => {
         const check = message.flags?.spycraft2;
         if (!Number.isFinite(check?.rawTotal)) return refuseStep(loc`Choose a recorded check result.`);
+        if (check.checkKind === "attack" && succeeded !== check.successConfirmed) assertDamageNotStarted(this, message);
         if (check.declaredSkillDC) {
           const declared = declaredDCOutcome(check);
           if (succeeded !== declared.succeeded || (difficultyClass !== undefined && difficultyClass !== declared.dc))
@@ -679,6 +683,7 @@ export const ActorOutcomes = Base =>
 
     /** The GC can resolve an owned opponent's payment; cross-client authority remains a separate workflow. */
     async activateCritical(message, options = {}) {
+      assertDamageNotStarted(this, message);
       if (message.flags?.spycraft2?.npcDefensePending)
         return refuse(loc`Finish the NPC Defense decision before critical activation.`);
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
@@ -828,6 +833,7 @@ export const ActorOutcomes = Base =>
           return refuseStep(
             loc`Review this character’s interrupted action-die settlement before activating another critical result.`
           );
+        assertDamageNotStarted(this, message);
         if (rollEvidence(message.flags.spycraft2) !== expected)
           return refuseStep(
             loc`This result changed while its critical activation was being prepared. Review the current result.`
@@ -1371,6 +1377,7 @@ export const ActorOutcomes = Base =>
     }
 
     async rerollCheck(message, options = {}) {
+      assertDamageNotStarted(this, message);
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
       if (message.flags.spycraft2.npcDefensePending)
         return refuse(loc`The attack result is fixed during the NPC Defense decision.`);
@@ -1428,6 +1435,7 @@ export const ActorOutcomes = Base =>
               skills: structuredClone(spec.skills ?? [])
             };
           const validateRerollContext = () => {
+            assertDamageNotStarted(this, message);
             const live = this.system.limitedUses?.find(s => s.id === spec.id);
             if (
               JSON.stringify(live) !== sourceSignature ||

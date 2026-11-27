@@ -467,6 +467,7 @@ export const ActorRolls = Base =>
         threatConfirmed: false,
         triumphed: false
       };
+      await options.recordRolledResult?.({ check, roll, alternativeRolls });
       try {
         if (check.drivingStance)
           return await ChatMessage.create({

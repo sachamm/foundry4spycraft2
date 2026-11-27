@@ -98,13 +98,16 @@ const OUCH_PRESETS = new Set(["hit.ouch", "hit.ouchAtZero"]);
  * @param {string} [damageMessageId] the damage card being applied
  * @returns {{critical: boolean, criticalDice: number, ouch: boolean, laterShot: boolean}}
  */
-export function criticalDamageDefaults(attack, damageMessageId = "") {
+export function criticalDamageDefaults(attack, damageMessageId = "", { hitIndex = null } = {}) {
   const none = { critical: false, criticalDice: 0, ouch: false, laterShot: false };
   if (attack?.criticalSuccess !== true) return none;
   const activation = attack.criticalActivation ?? {},
     dice = Math.max(1, Math.trunc(Number(activation.baseCost ?? activation.cost) || 1)),
     taken = attack.criticalShotApplied?.damageMessageId;
-  if ((Number(attack.attackResolution?.hits) || 1) > 1 && taken && taken !== damageMessageId)
+  if (
+    (Number(attack.attackResolution?.hits) || 1) > 1 &&
+    (Number.isSafeInteger(hitIndex) ? hitIndex > 1 : taken && taken !== damageMessageId)
+  )
     return { ...none, laterShot: true };
   if (OUCH_PRESETS.has(activation.preset)) return { ...none, ouch: true };
   return { critical: true, criticalDice: dice, ouch: false, laterShot: false };

@@ -59,6 +59,22 @@ import { specialistDefense } from "../rules/weapon-specialist.mjs";
 import { currentInjuryEffects, currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { applyShaken } from "./shaken-application.mjs";
 import { beginNpcDefenseReview, reviewNpcHitDefense } from "./gc/post-hit-defense.mjs";
+import { queueResources } from "../services/transactions.mjs";
+import { damageApplicationKey } from "../rules/attack-damage-hits.mjs";
+import {
+  acquireDamageHit,
+  validateDamageHit,
+  damageHitCount,
+  assertDamageNotStarted,
+  reviewDamageHits
+} from "../documents/actor/damage-hits.mjs";
+import {
+  beginDamageApplication,
+  finishDamageApplication,
+  damageApplicationUndo,
+  damageApplications,
+  reviewDamageApplication
+} from "../documents/actor/damage-applications.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -190,6 +206,7 @@ export async function resolveAttack(message, options = {}) {
   const check = message.flags?.spycraft2,
     attacker = check?.actorUuid ? fromUuidSync(check.actorUuid) : null;
   if (!attacker?.isOwner || check.checkKind !== "attack" || !Number.isFinite(check.effectiveTotal)) return null;
+  assertDamageNotStarted(attacker, message);
   if (check.npcDefensePending)
     return reviewNpcHitDefense(message, {
       finalize: (resolution, target, id) =>
@@ -288,6 +305,7 @@ export async function resolveAttack(message, options = {}) {
 }
 
 export async function settleAttackResolution(message, attacker, target, resolution, { npcDefenseReviewId = "" } = {}) {
+  assertDamageNotStarted(attacker, message);
   const check = message.flags.spycraft2,
     pending = check.npcDefensePending,
     outcome = resolution,
@@ -408,7 +426,19 @@ export async function resolveQuickAttack(message) {
   return message;
 }
 
-rollPipeline.register({ id: "sourceAttackRecord", order: 9598, record: ["sourceAttack"] });
+rollPipeline.register({
+  id: "sourceAttackRecord",
+  order: 9598,
+  record: ["sourceAttack"],
+  acquire: acquireDamageHit,
+  validate: validateDamageHit,
+  flags: ({ checkKind, options, weaponQualities }) =>
+    checkKind === "attack"
+      ? { damageHitsVersion: 1 }
+      : checkKind === "damage" && options.weaponDamageText
+        ? { damageProfile: damageProfile(options.weaponDamageText, weaponQualities) }
+        : {}
+});
 
 rollPipeline.register({
   id: "attackResolutionControl",
@@ -428,6 +458,12 @@ rollPipeline.register({
           ]
         : [];
     const controls = [];
+    if (user?.isGM && check.attackResolution?.hit)
+      controls.push({
+        label: loc`GC: review damage hits`,
+        placement: "card",
+        run: () => reviewDamageHitDialog(actor, message)
+      });
     if (!check.resolved && !check.gcPostHitDefense && check.npcDefenseReroll)
       controls.push({
         label: check.npcDefenseReroll.resolution.defenseHidden
@@ -471,7 +507,8 @@ rollPipeline.register({
     if (resolution?.hit && check.successConfirmed === true && weapon && !check.attackContext?.pummel) {
       const target = resolution.targetUuid ? fromUuidSync(resolution.targetUuid) : null;
       // Once every hit has its damage card, rolling damage is no longer the card's next step.
-      const rolled = damageCardsFor(message);
+      const rolled = damageHitCount(actor, message) ?? damageCardsFor(message);
+      if (rolled >= Math.max(1, resolution.hits || 1)) return controls.length ? controls : null;
       controls.push({
         label: resolution.hits > 1 ? loc`Roll damage (one of ${resolution.hits} hits)` : loc`Roll damage`,
         placement: "card",
@@ -498,6 +535,35 @@ export function damageCardsFor(message, messages = globalThis.game?.messages ?? 
   for (const m of messages)
     if (m.flags?.spycraft2?.checkKind === "damage" && m.flags.spycraft2.sourceAttack?.uuid === message?.uuid) count++;
   return count;
+}
+
+export async function reviewDamageHitDialog(actor, message) {
+  const ledger = actor.flags?.spycraft2?.attackDamageHits?.[message.id];
+  if (!ledger) {
+    const input = await systemDialog.input({
+      window: { title: loc`Review older attack damage` },
+      position: { width: 560 },
+      rejectClose: false,
+      content: `<p>${loc`Count all hits that already had damage rolled, including deleted cards and unknown interrupted results. These hits stay consumed. Existing damage cards remain valid; do not reroll them.`}</p><label>${loc`Hits already rolled`} <input name="legacyUsed" type="number" min="0" max="${message.flags.spycraft2.attackResolution.hits}" step="1" required /></label>`,
+      ok: { label: loc`Record reviewed history` }
+    });
+    if (input) return reviewDamageHits(actor, message, { legacyUsed: Number(input.legacyUsed) });
+    return null;
+  }
+  const rows = ledger.slots.filter(r => r.state !== "cancelled");
+  if (!rows.length) return null;
+  const input = await systemDialog.input({
+    window: { title: loc`Review attack damage hits` },
+    position: { width: 560 },
+    rejectClose: false,
+    content: `<p>${loc`Restore a saved actual result without new dice. A hit with unknown dice can only be consumed after reviewing its actual effects.`}</p><label>${loc`Hit`} <select name="claimId">${rows.map(r => `<option value="${esc(r.claimId)}">${loc`Hit ${r.index}: ${r.state}`}</option>`).join("")}</select></label><label>${loc`Decision`} <select name="decision"><option value="restore">${loc`Restore saved result`}</option><option value="consume">${loc`Keep hit consumed; no new dice`}</option></select></label>`,
+    ok: { label: loc`Record decision` }
+  });
+  if (input)
+    return reviewDamageHits(actor, message, {
+      [input.decision === "consume" ? "consumeClaimId" : "restoreClaimId"]: input.claimId
+    });
+  return null;
 }
 
 /* -------------------------------------------- */
@@ -620,8 +686,9 @@ async function nonLethalDamage(target, kind, amount, facts) {
 
 /** Take a lethal hit off a special character's vitality and wounds and set the conditions that follow. */
 async function lethalOnSpecial(target, hit, source) {
-  const system = target.system,
-    plan = lethalHitPlan(
+  const plan = await queueResources([target], async () => {
+    const system = target.system;
+    const plan = lethalHitPlan(
       {
         vitality: system.vitality?.value,
         wounds: system.wounds?.value,
@@ -631,7 +698,18 @@ async function lethalOnSpecial(target, hit, source) {
       hit,
       currentInjuryEffects()
     );
-  if (plan.net) await target.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
+    const update = {};
+    if (plan.net) Object.assign(update, { "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
+    if (hit.applicationReceipt) {
+      const receipt = hit.applicationReceipt;
+      const row = damageApplications(target)[receipt.key];
+      if (row?.attempt !== receipt.attempt || row.state !== "applying" || row.lethalPlan)
+        throw Error(loc`This lethal hit already has effects or needs GC review.`);
+      update[`flags.spycraft2.damageApplications.${receipt.key}.lethalPlan`] = plan;
+    }
+    if (Object.keys(update).length) await target.update(update);
+    return plan;
+  });
   const lines = lethalHitLines(esc(target.name), plan);
   if (plan.fatigued) lines.push(await condition(target, "fatigued", loc`Fatigued`));
   if (plan.stateChanged) lines.push(...(await woundConditions(target, plan.state)));
@@ -786,7 +864,8 @@ const damageFacts = message => {
           campaignStressAdjusted: check.fallingDamage.campaignStressAdjusted === true,
           blast: false
         }
-      : damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities);
+      : (check.damageProfile ??
+        damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities));
   return {
     check,
     weapon,
@@ -838,7 +917,9 @@ export async function applyDamage(message, options = {}) {
   const { check, weapon, attack, rolled, profile, attackKind: kindOfAttack, applied } = damageFacts(message);
   if (!message.flags?.spycraft2 || !Number.isFinite(rolled)) return null;
   let input = options;
-  const crit = criticalDamageDefaults(attack, message.id);
+  const crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
+    hitIndex: check.sourceAttack?.hitIndex
+  });
   if (input.targetUuid === undefined) {
     const choices = targetChoices(),
       selected =
@@ -879,10 +960,16 @@ export async function applyDamage(message, options = {}) {
     attackKind = Object.hasOwn(SUBDUAL_ATTACK_KINDS, input.attackKind) ? input.attackKind : kindOfAttack,
     armorPiercing = Math.max(0, Math.trunc(Number(input.armorPiercing) || 0)),
     armorPiercingAll = input.armorPiercingAll === true,
-    critical = input.critical === true,
-    criticalDice = critical ? Math.max(1, Math.trunc(Number(input.criticalDice) || 0)) : 0;
+    critical = check.sourceAttack?.claimId ? crit.critical : input.critical === true,
+    criticalDice = critical
+      ? check.sourceAttack?.claimId
+        ? crit.criticalDice
+        : Math.max(1, Math.trunc(Number(input.criticalDice) || 0))
+      : 0;
   if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
   if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
+  if (!(await markCard(message, "damageApplicationStarted", { targetUuid: target.uuid }, { quiet: true })))
+    return refuse(loc`Record the damage card's application before changing the target. Ask the GC to finish it.`);
   const source = loc`${weapon?.name ?? loc`Damage`} (${message.id ?? "roll"})`;
   const weaponProficiency = check.weaponProficiency ?? attack?.weaponProficiency ?? weapon?.system?.proficiency ?? "";
   const specialistDR = specialistDefense(target.system, weaponProficiency).damageReduction;
@@ -899,148 +986,173 @@ export async function applyDamage(message, options = {}) {
     failed = false,
     result = null;
   // A picture of the target before anything is written, so the application can be undone from chat.
+  const application = await beginDamageApplication(target, check, message.id, {
+    ...input,
+    damage,
+    kind,
+    type,
+    attackKind,
+    armorPiercing,
+    armorPiercingAll,
+    critical,
+    criticalDice
+  });
+  let completed = false;
   const beforeDamage = snapshot(target);
   try {
-    if (target.type === "vehicle") {
-      if (damage < 1) return refuse(loc`A Damage save needs at least 1 point of damage.`);
-      result = await rollObjectDamageSave(target, {
-        damage,
-        armorPiercing,
-        blast: input.blast === true,
-        critical,
-        fire: type === "fire" || profile.type === "fire"
-      });
-    } else if (type && (target.type === "agent" || (isSpecial(target) && NPC_TYPED.includes(type)))) {
-      // A special damage type has its own saves and effects, kept with the agent's other hazards. A special NPC
-      // takes the types that are settled by a save alone; the ones that keep a running total stay with the GC.
-      const reduction = armorPiercingAll ? 0 : Math.max(0, hit.dr - armorPiercing);
-      result =
-        type === "fire"
-          ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true })
-          : await sufferTypedDamage(target, {
-              type,
-              amount: damage,
-              reduction,
-              source: weapon?.name ?? "",
-              review: input.reviewType === true,
-              allowed: target.type === "agent" ? undefined : NPC_TYPED
-            });
-      if (!result) return null;
-    } else if (!isSpecial(target)) {
-      // Standard NPCs and animals: damage reduction, then a Damage save on what is left.
-      const reduced = standardReduction(kind, hit);
-      if (reduced.stopped)
-        lines.push(loc`${esc(target.name)}: damage reduction ${reduced.dr} stops all ${damage} damage.`);
-      else if (reduced.net < 1) lines.push(loc`${esc(target.name)} takes no damage.`);
-      else {
-        if (reduced.dr) lines.push(loc`${esc(target.name)}: ${damage} less damage reduction ${reduced.dr}.`);
-        result = await npcDamageSave(target, {
-          damage: reduced.net,
-          kind,
+    hit.applicationReceipt = damageApplicationUndo(application);
+    try {
+      if (target.type === "vehicle") {
+        if (damage < 1) return refuse(loc`A Damage save needs at least 1 point of damage.`);
+        result = await rollObjectDamageSave(target, {
+          damage,
+          armorPiercing,
           blast: input.blast === true,
-          criticalDice,
-          campaignStressAdjusted: hit.campaignStressAdjusted
+          critical,
+          fire: type === "fire" || profile.type === "fire"
         });
+      } else if (type && (target.type === "agent" || (isSpecial(target) && NPC_TYPED.includes(type)))) {
+        // A special damage type has its own saves and effects, kept with the agent's other hazards. A special NPC
+        // takes the types that are settled by a save alone; the ones that keep a running total stay with the GC.
+        const reduction = armorPiercingAll ? 0 : Math.max(0, hit.dr - armorPiercing);
+        result =
+          type === "fire"
+            ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true })
+            : await sufferTypedDamage(target, {
+                type,
+                amount: damage,
+                reduction,
+                source: weapon?.name ?? "",
+                review: input.reviewType === true,
+                allowed: target.type === "agent" ? undefined : NPC_TYPED
+              });
         if (!result) return null;
-      }
-    } else if (kind === "lethal") {
-      // Juggernaut: the brawler may take up to half of the hit as subdual damage instead.
-      const converted = Math.min(
-        Math.max(0, Math.trunc(Number(input.juggernaut) || 0)),
-        // Only what gets past damage reduction can be converted.
-        juggernautConversion(
-          target.system,
-          armorPiercingAll ? damage : Math.max(0, damage - Math.max(0, (hit.dr ?? 0) - armorPiercing))
-        )
-      );
-      if (converted) hit.damage = damage - converted;
-      ({ plan: result, lines, pendingSave } = await lethalOnSpecial(target, hit, source));
-      if (converted) {
-        // The converted points are already past damage reduction, so it is not taken off again.
-        const subdual = await nonLethalDamage(target, "subdual", converted, {
+      } else if (!isSpecial(target)) {
+        // Standard NPCs and animals: damage reduction, then a Damage save on what is left.
+        const reduced = standardReduction(kind, hit);
+        if (reduced.stopped)
+          lines.push(loc`${esc(target.name)}: damage reduction ${reduced.dr} stops all ${damage} damage.`);
+        else if (reduced.net < 1) lines.push(loc`${esc(target.name)} takes no damage.`);
+        else {
+          if (reduced.dr) lines.push(loc`${esc(target.name)}: ${damage} less damage reduction ${reduced.dr}.`);
+          result = await npcDamageSave(target, {
+            damage: reduced.net,
+            kind,
+            blast: input.blast === true,
+            criticalDice,
+            campaignStressAdjusted: hit.campaignStressAdjusted
+          });
+          if (!result) return null;
+        }
+      } else if (kind === "lethal") {
+        // Juggernaut: the brawler may take up to half of the hit as subdual damage instead.
+        const converted = Math.min(
+          Math.max(0, Math.trunc(Number(input.juggernaut) || 0)),
+          // Only what gets past damage reduction can be converted.
+          juggernautConversion(
+            target.system,
+            armorPiercingAll ? damage : Math.max(0, damage - Math.max(0, (hit.dr ?? 0) - armorPiercing))
+          )
+        );
+        if (converted) hit.damage = damage - converted;
+        ({ plan: result, lines, pendingSave } = await lethalOnSpecial(target, hit, source));
+        if (converted) {
+          // The converted points are already past damage reduction, so it is not taken off again.
+          const subdual = await nonLethalDamage(target, "subdual", converted, {
+            source,
+            attackKind,
+            armorPiercing,
+            armorPiercingAll: true
+          });
+          lines.push(
+            loc`Juggernaut: ${converted} of the ${damage} lethal damage is taken as subdual damage.`,
+            ...subdual.lines
+          );
+          pendingSave ??= subdual.pendingSave;
+        }
+        if (type)
+          lines.push(loc`${typeLabel(type)} damage: its other effects on ${esc(target.name)} are worked out by hand.`);
+      } else if (damage > 0) {
+        ({ lines, pendingSave, failed } = await nonLethalDamage(target, kind, damage, {
           source,
           attackKind,
+          weaponProficiency,
           armorPiercing,
-          armorPiercingAll: true
-        });
-        lines.push(
-          loc`Juggernaut: ${converted} of the ${damage} lethal damage is taken as subdual damage.`,
-          ...subdual.lines
-        );
-        pendingSave ??= subdual.pendingSave;
-      }
-      if (type)
-        lines.push(loc`${typeLabel(type)} damage: its other effects on ${esc(target.name)} are worked out by hand.`);
-    } else if (damage > 0) {
-      ({ lines, pendingSave, failed } = await nonLethalDamage(target, kind, damage, {
-        source,
-        attackKind,
-        weaponProficiency,
-        armorPiercing,
-        armorPiercingAll,
-        critical,
-        campaignStressAdjusted: hit.campaignStressAdjusted
-      }));
-    } else lines.push(loc`${esc(target.name)} takes no damage.`);
-  } catch (error) {
-    return refuse(error.message);
-  }
-  // A Table of Ouch critical on a special character (p.329). An agent's injury is rolled from the damage card, where
-  // its sheet records it; a special NPC has no injury record, so its injury is rolled and reported here.
-  const ouchHit = crit.ouch && isSpecial(target) && kind === "lethal" && Number.isFinite(result?.net),
-    ouch = ouchHit && target.type === "agent",
-    rolls = [];
-  if (ouch) lines.push(loc`Table of Ouch critical: roll ${esc(target.name)}’s injury from the damage card.`);
-  else if (ouchHit) {
-    const plan = criticalInjuryRollPlan(target.system, {
-        id: `ouch-${message.id}-${target.id}`,
-        damage: result.net,
-        source: loc`Critical hit: ${weapon?.name ?? loc`Damage`}`,
-        confirmed: true
-      }),
-      roll = await new Roll(plan.formula).evaluate(),
-      injury = criticalInjuryResult(plan, roll.total - plan.damage);
-    rolls.push(roll);
-    lines.push(
-      injury.listed
-        ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${injury.surgeryDC}.`
-        : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
-    );
-  }
-  if (specialistDR && kind !== "stress" && target.type !== "vehicle")
-    lines.push(
-      loc`Foibles supplies 1 class damage reduction against this weapon; natural quality defenses, armor piercing and damage-type rules still apply (p.49).`
-    );
-  if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
-  // Nothing was written, so the card is not marked: its Apply button stays for another try.
-  if (failed) return null;
-  // When the card cannot be marked the report above is the record.
-  await markCard(
-    message,
-    "damageAppliedEntry",
-    { targetUuid: target.uuid, name: target.name, damage, kind, ...(ouch ? { ouch: true, net: result.net } : {}) },
-    { quiet: true }
-  );
-  // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
-  // become normal hits.
-  const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
-  if (
-    (critical || crit.ouch) &&
-    attackMessage &&
-    (Number(attack?.attackResolution?.hits) || 1) > 1 &&
-    !attack.criticalShotApplied
-  )
-    await markCard(attackMessage, "criticalShotApplied", { damageMessageId: message.id }, { quiet: true });
-  try {
-    const entry = undoEntry(target, beforeDamage, snapshot(target));
-    if (entry)
-      await postUndo(loc`${damage} ${kind} damage applied to ${target.name}`, [entry], {
-        damageCard: { messageId: message.id, targetUuid: target.uuid }
+          armorPiercingAll,
+          critical,
+          campaignStressAdjusted: hit.campaignStressAdjusted
+        }));
+      } else lines.push(loc`${esc(target.name)} takes no damage.`);
+    } catch (error) {
+      return refuse(error.message);
+    }
+    // A Table of Ouch critical on a special character (p.329). An agent's injury is rolled from the damage card, where
+    // its sheet records it; a special NPC has no injury record, so its injury is rolled and reported here.
+    const ouchHit = crit.ouch && isSpecial(target) && kind === "lethal" && Number.isFinite(result?.net),
+      ouch = ouchHit && target.type === "agent",
+      rolls = [];
+    if (ouch) lines.push(loc`Table of Ouch critical: roll ${esc(target.name)}’s injury from the damage card.`);
+    else if (ouchHit) {
+      const plan = criticalInjuryRollPlan(target.system, {
+          id: `ouch-${message.id}-${target.id}`,
+          damage: result.net,
+          source: loc`Critical hit: ${weapon?.name ?? loc`Damage`}`,
+          confirmed: true
+        }),
+        roll = await new Roll(plan.formula).evaluate(),
+        injury = criticalInjuryResult(plan, roll.total - plan.damage);
+      rolls.push(roll);
+      lines.push(
+        injury.listed
+          ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${injury.surgeryDC}.`
+          : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
+      );
+    }
+    if (specialistDR && kind !== "stress" && target.type !== "vehicle")
+      lines.push(
+        loc`Foibles supplies 1 class damage reduction against this weapon; natural quality defenses, armor piercing and damage-type rules still apply (p.49).`
+      );
+    const entry = failed ? null : undoEntry(target, beforeDamage, snapshot(target));
+    if (!failed) {
+      await finishDamageApplication(application, true, {
+        undoEntry: entry,
+        label: loc`${damage} ${kind} damage applied to ${target.name}`
       });
-  } catch (error) {
-    console.warn("Field Agent's Handbook | No Undo note could be left for this damage.", error);
+      completed = true;
+      if (entry)
+        await postUndo(loc`${damage} ${kind} damage applied to ${target.name}`, [entry], {
+          damageCard: { messageId: message.id, targetUuid: target.uuid },
+          damageApplicationUndo: damageApplicationUndo(application)
+        });
+    }
+    if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
+    // Nothing was written, so the card is not marked: its Apply button stays for another try.
+    if (failed) return null;
+    // When the card cannot be marked the report above is the record.
+    await markCard(
+      message,
+      "damageAppliedEntry",
+      { targetUuid: target.uuid, name: target.name, damage, kind, ...(ouch ? { ouch: true, net: result.net } : {}) },
+      { quiet: true }
+    );
+    // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
+    // become normal hits.
+    const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
+    if (
+      (critical || crit.ouch) &&
+      attackMessage &&
+      (Number(attack?.attackResolution?.hits) || 1) > 1 &&
+      !attack.criticalShotApplied
+    )
+      await markCard(attackMessage, "criticalShotApplied", { damageMessageId: message.id }, { quiet: true });
+    return result ?? true;
+  } finally {
+    if (!completed)
+      await finishDamageApplication(application, false, {
+        undoEntry: undoEntry(target, beforeDamage, snapshot(target)),
+        label: loc`Interrupted ${kind} damage to ${target.name}`
+      });
   }
-  return result ?? true;
 }
 
 /**
@@ -1215,8 +1327,13 @@ export async function applyDamageBatch(message, inputs) {
       relayed.push(input);
       continue;
     }
-    const result = await applyDamage(message, input);
-    (result ? done : missed).push(target ? targetLabel(target) : input.targetUuid);
+    try {
+      const result = await applyDamage(message, input);
+      (result ? done : missed).push(target ? targetLabel(target) : input.targetUuid);
+    } catch (error) {
+      missed.push(target ? targetLabel(target) : input.targetUuid);
+      ui.notifications.warn(error.message);
+    }
   }
   if (relayed.length) {
     try {
@@ -1263,7 +1380,7 @@ function criticalHint(crit) {
 }
 
 export function quickApplyInput(message, targetUuid, damage = null) {
-  const { rolled, profile, attack, attackKind } = damageFacts(message);
+  const { check, rolled, profile, attack, attackKind } = damageFacts(message);
   return {
     targetUuid,
     damage: damage ?? Math.max(0, Math.trunc(rolled)),
@@ -1272,7 +1389,11 @@ export function quickApplyInput(message, targetUuid, damage = null) {
     attackKind,
     armorPiercing: profile.armorPiercing,
     armorPiercingAll: false,
-    ...(({ critical, criticalDice }) => ({ critical, criticalDice }))(criticalDamageDefaults(attack, message.id)),
+    ...(({ critical, criticalDice }) => ({ critical, criticalDice }))(
+      criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
+        hitIndex: check.sourceAttack?.hitIndex
+      })
+    ),
     blast: profile.blast === true,
     reviewType: true
   };
@@ -1346,6 +1467,35 @@ rollPipeline.register({
         run: () => applyBlast(message)
       });
     controls.push(...ouchInjuryControls(message, check));
+    if (
+      game.user?.isGM &&
+      targetChoices().actors.some(actor => damageApplications(actor)[damageApplicationKey(check, message.id)])
+    )
+      controls.push({ label: loc`GC: review target application`, run: () => reviewTargetDamageDialog(message) });
     return controls;
   }
 });
+
+export async function reviewTargetDamageDialog(message) {
+  const check = message.flags?.spycraft2 ?? {},
+    key = damageApplicationKey(check, message.id);
+  const actors = targetChoices().actors.filter(actor => actor.isOwner && damageApplications(actor)[key]);
+  if (!actors.length) return refuse(loc`This damage has no target application receipt to review.`);
+  const input = await systemDialog.input({
+    window: { title: loc`Review target damage` },
+    position: { width: 560 },
+    rejectClose: false,
+    content: `<p>${loc`Check the target's actual health, saves, conditions and reports first. Keep actual effects without replaying dice. Release only after verifying that no effects or dice occurred. Saved Undo evidence can be restored for a completed application.`}</p><label>${loc`Target`} <select name="targetUuid">${actors.map(actor => `<option value="${esc(actor.uuid)}">${esc(actor.name)} (${esc(damageApplications(actor)[key].state)})</option>`).join("")}</select></label><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects; restore saved Undo note`}</option><option value="release">${loc`Verified no effects or dice; allow same result again`}</option></select></label><label><input type="checkbox" name="confirmedNoEffects" /> ${loc`I verified that no effects or dice occurred`}</label><label>${loc`What actually happened`} <textarea name="note" required></textarea></label>`,
+    ok: { label: loc`Record review` }
+  });
+  if (!input) return null;
+  const actor = actors.find(a => a.uuid === input.targetUuid);
+  if (!actor) return null;
+  const row = await reviewDamageApplication(actor, key, input);
+  if (input.decision === "keep" && row.undoEntry)
+    return postUndo(row.label ?? loc`Reviewed damage application`, [row.undoEntry], {
+      damageCard: { messageId: message.id, targetUuid: actor.uuid },
+      damageApplicationUndo: { actorUuid: actor.uuid, key, attempt: row.attempt }
+    });
+  return true;
+}

@@ -340,8 +340,10 @@ test("lethal damage comes off a special character's vitality and wounds and sets
     { targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }
   ]);
   // A critical hit while vitality remains goes to wounds; armor-piercing lowers the DR.
+  await assert.rejects(applyDamage(damage, { targetUuid: kevin.uuid, damage: 11, kind: "lethal" }), /already reached/);
   kevin.system.vitality.value = 10;
-  await applyDamage(damage, {
+  const criticalCard = card("d1-critical", { actorUuid: "Actor.Guard", checkKind: "damage", effectiveTotal: 10 });
+  await applyDamage(criticalCard, {
     targetUuid: kevin.uuid,
     damage: 10,
     kind: "lethal",
@@ -588,7 +590,8 @@ test("a special NPC's stress and subdual damage is totalled and its threshold sa
   await applyDamage(damage, { targetUuid: boss.uuid, damage: 8, kind: "subdual" });
   assert.deepEqual(nonLethalTotals(boss), { stress: 0, subdual: 8 });
   assert.equal(posted.at(-1).flags, undefined, "below the threshold: no save");
-  await applyDamage(damage, { targetUuid: boss.uuid, damage: 6, kind: "subdual" });
+  const nextDamage = card("d4-next", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 6 });
+  await applyDamage(nextDamage, { targetUuid: boss.uuid, damage: 6, kind: "subdual" });
   assert.equal(nonLethalTotals(boss).subdual, 14);
   const save = posted.at(-1).flags.spycraft2.pendingSave;
   assert.deepEqual([save.kind, save.saveKey, save.dc, save.damageKind], ["thresholdSave", "fort", 12, "subdual"]);
@@ -817,16 +820,16 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
   game.user.targets = [{ actor: guard }, { actor: second }];
   const each = controls(damage).find(c => c.label === "Apply 7 to 2 targets");
   await each.run();
-  assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
-  assert.match(posted.at(-1).content, /Damage applied to 2 targets/);
+  assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [13, 13]);
+  assert.match(posted.at(-1).content, /Damage applied to Guard2/);
+  assert.match(posted.at(-1).content, /Not applied to: Guard/);
   game.user.targets = [];
   // A target the damage cannot reach is named as not applied, never counted as done.
   const crate = document({ uuid: "Actor.Crate", name: "Crate", type: "loot", isOwner: true, system: {}, flags: {} });
   registry.set(crate.uuid, crate);
   const done = await applyDamageToEach(damage, [second, crate]);
-  assert.deepEqual(done, ["Guard2 (not on the scene)"]);
-  assert.match(posted.at(-1).content, /Damage applied to Guard2/);
-  assert.match(posted.at(-1).content, /Not applied to: Crate/);
+  assert.deepEqual(done, []);
+  assert.match(posted.at(-1).content, /Not applied to: Guard2.*Crate/);
 });
 
 test("wound loss from applied damage records its end-of-round Initiative change", async () => {

@@ -858,6 +858,7 @@ export const ActorAttackRolls = Base =>
         underwaterDamage: damage.underwaterDamage,
         featReminders: options.featReminders,
         sourceAttack: options.sourceAttack ?? null,
+        weaponDamageText: damage.damageText ?? item.system.damage,
         pummelDamage: pummel,
         styleOverCaliber: options.styleOverCaliber === true,
         kick: options.kick === true,

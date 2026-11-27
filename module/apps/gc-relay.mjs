@@ -17,6 +17,7 @@
 import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { loc, locKey } from "../i18n.mjs";
+import { markDamageApplicationStart } from "../documents/actor/damage-hits.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
 export const RELAY_QUERY = "spycraft2.relay";
@@ -169,6 +170,7 @@ export async function askGC(action, data = {}, { timeout = 120000 } = {}) {
 
 /** Flags a player may set on a card that reports on his own character, with the values each may take. */
 const MARKS = {
+  damageApplicationStarted: value => typeof value?.targetUuid === "string",
   "pendingSave.rolled": value => value === true,
   "hazardSave.resolved": value => value === true,
   firstAid: value => typeof value?.patientUuid === "string" && typeof value?.name === "string",
@@ -197,7 +199,10 @@ registerRelay("markCard", {
       throw new Error(loc`That card cannot be marked this way.`);
     // The player whose own character took the damage may record that on the attacker's card: the damage itself, and
     // that the attack's critical shot is used up (the damage card must come from this attack and name that character).
-    let damaged = key === "damageAppliedEntry" && value?.targetUuid ? await fromUuid(value.targetUuid) : null;
+    let damaged =
+      ["damageAppliedEntry", "damageApplicationStarted"].includes(key) && value?.targetUuid
+        ? await fromUuid(value.targetUuid)
+        : null;
     if (key === "criticalShotApplied") {
       const damage = game.messages.get(value.damageMessageId)?.flags?.spycraft2;
       if (damage?.sourceAttack?.uuid === message.uuid)
@@ -211,6 +216,7 @@ registerRelay("markCard", {
     }
     if (!user.isGM && !actor?.testUserPermission(user, "OWNER") && !damaged?.testUserPermission?.(user, "OWNER"))
       throw new Error(loc`Only the character's own player can mark that card.`);
+    if (key === "damageApplicationStarted") return markDamageApplicationStart(message, value);
     await message.update(markUpdate(message, key, value));
     return true;
   }
@@ -222,8 +228,10 @@ registerRelay("markCard", {
  */
 export async function markCard(message, key, value = true, { quiet = false } = {}) {
   try {
-    if (message.isAuthor || game.user.isGM) await message.update(markUpdate(message, key, value));
-    else await askGC("markCard", { messageId: message.id, key, value });
+    if (message.isAuthor || game.user.isGM) {
+      if (key === "damageApplicationStarted") return await markDamageApplicationStart(message, value);
+      await message.update(markUpdate(message, key, value));
+    } else await askGC("markCard", { messageId: message.id, key, value });
     return true;
   } catch (error) {
     if (quiet) return false;

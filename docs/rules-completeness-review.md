@@ -1325,3 +1325,46 @@ feats/training **1.80/2**, with the other dimensions unchanged. Combat stays
 **9.6/10**. The broad class/origin/feat and equipment source audits, additional
 expert/multiclass creation cases and remaining combat/campaign gaps are still
 open; these two complete creation cases do not establish universal coverage.
+
+## Review 45: attack damage belongs to actual hits
+
+The combat review found that damage cards were counted only in chat. Deleting
+cards could free apparent hits, the first applied card could take a multi-hit
+attack's critical, and the same card could reduce one target's health twice.
+
+Damage now reserves a numbered hit on the attacker before RNG. The journal
+retains pending and completed rolls after card deletion, saves actual dice
+before posting and reconciles a lost successful response. Known unrolled
+cancellations release their slot; uncertain results retain it for GC review.
+Recovery restores saved results without rolling again. Older attacks require
+a reviewed count of already rolled hits, including deleted results. Critical
+activation is frozen with the roll and belongs to hit 1, independently of
+application order. Legal damage boosts update the saved result, and damage
+profiles survive later weapon edits or deletion. Attack changes stop once
+damage begins; damage boosts stop once application begins.
+
+Each target retains a stable hit/application receipt. Concurrent presses and
+restored cards cannot repeat that hit's effects. Pending target applications
+block further hits until settled or reviewed. Lethal health changes and their
+plan are written together under the target's lock. Partial failures retain
+Undo evidence and require GC review instead of replaying saves or effects.
+The GC can retain actual effects and recover the Undo note, or release a
+verified effect-free attempt. Positive health or Undo evidence cannot be
+released. Undo preserves the source hit quota and permits applying the same
+saved result again, with a new application attempt. Application records are
+replaced exactly so Foundry's merge behavior cannot retain an earlier plan.
+
+Native Foundry exercised a real three-hit burst, failed damage-card posting,
+saved-result restoration, numbered rolls, a refused fourth roll, out-of-order
+application, duplicate refusal after card deletion/restoration, Undo and
+reapplication, and a later weapon edit. The actual GC target-review dialog
+also completed at 1280 × 720. No browser errors occurred; the only recorded
+diagnostic was Foundry's known minimum-resolution warning. Automated checks:
+**4,274** Node tests, **988** fixture assertions and **261** layouts pass.
+Native schemas, lint, formatting, bundling and copy checks pass with existing
+warnings.
+
+PC creation remains **9.5/10** and combat **9.6/10**. This closes a material
+damage-delivery gap, but does not close the remaining Count, finalized-Defense
+correction, environment/grapple, campaign and broad source-audit gaps. The
+9.9 target has not yet been reached.
