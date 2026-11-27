@@ -1067,6 +1067,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         classLevel: counts,
         vitalityDie: ci?.system.vitalityDie,
         vitality: fixed ?? p.vitality,
+        needsVitalityReview: !!p.vitalityHistoryId && !p.vitality,
         fixedVitality: fixed !== null,
         fixedVitalityLabel: fixed !== null ? loc`Fragile: fixed class gain.` : "",
         first: i === 0,

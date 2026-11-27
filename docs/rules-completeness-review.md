@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **9.0/10**;
+**Continuing review, 26 November 2026:** PC creation **9.1/10**;
 combat play **9.2/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -489,3 +489,19 @@ natively verified hazard/damage paths, with remaining B-183 cases still explicit
 The next creation review targets retained vitality history when a level is removed
 and rebuilt. Neither area is complete; source-data and inherited-choice auditing,
 campaign details and the other combat/environment gaps remain required work.
+
+The creation history pass closes B-106. Removing a career level atomically retains
+its raw vitality source; rebuilding the same class/die restores its value, roll
+reference, career identity and historical Intelligence. A different class/die
+requires raw-result review rather than fresh RNG. Original roll or review evidence
+governs the archived source even if the class item's die was edited. Removing an
+unresolved rebuild cannot overwrite that original result. Deleted chat receipts,
+competing calls and lost removal responses do not permit another vitality roll.
+
+The native test restores an actual recorded Soldier gain with RNG disabled. After
+changing d12 to d8, the rebuilt row has no raw value, refuses RNG, hides the Roll
+button and retains Review; restoring d12 restores the original result and IDs.
+All **4,042** Node tests and **227** layout tests pass, along with native schemas,
+lint, formatting, bundling and the text-copy check. Creation rises to **9.1/10**;
+combat remains **9.2/10**. Inherited feature effects and the source-data audit are
+next; both scores remain below the requested target.

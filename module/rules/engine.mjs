@@ -1812,6 +1812,11 @@ function deriveFinalTotals(state) {
     const valid =
       fixed !== null || (Number.isSafeInteger(entry.vitality) && entry.vitality >= 0 && entry.vitality <= die);
     const roll = idx === 0 ? die : (fixed ?? (valid ? entry.vitality : 0));
+    if (idx > 0 && entry.vitalityHistoryId && !entry.vitality && fixed === null) {
+      const text = loc`Level ${idx + 1}: the class or vitality die changed after a recorded level was removed. Review the actual raw vitality result; do not reroll it.`;
+      warnings.push(text);
+      todo.push({ order: 15, error: true, tab: "classes", text });
+    }
     if (idx > 0 && !valid) {
       const text = loc`Level ${idx + 1}: review vitality and enter a whole die result from 1 to ${die}.`;
       warnings.push(text);

@@ -17,6 +17,7 @@ import { sameValues as same } from "../../rules/equal.mjs";
 import { modularCreationPlan } from "../../rules/modular-creation.mjs";
 import { advancementPlan } from "../../rules/advancement.mjs";
 import { recordReplacementPatch } from "../../rules/record-patch.mjs";
+import { retainedVitality, removedVitalityKey, removedVitalityRecord } from "../../rules/retained-vitality.mjs";
 import {
   CREATION_ABILITIES,
   startingAttributeSignature,
@@ -364,6 +365,8 @@ export const ActorProgression = Base =>
         level &&
         promptVitality &&
         level > 1 &&
+        !this.system.progression[level - 1].vitality &&
+        !this.system.progression[level - 1].vitalityHistoryId &&
         cls?.system.vitalityDie &&
         campaignVitalityDie(cls.system.vitalityDie, currentCampaignRules().effects) === null
       ) {
@@ -414,6 +417,12 @@ export const ActorProgression = Base =>
           : null;
       if (expertEntry && !expertEntry.ok)
         return refuseStep(loc`Expert-class entry requirements are not met: ${expertEntry.unmet.join("; ")}.`);
+      const retained = retainedVitality(
+        this.flags?.spycraft2?.removedLevelVitality,
+        sys.progression.length + 1,
+        ident,
+        definition.vitalityDie
+      );
       if (!cls) {
         const data = classData.toObject?.() ?? foundry.utils.deepClone(classData);
         delete data._id;
@@ -423,6 +432,10 @@ export const ActorProgression = Base =>
         ...sys.progression.map(p => ({ ...p })),
         { classId: ident, careerEntryId: foundry.utils.randomID(), vitality: 0, skills: {}, expertEntry }
       ];
+      if (retained)
+        Object.assign(progression.at(-1), retained, {
+          careerEntryId: retained.careerEntryId || progression.at(-1).careerEntryId
+        });
       const preview = this.system.toObject?.() ?? foundry.utils.deepClone(this.system);
       Object.assign(preview, this.attributeRuleContext);
       preview.progression = progression;
@@ -438,13 +451,15 @@ export const ActorProgression = Base =>
           modularTrade: this.flags?.spycraft2?.modularTrade
         }
       );
-      progression.at(-1).intelligenceModifier = Math.floor(
-        (preview.abilities.int.value -
-          (preview.abilities.int.misc ?? 0) -
-          (preview.abilities.int.temporaryBonus ?? 0) -
-          10) /
-          2
-      );
+      progression.at(-1).intelligenceModifier =
+        retained?.intelligenceModifier ??
+        Math.floor(
+          (preview.abilities.int.value -
+            (preview.abilities.int.misc ?? 0) -
+            (preview.abilities.int.temporaryBonus ?? 0) -
+            10) /
+            2
+        );
       const freshAdvancement = advancementPlan(this.system, CONFIG.SPYCRAFT, advancementContext());
       if (!same(advancement, freshAdvancement))
         return refuseStep(loc`The mission, XP or advancement permission changed. Review the level again.`);
@@ -483,9 +498,44 @@ export const ActorProgression = Base =>
       const progression = [...this.system.progression];
       const last = progression.pop();
       if (!last) return;
-      await this.update({ "system.progression": progression });
+      const cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === last.classId);
+      const evidence =
+        this.flags?.spycraft2?.vitalityReviews?.[last.vitalityReviewId] ??
+        this.flags?.spycraft2?.vitalityRolls?.[last.vitalityRollId];
+      const held = !last.vitality && last.vitalityHistoryId;
+      if (!held && evidence && evidence.value !== last.vitality)
+        throw Error(
+          loc`Review vitality that disagrees with its original roll or correction before removing this level.`
+        );
+      const record = held
+        ? null
+        : removedVitalityRecord(
+            { ...last, classId: evidence?.classId ?? last.classId },
+            progression.length + 1,
+            evidence?.die ?? cls?.system.vitalityDie,
+            foundry.utils.randomID(),
+            Date.now()
+          );
+      const key = record && removedVitalityKey(record.careerLevel, record.classId, record.die);
+      try {
+        await this.update({
+          "system.progression": progression,
+          ...(record
+            ? recordReplacementPatch(
+                `flags.spycraft2.removedLevelVitality.${key}`,
+                record,
+                this.flags?.spycraft2?.removedLevelVitality?.[key]
+              )
+            : {})
+        });
+      } catch (error) {
+        if (
+          !same(this.system.progression, progression) ||
+          (record && !same(this.flags?.spycraft2?.removedLevelVitality?.[key], record))
+        )
+          throw error;
+      }
       if (!progression.some(p => p.classId === last.classId)) {
-        const cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === last.classId);
         if (cls) await cls.delete();
       }
       await this.syncGrantedFeats();

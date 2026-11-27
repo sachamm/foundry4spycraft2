@@ -96,7 +96,11 @@ export async function rollCareerVitality(actor, index) {
         }
       return { total: source.value, recorded: true, legacy: !record, levelId: source.levelId };
     }
-    if (source.reviewId || (source.levelId && actor.flags?.spycraft2?.vitalityRolls?.[source.levelId]))
+    if (
+      source.historyId ||
+      source.reviewId ||
+      (source.levelId && actor.flags?.spycraft2?.vitalityRolls?.[source.levelId])
+    )
       throw new Error(
         loc`The current vitality value disagrees with its recorded history. Review it before continuing.`
       );

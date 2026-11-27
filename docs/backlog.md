@@ -196,7 +196,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-103 | Damage and Initiative ignore Shift. Apply the gesture table. | SG-D3 | S | earlier |
 | B-104 | Attestation-length checkbox labels (159 `…Confirmed` names in 74 files); Fight Defensively still needs a confirm tick; Aim is an honour-system tick box with no Aim action. Effect labels ("Flanking +2") with the detail as a hint; defaults, not attestations. | SG-D5, LR-20b, LR-32 | L | earlier |
 | B-105 | Initiative offers no action-die boost. | LR-34b | S | earlier |
-| B-106 | Removing and re-adding a level re-rolls vitality. Keep the roll. | LR-33b | S | earlier |
 | B-107 | Reaction controls: the target's button disappears once the attack is resolved; the card has no "incoming attack on …" heading. | LR-9 | S | earlier |
 | B-108 | One person, three names: sample agents are "Name — Class 1 (role)", and cards use the speaker name with no code name. | LR-27 | S | earlier |
 | B-109 | No one-step "New agent for player…" (create, own, assign) and no hint on a player's empty Actors tab. | LR-35 | S | earlier |

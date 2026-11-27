@@ -4,6 +4,7 @@ import { advancementPlan, missionLevelSnapshot } from "../module/rules/advanceme
 import { ActorProgression } from "../module/documents/actor/progression.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { rollCareerVitality, reviewCareerVitality } from "../module/apps/vitality.mjs";
 
 const source = (level = 1, xp = 1000000) => ({
   xp,
@@ -156,4 +157,121 @@ test("the owning GC can repair unknown advancement history with an audited recor
     a.reviewAdvancement({ mode: "grant", ceiling: 20, confirmed: true, note: "Unapproved" }),
     /owning GC/
   );
+});
+
+test("removing and rebuilding a career level preserves its original roll, identity and Intelligence history", async () => {
+  const { a } = actor();
+  let serial = 0,
+    rng = 0;
+  game.time = { worldTime: 0 };
+  game.messages = [];
+  game.spycraft2 = {};
+  foundry.utils.randomID = () => `retained${++serial}`;
+  foundry.utils.escapeHTML = String;
+  globalThis.ChatMessage = { getSpeaker: () => ({}) };
+  globalThis.Roll = class {
+    constructor(formula) {
+      this.formula = formula;
+    }
+    async evaluate() {
+      rng++;
+      this.total = 4;
+      this._evaluated = true;
+      return this;
+    }
+    toJSON() {
+      return { formula: this.formula, total: this.total, evaluated: this._evaluated };
+    }
+    static fromJSON(text) {
+      const d = JSON.parse(text),
+        r = new this(d.formula);
+      r.total = d.total;
+      r._evaluated = d.evaluated;
+      return r;
+    }
+    async toMessage(data) {
+      const m = { ...data, id: `chat${++serial}` };
+      game.messages.push(m);
+      return m;
+    }
+  };
+  await a.addClassLevel(cls, { promptVitality: false });
+  await rollCareerVitality(a, 1);
+  const original = structuredClone(a.system.progression[1]);
+  await a.removeLastLevel();
+  a.system.abilities.int.base = 18;
+  await a.addClassLevel(cls, { promptVitality: false });
+  const rebuilt = a.system.progression[1];
+  for (const key of ["vitality", "vitalityRollId", "careerEntryId", "intelligenceModifier"])
+    assert.equal(rebuilt[key], original[key], key);
+  game.messages.length = 0;
+  assert.equal((await rollCareerVitality(a, 1)).total, 4);
+  assert.equal(rng, 1, "deleting chat does not permit another vitality roll");
+
+  await a.removeLastLevel();
+  const other = {
+    id: "other",
+    name: "Other",
+    type: "class",
+    system: { ...cls.system, identifier: "other", vitalityDie: 12 },
+    async delete() {
+      a.items = a.items.filter(i => i !== this);
+    }
+  };
+  a.items.push(other);
+  await a.addClassLevel(other, { promptVitality: false });
+  assert.equal(a.system.progression[1].vitality, 0);
+  assert.ok(a.system.progression[1].vitalityHistoryId);
+  assert.ok(a.system.todo.some(t => t.text.includes("do not reroll")));
+  await assert.rejects(rollCareerVitality(a, 1), /recorded history/);
+  assert.equal(rng, 1);
+  await reviewCareerVitality(a, 1, { value: 5, confirmed: true, note: "GC reviewed corrected class die result" });
+  assert.equal((await rollCareerVitality(a, 1)).total, 5);
+  await a.removeLastLevel();
+  await a.addClassLevel(cls, { promptVitality: false });
+  assert.equal(
+    a.system.progression[1].vitality,
+    4,
+    "returning to the original class restores that source's original result"
+  );
+  assert.equal(a.system.progression[1].vitalityRollId, original.vitalityRollId);
+  assert.equal(rng, 1);
+  try {
+    cls.system.vitalityDie = 12;
+    await a.removeLastLevel();
+    await a.addClassLevel(cls, { promptVitality: false });
+    assert.equal(a.system.progression[1].vitality, 0, "editing the class die cannot relabel an old roll");
+    await assert.rejects(rollCareerVitality(a, 1), /recorded history/);
+    cls.system.vitalityDie = 8;
+    await a.removeLastLevel();
+    await a.addClassLevel(cls, { promptVitality: false });
+    assert.equal(
+      a.system.progression[1].vitality,
+      4,
+      "removing an unresolved rebuild does not erase the original result"
+    );
+    assert.equal(a.system.progression[1].vitalityRollId, original.vitalityRollId);
+    assert.equal(rng, 1);
+  } finally {
+    cls.system.vitalityDie = 8;
+  }
+});
+
+test("level removal records vitality atomically and recognizes an already committed removal after response loss", async () => {
+  const { a } = actor();
+  await a.addClassLevel(cls, { promptVitality: false });
+  const update = a.update;
+  a.update = async () => {
+    throw Error("write refused");
+  };
+  await assert.rejects(a.removeLastLevel(), /write refused/);
+  assert.equal(a.system.level, 2);
+  assert.equal(a.flags.spycraft2?.removedLevelVitality, undefined);
+  a.update = async patch => {
+    await update.call(a, patch);
+    throw Error("response lost");
+  };
+  await a.removeLastLevel();
+  assert.equal(a.system.level, 1);
+  assert.equal(Object.keys(a.flags.spycraft2.removedLevelVitality).length, 1);
 });

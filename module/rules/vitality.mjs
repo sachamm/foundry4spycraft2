@@ -14,8 +14,9 @@ export function vitalitySource(actor, index, { allowInvalidValue = false } = {})
       loc`The saved vitality result is outside its class die. Use Review vitality to enter the confirmed result before rolling.`
     );
   const levelId = entry.vitalityRollId ?? "",
-    reviewId = entry.vitalityReviewId ?? "";
-  if ((levelId && !validId(levelId)) || (reviewId && !validId(reviewId)))
+    reviewId = entry.vitalityReviewId ?? "",
+    historyId = entry.vitalityHistoryId ?? "";
+  if ((levelId && !validId(levelId)) || (reviewId && !validId(reviewId)) || (historyId && !validId(historyId)))
     throw new Error(loc`Review this career level’s vitality references.`);
   return {
     index,
@@ -26,7 +27,8 @@ export function vitalitySource(actor, index, { allowInvalidValue = false } = {})
     die,
     value: entry.vitality,
     levelId,
-    reviewId
+    reviewId,
+    historyId
   };
 }
 export const vitalitySourceEvidence = source => JSON.stringify(source);

@@ -395,6 +395,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           careerEntryId: str(),
           vitalityRollId: str(),
           vitalityReviewId: str(),
+          vitalityHistoryId: str(),
           /** INT modifier when points were earned; null reconstructs legacy history. */
           intelligenceModifier: new NumberField({ nullable: true, initial: null, integer: true }),
           /** Expert-class entry qualification at the time the level was taken. */
