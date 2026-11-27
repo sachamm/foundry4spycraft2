@@ -16,6 +16,13 @@
   }
  },
  "SPYCRAFT": {
+  "CampaignGear": {
+   "PersonalSource": "Personal gear source",
+   "Approved": "The GC approved this Possession",
+   "PickCount": "Possessions picks",
+   "ExtraFrom": "Big Budget extra Caliber I Possession from",
+   "ExtraHint": "Choose a funded Wealth Possession of the same gear category that supplies this extra pick."
+  },
   "Retro": {
    "EquipmentFile": "Reference file",
    "Archive": "Operations archive",

@@ -1,4 +1,5 @@
 import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
+import { campaignPickCaliber } from "./campaign-gear.mjs";
 import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
 import { unarmedTrickDamageBonus } from "./unarmed-tricks.mjs";
 import { hordeSupremacyDamage } from "./team-feats.mjs";
@@ -61,6 +62,7 @@ export function equipmentCategory(item) {
   if (explicit) return explicit;
   if (item?.type === "weapon") return "W";
   if (item?.type === "armor") return "S";
+  if (item?.type === "vehicle") return "V";
   return ["E", "G", "R", "S", "T", "V", "W"].includes(system.pick) ? system.pick : "";
 }
 /** Spycraft 2.0 pp.217–219,284,299,329. Pure equipment calculations. */
@@ -855,13 +857,35 @@ export function possessionBudget(items, allowance = "", system = {}) {
     available = Object.fromEntries([1, 2, 3, 4, 5].map(c => [c, 0]));
   for (const match of String(allowance).matchAll(/(\d+)\s*\/\s*(IV|III|II|V|I)\b/g))
     available[roman[match[2]]] += Number(match[1]);
+  const shift = system.campaignEffects?.gearCaliberShift ?? 0;
+  const pools = Object.entries(available).map(([base, count]) => ({
+    base: Number(base),
+    count,
+    ...campaignPickCaliber(Number(base), system.campaignEffects)
+  }));
+  for (const caliber of Object.keys(available)) available[caliber] = 0;
+  let lost = 0,
+    extraI = 0;
+  for (const pool of pools) {
+    if (pool.lost) lost += pool.count;
+    else available[pool.caliber] += pool.count;
+    extraI += pool.extraI * pool.count;
+  }
+  available[1] += extraI;
   const remaining = { ...available },
     assignments = [],
     warnings = [];
-  const gear = items.filter(i => ["weapon", "armor", "gear"].includes(i.type));
+  const gear = items.filter(i => ["weapon", "armor", "gear", "vehicle"].includes(i.type));
   const selected = gear
     .filter(i => i.system.possessionSource === "wealth")
     .sort((a, b) => (b.system.caliber ?? 0) - (a.system.caliber ?? 0));
+  const donors = new Set(selected.map(i => i.system.campaignBonusOf).filter(Boolean));
+  selected.sort(
+    (a, b) =>
+      Number(donors.has(b.id)) - Number(donors.has(a.id)) ||
+      Number(!!a.system.campaignBonusOf) - Number(!!b.system.campaignBonusOf)
+  );
+  const extraByItem = new Map();
   let spent = 0,
     unfunded = 0;
   for (const item of gear.filter(i => i.system.possessionSource)) {
@@ -892,14 +916,36 @@ export function possessionBudget(items, allowance = "", system = {}) {
     spent += count;
     let need = count;
     const slots = [];
-    for (let cap = caliber; cap <= 5 && need; cap++) {
-      const used = Math.min(need, remaining[cap]);
-      if (used) {
-        remaining[cap] -= used;
+    if (item.system.campaignBonusOf) {
+      const donor = selected.find(i => i.id === item.system.campaignBonusOf && !i.system.campaignBonusOf);
+      const room = extraByItem.get(donor?.id) ?? 0;
+      if (caliber === 1 && donor && equipmentCategory(donor) && equipmentCategory(donor) === equipmentCategory(item)) {
+        const used = Math.min(need, room);
+        extraByItem.set(donor.id, room - used);
+        remaining[1] -= used;
         need -= used;
-        slots.push({ caliber: cap, count: used });
+        if (used) slots.push({ caliber: 1, count: used, bonusOf: donor.id });
       }
-    }
+      if (need)
+        warnings.push(
+          loc`${item.name}: its Big Budget extra Possession needs an unused Caliber I allowance from a funded Possession of the same gear category.`
+        );
+    } else
+      for (const pool of [...pools].sort((a, b) =>
+        donors.has(item.id)
+          ? b.extraI - a.extraI || a.caliber - b.caliber
+          : a.caliber - b.caliber || b.extraI - a.extraI
+      )) {
+        if (!need || pool.lost || pool.caliber < caliber) continue;
+        const used = Math.min(need, pool.count);
+        if (used) {
+          pool.count -= used;
+          remaining[pool.caliber] -= used;
+          need -= used;
+          slots.push({ caliber: pool.caliber, count: used, ...(shift ? { baseCaliber: pool.base } : {}) });
+          if (pool.extraI) extraByItem.set(item.id, (extraByItem.get(item.id) ?? 0) + used);
+        }
+      }
     assignments.push({ id: item.id, name: item.name, caliber, count, slots, unfunded: need });
     unfunded += need;
     if (need)
@@ -917,6 +963,7 @@ export function possessionBudget(items, allowance = "", system = {}) {
     unfunded,
     total: Object.values(available).reduce((a, b) => a + b, 0),
     warnings,
+    ...(shift ? { campaign: { shift, lost, extraI } } : {}),
     unclassified: gear.filter(
       i =>
         !i.system.possessionSource &&

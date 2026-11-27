@@ -99,7 +99,11 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
     // The details template follows the item type (_configureRenderParts); feats and origins share the bonuses table.
     details: {
       template: `${TPL}/item-gear.hbs`,
-      templates: [`${TPL}/parts/bonuses.hbs`, "systems/spycraft2/templates/parts/editor.hbs"],
+      templates: [
+        `${TPL}/parts/bonuses.hbs`,
+        `${TPL}/parts/possession-pick.hbs`,
+        "systems/spycraft2/templates/parts/editor.hbs"
+      ],
       scrollable: [""]
     }
   };
@@ -240,7 +244,7 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
       context.fireModeOptions[sys.fireMode] = loc`Unavailable mode — review choice`;
     if (sys.loadedAmmoId && !Object.hasOwn(context.ammunitionOptions, sys.loadedAmmoId))
       context.ammunitionOptions[sys.loadedAmmoId] = loc`Missing ammunition — review link`;
-    if (["weapon", "armor", "gear"].includes(item.type)) {
+    if (["weapon", "armor", "gear", "vehicle"].includes(item.type)) {
       const category = equipmentCategory(item);
       if (category)
         context.pickOptions = Object.fromEntries(
@@ -248,6 +252,37 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
         );
       if (sys.pick && !Object.hasOwn(context.pickOptions, sys.pick))
         context.pickOptions[sys.pick] = `${sys.pick} — review category`;
+      if (
+        sys.possessionSource === "wealth" &&
+        ((item.actor?.system.wealth?.possessions?.budget?.campaign?.extraI ?? 0) > 0 || sys.campaignBonusOf)
+      ) {
+        context.campaignBonusOptions = Object.fromEntries([
+          ["", loc`Ordinary Possessions pick`],
+          ...(item.actor?.items ?? [])
+            .filter(
+              i =>
+                i.id !== item.id &&
+                i.system?.possessionSource === "wealth" &&
+                !i.system.campaignBonusOf &&
+                equipmentCategory(i) === category
+            )
+            .map(i => [i.id, i.name])
+        ]);
+        if (sys.campaignBonusOf && !Object.hasOwn(context.campaignBonusOptions, sys.campaignBonusOf))
+          context.campaignBonusOptions[sys.campaignBonusOf] = loc`Missing source Possession — review link`;
+      }
+      if (item.type === "vehicle")
+        context.vehiclePossessionSources = {
+          "": loc`Unclassified — not a Possession`,
+          wealth: loc`Wealth Possessions allowance`,
+          gcGrant: loc`Additional GC-granted Possession`
+        };
+      if (
+        context.vehiclePossessionSources &&
+        sys.possessionSource &&
+        !Object.hasOwn(context.vehiclePossessionSources, sys.possessionSource)
+      )
+        context.vehiclePossessionSources[sys.possessionSource] = loc`${sys.possessionSource} — review source`;
     }
     if (item.type === "armor" && item.actor) {
       const adjusted = armorTrainingAdjustments(item, item.actor.system.armorTraining, armorSlot(item));

@@ -1,5 +1,6 @@
 <section class="item-details">
   <div class="form-fields-grid">
+    {{> "systems/spycraft2/templates/item/parts/possession-pick.hbs"}}
     <label>{{localize "SPYCRAFT.Proficiency"}} <select name="system.proficiency">{{selectOptions proficiencies selected=system.proficiency}}</select></label>
     <label><input type="checkbox" name="system.improvised" {{checked system.improvised}} /> {{localize "SPYCRAFT.Template.ItemItemWeapon.ImprovisedWeapon"}}</label>
     <label><input type="checkbox" name="system.destroyed" {{checked system.destroyed}} /> {{localize "SPYCRAFT.Template.ItemItemWeapon.Destroyed"}}</label>

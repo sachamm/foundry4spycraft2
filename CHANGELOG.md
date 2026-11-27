@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Campaign Caliber shifts now affect Wealth Possessions allowances. Shoe String Budget removes picks lowered
+  below Caliber I. Big Budget's overflow items use explicit same-category source links and cannot exceed the
+  funded source's allowance. Vehicle gear now participates in Possessions accounting and can be classified
+  on its item sheet.
+
 - Feat Purchase now spends the required post-mission XP once per mission and grants a permanent extra feat
   choice. It preserves the current career level's XP minimum, including Growth policy, records the purchase
   durably, and retains purchase-level prerequisite/source checks when selecting the feat.

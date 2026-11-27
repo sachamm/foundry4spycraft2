@@ -1,6 +1,45 @@
 import { readFileSync } from "node:fs";
 import { systemCss } from "../lib/system-css.mjs";
 import { test, expect } from "@playwright/test";
+import { createEnvironment } from "../lib/hbs-harness.mjs";
+
+test("Big Budget extra Possession source is labelled, selectable by keyboard and fits a narrow item window", async ({
+  page
+}) => {
+  const { hbs } = createEnvironment();
+  hbs.registerHelper(
+    "selectOptions",
+    (choices, options) =>
+      new hbs.SafeString(
+        Object.entries(choices ?? {})
+          .map(
+            ([value, label]) =>
+              `<option value="${hbs.escapeExpression(value)}"${options.hash.selected === value ? " selected" : ""}>${hbs.escapeExpression(label)}</option>`
+          )
+          .join("")
+      )
+  );
+  const partial = hbs.compile(
+    readFileSync(new URL("../../templates/item/parts/possession-pick.hbs", import.meta.url), "utf8")
+  );
+  const html = partial({
+    system: { possessionSource: "wealth", possessionApproved: true, pickCount: 1, campaignBonusOf: "car" },
+    vehiclePossessionSources: { "": "Unclassified", wealth: "Wealth Possessions allowance" },
+    campaignBonusOptions: { "": "Ordinary Possessions pick", car: "Primary vehicle" }
+  });
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.setContent(
+    `<style>${systemCss()}</style><div class="spycraft2 sheet item" style="width:440px"><div class="item-details"><div class="form-fields-grid">${html}</div></div></div>`
+  );
+  const select = page.getByLabel("Big Budget extra Caliber I Possession from");
+  await expect(select).toHaveValue("car");
+  await select.focus();
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Enter");
+  await expect(select).toHaveValue("");
+  expect(await select.evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(450);
+  await expect(page.getByLabel("Possessions picks")).toBeVisible();
+});
 
 // Layout regression fixtures for the vehicle actor sheet and the gear and vehicle item templates. They mount each
 // template's real root classes and its section headings inside a Foundry-style fixed-height window, then check that

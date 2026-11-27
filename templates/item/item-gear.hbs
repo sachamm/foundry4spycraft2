@@ -1,5 +1,6 @@
 <section class="item-details">
   <div class="form-fields-grid">
+    {{> "systems/spycraft2/templates/item/parts/possession-pick.hbs"}}
     <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
     {{#if system.kitGrade}}<p>{{system.kitType}} {{localize "SPYCRAFT.Template.ItemItemGear.Grade"}} {{system.kitGrade}} · {{system.kitSize}}</p>{{#if system.kitNonPortable}}<label>{{localize "SPYCRAFT.Template.ItemItemGear.NonPortableKitLocation"}} <input name="system.kitLocation" value="{{system.kitLocation}}" required /></label>{{/if}}{{/if}}

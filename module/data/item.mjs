@@ -150,6 +150,7 @@ export class GearData extends BaseItemData {
       /** Mission gear pick category (R/T/V/S/G/W/E/CHA) — blank for personal gear. */
       pick: str(""),
       pickCount: int(1, { min: 1 }),
+      campaignBonusOf: str(),
       possessionSource: str("", {
         choices: [
           "",
