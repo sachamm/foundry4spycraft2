@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 27 November 2026:** PC creation **9.6/10**;
+**Continuing review, 27 November 2026:** PC creation **9.7/10**;
 combat play **9.8/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -1959,3 +1959,36 @@ All **4,370** Node tests and **988** reference assertions pass, as do schema,
 lint, formatting, bundle and copy checks. Remaining source/data audits constrain
 PC creation's score. Continue typed lethal bruising, initial fire totals,
 injury/recovery timing and Drained, alongside the existing broader backlog.
+
+## Pass 66: Independent weapon-table audit and usable source annotations
+
+PC creation rises to **9.7/10**; combat remains **9.8/10**. All **455** entries
+from the main weapon tables now have an independent second-printing comparison
+of nine stored fields: Caliber, damage, error/threat, ammunition code, Size/hands,
+qualities, recoil, base range increment and weight (**4,095** comparisons).
+Wrapped model names, shared caliber headings, alternate E/T punctuation and
+footnote-derived damage types were resolved against the PDF, with rendered-page
+checks for ambiguous cells. Reference fingerprints retain mechanical evidence
+without adding source extracts. They require checking the source before changes.
+The three shield/arrow records outside these tables retain their older separate
+reference coverage. Broader exceptional footnotes and equipment behavior remain
+part of the continuing review.
+
+Two genuine omissions were corrected: both Daewoo USAS-12 loads now offer
+`10M4 or 20D2`, and eight raw explosive charges turn their printed footnote into
+an explicit executable explosive damage type. Existing supplied-code choice and
+stockpile calculations handle the alternative without granting extra ammunition.
+Only the two outdated Daewoo cells changed in the older independent reference.
+
+Native Foundry loaded rebuilt compendiums, selected the 20-round drum through
+the actual weapon sheet, and calculated forty supplied shots. Actual dynamite
+damage rolled exactly 3d12, totaling 19, without an attribute bonus. Applying its
+card without a type override called the real explosive Reflex and Fortitude
+saves. A successful Reflex result reduced vitality by nine, from 75 to 66.
+The run reported no browser errors or diagnostics; it is a controlled gear test,
+not an additional complete PC build.
+
+All **4,373** Node tests, **988** engine reference assertions and **13** built-pack
+checks pass. Schema, lint, formatting, bundle and copy checks also pass. Continue
+the armor audit, broader feat/origin choices, compound damage types, initial fire
+totals and the remaining injury/recovery rules before either 9.9 score.

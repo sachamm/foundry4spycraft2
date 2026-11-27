@@ -1,0 +1,1837 @@
+{
+ "reference": "Spycraft 2.0, second printing, pp.250–271",
+ "fields": [
+  "caliber",
+  "damage",
+  "errorThreat",
+  "ammo",
+  "sizeHands",
+  "qualities",
+  "recoil",
+  "range",
+  "weight"
+ ],
+ "width": 12,
+ "weapons": {
+  "Brass knuckles": [
+   250,
+   "de7d1b721a1e047178b1f16949d634899f43bda050585a00bb5140f304cc39ec2ea90c475feceb66ffc85feceb66ffc8d2cbad71ff33"
+  ],
+  "Club, heavy": [
+   250,
+   "5d7f49449ab26cb579b8ac4210f7f6b8715bbda050585a00bd0e9802a056bda050585a005feceb66ffc85feceb66ffc8ef2d127de37b"
+  ],
+  "Club, light": [
+   250,
+   "de7d1b721a1e75bba5cb37fc10f7f6b8715bbda050585a008842e86ca5eabda050585a005feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Club, massive": [
+   250,
+   "5d7f49449ab2929b82f6331786fb5df842c2bda050585a0083d89365af18ea75b064d60b5feceb66ffc85feceb66ffc8f5ca38f748a1"
+  ],
+  "Garrote": [
+   250,
+   "5d7f49449ab2c2a0b3e484ed3e98314247e5bda050585a008586a6c8e3c3257e9d42ec1a5feceb66ffc85feceb66ffc8221764976efe"
+  ],
+  "Hammer, sledge": [
+   250,
+   "5d7f49449ab2dd5b846e262b10f7f6b8715bbda050585a00bd0e9802a056c93851a9922e5feceb66ffc85feceb66ffc8b17ef6d19c7a"
+  ],
+  "Hammer, tool": [
+   250,
+   "de7d1b721a1e8b7beccdbfb687b8c156e0cfbda050585a008842e86ca5eabda050585a005feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Jitte/Sai": [
+   250,
+   "de7d1b721a1e62740eea331a10f7f6b8715bbda050585a008842e86ca5eae05b9266877a5feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Maul": [
+   250,
+   "5d7f49449ab219964d847b3c8d38102b869cbda050585a0083d89365af18ea75b064d60b5feceb66ffc85feceb66ffc8624b60c58c9d"
+  ],
+  "Pepper spray": [
+   250,
+   "de7d1b721a1e3a248dcc417a504c52cbb5ac6b51d431df5dbb5140f304cc17d9c39055085feceb66ffc85feceb66ffc844896b093657"
+  ],
+  "Pick": [
+   250,
+   "5d7f49449ab22409c213e8e3504c52cbb5acbda050585a00bd0e9802a056e16f792af7de5feceb66ffc85feceb66ffc86b51d431df5d"
+  ],
+  "Punch gloves": [
+   250,
+   "de7d1b721a1e0679eca17f9f49d634899f43bda050585a00bb5140f304cc39ec2ea90c475feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Sap": [
+   250,
+   "de7d1b721a1ec496dbe03bc9cfea0fe20316bda050585a00b86f1d147dacda2e3bd3df985feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Stun gun, melee": [
+   250,
+   "de7d1b721a1e117dbb188f1ba6340dafdb54f5ca38f748a1b86f1d147daca383bcb77c835feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Stun gun, ranged": [
+   250,
+   "5d7f49449ab2eaa6e7179aea8d38102b869c4b227777d4ddb86f1d147dacbda050585a005feceb66ffc8ef2d127de37b4e07408562be"
+  ],
+  "Tonfa": [
+   250,
+   "de7d1b721a1e8b7beccdbfb610f7f6b8715bbda050585a008842e86ca5ea99af773782f65feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Bastard sword": [
+   251,
+   "de7d1b721a1e4444d855d7dc86fb5df842c2bda050585a00d90f11e3a9d183976c82396d5feceb66ffc85feceb66ffc8e7f6c011776e"
+  ],
+  "Battleaxe": [
+   251,
+   "5d7f49449ab24eae2a6451d88d38102b869cbda050585a00bd0e9802a05603faa5804af65feceb66ffc85feceb66ffc86b51d431df5d"
+  ],
+  "Broad axe": [
+   251,
+   "5d7f49449ab241af4746c06686fb5df842c2bda050585a00bd0e9802a05625d81d436b0f5feceb66ffc85feceb66ffc84ec9599fc203"
+  ],
+  "Broadsword": [
+   251,
+   "de7d1b721a1e41af4746c066a6340dafdb54bda050585a00d90f11e3a9d1bda050585a005feceb66ffc85feceb66ffc82c624232cdd2"
+  ],
+  "Butterfly sword": [
+   251,
+   "de7d1b721a1e2409c213e8e310f7f6b8715bbda050585a008842e86ca5ea6b37e576a1d35feceb66ffc85feceb66ffc8ef2d127de37b"
+  ],
+  "Chainsaw, light": [
+   251,
+   "de7d1b721a1e22646825e23d7e62510838d8bda050585a00d90f11e3a9d179e2919c623c5feceb66ffc85feceb66ffc87902699be42c"
+  ],
+  "Cutlass/saber": [
+   251,
+   "de7d1b721a1ed8149107985e86fb5df842c2bda050585a00d90f11e3a9d1a383bcb77c835feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Dagger/survival knife": [
+   251,
+   "de7d1b721a1e17ee2fda0ce686fb5df842c2bda050585a00b86f1d147dacd8324545e75d5feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Escape knife": [
+   251,
+   "de7d1b721a1e7a9968dfef9c87b8c156e0cfbda050585a00bb5140f304ccda2e3bd3df985feceb66ffc85feceb66ffc814be4b45f18e"
+  ],
+  "Hatchet": [
+   251,
+   "de7d1b721a1e17ee2fda0ce68d38102b869cbda050585a008842e86ca5eadccabf66de495feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Hook": [
+   251,
+   "de7d1b721a1e7d9aca3061c38d38102b869cbda050585a00b86f1d147dac16f7eacbede45feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Machete": [
+   251,
+   "de7d1b721a1e4eae2a6451d886fb5df842c2bda050585a008842e86ca5ea75dd3bfa00d95feceb66ffc85feceb66ffc84b227777d4dd"
+  ],
+  "Main-gauche": [
+   251,
+   "de7d1b721a1e7a9968dfef9c10f7f6b8715bbda050585a00b86f1d147dac133e0fa912515feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Punch dagger": [
+   251,
+   "de7d1b721a1e44868e6ec02e86fb5df842c2bda050585a00b86f1d147dac86d489fd52675feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Rapier": [
+   251,
+   "de7d1b721a1e2409c213e8e310f7f6b8715bbda050585a00d90f11e3a9d137230e11be475feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Scalpel/straight razor": [
+   251,
+   "de7d1b721a1e7d9aca3061c3cfea0fe20316bda050585a00bb5140f304ccf45e1370f3255feceb66ffc85feceb66ffc844896b093657"
+  ],
+  "Scythe": [
+   251,
+   "5d7f49449ab2d8149107985e3cd56eb5b003bda050585a0083d89365af1889e98a9680fc5feceb66ffc85feceb66ffc8e629fa6598d7"
+  ],
+  "Short sword": [
+   251,
+   "de7d1b721a1e2409c213e8e386fb5df842c2bda050585a008842e86ca5ea83976c82396d5feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Stiletto/switchblade": [
+   251,
+   "de7d1b721a1e44868e6ec02e86fb5df842c2bda050585a00b86f1d147dacc9102569fc325feceb66ffc85feceb66ffc844896b093657"
+  ],
+  "Syringe": [
+   251,
+   "de7d1b721a1e7a9968dfef9c3cd56eb5b003bda050585a00bb5140f304cc31ec11149c3e5feceb66ffc85feceb66ffc814be4b45f18e"
+  ],
+  "Bullwhip": [
+   250,
+   "5d7f49449ab2b153ef4b47938d38102b869cbda050585a00b86f1d147dac61c61536a4ff5feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Chain": [
+   250,
+   "5d7f49449ab244868e6ec02e8d38102b869cbda050585a008842e86ca5ea98171a31b3bd5feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Chain, combo": [
+   250,
+   "f5557d4fcf727d9aca3061c38d38102b869cbda050585a00c187c4fab2bc67ee2d160e8f5feceb66ffc85feceb66ffc84b227777d4dd"
+  ],
+  "Chain, massive": [
+   250,
+   "f5557d4fcf72d8149107985e504c52cbb5acbda050585a0083d89365af186b6f9bba785f5feceb66ffc85feceb66ffc8f5ca38f748a1"
+  ],
+  "Chain, weighted": [
+   250,
+   "f5557d4fcf727d9aca3061c3504c52cbb5acbda050585a00bd0e9802a05659a06366a9395feceb66ffc85feceb66ffc8ef2d127de37b"
+  ],
+  "Chain, whip": [
+   250,
+   "5d7f49449ab217ee2fda0ce6504c52cbb5acbda050585a00d90f11e3a9d10f52fca0cfba5feceb66ffc85feceb66ffc87902699be42c"
+  ],
+  "Flail": [
+   250,
+   "5d7f49449ab243ddf690fea68d38102b869cbda050585a008842e86ca5ea09a1dbf8205d5feceb66ffc85feceb66ffc82c624232cdd2"
+  ],
+  "Long staff": [
+   250,
+   "f5557d4fcf72b1af8877e13b10f7f6b8715bbda050585a0083d89365af185c51a4bc09dc5feceb66ffc85feceb66ffc86b51d431df5d"
+  ],
+  "Nunchaku": [
+   250,
+   "5d7f49449ab243ddf690fea68d38102b869cbda050585a008842e86ca5ea61c9a4b16ae05feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "Quarterstaff": [
+   250,
+   "f5557d4fcf72c496dbe03bc913439b37d3fdbda050585a0083d89365af183561ee2095225feceb66ffc85feceb66ffc87902699be42c"
+  ],
+  "Scourge": [
+   250,
+   "5d7f49449ab2cb995cfc10798d38102b869cbda050585a008842e86ca5ea971d7537701d5feceb66ffc85feceb66ffc8ef2d127de37b"
+  ],
+  "Short staff": [
+   250,
+   "5d7f49449ab2c496dbe03bc913439b37d3fdbda050585a00d90f11e3a9d1073c286a69ca5feceb66ffc85feceb66ffc84b227777d4dd"
+  ],
+  "Three-section staff": [
+   250,
+   "f5557d4fcf72dd5b846e262b8d38102b869cbda050585a00bd0e9802a0563c0879d97bd65feceb66ffc85feceb66ffc8ef2d127de37b"
+  ],
+  "Boar spear": [
+   251,
+   "f5557d4fcf722409c213e8e386fb5df842c2bda050585a0083d89365af189d4f68b45ba65feceb66ffc85feceb66ffc84fc82b26aecb"
+  ],
+  "Chainsaw, heavy": [
+   251,
+   "f5557d4fcf7239c4a8f5aa0b7e62510838d8bda050585a0083d89365af1879e2919c623c5feceb66ffc85feceb66ffc84ec9599fc203"
+  ],
+  "Claws": [
+   251,
+   "5d7f49449ab244868e6ec02e8d38102b869cbda050585a00bb5140f304cca1b90d7792765feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Fork/trident": [
+   251,
+   "f5557d4fcf722409c213e8e310f7f6b8715bbda050585a0083d89365af1861250734559d5feceb66ffc85feceb66ffc84a44dc153642"
+  ],
+  "Great sword": [
+   251,
+   "f5557d4fcf725b442e42fd3d504c52cbb5acbda050585a0083d89365af18b0fb0e4de8cf5feceb66ffc85feceb66ffc8624b60c58c9d"
+  ],
+  "Halberd": [
+   251,
+   "f5557d4fcf725b442e42fd3d86fb5df842c2bda050585a0083d89365af18186541a506d65feceb66ffc85feceb66ffc8e629fa6598d7"
+  ],
+  "Harpoon": [
+   251,
+   "f5557d4fcf7245cad0321cc0504c52cbb5acbda050585a0083d89365af18b34379b2ad2d5feceb66ffc85feceb66ffc86b51d431df5d"
+  ],
+  "Jagged sword": [
+   251,
+   "5d7f49449ab2d8149107985e10f7f6b8715bbda050585a00d90f11e3a9d1808411e0beb45feceb66ffc85feceb66ffc87902699be42c"
+  ],
+  "Kurki": [
+   251,
+   "5d7f49449ab217ee2fda0ce6a6340dafdb54bda050585a00b86f1d147dacfd1b78f613c35feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Lance": [
+   251,
+   "f5557d4fcf7222646825e23d8d38102b869cbda050585a006868c1921b160cac52f621bf5feceb66ffc85feceb66ffc8f5ca38f748a1"
+  ],
+  "Long blade": [
+   251,
+   "f5557d4fcf7222646825e23d504c52cbb5acbda050585a0083d89365af18929dfba26ed35feceb66ffc85feceb66ffc8c2356069e9d1"
+  ],
+  "Long knife": [
+   251,
+   "5d7f49449ab217ee2fda0ce686fb5df842c2bda050585a008842e86ca5ea8989299d38895feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Long spear": [
+   251,
+   "f5557d4fcf724eae2a6451d810f7f6b8715bbda050585a006868c1921b167458d3e001145feceb66ffc85feceb66ffc8e629fa6598d7"
+  ],
+  "Mancatcher": [
+   251,
+   "f5557d4fcf7217ee2fda0ce68d38102b869cbda050585a0083d89365af181ca913b2c8d55feceb66ffc85feceb66ffc8e629fa6598d7"
+  ],
+  "Nagamaki": [
+   251,
+   "f5557d4fcf724444d855d7dc86fb5df842c2bda050585a0083d89365af1829aa4de31d1c5feceb66ffc85feceb66ffc8b17ef6d19c7a"
+  ],
+  "Naginta": [
+   251,
+   "f5557d4fcf72d8149107985e86fb5df842c2bda050585a0083d89365af18cdb9896dc2555feceb66ffc85feceb66ffc86b51d431df5d"
+  ],
+  "Ninja-to": [
+   251,
+   "5d7f49449ab22409c213e8e310f7f6b8715bbda050585a00d90f11e3a9d137230e11be475feceb66ffc85feceb66ffc8e7f6c011776e"
+  ],
+  "Razor sword": [
+   251,
+   "5d7f49449ab2d8149107985ecfea0fe20316bda050585a00d90f11e3a9d1e9b288aa30cf5feceb66ffc85feceb66ffc8e7f6c011776e"
+  ],
+  "Scholar's sword": [
+   251,
+   "5d7f49449ab22409c213e8e310f7f6b8715bbda050585a00d90f11e3a9d1935b5cd2d9605feceb66ffc85feceb66ffc84b227777d4dd"
+  ],
+  "Sickle": [
+   251,
+   "5d7f49449ab244868e6ec02e13439b37d3fdbda050585a008842e86ca5ea0b244dd4961f5feceb66ffc85feceb66ffc84e07408562be"
+  ],
+  "War fan": [
+   251,
+   "5d7f49449ab27d9aca3061c38d38102b869cbda050585a00b86f1d147dac45b0043550c85feceb66ffc85feceb66ffc8d4735e3a265e"
+  ],
+  "Atlatl": [
+   252,
+   "de7d1b721a1e44868e6ec02e86fb5df842c22086076d238dd90f11e3a9d1bda050585a005feceb66ffc8624b60c58c9d4e07408562be"
+  ],
+  "Blowgun": [
+   252,
+   "de7d1b721a1e98597c357acd86fb5df842c2a7a72efe1863bd0e9802a056fdb7879a51665feceb66ffc8b7a56873cd77ef2d127de37b"
+  ],
+  "Bola": [
+   252,
+   "de7d1b721a1e62740eea331a8d38102b869cbda050585a008842e86ca5eabda050585a005feceb66ffc8e629fa6598d7d4735e3a265e"
+  ],
+  "Boomerang": [
+   252,
+   "de7d1b721a1e7d9aca3061c37e62510838d8bda050585a00b86f1d147dacbda050585a005feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Boomerang, hunting": [
+   252,
+   "de7d1b721a1e17ee2fda0ce610f7f6b8715bbda050585a00d90f11e3a9d1bda050585a005feceb66ffc84a44dc153642d4735e3a265e"
+  ],
+  "Caltrops": [
+   252,
+   "de7d1b721a1ebda050585a00ff074ed116bbbda050585a008586a6c8e3c39f4d260c964d5feceb66ffc8ef2d127de37bd4735e3a265e"
+  ],
+  "Compound bow": [
+   252,
+   "de7d1b721a1e9bcf953042cc86fb5df842c271c1bafcfa25bd0e9802a056fdb7879a51665feceb66ffc8ad57366865126b51d431df5d"
+  ],
+  "Crossbow, heavy": [
+   252,
+   "de7d1b721a1ecc2fbfd2eb8186fb5df842c271c1bafcfa25bd0e9802a056fdb7879a51665feceb66ffc82abaca4911e6e629fa6598d7"
+  ],
+  "Crossbow, light": [
+   252,
+   "de7d1b721a1ecc2fbfd2eb8186fb5df842c271c1bafcfa25b86f1d147dacfdb7879a51665feceb66ffc839fa9ec190eeef2d127de37b"
+  ],
+  "Longbow": [
+   252,
+   "de7d1b721a1e9bcf953042cc86fb5df842c271c1bafcfa2583d89365af18fdb7879a51665feceb66ffc869f59c273b6e2c624232cdd2"
+  ],
+  "Net": [
+   252,
+   "de7d1b721a1ebda050585a00c52f7bbfc51fbda050585a00bd0e9802a056bda050585a005feceb66ffc8ef2d127de37be7f6c011776e"
+  ],
+  "Short bow": [
+   252,
+   "de7d1b721a1e9bcf953042cc86fb5df842c271c1bafcfa25bd0e9802a056fdb7879a51665feceb66ffc8f369cb89fc62e7f6c011776e"
+  ],
+  "Shuriken": [
+   252,
+   "de7d1b721a1eee164fea760d10f7f6b8715bcfc7e074d693d104a0916c0e9f4d260c964d5feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Beretta 92 9mm": [
+   254,
+   "de7d1b721a1e4444d855d7dc8d38102b869c6c9a18fe1e31b86f1d147dacbda050585a006b51d431df5db7a56873cd77ad78cfa0ead3"
+  ],
+  "Beretta 93R 9mm": [
+   254,
+   "de7d1b721a1e4444d855d7dc7e62510838d800b9817bb78fb86f1d147daca23029f95a9c4a44dc153642b7a56873cd77af3266e6d0f3"
+  ],
+  "Beretta 950 Jetfire .22 LR": [
+   254,
+   "de7d1b721a1e2eb0276837128d38102b869c9036f140ff21bb5140f304cc5ca96bca67147902699be42c4a44dc153642b4af4e0d4039"
+  ],
+  "Beretta 950 Jetfire .25 ACP": [
+   254,
+   "de7d1b721a1e44868e6ec02e8d38102b869c9036f140ff21bb5140f304cc5ca96bca6714ef2d127de37be629fa6598d7b4af4e0d4039"
+  ],
+  "Colt Detective Special .38": [
+   256,
+   "de7d1b721a1e4eae2a6451d810f7f6b8715b537846ae31edb86f1d147dacbda050585a00e629fa6598d7e629fa6598d777ac319bfe19"
+  ],
+  "Colt M1911A1 .45 ACP": [
+   255,
+   "5d7f49449ab241af4746c06686fb5df842c2cdeff8f631f4b86f1d147dac767b351f50e94fc82b26aecbb7a56873cd77b8736b999909"
+  ],
+  "Colt Model 1908 Vest Pocket .25 ACP": [
+   254,
+   "de7d1b721a1e44868e6ec02e10f7f6b8715b2c225adc9933bb5140f304cc5ca96bca67144b227777d4dd4a44dc1536421e9d7c27c8bb"
+  ],
+  "Colt Police Positive .22 LR": [
+   256,
+   "de7d1b721a1e2eb02768371210f7f6b8715bbee050c2b2e0b86f1d147dacbda050585a004e07408562bee629fa6598d79c193c604ad7"
+  ],
+  "Colt Police Positive .32 S&W": [
+   256,
+   "de7d1b721a1e2eb02768371210f7f6b8715bbee050c2b2e0b86f1d147dacbda050585a004e07408562bee629fa6598d79c193c604ad7"
+  ],
+  "Colt Police Positive .38 Special": [
+   256,
+   "de7d1b721a1e4eae2a6451d810f7f6b8715b04913a774778b86f1d147dacbda050585a008527a891e224f5ca38f748a19c193c604ad7"
+  ],
+  "Colt Python .357 Magnum": [
+   256,
+   "5d7f49449ab2be9b564a102f86fb5df842c2e3bc9cd2f67ab86f1d147dac095d9c678d04f5ca38f748a1624b60c58c9d0814305f8cfb"
+  ],
+  "Colt Single Action Army .22 LR": [
+   256,
+   "de7d1b721a1e2eb02768371210f7f6b8715bbee050c2b2e0b86f1d147dac1c132e1b7ee5d4735e3a265ee629fa6598d7b8736b999909"
+  ],
+  "Colt Single Action Army .357 Magnum": [
+   256,
+   "5d7f49449ab2be9b564a102f86fb5df842c2e3bc9cd2f67ab86f1d147dac1c132e1b7ee59400f1b21cb5624b60c58c9db8736b999909"
+  ],
+  "Colt Single Action Army .44-40": [
+   256,
+   "5d7f49449ab26f96103fdd5886fb5df842c21360404a122fb86f1d147dac9e31fffaeefc4ec9599fc203624b60c58c9db8736b999909"
+  ],
+  "Colt Single Action Army .45 Long Colt": [
+   256,
+   "5d7f49449ab241af4746c06686fb5df842c2e3bc9cd2f67ab86f1d147dac9e31fffaeefc4fc82b26aecb624b60c58c9db8736b999909"
+  ],
+  "COP Inc. COP .357 Magnum": [
+   254,
+   "de7d1b721a1ebe9b564a102f504c52cbb5acae162db9f301bb5140f304cc0894ae568b3fb7a56873cd774a44dc153642a97b042d7bd5"
+  ],
+  "Distinject Model 35 13mm dart": [
+   254,
+   "de7d1b721a1eee164fea760d10f7f6b8715bc4c5ce0570c0b86f1d147dac966e2f9b34fce7f6c011776e4a44dc1536429f29a130438b"
+  ],
+  "FN Browning High-Power .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c06610f7f6b8715b6d4a5a172d01b86f1d147dacc93851a9922e3fdba35f04dcb7a56873cd77914204c25f3f"
+  ],
+  "FN Browning High-Power 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc10f7f6b8715b819d98b1242db86f1d147dac8ce3e71ef8636b51d431df5db7a56873cd77914204c25f3f"
+  ],
+  "FN Five-SeveN 5.7x28mm": [
+   255,
+   "5d7f49449ab28f247722b97c8d38102b869cdac802003f7db86f1d147dacc614281386cd4fc82b26aecb624b60c58c9d8771a6c04174"
+  ],
+  "General Motors Liberator .45 ACP": [
+   254,
+   "de7d1b721a1e41af4746c06686fb5df842c28fc872da0b34bb5140f304cc3b666da19b31b7a56873cd77ef2d127de37b6b86b273ff34"
+  ],
+  "Glock 17 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc10f7f6b8715b6bcb98190fb5b86f1d147dacc614281386cd4ec9599fc203b7a56873cd771a948f1b4374"
+  ],
+  "Glock 17L 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc10f7f6b8715b6bcb98190fb5b86f1d147dace2d7f54667fcb17ef6d19c7a9f14025af006ec6c168f4411"
+  ],
+  "Glock 18 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc7e62510838d8099365048327b86f1d147dacf0c966ce3cbc4523540f1504b7a56873cd779f29a130438b"
+  ],
+  "Glock 20 10mm": [
+   255,
+   "5d7f49449ab222646825e23d86fb5df842c2d03084e3694fb86f1d147dac98960407ab339400f1b21cb5b7a56873cd778f65223004a7"
+  ],
+  "Glock 21 .45 ACP": [
+   255,
+   "5d7f49449ab241af4746c06686fb5df842c2819d98b1242db86f1d147dac98960407ab33b17ef6d19c7ab7a56873cd778f65223004a7"
+  ],
+  "Glock 22 .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c06610f7f6b8715bcb1d6d5dbb32b86f1d147dac98960407ab33f5ca38f748a1b7a56873cd771a948f1b4374"
+  ],
+  "Glock 24 .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c06610f7f6b8715bcb1d6d5dbb32b86f1d147dac9cb3804f34914523540f15049f14025af006ec6c168f4411"
+  ],
+  "Glock 26 9mm": [
+   253,
+   "5d7f49449ab24444d855d7dc10f7f6b8715b982af3e201e1b86f1d147dacc614281386cd785f3ec7eb32f5ca38f748a177ac319bfe19"
+  ],
+  "Glock 27 .40 S&W": [
+   253,
+   "5d7f49449ab241af4746c06610f7f6b8715bebbc6554fef4b86f1d147dac98960407ab33535fa30d7e25f5ca38f748a177ac319bfe19"
+  ],
+  "Glock 28 .380 ACP": [
+   253,
+   "de7d1b721a1e45cad0321cc010f7f6b8715bda61bb12fb04b86f1d147dacc614281386cd8527a891e224f5ca38f748a177ac319bfe19"
+  ],
+  "Glock 29 10mm": [
+   253,
+   "5d7f49449ab222646825e23d86fb5df842c22d8550d1b88db86f1d147dac98960407ab33785f3ec7eb32f5ca38f748a19f29a130438b"
+  ],
+  "Glock 30 .45 ACP": [
+   253,
+   "5d7f49449ab241af4746c06686fb5df842c22d8550d1b88db86f1d147dac98960407ab339400f1b21cb5f5ca38f748a19f29a130438b"
+  ],
+  "Glock 31 .357 SiG": [
+   255,
+   "5d7f49449ab222646825e23d10f7f6b8715bcb1d6d5dbb32b86f1d147dacc614281386cd535fa30d7e25b7a56873cd771a948f1b4374"
+  ],
+  "Glock 33 .357 SiG": [
+   253,
+   "5d7f49449ab222646825e23d10f7f6b8715bebbc6554fef4b86f1d147dacc614281386cdb7a56873cd77f5ca38f748a177ac319bfe19"
+  ],
+  "H&K Mk. 23 .45 ACP": [
+   255,
+   "f5557d4fcf7241af4746c06686fb5df842c2763ea9c402f3b86f1d147dacba736382b2706b51d431df5d624b60c58c9d0814305f8cfb"
+  ],
+  "H&K P7 .40 S&W": [
+   253,
+   "5d7f49449ab241af4746c06610f7f6b8715b2d8550d1b88db86f1d147dacc93851a9922e4a44dc153642f5ca38f748a10faf54c7569c"
+  ],
+  "H&K P7 9mm": [
+   253,
+   "5d7f49449ab24444d855d7dc10f7f6b8715bbda8e7f0530db86f1d147dacbda050585a008527a891e224f5ca38f748a1eca06fdd26e5"
+  ],
+  "H&K USP .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c06610f7f6b8715b819d98b1242db86f1d147dac98960407ab33b17ef6d19c7ab7a56873cd778f65223004a7"
+  ],
+  "H&K USP .45 ACP": [
+   255,
+   "5d7f49449ab241af4746c06686fb5df842c2763ea9c402f3b86f1d147dac98960407ab33b17ef6d19c7ab7a56873cd778f65223004a7"
+  ],
+  "H&K USP 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc10f7f6b8715b6c9a18fe1e31b86f1d147dacc614281386cde629fa6598d7b7a56873cd778f65223004a7"
+  ],
+  "Kel-Tec P3AT .380 ACP": [
+   254,
+   "de7d1b721a1e45cad0321cc08d38102b869c735e2769bfe0bb5140f304cc340897f0cb63c6f3ac57944ae629fa6598d7d2cbad71ff33"
+  ],
+  "Kimber Ultra Carry .40 S&W": [
+   253,
+   "5d7f49449ab241af4746c06610f7f6b8715bb76044bb49dbb86f1d147dacc93851a9922e4523540f1504f5ca38f748a1ec6c168f4411"
+  ],
+  "Kimber Ultra Carry .45 ACP": [
+   253,
+   "5d7f49449ab241af4746c06686fb5df842c2b76044bb49dbb86f1d147dacc93851a9922e4523540f1504f5ca38f748a1ec6c168f4411"
+  ],
+  "Luger P08 9mm": [
+   254,
+   "de7d1b721a1e4444d855d7dc7e62510838d8de6b3d829ea4b86f1d147dac64ef8f3d1d473fdba35f04dcf5ca38f748a1eca06fdd26e5"
+  ],
+  "Magnum Research Desert Eagle .357 Magnum": [
+   255,
+   "5d7f49449ab2be9b564a102f504c52cbb5ac67f342afd560b86f1d147dac5af2392a948f4fc82b26aecb624b60c58c9d32209ccbf8a8"
+  ],
+  "Magnum Research Desert Eagle .41 Magnum": [
+   255,
+   "5d7f49449ab2dd03aa38b0d3504c52cbb5ac9036f140ff21b86f1d147dac14e5ef9b4a852c624232cdd29f14025af00632209ccbf8a8"
+  ],
+  "Magnum Research Desert Eagle .44 Magnum": [
+   255,
+   "5d7f49449ab29a4d1c433d183cd56eb5b0033c63abcee183b86f1d147dac14e5ef9b4a854fc82b26aecb9f14025af00632209ccbf8a8"
+  ],
+  "Magnum Research Desert Eagle .50 AE": [
+   255,
+   "5d7f49449ab26a40ee48f5443cd56eb5b003b76044bb49dbb86f1d147dac14e5ef9b4a85b7a56873cd77d59eced1ded032209ccbf8a8"
+  ],
+  "Makarov PB 9x18mm": [
+   253,
+   "de7d1b721a1e45cad0321cc08d38102b869cde6b3d829ea4b86f1d147dac7999a59f37cf19581e27de7cf5ca38f748a1eca06fdd26e5"
+  ],
+  "Makarov PM 9x18mm": [
+   253,
+   "de7d1b721a1e45cad0321cc08d38102b869cde6b3d829ea4b86f1d147dacbda050585a004a44dc153642f5ca38f748a1ec6c168f4411"
+  ],
+  "Manurhin MR-73 .357 Magnum": [
+   256,
+   "5d7f49449ab2be9b564a102f86fb5df842c2e3bc9cd2f67ab86f1d147dac8ce3e71ef863c2356069e9d1624b60c58c9dd4735e3a265e"
+  ],
+  "Manurhin MR-73 9mm": [
+   256,
+   "5d7f49449ab24444d855d7dc10f7f6b8715be3bc9cd2f67ab86f1d147dac8ce3e71ef8633fdba35f04dcb7a56873cd77d4735e3a265e"
+  ],
+  "NAA Mini-Revolver .17 HMR": [
+   256,
+   "de7d1b721a1e03fb0cc6e49210f7f6b8715b097ec93b236bbb5140f304ccbda050585a00b7a56873cd774a44dc153642221764976efe"
+  ],
+  "NAA Mini-Revolver .22 LR": [
+   256,
+   "de7d1b721a1e2eb02768371210f7f6b8715b4ee159b64d75bb5140f304ccbda050585a003fdba35f04dcef2d127de37b221764976efe"
+  ],
+  "NAA Mini-Revolver .22 Magnum": [
+   256,
+   "de7d1b721a1e03fb0cc6e49210f7f6b8715b097ec93b236bbb5140f304ccbda050585a00b7a56873cd774a44dc153642221764976efe"
+  ],
+  "RSA Ots-21 9x18mm": [
+   254,
+   "de7d1b721a1e45cad0321cc08d38102b869c307e7092c763bb5140f304cc340897f0cb638527a891e2244a44dc15364277ac319bfe19"
+  ],
+  "Ruger Mark III .22 LR": [
+   254,
+   "de7d1b721a1e2eb0276837128d38102b869cd3a1a0b4bac4b86f1d147dac0b67d020abb8d4735e3a265ef5ca38f748a1af3266e6d0f3"
+  ],
+  "Ruger Super Redhawk .44 Magnum": [
+   257,
+   "f5557d4fcf729a4d1c433d1886fb5df842c214b56e0a77f2b86f1d147dac767b351f50e98527a891e2249f14025af00694d362738276"
+  ],
+  "Ruger Super Redhawk .454 Casuall": [
+   257,
+   "f5557d4fcf726a40ee48f54486fb5df842c21360404a122fb86f1d147dac767b351f50e9b7a56873cd77811786ad1ae794d362738276"
+  ],
+  "Sharps Model 1A .22 LR": [
+   254,
+   "de7d1b721a1e2eb02768371210f7f6b8715b33cbe02506c6bb5140f304cc5494a78cd9d64a44dc153642ef2d127de37bf3e360d89952"
+  ],
+  "Sig P210 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc8d38102b869cde6b3d829ea4b86f1d147dac01698ce1dc073fdba35f04dc624b60c58c9dd4735e3a265e"
+  ],
+  "SiG Sauer P220 .32 ACP": [
+   254,
+   "de7d1b721a1e17ee2fda0ce68d38102b869c279d8eaebd39b86f1d147dac8ce3e71ef863e7f6c011776eb7a56873cd77ec6c168f4411"
+  ],
+  "SiG Sauer P220 .38 Super": [
+   255,
+   "5d7f49449ab20b2ced14772f8d38102b869cde6b3d829ea4b86f1d147dac8ce3e71ef863e629fa6598d7b7a56873cd77ec6c168f4411"
+  ],
+  "SiG Sauer P220 .45 ACP": [
+   255,
+   "5d7f49449ab241af4746c066504c52cbb5accdeff8f631f4b86f1d147dac767b351f50e94523540f1504b7a56873cd77ec6c168f4411"
+  ],
+  "SiG Sauer P220 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc8d38102b869cde6b3d829ea4b86f1d147dac8ce3e71ef863b17ef6d19c7ab7a56873cd77ec6c168f4411"
+  ],
+  "SiG Sauer P226 .357 SiG": [
+   255,
+   "5d7f49449ab222646825e23d8d38102b869c763ea9c402f3b86f1d147dac095d9c678d044523540f1504b7a56873cd77eca06fdd26e5"
+  ],
+  "SiG Sauer P226 .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c0668d38102b869c763ea9c402f3b86f1d147dac8e239c841f23e629fa6598d7b7a56873cd77eca06fdd26e5"
+  ],
+  "SiG Sauer P226 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc8d38102b869c6c9a18fe1e31b86f1d147dac095d9c678d04b17ef6d19c7ab7a56873cd77ec6c168f4411"
+  ],
+  "SiG Sauer P229 .357 SiG": [
+   255,
+   "5d7f49449ab222646825e23d8d38102b869c763ea9c402f3b86f1d147dac0618013fa64a9400f1b21cb5b7a56873cd778f65223004a7"
+  ],
+  "SiG Sauer P229 .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c0668d38102b869c763ea9c402f3b86f1d147dac51d07a5be85db17ef6d19c7ab7a56873cd778f65223004a7"
+  ],
+  "SiG Sauer P229 9mm": [
+   254,
+   "de7d1b721a1e4444d855d7dc8d38102b869c819d98b1242db86f1d147dac0618013fa64ae629fa6598d7b7a56873cd778f65223004a7"
+  ],
+  "SiG Sauer P239 .357 SiG": [
+   253,
+   "de7d1b721a1e22646825e23d8d38102b869cb76044bb49dbb86f1d147dacbda050585a009400f1b21cb5f5ca38f748a18f65223004a7"
+  ],
+  "SiG Sauer P239 .40 S&W": [
+   253,
+   "de7d1b721a1e41af4746c0668d38102b869cb76044bb49dbb86f1d147dacc93851a9922eb17ef6d19c7af5ca38f748a18f65223004a7"
+  ],
+  "SiG Sauer P239 9mm": [
+   253,
+   "de7d1b721a1e4444d855d7dc8d38102b869ca8ea714538f3b86f1d147dacbda050585a00e629fa6598d7f5ca38f748a18f65223004a7"
+  ],
+  "Smith & Wesson Bodyguard .357 Magnum": [
+   256,
+   "5d7f49449ab2be9b564a102f86fb5df842c23addcaa4c90db86f1d147dacbda050585a00b7a56873cd77f5ca38f748a16b86b273ff34"
+  ],
+  "Smith & Wesson Bodyguard .38 Special": [
+   256,
+   "de7d1b721a1e4eae2a6451d810f7f6b8715bda3dbe14d99cb86f1d147dacbda050585a004ec9599fc203e629fa6598d76b86b273ff34"
+  ],
+  "Smith & Wesson Chief's Special .38 Spec": [
+   256,
+   "de7d1b721a1e4eae2a6451d810f7f6b8715bda3dbe14d99cb86f1d147dacbda050585a003fdba35f04dce629fa6598d71a948f1b4374"
+  ],
+  "Smith & Wesson LadySmith .22 LR": [
+   256,
+   "de7d1b721a1e2eb02768371210f7f6b8715b0b4c8d494056bb5140f304cc371311a649474e07408562be4a44dc1536421a948f1b4374"
+  ],
+  "Smith & Wesson LadySmith .357 Magnum": [
+   256,
+   "5d7f49449ab2be9b564a102f86fb5df842c23addcaa4c90dbb5140f304cc371311a64947b7a56873cd77e629fa6598d71a948f1b4374"
+  ],
+  "Smith & Wesson LadySmith .38 Special": [
+   256,
+   "de7d1b721a1e4eae2a6451d810f7f6b8715bda3dbe14d99cbb5140f304cc371311a649473fdba35f04dce629fa6598d71a948f1b4374"
+  ],
+  "Smith & Wesson Model 500 .500 Magnum": [
+   257,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2da3dbe14d99cb86f1d147dacc93851a9922eb7a56873cd77811786ad1ae732209ccbf8a8"
+  ],
+  "Smith & Wesson Model 629 .44 Magnum": [
+   257,
+   "f5557d4fcf729a4d1c433d1886fb5df842c214b56e0a77f2b86f1d147dac767b351f50e94ec9599fc2039f14025af006c020bad937ec"
+  ],
+  "Taurus Model 608 .357 Magnum": [
+   256,
+   "5d7f49449ab2be9b564a102f86fb5df842c248bea88fdd9cb86f1d147dac4ac72870d95ee629fa6598d7624b60c58c9d3135d2d71bff"
+  ],
+  "Walther P99/ S&W SW99 .40 S&W": [
+   255,
+   "5d7f49449ab241af4746c0668d38102b869c763ea9c402f3b86f1d147dac98960407ab334523540f1504b7a56873cd77ec6c168f4411"
+  ],
+  "Walther P99/ S&W SW99 9mm": [
+   255,
+   "5d7f49449ab24444d855d7dc8d38102b869cb2baea85cb8cb86f1d147dacc614281386cdb17ef6d19c7ab7a56873cd77ec6c168f4411"
+  ],
+  "Walther PP .22 LR": [
+   253,
+   "de7d1b721a1e2eb0276837128d38102b869c62c4e61857a4b86f1d147dacbda050585a004e07408562bee629fa6598d79f29a130438b"
+  ],
+  "Walther PP .32 ACP": [
+   253,
+   "de7d1b721a1e17ee2fda0ce68d38102b869c62c4e61857a4b86f1d147dacbda050585a007902699be42cf5ca38f748a19f29a130438b"
+  ],
+  "Walther PP .25 ACP": [
+   253,
+   "de7d1b721a1e44868e6ec02e8d38102b869c62c4e61857a4b86f1d147dacbda050585a00d4735e3a265ee629fa6598d79f29a130438b"
+  ],
+  "Walther PP .380 ACP": [
+   253,
+   "de7d1b721a1e45cad0321cc08d38102b869c62c4e61857a4b86f1d147dacbda050585a004fc82b26aecbf5ca38f748a19f29a130438b"
+  ],
+  "Walther PPK .22 LR": [
+   253,
+   "de7d1b721a1e2eb0276837128d38102b869ce0bab69f0f9cb86f1d147dac0618013fa64a4e07408562be4a44dc1536429c193c604ad7"
+  ],
+  "Walther PPK .32 ACP": [
+   253,
+   "de7d1b721a1e17ee2fda0ce68d38102b869ce0bab69f0f9cb86f1d147dac0618013fa64a2c624232cdd2e629fa6598d79c193c604ad7"
+  ],
+  "Walther PPK .25 ACP": [
+   253,
+   "de7d1b721a1e44868e6ec02e8d38102b869ce0bab69f0f9cb86f1d147dac0618013fa64ad4735e3a265e4a44dc1536429c193c604ad7"
+  ],
+  "Walther PPK .380 ACP": [
+   253,
+   "de7d1b721a1e45cad0321cc08d38102b869ce0bab69f0f9cb86f1d147dac0618013fa64a3fdba35f04dce629fa6598d79c193c604ad7"
+  ],
+  "Webley Mk. 6 .455 British Service": [
+   256,
+   "de7d1b721a1e2409c213e8e310f7f6b8715bbee050c2b2e0b86f1d147dacbda050585a00ef2d127de37bf5ca38f748a10814305f8cfb"
+  ],
+  "Axe, throwing": [
+   252,
+   "de7d1b721a1e17ee2fda0ce68d38102b869c85072a6d88848842e86ca5ea20b3074cf1d25feceb66ffc84a44dc153642d4735e3a265e"
+  ],
+  "Concussive grenade": [
+   252,
+   "f5557d4fcf72c875edf4b88cc4fffa4a458bbda050585a00bb5140f304ccfbdc5b1128ef5feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Dart": [
+   252,
+   "de7d1b721a1e98597c357acda6340dafdb54c24390bb6033d104a0916c0eba6eb5739da45feceb66ffc8e629fa6598d714be4b45f18e"
+  ],
+  "Flash/bang grenade": [
+   252,
+   "5d7f49449ab2b8dbe9421ea5c4fffa4a458bbda050585a00bb5140f304cca894e5daeffc5feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Fragmentation grenade": [
+   252,
+   "f5557d4fcf7219dc30057843c4fffa4a458bbda050585a00bb5140f304cca894e5daeffc5feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Javelin": [
+   252,
+   "de7d1b721a1e44868e6ec02e8d38102b869cbda050585a00d90f11e3a9d19d4f68b45ba65feceb66ffc8e629fa6598d74e07408562be"
+  ],
+  "Knife, throwing": [
+   252,
+   "de7d1b721a1e44868e6ec02e86fb5df842c2dfe05250a1e9b86f1d147dac9f4d260c964d5feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Molotov cocktail": [
+   252,
+   "de7d1b721a1ededa7f743beb9ecbb7c980eabda050585a00bb5140f304cc5ce0dd99dd5e5feceb66ffc84a44dc153642d4735e3a265e"
+  ],
+  "Pipe bomb": [
+   252,
+   "5d7f49449ab2d5b8618c200be81e7140e9b1bda050585a00bb5140f304ccfbdc5b1128ef5feceb66ffc84a44dc153642d4735e3a265e"
+  ],
+  "Propane bomb": [
+   252,
+   "5d7f49449ab226c0ee8633a59ecbb7c980eabda050585a00bb5140f304ccfbdc5b1128ef5feceb66ffc84a44dc153642ef2d127de37b"
+  ],
+  "Rock, heavy": [
+   252,
+   "de7d1b721a1e6cb579b8ac4287b8c156e0cfbda050585a0074cbd3105d93bda050585a005feceb66ffc8ef2d127de37be629fa6598d7"
+  ],
+  "Rock, light": [
+   252,
+   "de7d1b721a1eda7535241b5aff074ed116bbc24390bb6033bb5140f304ccbda050585a005feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Rock, massive": [
+   252,
+   "de7d1b721a1e22646825e23d7e62510838d8bda050585a00bd0e9802a05686a59e0fdad75feceb66ffc8ef2d127de37b9f14025af006"
+  ],
+  "Smoke grenade": [
+   252,
+   "5d7f49449ab2bda050585a00c52f7bbfc51fbda050585a00bb5140f304cc00d183e667a05feceb66ffc84a44dc1536429f29a130438b"
+  ],
+  "Tear gas grenade": [
+   252,
+   "5d7f49449ab27d4c5c8894e0c4fffa4a458bbda050585a00bb5140f304cca894e5daeffc5feceb66ffc8e629fa6598d76b86b273ff34"
+  ],
+  "Thermite grenade": [
+   252,
+   "f5557d4fcf727bb67c0c6f61c4fffa4a458bbda050585a00bb5140f304cc45c261fe16bd5feceb66ffc84a44dc153642d4735e3a265e"
+  ],
+  "White phosphorus grenade": [
+   252,
+   "f5557d4fcf72d53a79b30adec4fffa4a458bbda050585a00bb5140f304cc77c5bb12819f5feceb66ffc84a44dc153642d4735e3a265e"
+  ],
+  "AI AW 7.62mm NATO": [
+   262,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2ea9e1fcb0210bd0e9802a056500f84095c186b51d431df5ddac53c17c250fca61c35cab0"
+  ],
+  "AI AW Covert 7.62": [
+   262,
+   "f5557d4fcf7222646825e23d86fb5df842c2ea9e1fcb0210bd0e9802a056b0b75da9d750d4735e3a265ef369cb89fc6271ad96eaaf70"
+  ],
+  "AI AW-50 .50 BMG": [
+   262,
+   "f5557d4fcf7265877a470d4ba6340dafdb5447e89e5dd79183d89365af18075caf2a9e55c2356069e9d1de5872c6bb44df3c4c5b236f"
+  ],
+  "AI AWM .300 Winchester": [
+   262,
+   "f5557d4fcf72d8dc3fa707d586fb5df842c2cbbb2689965cbd0e9802a056500f84095c18e629fa6598d70e6523810856591b139bd8a4"
+  ],
+  "AI AWM .338 Laupa": [
+   262,
+   "f5557d4fcf72d77bdb25a71786fb5df842c2d3eda2fda2babd0e9802a056500f84095c189400f1b21cb51e472b39b105ae8077b3a878"
+  ],
+  "AI AWM 7mm Magnum": [
+   262,
+   "f5557d4fcf72d8dc3fa707d586fb5df842c2cbbb2689965cbd0e9802a056500f84095c18e629fa6598d70e6523810856e629fa6598d7"
+  ],
+  "AMP DSR-1 .300 Winchester": [
+   262,
+   "f5557d4fcf72d8dc3fa707d586fb5df842c2cbbb2689965cbd0e9802a056500f84095c184ec9599fc2030e65238108563fdba35f04dc"
+  ],
+  "AMP DSR-1 .338 Laupa": [
+   262,
+   "f5557d4fcf72d77bdb25a71786fb5df842c2d3eda2fda2babd0e9802a056500f84095c18c2356069e9d11e472b39b1053fdba35f04dc"
+  ],
+  "AMP DSR-1 7.62mm NATO": [
+   262,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2cbbb2689965cbd0e9802a056500f84095c183fdba35f04dcdac53c17c2503fdba35f04dc"
+  ],
+  "AMP DSR-1 7.62mm Subsonic": [
+   262,
+   "f5557d4fcf7222646825e23d10f7f6b8715bcbbb2689965cbd0e9802a05661d5042930fb4e07408562bef369cb89fc623fdba35f04dc"
+  ],
+  "Barrett M82A1 .50 BMG": [
+   259,
+   "4c94485e0c2165877a470d4bcfea0fe203162d8550d1b88d83d89365af185c7293d64298b7a56873cd77deeeb5df3f2c6a8b7a87c94d"
+  ],
+  "C.G. Haenel StG.44 7.92mm": [
+   260,
+   "5d7f49449ab23f7fccf5392d91893febbc69b940811717e3bd0e9802a05666dc58d3bb522c624232cdd2ad5736686512d9d8b73e7fa3"
+  ],
+  "Colt Commando 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e38f1883487e9784cdb9810376b17ef6d19c7a1a6562590ef196b9eb6b674a"
+  ],
+  "Colt M16 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d91893febbc691c31d0c6838cbd0e9802a056ca678f097ddb3fdba35f04dc0f8ef3377b304f6c844184d2"
+  ],
+  "Colt M16A1 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d91893febbc691c31d0c6838cbd0e9802a0569790b8f4a5993fdba35f04dc0f8ef3377b304f6c844184d2"
+  ],
+  "Colt M16A2/A4 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8cbd0e9802a0567af8635035504a44dc1536420f8ef3377b3000dc1c832c18"
+  ],
+  "Colt M16A3 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8cbd0e9802a056bda050585a004a44dc1536420f8ef3377b3000dc1c832c18"
+  ],
+  "Colt M4 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8cbd0e9802a056a23029f95a9c6b51d431df5dad5736686512c4495da75095"
+  ],
+  "Colt M4 SOPMOD 5.56mm NATO": [
+   261,
+   "0ab3068230353f7fccf5392d7e62510838d8643c327fff8cbd0e9802a0564fd99b3abc356b51d431df5dad5736686512c4495da75095"
+  ],
+  "Colt M4A1 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8cbd0e9802a05684cdb98103766b51d431df5dad5736686512c4495da75095"
+  ],
+  "Dan-Inject IM 13mm dart": [
+   262,
+   "5d7f49449ab2ee164fea760d10f7f6b8715bc4c5ce0570c0bd0e9802a056c4fcd8072b606b86b273ff34b7a56873cd77772444a00dc2"
+  ],
+  "Enfield L85A1 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d91893febbc69b940811717e3bd0e9802a05660baaa45ba0119581e27de7c0f8ef3377b3011394bf7307f"
+  ],
+  "Enfield L85A2 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e3bd0e9802a05660baaa45ba0119581e27de7c0f8ef3377b3011394bf7307f"
+  ],
+  "FN FAL \"Para\" 7.62mm NATO": [
+   261,
+   "0ab306823035f4fa1fba91063cd56eb5b003aec63af09ce4bd0e9802a05631f33f2b0d146f4b6612125fa512db2741cd00dc1c832c18"
+  ],
+  "FN FAL 7.62mm NATO": [
+   261,
+   "0ab306823035f4fa1fba91063cd56eb5b003aec63af09ce4bd0e9802a056095d9c678d044523540f1504dac53c17c250fd263f51d239"
+  ],
+  "FN Hecate II .50 BMG": [
+   263,
+   "4c94485e0c2165877a470d4ba6340dafdb544ed6ab678de983d89365af187c14bbc242919400f1b21cb5de5872c6bb443a7b0af33dff"
+  ],
+  "FN Hecate II .50 BMG subsonic": [
+   263,
+   "4c94485e0c212bc354366ed586fb5df842c24ed6ab678de983d89365af187c14bbc242914b227777d4dd0f8ef3377b30ff3434be4531"
+  ],
+  "FN Mini-Hecate .338 Laupa": [
+   263,
+   "0ab306823035d77bdb25a71786fb5df842c2ea9e1fcb021083d89365af1815ad27c927b84523540f15041e472b39b105c955dbe1b30a"
+  ],
+  "FN Ultra-Ratio Commano II 7.62mm NATO": [
+   262,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2ea9e1fcb0210bd0e9802a056722b6e7dcdc44a44dc15364227badc983df1ae8077b3a878"
+  ],
+  "GIAT FAMAS F1 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b6fbbaac2191bd0e9802a056ed827c461fc64fc82b26aecb0f8ef3377b302c624232cdd2"
+  ],
+  "GIAT FAMAS G2 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e3bd0e9802a056ed827c461fc64a44dc1536420f8ef3377b30163c820d9576"
+  ],
+  "H&K G3 SG/1 7.62mm NATO": [
+   261,
+   "0ab306823035f4fa1fba9106504c52cbb5acaec63af09ce4bd0e9802a056361f7f425ca34ec9599fc203dac53c17c2500e25863be6ff"
+  ],
+  "H&K G36 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8cbd0e9802a056606d906e6c2b6b51d431df5d0f8ef3377b303dcfb00c29b1"
+  ],
+  "H&K G36C 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8c8f1883487e97606d906e6c2b8527a891e2241a6562590ef1971c487c6389"
+  ],
+  "H&K G36K 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8643c327fff8cbd0e9802a05628ec5d580ba73fdba35f04dcad573668651266bc4f39340e"
+  ],
+  "H&K G3A3 7.62mm NATO": [
+   261,
+   "0ab306823035f4fa1fba9106504c52cbb5acaec63af09ce4bd0e9802a0564ac72870d95e4523540f1504dac53c17c2501b5c15d377f5"
+  ],
+  "H&K G3A4 7.62mm NATO": [
+   261,
+   "0ab306823035f4fa1fba9106504c52cbb5acaec63af09ce4bd0e9802a05665d857472a3b4ec9599fc203dac53c17c2500e25863be6ff"
+  ],
+  "H&K HK33A2 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d8d38102b869cf8b78fb4f4adbd0e9802a0564ac72870d95e4a44dc1536420f8ef3377b30163c820d9576"
+  ],
+  "H&K HK33A3 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d8d38102b869cf8b78fb4f4adbd0e9802a05665d857472a3b4a44dc1536420f8ef3377b3000dc1c832c18"
+  ],
+  "H&K HK33SG1 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d8d38102b869cf8b78fb4f4adbd0e9802a056361f7f425ca34a44dc1536420f8ef3377b30163c820d9576"
+  ],
+  "H&K HK53A2 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d8d38102b869cf8b78fb4f4ad8f1883487e97bda050585a008527a891e2241a6562590ef1e7f6c011776e"
+  ],
+  "H&K HK53A3 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d8d38102b869cf8b78fb4f4ad8f1883487e9784cdb9810376e629fa6598d71a6562590ef1b5ead0a5626e"
+  ],
+  "H&K MSG-90 7.62mm NATO": [
+   259,
+   "f5557d4fcf72f4fa1fba9106504c52cbb5acdac802003f7dbd0e9802a0562c243a835e0f6b51d431df5ddac53c17c250fca61c35cab0"
+  ],
+  "H&K PSG-1 7.62mm NATO": [
+   259,
+   "0ab306823035f4fa1fba910686fb5df842c22ad93fb55cf7bd0e9802a0567d2435910b814a44dc153642dac53c17c250937c934f90f2"
+  ],
+  "KAC SR25 7.62mm NATO": [
+   259,
+   "0ab306823035f4fa1fba9106504c52cbb5acdac802003f7dbd0e9802a05645c685233cb28527a891e22427badc983df1cc4b3eb82f5e"
+  ],
+  "Lee Enfield Delisle Carbine .45  ACP": [
+   262,
+   "5d7f49449ab241af4746c06686fb5df842c2c884147ffdee8f1883487e97c51747bc869c4e07408562be811786ad1ae77759f94c149f"
+  ],
+  "Lee Enfield No. 1 MK3 .303 British": [
+   262,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2ea9e1fcb0210bd0e9802a056fa3274cc8eb0f5ca38f748a1dac53c17c2508719c8b9d63c"
+  ],
+  "Lee Enfield No. 2 .22 LR": [
+   262,
+   "f5557d4fcf722eb02768371210f7f6b8715b367de43f7431bd0e9802a056fa3274cc8eb06b86b273ff34b7a56873cd778719c8b9d63c"
+  ],
+  "Lee Enfield No. 4 Mk 1 .303 British": [
+   262,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2ea9e1fcb0210bd0e9802a05655120fb290219400f1b21cb527badc983df111394bf7307f"
+  ],
+  "Lee Enfield No. 5 .303 British": [
+   263,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2ea9e1fcb0210bd0e9802a056fa3274cc8eb0c2356069e9d10f8ef3377b30772444a00dc2"
+  ],
+  "Mauser Model 1898 7.62mm NATO": [
+   263,
+   "f5557d4fcf72f4fa1fba910686fb5df842c24ee159b64d75bd0e9802a056d4b0463c8f7e6b51d431df5d27badc983df16978e2340a85"
+  ],
+  "Mauser Model 1898 8mm Mauser": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c24ee159b64d75bd0e9802a056fa3274cc8eb0785f3ec7eb32dac53c17c25019581e27de7c"
+  ],
+  "Mosin-Nagent M1891 7.62mm Russian": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c24ee159b64d75bd0e9802a056fa3274cc8eb0535fa30d7e25dac53c17c250163c820d9576"
+  ],
+  "Mosin-Nagent M1891 Sniper 7.62mm Russian": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c24ee159b64d75bd0e9802a056f641c88c6ff8535fa30d7e2527badc983df1ed151875c927"
+  ],
+  "Norinco KBU-88 5.8mm": [
+   259,
+   "f5557d4fcf726a40ee48f544504c52cbb5ac26bc25b18456bd0e9802a0563832317d57e1b17ef6d19c7adac53c17c25060a370d06da7"
+  ],
+  "Norinco QBZ-95 5.8mm": [
+   260,
+   "f5557d4fcf726a40ee48f5443cd56eb5b003335afcb75a38bd0e9802a0560618013fa64a6f4b6612125f9ae2bdd7beed18ed019486eb"
+  ],
+  "Norinco QBZ-97 5.56mm NATO": [
+   260,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e3bd0e9802a0560618013fa64a6b51d431df5d0f8ef3377b3018ed019486eb"
+  ],
+  "Remington M24 SWS .300 Winchester Mag": [
+   263,
+   "0ab306823035d8dc3fa707d586fb5df842c24ee159b64d75bd0e9802a056ff78d6c8d1d2b17ef6d19c7a1e472b39b10520859fc7798f"
+  ],
+  "Remington M24 SWS 7.62mm NATO": [
+   263,
+   "f5557d4fcf72f4fa1fba910686fb5df842c24ee159b64d75bd0e9802a056ff78d6c8d1d26b51d431df5d27badc983df120859fc7798f"
+  ],
+  "Remington Model 700 .300 Winchester Mag": [
+   263,
+   "f5557d4fcf72d8dc3fa707d586fb5df842c24f09a1fad009bd0e9802a056fa3274cc8eb0b7a56873cd770e6523810856c4495da75095"
+  ],
+  "Remington Model 700 .30-06": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c233cbe02506c6bd0e9802a056fa3274cc8eb0b7a56873cd77dac53c17c250ddedc367715e"
+  ],
+  "Remington Model 700 .375 H&H Magnum": [
+   263,
+   "f5557d4fcf72d77bdb25a71786fb5df842c24f09a1fad009bd0e9802a056fa3274cc8eb0b7a56873cd770e65238108563bc77bf96558"
+  ],
+  "Remington Model 700 5.56mm NATO": [
+   263,
+   "f5557d4fcf723f7fccf5392d10f7f6b8715b6f22c87ac12dbd0e9802a056fa3274cc8eb06b51d431df5d0f8ef3377b303dcfb00c29b1"
+  ],
+  "Remington Model 700 7.62mm NATO": [
+   263,
+   "f5557d4fcf72f4fa1fba910686fb5df842c233cbe02506c6bd0e9802a056fa3274cc8eb0535fa30d7e25dac53c17c2503dcfb00c29b1"
+  ],
+  "Remington Model 700 7mm Remington Magnum": [
+   263,
+   "f5557d4fcf72d8dc3fa707d586fb5df842c24f09a1fad009bd0e9802a056fa3274cc8eb0b7a56873cd770e6523810856c4495da75095"
+  ],
+  "RSA AK-101 5.56mm NATO": [
+   261,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e3bd0e9802a0568ce3e71ef8636b51d431df5d0f8ef3377b30c4495da75095"
+  ],
+  "RSA AK-47 7.62mm Russian": [
+   260,
+   "f5557d4fcf727dfb0eef05f58d38102b869c5ee614daa7bdbd0e9802a056095d9c678d044fc82b26aecb0f8ef3377b30e0b04046fbfb"
+  ],
+  "RSA AK-74 5.45mm Russian": [
+   260,
+   "f5557d4fcf7206045242fa918d38102b869cb940811717e3bd0e9802a0564ac72870d95e4a44dc1536420f8ef3377b303dcfb00c29b1"
+  ],
+  "RSA AKS 7.62mm Russian": [
+   261,
+   "f5557d4fcf727dfb0eef05f58d38102b869c5ee614daa7bdbd0e9802a05631f33f2b0d144fc82b26aecb0f8ef3377b3060a370d06da7"
+  ],
+  "RSA AKS-74 5.45mm Russian": [
+   261,
+   "f5557d4fcf7206045242fa918d38102b869cb940811717e3bd0e9802a05665d857472a3b4a44dc1536420f8ef3377b30772444a00dc2"
+  ],
+  "RSA AKS-74U 5.45mm Russian": [
+   261,
+   "f5557d4fcf7206045242fa917e62510838d8b940811717e38f1883487e9784cdb98103766b51d431df5d0f8ef3377b30e7f6c011776e"
+  ],
+  "RSA AKS-74U-UBN 5.45mm Russian": [
+   261,
+   "f5557d4fcf7206045242fa917e62510838d8b940811717e38f1883487e979bed396fee1e6b51d431df5d0f8ef3377b30e7f6c011776e"
+  ],
+  "RSA Dragunov SVD 7.62mm Russian": [
+   259,
+   "f5557d4fcf7215ff4291fc96504c52cbb5ac6d4a5a172d01bd0e9802a056c81b66e02ce66f4b6612125f27badc983df1e0b04046fbfb"
+  ],
+  "RSA SVU 7.62mm Russian": [
+   259,
+   "5d7f49449ab20b2ced14772f504c52cbb5ac6d4a5a172d01bd0e9802a056bef2b72b41a38527a891e224f369cb89fc621e81bf048f2b"
+  ],
+  "Ruger 10/22 .22 LR": [
+   259,
+   "de7d1b721a1e2eb0276837128d38102b869cd3a1a0b4bac4bd0e9802a0568ce3e71ef8636b86b273ff34f5ca38f748a1e7f6c011776e"
+  ],
+  "Ruger Mini-14 5.56mm NATO": [
+   259,
+   "5d7f49449ab23f7fccf5392d10f7f6b8715be126c4fbf4a6bd0e9802a056bda050585a003fdba35f04dc0f8ef3377b30ee7e860a857f"
+  ],
+  "Ruger Mini-30 7.6mm Russian": [
+   259,
+   "5d7f49449ab27dfb0eef05f510f7f6b8715be126c4fbf4a6bd0e9802a056bda050585a00e629fa6598d7ad5736686512956e2659d9ec"
+  ],
+  "Simonov PTRD 14.5mm Russian": [
+   263,
+   "4c94485e0c2160ea50c9bdb6a6340dafdb541d6a7e0e6aa383d89365af184d34949e9ee8b7a56873cd771e472b39b1051b131164c370"
+  ],
+  "Simonov SKS 7.62mm Russian": [
+   259,
+   "f5557d4fcf727dfb0eef05f510f7f6b8715b22320ab05219bd0e9802a056095d9c678d046b51d431df5d27badc983df1cc6f2aa507f6"
+  ],
+  "Springfield Armory M1 Garand .30-06": [
+   259,
+   "f5557d4fcf7215ff4291fc9686fb5df842c2f0efa44a4870bd0e9802a056095d9c678d046f4b6612125f9ae2bdd7beede0b04046fbfb"
+  ],
+  "Springfield Armory M14 7.62mm NATO": [
+   261,
+   "0ab306823035f4fa1fba91063cd56eb5b003aec63af09ce4bd0e9802a0568ce3e71ef863e629fa6598d79ae2bdd7beed038c616c5803"
+  ],
+  "Springfield Armory M1903 .30-06": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c24ee159b64d75bd0e9802a056fa3274cc8eb0535fa30d7e25dac53c17c2508719c8b9d63c"
+  ],
+  "Springfield Armory M1903A4 .30-06": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c24ee159b64d75bd0e9802a056d2c79e85ee45785f3ec7eb3227badc983df101037eaa1fce"
+  ],
+  "Springfield Armory M21 7.62mm NATO": [
+   259,
+   "f5557d4fcf72f4fa1fba9106504c52cbb5acdac802003f7dbd0e9802a056cd68a990fd6ee629fa6598d7dac53c17c2509faf7f137581"
+  ],
+  "Steyr AUG 5.56mm NATO": [
+   261,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e3bd0e9802a056052b27c1d8354a44dc1536420f8ef3377b30163c820d9576"
+  ],
+  "Steyr AUG Carbine 5.56mm NATO": [
+   261,
+   "f5557d4fcf723f7fccf5392d7e62510838d8b940811717e3bd0e9802a056052b27c1d8354fc82b26aecbad57366865122c624232cdd2"
+  ],
+  "Steyr AUG Para 9mm": [
+   260,
+   "5d7f49449ab24444d855d7dc7e62510838d800cb08ee2dde8f1883487e97cdf1440bc54b4b227777d4dd9f14025af0063dcfb00c29b1"
+  ],
+  "Weatherby Mk. V .30-06": [
+   263,
+   "f5557d4fcf7215ff4291fc9686fb5df842c24ee159b64d75bd0e9802a056fa3274cc8eb0b7a56873cd77dac53c17c250ee7e860a857f"
+  ],
+  "Weatherby Mk. V .460 Weatherby Magnum": [
+   263,
+   "0ab3068230357e67364945bf86fb5df842c22bee8b25472fbd0e9802a056d501ee6a424cb7a56873cd771e472b39b1054a44dc153642"
+  ],
+  "Weatherby Mk. V 5.56mm NATO": [
+   262,
+   "5d7f49449ab23f7fccf5392d10f7f6b8715b6f22c87ac12dbd0e9802a056fa3274cc8eb04fc82b26aecb0f8ef3377b301d44b45c2708"
+  ],
+  "Weatherby Mk. V 7.62mm NATO": [
+   263,
+   "f5557d4fcf72f4fa1fba910686fb5df842c24ee159b64d75bd0e9802a056fa3274cc8eb0785f3ec7eb32dac53c17c2501d44b45c2708"
+  ],
+  "Weatherby Mk. V 7mm Remington Magnum": [
+   263,
+   "f5557d4fcf72d8dc3fa707d586fb5df842c24f09a1fad009bd0e9802a056fa3274cc8eb0b7a56873cd770e6523810856ee7e860a857f"
+  ],
+  "Benelli M1 Practical 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7178d38102b869c34fee312f470bd0e9802a0569ccd075ae15b9400f1b21cb59f14025af0063bc77bf96558"
+  ],
+  "Benelli M1 Practical 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf504c52cbb5ac34fee312f470bd0e9802a0569ccd075ae15b9400f1b21cb59f14025af0063bc77bf96558"
+  ],
+  "Benelli M1 Tactical 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7178d38102b869c32e5da6b0430bd0e9802a05665ab11fee07cb7a56873cd77624b60c58c9d01a6025a6200"
+  ],
+  "Benelli M1 Tactical 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf504c52cbb5ac32e5da6b0430bd0e9802a05665ab11fee07cb7a56873cd77624b60c58c9d01a6025a6200"
+  ],
+  "Benelli M4 Super 90 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7178d38102b869c14b56e0a77f2bd0e9802a05661822e50a9386f4b6612125f624b60c58c9d1d44b45c2708"
+  ],
+  "Benelli M4 Super 90 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf504c52cbb5ac14b56e0a77f2bd0e9802a05661822e50a9386f4b6612125f624b60c58c9d1d44b45c2708"
+  ],
+  "Browning Auto-5 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b33cbe02506c6bd0e9802a056f7cd19dc022c6f4b6612125f624b60c58c9d2c624232cdd2"
+  ],
+  "Browning Auto-5 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf86fb5df842c233cbe02506c6bd0e9802a056f7cd19dc022c6f4b6612125f624b60c58c9d2c624232cdd2"
+  ],
+  "Browning Auto-5 16 guage shot": [
+   266,
+   "f5557d4fcf72f4fa1fba910610f7f6b8715b6f22c87ac12dbd0e9802a056f7cd19dc022c4a44dc153642b7a56873cd772c624232cdd2"
+  ],
+  "Browning Auto-5 16 guage slug": [
+   266,
+   "f5557d4fcf7215ff4291fc9686fb5df842c26f22c87ac12dbd0e9802a056f7cd19dc022c4a44dc153642b7a56873cd772c624232cdd2"
+  ],
+  "Browning Auto-5 20 guage shot": [
+   266,
+   "f5557d4fcf72511d6000362c10f7f6b8715bc1646ba6616cbd0e9802a056f7cd19dc022c19581e27de7cf5ca38f748a12c624232cdd2"
+  ],
+  "Browning Auto-5 20 guage slug": [
+   266,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2c1646ba6616cbd0e9802a056f7cd19dc022c19581e27de7cf5ca38f748a12c624232cdd2"
+  ],
+  "Browning BPS Stalker 10 guage shot": [
+   265,
+   "f5557d4fcf72b259daec1d7e10f7f6b8715b32e5da6b0430bd0e9802a05665ab11fee07cb7a56873cd77624b60c58c9d7d96c5add449"
+  ],
+  "Browning BPS Stalker 10 guage slug": [
+   265,
+   "f5557d4fcf727a0e0369a8f7a6340dafdb5432e5da6b0430bd0e9802a05665ab11fee07cb7a56873cd77624b60c58c9d7d96c5add449"
+  ],
+  "Browning BPS Stalker 12 guage shot": [
+   265,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b32e5da6b0430bd0e9802a05665ab11fee07cb7a56873cd77624b60c58c9d00dc1c832c18"
+  ],
+  "Browning BPS Stalker 12 guage slug": [
+   265,
+   "f5557d4fcf727e67364945bf86fb5df842c232e5da6b0430bd0e9802a05665ab11fee07cb7a56873cd77624b60c58c9d00dc1c832c18"
+  ],
+  "Browning Superposed .410 shot": [
+   264,
+   "5d7f49449ab2be9b564a102f10f7f6b8715b39803cda3934bd0e9802a056328e75cedf724b227777d4dd4a44dc1536427902699be42c"
+  ],
+  "Browning Superposed .410 slug": [
+   264,
+   "5d7f49449ab29a4d1c433d1810f7f6b8715b39803cda3934bd0e9802a056328e75cedf724b227777d4dd4a44dc1536427902699be42c"
+  ],
+  "Browning Superposed 12 guage shot": [
+   264,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b2bee8b25472fbd0e9802a056328e75cedf72b7a56873cd77624b60c58c9d7902699be42c"
+  ],
+  "Browning Superposed 12 guage slug": [
+   264,
+   "f5557d4fcf727e67364945bf86fb5df842c22bee8b25472fbd0e9802a056328e75cedf72b7a56873cd77624b60c58c9d7902699be42c"
+  ],
+  "Browning Superposed 20 guage shot": [
+   264,
+   "5d7f49449ab2511d6000362c10f7f6b8715ba130dcba5a33bd0e9802a056328e75cedf726b51d431df5df5ca38f748a17902699be42c"
+  ],
+  "Browning Superposed 20 guage slug": [
+   264,
+   "5d7f49449ab2f4fa1fba910686fb5df842c2a130dcba5a33bd0e9802a056328e75cedf726b51d431df5df5ca38f748a17902699be42c"
+  ],
+  "Charles Daily Field II Hunter .410 Shot": [
+   264,
+   "5d7f49449ab2be9b564a102f10f7f6b8715b39803cda3934bd0e9802a056e0ee8faf1c6c4b227777d4dd4a44dc1536425798758bbc83"
+  ],
+  "Charles Daily Field II Hunter .410 Slug": [
+   264,
+   "5d7f49449ab29a4d1c433d1810f7f6b8715b39803cda3934bd0e9802a056e0ee8faf1c6c4b227777d4dd4a44dc1536425798758bbc83"
+  ],
+  "Charles Daily Field II Hunter 10 guage Shot": [
+   264,
+   "f5557d4fcf72b259daec1d7e10f7f6b8715b2bee8b25472fbd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9d843e508ebb10"
+  ],
+  "Charles Daily Field II Hunter 10 guage Slug": [
+   264,
+   "f5557d4fcf727a0e0369a8f7a6340dafdb542bee8b25472fbd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9d843e508ebb10"
+  ],
+  "Charles Daily Field II Hunter 12 guage Shot": [
+   264,
+   "5d7f49449ab2d77bdb25a71710f7f6b8715b2bee8b25472fbd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9dddedc367715e"
+  ],
+  "Charles Daily Field II Hunter 12 guage Slug": [
+   264,
+   "5d7f49449ab27e67364945bf86fb5df842c22bee8b25472fbd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9dddedc367715e"
+  ],
+  "Charles Daily Field II Hunter 16 guage Shot": [
+   264,
+   "5d7f49449ab2f4fa1fba910610f7f6b8715b40ef13632d55bd0e9802a056e0ee8faf1c6c8527a891e224b7a56873cd7718ed019486eb"
+  ],
+  "Charles Daily Field II Hunter 16 guage Slug": [
+   264,
+   "5d7f49449ab215ff4291fc9686fb5df842c240ef13632d55bd0e9802a056e0ee8faf1c6c8527a891e224b7a56873cd7718ed019486eb"
+  ],
+  "Charles Daily Field II Hunter 20 guage Shot": [
+   264,
+   "5d7f49449ab2511d6000362c10f7f6b8715ba130dcba5a33bd0e9802a056e0ee8faf1c6c6b51d431df5df5ca38f748a118ed019486eb"
+  ],
+  "Charles Daily Field II Hunter 20 guage Slug": [
+   264,
+   "5d7f49449ab2f4fa1fba910686fb5df842c2a130dcba5a33bd0e9802a056e0ee8faf1c6c6b51d431df5df5ca38f748a118ed019486eb"
+  ],
+  "Daewoo USAS-12 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7177e62510838d8cf30ed3c2966bd0e9802a05665ab11fee07c8527a891e224624b60c58c9d63a033c42ae3"
+  ],
+  "Daewoo USAS-12 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf3cd56eb5b003cf30ed3c2966bd0e9802a05665ab11fee07c8527a891e224624b60c58c9d63a033c42ae3"
+  ],
+  "Franchi SPAS-12 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7178d38102b869c34fee312f470bd0e9802a056778b04646d744523540f1504624b60c58c9d0e25863be6ff"
+  ],
+  "Franchi SPAS-12 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf504c52cbb5ac34fee312f470bd0e9802a056778b04646d744523540f1504624b60c58c9d0e25863be6ff"
+  ],
+  "Franchi SPAS-15 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7178d38102b869c735e2769bfe0bd0e9802a0562b2170fc9e029400f1b21cb5624b60c58c9d6dc50a2fd3ef"
+  ],
+  "Franchi SPAS-15 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf504c52cbb5ac735e2769bfe0bd0e9802a0562b2170fc9e029400f1b21cb5624b60c58c9d6dc50a2fd3ef"
+  ],
+  "KAC Masterkey 12 guage shot": [
+   265,
+   "5d7f49449ab2d77bdb25a71710f7f6b8715b7e16e616d665bd0e9802a056202aa0155391b17ef6d19c7ae629fa6598d74819f5315cb4"
+  ],
+  "KAC Masterkey 12 guage slug": [
+   265,
+   "5d7f49449ab27e67364945bf86fb5df842c27e16e616d665bd0e9802a056202aa0155391b17ef6d19c7ae629fa6598d74819f5315cb4"
+  ],
+  "Remington Model 870 12 guage shot": [
+   265,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b32e5da6b0430bd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9d3dcfb00c29b1"
+  ],
+  "Remington Model 870 12 guage slug": [
+   265,
+   "f5557d4fcf727e67364945bf86fb5df842c232e5da6b0430bd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9d3dcfb00c29b1"
+  ],
+  "Remington Model 870 16 guage shot": [
+   265,
+   "f5557d4fcf72f4fa1fba910610f7f6b8715b6f39d499b466bd0e9802a056e0ee8faf1c6c8527a891e224b7a56873cd777902699be42c"
+  ],
+  "Remington Model 870 16 guage slug": [
+   265,
+   "f5557d4fcf7215ff4291fc9686fb5df842c26f39d499b466bd0e9802a056e0ee8faf1c6c8527a891e224b7a56873cd777902699be42c"
+  ],
+  "Remington Model 870 20 guage shot": [
+   265,
+   "f5557d4fcf72511d6000362c10f7f6b8715bf41e1f7ceeabbd0e9802a056e0ee8faf1c6c3fdba35f04dcf5ca38f748a1a22eea496bce"
+  ],
+  "Remington Model 870 20 guage slug": [
+   265,
+   "f5557d4fcf72f4fa1fba910686fb5df842c2f41e1f7ceeabbd0e9802a056e0ee8faf1c6c3fdba35f04dcf5ca38f748a1a22eea496bce"
+  ],
+  "Remington Model 870P 12 guage shot": [
+   265,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b2562dc2fbb83bd0e9802a05690cfd56698f9b7a56873cd77624b60c58c9d3dcfb00c29b1"
+  ],
+  "Remington Model 870P 12 guage slug": [
+   265,
+   "f5557d4fcf727e67364945bf86fb5df842c22562dc2fbb83bd0e9802a05690cfd56698f9b7a56873cd77624b60c58c9d3dcfb00c29b1"
+  ],
+  "Reutech Striker 12 guage hot": [
+   266,
+   "f5557d4fcf72d77bdb25a7178d38102b869c00fc31b30389bd0e9802a05666d53d23fdee4ec9599fc203624b60c58c9d60a370d06da7"
+  ],
+  "Reutech Striker 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf504c52cbb5ac00fc31b30389bd0e9802a05666d53d23fdee4ec9599fc203624b60c58c9d60a370d06da7"
+  ],
+  "Saiga 12K .410 shot": [
+   266,
+   "5d7f49449ab2be9b564a102f7e62510838d8279d8eaebd39bd0e9802a05661822e50a9384e07408562be4a44dc1536420b0c07544262"
+  ],
+  "Saiga 12K .410 slug": [
+   266,
+   "5d7f49449ab29a4d1c433d187e62510838d8279d8eaebd39bd0e9802a05661822e50a9384e07408562be4a44dc1536420b0c07544262"
+  ],
+  "Saiga 12K 12 guage shot": [
+   266,
+   "f5557d4fcf72d77bdb25a7177e62510838d83c63abcee183bd0e9802a05661822e50a9386f4b6612125f624b60c58c9d0b0c07544262"
+  ],
+  "Saiga 12K 12 guage slug": [
+   266,
+   "f5557d4fcf727e67364945bf3cd56eb5b0033c63abcee183bd0e9802a05661822e50a9386f4b6612125f624b60c58c9d0b0c07544262"
+  ],
+  "Saiga 12K 20 guage shot": [
+   266,
+   "5d7f49449ab2511d6000362c7e62510838d8279d8eaebd39bd0e9802a05661822e50a93819581e27de7cf5ca38f748a10b0c07544262"
+  ],
+  "Saiga 12K 20 guage slug": [
+   266,
+   "5d7f49449ab2f4fa1fba91063cd56eb5b003279d8eaebd39bd0e9802a05661822e50a93819581e27de7cf5ca38f748a10b0c07544262"
+  ],
+  "Savage Arms Model 24 Rifled .17 HMR": [
+   264,
+   "5d7f49449ab203fb0cc6e49210f7f6b8715beabfc0402154bd0e9802a0568ce3e71ef863d4735e3a265e624b60c58c9d5feceb66ffc8"
+  ],
+  "Savage Arms Model 24 Rifled .22 LR": [
+   264,
+   "5d7f49449ab22eb02768371210f7f6b8715b7e1f90bff67cbd0e9802a0568ce3e71ef8636b86b273ff34f5ca38f748a15feceb66ffc8"
+  ],
+  "Savage Arms Model 24 Rifled .22 Magnum": [
+   264,
+   "5d7f49449ab203fb0cc6e49210f7f6b8715beabfc0402154bd0e9802a0568ce3e71ef863d4735e3a265e9f14025af0065feceb66ffc8"
+  ],
+  "Savage Arms Model 24 Rifled 5.56mm NATO": [
+   264,
+   "5d7f49449ab23f7fccf5392d10f7f6b8715b1d6a7e0e6aa3bd0e9802a0568ce3e71ef8634fc82b26aecbad57366865125feceb66ffc8"
+  ],
+  "Savage Arms Model 24 Shotgun .410 shot": [
+   264,
+   "5d7f49449ab2be9b564a102f10f7f6b8715b9c42af13bec2bd0e9802a056e0ee8faf1c6c4e07408562be4a44dc1536422c624232cdd2"
+  ],
+  "Savage Arms Model 24 Shotgun .410 slug": [
+   264,
+   "5d7f49449ab29a4d1c433d1810f7f6b8715b9c42af13bec2bd0e9802a056e0ee8faf1c6c4e07408562be4a44dc1536422c624232cdd2"
+  ],
+  "Savage Arms Model 24 Shotgun 12 guage shot": [
+   264,
+   "5d7f49449ab2d77bdb25a71710f7f6b8715b672b19429bd8bd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9d2c624232cdd2"
+  ],
+  "Savage Arms Model 24 Shotgun 12 guage slug": [
+   264,
+   "5d7f49449ab27e67364945bf86fb5df842c2672b19429bd8bd0e9802a056e0ee8faf1c6cb7a56873cd77624b60c58c9d2c624232cdd2"
+  ],
+  "Savage Arms Model 24 Shotgun 20 guage shot": [
+   264,
+   "5d7f49449ab2511d6000362c10f7f6b8715b1d6a7e0e6aa3bd0e9802a056e0ee8faf1c6c4fc82b26aecbf5ca38f748a12c624232cdd2"
+  ],
+  "Savage Arms Model 24 Shotgun 20 guage slug": [
+   264,
+   "5d7f49449ab2f4fa1fba910686fb5df842c21d6a7e0e6aa3bd0e9802a056e0ee8faf1c6c4fc82b26aecbf5ca38f748a12c624232cdd2"
+  ],
+  "Truvelo Neostead 12 guage shot": [
+   265,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715bddfdb918083fbd0e9802a05665be9d4a0c8ab7a56873cd77624b60c58c9d6dc50a2fd3ef"
+  ],
+  "Truvelo Neostead 12 guage slug": [
+   265,
+   "f5557d4fcf727e67364945bf86fb5df842c2ddfdb918083fbd0e9802a05665be9d4a0c8ab7a56873cd77624b60c58c9d6dc50a2fd3ef"
+  ],
+  "Winchester Model 1897 12 guage shot": [
+   265,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b14b56e0a77f2bd0e9802a0567db34d3f99adb7a56873cd77624b60c58c9dc4495da75095"
+  ],
+  "Winchester Model 1897 12 guage slug": [
+   265,
+   "f5557d4fcf727e67364945bf86fb5df842c214b56e0a77f2bd0e9802a0567db34d3f99adb7a56873cd77624b60c58c9dc4495da75095"
+  ],
+  "Winchester Model 21 12 guage shot": [
+   264,
+   "f5557d4fcf72d77bdb25a71710f7f6b8715b2bee8b25472fbd0e9802a0567db34d3f99adb7a56873cd77624b60c58c9d3dcfb00c29b1"
+  ],
+  "Winchester Model 21 12 guage slug": [
+   264,
+   "f5557d4fcf727e67364945bf86fb5df842c22bee8b25472fbd0e9802a0567db34d3f99adb7a56873cd77624b60c58c9d3dcfb00c29b1"
+  ],
+  "Winchester Model 21 16 guage shot": [
+   264,
+   "5d7f49449ab2f4fa1fba910610f7f6b8715ba130dcba5a33bd0e9802a0567db34d3f99ad3fdba35f04dcb7a56873cd773dcfb00c29b1"
+  ],
+  "Winchester Model 21 16 guage slug": [
+   264,
+   "5d7f49449ab215ff4291fc9686fb5df842c2a130dcba5a33bd0e9802a0567db34d3f99ad3fdba35f04dcb7a56873cd773dcfb00c29b1"
+  ],
+  "Winchester Model 21 20 guage shot": [
+   264,
+   "5d7f49449ab2511d6000362c10f7f6b8715b39803cda3934bd0e9802a0567db34d3f99ad6b51d431df5df5ca38f748a13dcfb00c29b1"
+  ],
+  "Winchester Model 21 20 guage slug": [
+   264,
+   "5d7f49449ab2f4fa1fba910686fb5df842c239803cda3934bd0e9802a0567db34d3f99ad6b51d431df5df5ca38f748a13dcfb00c29b1"
+  ],
+  "CZ Skorpion .32 ACP": [
+   257,
+   "de7d1b721a1e17ee2fda0ce67e62510838d8aec63af09ce4b86f1d147dac84cdb9810376ef2d127de37bf5ca38f748a1c020bad937ec"
+  ],
+  "CZ Skorpion .380 ACP": [
+   257,
+   "de7d1b721a1e45cad0321cc07e62510838d8b96747be9ca5b86f1d147dac84cdb98103762c624232cdd2f5ca38f748a1c020bad937ec"
+  ],
+  "CZ Skorpion 9x18mm": [
+   257,
+   "de7d1b721a1e45cad0321cc07e62510838d8b96747be9ca5b86f1d147dac84cdb98103762c624232cdd2b7a56873cd77c020bad937ec"
+  ],
+  "FN P90 5.7x28mm": [
+   258,
+   "5d7f49449ab28f247722b97c7e62510838d8be4a6429e4938f1883487e97243228eddb47ef2d127de37b9f14025af00666bc4f39340e"
+  ],
+  "German State Arsenal MP-40 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc7e62510838d80faed7835cb78f1883487e9784cdb98103764b227777d4dd624b60c58c9ded151875c927"
+  ],
+  "H&K MP5/10 10mm": [
+   258,
+   "f5557d4fcf7222646825e23d504c52cbb5ac335afcb75a388f1883487e97c93851a9922e7902699be42c624b60c58c9db5ead0a5626e"
+  ],
+  "H&K MP5/40 .40 S&W": [
+   258,
+   "5d7f49449ab241af4746c0668d38102b869c335afcb75a388f1883487e97c93851a9922ee7f6c011776e624b60c58c9db5ead0a5626e"
+  ],
+  "H&K MP5A4 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc8d38102b869cb940811717e38f1883487e97bda050585a00e7f6c011776e624b60c58c9d5fa067c1e4cd"
+  ],
+  "H&K MP5A5 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc8d38102b869cb940811717e38f1883487e9784cdb9810376e7f6c011776e624b60c58c9d5fa067c1e4cd"
+  ],
+  "H&K MP5K 9mm": [
+   257,
+   "5d7f49449ab24444d855d7dc8d38102b869c9a200ca74e08b86f1d147dacd4735e3a265e2c624232cdd2e629fa6598d79e6dccf291cf"
+  ],
+  "H&K MP5K in Briefcase 9mm": [
+   257,
+   "5d7f49449ab24444d855d7dc8d38102b869c1ed112335edd8842e86ca5eaa7d2a8e5f84e4b227777d4dd4a44dc1536422b640621567d"
+  ],
+  "H&K MP5SD5 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc8d38102b869cb940811717e38f1883487e97e5bf1f03cacfef2d127de37b624b60c58c9dee7e860a857f"
+  ],
+  "H&K MP5SD6 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc8d38102b869cb940811717e38f1883487e973d0ce91c3995ef2d127de37b624b60c58c9dee7e860a857f"
+  ],
+  "H&K MP7A1 4.6x30mm": [
+   257,
+   "5d7f49449ab2581edbfa8f4c8d38102b869ced2fb1b91697b86f1d147daca348c680069a2c624232cdd2624b60c58c9d8a199b120cf4"
+  ],
+  "H&K UMP .40 S&W": [
+   258,
+   "5d7f49449ab241af4746c0668d38102b869c335afcb75a388f1883487e97f57d34fe64d82c624232cdd2624b60c58c9d8bf40d0515e8"
+  ],
+  "H&K UMP .45 ACP": [
+   258,
+   "f5557d4fcf7241af4746c066504c52cbb5ac84744512b2998f1883487e97f57d34fe64d82c624232cdd2624b60c58c9d5ecf21708e12"
+  ],
+  "H&K UMP 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc8d38102b869cb940811717e38f1883487e975f8ba62d4e837902699be42c624b60c58c9d8bf40d0515e8"
+  ],
+  "IMI Micro-Uzi 9mm": [
+   257,
+   "5d7f49449ab24444d855d7dc7e62510838d896560b968280bb5140f304cc1ce14819ee424a44dc153642f5ca38f748a18c92bebd7404"
+  ],
+  "IMI Mini-Uzi 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc7e62510838d80faed7835cb774cbd3105d9384cdb9810376e7f6c011776eb7a56873cd77e7f6c011776e"
+  ],
+  "IMI Uzi 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc7e62510838d80faed7835cb78f1883487e9784cdb98103764b227777d4dd624b60c58c9d843e508ebb10"
+  ],
+  "MAC M10 .45 ACP": [
+   257,
+   "5d7f49449ab241af4746c0663cd56eb5b00366a861895d3eb86f1d147dac7da0341fb4f8e7f6c011776eb7a56873cd77971c487c6389"
+  ],
+  "MAC M10 9mm": [
+   257,
+   "5d7f49449ab24444d855d7dc7e62510838d866a861895d3eb86f1d147dac3090fab55935ef2d127de37bb7a56873cd77971c487c6389"
+  ],
+  "MAC M11 .380 ACP": [
+   257,
+   "de7d1b721a1e45cad0321cc07e62510838d80faed7835cb7b86f1d147dac3090fab559352c624232cdd2b7a56873cd778a199b120cf4"
+  ],
+  "RSA Bizon-2 9x18mm Improved": [
+   258,
+   "5d7f49449ab241af4746c0667e62510838d89333740866968f1883487e971a16fdbc1d897902699be42c9f14025af00696b9eb6b674a"
+  ],
+  "Sten Mk II 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc7e62510838d80faed7835cb78f1883487e978ce3e71ef863ef2d127de37b624b60c58c9d7902699be42c"
+  ],
+  "Sten Mk IIS 9mm": [
+   258,
+   "5d7f49449ab24444d855d7dc7e62510838d80faed7835cb78f1883487e974f886dc98d7fef2d127de37b624b60c58c9d7902699be42c"
+  ],
+  "Steyr TMP 9mm": [
+   257,
+   "5d7f49449ab24444d855d7dc7e62510838d85825661e9d6cb86f1d147dacb426cfb0aa5f3fdba35f04dce629fa6598d7f491e65f8d4b"
+  ],
+  "Thompson M1928 .45 ACP": [
+   258,
+   "f5557d4fcf7241af4746c0663cd56eb5b0037d4c5c8894e08f1883487e978e239c841f234e07408562be9f14025af006b52b603f9ec8"
+  ],
+  "Enfield L86A1 LSW 5.56×45mm NATO": [
+   267,
+   "f5557d4fcf723f7fccf5392d91893febbc69c42fdfaa7f35bd0e9802a056136e74a5786aef2d127de37b9ae2bdd7beed981955e70336"
+  ],
+  "Browning M1918 BAR .30-06": [
+   267,
+   "0ab30682303515ff4291fc963cd56eb5b003aec63af09ce4bd0e9802a056341d8e23d77d4a44dc153642dac53c17c250615a74687ed5"
+  ],
+  "FN Minimi 5.56×45mm NATO": [
+   267,
+   "0ab3068230353f7fccf5392d8d38102b869c112e4f6eaf1bbd0e9802a0564b45ede16b03ef2d127de37bdac53c17c2503303dbbd9dad"
+  ],
+  "FN Minimi Para 5.56×45mm NATO": [
+   267,
+   "0ab3068230353f7fccf5392d8d38102b869c112e4f6eaf1bbd0e9802a0566c4c7ed11dd5e7f6c011776e9ae2bdd7beed18c8b2b189a1"
+  ],
+  "NORINCO QJY-88 5.8×42mm": [
+   267,
+   "0ab3068230356a40ee48f5443cd56eb5b003112e4f6eaf1bbd0e9802a056ce1cc35f8d8ee629fa6598d7dac53c17c2505ad3a5738540"
+  ],
+  "RSA RPK 7.62×39mm Russian": [
+   267,
+   "0ab3068230357dfb0eef05f57e62510838d893751872dea9bd0e9802a05604d536c9d9384a44dc1536429ae2bdd7beed4fc82b26aecb"
+  ],
+  "RSA RPK-74 5.45×39mm Russian": [
+   267,
+   "0ab3068230356a40ee48f5447e62510838d85f671a5a18f1bd0e9802a05604d536c9d9388527a891e224dac53c17c2504fc82b26aecb"
+  ],
+  "Steyr AUG Hbar 5.56×45mm NATO": [
+   267,
+   "0ab3068230353f7fccf5392d7e62510838d815d288d24b54bd0e9802a0565aded932787f2c624232cdd29ae2bdd7beedb52b603f9ec8"
+  ],
+  "Saco M60 7.62×51mm NATO": [
+   267,
+   "f5557d4fcf72f4fa1fba9106acbe599583444a35f4f8bb1dbd0e9802a056850a5247a9ef7902699be42cdac53c17c250d5ad3bfb8045"
+  ],
+  "FN MAG 7.62×51mm NATO": [
+   267,
+   "0ab306823035f4fa1fba9106504c52cbb5ac4a35f4f8bb1dbd0e9802a056e971618513437902699be42c3a1dfb05d725ac87cb770e0b"
+  ],
+  "German State Arsenal MG-42 7.62×51mm NATO": [
+   267,
+   "0ab306823035f4fa1fba91063cd56eb5b0034a35f4f8bb1dbd0e9802a056af90634a258a7902699be42cdac53c17c250a86d4cb8b7e0"
+  ],
+  "German State Arsenal MG-42 8mm Mauser": [
+   267,
+   "0ab30682303515ff4291fc963cd56eb5b003454a7a4ee3b6bd0e9802a056af90634a258a2c624232cdd227badc983df1a86d4cb8b7e0"
+  ],
+  "RSA PK 7.62×54mm Russian": [
+   267,
+   "0ab30682303515ff4291fc963cd56eb5b0034a35f4f8bb1dbd0e9802a056e971618513434a44dc15364227badc983df1191bc08e6b1c"
+  ],
+  "Browning M2hB .50 BMG": [
+   268,
+   "0ab30682303565877a470d4b0417928e4fcd4a35f4f8bb1d83d89365af1870672a1c6fbbe7f6c011776e983bd614bb5a2747b7c71856"
+  ],
+  "General Electric M134 7.62×51mm NATO": [
+   268,
+   "0ab306823035f4fa1fba9106e883d53f59b4a1a33d4cdfd883d89365af188a48431fdc8c6b51d431df5d9ae2bdd7beed81b8a03f97e8"
+  ],
+  "RSA DShK 12.7×109mm Russian": [
+   268,
+   "0ab30682303583e6b7ac6b8a0417928e4fcd454a7a4ee3b683d89365af1843c2b1328466d4735e3a265e983bd614bb5a6aac0cf87a32"
+  ],
+  "RSA KPV 14.5mm Russian": [
+   268,
+   "0ab30682303560ea50c9bdb60417928e4fcd115489adef1c83d89365af1843c2b13284664b227777d4dddeeeb5df3f2c03a3d955b879"
+  ],
+  "Hydroar LC T1 M1": [
+   268,
+   "f5557d4fcf720c4d3aff90aac52f7bbfc51fa04fe4638ce4bd0e9802a056007de2149a445feceb66ffc8e629fa6598d7f369cb89fc62"
+  ],
+  "RSA LPO-50": [
+   268,
+   "f5557d4fcf720c4d3aff90aac4fffa4a458bfd50bdf80ee5bd0e9802a0560ca1bea402915feceb66ffc8f5ca38f748a11a6562590ef1"
+  ],
+  "U.S. Arsenal M2A1": [
+   268,
+   "f5557d4fcf720c4d3aff90aa9ecbb7c980eaf85ff4539b7fbd0e9802a056a6f3896edf875feceb66ffc8e629fa6598d7ff5a1ae012af"
+  ],
+  "U.S. Arsenal M9A1": [
+   268,
+   "f5557d4fcf720c4d3aff90aac4fffa4a458bf85ff4539b7fbd0e9802a0560ca1bea402915feceb66ffc8e629fa6598d71a6562590ef1"
+  ],
+  "Charge, breaching": [
+   268,
+   "5d7f49449ab283745826960bc52f7bbfc51fbda050585a00c5bdb8722514fbdc5b1128ef5feceb66ffc8b8736b9999094e07408562be"
+  ],
+  "Mine, anti-personnel": [
+   268,
+   "5d7f49449ab20bd6dd40c36cc52f7bbfc51fbda050585a00509a2da77898fbdc5b1128ef5feceb66ffc85feceb66ffc8e7f6c011776e"
+  ],
+  "Mine, anti-tank": [
+   268,
+   "5d7f49449ab2c5ee3c6182cf3cd56eb5b003bda050585a00c5bdb8722514fbdc5b1128ef5feceb66ffc85feceb66ffc8624b60c58c9d"
+  ],
+  "Mine, Bouncing Betty": [
+   268,
+   "5d7f49449ab22a27e969c07ac52f7bbfc51fbda050585a00e8cf37a317c1a894e5daeffc5feceb66ffc85feceb66ffc82c624232cdd2"
+  ],
+  "Mine, directional": [
+   268,
+   "5d7f49449ab23f73f61dcd0287b8c156e0cfbda050585a00e8cf37a317c1fbdc5b1128ef5feceb66ffc85feceb66ffc88a199b120cf4"
+  ],
+  "Charge, satchel": [
+   268,
+   "f5557d4fcf72385b203c3d79c52f7bbfc51fbda050585a00c5bdb8722514fbdc5b1128ef5feceb66ffc8e629fa6598d7f5ca38f748a1"
+  ],
+  "ANFO, 50 lbs.": [
+   269,
+   "5d7f49449ab256bff0dc2d25c4fffa4a458bbda050585a001b501160f5be96aac89ab54c5feceb66ffc85feceb66ffc81a6562590ef1"
+  ],
+  "Black powder, 1 lb.": [
+   269,
+   "5d7f49449ab20a8d184ff180c4fffa4a458bbda050585a00509a2da7789852c9381690825feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "Dynamite, 1 stick": [
+   269,
+   "5d7f49449ab2071e282b31829ecbb7c980eabda050585a00509a2da77898730aeb59dd825feceb66ffc85feceb66ffc8d2cbad71ff33"
+  ],
+  "Dynamite (expired), 1 stick": [
+   269,
+   "5d7f49449ab25f0415dffaa5b458185ecdfcbda050585a00e8cf37a317c195db7537fff25feceb66ffc85feceb66ffc8d2cbad71ff33"
+  ],
+  "Nitroglycerine, 1/4 lb.": [
+   269,
+   "5d7f49449ab25f0415dffaa5d6029a877116bda050585a00509a2da77898909c2c6474065feceb66ffc85feceb66ffc8a30a043314fa"
+  ],
+  "Plastic explosive, 1/4 lb.": [
+   269,
+   "5d7f49449ab21d49e8791b30c52f7bbfc51fbda050585a00509a2da77898730aeb59dd825feceb66ffc85feceb66ffc8a30a043314fa"
+  ],
+  "Plastic explosive, 1-ft. strip": [
+   269,
+   "5d7f49449ab21d49e8791b30c52f7bbfc51fbda050585a00e8cf37a317c1881a077e4e3b5feceb66ffc85feceb66ffc8d2cbad71ff33"
+  ],
+  "Thermite, 1 lb.": [
+   269,
+   "5d7f49449ab26395fa045cdc9ecbb7c980eabda050585a00509a2da77898fc7f10a10c875feceb66ffc85feceb66ffc86b86b273ff34"
+  ],
+  "TNT, 1/4 lb.": [
+   269,
+   "5d7f49449ab256bff0dc2d25c4fffa4a458bbda050585a00509a2da7789889c324110edf5feceb66ffc85feceb66ffc8a30a043314fa"
+  ],
+  "Watervliet Arsenal M224 60mm": [
+   269,
+   "0ab306823035bda050585a00c52f7bbfc51fbefc2919b050bd0e9802a056a32dc7db1a3a5feceb66ffc8f89f8d0e735a71ee45a3c0db"
+  ],
+  "Royal Ordnance L-16A2 81mm": [
+   269,
+   "4c94485e0c21bda050585a00c52f7bbfc51f68a3c2cbef17bd0e9802a056a32dc7db1a3a5feceb66ffc8bdc5d8a48c23ce6b323c58fa"
+  ],
+  "Soltam Commando 60mm": [
+   269,
+   "4c94485e0c21bda050585a00c52f7bbfc51fbefc2919b050bd0e9802a056a32dc7db1a3a5feceb66ffc89ae2bdd7beedb0774e3a70a6"
+  ],
+  "CTS TL-1 37mm": [
+   270,
+   "5d7f49449ab2bda050585a0087b8c156e0cf18440371ad70bd0e9802a056d720d1f1ee3e5feceb66ffc8d59eced1ded0e7f6c011776e"
+  ],
+  "CTS TL-8 37mm": [
+   270,
+   "f5557d4fcf72bda050585a0087b8c156e0cf65e2c36e4d90bd0e9802a05684bad3a4a61d5feceb66ffc8d59eced1ded04f36b20a12f6"
+  ],
+  "RSA BS-1": [
+   270,
+   "0ab3068230357e97caae0d0b3cd56eb5b003befc2919b05074cbd3105d9310cdceae1aa75feceb66ffc8f5ca38f748a18c92bebd7404"
+  ],
+  "RSA GP-25 40mm": [
+   270,
+   "0ab306823035bda050585a00c52f7bbfc51f8e7b418f53eb74cbd3105d93e217e17f51a75feceb66ffc81a6562590ef18c92bebd7404"
+  ],
+  "Colt M203 40mm": [
+   270,
+   "0ab306823035bda050585a00c52f7bbfc51f8e7b418f53eb74cbd3105d93e217e17f51a75feceb66ffc839fa9ec190ee4e07408562be"
+  ],
+  "Colt M203PI 40mm": [
+   270,
+   "0ab306823035bda050585a00c52f7bbfc51f8e7b418f53eb74cbd3105d93e217e17f51a75feceb66ffc839fa9ec190ee914204c25f3f"
+  ],
+  "Colt M79 40mm": [
+   270,
+   "0ab306823035bda050585a00c52f7bbfc51f8e7b418f53ebbd0e9802a0568a1274b0ce255feceb66ffc81a6562590ef1e7f6c011776e"
+  ],
+  "H&K AG36 40mm": [
+   270,
+   "0ab306823035bda050585a00c52f7bbfc51f8e7b418f53ebbd0e9802a0569c57a057bff35feceb66ffc81a6562590ef10fa04adf7214"
+  ],
+  "Hawk MM-1 40mm": [
+   270,
+   "0ab306823035bda050585a00c4fffa4a458b2bb1c9a15d18bd0e9802a056e217e17f51a75feceb66ffc81a6562590ef1f5ca38f748a1"
+  ],
+  "Milkor MGL Mk. 1 40mm": [
+   270,
+   "0ab306823035bda050585a00c4fffa4a458b093852e60d73bd0e9802a0563f496eb2bf565feceb66ffc8d59eced1ded0552223784817"
+  ],
+  "RSA AGS-17 30mm": [
+   270,
+   "4c94485e0c21bda050585a00c4fffa4a458b5b96a38d51a683d89365af1862f9a15ed8df5feceb66ffc83a1dfb05d725a21855da08cb"
+  ],
+  "Saco Mk. 19 40mm": [
+   270,
+   "4c94485e0c21bda050585a00c4fffa4a458b6fadfbb74fc883d89365af1862f9a15ed8df5feceb66ffc8983bd614bb5a349c41201b62"
+  ],
+  "Euromissile Milan": [
+   271,
+   "4c94485e0c21e0f366f9b1923cd56eb5b0032086076d238dbd0e9802a05613988e73d0505feceb66ffc8983bd614bb5adec3668f0e82"
+  ],
+  "Raytheon FIM-92": [
+   271,
+   "4c94485e0c214c106156a6267e62510838d82086076d238dbd0e9802a0561c343afcdd435feceb66ffc815197cf7214bef2d127de37b"
+  ],
+  "Raytheon Javelin": [
+   271,
+   "4c94485e0c214c736b34ffc83cd56eb5b0032086076d238dbd0e9802a056711d4f182afb5feceb66ffc826d228663f138527a891e224"
+  ],
+  "RSA SA-7": [
+   271,
+   "4c94485e0c21357c1b621fdd7e62510838d82086076d238dbd0e9802a056bbbb2b512eb15feceb66ffc8bdc5d8a48c237d96c5add449"
+  ],
+  "Blacker PIAT": [
+   271,
+   "f5557d4fcf72360c6dbe526291893febbc69befc2919b050bd0e9802a0560fa767d820335feceb66ffc8b7a56873cd7786e501496586"
+  ],
+  "Talley M72 LAW": [
+   271,
+   "f5557d4fcf72ead0db0c40f2acbe59958344921593166a4ebd0e9802a05658d22317146b5feceb66ffc8f369cb89fc624819f5315cb4"
+  ],
+  "Bofors AT4 HE": [
+   271,
+   "0ab3068230354c106156a6267e62510838d8921593166a4ebd0e9802a0569010d3f456335feceb66ffc81a6562590ef131b1978a2d53"
+  ],
+  "Bofors AT4 HEAT": [
+   271,
+   "0ab3068230355ba8f49003c33cd56eb5b003921593166a4ebd0e9802a056919469794e295feceb66ffc81a6562590ef131b1978a2d53"
+  ],
+  "Bofors AT4 CS HE": [
+   271,
+   "0ab3068230354c106156a6267e62510838d8921593166a4ebd0e9802a0569010d3f456335feceb66ffc81a6562590ef14523540f1504"
+  ],
+  "Bofors AT4 CS HEAT": [
+   271,
+   "0ab3068230355ba8f49003c33cd56eb5b003921593166a4ebd0e9802a056919469794e295feceb66ffc81a6562590ef14523540f1504"
+  ],
+  "Bofors Carl Gustav": [
+   271,
+   "0ab306823035bda050585a00c52f7bbfc51f68a3c2cbef17bd0e9802a056e08481a59c7f5feceb66ffc8ad5736686512b7a56873cd77"
+  ],
+  "RSA RPG-7": [
+   271,
+   "0ab306823035bda050585a00c4fffa4a458bbefc2919b050bd0e9802a056b458b35636d35feceb66ffc81a6562590ef1c6893771323e"
+  ],
+  "U.S. Arsenal M9A1 rocket launcher": [
+   271,
+   "0ab306823035a82866be2dabacbe59958344befc2919b050bd0e9802a05662093854c37c5feceb66ffc839fa9ec190ee6b51d431df5d"
+  ]
+ }
+}
