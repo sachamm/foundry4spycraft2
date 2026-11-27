@@ -1,5 +1,7 @@
 <section class="tab skills {{tab.cssClass}}" data-tab="skills" data-group="primary">
   {{#if cakewalk}}<div class="sc2-panel"><p><b>{{cakewalk.label}}:</b> {{cakewalk.selected}}</p>{{#if cakewalk.warning}}<p class="bad">{{cakewalk.warning}}</p>{{/if}}{{#if cakewalk.canChoose}}<button type="button" class="sc2-action" data-action="selectCakewalkSkills">{{cakewalk.action}}</button>{{/if}}</div>{{/if}}
+  {{#if canReviewSkillPurchasePolicy}}<p class="edit-only"><button type="button" class="sc2-action" data-action="reviewSkillPurchasePolicy">{{skillPurchasePolicyLabel}}</button></p>{{/if}}
+  {{#if skillPurchasePolicyHint}}<p class="edit-only {{#if skillPurchasePolicyNeedsReview}}bad{{else}}muted{{/if}}">{{skillPurchasePolicyHint}}</p>{{/if}}
   {{#if skillLevel}}
   <div class="skill-levels edit-only">
     <span>{{localize "SPYCRAFT.Skill.SpendAtLevel"}}:</span>

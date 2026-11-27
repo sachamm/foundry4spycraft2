@@ -26,6 +26,7 @@ import {
 } from "../../module/apps/crossroads-xp.mjs";
 import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
 import { manageSceneDisposition } from "../../module/apps/scene-disposition.mjs";
+import { reviewSkillPurchasePolicy } from "../../module/apps/skill-purchase-policy.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -224,6 +225,40 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+test("purchase-time skill policy review keeps the historical choice and final controls reachable at720px", async ({
+  page
+}) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { id: "gc", isGM: true } };
+    const progression = Array.from({ length: 20 }, () => ({ classId: "soldier", skills: {} }));
+    await reviewSkillPurchasePolicy({
+      uuid: "Actor.skill-history",
+      name: "Skill history",
+      type: "agent",
+      isOwner: true,
+      system: { campaignEffects: { allSkillsClass: 1 } },
+      toObject: () => ({ system: { progression } })
+    });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByRole("combobox", { name: "Career level", exact: true }).selectOption("20");
+    await page
+      .getByRole("combobox", { name: "Rules at that level's skill purchase", exact: true })
+      .selectOption("normal");
+    await page.getByLabel("Source or review note", { exact: true }).fill("Original normal-cost season");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("scene disposition source and expiry controls remain reachable at720px", async ({ page }) => {
   const prior = content,
     oldGame = globalThis.game,

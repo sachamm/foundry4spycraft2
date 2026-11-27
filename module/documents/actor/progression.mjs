@@ -11,6 +11,7 @@ import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
 import { esc } from "../../html.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
+import { skillPurchasePolicyRecord } from "../../rules/skill-purchase-policy.mjs";
 import { campaignVitalityDie, campaignCharacterEffects } from "../../rules/campaign-creation.mjs";
 import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
 import { sameValues as same } from "../../rules/equal.mjs";
@@ -430,7 +431,20 @@ export const ActorProgression = Base =>
       }
       const progression = [
         ...sys.progression.map(p => ({ ...p })),
-        { classId: ident, careerEntryId: foundry.utils.randomID(), vitality: 0, skills: {}, expertEntry }
+        {
+          classId: ident,
+          careerEntryId: foundry.utils.randomID(),
+          vitality: 0,
+          skills: {},
+          expertEntry,
+          skillPolicy: sys.companionOf?.ownerUuid
+            ? null
+            : skillPurchasePolicyRecord(sys.progression.length + 1, currentCampaignRules().effects, {
+                reviewerId: game.user?.id ?? "owner",
+                note: loc`Campaign rules captured when this career level was added.`,
+                at: game.time?.worldTime ?? 0
+              })
+        }
       ];
       if (retained)
         Object.assign(progression.at(-1), retained, {

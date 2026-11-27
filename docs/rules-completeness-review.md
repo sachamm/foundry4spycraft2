@@ -1055,3 +1055,34 @@ formatting, bundling and copy checks pass with existing warnings.
 Scores remain **PC creation 9.4/10 and combat 9.5/10**. The documented source
 audit, creation histories/options and remaining combat rules still prevent a
 defensible 9.9 rating. The next pass continues with those gaps.
+
+### Jack-of-All-Trades purchase-history review — 27 November 2026
+
+The source audit found this quality had no executable effect. It now makes all
+skills class skills for PC purchases under the applicable season, while keeping
+skill-point awards unchanged. New career levels capture that purchase-time
+policy. Each earlier allocation uses its recorded policy when calculating ranks;
+turning the quality on or off does not reprice those points. Rebuilding the same
+retained career slot preserves its recorded policy alongside the retained roll.
+Agent-built companions do not receive this player-only benefit.
+
+Unknown earlier history under the active quality produces an always-visible
+creation error and prevents relying on invented cheaper ranks. The owning GC
+can review each career level, with a source note and Undo. This changes the cost
+interpretation and derived ranks, preserving the allocated points. The skill
+sheet distinguishes historical costs from the current season. Invalid policy
+records need review. Unrelated legacy characters retain their prior output.
+
+Native Foundry tested an actual Soldier level added under the quality, a
+cross-class Analysis allocation, legacy review through the real GC dialog,
+preserved point budgets, a later season without the quality and Undo. The new
+level retained two purchased ranks from two points; the reviewed legacy level
+returned to one purchased rank after Undo. These are focused career/history
+fixtures, not another fully completed PC. Browser errors and diagnostics were
+empty.
+
+All **4,202** Node tests, **988** fixture assertions, **13** pack checks and
+**245** layout checks pass. Native schema/package/sample checks, lint,
+formatting, bundling and copy checks pass with existing warnings. Scores remain
+**PC creation 9.4/10 and combat 9.5/10** pending the broader source audit and
+remaining mechanics. The next campaign-skill audit covers Omni-Competent.

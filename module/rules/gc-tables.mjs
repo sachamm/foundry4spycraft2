@@ -10877,7 +10877,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Every skill counts as a class skill for every class. Skill points gained do not change.",
-   "effects": {}
+   "effects": {
+    "allSkillsClass": 1
+   }
   },
   {
    "id": "the-market",

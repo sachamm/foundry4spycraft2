@@ -2,6 +2,7 @@ import { originRuleName, ruleName } from "./rule-name.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
 import { subplotPlan } from "./subplots.mjs";
 import { crossroadsSessionPolicy } from "./crossroads-session.mjs";
+import { skillPurchasePolicy } from "./skill-purchase-policy.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import { purchasedFeatSources } from "./feat-purchase.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
@@ -1126,7 +1127,13 @@ function deriveSkillRanks(state) {
     return !!override?.classSkill && idx + 1 >= (override.classSkillAt ?? 1);
   };
   const isClassSkillAt = (key, idx) => manualClassSkillAt(key, idx) || ruleClassSkillAt(key, idx);
+  const policies = progression.map((entry, idx) =>
+    sys.companionOf?.ownerUuid
+      ? { allSkillsClass: false, recorded: false, needsReview: false }
+      : skillPurchasePolicy(entry, idx + 1, sys.campaignEffects)
+  );
   const ruleClassSkillAt = (key, idx) => {
+    if (policies[idx]?.allSkillsClass) return true;
     if (stageAt(idx + 1).bonus(`skills.${key}.classSkill`)) return true;
     const ci = classAtLevel[idx];
     return (
@@ -1146,6 +1153,12 @@ function deriveSkillRanks(state) {
   const skillPoints = [];
   progression.forEach((entry, idx) => {
     let spent = 0;
+    if (policies[idx].needsReview) {
+      const message = loc`Level ${idx + 1}: the GC must review whether Jack-of-All-Trades applied to these skill purchases. Earlier costs are not inferred from the current season.`;
+      warnings.push(message);
+      purchaseIssue("campaign-history", idx + 1, message);
+      todo.push({ order: 29, always: true, error: true, tab: "skills", skillLevel: idx + 1, text: message });
+    }
     for (const [key, raw] of Object.entries(entry.skills ?? {})) {
       const points = Number(raw);
       if (!cfg.skills[key] || !Number.isSafeInteger(points) || points < 0) {
@@ -1243,6 +1256,7 @@ function deriveSkillRanks(state) {
       spent,
       available: 0,
       classId: entry.classId,
+      ...(policies[idx].recorded || policies[idx].needsReview ? { skillPolicy: policies[idx] } : {}),
       maxRanks: levelRow(idx + 1)?.maxRanks ?? 0,
       skills: Object.fromEntries(
         skillDefs.map(sd => [
@@ -1958,6 +1972,8 @@ function deriveSkillTotals(state) {
     classItems.filter(c => classLevels[c.system.identifier || c.name]).flatMap(c => c.system.classSkills ?? [])
   );
   if ((classLevels.schemer ?? 0) >= 6) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
+  if (sys.campaignEffects?.allSkillsClass === 1 && !sys.companionOf?.ownerUuid)
+    for (const key of Object.keys(cfg.skills)) anyClass.add(key);
   const derivedSkills = {};
   for (const sd of skillDefs) {
     const stored = sys.skills?.[sd.key] ?? {};

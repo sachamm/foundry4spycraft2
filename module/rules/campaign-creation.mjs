@@ -13,7 +13,8 @@ export function campaignCharacterEffects(system, effects = {}) {
       "bonusFeatTrees",
       "creationPointBuy",
       "modularCreation",
-      "betweenMissionLevels"
+      "betweenMissionLevels",
+      "allSkillsClass"
     ])
       delete result[key];
   return result;

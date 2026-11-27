@@ -878,6 +878,16 @@ export const RECORD_SHAPES = {
   progressionSkills: {
     "*": "number"
   },
+  skillPurchasePolicy: {
+    version: "number",
+    careerLevel: "number",
+    allSkillsClass: "boolean",
+    confirmed: "boolean",
+    reviewerId: "string",
+    note: "string",
+    source: "string",
+    at: "number"
+  },
   promotion: {
     "*": "any",
     mission: "any"

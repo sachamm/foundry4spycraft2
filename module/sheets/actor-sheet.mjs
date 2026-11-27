@@ -150,6 +150,7 @@ import {
 } from "../apps/gc/npc-play.mjs";
 import { costsAction } from "../apps/gc/combat.mjs";
 import { manageSceneDisposition } from "../apps/scene-disposition.mjs";
+import { reviewSkillPurchasePolicy } from "../apps/skill-purchase-policy.mjs";
 import { usesSceneDisposition } from "../rules/scene-disposition.mjs";
 import { loc } from "../i18n.mjs";
 import { featActions } from "./feat-actions.mjs";
@@ -346,6 +347,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       // Buttons that hand the actor to a workflow.
       ...actorWorkflows({
         manageSceneDisposition,
+        reviewSkillPurchasePolicy,
         selectCakewalkSkills,
         recordUncontrolledFall,
         checkReflexDamage,
@@ -1172,6 +1174,17 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const entry = sys.progression[lvl - 1];
     const lvlClass = entry ? classById[entry.classId] : null;
     context.skillLevelInfo = sys.skillPoints?.[lvl - 1];
+    context.canReviewSkillPurchasePolicy = game.user.isGM && sys.level > 0 && !sys.companionOf?.ownerUuid;
+    context.skillPurchasePolicyLabel = loc`Review skill-cost history`;
+    const costPolicy = context.skillLevelInfo?.skillPolicy;
+    context.skillPurchasePolicyNeedsReview = costPolicy?.needsReview === true;
+    context.skillPurchasePolicyHint = costPolicy?.needsReview
+      ? loc`Review this level's purchase-time campaign rules before relying on its skill ranks.`
+      : costPolicy?.allSkillsClass
+        ? loc`Jack-of-All-Trades applied when these points were spent; historical class-skill costs are retained.`
+        : costPolicy?.recorded && sys.campaignEffects?.allSkillsClass === 1
+          ? loc`This level retains its recorded normal class-skill costs despite the current Jack-of-All-Trades quality.`
+          : "";
     context.skillLevels = sys.progression.map((p, i) => ({ level: i + 1, active: i + 1 === lvl }));
     context.skills = Object.values(sys.skillTotals ?? {}).map(s => ({
       ...s,

@@ -28,6 +28,7 @@ export function removedVitalityRecord(entry, careerLevel, die, id, at) {
     vitalityReviewId: entry.vitalityReviewId ?? "",
     vitalityHistoryId: entry.vitalityHistoryId ?? "",
     intelligenceModifier: entry.intelligenceModifier ?? null,
+    ...(Object.hasOwn(entry, "skillPolicy") ? { skillPolicy: structuredClone(entry.skillPolicy) } : {}),
     at
   };
 }
@@ -54,7 +55,8 @@ export function retainedVitality(records, careerLevel, classId, die) {
       vitalityRollId: matching.vitalityRollId ?? "",
       vitalityReviewId: matching.vitalityReviewId ?? "",
       vitalityHistoryId: matching.vitalityHistoryId ?? "",
-      intelligenceModifier: matching.intelligenceModifier ?? null
+      intelligenceModifier: matching.intelligenceModifier ?? null,
+      ...(Object.hasOwn(matching, "skillPolicy") ? { skillPolicy: structuredClone(matching.skillPolicy) } : {})
     };
   }
   const prior = Object.values(records).find(

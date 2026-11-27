@@ -415,6 +415,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           intelligenceModifier: new NumberField({ nullable: true, initial: null, integer: true }),
           /** Expert-class entry qualification at the time the level was taken. */
           expertEntry: record("expertEntry", { nullable: true, initial: null }),
+          /** Campaign skill-cost rules at this level's purchase, preserved across seasons. */
+          skillPolicy: record("skillPurchasePolicy", { nullable: true, initial: null }),
           /** Skill points spent at this level: { skillKey: points } */
           skills: record("progressionSkills")
         })
