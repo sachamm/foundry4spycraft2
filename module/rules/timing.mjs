@@ -3,6 +3,7 @@ import { loc } from "../i18n.mjs";
 export function skillTimingPlan({
   method = "roll",
   take10Normal = false,
+  take10Base = 2,
   falseStart = false,
   professional = false,
   classEffect = {},
@@ -11,7 +12,9 @@ export function skillTimingPlan({
   crossCheck = false,
   minimumRequired = 0
 } = {}) {
-  const base = method === "take10" ? 2 : method === "take20" ? 20 : 1;
+  if (!Number.isFinite(take10Base) || take10Base < 1)
+    throw new Error(loc`Review the campaign's take-10 time multiplier.`);
+  const base = method === "take10" ? take10Base : method === "take20" ? 20 : 1;
   const choices = [{ id: "none", name: loc`No time reduction`, multiplier: base, minimum: 0, rounding: null }];
   if (method === "take10" && take10Normal)
     choices.push({ id: "take10", name: loc`Normal-time take 10`, multiplier: 1, minimum: 0, rounding: null });

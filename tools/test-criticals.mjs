@@ -147,6 +147,34 @@ test("actual injury activation quotes the live campaign policy and records its p
     game.settings = before;
   }
 });
+test("the campaign skill-error ceiling includes Shaken payment surcharges and refuses before spending", async () => {
+  const before = game.settings;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["comedy-of-errors"] } : {}) };
+  try {
+    const actor = new SpycraftActor(),
+      payer = new SpycraftActor();
+    payer.uuid = "Actor.opponent";
+    payer.system.conditionContext = { shakenGrade: 2 };
+    const msg = message({ checkKind: "skill", threatConfirmed: false, errorConfirmed: true });
+    await assert.rejects(
+      actor.activateCritical(msg, {
+        kind: "failure",
+        payer,
+        baseCost: 2,
+        effect: "Complication",
+        effectConfirmed: true,
+        opponent: true,
+        lineOfSight: true
+      }),
+      /complete payment exceeds/
+    );
+    assert.equal(payer.system.actionDice.value, 4);
+    assert.equal(msg.flags.spycraft2.criticalFailure, undefined);
+  } finally {
+    game.settings = before;
+  }
+});
+
 test("zero-cost Most Deadly activation works with an empty pool, and failed updates refund paid dice", async () => {
   const actor = new SpycraftActor();
   actor.system.actionDice.value = 0;

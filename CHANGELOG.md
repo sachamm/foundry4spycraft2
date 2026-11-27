@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Campaign Medicine error modifiers now affect actual skill plans. Comedy of Errors adds its lowest-attribute
+  error penalty, uses four-times base time for taking 10, and refuses skill-error activations costing more
+  than two action dice. Specific normal-time take-10 benefits remain available.
+
 - Under the confirmed Fragile ruling, grade-built special NPCs retain Health-table vitality. Special NPC
   sheets now flag class-die health exceptions for GC review instead of inventing a grade conversion.
 

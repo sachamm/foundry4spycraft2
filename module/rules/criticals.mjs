@@ -220,6 +220,16 @@ export function criticalPlan(
     sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
   }
   const cost = Math.max(minimum, baseCost + adjustment);
+  const maximumCost =
+    kind === "failure" &&
+    check.checkKind === "skill" &&
+    Number.isSafeInteger(campaignEffects.skillErrorActivationMaximum)
+      ? campaignEffects.skillErrorActivationMaximum
+      : null;
+  if (maximumCost !== null && cost > maximumCost)
+    return reject(
+      loc`This campaign limits the action dice spent on a skill error to ${campaignEffects.skillErrorActivationMaximum}. Choose a less costly effect.`
+    );
   if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {
     blocked: false,
@@ -228,6 +238,7 @@ export function criticalPlan(
     baseCost,
     effect: String(effect).trim(),
     sources,
+    ...(maximumCost !== null ? { maximumCost } : {}),
     vehicleMounted,
     vehicleMountDeclared,
     ...(targetStandardDeclared ? { targetStandardDeclared: true } : {})

@@ -10612,7 +10612,10 @@ export const GC_DATA = {
    "gcDice": 3,
    "summary": "For everyone, NPCs included: skill DCs rise by 5; error range +2 on skills keyed to a character's lowest attribute; at most 2 action dice may be spent activating a skill error; taking 10 takes 4x standard time instead of 2x.",
    "effects": {
-    "skillDC": 5
+    "skillDC": 5,
+    "lowestAttributeSkillError": 2,
+    "skillErrorActivationMaximum": 2,
+    "take10Base": 4
    }
   },
   {

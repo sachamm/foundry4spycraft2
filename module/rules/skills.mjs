@@ -548,6 +548,14 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     (skill.errorReduction ?? 0) +
     conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0) +
     terms.sum("errorReduction");
+  const campaign = system.campaignEffects ?? {};
+  const attributeScores = ["str", "dex", "con", "int", "wis", "cha"].map(k => system.abilities?.[k]?.value);
+  const lowestAttribute =
+    attributeScores.every(Number.isFinite) && system.abilities?.[selected]?.value === Math.min(...attributeScores);
+  const campaignErrorIncrease =
+    (lowestAttribute ? (campaign.lowestAttributeSkillError ?? 0) : 0) +
+    (key === "medicine" ? Math.max(0, campaign.medicineError ?? 0) : 0);
+  const campaignErrorReduction = key === "medicine" ? Math.max(0, -(campaign.medicineError ?? 0)) : 0;
   const errorFloor = Math.max(
     skill.errorFloor ?? 0,
     ...conditional.filter(row => row.kind === "errorFloor").map(row => row.value)
@@ -555,6 +563,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const originalError = Math.max(
     contactFeat.minimumError ?? 0,
     check.error +
+      campaignErrorIncrease +
       tumblePath.errorIncrease +
       balance.errorIncrease +
       detectionObserver.errorIncrease +
@@ -706,6 +715,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   try {
     timing = skillTimingPlan({
       method,
+      take10Base: campaign.take10Base ?? 2,
       take10Normal:
         tracking.take10Normal ||
         hasForte ||
@@ -721,7 +731,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     });
   } catch (error) {
     blockedReasons.push(error.message);
-    timing = skillTimingPlan({ method, time: listedTime });
+    timing = skillTimingPlan({ method, time: listedTime, take10Base: campaign.take10Base ?? 2 });
   }
   timing = targetSkillTimingPlan(timing, targetSkillEffect);
   if (timing.blockedReason) blockedReasons.push(timing.blockedReason);
@@ -736,6 +746,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       originalError + timing.errorIncrease - reduction
     ) - zeroReduction
   );
+  if (campaignErrorReduction) error = Math.max(Math.min(error, 1), error - campaignErrorReduction);
   const actionDiceCost = (hailMaryUntrained ? 1 : 0) + (hailMaryUncap ? 3 : 0) + (hailMaryActive ? 4 : 0);
   let cunning = null;
   if (cunningPlan)
@@ -868,6 +879,18 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     : null;
   // The note text is a run of segments: the check's own, and one from each registered term, in a fixed order.
   const noteSegments = terms.merge("segment", [
+    [
+      5,
+      campaignErrorIncrease || campaignErrorReduction
+        ? loc`Campaign error range: +${campaignErrorIncrease}, reduction ${campaignErrorReduction}. `
+        : ""
+    ],
+    [
+      6,
+      method === "take10" && campaign.take10Base
+        ? loc`Campaign take-10 base time: ${campaign.take10Base}×, before any applicable time benefit. `
+        : ""
+    ],
     [10, vehicleControl?.note ? `${vehicleControl.note} ` : ""],
     [80, `${tumblePath.notes.join(" ")} `],
     [110, `${fallDistance.notes.join(" ")} `],
@@ -1188,7 +1211,11 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     blocked: blockedReasons.length > 0,
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
-      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" ? 1 : (skill.take10TimeMultiplier ?? 2),
+      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int"
+        ? 1
+        : skill.take10TimeMultiplier === 1
+          ? 1
+          : (campaign.take10Base ?? skill.take10TimeMultiplier ?? 2),
     notes: noteSegments.join("")
   };
 }

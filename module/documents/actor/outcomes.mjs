@@ -14,7 +14,7 @@ import {
 import { boostPaymentQuote, paidBoostSurcharge, generousSurchargeQuote } from "../../rules/boost-payments.mjs";
 import { applyPaidCheckBoost } from "../../apps/paid-check-boost.mjs";
 import { getActionDieSettlementReview } from "../../rules/action-die-payments.mjs";
-import { shakenRules } from "../../rules/shaken.mjs";
+import { shakenRules, shakenActionDieCost } from "../../rules/shaken.mjs";
 import { brightIdeaPoolStatus, brightIdeaMigrationPlan } from "../../rules/bright-idea.mjs";
 import { hintSources, hintResponsePlan } from "../../rules/hints.mjs";
 import {
@@ -837,6 +837,10 @@ export const ActorOutcomes = Base =>
                 sources: [...plan.sources, `Shaken surcharge +${payment.surcharge}`]
               }
             : plan;
+          if (Number.isSafeInteger(plan.maximumCost) && paidPlan.cost > plan.maximumCost)
+            throw new Error(
+              loc`The complete payment exceeds the campaign's ${plan.maximumCost}-die limit for this skill error.`
+            );
           const gain = hardKnocksGainPlan(this.system, check, {
             kind: plan.kind,
             careerDie: globalThis.CONFIG?.SPYCRAFT?.tables?.levels?.[this.system.level ?? 0]?.actionDie ?? 4
@@ -980,6 +984,13 @@ export const ActorOutcomes = Base =>
           return paidPlan;
         };
         const pay = () => {
+          if (!useGC && Number.isSafeInteger(plan.maximumCost)) {
+            const quote = shakenActionDieCost(payer.actionDiceFundingSystem, { baseCost: plan.cost });
+            if (!quote.blocked && quote.cost > plan.maximumCost)
+              throw new Error(
+                loc`The complete payment exceeds the campaign's ${plan.maximumCost}-die limit for this skill error.`
+              );
+          }
           if (useGC && plan.cost)
             return spendGCDice(plan.cost, perform, {
               purpose: "Critical activation",
