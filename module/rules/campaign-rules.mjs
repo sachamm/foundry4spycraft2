@@ -213,6 +213,11 @@ export function campaignRuleLines(effects = campaignRules()) {
     lines.push(loc`CQB Range reaches ${campaignCqbRange(false, effects)} ft.`);
   if (effects.meleeFeatRangedDefense)
     lines.push(loc`Each Melee or Unarmed Combat feat gives +1 Defense against ranged attacks, NPCs included.`);
+  if (effects.featPurchase) lines.push(loc`After a mission an agent may buy a feat for 1,000 XP per career level.`);
+  if (effects.modularFeats) lines.push(loc`At creation a feat costs 2 attribute points, or gives 2 when given up.`);
+  if (effects.noCrossroads) lines.push(loc`No Crossroads Subplots, so no Crossroads Titles.`);
+  if (campaignSubplotBonus(effects))
+    lines.push(loc`Each agent may have ${campaignSubplotBonus(effects)} more Subplot(s) in play.`);
   if (effects.closedStandOffs) lines.push(loc`Nobody may interrupt or join a Stand Off.`);
   if (effects.catchPhrase)
     lines.push(
@@ -454,3 +459,44 @@ export function gladiatorsDefense(system, ranged = true, effects = campaignRules
     )
   ).length;
 }
+
+/**
+ * Feat Purchase and Modular (pp.406–407): extra feat choices and the attribute points they cost or give. Trades the
+ * qualities in force do not allow are reported and left out.
+ */
+export function campaignFeatTrades(trades = {}, effects = campaignRules()) {
+  const purchased = Math.max(0, Math.trunc(Number(trades?.purchased) || 0)),
+    modular = Math.trunc(Number(trades?.modular) || 0),
+    problems = [];
+  if (purchased && !effects.featPurchase)
+    problems.push(loc`${purchased} feat(s) bought with XP, but Feat Purchase is not in force.`);
+  if (modular && !effects.modularFeats)
+    problems.push(loc`Feats traded for attribute points, but Modular is not in force.`);
+  const feats = (effects.featPurchase ? purchased : 0) + (effects.modularFeats ? modular : 0),
+    points = effects.modularFeats ? -2 * modular : 0;
+  return { feats, points, purchased, modular, problems };
+}
+
+/** Feat Purchase (p.406): the XP a feat costs at a career level, and whether the character can pay it. */
+export function featPurchasePlan(system, levelRow, effects = campaignRules()) {
+  if (!effects.featPurchase) return { allowed: false, reason: loc`Feat Purchase is not in force this season.` };
+  const level = Number(system?.level) || 0;
+  if (level < 1) return { allowed: false, reason: loc`Finish Level 1 before buying a feat.` };
+  const cost = 1000 * level,
+    xp = Number(system?.xp) || 0,
+    minimum = Number(levelRow?.xp) || 0;
+  if (xp - cost < minimum)
+    return {
+      allowed: false,
+      cost,
+      reason: loc`A feat costs ${cost} XP at Level ${level}, which would take XP below ${minimum}, this level's minimum.`
+    };
+  return { allowed: true, cost, xp: xp - cost };
+}
+
+/** Soap (p.408): extra Subplots each character may have in play. */
+export const campaignSubplotBonus = (effects = campaignRules()) =>
+  Number.isSafeInteger(effects.subplotLimitBonus) ? effects.subplotLimitBonus : 0;
+
+/** Routine (p.408): no Crossroads Subplots, so no Crossroads Titles. */
+export const crossroadsAllowed = (effects = campaignRules()) => !effects.noCrossroads;

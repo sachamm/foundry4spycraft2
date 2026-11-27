@@ -11477,7 +11477,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "After each mission a player character may trade 1,000 XP x career level for 1 extra feat, but cannot drop below the XP minimum for his current career level.",
-   "effects": {}
+   "effects": {
+    "featPurchase": true
+   }
   },
   {
    "id": "fragile",
@@ -11652,7 +11654,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "At character creation a player may buy extra feats for 2 attribute-purchase points each, or surrender feat choices to gain 2 extra attribute-purchase points per feat given up.",
-   "effects": {}
+   "effects": {
+    "modularFeats": true
+   }
   },
   {
    "id": "omni-competent",
@@ -11712,7 +11716,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Characters can never take on Crossroads Subplots.",
-   "effects": {}
+   "effects": {
+    "noCrossroads": true
+   }
   },
   {
    "id": "shoe-string-budget",
@@ -11806,7 +11812,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Each character may be involved in 1 more Subplot at a time than normal.",
-   "effects": {}
+   "effects": {
+    "subplotLimitBonus": 1
+   }
   },
   {
    "id": "speed-frame",

@@ -3,7 +3,10 @@ import {
   allClassSkills,
   campaignActionDice,
   campaignCqbRange,
+  campaignFeatTrades,
   campaignLevelRow,
+  campaignSubplotBonus,
+  crossroadsAllowed,
   campaignPointBuy,
   campaignRules,
   campaignFeatTrees,
@@ -814,7 +817,10 @@ function deriveAttributes(state) {
     sys.pointBuyBudget === undefined || sys.pointBuyBudget === null || sys.pointBuyBudget === cfg.pointBuy
       ? campaignPointBuy(cfg.pointBuy)
       : sys.pointBuyBudget;
-  sys.pointBuy = { budget, spent: pointCost };
+  // Modular (p.407): each feat bought costs 2 points, each feat given up adds 2.
+  const featTrades = campaignFeatTrades(sys.featTrades);
+  warnings.push(...featTrades.problems);
+  sys.pointBuy = { budget: budget + featTrades.points, spent: pointCost };
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
   if (sys.pointBuy.remaining < 0) {
     warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
@@ -1743,7 +1749,10 @@ function deriveFinalTotals(state) {
   sys.subdualThreshold = sys.abilities.con.value + B.get("subdualThreshold");
 
   sys.actionDice ??= { value: 0 };
-  const title = cfg.tables.crossroads?.[sys.crossroadsTitle];
+  // Routine (p.408) rules out Crossroads Subplots, and so their Titles.
+  const title = crossroadsAllowed() ? cfg.tables.crossroads?.[sys.crossroadsTitle] : null;
+  if (sys.crossroadsTitle && !crossroadsAllowed())
+    warnings.push(loc`Routine is in force: no Crossroads Subplots, so the Crossroads Title gives nothing.`);
   const earnedTitle = title && level >= title.level ? title : null;
   sys.crossroads = earnedTitle ?? { actionDice: 0, xpPercent: 0 };
   if (title && level < title.level) warnings.push(loc`${title.label}: the minimum Career Level is ${title.level}.`);
@@ -1957,7 +1966,8 @@ function deriveSkillTotals(state) {
 function deriveFeatSlots(state) {
   const { sys, cfg, items, warnings, todo, plural, classItems, classLevels, inherited, lr, featItems, featTrees, B } =
     state;
-  const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") };
+  // Feat Purchase and Modular (pp.406–407) add or remove general feat choices.
+  const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") + campaignFeatTrades(sys.featTrades).feats };
   for (const t of Object.keys(cfg.featTrees)) slots[t] = B.get(`featSlots.${t}`);
   const classGrantCounts = new Map();
   const originGrantNames = new Set(
@@ -2155,7 +2165,7 @@ function deriveProficiencies(state) {
     row => String(row.name ?? "").trim() || String(row.notes ?? "").trim()
   ).length;
   sys.subplotPicks = {
-    available: (lr?.subplots ?? 0) + B.get("subplots"),
+    available: (lr?.subplots ?? 0) + B.get("subplots") + campaignSubplotBonus(),
     used: subplotsInPlay,
     minimum: minimumSubplots,
     inPlay: subplotsInPlay,

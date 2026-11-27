@@ -602,7 +602,9 @@
     "FreeWeaponActionTwiceRound": "Free weapon action (twice/round)",
     "FreeNonAttackHalfAction": "Free non-attack half action",
     "GCSettleSeductionVictory": "GC: settle seduction victory",
-    "ObserveThreeSkillsFreeAction": "Observe three skills (free action)"
+    "ObserveThreeSkillsFreeAction": "Observe three skills (free action)",
+    "FeatsBoughtWithXP": "Feats bought with XP under Feat Purchase: {count}.",
+    "ModularFeats": "Modular: feats bought with attribute points (2 each), or a negative number for feats given up for 2 points each"
    },
    "ActorAgentGear": {
     "BrowseWeapons": "Browse weapons",

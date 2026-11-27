@@ -424,6 +424,9 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       startingIntelligenceModifier: new NumberField({ nullable: true, initial: null, integer: true }),
       skillFortes: new ArrayField(new SchemaField({ skill: str(), focus: str(), forte: str() })),
       crossroadsTitle: str(),
+      // Feat Purchase and Modular (pp.406–407): feats bought with XP after missions, and feats traded for
+      // attribute points at creation (positive: feats bought at 2 points each; negative: feats given up for 2 each).
+      featTrades: new SchemaField({ purchased: int(0, { min: 0 }), modular: int(0, { min: -20, max: 20 }) }),
       relinquishedInterests: int(0, { min: 0 }),
       interests: str(),
       contacts: new ArrayField(

@@ -151,6 +151,7 @@ import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/re
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
 import { abilityIncreaseLevels } from "../rules/campaign-rules.mjs";
 import { contactPeopleRows, editContactPeople, summonContactPerson } from "../apps/contact-people.mjs";
+import { buyFeatWithXP, featTradeContext } from "../apps/feat-purchase.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -526,6 +527,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       editContactPeople(event, target) {
         return editContactPeople(this.actor, Number(target.dataset.index));
+      },
+      buyFeatWithXP() {
+        return buyFeatWithXP(this.actor);
       },
       summonContactPerson(event, target) {
         return summonContactPerson(this.actor, Number(target.dataset.index), Number(target.dataset.person));
@@ -1289,6 +1293,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     ]);
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
     context.contactPeople = contactPeopleRows(sys);
+    context.featTrades = featTradeContext(sys);
 
     // Gear
     context.weapons = byType("weapon").map(w => ({
