@@ -10,6 +10,8 @@ const { sufferLethal } = await import("../module/apps/hazards.mjs");
 
 function agent(vitality, wounds) {
   const a = {
+    type: "agent",
+    isOwner: true,
     system: { vitality: { value: vitality, max: 14 }, wounds: { value: wounds, max: 15 } },
     effects: [],
     async update(patch) {
@@ -38,4 +40,15 @@ test("lethal hazard or typed damage that takes wounds below 0 sets fatigued, unc
   assert.deepEqual([...b.statuses].sort(), ["fatigued"]);
   await sufferLethal(b, 12);
   assert.deepEqual([...b.statuses].sort(), ["dying", "fatigued", "unconscious"]);
+});
+
+test("unowned lethal hazards and fractional damage cannot change health", async () => {
+  const a = agent(14, 15);
+  a.isOwner = false;
+  assert.equal(await sufferLethal(a, 10), null);
+  assert.equal(a.system.vitality.value, 14);
+  a.isOwner = true;
+  for (const damage of [-1, 1.5, Infinity]) await assert.rejects(sufferLethal(a, damage), /nonnegative whole/);
+  assert.equal(a.system.vitality.value, 14);
+  assert.equal(a.effects.length, 0);
 });

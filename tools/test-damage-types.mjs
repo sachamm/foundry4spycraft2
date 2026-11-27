@@ -25,11 +25,46 @@ import {
   survivalSaveMade,
   survivalSavePlan,
   typedStress,
+  typedHitContext,
   vacuumDamage
 } from "../module/rules/damage-types.mjs";
 import { hazardState } from "../module/rules/hazards.mjs";
 import { checkRecord } from "../module/rules/record-check.mjs";
 import { RECORD_SHAPES } from "../module/data/record-shapes.mjs";
+
+test("typed hits freeze critical size and DR scope and reject malformed context before effects", () => {
+  const source = {
+    critical: true,
+    criticalDice: 2,
+    blast: true,
+    attackKind: "meleeWeapon",
+    weaponProficiency: "blunt"
+  };
+  const saved = typedHitContext(source);
+  source.critical = false;
+  source.criticalDice = 0;
+  assert.deepEqual(saved, {
+    critical: true,
+    criticalDice: 2,
+    blast: true,
+    attackKind: "meleeWeapon",
+    weaponProficiency: "blunt"
+  });
+  assert.equal(typedHitContext().criticalDice, 0);
+  for (const invalid of [
+    null,
+    [],
+    { critical: "true" },
+    { critical: true, criticalDice: 0 },
+    { critical: false, criticalDice: 1 },
+    { criticalDice: -1 },
+    { critical: true, criticalDice: Infinity },
+    { blast: 1 },
+    { attackKind: "invented" },
+    { weaponProficiency: 5 }
+  ])
+    assert.throws(() => typedHitContext(invalid), /original typed hit/);
+});
 
 test("stress comes back as the listed share of vitality and wounds lost", () => {
   assert.deepEqual(typedStress("acid", 5), { points: 2, formula: null });

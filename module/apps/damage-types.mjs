@@ -35,6 +35,7 @@ import {
   survivalSaveMade,
   survivalSavePlan,
   typedStress,
+  typedHitContext,
   vacuumDamage
 } from "../rules/damage-types.mjs";
 import { hazardState } from "../rules/hazards.mjs";
@@ -50,6 +51,9 @@ import {
 } from "./hazards.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { postNonLethalDamage } from "./nonlethal-damage.mjs";
+import { drForAttack, reducedDamage } from "../rules/damage-application.mjs";
+import { npcDamageSave } from "./gc/npc-damage-save.mjs";
+import { npcIsSpecial } from "../rules/gc/npc-state.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
@@ -84,37 +88,73 @@ async function condition(actor, id, rounds, label) {
 }
 
 /** Record subdual damage through the ledger, so thresholds and the Fortitude save follow. */
-async function sufferSubdual(actor, amount, source, defenses = {}) {
-  if (!amount) return "";
+async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = {}) {
+  if (!amount) return { line: "", net: 0 };
+  const context = typedHitContext(hitContext);
+  if (actor.type === "npc" && !npcIsSpecial(actor)) {
+    const dr = drForAttack(actor.system, context.attackKind, context.weaponProficiency),
+      reduction = defenses.armorPiercingAll ? 0 : 2 * Math.max(0, dr - (defenses.armorPiercing ?? 0)),
+      net = reducedDamage({ damage: amount, dr: reduction }).net,
+      result = net
+        ? await npcDamageSave(actor, {
+            damage: net,
+            kind: "subdual",
+            criticalDice: context.criticalDice,
+            blast: context.blast
+          })
+        : null;
+    if (net && !result)
+      throw Error(
+        loc`The standard character's subdual Damage save was not recorded. Review its actual damage before retrying.`
+      );
+    return {
+      line: net
+        ? loc`${net} subdual damage after defenses; the standard character's Damage save is recorded separately.`
+        : loc`Damage reduction prevents the subdual damage; no Damage save is required.`,
+      net
+    };
+  }
   if (actor.type === "npc" && Number(actor.system.vitality?.max) > 0) {
-    await postNonLethalDamage(actor, "subdual", amount, source, defenses);
-    return loc`${amount} subdual damage recorded; any required Fortitude save is on its damage report.`;
+    const result = await postNonLethalDamage(actor, "subdual", amount, source, { ...defenses, ...context });
+    return {
+      line: loc`${result.net} subdual damage recorded; any required Fortitude save is on its damage report.`,
+      net: result.net
+    };
   }
-  try {
-    await applyAccumulatedDamage(actor, {
-      source: `${source} [${foundry.utils.randomID(6)}]`,
-      kind: "subdual",
-      newDamage: amount,
-      damageMode: "subdualBeforeDefenses",
-      ...defenses,
-      confirmed: true
-    });
-    return loc`${amount} subdual damage recorded; roll any Fortitude save it calls for from the sheet.`;
-  } catch (error) {
-    return loc`${amount} subdual damage could not be recorded (${esc(error.message)}); record it by hand.`;
-  }
+  const record = await applyAccumulatedDamage(actor, {
+    source: `${source} [${foundry.utils.randomID(6)}]`,
+    kind: "subdual",
+    newDamage: amount,
+    damageMode: "subdualBeforeDefenses",
+    ...defenses,
+    attackKind: context.attackKind,
+    weaponProficiency: context.weaponProficiency,
+    criticalHit: context.critical,
+    confirmed: true
+  });
+  if (!record) throw Error(loc`The typed subdual event was not recorded. Review the actual damage before continuing.`);
+  return {
+    line: loc`${record.newDamage} subdual damage recorded; roll any Fortitude save it calls for from the sheet.`,
+    net: record.newDamage
+  };
 }
 
 /** Lethal damage now and the stress its type adds for what was lost. Returns the report lines. */
-async function sufferTypedLethal(actor, type, amount, label) {
-  const loss = await sufferLethal(actor, amount),
-    lines = [
-      loss
-        ? loc`${label}: ${amount} damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-        : loc`${label}: ${amount} damage; the GC applies it (a standard character makes a Damage save).`,
+async function sufferTypedLethal(actor, type, amount, label, hitContext = {}) {
+  const loss = await sufferLethal(actor, amount, hitContext);
+  if (!loss)
+    throw Error(
+      loc`Typed lethal damage was not recorded. Review the character's actual health and ownership before continuing.`
+    );
+  const lines = [
+      loss?.standard
+        ? amount
+          ? loc`${label}: ${amount} damage; the standard character's Damage save is recorded separately.`
+          : loc`${label}: no lethal damage remains; no Damage save is required.`
+        : loc`${label}: ${amount} damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`,
       ...(loss?.notes ?? [])
     ],
-    lost = loss ? loss.vitalityLoss + loss.woundLoss : amount,
+    lost = loss.standard ? loss.damage : loss.vitalityLoss + loss.woundLoss,
     stress = typedStress(type, lost);
   let points = stress.points;
   const rolls = [];
@@ -194,14 +234,17 @@ export async function sufferTypedDamage(actor, preset = {}) {
     if (!input) return null;
   }
   const type = String(input.type),
-    amount = Math.trunc(Number(input.amount)),
-    reduction = Math.max(0, Math.trunc(Number(input.reduction) || 0)),
+    amount = Number(input.amount),
+    reduction = Number(input.reduction ?? 0),
     source = String(input.source ?? "").trim() || DAMAGE_TYPE_LABELS[type] || type;
   if (!DAMAGE_TYPES[type] || (preset.allowed && !preset.allowed.includes(type)))
     return refuse(loc`Choose a listed damage type.`);
   if (!Number.isSafeInteger(amount) || amount < 0) return refuse(loc`Enter the damage as a whole number.`);
+  if (!Number.isSafeInteger(reduction) || reduction < 0)
+    return refuse(loc`Enter damage reduction as a nonnegative whole number.`);
   const label = DAMAGE_TYPE_LABELS[type];
   try {
+    const hitContext = typedHitContext(preset.hitContext);
     switch (type) {
       case "bang":
         if (has(actor, "deaf")) return post(actor, [loc`Bang: a deafened character is not affected (p.334).`]);
@@ -210,18 +253,24 @@ export async function sufferTypedDamage(actor, preset = {}) {
         if (has(actor, "blind")) return post(actor, [loc`Flash: a blinded character is not affected (p.338).`]);
         return actor.rollSave("fort", { askContext: true, hazardSave: { kind: "flash", label, dc: amount } });
       case "acid":
-        return startAcid(actor, { amount, reduction, armor: input.armor ?? "none", halfActions: input.halfActions });
+        return startAcid(actor, {
+          amount,
+          reduction,
+          armor: input.armor ?? "none",
+          halfActions: input.halfActions,
+          hitContext
+        });
       case "explosive":
-        return startExplosive(actor, { ...input, amount, reduction });
+        return startExplosive(actor, { ...input, amount, reduction, hitContext });
       case "vacuum":
-        return startVacuum(actor, { amount, firstRound: input.firstRound !== false, source });
+        return startVacuum(actor, { amount, firstRound: input.firstRound !== false, source, hitContext });
       case "cold":
       case "heat":
-        return sufferSurroundings(actor, type, { ...input, amount, source });
+        return sufferSurroundings(actor, type, { ...input, amount, source, hitContext });
       case "electrical":
-        return sufferElectrical(actor, { amount, source });
+        return sufferElectrical(actor, { amount, source, hitContext });
       default: {
-        const result = await sufferTypedLethal(actor, type, Math.max(0, amount - reduction), label);
+        const result = await sufferTypedLethal(actor, type, Math.max(0, amount - reduction), label, hitContext);
         if (type === "collision" && (classFeatureLevels(actor.system)?.stuntman ?? 0) >= 4)
           result.lines.push(
             loc`Fall Guy: each collision damage die is 2 lower (minimum 1 per die); lower the damage entered if that was not done.`
@@ -238,7 +287,7 @@ export async function sufferTypedDamage(actor, preset = {}) {
   }
 }
 
-async function startAcid(actor, { amount, reduction, armor, halfActions }) {
+async function startAcid(actor, { amount, reduction, armor, halfActions, hitContext }) {
   const lines = [],
     rolls = [];
   let dr = reduction;
@@ -264,7 +313,8 @@ async function startAcid(actor, { amount, reduction, armor, halfActions }) {
       bonus: plan.bonus,
       bonusLabel: loc`Half actions given up`,
       damage: amount,
-      reduction: dr
+      reduction: dr,
+      hitContext
     }
   });
 }
@@ -283,7 +333,8 @@ async function startExplosive(actor, input) {
     bonus: plan.bonus,
     bonusLabel: loc`Moved before the blast`,
     damage: plan.dc,
-    reduction: input.reduction ?? 0
+    reduction: input.reduction ?? 0,
+    hitContext: input.hitContext
   };
   if (plan.reflexFails) {
     await post(actor, [loc`Explosive: no room to move and less than half cover, so the Reflex save fails (p.336).`]);
@@ -292,14 +343,9 @@ async function startExplosive(actor, input) {
   return actor.rollSave("ref", { askContext: true, hazardSave: save });
 }
 
-async function startVacuum(actor, { amount, firstRound, source }) {
-  let rolled = amount;
+async function startVacuum(actor, { amount, firstRound, source, hitContext }) {
+  const rolled = amount;
   const rolls = [];
-  if (!rolled) {
-    const roll = await rollTotal(VACUUM.formula);
-    rolls.push(roll.roll);
-    rolled = roll.total;
-  }
   if (firstRound) {
     if (rolls.length) await post(actor, [loc`Vacuum: ${rolled} damage rolled.`], rolls);
     return actor.rollSave("fort", {
@@ -310,15 +356,16 @@ async function startVacuum(actor, { amount, firstRound, source }) {
         label: DAMAGE_TYPE_LABELS.vacuum,
         dc: VACUUM.saveDC,
         damage: rolled,
-        source
+        source,
+        hitContext
       }
     });
   }
-  return applyVacuum(actor, rolled, source, rolls);
+  return applyVacuum(actor, rolled, source, rolls, hitContext);
 }
 
-async function applyVacuum(actor, damage, source, rolls = []) {
-  const result = await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum);
+async function applyVacuum(actor, damage, source, rolls = [], hitContext = {}) {
+  const result = await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum, hitContext);
   result.lines.push(loc`A character in vacuum is also suffocating (p.349).`);
   const tracked = addExposure(hazardState(actor.system), {
     type: "vacuum",
@@ -333,8 +380,9 @@ async function applyVacuum(actor, damage, source, rolls = []) {
   return true;
 }
 
-async function sufferSurroundings(actor, type, { amount, source, temperature, medium, armor }) {
-  const lines = [await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS[type], { armorPiercingAll: true })];
+async function sufferSurroundings(actor, type, { amount, source, temperature, medium, armor, hitContext }) {
+  const applied = await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS[type], { armorPiercingAll: true }, hitContext);
+  const lines = [applied.line];
   let interval = null;
   if (temperature !== undefined && temperature !== null && String(temperature).trim() !== "") {
     interval = exposureInterval(type, Number(temperature), medium ?? "air");
@@ -349,26 +397,43 @@ async function sufferSurroundings(actor, type, { amount, source, temperature, me
   lines.push(
     loc`If that Fortitude save fails, use "Failed save" on the sheet: fatigued and 1 point of temporary ${type === "cold" ? "Con" : "Str"} damage, neither recovered until the character leaves the source.`
   );
-  const tracked = addExposure(hazardState(actor.system), { type, amount, source, worldTime: now(), interval });
+  const tracked = addExposure(hazardState(actor.system), {
+    type,
+    amount: applied.net,
+    source,
+    worldTime: now(),
+    interval
+  });
   await writeHazards(actor, tracked.hazards);
   await post(actor, lines);
   for (const injury of tracked.injuries) await injurySave(actor, type, injury, "exposure");
   return true;
 }
 
-async function sufferElectrical(actor, { amount, source }) {
+async function sufferElectrical(actor, { amount, source, hitContext }) {
+  const applied = await sufferSubdual(
+    actor,
+    amount,
+    DAMAGE_TYPE_LABELS.electrical,
+    { armorPiercing: amount },
+    hitContext
+  );
   const lines = [
-    await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS.electrical, { armorPiercing: amount }),
-    loc`If that Fortitude save fails, use "Failed save" on the sheet: nauseated for 1d6 rounds and Initiative Count −${Math.floor(amount / 2)}.`
+    applied.line,
+    loc`If that Fortitude save fails, use "Failed save" on the sheet: nauseated for 1d6 rounds and Initiative Count −${Math.floor(applied.net / 2)}.`
   ];
+  if (actor.type === "npc" && !npcIsSpecial(actor)) {
+    const stress = typedStress("electrical", applied.net);
+    if (stress.points) lines.push(await sufferStress(actor, stress.points, DAMAGE_TYPE_LABELS.electrical));
+  }
   // Electrical injuries count a single attack, so each attack is its own source.
   const tracked = addExposure(hazardState(actor.system), {
     type: "electrical",
-    amount,
+    amount: applied.net,
     source: `${source} ${foundry.utils.randomID(4)}`,
     worldTime: now()
   });
-  await writeHazards(actor, { ...tracked.hazards, exposure: { ...tracked.hazards.exposure, lastDamage: amount } });
+  await writeHazards(actor, { ...tracked.hazards, exposure: { ...tracked.hazards.exposure, lastDamage: applied.net } });
   await post(actor, lines);
   for (const injury of tracked.injuries) await injurySave(actor, "electrical", injury, "exposure");
   return true;
@@ -495,7 +560,7 @@ const total = check => Number(check?.effectiveTotal);
 async function resolveExplosiveReflex(actor, message, save, succeeded) {
   if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
   const taken = Math.max(0, explosiveDamageTaken(save.damage, succeeded) - Math.max(0, save.reduction ?? 0)),
-    result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive);
+    result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive, save.hitContext);
   result.lines.unshift(
     succeeded
       ? loc`The Reflex save succeeds: half damage, and the character moves to the next blast increment out.`
@@ -550,7 +615,7 @@ const resolvers = {
     if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
     const first = acidFirstDamage(save.damage, succeeded),
       taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
-      result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid);
+      result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid, save.hitContext);
     result.lines.unshift(
       succeeded ? loc`The Reflex save succeeds: the acid is halved.` : loc`The Reflex save fails: full acid damage.`
     );
@@ -571,7 +636,7 @@ const resolvers = {
   async vacuum(actor, message, save, succeeded) {
     if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
     const damage = vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
-    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum);
+    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum, [], save.hitContext);
   },
   async typedInjury(actor, message, save, succeeded) {
     const state = hazardState(actor.system);
@@ -616,16 +681,18 @@ const resolvers = {
       rolls.push(damage.roll);
       const loss = await sufferLethal(actor, damage.total);
       lines.push(
-        loss
-          ? loc`${damage.total} lethal damage: vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-          : loc`${damage.total} lethal damage: the GC applies it.`,
+        loss?.standard
+          ? loc`${damage.total} lethal damage; the standard character's Damage save is recorded separately.`
+          : loss
+            ? loc`${damage.total} lethal damage: vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
+            : loc`${damage.total} lethal damage: the GC applies it.`,
         ...(loss?.notes ?? [])
       );
     }
     if (failure.subdual) {
       const damage = await rollTotal(failure.subdual);
       rolls.push(damage.roll);
-      lines.push(await sufferSubdual(actor, damage.total, save.label));
+      lines.push((await sufferSubdual(actor, damage.total, save.label)).line);
     }
     for (const entry of failure.conditions) {
       const id = entry.id;

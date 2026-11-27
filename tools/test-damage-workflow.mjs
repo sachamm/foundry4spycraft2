@@ -63,7 +63,7 @@ const {
   standardReduction
 } = await import("../module/apps/damage-application.mjs");
 const { appliedDamageEntries } = await import("../module/rules/damage-application.mjs");
-const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
+const { hazardSaveResolvers, resolveHazardSave } = await import("../module/apps/hazards.mjs");
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
 const { settleGrapple } = await import("../module/apps/combat-actions.mjs");
 const { restAndRecover } = await import("../module/apps/healing.mjs");
@@ -813,6 +813,168 @@ test("acid and laser conversion is refused before source or target mutation", as
     assert.match(warnings[0], /cannot be converted/);
     assert.equal(actor.system.damageTrack, undefined);
     assert.equal(damage.flags.spycraft2.damageApplicationStarted, undefined);
+  }
+});
+
+test("standard NPC acid, explosive, vacuum and fire use actual Damage saves and tracked hazard state", async () => {
+  for (const type of ["acid", "explosive", "vacuum", "fire"]) {
+    reset();
+    const actor = character(`Standard-full-${type}`, {
+      npcType: "standard",
+      damageSave: 30,
+      vitality: { value: 0, max: 0 },
+      dr: { other: 3 }
+    });
+    actor.type = "npc";
+    const asked = [];
+    actor.rollSave = async (key, options) => (asked.push([key, structuredClone(options.hazardSave)]), { flags: {} });
+    const damage = card(`full-${type}`, { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+    await applyDamage(damage, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type });
+    assert.equal(asked[0][0], type === "vacuum" ? "fort" : "ref");
+    if (type !== "fire") {
+      assert.equal(actor.system.damageTrack, undefined, "damage waits for its actual first save");
+      const save = card(`delayed-${type}`, {
+        actorUuid: actor.uuid,
+        checkKind: "save",
+        rawTotal: 5,
+        effectiveTotal: 5,
+        resolved: true,
+        successConfirmed: false,
+        hazardSave: asked[0][1]
+      });
+      await resolveHazardSave(actor, save);
+      assert.equal(actor.flags.spycraft2.hazardResolutions[save.id].state, "complete");
+      const before = posted.length;
+      await resolveHazardSave(actor, save);
+      assert.equal(posted.length, before);
+    }
+    const reports = posted.filter(m => m.flags?.spycraft2?.npcDamageSave).map(m => m.flags.spycraft2.npcDamageSave);
+    const net = type === "vacuum" ? 14 : 11;
+    assert.deepEqual([reports[0].kind, reports[0].damage], ["lethal", net]);
+    assert.equal(reports[1].kind, "stress");
+    if (type === "acid") {
+      assert.equal(reports[1].damage, 5);
+      assert.equal(actor.system.hazards.acid.damage, 14);
+    }
+    if (type === "vacuum") {
+      assert.equal(reports[1].damage, 7);
+      assert.equal(actor.system.hazards.exposure.type, "vacuum");
+    }
+    if (type === "fire") {
+      assert.equal(reports[1].damage, 11);
+      assert.equal(actor.system.hazards?.fire ?? null, null);
+    }
+    if (type === "explosive") {
+      const flat = posted.flatMap(m => m.rolls ?? []).find(r => r.formula === "1d4");
+      assert.equal(reports[1].damage, Math.floor(net / 4) + flat.total);
+      assert.equal(asked[1][1].kind, "explosiveFort");
+    }
+  }
+});
+
+test("a delayed typed hit retains its activated critical size for standard and special NPCs", async () => {
+  for (const special of [false, true]) {
+    reset();
+    const actor = character(`Critical-acid-${special}`, {
+      npcType: special ? "special" : "standard",
+      damageSave: 30,
+      vitality: { value: 40, max: special ? 40 : 0 },
+      wounds: { value: 20, max: 20 },
+      abilities: { con: { value: 10 }, wis: { value: 10 } },
+      dr: { other: 3 }
+    });
+    actor.type = "npc";
+    let retained;
+    actor.rollSave = async (key, options) => ((retained = structuredClone(options.hazardSave)), { flags: {} });
+    const damage = card(`critical-acid-${special}`, {
+      actorUuid: "Actor.Kevin",
+      checkKind: "damage",
+      effectiveTotal: 14
+    });
+    await applyDamage(damage, {
+      targetUuid: actor.uuid,
+      damage: 14,
+      kind: "lethal",
+      type: "acid",
+      critical: true,
+      criticalDice: 2,
+      blast: true
+    });
+    assert.equal(retained.hitContext.critical, true);
+    assert.equal(retained.hitContext.criticalDice, 2);
+    assert.equal(retained.hitContext.blast, true);
+    const save = card(`critical-acid-save-${special}`, {
+      actorUuid: actor.uuid,
+      checkKind: "save",
+      rawTotal: 5,
+      effectiveTotal: 5,
+      resolved: true,
+      successConfirmed: false,
+      hazardSave: retained
+    });
+    await resolveHazardSave(actor, save);
+    if (special) {
+      assert.equal(actor.system.vitality.value, 40);
+      assert.equal(actor.system.wounds.value, 9);
+    } else {
+      assert.equal(actor.system.damageTrack.last.failures, 2);
+      assert.equal(actor.system.damageTrack.state, "dead");
+    }
+  }
+});
+
+test("typed electrical subdual retains its original melee DR column and tracks only net exposure", async () => {
+  for (const special of [false, true]) {
+    reset();
+    const actor = character(`Electrical-DR-${special}`, {
+      npcType: special ? "special" : "standard",
+      damageSave: 30,
+      vitality: { value: 40, max: special ? 40 : 0 },
+      abilities: { con: { value: 10 }, wis: { value: 10 } },
+      dr: { melee: 20, other: 3 }
+    });
+    actor.type = "npc";
+    const damage = card(`electrical-dr-${special}`, {
+      actorUuid: "Actor.Kevin",
+      checkKind: "damage",
+      effectiveTotal: 14,
+      weaponProficiency: "blunt"
+    });
+    await applyDamage(damage, {
+      targetUuid: actor.uuid,
+      damage: 14,
+      kind: "lethal",
+      type: "electrical",
+      attackKind: "meleeWeapon"
+    });
+    assert.equal(special ? actor.flags.spycraft2.nonLethal.subdual : actor.system.damageTrack.last.damage, 2);
+    assert.equal(actor.system.hazards.exposure.suffered, 2);
+    assert.equal(actor.system.hazards.exposure.lastDamage, 2);
+  }
+});
+
+test("typed damage rejects fractional inputs and zero vacuum impact never creates replacement damage dice", async () => {
+  reset();
+  const actor = character("Zero-vacuum", { npcType: "standard", damageSave: 30, vitality: { value: 0, max: 0 } });
+  actor.type = "npc";
+  let save;
+  actor.rollSave = async (key, options) => ((save = options.hazardSave), { flags: {} });
+  const { sufferTypedDamage } = await import("../module/apps/damage-types.mjs"),
+    evaluate = Roll.prototype.evaluate;
+  let dice = 0;
+  Roll.prototype.evaluate = async function (...args) {
+    dice++;
+    return evaluate.apply(this, args);
+  };
+  try {
+    for (const input of [{ amount: 1.5 }, { amount: 1, reduction: 0.5 }])
+      assert.equal(await sufferTypedDamage(actor, { type: "vacuum", ...input }), false);
+    await sufferTypedDamage(actor, { type: "vacuum", amount: 0 });
+    assert.equal(save.damage, 0);
+    assert.equal(dice, 0);
+    assert.equal(actor.system.damageTrack, undefined);
+  } finally {
+    Roll.prototype.evaluate = evaluate;
   }
 });
 

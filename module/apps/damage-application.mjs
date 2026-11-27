@@ -34,7 +34,7 @@ import {
   woundState
 } from "../rules/damage-application.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
-import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS, typedStress } from "../rules/damage-types.mjs";
+import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
@@ -43,7 +43,7 @@ import { nonLethalDamage } from "./nonlethal-damage.mjs";
 export { accumulatedDamageLines, nonLethalTotals } from "./nonlethal-damage.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
 import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
-import { exposeToFire, hazardSaveResolvers, sufferStress } from "./hazards.mjs";
+import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
 import { sufferTypedDamage } from "./damage-types.mjs";
 import { rollCriticalInjury } from "./critical-injuries.mjs";
 import { blastCaught } from "./map.mjs";
@@ -579,8 +579,6 @@ export async function reviewDamageHitDialog(actor, message) {
 const isSpecial = target => target.type === "agent" || (target.type === "npc" && npcIsSpecial(target));
 /** Damage types with rules of their own that an agent's hazards track; fire is kept with the other hazards. */
 const TYPED = [...Object.keys(DAMAGE_TYPES), "fire"];
-/** Special NPCs keep hazard state and use their own health, running totals and saves. */
-const NPC_TYPED = TYPED;
 const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
 
 /** Take a lethal hit off a special character's vitality and wounds and set the conditions that follow. */
@@ -918,28 +916,30 @@ export async function applyDamage(message, options = {}) {
           critical,
           fire: type === "fire" || profile.type === "fire"
         });
-      } else if (
-        type &&
-        (target.type === "agent" ||
-          (isSpecial(target) && NPC_TYPED.includes(type)) ||
-          (target.type === "npc" && ["bang", "flash"].includes(type)))
-      ) {
+      } else if (type && ["agent", "npc"].includes(target.type)) {
         // Typed damage shares its hazard state and saves across agents and special NPCs.
         const typedAP = DAMAGE_TYPES[type]?.armorPiercing;
+        const hitContext = {
+          critical,
+          criticalDice,
+          blast: input.blast === true || profile.blast === true,
+          attackKind,
+          weaponProficiency
+        };
         const reduction =
           armorPiercingAll || typedAP === "all"
             ? 0
             : Math.max(0, hit.dr - Math.max(armorPiercing, typedAP === "damage" ? damage : 0));
         result =
           type === "fire"
-            ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true })
+            ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true, hitContext })
             : await sufferTypedDamage(target, {
                 type,
                 amount: damage,
                 reduction,
                 source: weapon?.name ?? "",
                 review: input.reviewType === true,
-                allowed: target.type === "agent" ? undefined : isSpecial(target) ? NPC_TYPED : ["bang", "flash"]
+                hitContext
               });
         if (!result) return null;
       } else if (!isSpecial(target)) {
@@ -958,10 +958,6 @@ export async function applyDamage(message, options = {}) {
             campaignStressAdjusted: hit.campaignStressAdjusted
           });
           if (!result) return null;
-          if (["collision", "electrical", "laser"].includes(type)) {
-            const stress = typedStress(type, reduced.net);
-            if (stress.points) lines.push(await sufferStress(target, stress.points, typeLabel(type)));
-          }
         }
       } else if (kind === "lethal") {
         // Juggernaut: the brawler may take up to half of the hit as subdual damage instead.

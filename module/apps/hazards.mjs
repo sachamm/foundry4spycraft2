@@ -26,7 +26,8 @@ import {
 } from "../rules/hazards.mjs";
 import { attributeDamagePlan } from "../rules/attribute-damage.mjs";
 import { notTheFaceCharismaResistance } from "../rules/not-the-face.mjs";
-import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS } from "../rules/damage-types.mjs";
+import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS, typedHitContext } from "../rules/damage-types.mjs";
+import { npcIsSpecial } from "../rules/gc/npc-state.mjs";
 import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
@@ -118,7 +119,25 @@ export async function writeHazards(actor, hazards) {
 }
 
 /** Take lethal damage off vitality, then wounds, where the character tracks them. Returns what was lost. */
-export async function sufferLethal(actor, amount) {
+export async function sufferLethal(actor, amount, hitContext = {}) {
+  if (!owned(actor)) return null;
+  if (!Number.isSafeInteger(amount) || amount < 0) throw Error(loc`Enter nonnegative whole lethal damage.`);
+  const context = typedHitContext(hitContext);
+  if (actor.type === "npc" && !npcIsSpecial(actor)) {
+    const result = amount
+      ? await npcDamageSave(actor, {
+          damage: amount,
+          kind: "lethal",
+          criticalDice: context.criticalDice,
+          blast: context.blast
+        })
+      : null;
+    if (amount && !result)
+      throw Error(
+        loc`The standard character's lethal Damage save was not recorded. Review its actual damage before retrying.`
+      );
+    return { standard: true, damage: amount, vitalityLoss: 0, woundLoss: 0, notes: [], result };
+  }
   if (!Number.isFinite(actor.system.vitality?.max) || !actor.system.vitality.max) return null;
   const system = actor.system,
     plan = lethalHitPlan(
@@ -128,7 +147,7 @@ export async function sufferLethal(actor, amount) {
         woundsMax: system.wounds?.max,
         deathThreshold: system.deathThreshold
       },
-      { damage: amount },
+      { damage: amount, critical: context.critical },
       currentInjuryEffects()
     );
   await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
@@ -346,9 +365,11 @@ async function resolveContagionSave(actor, message, save, succeeded) {
     } else if (effect.kind === "lethal") {
       const loss = await sufferLethal(actor, amount.total);
       lines.push(
-        loss
-          ? loc`${amount.total} lethal damage: vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-          : loc`${amount.total} lethal damage: the GC applies it.`,
+        loss?.standard
+          ? loc`${amount.total} lethal damage; the standard character's Damage save is recorded separately.`
+          : loss
+            ? loc`${amount.total} lethal damage: vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
+            : loc`${amount.total} lethal damage: the GC applies it.`,
         ...(loss?.notes ?? [])
       );
     } else if (effect.kind === "condition") {
@@ -373,17 +394,23 @@ async function resolveContagionSave(actor, message, save, succeeded) {
 /* -------------------------------------------- */
 
 /** Fire damage taken now: vitality and wounds, matching stress, and the running total for this fire. */
-async function sufferFire(actor, state, damage, reduction, label) {
+async function sufferFire(actor, state, damage, reduction, label, hitContext = {}) {
   const taken = Math.max(0, damage - Math.max(0, reduction)),
-    loss = await sufferLethal(actor, taken),
+    loss = await sufferLethal(actor, taken, hitContext),
     plan = fireDamagePlan(state.fire, taken);
+  if (!loss)
+    throw Error(
+      loc`Fire damage was not recorded. Review the character's actual health and ownership before continuing.`
+    );
   const lines = [
-    loss
-      ? loc`${label}: ${taken} fire damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-      : loc`${label}: ${taken} fire damage; the GC applies it (a standard character saves against it).`,
+    loss?.standard
+      ? taken
+        ? loc`${label}: ${taken} fire damage; the standard character's Damage save is recorded separately.`
+        : loc`${label}: no fire damage remains after defenses.`
+      : loc`${label}: ${taken} fire damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`,
     ...(loss?.notes ?? [])
   ];
-  const lost = loss ? loss.vitalityLoss + loss.woundLoss : taken;
+  const lost = loss.standard ? loss.damage : loss.vitalityLoss + loss.woundLoss;
   lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses"));
   if (plan.scarSaveDue)
     lines.push(
@@ -414,7 +441,14 @@ export async function exposeToFire(actor, options = {}) {
   if (!Number.isSafeInteger(input.damage) || input.damage < 1)
     return refuse(loc`Enter the fire's damage as a whole number.`);
   const state = hazardState(actor.system),
-    result = await sufferFire(actor, state, input.damage, input.reduction ?? 0, loc`Fire (AP ${input.ap ?? 0})`);
+    result = await sufferFire(
+      actor,
+      state,
+      input.damage,
+      input.reduction ?? 0,
+      loc`Fire (AP ${input.ap ?? 0})`,
+      input.hitContext
+    );
   if (result.fire) await writeHazards(actor, { ...state, fire: result.fire });
   await post(actor, result.lines);
   if (input.save === false || input.damage < 10) return true;

@@ -22,6 +22,29 @@
  */
 import { loc } from "../i18n.mjs";
 
+/** Preserve the original hit while a type-specific save waits for resolution. */
+export function typedHitContext(input = {}) {
+  if (!input || typeof input !== "object" || Array.isArray(input))
+    throw Error(loc`Review the original typed hit's critical size, blast and DR category.`);
+  const critical = input.critical ?? false,
+    criticalDice = input.criticalDice ?? (critical ? 1 : 0),
+    blast = input.blast ?? false,
+    attackKind = input.attackKind ?? "other",
+    weaponProficiency = input.weaponProficiency ?? "";
+  if (
+    typeof critical !== "boolean" ||
+    typeof blast !== "boolean" ||
+    !Number.isSafeInteger(criticalDice) ||
+    criticalDice < 0 ||
+    (critical ? criticalDice < 1 : criticalDice !== 0) ||
+    !["unarmed", "meleeWeapon", "hurledWeapon", "rangedWeapon", "other"].includes(attackKind) ||
+    typeof weaponProficiency !== "string" ||
+    weaponProficiency.length > 100
+  )
+    throw Error(loc`Review the original typed hit's critical size, blast and DR category.`);
+  return { critical, criticalDice, blast, attackKind, weaponProficiency };
+}
+
 /** Fortitude save against a lasting injury from heavy damage of one type (pp.333–340). */
 export const INJURY_SAVE_DC = 15;
 

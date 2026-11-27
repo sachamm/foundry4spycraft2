@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
 **Continuing review, 27 November 2026:** PC creation **9.6/10**;
-combat play **9.6/10**. Implementation continues toward the requested **9.9/10**
+combat play **9.7/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -1712,5 +1712,40 @@ diagnostics occurred. All **4,337** Node tests, **988** fixture assertions and
 **267** layouts pass; schema, lint, formatting, bundling and copy checks pass.
 Standard NPC acid/explosive/vacuum/fire paths, typed critical/secondary timing,
 Drained and the wider combat audit remain open.
+
+## Pass 58: complete NPC type routing and original critical-hit context
+
+PC creation remains **9.6/10**. Combat advances to **9.7/10**: supported typed
+weapon damage now executes through the same hazard workflows for standard and
+special NPCs. Standard acid, explosive, vacuum and fire now roll actual primary
+and secondary Damage saves instead of leaving health application as a reminder.
+Acid/exposure/fire state and subsequent type-specific saves use the existing
+hazard interface. Cold/heat/electrical share net subdual accounting with the
+original DR column; exposure and electrical Count consequences use net damage.
+
+A typed hit now freezes critical size, blast, incoming DR category and weapon
+proficiency. Delayed acid/explosive/vacuum saves retain that context. Activated
+criticals apply to special-character wounds and add the original automatic
+failed saves for standard NPCs. Ongoing acid/fire ticks receive no new critical
+activation. Invalid context or fractional damage/DR is refused; unowned lethal
+damage cannot change health. A zero-point vacuum impact no longer creates new
+damage dice. Failed agent-ledger writes stop the typed workflow rather than
+claiming that an unapplied event succeeded.
+
+Native checks used actual first-save and Damage-save dice for all four remaining
+standard-NPC chains. A delayed acid critical retained size 2 after the actual
+successful Reflex save: its remaining 4 damage produced two automatic failures
+and death on a standard NPC; a special NPC retained 75 vitality and lost 4
+wounds (26 to 22). Native cards retained the complete original hit context.
+No browser errors or diagnostics occurred. Controlled +30 standard-NPC save
+adjustments isolate ordinary damage arithmetic; they are not printed table
+values. All **4,343** Node tests, **988** fixture assertions and **267** layouts
+pass; schemas, lint, formatting, bundling and copy checks pass.
+
+The increase reflects executable typed damage/criticals and durable resolution
+across both NPC health models. Drained, typed secondary-effect/recovery timing,
+remaining resistance/ability interactions, grapple, cover and coordinated-action
+gaps still prevent 9.9. Character source/gear audits and additional complete
+native builds remain necessary for the creation score.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.

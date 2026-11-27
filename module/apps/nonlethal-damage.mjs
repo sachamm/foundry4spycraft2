@@ -78,6 +78,7 @@ export async function nonLethalDamage(target, kind, amount, facts) {
       });
       return {
         lines: accumulatedDamageLines(esc(target.name), kind, amount, record, target.system),
+        net: record?.newDamage ?? amount,
         pendingSave: null
       };
     } catch (error) {
@@ -105,11 +106,12 @@ export async function nonLethalDamage(target, kind, amount, facts) {
       ? loc`${esc(target.name)}: damage reduction stops all ${amount} ${kind} damage (it counts twice against subdual damage).`
       : loc`${esc(target.name)} takes ${plan.net} ${kind} damage: ${plan.total} in all, against a threshold of ${plan.threshold}.`
   ];
-  if (!plan.saveRequired) return { lines, pendingSave: null };
+  if (!plan.saveRequired) return { lines, pendingSave: null, net: plan.net };
   const saveName = plan.saveKey === "will" ? loc`Will` : loc`Fortitude`;
   lines.push(loc`This calls for a ${saveName} save, DC ${plan.dc}.`);
   return {
     lines,
+    net: plan.net,
     pendingSave: {
       kind: "thresholdSave",
       saveKey: plan.saveKey,
