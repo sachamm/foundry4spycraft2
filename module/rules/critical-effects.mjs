@@ -12,6 +12,7 @@
  * This module is pure.
  */
 import { loc } from "../i18n.mjs";
+import { criticalInjuryCostShift } from "./campaign-rules.mjs";
 
 const MELEE = ["blunt", "exoticBlunt", "edged", "exoticEdged"];
 const HURLED = ["hurled", "exoticHurled", "explosives"];
@@ -89,16 +90,25 @@ export function criticalMissChoices(check) {
 }
 
 /** The critical hit effects (p.329), for every kind of target; the GC picks the one that fits. */
-export function criticalHitChoices(check) {
+export function criticalHitChoices(check, { injuryCostShift = criticalInjuryCostShift() } = {}) {
   if (check?.checkKind !== "attack") return [];
+  // Bulletproof (+1) and Gritty (−1, minimum 0) change what a Table of Ouch injury costs (p.406).
+  const ouch = base => Math.max(0, base + injuryCostShift),
+    shifted = injuryCostShift
+      ? loc` (campaign quality ${injuryCostShift > 0 ? "+" : "−"}${Math.abs(injuryCostShift)})`
+      : "";
   return [
     { id: "hit.wounds", cost: 1, label: loc`Special character with vitality left: the damage goes to wounds` },
     {
       id: "hit.ouch",
-      cost: 2,
-      label: loc`Special character with vitality left, damage above Constitution: a Table of Ouch injury`
+      cost: ouch(2),
+      label: `${loc`Special character with vitality left, damage above Constitution: a Table of Ouch injury`}${shifted}`
     },
-    { id: "hit.ouchAtZero", cost: 1, label: loc`Special character at 0 vitality: also a Table of Ouch injury` },
+    {
+      id: "hit.ouchAtZero",
+      cost: ouch(1),
+      label: `${loc`Special character at 0 vitality: also a Table of Ouch injury`}${shifted}`
+    },
     ...[1, 2, 3, 4].map(n => ({
       id: `hit.saves${n}`,
       cost: n,

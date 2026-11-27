@@ -1,3 +1,5 @@
+import { actionDieTerm } from "./action-die-formula.mjs";
+import { triumphAt } from "./check-candidates.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./check-candidates.mjs";
@@ -80,7 +82,9 @@ export function actionDieBoostPlan(
         kind === "save" ||
         kind === "damage"),
     intelligence: system.abilities?.int?.mod ?? 0,
-    formula: Array(rolls).fill(`1d${die}x>=${explodeAt}`).join(" + "),
+    formula: Array(rolls)
+      .fill(actionDieTerm(die, explodeAt, system.actionDice))
+      .join(" + "),
     wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill",
     // Better Luck Next Time, p.189: a single boosting die on a skill check or save that rolls a natural 1 comes back.
     betterLuck: system.activeFeatNames?.includes("Better Luck Next Time") === true && ["skill", "save"].includes(kind)
@@ -105,7 +109,8 @@ export function actionDieBoostResult(check, plan, dieResults) {
   const resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
     cap,
     threat: check.threat ?? 0,
-    actionDieBonus: boostTotal
+    actionDieBonus: boostTotal,
+    triumphAt: triumphAt(check)
   });
   const naturalOne = plan.betterLuck === true && plan.count === 1 && plan.rolls === 1 && Number(dieResults[0]) === 1;
   return {
@@ -148,7 +153,7 @@ export function generousBoostPlan(
   const plan = actionDieBoostPlan(donor, check, { count: 1, errorDeclined, calculating });
   if (plan.blocked) return plan;
   // Generous explicitly uses one donor die; other doubled-die cores do not multiply it.
-  return { ...plan, rolls: 1, formula: `1d${plan.die}x>=${plan.explodeAt}`, wellRounded: false };
+  return { ...plan, rolls: 1, formula: actionDieTerm(plan.die, plan.explodeAt, donor.actionDice), wellRounded: false };
 }
 
 /** Pointman Improved Fortune, p.41: distinct teammates stack with self, maximum three starting dice. */

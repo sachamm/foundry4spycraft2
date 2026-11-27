@@ -1,15 +1,16 @@
+import { triumphResult } from "./campaign-rules.mjs";
 /** Pure Spycraft 2.0 result-cap logic. Keep raw dice results for auditability. */
 export function resolveSkillResult(
   rawTotal,
   naturalDie,
-  { cap = null, threat = 20, actionDieBonus = 0, succeeded = null } = {}
+  { cap = null, threat = 20, actionDieBonus = 0, succeeded = null, triumphAt = triumphResult() } = {}
 ) {
   // A missing outcome is provisional; a confirmed failure cannot retain threat/Triumph cap exceptions.
   const isThreat = succeeded !== false && threat > 0 && naturalDie >= threat;
   const numericCap = Number(cap);
   const capped = cap !== null && cap !== undefined && Number.isFinite(numericCap);
-  // A result of 75+ is a Triumph irrespective of rank, and threats lift the cap.
-  const triumph = succeeded !== false && rawTotal >= 75;
+  // A result of 75+ (60 or 90 under the Spectacle qualities) is a Triumph irrespective of rank; threats lift the cap.
+  const triumph = succeeded !== false && rawTotal >= triumphAt;
   const base = capped && !isThreat && !triumph ? Math.min(rawTotal, numericCap) : rawTotal;
   // Action dice increase the capped result, rather than the otherwise discarded overflow.
   const total = base + actionDieBonus;
@@ -18,7 +19,7 @@ export function resolveSkillResult(
     total,
     limited: total !== rawTotal + actionDieBonus,
     threat: isThreat,
-    triumph: succeeded !== false && total >= 75
+    triumph: succeeded !== false && total >= triumphAt
   };
 }
 

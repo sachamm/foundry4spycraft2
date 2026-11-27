@@ -539,6 +539,7 @@ async function lethalOnSpecial(target, hit, source) {
         label: loc`Massive damage`,
         damage: plan.net,
         toMinusNine: plan.massive.toMinusNine,
+        threshold: plan.massive.threshold ?? 50,
         source
       }
     : null;
@@ -607,7 +608,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     const wounds = Math.min(-9, Math.trunc(Number(actor.system.wounds?.value) || 0));
     await actor.update({ "system.wounds.value": wounds });
     lines.push(
-      loc`A hit of 50 or more: wounds drop to ${wounds}.`,
+      loc`A hit of ${save.threshold ?? 50} or more: wounds drop to ${wounds}.`,
       ...(await woundConditions(actor, woundState(wounds, actor.system.deathThreshold)))
     );
   }

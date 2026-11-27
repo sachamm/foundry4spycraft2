@@ -1,3 +1,5 @@
+import { triumphAt } from "./check-candidates.mjs";
+import { threatsAutoActivate } from "./campaign-rules.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { cleaveCriticalPlan } from "./cleave.mjs";
 import { finesseCriticalEligible } from "./finesse.mjs";
@@ -117,7 +119,7 @@ export function criticalPlan(
       adjustment--;
       sources.push(loc`Most Lethal (vehicle-mounted weapon) –1`);
     }
-    if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= 75) {
+    if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= triumphAt(check)) {
       adjustment--;
       sources.push(loc`Attack Triumph: one-die critical hit included`);
     }
@@ -146,6 +148,11 @@ export function criticalPlan(
     if ((system.classLevels?.grunt ?? 0) >= 8 && ["tactical", "indirectFire"].includes(check.weaponProficiency)) {
       adjustment--;
       sources.push("Overkill –1");
+    }
+    // Bloodbath (p.406): a player or special character's threat on a hit becomes a critical hit without paying.
+    if (threatsAutoActivate() && !["standard", "animal"].includes(system.npcType)) {
+      adjustment--;
+      sources.push(loc`Bloodbath campaign quality –1`);
     }
   }
   if (kind === "failure") {

@@ -8,6 +8,7 @@
  *    and its application carry the critical hit on.
  * Both go through spendGCDice, which checks the pool, the NPC's qualities and posts the spend to the GC.
  */
+import { triumphAt } from "../../rules/check-candidates.mjs";
 import { rollPipeline } from "../../rules/roll-pipeline.mjs";
 import { gcDieType } from "../../rules/gc/gc-spend.mjs";
 import { spendProfile } from "./npc-play.mjs";
@@ -46,7 +47,8 @@ export async function gcBoostCard(message, actor) {
     resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
       cap: check.cap ?? null,
       threat: check.threat ?? 0,
-      actionDieBonus: boostTotal
+      actionDieBonus: boostTotal,
+      triumphAt: triumphAt(check)
     });
   await message.update({
     "flags.spycraft2.effectiveTotal": resolved.total,

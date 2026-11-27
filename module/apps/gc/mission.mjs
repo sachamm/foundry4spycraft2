@@ -1,4 +1,5 @@
 /** Mission record dialogs (pp.423–440): Threat Level, Caliber, objectives, complications, antagonists, exposure and rewards. */
+import { honorExposureMultiplier } from "../../rules/campaign-rules.mjs";
 import { esc } from "../../html.mjs";
 import { refuse, decline } from "../../error-notices.mjs";
 import {
@@ -468,7 +469,8 @@ export async function recordInfraction() {
     ])
   );
   const { effects } = currentCampaignEffects(),
-    rules = effects.gearRules;
+    rules = effects.gearRules,
+    honorMultiplier = honorExposureMultiplier(effects);
   const input = await ask(
     loc`Record an exposure infraction — Table 7.7`,
     `
@@ -483,7 +485,7 @@ export async function recordInfraction() {
       rules === "freelance" ? "netWorth" : "reputation"
     )}</select></label>
     <label><input type="checkbox" name="preventing" /> ${loc`Committed to prevent an equal or worse infraction (half, rounded up)`}</label>
-    <label><input type="checkbox" name="honor" /> ${loc`Honor-code violation under the Corrupt campaign quality (half, rounded down)`}</label>`,
+    <label><input type="checkbox" name="honor" /> ${honorMultiplier === 1 ? loc`Honor-code violation (no campaign quality changes it)` : honorMultiplier > 1 ? loc`Honor-code violation: doubled under the Virtuous campaign quality` : loc`Honor-code violation: halved, rounded down, under the Corrupt campaign quality`}</label>`,
     loc`Record infraction`
   );
   if (!input) return null;
@@ -491,7 +493,10 @@ export async function recordInfraction() {
     [objectiveId, index] = String(input.infraction).split("|");
   const infraction = T.exposure.find(row => row.id === objectiveId)?.infractions[Number(index)];
   if (!actor || !infraction) return refuse(loc`Choose a character and an infraction.`);
-  const penalty = exposurePenalty(infraction, { preventing: !!input.preventing, halve: !!input.honor })[input.currency];
+  const penalty = exposurePenalty(infraction, {
+    preventing: !!input.preventing,
+    honorMultiplier: input.honor ? honorMultiplier : 1
+  })[input.currency];
   const path = `system.${input.currency}`,
     before = actor.system[input.currency] ?? 0;
   await actor.update({ [path]: before + penalty });

@@ -1,3 +1,4 @@
+import { campaignActionDice, campaignRules } from "./campaign-rules.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
@@ -1735,7 +1736,15 @@ function deriveFinalTotals(state) {
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
   sys.combatMovement = combatMovementRules(sys);
   sys.senses = baseSensoryRanges(sys);
-  sys.cqbRange = sys.activeFeatNames.includes("Marksmanship Supremacy") ? 60 : 30;
+  // Gunmen widens CQB Range to 60 ft. for everyone (p.407).
+  const gunmenCqb = (campaignRules().rangeIncrementMultiplier ?? 1) !== 1;
+  sys.cqbRange = sys.activeFeatNames.includes("Marksmanship Supremacy") || gunmenCqb ? 60 : 30;
+  // Spirited raises player character action dice one type (d12 at most); Bleak stops them exploding and Spirited
+  // makes them explode on a natural 1 as well (pp.406, 408).
+  const campaignDice = campaignActionDice();
+  if (campaignDice.step > 0) sys.actionDice.die = Math.min(12, sys.actionDice.die + 2 * campaignDice.step);
+  sys.actionDice.explodes = !campaignDice.noExplode;
+  sys.actionDice.explodeLow = campaignDice.explodeLow;
   sys.actionDice.explodeAt = sys.activeFeatNames.includes("Lady Luck's Smile")
     ? sys.actionDice.die - 1
     : sys.actionDice.die;

@@ -6,6 +6,7 @@
  * most; each helper's critical success adds a further +1 that is not a synergy bonus. One helper's critical
  * failure ruins the task. Nobody takes 10 or 20. Table 2.9 says how many helpers a check allows.
  */
+import { triumphAt } from "./check-candidates.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { loc } from "../i18n.mjs";
@@ -88,7 +89,8 @@ export function applyCooperativeBonus(check, helpers, { max = null } = {}) {
   const resolved = resolveSkillResult(rawTotal, check.naturalDie, {
     cap: check.boostCap ?? check.cap ?? null,
     threat: check.threat ?? 0,
-    actionDieBonus: check.boostTotal ?? 0
+    actionDieBonus: check.boostTotal ?? 0,
+    triumphAt: triumphAt(check)
   });
   return {
     ...check,

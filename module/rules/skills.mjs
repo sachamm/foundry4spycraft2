@@ -567,6 +567,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       ambush.errorIncrease +
       tracking.errorIncrease +
       medical.errorIncrease +
+      terms.sum("errorIncrease") +
       Math.max(0, Math.trunc(Number(vehicleErrorIncrease) || 0)) +
       ((skill.ranks === 0 && !hailMaryUntrained) || missingFocus ? 2 : 0)
   );

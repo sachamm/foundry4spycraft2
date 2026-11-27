@@ -56,7 +56,19 @@ const MERGE = {
   gearCaliberShift: (a, b) => a + b,
   blastIncrementMultiplier: (a, b) => a * b,
   rangeIncrementMultiplier: (a, b) => a * b,
-  xpToLevelFraction: (a, b) => a * b
+  xpToLevelFraction: (a, b) => a * b,
+  attackThreatIncrease: (a, b) => a + b,
+  attackModifier: (a, b) => a + b,
+  stressMultiplier: (a, b) => a * b,
+  complexTaskChallenges: (a, b) => a + b,
+  leadAdvantageShift: (a, b) => a + b,
+  honorExposureMultiplier: (a, b) => a * b,
+  fallingDamageMultiplier: (a, b) => a * b,
+  dispositionCheckModifier: (a, b) => a + b,
+  surpriseHideBonus: (a, b) => a + b,
+  favorableDispositionBonus: (a, b) => a + b,
+  actionDieStep: (a, b) => a + b,
+  lowestAttributeErrorIncrease: (a, b) => a + b
 };
 
 /**

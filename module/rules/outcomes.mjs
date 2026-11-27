@@ -9,7 +9,7 @@ import { resolveSkillResult } from "./checks.mjs";
 import { describeModifiers } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { formatRange, outcomeLabel } from "./outcome-labels.mjs";
-import { checkCandidates, errorDecisionPending, triumphCheck } from "./check-candidates.mjs";
+import { checkCandidates, errorDecisionPending, triumphAt, triumphCheck } from "./check-candidates.mjs";
 export { checkCandidates, errorDecisionPending };
 export function adjudicateCheck(check, succeeded) {
   if (check.manualAdjustment && !succeeded)
@@ -17,7 +17,7 @@ export function adjudicateCheck(check, succeeded) {
       loc`Manual Adjustment already reversed this failure. Review its recorded effect before changing the outcome.`
     );
   if (typeof succeeded !== "boolean") throw new Error(loc`Confirm whether the check succeeded or failed.`);
-  if (check.checkKind === "attack" && check.effectiveTotal >= 75 && !succeeded)
+  if (check.checkKind === "attack" && check.effectiveTotal >= triumphAt(check) && !succeeded)
     throw new Error(
       loc`An attack Triumph is a critical hit (pp.330–331). Correct the recorded result before marking it a miss.`
     );
@@ -28,7 +28,8 @@ export function adjudicateCheck(check, succeeded) {
     cap,
     threat: check.threat ?? 0,
     actionDieBonus: check.boostTotal ?? 0,
-    succeeded
+    succeeded,
+    triumphAt: triumphAt(check)
   });
   const candidates = checkCandidates({ ...check, effectiveTotal: result.total });
   return {

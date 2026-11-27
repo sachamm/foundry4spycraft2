@@ -12,6 +12,7 @@
  *
  * This module is pure. The fire actions join an attack as a term of its plan (module/rules/roll-pipeline.mjs).
  */
+import { campaignBlastIncrement } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { specialtyAttackAction, specialtyAttackBonus } from "./specialty-attacks.mjs";
@@ -266,7 +267,8 @@ export function blastProfile(damage, incrementFeet = 5) {
 /** A blast increment in feet from a weapon's qualities ("BLS (25 ft.)"), or the default single square. */
 export function blastIncrementFeet(qualities = "") {
   const match = String(qualities).match(/\bBLS\s*\((\d[\d,]*)\s*ft\.?/i);
-  return match ? Number(match[1].replace(/,/g, "")) : 5;
+  // Blockbuster triples the blast increment of every explosion (p.406).
+  return campaignBlastIncrement(match ? Number(match[1].replace(/,/g, "")) : 5);
 }
 
 /* -------------------------------------------- */

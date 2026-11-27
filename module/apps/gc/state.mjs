@@ -2,6 +2,7 @@
 import { renderOpenSheet } from "../../services/refresh.mjs";
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
+import { setCampaignRulesSource } from "../../rules/campaign-rules.mjs";
 import { missionCatalog } from "./mission-defaults.mjs";
 import { loc, locKey } from "../../i18n.mjs";
 
@@ -133,6 +134,8 @@ export async function setCampaign(campaign) {
 export const qualitiesInForce = () =>
   activeQualities(getCampaign().qualities, getMission().active ? getMission().qualities : []);
 export const currentCampaignEffects = () => campaignEffects(qualitiesInForce());
+// The rules read the qualities in force through this source (module/rules/campaign-rules.mjs).
+setCampaignRulesSource(() => currentCampaignEffects().effects);
 
 /** Mission XP including season-long campaign qualities (which modify every mission of the season, p.435). */
 export function missionXP({ planned = false } = {}) {

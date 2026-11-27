@@ -1,3 +1,4 @@
+import { actionDieTerm } from "./action-die-formula.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeCollapsePlan, attributeActionBlock } from "./attributes.mjs";
@@ -34,7 +35,7 @@ export function healingPlan(system, { vitalityDice = 0, woundDice = 0, inCombat 
     bonus,
     formula: vitalityDice
       ? Array(vitalityDice)
-          .fill(`1d${die}x>=${explodeAt}${bonus ? ` + (${bonus})` : ""}`)
+          .fill(`${actionDieTerm(die, explodeAt, system.actionDice)}${bonus ? ` + (${bonus})` : ""}`)
           .join(" + ")
       : null
   };
@@ -106,7 +107,11 @@ export function defenseBoostPlan(
   const die = system.actionDice?.die ?? 4,
     explodeAt = system.actionDice?.explodeAt ?? die,
     bonus = system.actionDice?.bonus ?? 0;
-  return { blocked: false, cost: 1, formula: `1d${die}x>=${explodeAt}${bonus ? ` + (${bonus})` : ""}` };
+  return {
+    blocked: false,
+    cost: 1,
+    formula: `${actionDieTerm(die, explodeAt, system.actionDice)}${bonus ? ` + (${bonus})` : ""}`
+  };
 }
 
 /** Refresh's specific initiative action (p.359) takes precedence over the p.62 summary. */

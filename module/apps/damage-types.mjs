@@ -27,6 +27,8 @@ import {
   explosiveSavePlan,
   explosiveStunRounds,
   exposureInterval,
+  fallingOutcome,
+  fallingPlan,
   flashOutcome,
   halveAcid,
   survivalFailure,
@@ -50,6 +52,7 @@ import {
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignRules } from "../rules/campaign-rules.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -151,10 +154,11 @@ export async function sufferTypedDamage(actor, preset = {}) {
             Object.keys(DAMAGE_TYPES)
               .filter(type => !preset.allowed || preset.allowed.includes(type))
               .map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`])
+              .concat(preset.allowed ? [] : [["falling", loc`Falling (p.336): asks for the distance next`]])
           ),
           known.type
         )}</select></label>
-        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" required /></label>
+        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" /></label>
         <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
         <label>${loc`Armor worn (acid, heat)`} <select name="armor">${options(ARMORS())}</select></label>
         <label>${loc`Acid: half actions given up next Count to shed armor or an item (+1 each)`} <input type="number" name="halfActions" min="0" max="2" step="1" value="0" /></label>
@@ -177,8 +181,11 @@ export async function sufferTypedDamage(actor, preset = {}) {
     });
     if (!input) return null;
   }
+  if (String(input.type) === "falling" && !preset.allowed) return sufferFall(actor, preset.fall ?? {});
+  if (String(input.amount ?? "").trim() === "" && String(input.type) !== "vacuum")
+    return refuse(loc`Enter the damage rolled for this type.`);
   const type = String(input.type),
-    amount = Math.trunc(Number(input.amount)),
+    amount = Math.trunc(Number(input.amount ?? 0)),
     reduction = Math.max(0, Math.trunc(Number(input.reduction) || 0)),
     source = String(input.source ?? "").trim() || DAMAGE_TYPE_LABELS[type] || type;
   if (!DAMAGE_TYPES[type] || (preset.allowed && !preset.allowed.includes(type)))
@@ -347,6 +354,79 @@ async function sufferElectrical(actor, { amount, source }) {
   await post(actor, lines);
   for (const injury of tracked.injuries) await injurySave(actor, "electrical", injury, "exposure");
   return true;
+}
+
+/* -------------------------------------------- */
+/*  Falling                                      */
+/* -------------------------------------------- */
+
+/**
+ * A fall (p.336): roll the dice for the damage distance, take a made Acrobatics/Falling check off the damage, apply
+ * it as lethal or subdual after the fall's armor piercing, then the stress and the sprawl. Wire Fu halves it for a
+ * player or special character (p.408).
+ */
+export async function sufferFall(actor, preset = {}) {
+  if (!owned(actor)) return null;
+  const wireFu =
+      Number.isFinite(campaignRules().fallingDamageMultiplier) && campaignRules().fallingDamageMultiplier < 1,
+    special = actor.type === "agent" || !["standard", "animal"].includes(actor.system?.npcType);
+  const input =
+    preset.feet !== undefined
+      ? preset
+      : await systemDialog.input({
+          window: { title: loc`Falling damage` },
+          rejectClose: false,
+          ok: { label: loc`Roll the fall` },
+          content: `<div class="spycraft2-roll-options">
+        <label>${loc`Distance fallen for damage (ft.)`} <input type="number" name="feet" min="0" step="1" required /></label>
+        <label>${loc`Landing on`} <select name="surface">${options([
+          ["solid", loc`A solid surface (lethal)`],
+          ["fluid", loc`Water or another fluid (subdual)`]
+        ])}</select></label>
+        <label><input type="checkbox" name="soft" /> ${loc`Soft or yielding landing: counts as 10 ft. shorter`}</label>
+        <label>${loc`Acrobatics/Falling result, if the check succeeded (DC 20)`} <input type="number" name="checkResult" step="1" /></label>
+        <label>${loc`Armor damage reduction`} <input type="number" name="dr" min="0" step="1" value="${Math.max(0, Math.trunc(Number(actor.system?.armor?.dr) || 0))}" /></label>
+        ${wireFu && special ? `<p class="hint">${loc`Wire Fu: the damage is halved, rounded down (p.408).`}</p>` : ""}
+        <p class="hint">${loc`Use the distance after Equilibrium Basics; the Falling skill dialog works it out. Action dice cannot boost falling damage (p.336).`}</p>
+      </div>`
+        });
+  if (!input) return null;
+  try {
+    const plan = fallingPlan({
+      feet: Math.trunc(Number(input.feet)),
+      surface: input.surface ?? "solid",
+      soft: input.soft === true
+    });
+    const result = String(input.checkResult ?? "").trim() === "" ? null : Math.trunc(Number(input.checkResult));
+    if (!plan.dice) return post(actor, [loc`A fall of ${plan.counted} ft. deals no damage (p.336).`]);
+    const roll = await rollTotal(plan.formula),
+      outcome = fallingOutcome(plan, {
+        rolled: roll.total,
+        checkResult: result,
+        dr: Math.max(0, Math.trunc(Number(input.dr) || 0)),
+        halve: wireFu && special
+      });
+    const lines = [
+      loc`Fall of ${plan.feet} ft.: ${plan.formula} = ${roll.total}${outcome.landed ? loc`, less a quarter of the Falling check (${result})` : ""}${outcome.halved ? loc`, halved by Wire Fu` : ""}: ${outcome.damage} ${outcome.kind} damage, armor piercing ${plan.armorPiercing}.`
+    ];
+    const rolls = [roll.roll];
+    if (outcome.kind === "subdual") lines.push(await sufferSubdual(actor, outcome.net, loc`Falling`));
+    else {
+      const loss = await sufferLethal(actor, outcome.net);
+      lines.push(
+        loss
+          ? loc`Falling: ${outcome.net} damage after damage reduction ${outcome.reduction}, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
+          : loc`Falling: ${outcome.net} damage after damage reduction ${outcome.reduction}; the GC applies it (a standard character makes a Damage save).`,
+        ...(loss?.notes ?? [])
+      );
+    }
+    if (outcome.stress) lines.push(await sufferStress(actor, outcome.stress, loc`Falling`));
+    if (outcome.sprawled) lines.push(await condition(actor, "sprawled", 0, loc`Sprawled on landing`));
+    else lines.push(loc`A made Falling check: lands on their feet.`);
+    return post(actor, lines, rolls);
+  } catch (error) {
+    return refuse(error.message);
+  }
 }
 
 /* -------------------------------------------- */

@@ -10531,7 +10531,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Weapons that normally hold 5 or more shots never run out of ammunition.",
-   "effects": {}
+   "effects": {
+    "bottomlessClip": true
+   }
   },
   {
    "id": "bulletproof",
@@ -10608,7 +10610,10 @@ export const GC_DATA = {
    "gcDice": 3,
    "summary": "For everyone, NPCs included: skill DCs rise by 5; error range +2 on skills keyed to a character's lowest attribute; at most 2 action dice may be spent activating a skill error; taking 10 takes 4x standard time instead of 2x.",
    "effects": {
-    "skillDC": 5
+    "skillDC": 5,
+    "lowestAttributeErrorIncrease": 2,
+    "errorActivationDiceMaximum": 2,
+    "take10TimeMultiplier": 4
    }
   },
   {
@@ -10632,7 +10637,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "No GC action dice may be spent to flag characters as honorable in bribes. Honor-code breaches cost half the usual Reputation / Net Worth exposure penalty (round down).",
-   "effects": {}
+   "effects": {
+    "honorExposureMultiplier": 0.5
+   }
   },
   {
    "id": "diplomatic",
@@ -10642,7 +10649,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Player and special characters get +1 on top of any skill bonus granted by a target's favorable disposition.",
-   "effects": {}
+   "effects": {
+    "favorableDispositionBonus": 1
+   }
   },
   {
    "id": "elite-ops",
@@ -10877,7 +10886,9 @@ export const GC_DATA = {
    "xp": -75,
    "gcDice": null,
    "summary": "All stress damage is halved (rounded down, minimum 1).",
-   "effects": {}
+   "effects": {
+    "stressMultiplier": 0.5
+   }
   },
   {
    "id": "mercenary",
@@ -10909,7 +10920,10 @@ export const GC_DATA = {
    "xp": -100,
    "gcDice": 1,
    "summary": "No result caps on skill checks; every check is treated as active; skill penalties are cut in half (round down, never better than -1).",
-   "effects": {}
+   "effects": {
+    "noSkillResultCaps": true,
+    "halveSkillPenalties": true
+   }
   },
   {
    "id": "paranoid",
@@ -10919,7 +10933,10 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": 2,
    "summary": "Player and special characters get +4 morale on Blend/Stealth and Sneak/Hide checks that decide surprise rounds. All characters take -4 morale on skill checks to shift disposition or persuade a target into an action.",
-   "effects": {}
+   "effects": {
+    "surpriseHideBonus": 4,
+    "dispositionCheckModifier": -4
+   }
   },
   {
    "id": "rare-spectacle",
@@ -11053,7 +11070,10 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Complex Tasks need 1 fewer Challenge (minimum 1). In Dramatic Conflicts, every Lead Advantage has its effect raised by 1.",
-   "effects": {}
+   "effects": {
+    "complexTaskChallenges": -1,
+    "leadAdvantageShift": 1
+   }
   },
   {
    "id": "spirited",
@@ -11064,7 +11084,9 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "PCs open every session with +2 action dice (class ability use counts based on starting dice unchanged). PC action dice explode on a natural 1 as well, and each die type is 1 step bigger (d4 becomes d6, d6 becomes d8, etc.).",
    "effects": {
-    "startingActionDice": 2
+    "startingActionDice": 2,
+    "actionDiceExplodeLow": true,
+    "actionDieStep": 1
    }
   },
   {
@@ -11099,7 +11121,9 @@ export const GC_DATA = {
    "xp": -50,
    "gcDice": 2,
    "summary": "Every attack check by any character, NPCs included, takes a -1 penalty.",
-   "effects": {}
+   "effects": {
+    "attackModifier": -1
+   }
   },
   {
    "id": "tense",
@@ -11109,7 +11133,10 @@ export const GC_DATA = {
    "xp": 75,
    "gcDice": 3,
    "summary": "Stress damage x2. Taking 10 on skill checks is off the table for everybody.",
-   "effects": {}
+   "effects": {
+    "stressMultiplier": 2,
+    "noTakeTen": true
+   }
   },
   {
    "id": "thriller",
@@ -11119,7 +11146,10 @@ export const GC_DATA = {
    "xp": 25,
    "gcDice": null,
    "summary": "Complex Tasks need 1 more Challenge (may exceed 10). In Dramatic Conflicts, every Lead result has its effect lowered by 1 (minimum 0).",
-   "effects": {}
+   "effects": {
+    "complexTaskChallenges": 1,
+    "leadAdvantageShift": -1
+   }
   },
   {
    "id": "violent",
@@ -11129,7 +11159,9 @@ export const GC_DATA = {
    "xp": 50,
    "gcDice": 2,
    "summary": "Threat ranges of all attack checks by any character, NPCs included, widen by 2.",
-   "effects": {}
+   "effects": {
+    "attackThreatIncrease": 2
+   }
   },
   {
    "id": "virtuous",
@@ -11139,7 +11171,9 @@ export const GC_DATA = {
    "xp": 25,
    "gcDice": 1,
    "summary": "Honor-code breaches cost double the usual Reputation / Net Worth exposure penalty.",
-   "effects": {}
+   "effects": {
+    "honorExposureMultiplier": 2
+   }
   },
   {
    "id": "wire-fu",
@@ -11149,7 +11183,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Player and special characters may move in any direction, including straight up or along walls. Ending movement off a stable surface triggers the falling rules, but falling damage is halved (rounded down).",
-   "effects": {}
+   "effects": {
+    "fallingDamageMultiplier": 0.5
+   }
   }
  ]
 };

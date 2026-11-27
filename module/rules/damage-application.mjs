@@ -5,6 +5,7 @@
  * armor-piercing value, and what a hit does to a special character's vitality and wounds. The Foundry side is in
  * module/apps/damage-application.mjs.
  */
+import { criticalInjuryBand } from "./campaign-rules.mjs";
 import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
@@ -140,7 +141,8 @@ export function lethalHitPlan(facts = {}, hit = {}) {
     woundsMax = int(facts.woundsMax),
     death = facts.deathThreshold;
   const reduced = reducedDamage(hit),
-    net = reduced.net;
+    net = reduced.net,
+    band = hit.injuryBand ?? criticalInjuryBand();
   const toWounds = hit.critical === true && vitality > 0,
     vitalityLoss = toWounds ? 0 : Math.min(vitality, net),
     woundLoss = net - vitalityLoss;
@@ -163,7 +165,11 @@ export function lethalHitPlan(facts = {}, hit = {}) {
     // DR that stops a hit still bruises: 1 point of subdual damage (p.332).
     bruise: reduced.stopped ? 1 : 0,
     // One hit of 25 or more calls for a Fortitude save against a critical injury; 50 or more also threatens –9 wounds.
-    massive: net >= 25 ? { dc: Math.floor(net / 2), toMinusNine: net >= 50 } : null
+    // Bulletproof and Gritty move both numbers (p.406).
+    massive:
+      net >= band.min
+        ? { dc: Math.floor(net / 2), toMinusNine: net >= band.massive, min: band.min, threshold: band.massive }
+        : null
   };
 }
 
@@ -188,8 +194,8 @@ export function lethalHitLines(name, plan) {
   if (plan.massive)
     lines.push(
       plan.massive.toMinusNine
-        ? loc`A hit of 50 or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury and wounds drop to –9 (p.331).`
-        : loc`A hit of 25 or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury (p.331).`
+        ? loc`A hit of ${plan.massive.threshold ?? 50} or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury and wounds drop to –9 (p.331).`
+        : loc`A hit of ${plan.massive.min ?? 25} or more: Fortitude save DC ${plan.massive.dc}; on a failure roll a critical injury (p.331).`
     );
   return lines;
 }

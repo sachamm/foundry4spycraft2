@@ -150,6 +150,57 @@ export function fallingStress(feet, lethalDice) {
   return whole(feet, loc`Fall distance`) >= 30 ? 2 * whole(lethalDice, loc`Damage dice`) : 0;
 }
 
+/** The largest fall the book prices: 20d6 (p.336). */
+export const FALLING_MAX_DICE = 20;
+
+/**
+ * A fall before its dice are rolled (p.336): 1d6 per full 10 ft. of the damage distance, 20d6 at most; lethal onto a
+ * solid surface and subdual into a fluid one; a soft or yielding landing counts the fall as 10 ft. shorter; armor
+ * piercing 1 per 10 ft. fallen.
+ * @param {object} fall  { feet: the damage distance, surface: "solid"|"fluid", soft }
+ */
+export function fallingPlan({ feet, surface = "solid", soft = false } = {}) {
+  const distance = whole(feet, loc`Fall distance`);
+  if (!["solid", "fluid"].includes(surface)) throw new Error(loc`Choose a solid or a fluid landing surface.`);
+  const counted = Math.max(0, distance - (soft ? 10 : 0)),
+    dice = Math.min(FALLING_MAX_DICE, Math.floor(counted / 10));
+  return {
+    feet: distance,
+    counted,
+    dice,
+    formula: dice ? `${dice}d6` : null,
+    kind: surface === "fluid" ? "subdual" : "lethal",
+    armorPiercing: Math.floor(distance / 10)
+  };
+}
+
+/**
+ * The damage a fall deals once rolled (pp.106, 336). A made Acrobatics/Falling check (DC 20) lands the character on
+ * their feet and takes a quarter of its result off the damage, never below 1 per die; otherwise they land sprawled.
+ * Damage reduction counts after the fall's armor piercing. A lethal fall of 30 ft. or more adds 2 stress per die.
+ * `halve` is Wire Fu's halving for a player or special character (p.408).
+ * @param {object} plan     from fallingPlan
+ * @param {object} outcome  { rolled, checkResult: the Falling check's result when it succeeded, dr, halve }
+ */
+export function fallingOutcome(plan, { rolled, checkResult = null, dr = 0, halve = false } = {}) {
+  const total = whole(rolled, loc`Falling damage`),
+    landed = Number.isFinite(checkResult) && checkResult >= 20;
+  let damage = landed ? Math.max(plan.dice, total - Math.floor(checkResult / 4)) : total;
+  if (halve) damage = Math.floor(damage / 2);
+  const reduction = Math.max(0, whole(dr, loc`Damage reduction`) - plan.armorPiercing),
+    net = Math.max(0, damage - reduction);
+  return {
+    damage,
+    reduction,
+    net,
+    kind: plan.kind,
+    sprawled: !landed,
+    landed,
+    halved: !!halve,
+    stress: plan.kind === "lethal" && net > 0 ? fallingStress(plan.feet, plan.dice) : 0
+  };
+}
+
 /**
  * Injury saves that a running total of one type has newly earned.
  * @param {string} type

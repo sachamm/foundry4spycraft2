@@ -250,12 +250,15 @@ export function characterMissionXP({ baseXP, awards = 0, level, threatLevel: tl 
  * Exposure (p.435): an infraction costs its listed penalty; committed to stop an equal or worse
  * infraction it costs half, rounded up. Penalties are negative numbers in the data.
  */
-export function exposurePenalty(infraction, { preventing = false, halve = false } = {}) {
+export function exposurePenalty(infraction, { preventing = false, halve = false, honorMultiplier = 1 } = {}) {
   const scale = value => {
     if (!Number.isFinite(value) || value === 0) return 0;
     let magnitude = Math.abs(value);
     if (preventing) magnitude = Math.ceil(magnitude / 2);
     if (halve) magnitude = Math.floor(magnitude / 2); // Corrupt campaign quality
+    // An honor-code breach: doubled under Virtuous, halved (rounded down) under Corrupt (p.408).
+    if (Number.isFinite(honorMultiplier) && honorMultiplier > 0 && honorMultiplier !== 1)
+      magnitude = Math.floor(magnitude * honorMultiplier);
     return -magnitude;
   };
   return { reputation: scale(infraction?.reputation), netWorth: scale(infraction?.netWorth) };
