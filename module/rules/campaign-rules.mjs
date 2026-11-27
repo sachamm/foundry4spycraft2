@@ -193,6 +193,10 @@ export function campaignRuleLines(effects = campaignRules()) {
   if (number(effects.stressMultiplier, 1) !== 1) lines.push(loc`Stress damage ×${effects.stressMultiplier}.`);
   if (effects.noTakeTen) lines.push(loc`Nobody may take 10.`);
   if (skillCapsLifted(effects)) lines.push(loc`Skill checks have no result cap.`);
+  if (Number.isFinite(effects.medicineDC) && effects.medicineDC)
+    lines.push(loc`Medicine DCs ${effects.medicineDC > 0 ? "+" : "−"}${Math.abs(effects.medicineDC)}.`);
+  if (Number.isFinite(effects.medicineError) && effects.medicineError)
+    lines.push(loc`Medicine error ranges ${effects.medicineError > 0 ? "+" : "−"}${Math.abs(effects.medicineError)}.`);
   if (Number.isFinite(effects.skillDC) && effects.skillDC)
     lines.push(loc`Skill DCs ${effects.skillDC > 0 ? "+" : "−"}${Math.abs(effects.skillDC)}.`);
   if (threatsAutoActivate(effects))
@@ -278,6 +282,17 @@ export function campaignSkillPlan(system, skillKey, check, input = {}, effects =
         loc`Comedy of Errors: error range +${lowestIncrease}, as this check uses the lowest attribute (p.406).`
       );
     }
+  }
+  // Bulletproof and Gritty (pp.406–407): Medicine DCs and error ranges move with the setting's toughness.
+  if (skillKey === "medicine") {
+    const medicineError = Math.trunc(number(effects.medicineError, 0)),
+      medicineDC = Math.trunc(number(effects.medicineDC, 0));
+    if (medicineError) {
+      errorIncrease += medicineError;
+      notes.push(loc`Medicine error range ${medicineError > 0 ? "+" : "−"}${Math.abs(medicineError)} (pp.406–407).`);
+    }
+    if (medicineDC)
+      notes.push(loc`Medicine: the DC is ${Math.abs(medicineDC)} ${medicineDC > 0 ? "higher" : "lower"} (pp.406–407).`);
   }
   const shift = Math.trunc(number(effects.skillDC, 0));
   if (shift)

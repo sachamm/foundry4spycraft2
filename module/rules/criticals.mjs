@@ -218,12 +218,13 @@ export function criticalPlan(
     sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
   }
   let cost = Math.max(minimum, baseCost + adjustment);
-  // Comedy of Errors (p.406): no more than 2 action dice may be spent activating a skill error.
+  // Comedy of Errors (p.406): no more than 2 action dice may be spent activating a skill error, so an effect that
+  // costs more cannot be bought.
   const errorCap = campaignErrorActivationCap();
-  if (kind === "failure" && check.checkKind === "skill" && errorCap !== null && cost > errorCap) {
-    cost = errorCap;
-    sources.push(loc`Comedy of Errors: at most ${errorCap}`);
-  }
+  if (kind === "failure" && check.checkKind === "skill" && errorCap !== null && cost > errorCap)
+    return reject(
+      loc`Comedy of Errors: a skill error takes at most ${errorCap} action dice to activate, and this effect costs ${cost} (p.406).`
+    );
   if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {
     blocked: false,

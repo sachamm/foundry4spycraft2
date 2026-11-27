@@ -975,3 +975,11 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
     game.spycraft2.gc.console = null;
   }
 });
+
+test("a dramatic scene doubles hostile combatants only (p.424)", () => {
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: -1 } }), true);
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: 1 } }), false, "an ally");
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: 0 } }), false, "neutral");
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: true, token: { disposition: -1 } }), false);
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false }), true, "no token: any NPC");
+});

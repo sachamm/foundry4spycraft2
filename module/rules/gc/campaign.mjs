@@ -4,6 +4,7 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignSkillDC } from "../campaign-rules.mjs";
 
 export const CAMPAIGN_QUALITIES = GC_DATA.campaignQualities;
 export const campaignQuality = id => CAMPAIGN_QUALITIES.find(quality => quality.id === id) ?? null;
@@ -108,14 +109,8 @@ export function injuryThresholds(effects = {}) {
   return { criticalInjuryMin: min, criticalInjuryMax: max, massiveDamage: effects.massiveDamageThreshold ?? max + 1 };
 }
 
-/** A skill DC after campaign qualities such as Cakewalk or Comedy of Errors. */
-export function adjustedDC(dc, effects = {}) {
-  if (!Number.isFinite(dc)) return dc;
-  const shifted = dc + (effects.skillDC ?? 0);
-  return Number.isFinite(effects.skillDCMinimum) && (effects.skillDC ?? 0) < 0
-    ? Math.max(Math.min(dc, effects.skillDCMinimum), shifted)
-    : shifted;
-}
+/** A skill DC after campaign qualities such as Cakewalk or Comedy of Errors (one rule: campaignSkillDC). */
+export const adjustedDC = (dc, effects = {}) => campaignSkillDC(dc, effects);
 
 /** Starting action dice per session after campaign qualities and the Threat Level bonus (minimum 0). */
 export const adjustedStartingDice = (base, effects = {}, threatBonus = 0) =>

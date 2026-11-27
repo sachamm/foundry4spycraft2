@@ -830,6 +830,11 @@ test("Delay counts toward the round's ±10 limit; Press does not (p.324)", () =>
   assert.equal(endOfRound(12, [fluidModifier("finalAttack", { times: 3 })]).delta, -6);
 });
 
+test("a Delay past 10 Counts stands, and the round's end never gives Counts back (p.356)", () => {
+  assert.equal(endOfRound(10, [], { alreadyApplied: -12 }).count, 10);
+  assert.equal(endOfRound(10, [fluidModifier("finalAttack", { times: 3 })], { alreadyApplied: -12 }).delta, 0);
+});
+
 test("a special antagonist's reward shows its four-times multiplier (p.452)", () => {
   assert.deepEqual(antagonistReward({ type: "special", xp: 84 }), { xp: 84, multiplier: 4, total: 336, special: true });
   assert.deepEqual(antagonistReward({ type: "standard", xp: 30 }), {
@@ -838,4 +843,18 @@ test("a special antagonist's reward shows its four-times multiplier (p.452)", ()
     total: 30,
     special: false
   });
+});
+
+test("Cakewalk and Comedy of Errors shift a device's skill DCs, not its Defense (p.406)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const plain = resolveDevice("acid-jet", 5);
+  setCampaignRulesSource(() => ({ skillDC: 5 }));
+  try {
+    const shifted = resolveDevice("acid-jet", 5);
+    if (Number.isFinite(plain.detectDC)) assert.equal(shifted.detectDC, plain.detectDC + 5);
+    if (Number.isFinite(plain.disableDC)) assert.equal(shifted.disableDC, plain.disableDC + 5);
+    assert.equal(shifted.defense, plain.defense);
+  } finally {
+    setCampaignRulesSource(null);
+  }
 });

@@ -73,10 +73,8 @@ export function planSpend(id, context = {}) {
       cost = whole(context.dice, 1) ? context.dice : 1;
       // Comedy of Errors (p.406): a skill error costs at most this many dice to activate.
       const cap = campaignErrorActivationCap();
-      if (context.checkKind !== "attack" && cap !== null && cost > cap) {
-        cost = cap;
-        notes.push(loc`Comedy of Errors: at most ${cap} dice to activate a skill error (p.406).`);
-      }
+      if (context.checkKind !== "attack" && cap !== null && cost > cap)
+        throw new Error(loc`Comedy of Errors: a skill error takes at most ${cap} action dice to activate (p.406).`);
       break;
     }
     case "promote":

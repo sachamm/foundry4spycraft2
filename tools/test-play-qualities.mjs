@@ -60,9 +60,10 @@ test("Comedy of Errors caps skill error activation at 2 dice and slows take 10",
   assert.equal(before.blocked, false, before.reason);
   assert.equal(before.cost, 4);
   withRules({ errorActivationDiceMaximum: 2 }, () => {
-    const capped = criticalPlan({}, check, options);
-    assert.equal(capped.cost, 2);
-    assert.ok(capped.sources.some(line => line.includes("Comedy of Errors")));
+    const refused = criticalPlan({}, check, options);
+    assert.equal(refused.blocked, true, "an effect costing more than the cap cannot be bought");
+    assert.match(refused.reason, /Comedy of Errors/);
+    assert.equal(criticalPlan({}, check, { ...options, baseCost: 2 }).cost, 2);
   });
 });
 

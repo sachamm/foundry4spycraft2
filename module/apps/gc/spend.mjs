@@ -265,15 +265,26 @@ export async function setDramaticScene(dramatic, { source = "scripted" } = {}) {
   return getSceneState();
 }
 
+/**
+ * An opponent of the agents for the dramatic-scene doubling (p.424): a hostile token, or, with no token to say, a
+ * combatant no player owns. Allied and neutral NPCs keep their Counts.
+ */
+export function dramaticOpponent(combatant) {
+  if (combatant.hasPlayerOwner) return false;
+  const disposition = combatant.token?.disposition;
+  const hostile = globalThis.CONST?.TOKEN_DISPOSITIONS?.HOSTILE ?? -1;
+  return Number.isFinite(disposition) ? disposition === hostile : true;
+}
+
 /** Dramatic scene: double each opponent's current Initiative Count, to at most 50 (p.424). Each combatant is doubled once per combat. */
-export async function doubleOpponentInitiative(combat = game.combat) {
+export async function doubleOpponentInitiative(combat = game.combat, { quiet = false } = {}) {
   requireGC();
-  if (!combat) return refuse(loc`There is no active combat.`);
-  if (!isDramaticScene()) return refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
+  if (!combat) return quiet ? [] : refuse(loc`There is no active combat.`);
+  if (!isDramaticScene()) return quiet ? [] : refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
   for (const combatant of combat.combatants) {
     if (
-      combatant.hasPlayerOwner ||
+      !dramaticOpponent(combatant) ||
       !Number.isFinite(combatant.initiative) ||
       combatant.flags?.spycraft2?.dramaticDoubled
     )
@@ -289,6 +300,18 @@ export async function doubleOpponentInitiative(combat = game.combat) {
       whisper: gmWhisper()
     });
   return changed;
+}
+
+/** An opponent who joins or rolls once the scene is dramatic is doubled when it first has a Count (p.424). */
+export function installDramaticInitiative() {
+  Hooks.on("updateCombatant", (combatant, changed) => {
+    if (game.users?.activeGM?.id !== game.user.id || !Object.hasOwn(changed, "initiative")) return;
+    if (!Number.isFinite(changed.initiative) || combatant.flags?.spycraft2?.dramaticDoubled) return;
+    if (!isDramaticScene() || !dramaticOpponent(combatant)) return;
+    doubleOpponentInitiative(combatant.combat, { quiet: true }).catch(error =>
+      console.warn("Field Agent's Handbook | A dramatic Initiative Count was not doubled.", error)
+    );
+  });
 }
 
 /** Mission Caliber increase (p.398): the stored Caliber follows the pool's +2 dice per step. */

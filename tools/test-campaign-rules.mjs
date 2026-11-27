@@ -256,3 +256,15 @@ test("Spirited raises a bonus pool's die when it is spent, not the pool on recor
     assert.equal(spentPoolDie({ npcType: "special" }, 4), 4, "player characters only");
   });
 });
+
+test("Bulletproof and Gritty move Medicine error ranges and DCs (pp.406–407)", () => {
+  withQualities(["gritty"], effects => {
+    const plan = campaignSkillPlan({}, "medicine", { attributes: ["int"] }, {}, effects);
+    assert.equal(plan.errorIncrease, 2);
+    assert.ok(plan.notes.some(note => /DC is 5 higher/.test(note)));
+    assert.equal(campaignSkillPlan({}, "notice", { attributes: ["wis"] }, {}, effects).errorIncrease, 0);
+  });
+  withQualities(["bulletproof"], effects => {
+    assert.equal(campaignSkillPlan({}, "medicine", { attributes: ["int"] }, {}, effects).errorIncrease, -2);
+  });
+});
