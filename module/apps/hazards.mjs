@@ -46,6 +46,8 @@ import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { damageResistancePlan, damageResistanceSource } from "../rules/resistances.mjs";
+import { fireExposurePlan, legacyFireSourcePlan, readFireSource } from "../rules/fire-sources.mjs";
+import { rollFireSourceSave, markFireSourceScarring } from "./fire-sources.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -111,6 +113,16 @@ export function hazardsView(actor) {
       };
     }),
     fire: state.fire,
+    fireSources: Object.entries(state.fireSources ?? {}).map(([id, source]) => ({
+      ...source,
+      id,
+      due: source.suffered >= 25 && !source.scarChecked,
+      canRoll: owned(actor) && source.suffered >= 25 && !source.scarChecked && !source.needsReview && !source.scarRoll,
+      canReview: owned(actor) && game.user?.isGM === true
+    })),
+    fireSourceNeedsAttention: Object.values(state.fireSources ?? {}).some(
+      source => source.needsReview || (!source.scarChecked && source.suffered >= 25)
+    ),
     acid: state.acid,
     exposure: state.exposure
       ? { ...state.exposure, label: DAMAGE_TYPE_LABELS[state.exposure.type] ?? state.exposure.type }
@@ -120,7 +132,12 @@ export function hazardsView(actor) {
       label: SURVIVAL_LABELS[kind] ?? kind,
       saves: entry.saves
     })),
-    any: Object.keys(state.contagions).length > 0 || !!state.fire || !!state.acid || !!state.exposure
+    any:
+      Object.keys(state.contagions).length > 0 ||
+      !!state.fire ||
+      !!state.acid ||
+      !!state.exposure ||
+      Object.keys(state.fireSources ?? {}).length > 0
   };
 }
 
@@ -448,13 +465,28 @@ async function resolveContagionSave(actor, message, save, succeeded) {
 /* -------------------------------------------- */
 
 /** Fire damage taken now: vitality and wounds, matching stress, and the running total for this fire. */
-async function sufferFire(actor, state, damage, reduction, label, hitContext = {}) {
+async function sufferFire(actor, state, damage, reduction, label, hitContext = {}, sourceId, sourceLabel) {
   const resistance = damageResistancePlan(actor.system, "fire", Math.max(0, damage - Math.max(0, reduction))),
     taken = resistance.net,
     stopped = damage > 0 && damage <= Math.max(0, reduction),
+    tracked = sourceId
+      ? fireExposurePlan(state, { id: sourceId, label: sourceLabel ?? loc`Fire`, damage: taken, at: now() })
+      : null,
     bruise = stopped && !resistance.negatesEffects ? await sufferBruise(actor, hitContext) : "",
     loss = await sufferLethal(actor, taken, hitContext),
-    plan = fireDamagePlan(state.fire, taken);
+    plan = tracked
+      ? {
+          fire:
+            state.fire?.sourceId === sourceId
+              ? {
+                  ...state.fire,
+                  suffered: tracked.source?.suffered ?? state.fire.suffered,
+                  scarChecked: tracked.source?.scarChecked ?? state.fire.scarChecked
+                }
+              : state.fire,
+          scarSaveDue: tracked.scarSaveDue
+        }
+      : fireDamagePlan(state.fire, taken);
   if (!loss)
     throw Error(
       loc`Fire damage was not recorded. Review the character's actual health and ownership before continuing.`
@@ -472,13 +504,27 @@ async function sufferFire(actor, state, damage, reduction, label, hitContext = {
   lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses"));
   if (plan.scarSaveDue)
     lines.push(
-      loc`This fire has now done ${plan.fire.suffered} damage: make the Fortitude save (DC ${SCAR_SAVE_DC}) against scarring from the sheet.`
+      loc`This fire has now done ${tracked?.source?.suffered ?? plan.fire.suffered} damage: make the Fortitude save (DC ${SCAR_SAVE_DC}) against scarring from the sheet.`
     );
   if (resistance.resisted) lines.push(loc`Fire resistance prevents ${resistance.resisted} damage.`);
-  return { lines, fire: plan.fire, negatesEffects: resistance.negatesEffects || stopped };
+  return {
+    lines,
+    fire: plan.fire,
+    hazards: tracked?.hazards ?? state,
+    negatesEffects: resistance.negatesEffects || stopped
+  };
 }
 
 /** A fire in the character's square, contact with a fire, or a fire attack: damage now, then a save or catch fire. */
+const fireSourceFields = actor =>
+  `<label>${loc`Fire source`} <select name="sourceId"><option value="">${loc`New fire`}</option>${Object.entries(
+    hazardState(actor.system).fireSources ?? {}
+  )
+    .map(([id, source]) => `<option value="${esc(id)}">${esc(source.label)} (${source.suffered})</option>`)
+    .join(
+      ""
+    )}</select></label><label>${loc`Name for a new fire`} <input name="sourceLabel" value="${esc(loc`Fire`)}" maxlength="100" required /></label>`;
+
 export async function exposeToFire(actor, options = {}) {
   if (!owned(actor)) return null;
   let input = options;
@@ -487,18 +533,23 @@ export async function exposeToFire(actor, options = {}) {
       window: { title: loc`Fire` },
       rejectClose: false,
       ok: { label: loc`Apply` },
-      content: `<div class="spycraft2-roll-options"><label>${loc`The fire's current damage`} <input type="number" name="damage" min="1" step="1" required /></label><label>${loc`Temperature (sets the armor-piercing value)`} <select name="band">${FIRE_AP.map(band => `<option value="${band.id}"${band.id === "t1500" ? " selected" : ""}>${Number.isFinite(band.upTo) ? loc`up to ${band.upTo}°F — AP ${band.ap}` : loc`hotter — AP ${band.ap}`}</option>`).join("")}</select></label><label>${loc`Damage reduction left after armor-piercing`} <input type="number" name="reduction" value="0" min="0" step="1" /></label><label><input type="checkbox" name="save" checked /> ${loc`Ten or more points in the square: roll a Reflex save or catch fire`}</label></div>`
+      content: `<div class="spycraft2-roll-options">${fireSourceFields(actor)}<label>${loc`The fire's current damage`} <input type="number" name="damage" min="1" step="1" required /></label><label>${loc`Temperature (sets the armor-piercing value)`} <select name="band">${FIRE_AP.map(band => `<option value="${band.id}"${band.id === "t1500" ? " selected" : ""}>${Number.isFinite(band.upTo) ? loc`up to ${band.upTo}°F — AP ${band.ap}` : loc`hotter — AP ${band.ap}`}</option>`).join("")}</select></label><label>${loc`Damage reduction left after armor-piercing`} <input type="number" name="reduction" value="0" min="0" step="1" /></label><label><input type="checkbox" name="save" checked /> ${loc`Ten or more points in the square: roll a Reflex save or catch fire`}</label></div>`
     });
     if (!input) return null;
     input = {
-      damage: Math.trunc(Number(input.damage)),
+      sourceId: input.sourceId,
+      sourceLabel: input.sourceLabel,
+      damage: Number(input.damage),
       ap: FIRE_AP.find(band => band.id === input.band)?.ap ?? 0,
-      reduction: Math.trunc(Number(input.reduction) || 0),
+      reduction: Number(input.reduction),
       save: input.save === true
     };
   }
   if (!Number.isSafeInteger(input.damage) || input.damage < 1)
     return refuse(loc`Enter the fire's damage as a whole number.`);
+  if (![input.ap ?? 0, input.reduction ?? 0].every(value => Number.isSafeInteger(value) && value >= 0))
+    return refuse(loc`Enter whole fire armor-piercing and remaining DR, 0 or more.`);
+  const sourceId = input.sourceId || foundry.utils.randomID();
   const state = hazardState(actor.system),
     result = await sufferFire(
       actor,
@@ -506,21 +557,30 @@ export async function exposeToFire(actor, options = {}) {
       input.damage,
       input.reduction ?? 0,
       loc`Fire (AP ${input.ap ?? 0})`,
-      input.hitContext
+      input.hitContext,
+      sourceId,
+      input.sourceLabel ?? loc`Fire`
     );
-  if (result.fire) await writeHazards(actor, { ...state, fire: result.fire });
+  if (result.fire || result.hazards.fireSources) await writeHazards(actor, { ...result.hazards, fire: result.fire });
   await post(actor, result.lines);
   if (result.negatesEffects || input.save === false || input.damage < 10) return true;
   return actor.rollSave("ref", {
     askContext: true,
-    hazardSave: { kind: "fire", label: loc`Catch fire`, dc: input.damage, damage: input.damage, ap: input.ap ?? 0 }
+    hazardSave: {
+      kind: "fire",
+      label: loc`Catch fire`,
+      dc: input.damage,
+      damage: input.damage,
+      ap: input.ap ?? 0,
+      fireSourceId: sourceId
+    }
   });
 }
 
 /** The start of a burning character's round. */
 export async function burningRound(actor, options = {}) {
   if (!owned(actor)) return null;
-  const state = hazardState(actor.system);
+  let state = hazardState(actor.system);
   if (!state.fire) return refuse(loc`This character is not on fire.`);
   let reduction = options.reduction;
   if (reduction === undefined) {
@@ -530,11 +590,22 @@ export async function burningRound(actor, options = {}) {
       content: `<div class="spycraft2-roll-options"><p>${loc`The fire does ${state.fire.damage} damage (AP ${state.fire.ap}).`}</p><label>${loc`Damage reduction left after armor-piercing`} <input type="number" name="reduction" value="0" min="0" step="1" /></label></div>`
     });
     if (!input) return null;
-    reduction = Math.trunc(Number(input.reduction) || 0);
+    reduction = Number(input.reduction);
   }
+  if (!Number.isSafeInteger(reduction) || reduction < 0) return refuse(loc`Enter whole remaining fire DR, 0 or more.`);
+  state = legacyFireSourcePlan(state, foundry.utils.randomID());
   const plan = burningRoundPlan(state),
-    result = await sufferFire(actor, state, plan.damage, reduction, loc`Burning (AP ${state.fire.ap})`);
-  await writeHazards(actor, { ...state, fire: result.negatesEffects ? null : result.fire });
+    result = await sufferFire(
+      actor,
+      state,
+      plan.damage,
+      reduction,
+      loc`Burning (AP ${state.fire.ap})`,
+      {},
+      state.fire.sourceId,
+      state.fireSources[state.fire.sourceId].label
+    );
+  await writeHazards(actor, { ...result.hazards, fire: result.negatesEffects ? null : result.fire });
   if (!result.negatesEffects)
     result.lines.push(
       loc`To do anything but leave the fire, drop prone and roll, make a Will save against DC ${state.fire.damage} (p.337).`
@@ -572,18 +643,27 @@ export async function fightFire(actor, method) {
 }
 
 /** The Will save a burning character needs to act freely, or the Fortitude save against scarring. */
-export async function rollFireSave(actor, kind) {
+export async function rollFireSave(actor, kind, sourceId) {
   if (!owned(actor)) return null;
-  const fire = hazardState(actor.system).fire;
+  const state = hazardState(actor.system),
+    fire = state.fire;
+  if (kind !== "will" && (sourceId || fire?.sourceId)) {
+    try {
+      return await rollFireSourceSave(actor, sourceId || fire.sourceId);
+    } catch (error) {
+      return refuse(error.message);
+    }
+  }
   if (!fire) return null;
-  if (kind === "will")
-    return actor.rollSave("will", {
-      askContext: true,
-      hazardSave: { kind: "burningWill", label: loc`Act while burning`, dc: fire.damage, resolved: true }
-    });
-  return actor.rollSave("fort", {
+  if (kind !== "will") {
+    await writeHazards(actor, legacyFireSourcePlan(state, foundry.utils.randomID()));
+    return refuse(
+      loc`The earlier fire's initial damage is unknown. The GC must review its cumulative total before the scarring save.`
+    );
+  }
+  return actor.rollSave("will", {
     askContext: true,
-    hazardSave: { kind: "scar", label: loc`Scarring`, dc: SCAR_SAVE_DC }
+    hazardSave: { kind: "burningWill", label: loc`Act while burning`, dc: fire.damage, resolved: true }
   });
 }
 
@@ -640,9 +720,15 @@ export async function resolveHazardSave(actor, message) {
   else if (save.kind === "fire") {
     if (succeeded) await post(actor, [loc`The save succeeds: the character does not catch fire.`]);
     else {
+      if (save.fireSourceId) readFireSource(hazardState(actor.system), save.fireSourceId);
       await writeHazards(
         actor,
-        ignitePlan(hazardState(actor.system), { damage: save.damage, ap: save.ap, worldTime: now() })
+        ignitePlan(hazardState(actor.system), {
+          damage: save.damage,
+          ap: save.ap,
+          worldTime: now(),
+          sourceId: save.fireSourceId
+        })
       );
       await post(actor, [
         loc`The save fails: the character is on fire and takes ${save.damage} fire damage as each round begins.`
@@ -659,7 +745,8 @@ export async function resolveHazardSave(actor, message) {
     ]);
   } else if (save.kind === "scar") {
     const state = hazardState(actor.system);
-    if (state.fire) await writeHazards(actor, scarChecked(state));
+    if (save.fireSourceId) await markFireSourceScarring(actor, save);
+    else if (state.fire) await writeHazards(actor, scarChecked(state));
     if (succeeded) await post(actor, [loc`The save succeeds: no scarring.`]);
     else {
       const result = await sufferAttributeLoss(actor, { ability: "cha", permanent: "all" }, 1, loc`Fire scarring`);

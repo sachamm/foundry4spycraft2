@@ -875,6 +875,7 @@ export async function applyDamage(message, options = {}) {
       : 0;
   if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
   if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
+  if (type === "fire" && kind !== "lethal") return refuse(loc`Fire damage must remain lethal.`);
   if (DAMAGE_TYPES[type]?.convertible === false && kind !== "lethal")
     return refuse(loc`Acid and laser damage cannot be converted to subdual or stress damage.`);
   if (!(await markCard(message, "damageApplicationStarted", { targetUuid: target.uuid }, { quiet: true })))
@@ -957,7 +958,15 @@ export async function applyDamage(message, options = {}) {
               : Math.max(0, hit.dr - Math.max(armorPiercing, typedAP === "damage" ? damage : 0));
           result =
             type === "fire"
-              ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true, hitContext })
+              ? await exposeToFire(target, {
+                  damage,
+                  ap: armorPiercing,
+                  reduction,
+                  save: true,
+                  hitContext,
+                  sourceId: message.id,
+                  sourceLabel: weapon?.name ?? loc`Fire`
+                })
               : await sufferTypedDamage(target, {
                   type,
                   amount: damage,

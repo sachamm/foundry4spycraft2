@@ -2105,3 +2105,37 @@ bruise regression then passed with the **55** affected workflow tests. Schema,
 lint, formatting, bundle and copy checks pass. Ongoing acid's DR/source tracking,
 initial fire totals and scarring, wider injury/recovery timing, Drained and the
 remaining creation-choice evidence still constrain the requested final scores.
+
+## Pass 71: Initial fire damage, separate sources and durable scarring
+
+Both areas remain **9.8/10**. Named fire sources now retain actual damage after
+DR/resistance from the first exposure onward. Catching fire carries that initial
+total into later rounds; different fires keep separate totals and a hotter new
+fire uses its own history. Extinguishing, a successful catch-fire save and reload
+preserve any scarring save already owed. Weapon fire cards supply stable source
+identities; the standalone fire dialog can reuse a named fire. Source totals and
+scarring actions remain available on both character sheets without an active
+burning condition. Fire conversion is refused before applying a hit.
+
+A scarring roll reserves its source before dice, reuses an existing card, retains
+posted results after response loss and blocks uncertain replacements. Cancellation
+before a roll releases the unused claim. Actual hazard outcomes remain guarded
+by the existing resolution journal. GC correction records a verified total and
+scarring outcome, rejects stale forms, and retains original dice evidence.
+Legacy burning records preserve known totals but require review of the unknown
+initial damage; no historical starting damage is invented. Delayed catch-fire
+saves cannot recreate a source removed by an earlier correction or Undo.
+
+Native Foundry used controlled manual NPC stat lines. An initial 25 damage was
+retained despite a successful catch-fire save (57). The actual sheet action rolled
+scarring once (63), duplicate requests reused that card, and the actual GC review
+form saved its note. A separate failed catch-fire save retained the initial 12;
+two later rounds reached 36. Extinguishing and reloading preserved both histories.
+The scarring button ended at 483px in a 720px viewport. This run also exposed a
+minimal legacy NPC-profile rendering defect: absent builder arrays/grades now
+render without assigning new choices or changing manual combat values.
+
+All **4,396** Node tests, **988** engine checks and **269** layout cases pass,
+alongside schema, lint, formatting, bundle and copy checks. Continue ongoing acid
+DR/source tracking, remaining secondary-effect/recovery rules, Drained and the
+creation-choice evidence before either requested 9.9 score.

@@ -100,6 +100,7 @@ export function hazardState(system) {
     contagions: { ...(stored?.contagions ?? {}) },
     recovered: [...(stored?.recovered ?? [])],
     fire: stored?.fire ? { ...stored.fire } : null,
+    ...(stored?.fireSources ? { fireSources: { ...stored.fireSources } } : {}),
     // Other damage types and survival saves (module/rules/damage-types.mjs).
     acid: stored?.acid ? { ...stored.acid } : null,
     exposure: stored?.exposure
@@ -251,18 +252,20 @@ const fireDamage = value => {
 };
 
 /** Set a character on fire with the damage that lit them. A hotter fire replaces a cooler one. */
-export function ignitePlan(hazards = empty(), { damage, ap = 0, worldTime = null } = {}) {
+export function ignitePlan(hazards = empty(), { damage, ap = 0, worldTime = null, sourceId } = {}) {
   fireDamage(damage);
   if (damage === 0) return hazards;
   const current = hazards.fire;
+  const source = sourceId ? hazards.fireSources?.[sourceId] : null;
   if (current && current.damage >= damage) return hazards;
   return {
     ...hazards,
     fire: {
       damage,
       ap: Math.max(0, Math.trunc(Number(ap) || 0)),
-      suffered: current?.suffered ?? 0,
-      scarChecked: current?.scarChecked ?? false,
+      suffered: source?.suffered ?? current?.suffered ?? 0,
+      scarChecked: source?.scarChecked ?? current?.scarChecked ?? false,
+      ...(sourceId ? { sourceId } : {}),
       startedAt: current?.startedAt ?? worldTime
     }
   };

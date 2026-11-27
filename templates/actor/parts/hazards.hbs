@@ -16,10 +16,118 @@
     </p>
   {{/if}}
   <p><button type="button" class="sc2-action" data-action="recordUncontrolledFall">{{localize "SPYCRAFT.Hazards.FallWithoutCheck"}}</button></p>
-  <p><b>{{localize "SPYCRAFT.Template.ActorAgentMain.Hazards"}}</b> <button type="button" class="sc2-action" data-action="exposeToContagion">{{localize "SPYCRAFT.Template.ActorAgentMain.ExposeToAContagion"}}</button> <button type="button" class="sc2-action" data-action="exposeToFire">{{localize "SPYCRAFT.Template.ActorAgentMain.FireDamage"}}</button> <button type="button" class="sc2-action" data-action="sufferTypedDamage">{{localize "SPYCRAFT.Template.ActorAgentMain.OtherDamageTypes"}}</button> <button type="button" class="sc2-action" data-action="survivalSave">{{localize "SPYCRAFT.Template.ActorAgentMain.SurvivalSave"}}</button></p>
-  {{#each hazards.contagions}}<p class="hazard{{#if due}} due{{/if}}">{{label}}{{#if doses}} ×{{doses}}{{/if}} — {{phase}}, {{localize "SPYCRAFT.Template.ActorAgentMain.FortitudeDC"}} {{dc}} ({{effect}}); {{#if due}}<b>{{localize "SPYCRAFT.Template.ActorAgentMain.SaveDueNow"}}</b>{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.SaveDueIn"}} {{dueIn}}{{/if}} <button type="button" class="sc2-action" data-action="rollContagionSave" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.RollTheSave"}}</button> <button type="button" class="sc2-action" data-action="cureHazard" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.AntidoteOrEnd"}}</button></p>{{/each}}
-  {{#if hazards.fire}}<p class="hazard due"><b>{{localize "SPYCRAFT.Template.ActorAgentMain.OnFire"}}</b> {{hazards.fire.damage}} ({{localize "SPYCRAFT.Template.ActorAgentMain.ArmorPiercing"}} {{hazards.fire.ap}}; {{localize "SPYCRAFT.Template.ActorAgentMain.TakenFromThisFire"}} {{hazards.fire.suffered}}) <button type="button" class="sc2-action" data-action="burningRound">{{localize "SPYCRAFT.Template.ActorAgentMain.StartOfRound"}}</button> <button type="button" class="sc2-action" data-action="rollFireSave" data-kind="will">{{localize "SPYCRAFT.Template.ActorAgentMain.WillSaveToAct"}}</button> <button type="button" class="sc2-action" data-action="fightFire" data-method="roll">{{localize "SPYCRAFT.Template.ActorAgentMain.RollOnTheGround"}}</button> <button type="button" class="sc2-action" data-action="fightFire" data-method="water">{{localize "SPYCRAFT.Template.ActorAgentMain.Water"}}</button> <button type="button" class="sc2-action" data-action="fightFire" data-method="blanket">{{localize "SPYCRAFT.Template.ActorAgentMain.Blanket"}}</button> <button type="button" class="sc2-action" data-action="fightFire" data-method="extinguisher">{{localize "SPYCRAFT.Template.ActorAgentMain.Extinguisher"}}</button> <button type="button" class="sc2-action" data-action="rollFireSave" data-kind="scar">{{localize "SPYCRAFT.Template.ActorAgentMain.ScarringSave"}}</button>{{#if isGM}} <button type="button" class="sc2-action" data-action="extinguishFire">{{localize "SPYCRAFT.Template.ActorAgentMain.FireIsOut"}}</button>{{/if}}</p>{{/if}}
-  {{#if hazards.acid}}<p class="hazard due"><b>{{localize "SPYCRAFT.Template.ActorAgentMain.Acid"}}</b> {{hazards.acid.damage}} ({{localize "SPYCRAFT.Template.ActorAgentMain.TakenFromThisAcid"}} {{hazards.acid.suffered}}) <button type="button" class="sc2-action" data-action="acidStep" data-step="round">{{localize "SPYCRAFT.Template.ActorAgentMain.StartOfRound"}}</button> <button type="button" class="sc2-action" data-action="acidStep" data-step="end">{{localize "SPYCRAFT.Template.ActorAgentMain.EndOfRoundHalve"}}</button> <button type="button" class="sc2-action" data-action="acidStep" data-step="wash">{{localize "SPYCRAFT.Template.ActorAgentMain.WashItOff"}}</button> <button type="button" class="sc2-action" data-action="acidStep" data-step="injury">{{localize "SPYCRAFT.Template.ActorAgentMain.ScarringSave"}}</button></p>{{/if}}
-  {{#if hazards.exposure}}<p class="hazard">{{hazards.exposure.label}} — {{hazards.exposure.source}}: {{hazards.exposure.suffered}} {{localize "SPYCRAFT.Template.ActorAgentMain.DamageSoFar"}} <button type="button" class="sc2-action" data-action="exposureFailedSave">{{localize "SPYCRAFT.Template.ActorAgentMain.FailedSubdualSave"}}</button> <button type="button" class="sc2-action" data-action="endTypedExposure">{{localize "SPYCRAFT.Template.ActorAgentMain.ClearOfTheSource"}}</button></p>{{/if}}
-  {{#each hazards.survival}}<p class="hazard">{{label}}: {{saves}} {{localize "SPYCRAFT.Template.ActorAgentMain.SavesMade"}} <button type="button" class="sc2-action" data-action="endSurvivalHazard" data-kind="{{kind}}">{{localize "SPYCRAFT.Template.ActorAgentMain.HazardOver"}}</button></p>{{/each}}
+  <p>
+  <b>
+  {{localize "SPYCRAFT.Template.ActorAgentMain.Hazards"}}
+  </b>
+  <button type="button" class="sc2-action" data-action="exposeToContagion">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.ExposeToAContagion"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="exposeToFire">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.FireDamage"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="sufferTypedDamage">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.OtherDamageTypes"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="survivalSave">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.SurvivalSave"}}
+  </button>
+  </p>
+  {{#each hazards.contagions}}
+  <p class="hazard{{#if due}} due{{/if}}">
+  {{label}}{{#if doses}} ×{{doses}}{{/if}} — {{phase}}, {{localize "SPYCRAFT.Template.ActorAgentMain.FortitudeDC"}} {{dc}} ({{effect}}); {{#if due}}
+  <b>
+  {{localize "SPYCRAFT.Template.ActorAgentMain.SaveDueNow"}}
+  </b>
+  {{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.SaveDueIn"}} {{dueIn}}{{/if}} <button type="button" class="sc2-action" data-action="rollContagionSave" data-id="{{id}}">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.RollTheSave"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="cureHazard" data-id="{{id}}">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.AntidoteOrEnd"}}
+  </button>
+  </p>
+  {{/each}}
+  {{#if hazards.fire}}
+  <p class="hazard due">
+  <b>
+  {{localize "SPYCRAFT.Template.ActorAgentMain.OnFire"}}
+  </b> {{hazards.fire.damage}} ({{localize "SPYCRAFT.Template.ActorAgentMain.ArmorPiercing"}} {{hazards.fire.ap}}; {{localize "SPYCRAFT.Template.ActorAgentMain.TakenFromThisFire"}} {{hazards.fire.suffered}}) <button type="button" class="sc2-action" data-action="burningRound">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.StartOfRound"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="rollFireSave" data-kind="will">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.WillSaveToAct"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="fightFire" data-method="roll">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.RollOnTheGround"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="fightFire" data-method="water">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.Water"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="fightFire" data-method="blanket">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.Blanket"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="fightFire" data-method="extinguisher">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.Extinguisher"}}
+  </button> {{#unless hazards.fire.sourceId}}{{#unless hazards.fire.scarChecked}}
+  <button type="button" class="sc2-action" data-action="rollFireSave" data-kind="scar">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.ScarringSave"}}
+  </button>
+  {{/unless}}{{/unless}}{{#if isGM}} <button type="button" class="sc2-action" data-action="extinguishFire">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.FireIsOut"}}
+  </button>
+  {{/if}}
+  </p>
+  {{/if}}
+  {{#if hazards.acid}}
+  <p class="hazard due">
+  <b>
+  {{localize "SPYCRAFT.Template.ActorAgentMain.Acid"}}
+  </b> {{hazards.acid.damage}} ({{localize "SPYCRAFT.Template.ActorAgentMain.TakenFromThisAcid"}} {{hazards.acid.suffered}}) <button type="button" class="sc2-action" data-action="acidStep" data-step="round">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.StartOfRound"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="acidStep" data-step="end">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.EndOfRoundHalve"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="acidStep" data-step="wash">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.WashItOff"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="acidStep" data-step="injury">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.ScarringSave"}}
+  </button>
+  </p>
+  {{/if}}
+  {{#if hazards.exposure}}
+  <p class="hazard">
+  {{hazards.exposure.label}} — {{hazards.exposure.source}}: {{hazards.exposure.suffered}} {{localize "SPYCRAFT.Template.ActorAgentMain.DamageSoFar"}} <button type="button" class="sc2-action" data-action="exposureFailedSave">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.FailedSubdualSave"}}
+  </button>
+  <button type="button" class="sc2-action" data-action="endTypedExposure">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.ClearOfTheSource"}}
+  </button>
+  </p>
+  {{/if}}
+  {{#each hazards.survival}}
+  <p class="hazard">
+  {{label}}: {{saves}} {{localize "SPYCRAFT.Template.ActorAgentMain.SavesMade"}} <button type="button" class="sc2-action" data-action="endSurvivalHazard" data-kind="{{kind}}">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.HazardOver"}}
+  </button>
+  </p>
+  {{/each}}
+  {{#if hazards.fireSources.length}}
+    <details {{#if hazards.fireSourceNeedsAttention}}open{{/if}}>
+      <summary>{{localize "SPYCRAFT.Hazards.FireSources"}}</summary>
+      {{#each hazards.fireSources}}
+        <p class="hazard{{#if due}} due{{/if}}"><b>{{label}}</b> — {{localize "SPYCRAFT.Hazards.FireDamageTotal" amount=suffered}}
+          {{#if needsReview}}{{localize "SPYCRAFT.Hazards.FireHistoryReview"}}{{/if}}
+          {{#if scarChecked}}{{localize "SPYCRAFT.Hazards.FireScarringResolved"}}{{else}}{{#if scarRoll}}{{localize "SPYCRAFT.Hazards.FireScarringPending"}}{{/if}}{{/if}}
+  {{#if canRoll}}
+  <button type="button" class="sc2-action" data-action="rollFireSave" data-kind="scar" data-fire-source="{{id}}">
+  {{localize "SPYCRAFT.Template.ActorAgentMain.ScarringSave"}}
+  </button>
+  {{/if}}
+          {{#if canReview}}<button type="button" class="sc2-action" data-action="reviewFireSource" data-fire-source="{{id}}">{{localize "SPYCRAFT.Hazards.ReviewFireSource"}}</button>{{/if}}
+        </p>
+      {{/each}}
+    </details>
+  {{/if}}
 </div>

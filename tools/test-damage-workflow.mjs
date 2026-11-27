@@ -1345,6 +1345,231 @@ test("pending typed bruising refuses changed or unknown original resistance befo
   assert.equal(actor.flags.spycraft2?.nonLethal, undefined);
 });
 
+test("fire conversion is refused before reserving an application or changing health", async () => {
+  reset();
+  const actor = character("Fire-conversion", { vitality: { value: 100, max: 100 } });
+  const message = card("fire-conversion", { checkKind: "damage", effectiveTotal: 20 });
+  assert.equal(
+    await applyDamage(message, { targetUuid: actor.uuid, damage: 20, type: "fire", kind: "subdual" }),
+    false
+  );
+  assert.equal(actor.system.vitality.value, 100);
+  assert.equal(message.flags.spycraft2.damageApplicationStarted, undefined);
+  assert.ok(warnings.some(w => /Fire damage must remain lethal/.test(w)));
+});
+
+test("initial fire damage remains owed for scarring even after a successful catch-fire save", async () => {
+  reset();
+  const { exposeToFire, rollFireSave } = await import("../module/apps/hazards.mjs");
+  const actor = character("Initial-fire", {
+    npcType: "special",
+    vitality: { value: 500, max: 500 },
+    wounds: { value: 30, max: 30 },
+    stressThreshold: 1000,
+    survivalStats: { resistances: { FR: 5 }, resistanceSources: [] }
+  });
+  actor.type = "npc";
+  const saves = [];
+  actor.rollSave = async (key, options) => {
+    const save = options.hazardSave;
+    if (save.kind === "scar")
+      assert.equal(actor.system.hazards.fireSources.room.scarRoll.state, "started", "intent saved before dice");
+    const message = card(`initial-fire-${saves.length}`, {
+      actorUuid: actor.uuid,
+      checkKind: "save",
+      checkId: key,
+      hazardSave: save,
+      effectiveTotal: save.dc + 1,
+      successConfirmed: true,
+      resolved: true
+    });
+    saves.push(message);
+    game.messages.push(message);
+    return message;
+  };
+  await exposeToFire(actor, { damage: 30, reduction: 0, sourceId: "room", sourceLabel: "Room fire" });
+  await resolveHazardSave(actor, saves[0]);
+  assert.equal(actor.system.hazards.fire, null);
+  assert.equal(actor.system.hazards.fireSources.room.suffered, 25);
+  const scar = await rollFireSave(actor, "scar", "room");
+  assert.equal(scar.flags.spycraft2.hazardSave.dc, 15);
+  assert.equal(await rollFireSave(actor, "scar", "room"), scar);
+  assert.equal(saves.length, 2, "repeat scarring clicks reuse the original card");
+  await resolveHazardSave(actor, scar);
+  assert.equal(actor.system.hazards.fireSources.room.scarChecked, true);
+  await resolveHazardSave(actor, scar);
+  assert.equal(saves.length, 2);
+});
+
+test("catching fire preserves its initial damage and later ticks without merging separate fires", async () => {
+  reset();
+  const { exposeToFire, burningRound, extinguish } = await import("../module/apps/hazards.mjs");
+  const actor = character("Cumulative-fire", {
+    npcType: "special",
+    vitality: { value: 500, max: 500 },
+    wounds: { value: 30, max: 30 },
+    stressThreshold: 1000
+  });
+  actor.type = "npc";
+  let save;
+  actor.rollSave = async (key, options) =>
+    (save = card("cumulative-ref", {
+      actorUuid: actor.uuid,
+      checkKind: "save",
+      checkId: key,
+      hazardSave: options.hazardSave,
+      effectiveTotal: 0,
+      successConfirmed: false,
+      resolved: true
+    }));
+  await exposeToFire(actor, { damage: 12, reduction: 0, sourceId: "room", sourceLabel: "Room" });
+  await resolveHazardSave(actor, save);
+  assert.equal(actor.system.hazards.fire.suffered, 12);
+  await burningRound(actor, { reduction: 2 });
+  await burningRound(actor, { reduction: 2 });
+  assert.equal(actor.system.hazards.fire.suffered, 32);
+  assert.equal(actor.system.hazards.fireSources.room.suffered, 32);
+  await exposeToFire(actor, { damage: 8, reduction: 0, save: false, sourceId: "other", sourceLabel: "Other" });
+  assert.equal(actor.system.hazards.fireSources.room.suffered, 32);
+  assert.equal(actor.system.hazards.fireSources.other.suffered, 8);
+  assert.equal(actor.system.hazards.fire.suffered, 32);
+  await extinguish(actor);
+  assert.equal(actor.system.hazards.fire, null);
+  assert.equal(actor.system.hazards.fireSources.room.suffered, 32);
+});
+
+test("scarring claims retain posted rolls after lost responses and block uncertain replacement dice", async () => {
+  const { rollFireSourceSave } = await import("../module/apps/fire-sources.mjs");
+  for (const postedFirst of [true, false]) {
+    reset();
+    const actor = character(`Lost-scar-${postedFirst}`, {
+      hazards: {
+        fireSources: { fire: { label: "Fire", suffered: 25, scarChecked: false, needsReview: false, startedAt: 0 } }
+      }
+    });
+    let rolls = 0,
+      original;
+    actor.rollSave = async (key, options) => {
+      rolls++;
+      if (postedFirst) {
+        original = card(`scar-${postedFirst}`, {
+          actorUuid: actor.uuid,
+          checkKind: "save",
+          checkId: key,
+          hazardSave: options.hazardSave
+        });
+        game.messages.push(original);
+      }
+      throw Error("Connection lost after dice");
+    };
+    if (postedFirst) {
+      assert.equal(await rollFireSourceSave(actor, "fire"), original);
+      assert.equal(await rollFireSourceSave(actor, "fire"), original);
+    } else {
+      await assert.rejects(rollFireSourceSave(actor, "fire"), /Connection lost/);
+      await assert.rejects(rollFireSourceSave(actor, "fire"), /needs GC review/);
+    }
+    assert.equal(rolls, 1);
+  }
+});
+
+test("a cancelled scarring dialog releases its unused claim, while concurrent clicks cannot roll twice", async () => {
+  const { rollFireSourceSave } = await import("../module/apps/fire-sources.mjs");
+  const actor = character("Concurrent-scar", {
+    hazards: {
+      fireSources: { fire: { label: "Fire", suffered: 25, scarChecked: false, needsReview: false, startedAt: 0 } }
+    }
+  });
+  actor.rollSave = async () => null;
+  assert.equal(await rollFireSourceSave(actor, "fire"), null);
+  assert.equal(actor.system.hazards.fireSources.fire.scarRoll, undefined);
+  let resolve, started;
+  const ready = new Promise(r => (started = r));
+  actor.rollSave = async (key, options) => {
+    started();
+    await new Promise(r => (resolve = r));
+    return card("concurrent-scar-original", {
+      actorUuid: actor.uuid,
+      checkKind: "save",
+      checkId: key,
+      hazardSave: options.hazardSave
+    });
+  };
+  const first = rollFireSourceSave(actor, "fire");
+  await ready;
+  await assert.rejects(rollFireSourceSave(actor, "fire"), /needs GC review/);
+  resolve();
+  assert.ok(await first);
+});
+
+test("a fire review cannot overwrite damage that changed while its dialog was open", async () => {
+  const { reviewFireSource } = await import("../module/apps/fire-sources.mjs");
+  const oldInput = foundry.applications.api.DialogV2.input,
+    oldUser = game.user,
+    oldTime = game.time;
+  game.user = { id: "gc", isGM: true };
+  game.time = { worldTime: 0 };
+  const actor = character("Stale-fire-review", {
+    hazards: { fireSources: { fire: { label: "Fire", suffered: 25, scarChecked: false, needsReview: false } } }
+  });
+  let finish, opened;
+  const ready = new Promise(r => (opened = r));
+  foundry.applications.api.DialogV2.input = async () => {
+    opened();
+    return new Promise(r => (finish = r));
+  };
+  try {
+    const review = reviewFireSource(actor, "fire");
+    await ready;
+    actor.system.hazards.fireSources.fire.suffered = 30;
+    finish({ label: "Fire", suffered: "25", scarChecked: false, note: "Verified the earlier total" });
+    await assert.rejects(review, /changed while this review was open/);
+    assert.equal(actor.system.hazards.fireSources.fire.suffered, 30);
+  } finally {
+    foundry.applications.api.DialogV2.input = oldInput;
+    game.user = oldUser;
+    game.time = oldTime;
+  }
+});
+
+test("invalid fire source evidence is refused before even DR-stopped bruising", async () => {
+  const { exposeToFire } = await import("../module/apps/hazards.mjs");
+  const actor = character("Invalid-fire-evidence", { npcType: "special", vitality: { value: 100, max: 100 } });
+  actor.type = "npc";
+  await assert.rejects(
+    exposeToFire(actor, { damage: 2, reduction: 5, sourceId: "__proto__", sourceLabel: "Invalid" }),
+    /Choose a named fire/
+  );
+  assert.equal(actor.system.vitality.value, 100);
+  assert.equal(actor.flags.spycraft2?.nonLethal, undefined);
+});
+
+test("a delayed catch-fire save cannot recreate a removed source", async () => {
+  const { exposeToFire } = await import("../module/apps/hazards.mjs");
+  const actor = character("Removed-fire-source", {
+    npcType: "special",
+    vitality: { value: 100, max: 100 },
+    wounds: { value: 20, max: 20 },
+    stressThreshold: 1000
+  });
+  actor.type = "npc";
+  let save;
+  actor.rollSave = async (key, options) =>
+    (save = card("removed-fire-ref", {
+      actorUuid: actor.uuid,
+      checkKind: "save",
+      checkId: key,
+      hazardSave: options.hazardSave,
+      effectiveTotal: 0,
+      successConfirmed: false,
+      resolved: true
+    }));
+  await exposeToFire(actor, { damage: 12, reduction: 0, sourceId: "removed", sourceLabel: "Removed fire" });
+  delete actor.system.hazards.fireSources.removed;
+  await assert.rejects(resolveHazardSave(actor, save), /Review this fire's name/);
+  assert.equal(actor.system.hazards.fire, null);
+});
+
 test("ongoing acid and fire use current resistance and count only damage that gets through", async () => {
   reset();
   const { acidStep, sufferTypedDamage } = await import("../module/apps/damage-types.mjs");

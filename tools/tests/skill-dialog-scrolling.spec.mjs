@@ -3,6 +3,8 @@ import { createAnalysisTaskPlan } from "../../module/rules/analysis-tasks.mjs";
 import { taskPressureUseSpec } from "../../module/rules/task-pressure.mjs";
 import { readFileSync } from "node:fs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
+import { reviewFireSource } from "../../module/apps/fire-sources.mjs";
+import { exposeToFire } from "../../module/apps/hazards.mjs";
 import { SPYCRAFT as cfg } from "../../module/config.mjs";
 import { ActorProgression } from "../../module/documents/actor/progression.mjs";
 import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
@@ -1174,6 +1176,68 @@ async function render(page, height, markup = content) {
     })
   );
 }
+test("fire-source selection keeps fifteen named fires and the final action reachable at 720px", async ({ page }) => {
+  const prior = content;
+  try {
+    const fireSources = Object.fromEntries(
+      Array.from({ length: 15 }, (_, i) => [
+        `fire${i}`,
+        { label: `Warehouse fire ${i}: loading bay and upper storage`, suffered: i, scarChecked: false }
+      ])
+    );
+    await exposeToFire({ isOwner: true, system: { hazards: { fireSources } } });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await expect(page.locator('[name="sourceId"] option')).toHaveCount(16);
+    await page.locator('[name="sourceId"]').selectOption("fire14");
+    await page.locator('[name="damage"]').fill("25");
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  } finally {
+    content = prior;
+  }
+});
+
+test("fire-history review keeps cumulative damage, prior scarring and the GC note reachable at 720px", async ({
+  page
+}) => {
+  const prior = content,
+    oldGame = game;
+  try {
+    globalThis.game = { ...game, user: { id: "gc", isGM: true } };
+    await reviewFireSource(
+      {
+        isOwner: true,
+        system: {
+          hazards: {
+            fireSources: {
+              legacy: { label: "Earlier warehouse fire", suffered: 12, scarChecked: false, needsReview: true }
+            }
+          }
+        }
+      },
+      "legacy"
+    );
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.locator('[name="suffered"]').fill("32");
+    await page
+      .locator('[name="note"]')
+      .fill("Verified initial damage and later rounds; no scarring dice have been rolled.");
+    await expect(page.locator('[name="scarChecked"]')).toBeVisible();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("expert entry review remains reachable at720px", async ({ page }) => {
   const prior = content,
     oldGame = globalThis.game;

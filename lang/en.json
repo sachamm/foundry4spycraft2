@@ -93,6 +93,12 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Hazards": {
+   "FireSources": "Fire damage sources",
+   "FireDamageTotal": "Fire damage suffered: {amount}.",
+   "FireHistoryReview": "Earlier fire damage needs GC review.",
+   "FireScarringResolved": "Scarring save resolved.",
+   "FireScarringPending": "Scarring save already started. Keep its original dice and outcome.",
+   "ReviewFireSource": "Review fire damage",
    "InterruptedResult": "interrupted result",
    "SourceMissing": "Original chat card missing.",
    "ReviewInterrupted": "Review interrupted result",

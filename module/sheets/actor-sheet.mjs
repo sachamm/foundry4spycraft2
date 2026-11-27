@@ -85,6 +85,7 @@ import {
   rollFireSave
 } from "../apps/hazards.mjs";
 import { takeMobileOffense } from "../apps/mobile-offense.mjs";
+import { reviewFireSource } from "../apps/fire-sources.mjs";
 import { takeContempt } from "../apps/contempt.mjs";
 import { takeCombatInstincts } from "../apps/combat-instincts.mjs";
 import { takeDropFollowUp, reviewTriggeredAttacks } from "../apps/drop-follow-up.mjs";
@@ -543,7 +544,10 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         return reviewHazardResolution(this.actor, target.dataset.hazard);
       },
       rollFireSave(event, target) {
-        return rollFireSave(this.actor, target.dataset.kind);
+        return rollFireSave(this.actor, target.dataset.kind, target.dataset.fireSource);
+      },
+      reviewFireSource(event, target) {
+        return reviewFireSource(this.actor, target.dataset.fireSource);
       },
       planAmmunition(event, target) {
         return planAmmunitionStockpile(this.actor.items.get(target.closest("[data-item-id]").dataset.itemId));
@@ -1986,7 +1990,10 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         return reviewHazardResolution(this.actor, target.dataset.hazard);
       },
       rollFireSave(event, target) {
-        return rollFireSave(this.actor, target.dataset.kind);
+        return rollFireSave(this.actor, target.dataset.kind, target.dataset.fireSource);
+      },
+      reviewFireSource(event, target) {
+        return reviewFireSource(this.actor, target.dataset.fireSource);
       },
       acidStep(event, target) {
         return acidStep(this.actor, target.dataset.step);
@@ -2134,10 +2141,10 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         .map(([key, label]) => ({
           key,
           label: key === "health" ? (result.type === "special" ? loc`Vitality / wounds` : loc`Damage save`) : label,
-          value: profile.grades[key],
+          value: profile.grades?.[key],
           options: key === "wealth" ? { 0: loc`None`, ...gradeOptions } : gradeOptions
         })),
-      skills: profile.skills.map((s, index) => ({
+      skills: (profile.skills ?? []).map((s, index) => ({
         ...s,
         index,
         resolved: result.skills?.[index],
@@ -2145,14 +2152,14 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       })),
       equipment: NPC_CATEGORIES.map(category => ({
         category,
-        picks: (profile.equipment[category] ?? []).map((caliber, index) => ({ caliber, index, category }))
+        picks: (profile.equipment?.[category] ?? []).map((caliber, index) => ({ caliber, index, category }))
       })),
       qualityOptions: Object.fromEntries(
         NPC_RULES.qualities
           .filter(q => q.types.includes(result.type) && q.mode !== "dedicated")
           .map(q => [q.id, `${q.name} (${q.costLabel})`])
       ),
-      qualities: profile.qualities.map((q, index) => {
+      qualities: (profile.qualities ?? []).map((q, index) => {
         const rule = NPC_RULES.qualities.find(r => r.id === q.id);
         return {
           ...q,

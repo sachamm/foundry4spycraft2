@@ -150,7 +150,19 @@ export const RECORD_SHAPES = {
       ap: "number",
       suffered: "number",
       scarChecked: "boolean",
+      sourceId: "string",
       startedAt: "null|number"
+    },
+    fireSources: {
+      "*": {
+        label: "string",
+        suffered: "number",
+        scarChecked: "boolean",
+        needsReview: "boolean",
+        startedAt: "null|number",
+        scarRoll: { attempt: "string", state: "string", messageUuid: "null|string" },
+        review: { note: "string", reviewer: "string", at: "number" }
+      }
     },
     acid: {
       $also: "null",

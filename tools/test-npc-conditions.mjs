@@ -138,6 +138,19 @@ test("manual NPCs expose actual skill-condition/save context without replacing t
   assert.equal(m.conditionContext.baffled, true);
 });
 
+test("a minimal legacy manual profile can render its sheet without inventing missing builder choices", () => {
+  const m = model();
+  m.npcProfile = { enabled: false };
+  m.bab = 7;
+  m.prepareDerivedData();
+  const view = new SpycraftNpcSheet({ system: m, statuses: m.parent.statuses })._npcContext();
+  assert.deepEqual(view.skills, []);
+  assert.deepEqual(view.qualities, []);
+  assert.deepEqual(view.profile, { enabled: false });
+  assert.equal(m.bab, 7);
+  assert.ok(view.grades.every(row => row.value === undefined));
+});
+
 test("NPC armor prepares protection and penalties once across health types and manual/profile preparation", () => {
   for (const enabled of [true, false])
     for (const npcType of ["standard", "special", "animal"]) {
