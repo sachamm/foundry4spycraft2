@@ -310,8 +310,8 @@ rollPipeline.register({
   id: "campaignQualitySkillTerm",
   kinds: ["skill"],
   order: 9320,
-  terms({ system, skillKey, check, input }) {
-    const plan = campaignSkillPlan(system, skillKey, check, input ?? {});
+  terms({ system, skillKey, check, input, ability }) {
+    const plan = campaignSkillPlan(system, skillKey, check, { ...(input ?? {}), ...(ability ? { ability } : {}) });
     return {
       ...skillPlanTerm("campaignQuality", plan, { noteAt: 990, bonusAt: 990 }),
       errorIncrease: plan.errorIncrease

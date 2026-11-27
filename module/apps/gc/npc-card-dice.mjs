@@ -11,7 +11,8 @@
 import { triumphAt } from "../../rules/check-candidates.mjs";
 import { rollPipeline } from "../../rules/roll-pipeline.mjs";
 import { gcDieType } from "../../rules/gc/gc-spend.mjs";
-import { spendProfile } from "./npc-play.mjs";
+import { npcIsSpecial, spendProfile } from "./npc-play.mjs";
+import { threatsAutoActivate } from "../../rules/campaign-rules.mjs";
 import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
@@ -63,6 +64,14 @@ export async function gcBoostCard(message, actor) {
 /** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */
 export async function gcActivateThreat(message, actor) {
   const check = message.flags.spycraft2;
+  // Bloodbath (p.406): a special character's attack threat becomes a critical hit without paying a die.
+  if (check.checkKind === "attack" && threatsAutoActivate() && actor && npcIsSpecial(actor)) {
+    await message.update({
+      "flags.spycraft2.criticalSuccess": true,
+      "flags.spycraft2.criticalActivation": { cost: 0, payer: "gc", source: "Bloodbath" }
+    });
+    return true;
+  }
   const result = await spendGCDice({
     id: "activateThreat",
     actor,

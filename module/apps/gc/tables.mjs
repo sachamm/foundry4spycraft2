@@ -226,7 +226,13 @@ export async function npcKnowledgeDialog() {
   if (!input) return null;
   const actor = input.npc ? game.actors.get(input.npc) : null,
     profile = actor?.system?.npcProfile ?? {},
-    role = input.role || knowledgeRole({ qualities: profile.qualities, npcType: actor?.system?.npcType }),
+    // As spendProfile does: a graded NPC's role is among its qualities, a hand-built one names it as its manual role.
+    roleQualities = profile.enabled
+      ? (profile.qualities ?? [])
+      : actor?.system?.manualRole
+        ? [{ id: actor.system.manualRole }]
+        : [],
+    role = input.role || knowledgeRole({ qualities: roleQualities, npcType: actor?.system?.npcType }),
     competence = actor && profile.enabled ? (profile.grades?.competence ?? 1) : Number(input.competence) || 1;
   if (!Number.isFinite(Number(input.team)) || !Number.isFinite(Number(input.npcResult)))
     return refuse(loc`Enter both check results, then ask again.`);

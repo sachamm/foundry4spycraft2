@@ -280,7 +280,9 @@ export function gearAcquisitionPlan(
       loc`Procure requires the earned Intruder option, a city of at least 10,000 people and quick communication (pp.30,38).`
     );
   // Shoe-String Budget (p.408): picks pushed below Caliber I are lost, so an ordinary Request has nothing to draw on.
-  if (!benefit?.ignoreMissionCaliber && !useProcure && campaignGearCaliber(record.caliber).lost)
+  // Procure's +1 and the campaign's shift both apply before the ceiling is clamped to Calibers I–V.
+  const ceiling = campaignGearCaliber(record.caliber + (useProcure ? 1 : 0));
+  if (!benefit?.ignoreMissionCaliber && ceiling.lost)
     throw new Error(
       loc`Shoe-String Budget takes this mission's Reserve picks below Caliber I, so they are lost (p.408).`
     );
@@ -290,7 +292,7 @@ export function gearAcquisitionPlan(
     !Number.isSafeInteger(caliber) ||
     caliber < 1 ||
     caliber > maxCaliber ||
-    (!benefit?.ignoreMissionCaliber && caliber > campaignGearCaliber(record.caliber).caliber + (useProcure ? 1 : 0))
+    (!benefit?.ignoreMissionCaliber && caliber > ceiling.caliber)
   )
     throw new Error(
       maxCaliber === 5

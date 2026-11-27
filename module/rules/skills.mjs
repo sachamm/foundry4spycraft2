@@ -306,8 +306,6 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     grappleContextConfirmed
   });
   check = restraint.check;
-  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
-  const terms = planTerms("skill", { system, skillKey: key, check, method, input });
   const conditionSystem =
     bound === true ? { ...system, conditionContext: { ...system.conditionContext, bound: true } } : system;
   const originalAbility =
@@ -315,6 +313,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const accordingEligible = (system.classLevels?.schemer ?? 0) >= 4;
   const substituted = !!allAccordingToPlan && accordingEligible,
     selected = substituted ? "int" : originalAbility;
+  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
+  // They see the attribute the check actually uses, after any substitution.
+  const terms = planTerms("skill", { system, skillKey: key, check, method, input, ability: selected });
   const originalRow = skill.totals.find(t => t.ability === originalAbility),
     originalTotal =
       originalRow?.normalSkillBonus ?? originalRow?.total - skillConditionCheckPenalty(system, originalAbility);

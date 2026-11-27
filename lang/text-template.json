@@ -2955,6 +2955,7 @@
    "FallGuyEachCollisionDamageDie_0kysccm": "Fall Guy: each collision damage die is 2 lower (minimum 1 per die); lower the damage entered if that was not done.",
    "FallGuyEachFallingDamageDie_1rf2o1u": "Fall Guy: each falling damage die is 2 lower (minimum 1 per die).",
    "FallOfFtDamageArmorPiercing_0jg9l5z": "Fall of {0} ft.: {1} = {2}{3}{4}: {5} {6} damage, armor piercing {7}.",
+   "Fall_110arbw": "Fall: {0}",
    "FallingCheck_1sacxsw": "Falling Check",
    "FallingDamageAfterDamageReductionThe_0onpuip": "Falling: {0} damage after damage reduction {1}; the GC applies it (a standard character makes a Damage save).",
    "FallingDamageAfterDamageReductionVitalit_0eyyh39": "Falling: {0} damage after damage reduction {1}, vitality −{2}, wounds −{3}.",
