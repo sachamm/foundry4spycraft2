@@ -1,6 +1,7 @@
 import { equipmentCategory } from "./gear.mjs";
 import { currentReserves, missionEpoch } from "./gear-acquisition.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignPickCaliber } from "./campaign-gear.mjs";
 /** Reviewed mission-pick exceptions. Upgrade buying/effects at Caliber V remain separate. */
 export const MISSION_CALIBER_SOURCES = {
   heavilyArmed: {
@@ -90,13 +91,15 @@ export function missionCaliberMatches(system, item) {
     !!source &&
     missionCaliberSourceActive(system, stamp.source) &&
     !!mission &&
+    Number.isSafeInteger(mission.caliber) &&
+    mission.caliber >= 1 &&
     mission.caliber < 5 &&
     stamp.epoch === epoch &&
     record?.epoch === epoch &&
     recordItemIds(record).slice(0, missionCaliberLimit(system, stamp.source)).includes(item.id) &&
     record.missionCaliber === mission.caliber &&
     eligibleItem(system, item, source) &&
-    item.system.caliber <= mission.caliber + 1
+    item.system.caliber <= campaignPickCaliber(Math.min(5, mission.caliber + 1), system.campaignEffects).caliber
   );
 }
 export function missionCaliberOptions(system, items = []) {
@@ -155,6 +158,8 @@ export function missionCaliberPlan(system, items, { source: key, itemId, intelCo
     throw new Error(loc`Choose an earned mission-Caliber ability.`);
   if (!intelConfirmed) throw new Error(loc`Confirm this item was chosen as mission gear during Intel.`);
   if (!mission) throw new Error(loc`Record mission Caliber in reserve setup first; zero reserves are allowed.`);
+  if (!Number.isSafeInteger(mission.caliber) || mission.caliber < 1 || mission.caliber > 5)
+    throw new Error(loc`Review the recorded mission Caliber before assigning an exception.`);
   if (mission.caliber === 5)
     throw new Error(
       loc`${source.name} grants extra upgrades at Caliber V instead; upgrade purchasing and effects require separate adjudication.`
@@ -172,9 +177,10 @@ export function missionCaliberPlan(system, items, { source: key, itemId, intelCo
     throw new Error(loc`${source.name} has already been selected this mission.`);
   if (ids.includes(itemId)) throw new Error(loc`This pick has already been selected for this ability.`);
   const item = items.find(i => i.id === itemId);
-  if (!eligibleItem(system, item, source) || item.system.caliber > mission.caliber + 1)
+  const maximumCaliber = campaignPickCaliber(Math.min(5, mission.caliber + 1), system.campaignEffects).caliber;
+  if (!eligibleItem(system, item, source) || item.system.caliber > maximumCaliber)
     throw new Error(
-      loc`Choose one paid ${source.category === "*" ? "matching-category" : source.category} mission pick at most one Caliber above the mission.`
+      loc`Choose one paid ${source.category === "*" ? "matching-category" : source.category} mission pick within this ability's adjusted Caliber limit (${maximumCaliber}).`
     );
   if ((item.system.quantity ?? 1) < 1 || (item.system.quantity ?? 1) > (item.system.bundleSize ?? 1))
     throw new Error(loc`Choose one available paid mission bundle.`);

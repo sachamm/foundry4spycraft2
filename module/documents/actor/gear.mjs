@@ -174,7 +174,7 @@ export const ActorGear = Base =>
           window: { title: loc`Higher-Caliber mission pick` },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options"><p>${loc`Record mission Caliber in reserve setup first. Import the item and assign its ordinary paid mission pick. This ability permits one higher-Caliber pick; it does not grant an extra pick. Caliber V grants upgrades instead, with purchasing/effects adjudicated separately.`}</p><label>${loc`Ability`} <select name="source">${sources.map(s => `<option value="${s.key}" ${input.source === s.key ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label><label>${loc`Item`} <select name="itemId">${this.items
-            .filter(i => ["weapon", "armor", "gear"].includes(i.type) && !isResourceLock(i))
+            .filter(i => ["weapon", "armor", "gear", "vehicle"].includes(i.type) && !isResourceLock(i))
             .map(i => `<option value="${i.id}">${loc`${esc(i.name)} (Caliber ${i.system.caliber})`}</option>`)
             .join(
               ""

@@ -1,7 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { campaignPickCaliber } from "../module/rules/campaign-gear.mjs";
-import { possessionBudget } from "../module/rules/gear.mjs";
+import {
+  possessionBudget,
+  armorGrantPlan,
+  armorGrantStatus,
+  bigStickPlan,
+  bigStickStatus
+} from "../module/rules/gear.mjs";
+import { missionCaliberPlan, missionCaliberMatches } from "../module/rules/mission-gear.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
 
 const policy = shift => ({ campaignEffects: { gearCaliberShift: shift } });
 const item = (id, caliber, patch = {}, type = "weapon") => ({
@@ -73,4 +82,56 @@ test("explicit overflow sources are allocated before ordinary picks, and vehicle
     bike = item("bike", 1, { campaignBonusOf: "car" }, "vehicle");
   assert.equal(possessionBudget([car, bike], "1/V", policy(1)).unfunded, 0);
   assert.equal(possessionBudget([car], "1/I").unfunded, 1);
+});
+
+test("campaign Caliber changes apply after class mission exceptions and preserve their original mission provenance", () => {
+  for (let base = 1; base <= 4; base++)
+    for (const shift of [-1, 1]) {
+      const s = {
+        ...policy(shift),
+        usagePeriods: { mission: "m" },
+        missionReserves: { epoch: "m", caliber: base },
+        classLevels: { wheelman: 1 }
+      };
+      const car = item("car", Math.min(5, base + 1 + shift), { possessionSource: "", pick: "V" }, "vehicle");
+      const p = missionCaliberPlan(s, [car], { source: "customRide", itemId: car.id, intelConfirmed: true });
+      s.missionCaliberPicks = { customRide: p.record };
+      car.system.missionCaliberGrant = p.stamp;
+      assert.equal(p.record.missionCaliber, base);
+      assert.equal(missionCaliberMatches(s, car), true);
+      const gun = item("gun", Math.min(5, base + 1 + shift), { possessionSource: "", pick: "W", proficiency: "rifle" });
+      s.weaponSpecialist = { abilities: ["Big Stick"], proficiencies: ["rifle"] };
+      assert.equal(bigStickStatus(s, [gun]).maximumCaliber, gun.system.caliber);
+      assert.equal(bigStickPlan(s, [gun], { itemId: gun.id, intelConfirmed: true }).record.missionCaliber, base);
+    }
+});
+
+test("Armor Use keeps the earned grade while its usable Caliber changes with the campaign", () => {
+  const s = { ...policy(1), legacyAbilities: { armorUse: { freeArmorCaliber: 2 } } };
+  const armor = item("armor", 3, { possessionSource: "" }, "armor");
+  assert.equal(armorGrantStatus(s).caliber, 3);
+  const p = armorGrantPlan(s, [armor], { itemId: armor.id, intelConfirmed: true });
+  assert.equal(p.record.grade, 2);
+  assert.equal(p.record.caliber, 3);
+  assert.equal(armorGrantStatus({ ...policy(-1), legacyAbilities: { armorUse: { freeArmorCaliber: 1 } } }).caliber, 0);
+});
+
+test("the full engine checks shifted mission limits for vehicle gear and reviews malformed mission Caliber without crashing", () => {
+  const source = caliber => ({
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+    progression: [],
+    usagePeriods: { mission: "m" },
+    missionReserves: { epoch: "m", caliber, picks: {}, spent: {}, common: 0 }
+  });
+  const car = item("car", 2, { possessionSource: "", pick: "V" }, "vehicle");
+  const warns = (caliber, shift) =>
+    computeAgent(source(caliber), [car], cfg, { campaignEffects: policy(shift).campaignEffects }).warnings;
+  assert.ok(warns(1, 0).some(w => /Caliber exceeds/.test(w)));
+  assert.equal(
+    warns(1, 1).some(w => /Caliber exceeds/.test(w)),
+    false
+  );
+  assert.ok(warns(1, -1).some(w => /Caliber exceeds/.test(w)));
+  for (const bad of [0, "3", undefined, NaN])
+    assert.ok(warns(bad, 1).some(w => /Review the recorded mission Caliber/.test(w)));
 });

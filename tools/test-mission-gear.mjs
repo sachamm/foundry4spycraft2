@@ -289,7 +289,7 @@ test("Heavily Armed cannot split a multi-pick record across changed mission Cali
         ...options,
         source: "heavilyArmed"
       }),
-    /at most one Caliber/
+    /adjusted Caliber limit/
   );
 });
 

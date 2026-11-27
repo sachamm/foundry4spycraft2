@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Campaign Caliber changes now apply to ordinary mission-pick limits, class-raised mission picks, Big Stick
+  and Armor Use. Class exceptions retain their source mission/grade records. Vehicle mission picks receive
+  the same Caliber checks as other gear, and malformed mission Caliber stays reviewable without breaking preparation.
+
 - Campaign Caliber shifts now affect Wealth Possessions allowances. Shoe String Budget removes picks lowered
   below Caliber I. Big Budget's overflow items use explicit same-category source links and cannot exceed the
   funded source's allowance. Vehicle gear now participates in Possessions accounting and can be classified

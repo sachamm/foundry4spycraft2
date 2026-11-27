@@ -2,6 +2,7 @@ import { originRuleName, ruleName } from "./rule-name.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import { purchasedFeatSources } from "./feat-purchase.mjs";
+import { campaignPickCaliber } from "./campaign-gear.mjs";
 import {
   campaignAttributeLevels,
   campaignFeatCount,
@@ -2263,6 +2264,10 @@ function deriveWealthAndGear(state) {
   sys.reserveCapacity = Math.max(0, abil.wis.mod) + (hasProcure(sys) && currentReserves(sys)?.procureAtIntel ? 2 : 0);
   const reserveEntries = items.filter(i => ["weapon", "armor", "gear"].includes(i.type) && i.system.reserve);
   const activeReserves = currentReserves(sys);
+  const validMissionCaliber =
+    Number.isSafeInteger(activeReserves?.caliber) && activeReserves.caliber >= 1 && activeReserves.caliber <= 5;
+  if (activeReserves && !validMissionCaliber)
+    warnings.push(loc`Review the recorded mission Caliber before choosing gear.`);
   for (const item of items.filter(i => i.system?.reserveAcquisition && !managedAcquisition(sys, i)))
     warnings.push(
       loc`${item.name}: its reserve-acquisition reference does not match a successful claimed transaction.`
@@ -2282,10 +2287,17 @@ function deriveWealthAndGear(state) {
   if (sys.reserveUsed > sys.reserveCapacity)
     warnings.push(loc`Reserve picks/items: ${sys.reserveUsed} exceeds Wisdom's maximum ${sys.reserveCapacity}.`);
   const charismaCategories = sys.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"];
-  for (const item of items.filter(item => ["weapon", "armor", "gear"].includes(item.type) && item.system.pick)) {
+  for (const item of items.filter(
+    item => ["weapon", "armor", "gear", "vehicle"].includes(item.type) && item.system.pick
+  )) {
     const category = equipmentCategory(item),
       pick = item.system.pick;
-    if (activeReserves && !managedAcquisition(sys, item) && item.system.caliber > activeReserves.caliber) {
+    if (
+      activeReserves &&
+      validMissionCaliber &&
+      !managedAcquisition(sys, item) &&
+      item.system.caliber > campaignPickCaliber(activeReserves.caliber, sys.campaignEffects).caliber
+    ) {
       const exception =
         bigStickMatches(sys, item) &&
         sys.bigStickMissionPick.missionCaliber === activeReserves.caliber &&
@@ -2300,7 +2312,8 @@ function deriveWealthAndGear(state) {
         !item.system.common &&
         !item.system.ammunitionOnly &&
         !item.system.reserve &&
-        item.system.caliber <= activeReserves.caliber + 1;
+        item.system.caliber <=
+          campaignPickCaliber(Math.min(5, activeReserves.caliber + 1), sys.campaignEffects).caliber;
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
           loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`

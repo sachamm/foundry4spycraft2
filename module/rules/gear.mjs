@@ -999,7 +999,9 @@ export function cleanAndPolishedApplies(system, gear) {
 /** Armor Use, pp.49,70: one piece during Intel, with the combined legacy grade's cap. */
 export function armorGrantStatus(system, items = []) {
   const epoch = String(system.usagePeriods?.mission ?? "initial");
-  const cap = Math.max(0, Math.min(5, Number(system.legacyAbilities?.armorUse?.freeArmorCaliber) || 0));
+  const rawCap = Number(system.legacyAbilities?.armorUse?.freeArmorCaliber ?? 0);
+  const baseCap = Number.isSafeInteger(rawCap) ? Math.max(0, Math.min(5, rawCap)) : 0;
+  const cap = baseCap ? campaignPickCaliber(baseCap, system.campaignEffects).caliber : 0;
   const record = system.armorMissionGrant?.epoch === epoch ? system.armorMissionGrant : null;
   const warnings = [];
   if (record) {
@@ -1033,7 +1035,13 @@ export function armorGrantStatus(system, items = []) {
     else if (!armorGrantMatches(system, item))
       warnings.push(loc`${item.name}: Armor Use provenance does not match this mission’s recorded selection.`);
   }
-  return { caliber: cap, used: !!record, itemId: record?.itemId ?? "", warnings };
+  return {
+    caliber: cap,
+    used: !!record,
+    itemId: record?.itemId ?? "",
+    warnings,
+    ...(system.campaignEffects?.gearCaliberShift ? { baseCaliber: baseCap } : {})
+  };
 }
 export function armorGrantMatches(system, item) {
   const epoch = String(system.usagePeriods?.mission ?? "initial"),
@@ -1069,7 +1077,7 @@ export function armorGrantPlan(system, items, { itemId, intelConfirmed = false }
     throw new Error(loc`Armor Use grants exactly one piece of armor.`);
   const epoch = String(system.usagePeriods?.mission ?? "initial");
   return {
-    record: { epoch, itemId, caliber: gear.caliber, grade: status.caliber },
+    record: { epoch, itemId, caliber: gear.caliber, grade: status.baseCaliber ?? status.caliber },
     stamp: { epoch, source: "Armor Use" }
   };
 }
@@ -1081,6 +1089,8 @@ export function bigStickStatus(system, items = []) {
   const active = system.weaponSpecialist?.abilities?.includes("Big Stick") === true;
   const record = system.bigStickMissionPick?.epoch === epoch ? system.bigStickMissionPick : null;
   const warnings = [];
+  const validCaliber = Number.isSafeInteger(mission?.caliber) && mission.caliber >= 1 && mission.caliber <= 5;
+  if (mission && !validCaliber) warnings.push(loc`Review the recorded mission Caliber before using Big Stick.`);
   if (record) {
     const item = items.find(i => i.id === record.itemId);
     if (!item) warnings.push(loc`Big Stick: the selected mission weapon is missing; its exception remains used.`);
@@ -1090,7 +1100,8 @@ export function bigStickStatus(system, items = []) {
       !system.weaponSpecialist?.proficiencies?.includes(item.system.proficiency) ||
       !mission ||
       mission.caliber !== record.missionCaliber ||
-      item.system.caliber > record.missionCaliber + 1 ||
+      !validCaliber ||
+      item.system.caliber > campaignPickCaliber(Math.min(5, mission.caliber + 1), system.campaignEffects).caliber ||
       !bigStickWeapon(system, item)
     )
       warnings.push(loc`${item.name}: review its Big Stick selection, proficiency, Caliber and paid mission pick.`);
@@ -1107,7 +1118,9 @@ export function bigStickStatus(system, items = []) {
     active,
     caliber: mission?.caliber ?? 0,
     used: !!record,
-    maximumCaliber: mission ? Math.min(5, mission.caliber + 1) : 0,
+    maximumCaliber: validCaliber
+      ? campaignPickCaliber(Math.min(5, mission.caliber + 1), system.campaignEffects).caliber
+      : 0,
     upgradeAllowance: active && mission?.caliber === 5 ? (system.actionDice?.max ?? 0) : 0,
     warnings
   };
@@ -1159,7 +1172,7 @@ export function bigStickPlan(system, items, { itemId, intelConfirmed = false } =
     item.system.caliber > status.maximumCaliber
   )
     throw new Error(
-      loc`Choose one paid mission Weapon pick covered by your specialist proficiencies, at most one Caliber above the mission.`
+      loc`Choose one paid mission Weapon pick covered by your specialist proficiencies, within the adjusted Caliber limit (${status.maximumCaliber}).`
     );
   if ((item.system.quantity ?? 1) < 1 || (item.system.quantity ?? 1) > (item.system.bundleSize ?? 1))
     throw new Error(loc`Choose one available paid weapon bundle.`);
