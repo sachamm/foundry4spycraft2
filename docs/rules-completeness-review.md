@@ -429,3 +429,14 @@ effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,
 source-to-data auditing and native creation/combat play-throughs. The backlog
 remains the authoritative list. Work continues; neither score meets 9.9 yet.
+
+The p.452 review connected feat vitality/wound changes to standard NPC and animal
+Damage saves in both graded and manual profiles. Derived bonuses disappear when
+their source is removed and never accumulate during preparation. A nonzero
+legacy manual adjustment remains unchanged pending explicit accounting review;
+the sheet shows the calculated contribution and the available modes. Special
+NPCs retain their vitality/wound behavior. Tests exercise actual model preparation
+and Damage save totals, including source removal and legacy corrections.
+All **4,026** Node tests and **224** layout tests pass. Native schemas, lint and
+the text-copy check also pass. Non-feat temporary health effects remain in B-185;
+the scores remain **9.0/10** and **9.1/10** pending further coverage.

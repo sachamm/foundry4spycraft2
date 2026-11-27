@@ -9,6 +9,15 @@
 import { evaluate } from "./formula.mjs";
 import { loc } from "../i18n.mjs";
 import { SKILLS } from "./tables.mjs";
+import { damageSaveAdjustment } from "./gc/npc-damage.mjs";
+
+/** Preserve legacy manual health adjustments until the GC chooses how their feat bonuses were counted. */
+export function npcHealthSaveAdjustment(effects, { damageSaveAdjust = 0, damageSaveHealthMode = "review" } = {}) {
+  const automatic = damageSaveAdjustment(effects),
+    needsReview = damageSaveHealthMode === "review" && damageSaveAdjust !== 0 && automatic !== 0,
+    applied = damageSaveHealthMode === "manual" || needsReview ? 0 : automatic;
+  return { automatic, applied, needsReview };
+}
 
 /** A skill key as the table reads it, localised when the system config is loaded. */
 const skillName = key =>

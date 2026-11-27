@@ -36,6 +36,7 @@ globalThis.foundry = {
 globalThis.CONFIG = { SPYCRAFT };
 const { SpycraftNpcSheet } = await import("../module/sheets/actor-sheet.mjs");
 const { NpcData } = await import("../module/data/actor.mjs");
+const { damageSaveState } = await import("../module/apps/gc/npc-play.mjs");
 const make = () => ({
   npcProfile: { ...defaultNpcProfile(), enabled: true },
   threatLevel: 7,
@@ -48,6 +49,60 @@ const make = () => ({
   saves: { fort: { base: 0 }, ref: { base: 0 }, will: { base: 0 } },
   defense: { bonus: 0 },
   initiative: { bonus: 0 }
+});
+
+test("standard and animal NPC feat health changes reach the actual Damage save without altering stored bonuses", () => {
+  for (const enabled of [true, false]) {
+    for (const npcType of ["standard", "animal"]) {
+      const model = Object.assign(new NpcData(), make(), { npcType, manualDamageSave: 8, damageSaveAdjust: 0 });
+      model.npcProfile.enabled = enabled;
+      const feat = {
+        type: "feat",
+        name: "Health fixture",
+        system: {
+          bonuses: [
+            { target: "vitality", value: "5" },
+            { target: "wounds", value: "-1" }
+          ]
+        }
+      };
+      model.parent = { items: [feat], flags: {} };
+      model.prepareDerivedData();
+      const base = model.damageSave;
+      assert.equal(model.featEffects.damageSaveHealth.applied, 1);
+      assert.equal(damageSaveState({ system: model }).bonus, base + 1);
+      model.prepareDerivedData();
+      assert.equal(damageSaveState({ system: model }).bonus, base + 1, "preparation does not accumulate the bonus");
+      assert.equal(model.damageSaveAdjust, 0);
+      model.parent.items = [];
+      model.prepareDerivedData();
+      assert.equal(damageSaveState({ system: model }).bonus, base, "removing the source removes its bonus");
+    }
+  }
+});
+
+test("legacy manual adjustments require review before feat health bonuses are added twice", () => {
+  const model = Object.assign(new NpcData(), make(), { damageSaveAdjust: 2 });
+  model.parent = {
+    items: [{ type: "feat", name: "Health fixture", system: { bonuses: [{ target: "vitality", value: "5" }] } }],
+    flags: {}
+  };
+  model.prepareDerivedData();
+  const base = model.damageSave;
+  assert.equal(model.featEffects.damageSaveHealth.needsReview, true);
+  assert.ok(model.warnings.some(s => s.includes("manual Damage save")));
+  assert.equal(damageSaveState({ system: model }).bonus, base + 2);
+  model.damageSaveHealthMode = "automatic";
+  model.prepareDerivedData();
+  assert.equal(damageSaveState({ system: model }).bonus, base + 4);
+  assert.equal(model.featEffects.damageSaveHealth.needsReview, false);
+  model.damageSaveHealthMode = "manual";
+  model.prepareDerivedData();
+  assert.equal(damageSaveState({ system: model }).bonus, base + 2);
+  model.npcType = "special";
+  model.prepareDerivedData();
+  assert.equal(model.featEffects.damageSaveHealth, undefined);
+  assert.equal(model.featEffects.healthApplied, true);
 });
 
 test("both graded and manual NPCs retain their recorded creation cap across seasons and require unknown history review", () => {

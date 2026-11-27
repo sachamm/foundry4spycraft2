@@ -195,7 +195,10 @@ const toughGrades = actor => spendProfile(actor).tough;
 export function damageSaveState(actor) {
   const system = actor.system,
     track = currentDamageTrack(system.damageTrack, sceneEpoch());
-  const bonus = (Number.isFinite(system.damageSave) ? system.damageSave : 0) + (system.damageSaveAdjust ?? 0);
+  const bonus =
+    (Number.isFinite(system.damageSave) ? system.damageSave : 0) +
+    (system.damageSaveAdjust ?? 0) +
+    (system.featEffects?.damageSaveHealth?.applied ?? 0);
   return {
     track,
     bonus,

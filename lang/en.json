@@ -92,6 +92,7 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Npc": {
+   "HealthBonuses": "Health bonuses",
    "PinnedResults": "What these choices give",
    "PinnedXP": "XP reward",
    "PinnedHealth": "Health",
@@ -1304,7 +1305,7 @@
     "Used": "(used",
     "SufferDamage": "Suffer damage",
     "Reset": "Reset",
-    "SaveAdjustmentVitalityWoundEffectsP": "Save adjustment (vitality/wound effects, p.452)",
+    "SaveAdjustmentVitalityWoundEffectsP": "Manual Damage save adjustment",
     "VillainRole": "Villain role",
     "DamageSaveBonus": "Damage save bonus",
     "DoneEditing": "Done editing",

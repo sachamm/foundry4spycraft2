@@ -1,6 +1,6 @@
 import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
-import { npcFeatEffects } from "../rules/npc-feat-effects.mjs";
+import { npcFeatEffects, npcHealthSaveAdjustment } from "../rules/npc-feat-effects.mjs";
 import { ruleName } from "../rules/rule-name.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "../rules/cheap-shot-effects.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
@@ -200,7 +200,7 @@ export class NpcData extends BaseActorData {
     });
     if (!this.npcProfile?.enabled) {
       super.prepareDerivedData();
-      if (!["special", "villain"].includes(this.npcType) && !this.promoted) this.damageSave = this.manualDamageSave;
+      this.damageSave = !["special", "villain"].includes(this.npcType) && !this.promoted ? this.manualDamageSave : null;
       this.applyFeatEffects({ health: false });
       this.warnings.push(
         ...campaignNpcHealthReview({
@@ -259,6 +259,10 @@ export class NpcData extends BaseActorData {
   }
 
   reviewCreationRules() {
+    if (this.featEffects?.damageSaveHealth?.needsReview)
+      this.warnings.push(
+        loc`Review the manual Damage save adjustment: choose whether it already includes feat vitality and wound bonuses.`
+      );
     if (this.creationPolicyStatus.needsReview)
       this.warnings.push(
         loc`The GC must review which creation-only campaign qualities applied when this character was created.`
@@ -301,6 +305,7 @@ export class NpcData extends BaseActorData {
     this.initiative.total += effects.initiative;
     if (this.qualityEffects && Number.isFinite(this.qualityEffects.speed)) this.qualityEffects.speed += effects.speed;
     effects.healthApplied = health && this.vitality.max > 0;
+    if (Number.isFinite(this.damageSave)) effects.damageSaveHealth = npcHealthSaveAdjustment(effects, this);
     if (effects.healthApplied) {
       this.vitality.max += effects.vitality;
       this.wounds.max += effects.wounds;
@@ -316,6 +321,7 @@ export class NpcData extends BaseActorData {
       promotion: record("promotion", { nullable: true, initial: null }),
       manualDamageSave: int(0),
       damageSaveAdjust: int(0),
+      damageSaveHealthMode: str("review", { choices: ["review", "automatic", "manual"] }),
       damageTrack: record("damageTrack", { nullable: true, initial: null }),
       disposition: record("disposition", { initial: () => ({ base: "neutral", toward: {} }) }),
       manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),

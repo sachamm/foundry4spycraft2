@@ -97,6 +97,7 @@
         data-tooltip="{{localize 'SPYCRAFT.Npc.ResetTrackHint'}}">{{localize "SPYCRAFT.Npc.ResetTrack"}}</button></p>
       <p>
       <label class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.SaveAdjustmentVitalityWoundEffectsP"}} <input name="system.damageSaveAdjust" type="number" value="{{system.damageSaveAdjust}}" class="w-2" /></label>
+      <label class="edit-only">{{localize "SPYCRAFT.Npc.HealthBonuses"}} <select name="system.damageSaveHealthMode">{{selectOptions damageSaveHealthModes selected=system.damageSaveHealthMode}}</select></label>
       {{#unless system.npcProfile.enabled}}<label class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRole"}} <select name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label>
       <label
         class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.DamageSaveBonus"}} <input

@@ -168,13 +168,17 @@ function weaponShots(item) {
 function npcFeatPlay(effects) {
   if (!effects?.rows?.length && !effects?.uncounted?.length) return null;
   const signed = value => (value >= 0 ? `+${value}` : `${value}`);
-  const healthLeft = !effects.healthApplied && (effects.vitality || effects.wounds);
+  const healthLeft = !effects.healthApplied && !effects.damageSaveHealth && (effects.vitality || effects.wounds);
   return {
     title: loc`Feats in play`,
     rows: effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
-    health: healthLeft
-      ? loc`Vitality ${signed(effects.vitality)} and wounds ${signed(effects.wounds)} are not added to typed-in maximums: include them in the numbers above.`
-      : "",
+    health: effects.damageSaveHealth
+      ? effects.damageSaveHealth.needsReview
+        ? loc`Feat health bonuses would adjust the Damage save by ${signed(effects.damageSaveHealth.automatic)}. Review the existing manual adjustment before adding them.`
+        : loc`Feat health bonuses add ${signed(effects.damageSaveHealth.applied)} to the Damage save; the manual adjustment is separate.`
+      : healthLeft
+        ? loc`Vitality ${signed(effects.vitality)} and wounds ${signed(effects.wounds)} are not added to typed-in maximums: include them in the numbers above.`
+        : "",
     uncounted: effects.uncounted.length
       ? loc`These feats have other bonuses that are not worked out; apply them by hand: ${effects.uncounted.join(", ")}.`
       : ""
@@ -1913,6 +1917,11 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         .map(row => ({ ...row, facts: weaponFacts(row.attack), attackTip: weaponAttackTip(row.attack) })),
       playLabels: playLabels(),
       featPlay: npcFeatPlay(sys.featEffects),
+      damageSaveHealthModes: {
+        review: loc`Review existing adjustment`,
+        automatic: loc`Add feat health bonuses`,
+        manual: loc`Health bonuses already included manually`
+      },
       hazards: hazardsView(this.actor),
       nonLethal: nonLethalTotals(this.actor),
       dying: woundState(Number(this.actor.system.wounds?.value), this.actor.system.deathThreshold) === "dying",
