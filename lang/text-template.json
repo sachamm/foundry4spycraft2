@@ -5671,6 +5671,7 @@
    "ResultAgainstDefenseAMiss_05jymu7": "{0}: result {1} against Defense {2} — a miss.",
    "ResultAgainstDefenseShotSHit_01l1guw": "{0}: result {1} against Defense {2} — {3} shot(s) hit. Roll damage once for each; a critical hit sends only the first to wounds.",
    "ResultCap_0qf2laz": "{0} result cap {1}{2}",
+   "ResultCappedAtP88_0ppcwkt": "Result capped at {0} (p.88).",
    "ResultEvasion_02yfx6l": "{0} — result {1}, Evasion {2}{3}",
    "ResultForThisCharacter_14gljdq": "Result for this character",
    "ResultIfNotListed_1xh0777": "Result, if not listed",

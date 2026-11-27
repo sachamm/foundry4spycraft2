@@ -298,7 +298,6 @@
   "Roll": {
    "Threat": "Threat!",
    "Error": "Error!",
-   "Capped": "Result capped at {cap}.",
    "Range": "(error {error}, threat {threat})"
   },
   "ActionDice": {
