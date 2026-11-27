@@ -766,3 +766,89 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
   };
   assert.deepEqual(ids(damage), ["ouchInjury"]);
 });
+
+test("rest, a dying roll, Stabilize, a hazard save's result and a grapple each leave an Undo note (U1)", async () => {
+  reset();
+  undoNotes.length = 0;
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  const { applyStabilize, rollDying } = await import("../module/apps/healing.mjs");
+  const { resolveHazardSave } = await import("../module/apps/hazards.mjs");
+  const cards = new Map();
+  const keptMessages = game.messages;
+  game.messages = Object.assign([], { get: id => cards.get(id) });
+  const noteOf = data => document({ id: `n${undoNotes.length}`, flags: structuredClone(data.flags) });
+
+  const rester = character("Sleeper", {
+    vitality: { value: 4, max: 30 },
+    wounds: { value: 10, max: 12 },
+    abilities: { con: { value: 12 }, wis: { value: 10 } },
+    effectiveThreatLevel: 3,
+    npcType: "special"
+  });
+  rester.type = "npc";
+  await restAndRecover(rester, { hours: 2, days: 0 });
+  assert.ok(rester.system.vitality.value > 4);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Rest: Sleeper");
+  await applyUndo(noteOf(undoNotes.at(-1)));
+  assert.equal(rester.system.vitality.value, 4, "Undo puts the vitality back");
+
+  const dying = character("Faller", {
+    vitality: { value: 0, max: 30 },
+    wounds: { value: -3, max: 12 },
+    deathThreshold: -10,
+    abilities: { con: { value: 12 } }
+  });
+  await rollDying(dying);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Dying roll: Faller");
+
+  const medic = card("st1", { actorUuid: "Actor.Medic", checkKind: "skill", successConfirmed: true });
+  cards.set(medic.id, medic);
+  dying.system.wounds.value = -4;
+  await applyStabilize(medic, { patient: dying });
+  assert.equal(dying.system.wounds.value, 0);
+  assert.ok(medic.flags.spycraft2.stabilized);
+  const stabilize = undoNotes.at(-1);
+  assert.deepEqual(stabilize.flags.spycraft2.undo.cardMarks, [{ messageId: "st1", key: "stabilized" }]);
+  await applyUndo(noteOf(stabilize));
+  assert.equal(dying.system.wounds.value, -4);
+  assert.equal(medic.flags.spycraft2.stabilized, undefined, "the card can be used again");
+
+  // A failed Coup de Grace save, applied from its card: the wounds and the card's mark both go back.
+  const victim = character("Victim", { vitality: { value: 0, max: 30 }, wounds: { value: 5, max: 12 } });
+  const save = card("cg1", {
+    actorUuid: victim.uuid,
+    checkKind: "save",
+    effectiveTotal: 3,
+    successConfirmed: false,
+    hazardSave: { kind: "coupDeGrace", label: "Coup de Grace", dc: 10 }
+  });
+  cards.set(save.id, save);
+  await resolveHazardSave(victim, save);
+  assert.equal(victim.system.wounds.value, -10);
+  assert.equal(save.flags.spycraft2.hazardSave.resolved, true);
+  await applyUndo(noteOf(undoNotes.at(-1)));
+  assert.equal(victim.system.wounds.value, 5);
+  assert.equal(save.flags.spycraft2.hazardSave.resolved, undefined);
+
+  // A grapple: both wrestlers' conditions are on one note.
+  const tracked = name => {
+    const who = character(name, {});
+    who.createEmbeddedDocuments = async (kind, rows) => {
+      for (const row of rows) {
+        for (const status of row.statuses) who.statuses.add(status);
+        const id = `${name}-${who.effects.length}`;
+        who.effects.push({ id, ...row, toObject: () => ({ _id: id, ...row }) });
+      }
+      return rows;
+    };
+    return who;
+  };
+  CONFIG.statusEffects.push({ id: "vulnerable", name: "vulnerable", img: "" });
+  const grappler = tracked("Holder"),
+    held = tracked("Held");
+  await settleGrapple(grappler, { opening: true, total: 20, opponentTotal: 12, opponentUuid: held.uuid, benefits: [] });
+  const grapple = undoNotes.at(-1).flags.spycraft2.undo;
+  assert.equal(grapple.label, "Grapple: Holder");
+  assert.deepEqual(grapple.entries.map(entry => entry.name).sort(), ["Held", "Holder"]);
+  game.messages = keptMessages;
+});

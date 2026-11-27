@@ -796,14 +796,15 @@ export async function applyDamage(message, options = {}) {
       const reduction = armorPiercingAll ? 0 : Math.max(0, hit.dr - armorPiercing);
       result =
         type === "fire"
-          ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true })
+          ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true, undo: false })
           : await sufferTypedDamage(target, {
               type,
               amount: damage,
               reduction,
               source: weapon?.name ?? "",
               review: input.reviewType === true,
-              allowed: target.type === "agent" ? undefined : NPC_TYPED
+              allowed: target.type === "agent" ? undefined : NPC_TYPED,
+              undo: false
             });
       if (!result) return null;
     } else if (!isSpecial(target)) {

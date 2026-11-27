@@ -28,6 +28,7 @@ import { recentResultsHint } from "./opposed-checks.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { withUndo } from "./undo.mjs";
 
 const post = (actor, lines) =>
   ChatMessage.create({
@@ -441,14 +442,18 @@ export async function settleGrapple(actor, options = {}) {
   const tricks = grappleTrickLines(actor.system);
   if (tricks.length)
     benefits.push(loc`Your grapple tricks:`, `<ul>${tricks.map(line => `<li>${esc(line)}</li>`).join("")}</ul>`);
-  await post(actor, [
-    loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
-    ...outcome.effects.map(esc),
-    sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
-    ...benefits,
-    ...(await grappleConditions(actor, input, outcome))
-  ]);
-  const taken = await grappleBenefitsChosen(actor, input, outcome);
-  if (taken.length) await post(actor, taken);
-  return outcome;
+  // Both wrestlers' conditions go on one Undo note.
+  const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+  return withUndo([actor, opponent], loc`Grapple: ${actor.name}`, async () => {
+    await post(actor, [
+      loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
+      ...outcome.effects.map(esc),
+      sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
+      ...benefits,
+      ...(await grappleConditions(actor, input, outcome))
+    ]);
+    const taken = await grappleBenefitsChosen(actor, input, outcome);
+    if (taken.length) await post(actor, taken);
+    return outcome;
+  });
 }

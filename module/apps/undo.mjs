@@ -189,7 +189,9 @@ export function restoreUpdate(entry) {
  * @param {object[]} actors
  * @param {string} label           What the step was, as the note will say it
  * @param {() => Promise<any>} work
- * @param {object} [extra]         { gcDice: dice to give back, damageCard: {messageId, targetUuid} }
+ * @param {object} [extra]         { gcDice: dice to give back, damageCard: {messageId, targetUuid},
+ *   cardMarks: [{messageId, key}] marks the step set on a card, cleared so the card's button works again,
+ *   mission: mission fields as they were before the step }
  */
 export async function withUndo(actors, label, work, extra = {}) {
   const list = (actors ?? []).filter(actor => actor?.uuid);
@@ -209,7 +211,15 @@ export async function withUndo(actors, label, work, extra = {}) {
 export function postUndo(
   label,
   entries,
-  { gcDice = 0, damageCard = null, antagonist = null, dcBoost = null, standingPaid = null } = {}
+  {
+    gcDice = 0,
+    damageCard = null,
+    antagonist = null,
+    dcBoost = null,
+    standingPaid = null,
+    cardMarks = null,
+    mission = null
+  } = {}
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
@@ -217,7 +227,9 @@ export function postUndo(
     whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
     flags: {
-      spycraft2: { undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, standingPaid, done: false } }
+      spycraft2: {
+        undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, standingPaid, cardMarks, mission, done: false }
+      }
     }
   });
 }
@@ -322,6 +334,23 @@ async function undoRecord(message, record) {
       await setSceneState({
         dcBoostsByCheck: { ...scene.dcBoostsByCheck, [record.dcBoost.key]: { ...counted, count: counted.count - 1 } }
       }).catch(error => ui.notifications.warn(loc`The DC boost count was not put back: ${error.message}`));
+  }
+  // A step that marked a card done (First Aid applied, a grapple settled) can be taken on that card again.
+  for (const mark of record.cardMarks ?? []) {
+    const marked = mark?.messageId && mark.key ? game.messages?.get(mark.messageId) : null;
+    if (!marked || !(marked.isAuthor || game.user.isGM)) continue;
+    const keys = String(mark.key).split("."),
+      last = keys.pop(),
+      holder = keys.reduce((value, key) => value?.[key], marked.flags?.spycraft2);
+    if (holder?.[last] !== undefined)
+      await marked.update({ [`flags.spycraft2.${[...keys, `-=${last}`].join(".")}`]: null }).catch(() => null);
+  }
+  // Mission fields the step set (the XP settled marks, the session dice changes) go back to their earlier values.
+  if (record.mission && Object.keys(record.mission).length && game.user.isGM) {
+    const { updateMission } = await import("./gc/state.mjs");
+    await updateMission(structuredClone(record.mission)).catch(error =>
+      ui.notifications.warn(loc`The mission was not put back: ${error.message}`)
+    );
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;
