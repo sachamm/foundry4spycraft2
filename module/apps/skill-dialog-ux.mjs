@@ -24,6 +24,7 @@ const CHECK_SECTIONS = {
   grappleAdvantageConfirmed: ["grapple", "restraint-escape"],
   grappleJointLock: ["restraint-escape"],
   grappleSizeDifference: ["grapple"],
+  grappleOthers: ["grapple"],
   grappleSecondOpponent: ["grapple", "restraint-escape"],
   grappleMute: ["grapple", "restraint-escape"],
   grappleGarrote: ["grapple", "restraint-escape"],

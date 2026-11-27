@@ -213,3 +213,22 @@ test("Grapple Size limits, the bigger side's +4, the second-opponent and Mute pe
   const escape = grappleCheckPlan(sys, "athletics", { id: "restraint-escape" }, { grappleSizeDifference: 2 });
   assert.equal(escape.blockedReason, "");
 });
+
+test("Grapple: 2, 4 or 8 grapplers at most, by the target's Size (p.357)", () => {
+  const sys = {
+    activeFeatNames: [],
+    abilities: { str: { mod: 0 } },
+    unarmed: { die: 4, extraDice: 0, damageBonus: 0 }
+  };
+  const check = { ...GRAPPLE_CHECK };
+  assert.match(
+    grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: -1, grappleOthers: 2 }).blockedReason,
+    /At most 2/
+  );
+  assert.equal(grappleCheckPlan(sys, "athletics", check, { grappleOthers: "3" }).blockedReason, "");
+  assert.match(grappleCheckPlan(sys, "athletics", check, { grappleOthers: 4 }).blockedReason, /At most 4/);
+  assert.equal(
+    grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: 1, grappleOthers: 7 }).blockedReason,
+    ""
+  );
+});
