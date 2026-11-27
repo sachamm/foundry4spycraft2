@@ -1,4 +1,5 @@
 /** Action dice: spending, healing and refresh, awards, mission XP and starting dice. */
+import { recordReplacementPatch } from "../../rules/record-patch.mjs";
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { missionSettlementDefaults } from "../../apps/gc/mission-defaults.mjs";
@@ -102,29 +103,7 @@ export const ActorActionDice = Base =>
     }
 
     actorRecordRestorePatch(path, before) {
-      if (before === undefined) {
-        const keys = path.split("."),
-          last = keys.pop();
-        return { [keys.join(".") + ".-=" + last]: null };
-      }
-      const patch = { [path]: structuredClone(before) },
-        walk = (at, old, current) => {
-          if (
-            !old ||
-            !current ||
-            typeof old !== "object" ||
-            typeof current !== "object" ||
-            Array.isArray(old) ||
-            Array.isArray(current)
-          )
-            return;
-          for (const key of Object.keys(current)) {
-            if (!Object.hasOwn(old, key)) patch[at + ".-=" + key] = null;
-            else walk(at + "." + key, old[key], current[key]);
-          }
-        };
-      walk(path, before, this.actorRecordValue(path));
-      return patch;
+      return recordReplacementPatch(path, before, this.actorRecordValue(path));
     }
 
     async settleActionDiceHealing(

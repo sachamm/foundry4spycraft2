@@ -13,9 +13,10 @@ import { esc } from "../../html.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { campaignVitalityDie, campaignCharacterEffects } from "../../rules/campaign-creation.mjs";
 import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
-import { same } from "../../rules/equal.mjs";
+import { sameValues as same } from "../../rules/equal.mjs";
 import { modularCreationPlan } from "../../rules/modular-creation.mjs";
 import { advancementPlan } from "../../rules/advancement.mjs";
+import { recordReplacementPatch } from "../../rules/record-patch.mjs";
 import {
   CREATION_ABILITIES,
   startingAttributeSignature,
@@ -84,7 +85,7 @@ export const ActorProgression = Base =>
           reviewedBy: game.user.id ?? "GC"
         };
         try {
-          await this.update({ "flags.spycraft2.advancementReview": record });
+          await this.update(recordReplacementPatch("flags.spycraft2.advancementReview", record, current()));
         } catch (error) {
           if (!same(current(), record)) throw error;
         }
@@ -184,7 +185,9 @@ export const ActorProgression = Base =>
         const plan = modularCreationPlan(record, available, budget, true);
         if (!plan.valid) throw new Error(plan.warnings.join(" "));
         try {
-          await this.update({ "flags.spycraft2.modularTrade": record });
+          await this.update(
+            recordReplacementPatch("flags.spycraft2.modularTrade", record, this.flags?.spycraft2?.modularTrade)
+          );
         } catch (error) {
           if (!same(this.flags?.spycraft2?.modularTrade, record)) throw error;
         }
@@ -229,7 +232,7 @@ export const ActorProgression = Base =>
           reviewedBy: game.user.id ?? "GC"
         });
         try {
-          await this.update({ "flags.spycraft2.creationPolicy": record });
+          await this.update(recordReplacementPatch("flags.spycraft2.creationPolicy", record, current()));
         } catch (error) {
           if (!same(current(), record)) throw error;
         }
@@ -288,7 +291,7 @@ export const ActorProgression = Base =>
           at: Date.now()
         });
         try {
-          await this.update({ "flags.spycraft2.creationAttributes": record });
+          await this.update(recordReplacementPatch("flags.spycraft2.creationAttributes", record, current()));
         } catch (error) {
           if (!same(current(), record)) throw error;
         }

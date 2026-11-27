@@ -390,6 +390,17 @@ rechecks the actual creation allowances, policy, level and mission context.
 The native rerun creates exactly one actor and records no transaction warnings
 or page errors. All **4,014** Node tests, formatting and lint pass. Further native
 multiplayer and combat checks continue before any higher completeness claim.
+
+A second native pass reproduced obsolete nested fields surviving a GC creation
+history correction. Revised creation, starting-score, advancement and trigger
+records now use exact replacement patches, and their committed-write proofs
+compare values independently of native object key order. A shared helper keeps
+the existing action-die restoration behavior unchanged. Native tests now pass
+removing old creation effects, switching Modular from surrendering to buying,
+changing a level grant into historical review, and deliberately losing the
+responses after those writes commit. The resulting records remain valid and
+contain no obsolete allowances. All **4,018** Node tests, lint, formatting and
+bundle checks pass. Full multiplayer and combat play-through work continues.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,

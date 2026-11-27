@@ -1,11 +1,18 @@
 import { triggerClaimKey, triggerClaimUsed } from "../rules/triggered-attacks.mjs";
 import { postedReceipt } from "./message-lookup.mjs";
-import { same } from "../rules/equal.mjs";
+import { sameValues as same } from "../rules/equal.mjs";
+import { recordReplacementPatch } from "../rules/record-patch.mjs";
 import { loc } from "../i18n.mjs";
 
 async function save(actor, key, value) {
   try {
-    await actor.update({ [`flags.spycraft2.triggeredAttacks.${key}`]: value });
+    await actor.update(
+      recordReplacementPatch(
+        `flags.spycraft2.triggeredAttacks.${key}`,
+        value,
+        actor.flags?.spycraft2?.triggeredAttacks?.[key]
+      )
+    );
   } catch (error) {
     if (!same(actor.flags?.spycraft2?.triggeredAttacks?.[key], value)) throw error;
   }

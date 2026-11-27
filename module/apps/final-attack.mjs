@@ -3,7 +3,7 @@ import { loc } from "../i18n.mjs";
 import { postedReceipt } from "../services/message-lookup.mjs";
 import { withAttackTriggerClaim } from "../services/triggered-attacks.mjs";
 import { queueResources } from "../services/transactions.mjs";
-import { same } from "../rules/equal.mjs";
+import { sameValues as same } from "../rules/equal.mjs";
 import { triggerClaimKey } from "../rules/triggered-attacks.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 export function finalAttackOptions(input) {

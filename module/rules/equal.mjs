@@ -25,3 +25,6 @@ export const stable = value =>
  * records built or stored the same way on both sides; use stable() where the key order may differ.
  */
 export const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/** Document backends preserve older key insertion order while merging; compare record values independently of that order. */
+export const sameValues = (a, b) => stable(a) === stable(b);
