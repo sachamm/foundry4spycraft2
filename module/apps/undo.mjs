@@ -104,6 +104,7 @@ export function snapshot(actor) {
   const source = actor.toObject?.() ?? { system: actor.system, flags: actor.flags };
   const undoFlags = { ...source.flags?.spycraft2 };
   delete undoFlags.damageApplications;
+  delete undoFlags.hazardResolutions;
   delete undoFlags.attackDamageHits;
   delete undoFlags.countShifts;
   delete undoFlags.fallTimelines;

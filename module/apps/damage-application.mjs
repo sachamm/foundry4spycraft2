@@ -910,7 +910,12 @@ export async function applyDamage(message, options = {}) {
           critical,
           fire: type === "fire" || profile.type === "fire"
         });
-      } else if (type && (target.type === "agent" || (isSpecial(target) && NPC_TYPED.includes(type)))) {
+      } else if (
+        type &&
+        (target.type === "agent" ||
+          (isSpecial(target) && NPC_TYPED.includes(type)) ||
+          (target.type === "npc" && ["bang", "flash"].includes(type)))
+      ) {
         // Typed damage shares its hazard state and saves across agents and special NPCs.
         const typedAP = DAMAGE_TYPES[type]?.armorPiercing;
         const reduction =
@@ -926,7 +931,7 @@ export async function applyDamage(message, options = {}) {
                 reduction,
                 source: weapon?.name ?? "",
                 review: input.reviewType === true,
-                allowed: target.type === "agent" ? undefined : NPC_TYPED
+                allowed: target.type === "agent" ? undefined : isSpecial(target) ? NPC_TYPED : ["bang", "flash"]
               });
         if (!result) return null;
       } else if (!isSpecial(target)) {

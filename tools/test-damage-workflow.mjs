@@ -28,6 +28,9 @@ globalThis.Roll = class {
       .reduce((sum, part) => sum + (/d/.test(part) ? 5 : Number(part)), 0);
     return this;
   }
+  toMessage(data) {
+    return ChatMessage.create({ ...data, rolls: [this] });
+  }
 };
 globalThis.ChatMessage = {
   getSpeaker: ({ actor }) => ({ alias: actor?.name }),
@@ -93,6 +96,10 @@ function character(name, system, extra = {}) {
     flags: {},
     statuses: new Set(),
     effects: [],
+    async toggleStatusEffect(id, { active }) {
+      if (active) this.statuses.add(id);
+      else this.statuses.delete(id);
+    },
     confirmed: [],
     async confirmCheckOutcome(message, options) {
       this.confirmed.push(options);
@@ -696,6 +703,40 @@ test("a special damage type is handed to an agent's own rules, with the dialog o
   await applyDamage(damage, { targetUuid: agent.uuid, damage: 18, kind: "lethal", type: "bang", attackKind: "other" });
   assert.deepEqual(asked, [["fort", { kind: "bang", label: asked[0][1].label, dc: 18 }]]);
   assert.equal(agent.system.vitality.value, 40, "bang damage is a save, not lost vitality");
+});
+
+test("standard NPC bang and flash hits call for Fortitude saves instead of lethal Damage saves", async () => {
+  for (const type of ["bang", "flash"]) {
+    reset();
+    const actor = character(`Standard-${type}`, { npcType: "standard", damageSave: 0, vitality: { value: 0, max: 0 } });
+    actor.type = "npc";
+    const asked = [];
+    actor.rollSave = async (key, options) => (asked.push([key, options.hazardSave]), { flags: {} });
+    const damage = card(`standard-${type}`, { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 18 });
+    await applyDamage(damage, { targetUuid: actor.uuid, damage: 18, kind: "lethal", type });
+    assert.equal(asked[0][0], "fort");
+    assert.equal(asked[0][1].kind, type);
+    assert.equal(asked[0][1].dc, 18);
+    assert.equal(actor.system.damageTrack, undefined, "the sensory hit itself is no lethal damage");
+  }
+});
+
+test("standard NPC hazard stress rolls its actual Damage save with campaign factors once", async () => {
+  reset();
+  const actor = character("Standard-stress", {
+    npcType: "standard",
+    damageSave: 0,
+    vitality: { value: 0, max: 0 },
+    campaignEffects: { stressDamageMultipliers: [2] }
+  });
+  actor.type = "npc";
+  const { sufferStress } = await import("../module/apps/hazards.mjs");
+  await sufferStress(actor, 6, "Sensory hazard");
+  const report = posted.find(m => m.flags?.spycraft2?.npcDamageSave);
+  assert.ok(report, "actual Damage save posted rather than a reminder");
+  assert.equal(report.flags.spycraft2.npcDamageSave.campaignStressAdjusted, true);
+  assert.equal(report.flags.spycraft2.npcDamageSave.damage, 12);
+  assert.equal(actor.system.damageTrack.state, "unconscious");
 });
 
 test("grapple benefits the winner takes change conditions on both sides", async () => {

@@ -1657,5 +1657,34 @@ and reallocating Networking left attribute/contact setup tasks. Those fixture
 limitations do not establish a Freelance creation defect. The four previously
 completed distinct builds remain the native completeness evidence. B-193 retains
 the broader source audit and additional legal character choices.
+
+## Pass 56: standard NPC sensory damage and durable hazard resolution
+
+Both areas remain **9.6/10**. Bang and flash weapon hits now give standard NPCs
+their actual Fortitude saves instead of treating the sensory hit as lethal
+damage. Stress from their hazards now rolls the standard NPC Damage save and
+updates its real track and condition. Saved campaign stress factors are applied
+once. Damage-save execution and pure NPC status helpers were separated from
+NPC skill registrations, preserving the established contributor/button order.
+
+Hazard saves now reserve an actor-held record before any effects or secondary
+dice. Concurrent delivery, lost responses and partial effects cannot replay the
+save. A completed record repairs a missing card marker without reapplying the
+outcome. An interrupted record requires owning-GC review: keep actual outcomes,
+or release only after explicitly confirming both no effects and no dice.
+Source changes and unauthorized reviews are refused. New hits wait for a pending
+hazard review, and hazard resolution waits for pending hit applications. Generic
+Undo preserves the resolution records. A refused final transaction cannot report
+completion.
+
+Native standard-NPC bang resolution reserved its record before the actual stress
+and Damage-save dice. An injected loss after those actual effects left a durable
+interruption; another application was refused. After reload, the actual GC review
+dialog kept the verified outcomes without new rolls or track changes. The native
+run also passed at 1280×720; the only diagnostic was Foundry's expected minimum
+resolution notice. All **4,333** Node tests, **988** fixture assertions and **267**
+layouts pass. Schemas, lint, formatting, bundling and copy checks pass. Remaining
+standard-NPC damage types, typed secondary-effect timing, Drained, grapple and
+the other documented combat gaps still need implementation and review.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.

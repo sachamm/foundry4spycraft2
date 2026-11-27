@@ -31,7 +31,13 @@ import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { postNonLethalDamage } from "./nonlethal-damage.mjs";
-import { markCard } from "./gc-relay.mjs";
+import { npcDamageSave } from "./gc/npc-damage-save.mjs";
+import {
+  beginHazardResolution,
+  finishHazardResolution,
+  hazardResolution,
+  reviewHazardResolution
+} from "./hazard-resolution-records.mjs";
 import { setCondition, woundConditions } from "./wound-conditions.mjs";
 import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
@@ -146,10 +152,10 @@ export async function sufferStress(actor, amount, source, damageMode = "stressBe
         : []
     ).adjustedDamage;
     // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
-    if (!(Number(actor.system.vitality?.max) > 0))
-      return campaignStressPolicy(actor.system.campaignEffects)
-        ? loc`${amount} stress damage after campaign modifiers: roll the Damage save and mark that these modifiers are already included.`
-        : loc`${amount} stress damage: roll the Damage save for it.`;
+    if (!(Number(actor.system.vitality?.max) > 0)) {
+      if (amount > 0) await npcDamageSave(actor, { damage: amount, kind: "stress", campaignStressAdjusted: true });
+      return loc`${amount} stress damage after campaign modifiers; the standard character's Damage save is recorded separately.`;
+    }
     await postNonLethalDamage(actor, "stress", amount, source, { campaignStressAdjusted: true });
     return loc`${amount} stress damage recorded; any required Will save is on its damage report.`;
   }
@@ -524,6 +530,8 @@ export async function resolveHazardSave(actor, message) {
   }
   const succeeded =
     typeof check.successConfirmed === "boolean" ? check.successConfirmed : check.effectiveTotal >= save.dc;
+  const lease = await beginHazardResolution(actor, message);
+  if (lease.alreadyComplete) return finishHazardResolution(actor, message, lease);
   if (hazardSaveResolvers.has(save.kind))
     await hazardSaveResolvers.get(save.kind)(actor, message, save, succeeded, check);
   else if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);
@@ -556,8 +564,7 @@ export async function resolveHazardSave(actor, message) {
       await post(actor, [loc`The save fails: scarring.`, ...result.lines]);
     }
   }
-  await markCard(message, "hazardSave.resolved");
-  return succeeded;
+  return finishHazardResolution(actor, message, lease);
 }
 
 rollPipeline.register({
@@ -566,6 +573,10 @@ rollPipeline.register({
   order: 9730,
   chatControls({ message, check, actor }) {
     if (!check.hazardSave || check.hazardSave.resolved || check.superseded) return null;
+    if (hazardResolution(actor, message)?.state === "started")
+      return game.user?.isGM
+        ? [{ label: loc`Review interrupted hazard`, run: () => reviewHazardResolution(actor, message) }]
+        : null;
     return [{ label: loc`Apply this save's result`, run: () => resolveHazardSave(actor, message) }];
   }
 });
