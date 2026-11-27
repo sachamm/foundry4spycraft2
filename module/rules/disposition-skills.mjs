@@ -3,6 +3,7 @@ import { GC_DATA } from "./gc-tables.mjs";
 import { dispositionCheckModifier, dispositionToward, DISPOSITIONS } from "./gc/disposition.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { sceneDispositionState } from "./scene-disposition.mjs";
 
 const D = GC_DATA.core.disposition;
 export function dispositionCheckName(key, check) {
@@ -48,14 +49,15 @@ export function dispositionSkillPlan(system, key, check, target = null) {
     !target.actingActorId ||
     typeof target.actingActorUuid !== "string" ||
     !target.actingActorUuid ||
-    target.type !== "npc" ||
-    target.npcType === "villain" ||
-    target.sceneEffects === true
+    !["agent", "npc"].includes(target.type)
   )
     return {
       ...empty,
-      blockedReason: loc`Confirm an actual NPC target and the acting character. PC/villain disposition shifts require their separate scene effects.`
+      blockedReason: loc`Confirm the actual disposition target and acting character.`
     };
+  if (target.sceneEffects === true) return sceneSkillPlan(system, key, check, target, empty, name);
+  if (target.type !== "npc" || target.npcType === "villain")
+    return { ...empty, blockedReason: loc`PC and villain targets require their scene disposition record.` };
   const gradeId = dispositionToward(target.disposition, target.actingActorId),
     grade = DISPOSITIONS.find(g => g.id === gradeId);
   if (!grade) return { ...empty, blockedReason: loc`Review the target NPC's saved disposition grade.` };
@@ -98,6 +100,60 @@ export function dispositionSkillPlan(system, key, check, target = null) {
     blockedReason: "",
     notes: [
       loc`${target.name}: ${grade.name} disposition; check modifier ${modifier}, error range +${effect.error}, threat range +${effect.threat}, required-time multiplier ${priority}.`
+    ]
+  };
+}
+
+function sceneSkillPlan(system, key, check, target, empty, name) {
+  if (target.combatPersuasion)
+    return { ...empty, blockedReason: loc`PCs and villains do not use combat disposition decisions.` };
+  const state = sceneDispositionState(target.sceneDisposition, {
+      scene: target.scene,
+      worldTime: target.worldTime,
+      actingActorUuid: target.actingActorUuid
+    }),
+    kind = D.intimacyChecks.includes(name) ? "intimacy" : D.fondnessChecks.includes(name) ? "fondness" : null;
+  const modifier = kind ? state.modifier : 0,
+    special =
+      !system.npcType ||
+      ["special", "villain"].includes(system.npcType) ||
+      system.promoted === true ||
+      system.promotion?.mission === String(system.usagePeriods?.mission ?? "initial"),
+    diplomatic = special && modifier > 0 ? (system.campaignEffects?.positiveDispositionBonus ?? 0) : 0;
+  if (!Number.isSafeInteger(diplomatic) || diplomatic < 0)
+    throw Error(loc`Review the campaign's favorable-disposition skill bonus.`);
+  const effect = {
+    modifier,
+    diplomatic,
+    errorIncrease: kind ? state.error : 0,
+    threatIncrease: kind ? state.threat : 0,
+    priority: kind ? state.timeMultiplier : 1
+  };
+  return {
+    ...empty,
+    bonus: Math.max(0, modifier + diplomatic),
+    penalty: Math.min(0, modifier + diplomatic),
+    errorIncrease: effect.errorIncrease,
+    threatIncrease: effect.threatIncrease,
+    priority: effect.priority,
+    evidence: {
+      version: 2,
+      skillKey: key,
+      checkId: check.id,
+      targetActorUuid: target.actorUuid,
+      targetName: target.name,
+      actingActorId: target.actingActorId,
+      actingActorUuid: target.actingActorUuid,
+      targetConfirmed: true,
+      sceneEffects: true,
+      scene: target.scene,
+      degree: state.degree,
+      sources: state.active,
+      kind,
+      ...effect
+    },
+    notes: [
+      loc`${target.name}: temporary disposition degree ${state.degree}; check modifier ${modifier + diplomatic}, error range +${effect.errorIncrease}, threat range +${effect.threatIncrease}, required-time multiplier ${effect.priority}.`
     ]
   };
 }

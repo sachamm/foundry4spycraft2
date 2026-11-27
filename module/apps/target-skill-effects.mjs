@@ -3,7 +3,8 @@ import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 import { dispositionSkillPlan, hasDispositionCheck } from "../rules/disposition-skills.mjs";
-import { npcUsesSceneDisposition } from "../rules/gc/disposition.mjs";
+import { usesSceneDisposition } from "../rules/scene-disposition.mjs";
+import { readSetting } from "../settings.mjs";
 import { persuasionKey } from "../rules/gc/combat-persuasion.mjs";
 const actors = () =>
     Array.isArray(game.actors?.contents)
@@ -50,7 +51,7 @@ export function targetSkillEffectCandidates(key) {
 
 export function dispositionTargetCandidates(key) {
   if (!hasDispositionCheck(key)) return [];
-  return dispositionActors().filter(a => a.type === "npc" && readable(a) && !npcUsesSceneDisposition(a.system));
+  return dispositionActors().filter(a => readable(a) && (a.type === "npc" || usesSceneDisposition(a.type, a.system)));
 }
 /** Read target state only after permission checks and bind the acting character from its document. */
 export function dispositionSkillContext(input, key, acting) {
@@ -66,12 +67,15 @@ export function dispositionSkillContext(input, key, acting) {
     typeof uuid !== "string" ||
     !target ||
     target.uuid !== uuid ||
-    target.type !== "npc" ||
+    !["agent", "npc"].includes(target.type) ||
     !readable(target) ||
     (target.isToken && !readableScene(target.token?.parent))
   )
     throw Error(loc`The disposition target is unavailable or private. Ask the GC to resolve this check.`);
-  if (npcUsesSceneDisposition(target.system)) throw Error(loc`Villain disposition uses its separate scene effects.`);
+  const sceneEffects = usesSceneDisposition(target.type, target.system);
+  if (target.type === "agent" && !sceneEffects)
+    throw Error(loc`Agent-built companions require their NPC disposition rules.`);
+  if (binding && sceneEffects) throw Error(loc`PCs and villains do not use combat disposition decisions.`);
   if (input.targetSkillActorUuid && input.targetSkillActorUuid !== uuid)
     throw Error(loc`Choose the same actual target for disposition and target feat effects.`);
   let disposition = target.system.disposition,
@@ -108,10 +112,17 @@ export function dispositionSkillContext(input, key, acting) {
       name: target.name,
       type: target.type,
       npcType: target.system.npcType,
-      sceneEffects: npcUsesSceneDisposition(target.system),
+      sceneEffects,
       actingActorId: acting?.id,
       actingActorUuid: acting?.uuid,
       disposition,
+      ...(sceneEffects
+        ? {
+            sceneDisposition: target.flags?.spycraft2?.sceneDisposition ?? null,
+            scene: String(readSetting("usagePeriods", {})?.scene ?? "initial"),
+            worldTime: game.time?.worldTime ?? 0
+          }
+        : {}),
       ...(frozen ? { combatPersuasion: frozen } : {}),
       confirmed: !!frozen || input.dispositionTargetConfirmed === true
     }
@@ -121,7 +132,7 @@ export function dispositionTargetContent(key) {
   const candidates = dispositionTargetCandidates(key);
   if (!candidates.length) return "";
   const esc = foundry.utils.escapeHTML;
-  return `<details><summary>${loc`NPC disposition toward this character`}</summary><p>${loc`For one actual NPC target. Apply the target's recorded disposition toward the acting character to the applicable named check and Disposition-tagged timing. Private targets require the GC. Player and villain scene effects require separate GC adjudication.`}</p><label>${loc`NPC disposition target`} <select name="dispositionTargetUuid"><option value="">${loc`No selected disposition target`}</option>${candidates.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join("")}</select></label><label><input name="dispositionTargetConfirmed" type="checkbox" /> ${loc`The GC confirms this check targets that NPC and its recorded disposition applies`}</label></details>`;
+  return `<details><summary>${loc`Disposition toward this character`}</summary><p>${loc`Select one actual target. NPCs use their recorded attitude; PCs and villains use active scene effects for this acting character. The GC records successful sources and ends them early when required. Private targets require the GC.`}</p><label>${loc`Disposition target`} <select name="dispositionTargetUuid"><option value="">${loc`No selected disposition target`}</option>${candidates.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join("")}</select></label><label><input name="dispositionTargetConfirmed" type="checkbox" /> ${loc`The GC confirms this check targets that character and its recorded disposition effects apply`}</label></details>`;
 }
 export function validateDispositionSkillProof(proof, { actor, checkKind, skillKey, checkId } = {}) {
   if (!proof) return;

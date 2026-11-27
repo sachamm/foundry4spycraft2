@@ -6,6 +6,7 @@ import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { campaignEffects, activeQualities } from "../module/rules/gc/campaign.mjs";
 import { rollNpcSkill } from "../module/apps/gc/npc-play.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { sceneDispositionChange } from "../module/rules/scene-disposition.mjs";
 import {
   dispositionSkillContext,
   dispositionTargetCandidates,
@@ -204,6 +205,106 @@ const check = (key, id) => cfg.skills[key].checks.find(c => c.id === id),
     disposition: { base: "neutral", toward: { pc: { grade } } }
   }),
   opts = { synergySkill: "none", gearStatus: "available" };
+test("PC and villain scene degrees affect every Intimacy/Fondness use, including timing without a Disposition tag", () => {
+  for (const type of ["agent", "npc"])
+    for (const direction of [-1, 1])
+      for (const count of [1, 2]) {
+        let record;
+        for (let i = 0; i < count; i++)
+          record = sceneDispositionChange(record, {
+            id: `source${i}`,
+            sourceKey: `Check.${i}`,
+            source: "Confirmed influence",
+            direction,
+            scene: "s1",
+            worldTime: 100,
+            actingActorUuid: "Actor.pc",
+            reviewerId: "gc",
+            confirmed: true
+          });
+        const t = {
+          ...target("adversarial"),
+          type,
+          npcType: type === "npc" ? "villain" : undefined,
+          sceneEffects: true,
+          sceneDisposition: record,
+          scene: "s1",
+          worldTime: 101
+        };
+        for (const [key, id] of [
+          ["impress", "persuasion"],
+          ["impress", "influence"],
+          ["blend", "stealth"]
+        ]) {
+          const c = check(key, id),
+            b = resolveSkillCheck(state(), key, c, opts),
+            p = resolveSkillCheck(state(), key, c, { ...opts, dispositionTarget: t });
+          assert.equal(p.total, b.total + direction * count * 2, `${type}/${key}/${id}`);
+          assert.equal(p.error, b.error + (direction === -1 && count === 2 ? 1 : 0));
+          assert.equal(p.threat, b.threat - (direction === 1 && count === 2 ? 1 : 0));
+          assert.equal(p.timeMultiplier, direction === 1 ? (count === 1 ? 0.5 : 0.25) : count === 1 ? 2 : 4);
+          assert.equal(p.timeRounding, direction === 1 ? "up" : null);
+          assert.equal(p.dispositionSkill.degree, direction * count);
+          assert.equal(p.dispositionSkill.sources.length, count);
+          const expired = resolveSkillCheck(state(), key, c, { ...opts, dispositionTarget: { ...t, scene: "s2" } });
+          assert.equal(expired.total, b.total);
+          assert.equal(expired.timeMultiplier, 1);
+        }
+        const unlisted = plan(state(), "impress", check("impress", "persuasion"), {
+          ...t,
+          actingActorUuid: "Actor.someoneElse"
+        });
+        assert.equal(unlisted.bonus + unlisted.penalty, 0);
+      }
+});
+
+test("actual scene target records ignore invented payloads and posting rejects an expiry or a changed scene", () => {
+  const { actor, npc } = npcContext();
+  actor.type = "agent";
+  npc.type = "agent";
+  game.time = { worldTime: 100 };
+  let scene = "s1";
+  game.settings = { get: (_system, key) => (key === "usagePeriods" ? { scene } : undefined) };
+  npc.flags.spycraft2 = {
+    sceneDisposition: sceneDispositionChange(null, {
+      id: "a",
+      sourceKey: "Check.a",
+      source: "Confirmed influence",
+      direction: 1,
+      durationSeconds: 5,
+      scene,
+      worldTime: 100,
+      actingActorUuid: actor.uuid,
+      reviewerId: "gc",
+      confirmed: true
+    })
+  };
+  const request = {
+      dispositionTargetUuid: npc.uuid,
+      dispositionTargetConfirmed: true,
+      dispositionTarget: { sceneEffects: false, disposition: { base: "helpful" } }
+    },
+    actual = dispositionSkillContext(request, "impress", actor).dispositionTarget,
+    p = plan(actor.system, "impress", check("impress", "persuasion"), actual),
+    validation = { actor, checkKind: "skill", skillKey: "impress", checkId: "persuasion" };
+  assert.equal(actual.sceneEffects, true);
+  assert.equal(p.evidence.degree, 1);
+  assert.equal(p.bonus, 3);
+  validateDispositionSkillProof(p.evidence, validation);
+  game.time.worldTime = 105;
+  assert.throws(() => validateDispositionSkillProof(p.evidence, validation), /changed before posting/);
+  game.time.worldTime = 101;
+  scene = "s2";
+  assert.throws(() => validateDispositionSkillProof(p.evidence, validation), /changed before posting/);
+  assert.equal(
+    plan(actor.system, "impress", check("impress", "persuasion"), {
+      ...actual,
+      combatPersuasion: {}
+    }).blockedReason.includes("combat disposition"),
+    true
+  );
+});
+
 test("printed disposition result/error/threat values apply to the actual intimacy/fondness check", () => {
   for (const [grade, intimacy, ie, fondness, fe, ft] of [
     ["helpful", -8, 3, 6, 0, 3],
@@ -314,11 +415,11 @@ test("target access precedes private reads; invented target records are replaced
   assert.equal(hasDispositionCheck("impress"), true);
   assert.equal(hasDispositionCheck("athletics"), false);
   npc.system.manualRole = "minion";
-  assert.deepEqual(dispositionTargetCandidates("impress"), []);
-  assert.throws(() => dispositionSkillContext(input, "impress", actor), /separate scene effects/);
+  assert.deepEqual(dispositionTargetCandidates("impress"), [npc]);
+  assert.equal(dispositionSkillContext(input, "impress", actor).dispositionTarget.sceneEffects, true);
   npc.system.manualRole = "";
   npc.system.npcProfile = { enabled: true, qualities: [{ id: "henchman" }] };
-  assert.deepEqual(dispositionTargetCandidates("impress"), []);
+  assert.deepEqual(dispositionTargetCandidates("impress"), [npc]);
 });
 
 test("actual PC combat roll automatically binds the reserved NPC and frozen attitude without trusting a supplied target record", async () => {

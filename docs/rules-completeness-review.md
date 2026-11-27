@@ -1016,3 +1016,42 @@ All **243** layout checks also pass. Lint, formatting, bundling and copy checks 
 Scores remain **PC creation 9.4/10 and combat 9.5/10**. Whole-Complex-Task
 timing scope, temporary PC/villain effects and the broader documented creation
 and combat gaps still require implementation and review.
+
+### Temporary PC/villain disposition review — 27 November 2026
+
+PCs and actual villain roles now use the p.458 temporary effects instead of
+persistent NPC attitude grades. The GC records each successful source for one
+acting character. The effects advance or cancel one degree at a time, cap at
+two degrees, and change Intimacy/Fondness results, ranges and time. They do not
+decide player behavior, Loyalty or combat allegiance. Standard NPC grades are
+preserved. Agent-built companions are not silently treated as player characters.
+
+The new sheet workflow records the source occurrence once, supports an earlier
+remaining duration or explicit early end, and leaves an Undo receipt naming the
+source and resulting degree. An expired or ended source is excluded; scene
+changes expire all remaining effects. A source ignored at the cap does not
+become a deferred extra degree. Retained sources are evaluated in their saved
+order when another source expires. The GC still adjudicates the source's success
+and records non-timed early endings; the workflow does not claim to resolve all
+disposition-changing abilities automatically.
+
+Actual PC and named NPC checks can select readable PC/villain targets. Effects
+apply to every Intimacy/Fondness use, including timing for checks without the
+Disposition tag. Diplomatic retains its role scope; time reductions follow the
+confirmed additive policy. Private targets are checked before their state is
+read, supplied target records are replaced from actual documents, and posting
+guards detect source changes, expiry and scene changes. Completed cards retain
+their recorded effects for settlement.
+
+Native Foundry exercised the GC source dialog at 1280×720, both positive
+degrees, cancellation, duplicate rejection, Undo, early end, a two-degree
+villain penalty, exact timed expiry and scene expiry. Saved cards remained
+unchanged. No browser errors occurred; the only diagnostic was Foundry's known
+minimum-resolution warning. All **4,196** Node tests and **988** fixture
+assertions pass. The full **243** layout checks and **126** focused dialog
+checks pass; the latter include the new source/expiry layout case. Lint,
+formatting, bundling and copy checks pass with existing warnings.
+
+Scores remain **PC creation 9.4/10 and combat 9.5/10**. The documented source
+audit, creation histories/options and remaining combat rules still prevent a
+defensible 9.9 rating. The next pass continues with those gaps.

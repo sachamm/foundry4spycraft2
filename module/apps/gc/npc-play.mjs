@@ -26,6 +26,7 @@ import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { readSetting } from "../../settings.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
+import { manageSceneDisposition } from "../scene-disposition.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { manageCombatPersuasion } from "./combat-persuasion.mjs";
 import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
@@ -457,6 +458,7 @@ export function dispositionRows(actor) {
 /** Set, shift or roll against an NPC's disposition toward a character (or its general attitude). */
 export async function manageDisposition(actor) {
   if (!game.user.isGM) return refuse(loc`The GC manages NPC dispositions.`);
+  if (isVillain(actor)) return manageSceneDisposition(actor);
   const record = dispositionRecord(actor),
     villain = isVillain(actor),
     mission = String(actor.system.usagePeriods?.mission ?? "initial");

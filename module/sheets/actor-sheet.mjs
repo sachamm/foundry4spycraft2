@@ -149,6 +149,8 @@ import {
   dispositionRows
 } from "../apps/gc/npc-play.mjs";
 import { costsAction } from "../apps/gc/combat.mjs";
+import { manageSceneDisposition } from "../apps/scene-disposition.mjs";
+import { usesSceneDisposition } from "../rules/scene-disposition.mjs";
 import { loc } from "../i18n.mjs";
 import { featActions } from "./feat-actions.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
@@ -343,6 +345,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ),
       // Buttons that hand the actor to a workflow.
       ...actorWorkflows({
+        manageSceneDisposition,
         selectCakewalkSkills,
         recordUncontrolledFall,
         checkReflexDamage,
@@ -1330,6 +1333,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       };
     context.subplotKindLabel = loc`Subplot type`;
     context.crossroadsXPReviewLabel = loc`Review mission title XP`;
+    context.canManageSceneDisposition = game.user.isGM && usesSceneDisposition(this.actor.type, sys);
+    context.sceneDispositionLabel = loc`Scene disposition effects`;
     context.crossroadsSessionReviewLabel = loc`Review session title dice`;
     context.completeCrossroadsLabel = loc`Complete Crossroads and award title`;
     context.canCompleteCrossroads = sys.subplots.some(
@@ -2046,6 +2051,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       gcPlay: {
         damage: (state => ({ ...state, stateLabel: damageStateLabel(state.track.state) }))(damageSaveState(this.actor)),
         special: npcIsSpecial(this.actor),
+        sceneDisposition: usesSceneDisposition(this.actor.type, sys),
+        sceneDispositionLabel: loc`Scene disposition effects`,
         dispositions: dispositionRows(this.actor),
         baseDisposition: sys.disposition?.base ?? "neutral"
       },

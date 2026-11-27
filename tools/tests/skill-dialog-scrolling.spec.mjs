@@ -25,6 +25,7 @@ import {
   completeCrossroads
 } from "../../module/apps/crossroads-xp.mjs";
 import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
+import { manageSceneDisposition } from "../../module/apps/scene-disposition.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -223,7 +224,45 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
-test("actual NPC disposition target selection and confirmation remain reachable at720px", async ({ page }) => {
+test("scene disposition source and expiry controls remain reachable at720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game,
+    oldRandom = foundry.utils.randomID;
+  try {
+    foundry.utils.randomID = () => "layout-scene-effect";
+    globalThis.game = {
+      user: { id: "gc", isGM: true },
+      time: { worldTime: 0 },
+      settings: { get: () => ({ scene: "s1" }) },
+      actors: [{ uuid: "Actor.acting", name: "Acting character", type: "agent" }]
+    };
+    await manageSceneDisposition({
+      uuid: "Actor.target",
+      name: "PC target",
+      type: "agent",
+      isOwner: true,
+      system: {},
+      flags: {}
+    });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByLabel("Source check, ability or rule", { exact: true }).fill("Successful Influence");
+    await page.getByLabel("Source occurrence (check link or unique use)", { exact: true }).fill("ChatMessage.source");
+    await page.getByLabel("Seconds remaining before the source ends (blank for scene end)", { exact: true }).fill("30");
+    await expect(page.locator('option[value="end"]')).toBeDisabled();
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+    foundry.utils.randomID = oldRandom;
+  }
+});
+
+test("actual disposition target selection and confirmation remain reachable at720px", async ({ page }) => {
   const prior = content,
     oldGame = game;
   try {
@@ -249,7 +288,7 @@ test("actual NPC disposition target selection and confirmation remain reachable 
     await render(page, 720);
     await page.setViewportSize({ width: 1280, height: 720 });
     await page
-      .getByRole("combobox", { name: "NPC disposition target", exact: true })
+      .getByRole("combobox", { name: "Disposition target", exact: true })
       .selectOption("Actor.disposition-target");
     await page.locator('[name="dispositionTargetConfirmed"]').check();
     await page.locator("#confirm").scrollIntoViewIfNeeded();
