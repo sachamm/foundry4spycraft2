@@ -1,4 +1,4 @@
-/** World state for the Game Control tools: the mission record, campaign qualities, scene state and Dramatic Conflicts. */
+/** World state for the Game Control tools: the mission record, campaign qualities, scene state, organizations and Dramatic Conflicts. */
 import { renderOpenSheet } from "../../services/refresh.mjs";
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
@@ -35,6 +35,8 @@ export function registerGCSettings() {
     hidden({ scene: null, dramatic: false, source: null, dcBoosts: 0 }, refreshConsole)
   );
   game.settings.register(SYSTEM, "conflicts", hidden({}, refreshConsole));
+  // The Agency and the other enduring organizations (pp.389–395), by id.
+  game.settings.register(SYSTEM, "organizations", hidden({}, refreshConsole));
   // Which console sections this GC has opened or closed, kept in the browser rather than the world.
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
@@ -162,6 +164,17 @@ export async function setSceneState(change) {
 }
 export const isDramaticScene = () => getSceneState().dramatic === true;
 
+export const getOrganizations = () => ({ ...read("organizations", {}) });
+export async function saveOrganization(id, organization) {
+  requireGC();
+  const all = getOrganizations();
+  if (organization === null) delete all[id];
+  else all[id] = organization;
+  await game.settings.set(SYSTEM, "organizations", all);
+  return organization;
+}
+/** The organization the GC marked as the team's Agency, if any. */
+export const agencyOrganization = () => Object.values(getOrganizations()).find(org => org?.agency) ?? null;
 export const getConflicts = () => ({ ...read("conflicts", {}) });
 export async function saveConflict(id, conflict) {
   requireGC();

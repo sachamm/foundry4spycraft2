@@ -190,7 +190,8 @@ export function gearAcquisitionPlan(
     sourcesOption = "",
     sourcesOptionConfirmed = false,
     atHome = false,
-    usePersonalStash = false
+    usePersonalStash = false,
+    agencySite = null
   } = {}
 ) {
   const existing = currentReserves(system),
@@ -304,6 +305,17 @@ export function gearAcquisitionPlan(
   if (!DELIVERY[location]) throw new Error(loc`Choose a source-listed delivery location.`);
   if (!Number.isSafeInteger(availableFunding) || availableFunding < cost)
     throw new Error(loc`Not enough action dice remain in the selected funding.`);
+  // An Agency Site (p.394): +4 on Requests it serves, and they arrive in half the time.
+  if (
+    agencySite &&
+    !String(agencySite.category ?? "")
+      .split("/")
+      .includes(category)
+  )
+    throw new Error(
+      loc`The ${agencySite.name} serves ${agencySite.request}, not category ${category} Requests. Choose another Site or none.`
+    );
+  const site = agencySite ? [{ name: loc`${agencySite.name} (Agency Site)`, value: agencySite.bonus ?? 4 }] : [];
   const priority = priorityRequestBonus(system, category),
     local = localHeroRequestBonus(system, { homeTurf }),
     requestBase =
@@ -329,10 +341,11 @@ export function gearAcquisitionPlan(
     abilityRecord: use?.record,
     automatic: !!benefit?.automatic,
     dc: 10 * caliber,
-    bonus: requestBase + priority.bonus + local.bonus,
-    bonusSources: [...priority.sources, ...local.sources],
+    bonus: requestBase + priority.bonus + local.bonus + (site[0]?.value ?? 0),
+    bonusSources: [...priority.sources, ...local.sources, ...site],
+    agencySite: agencySite?.id ?? "",
     location,
-    deliveryMultiplier: useProcure ? 0.5 : 1,
+    deliveryMultiplier: (useProcure ? 0.5 : 1) * (agencySite ? 0.5 : 1),
     delivery: benefit?.immediate ? IMMEDIATE_DELIVERY : DELIVERY[location],
     record: {
       ...record,

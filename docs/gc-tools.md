@@ -144,6 +144,12 @@ All seven types are supported with their printed Strategies, requirements, modif
 
 All 60 qualities are listed with XP modifier and action die cost. Season qualities apply to every mission; mission qualities are scripted (XP applies) or bought with action dice (no XP).
 
+The qualities in force change the rolls themselves: threat and attack modifiers (Violent, Subtle), Triumph thresholds (the Spectacle qualities), range and blast increments (Gunmen), critical injury bands and costs (Bloodbath and its kin), stress (Tense, Mellow), falling damage (Wire-Fu), the skill caps (Omni-Competent), surprise and persuasion modifiers (Paranoid), error ranges (Comedy of Errors), action dice (Spirited), Lead Advantage and challenge counts (Speed-Frame, Thriller) and the honor exposure penalty (Virtuous, Corrupt). The Campaign qualities section lists each change in force.
+
+## Organizations (pp.389–395)
+
+**Add organization** records the Agency or a rival with its five Power Ratings, goals, turning points, Image facets, Sites and Tools. The console shows each one's total and what is over or under its Ratings; **Post summary** whispers its Ratings, the Canvass and Research levels of each facet, the cover and immunity bonuses its people carry, and its goal dice. Marking one as the Agency puts its Sites on the Request dialog (+4 and half the delivery time in the categories each Site serves), and either side of a Dramatic Conflict can take its Ratings from a recorded organization.
+
 ## Reference
 
 Security devices at any Power Rating with sensor and trap rolls (Table 7.9), hazards and nature's fury by dice spent (Tables 7.2–7.3), event summaries, and random possessions (Table 7.16, also a **GC Tables** roll-table compendium).
@@ -152,7 +158,8 @@ Security devices at any Power Rating with sensor and trap rolls (Table 7.9), haz
 
 - Strategy choices are entered by the GC; players tell the GC their choice privately. Opposed checks are rolled on the sheets and the totals typed in.
 - Advantage effects other than Lead, Swap, Victory and Halt are reported, not applied.
-- Disposition and campaign-quality modifiers are shown but not added to agents' rolls automatically. Of the campaign qualities, only XP, action die cost and starting action dice are applied; the rest is a reference list.
+- Disposition modifiers are shown but not added to agents' rolls automatically. Campaign qualities that need a ruling at the table (a DC the GC calls aloud, which side a scene favors) appear as card notes.
+- Organization goal dice and turning-point morale are listed on the summary card; the GC grants them.
 - Initiative boosts for the dramatic-scene spend change the Count; Defense and DC boosts are reported for the GC to apply.
 - Some printed cells are garbled or inconsistent in the source text; each is listed under `anomalies` in `src/data/gc-tables.json` and `src/data/conflicts.json` and kept as printed.
 

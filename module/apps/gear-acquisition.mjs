@@ -27,7 +27,19 @@ import {
   officeGossipTake10
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
+import { organizationSite, siteForRequest } from "../rules/gc/organization.mjs";
+import { agencyOrganization } from "./gc/state.mjs";
 import { loc } from "../i18n.mjs";
+
+/** The Agency's Sites a Request may go through (p.394): +4 and half the delivery time. */
+function agencySiteSelect() {
+  const sites = (agencyOrganization()?.sites ?? []).map(organizationSite).filter(Boolean);
+  if (!sites.length) return "";
+  return `<label>${loc`Agency Site`} <select name="agencySite"><option value="">${loc`None`}</option>${sites
+    .map(site => `<option value="${esc(site.id)}">${esc(loc`${site.name}: ${site.request} (+4, half time)`)}</option>`)
+    .join("")}</select></label>`;
+}
+const chosenSite = id => (id ? siteForRequest(agencyOrganization(), id) : null);
 import { same } from "../rules/equal.mjs";
 import { postedReceipt } from "../services/message-lookup.mjs";
 const queued = (actor, work, options) => queueResources([actor], work, options);
@@ -124,6 +136,7 @@ export async function rollGearAcquisition(actor, options = {}) {
      .map(([key, d]) => `<option value="${key}">${esc(d.label)}: ${d.formula} ${d.unit}</option>`)
      .join("")}</select></label>
    <label><input type="checkbox" name="notIntel" /> ${loc`We are in the field, after the Intel Phase`}</label>
+   ${agencySiteSelect()}
    <label><input type="checkbox" name="homeTurf" /> ${loc`Request is within my home turf: five-block urban radius or one-mile wilderness radius of home (Local Hero)`}</label>
    <label><input type="checkbox" name="rapidCommunication" /> ${loc`Request: rapid communication is available`}</label>
    <label><input type="checkbox" name="minuteAvailable" /> ${loc`Request: spend one full minute communicating`}</label>
@@ -164,6 +177,7 @@ export async function rollGearAcquisition(actor, options = {}) {
   }
   const preview = gearAcquisitionPlan(actor.system, {
       ...input,
+      agencySite: chosenSite(input.agencySite),
       caliber: Number(input.caliber ?? 1),
       availableFunding: Number.MAX_SAFE_INTEGER
     }),
@@ -226,6 +240,7 @@ export async function rollGearAcquisition(actor, options = {}) {
       }
       const plan = gearAcquisitionPlan(actor.system, {
           ...input,
+          agencySite: chosenSite(input.agencySite),
           caliber: Number(input.caliber ?? 1),
           availableFunding: funding.reduce((n, f) => n + f.count, 0)
         }),

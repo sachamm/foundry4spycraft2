@@ -7,6 +7,7 @@ import { installResolutionGuide } from "../resolution-guide.mjs";
 import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
 import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
+import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
@@ -23,6 +24,7 @@ import * as mission from "./mission.mjs";
 import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
+import * as organizations from "./organizations.mjs";
 import * as tables from "./tables.mjs";
 import { addNpcToScene } from "./add-npc.mjs";
 import * as turn from "./console-turn.mjs";
@@ -134,6 +136,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
       consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
       startConflict: guard(() => conflicts.startConflictDialog()),
+      addOrganization: guard(() => organizations.editOrganization()),
+      editOrganization: guard((event, target) => organizations.editOrganization(target.dataset.id)),
+      organizationCard: guard((event, target) => organizations.organizationCard(target.dataset.id)),
+      removeOrganization: guard((event, target) => organizations.removeOrganization(target.dataset.id)),
       advanceConflict: guard((event, target) => conflicts.advanceConflict(target.dataset.id)),
       manageConflict: guard((event, target) => conflicts.manageConflict(target.dataset.id)),
       clockStep: guard((event, target) => advanceClock(Number(target.dataset.seconds))),
@@ -280,7 +286,7 @@ function rememberView(view, state) {
 }
 /** Which sections each view shows. A search looks through all of them. */
 const VIEW_SECTIONS = {
-  prep: ["mission", "objectives", "antagonists", "complications", "campaign", "reference"],
+  prep: ["mission", "objectives", "antagonists", "complications", "organizations", "campaign", "reference"],
   play: ["combat", "dice", "objectives", "antagonists", "conflicts", "clock", "reference"],
   wrap: ["mission", "objectives", "antagonists", "campaign"]
 };
@@ -354,6 +360,7 @@ export function consoleSections({ missionActive, combat, conflictsRunning }, sto
     dice: missionActive ? "active" : "planning",
     combat: combat ? "running" : "idle",
     conflicts: conflictsRunning ? "running" : "idle",
+    organizations: "always",
     campaign: "always",
     reference: "always"
   };
@@ -366,6 +373,7 @@ export function consoleSections({ missionActive, combat, conflictsRunning }, sto
     dice: missionActive,
     combat: !!combat,
     conflicts: conflictsRunning,
+    organizations: false,
     campaign: false,
     reference: false
   };
@@ -517,7 +525,7 @@ export function consoleContext() {
     season: qualities
       .filter(quality => quality.source === "season")
       .map(quality => ({ name: quality.name, xp: signed(quality.xp), summary: quality.summary })),
-    effects: Object.entries(effects).map(([key, value]) => ({ key, value: JSON.stringify(value) })),
+    ruleLines: campaignRuleLines(effects),
     effectConflicts,
     combat: combatNow
       ? {
@@ -534,6 +542,7 @@ export function consoleContext() {
         }
       : null,
     conflicts: conflictList,
+    organizations: organizations.organizationRows(),
     counts: {
       objectives: `${m.objectives.filter(objective => objective.complete).length}/${m.objectives.length}`,
       antagonists: m.antagonists.length,

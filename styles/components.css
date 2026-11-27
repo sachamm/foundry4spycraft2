@@ -968,6 +968,13 @@
 }
 
 /* A pick list keeps the rows its size asks for; Foundry's one-line select height would cut it to a single row. */
+/* A long list of tick boxes (organization goals, turning points, Sites) in columns. */
+.spycraft2-roll-options .sc2-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--sc2-space-1) var(--sc2-space-3);
+}
+
 .spycraft2-roll-options select.sc2-pick-list {
   height: auto;
   min-height: 15em;

@@ -2322,3 +2322,17 @@ test("Political Clout, Favors and Immunity: once per mission, automatic, no acti
   assert.throws(() => gearAcquisitionPlan(s, input), /no uses/);
   assert.equal(DELIVERY.largeCity.formula, "3d20", "ordinary delivery is unchanged");
 });
+
+test("an Agency Site adds +4 and halves delivery for the Requests it serves (p.394)", () => {
+  const sys = system();
+  sys.missionReserves = reserveInitialization(sys, [], initialize);
+  const site = { id: "classroom", name: "Classroom", request: "Skill training requests", category: "R", bonus: 4 };
+  const plan = gearAcquisitionPlan(sys, { ...request, agencySite: site });
+  assert.equal(plan.bonus, 13);
+  assert.equal(plan.deliveryMultiplier, 0.5);
+  assert.equal(plan.agencySite, "classroom");
+  assert.throws(
+    () => gearAcquisitionPlan(sys, { ...request, agencySite: { ...site, category: "W" } }),
+    /serves Skill training requests/
+  );
+});

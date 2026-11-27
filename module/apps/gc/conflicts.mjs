@@ -23,7 +23,8 @@ import {
   roomFeatFor,
   easedRoom
 } from "../../rules/gc/conflict.mjs";
-import { requireGC, getConflicts, saveConflict } from "./state.mjs";
+import { requireGC, getConflicts, saveConflict, getOrganizations } from "./state.mjs";
+import { conflictRatings } from "../../rules/gc/organization.mjs";
 import {
   MANEUVERING_ROOM,
   chaseScale,
@@ -123,6 +124,16 @@ const chaseLine = (conflict, state) => {
   return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${eased}${distance !== null ? loc` · ${distance.toLocaleString("en-US")} ft. apart (${r.leadFeet} ft. per Lead)` : ""}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ""}${r.fastest ? loc` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ""}${r.mismatched ? ` · <b>${loc`mismatched scales: settle with one opposed check`}</b>` : ""}${smashText}`;
 };
 
+/** Choose a recorded organization for either side, so its Ratings fill the Conflict's rating fields. */
+function organizationPickers() {
+  const rows = Object.entries(getOrganizations()).map(([id, org]) => [id, org.name || id]);
+  if (!rows.length) return "";
+  const pick = () => `<option value="">${esc(loc`None`)}</option>${options(rows, "")}`;
+  return `<fieldset><legend>${loc`Organization Ratings (Infiltration, Manhunt, Seduction)`}</legend>
+      <label>${loc`Predator organization`} <select name="predatorOrganization">${pick()}</select></label>
+      <label>${loc`Prey organization`} <select name="preyOrganization">${pick()}</select></label></fieldset>`;
+}
+
 export function conflictRows() {
   return Object.entries(getConflicts()).map(([id, conflict]) => ({
     id,
@@ -147,6 +158,7 @@ export async function startConflictDialog() {
     <label>${loc`Name`} <input name="name" placeholder="${loc`e.g. Rooftop pursuit`}" /></label>
     <label>${loc`Predator`} <input name="predator" /></label>
     <label>${loc`Prey`} <input name="prey" /></label>
+    ${organizationPickers()}
     <fieldset><legend>${loc`Chase only`}</legend>
       <label>${loc`Predator vehicle or character`} <select name="predatorActor">${options(chaseActorOptions(), "")}</select></label>
       <label>${loc`Prey vehicle or character`} <select name="preyActor">${options(chaseActorOptions(), "")}</select></label>
@@ -168,6 +180,17 @@ export async function startConflictDialog() {
     first.predator ||= state.predator?.actor.name ?? "";
     first.prey ||= state.prey?.actor.name ?? "";
     chaseNote = `<p><b>${loc`From the vehicles:`}</b> ${loc`starting Lead ${start.lead} (${start.rating} difference ${signed(start.difference)}). ${chaseLine({ ...{ lead: start.lead }, predator: { name: first.predator }, prey: { name: first.prey } }, state)}.`}</p>`;
+  }
+  // An organization's Ratings fill the Infiltration, Manhunt and Seduction ratings that name them (p.389).
+  for (const [side, key] of [
+    ["p", "predatorOrganization"],
+    ["q", "preyOrganization"]
+  ]) {
+    const org = getOrganizations()[first[key]];
+    if (!org) continue;
+    suggested[side] = { ...conflictRatings(org), ...(suggested[side] ?? {}) };
+    if (side === "p") first.predator ||= org.name;
+    else first.prey ||= org.name;
   }
   const leadRows = (rules.startingLead?.rules ?? [])
     .map(rule => `<li>${esc(rule.when)}: ${rule.lead ?? esc(rule.formula ?? rule.result ?? "")}</li>`)

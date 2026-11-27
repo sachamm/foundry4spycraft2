@@ -110,11 +110,44 @@
     <ul data-sc2-display="icon">{{#each conflicts}}<li><b>{{name}}</b> ({{type}}{{localize "SPYCRAFT.Template.AppsGcConsole.Round2"}} {{round}}{{localize "SPYCRAFT.Template.AppsGcConsole.Lead"}} <b>{{lead}}</b>, {{predator}} {{localize "SPYCRAFT.Template.AppsGcConsole.Vs"}} {{prey}} · {{#if winner}}{{localize "SPYCRAFT.Template.AppsGcConsole.Ended"}} {{winner}} {{localize "SPYCRAFT.Template.AppsGcConsole.Wins"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.Step"}} {{step}}{{/if}}
     {{#unless winner}}<button type="button" class="sc2-action" data-action="advanceConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.NextStep"}}</button> · {{/unless}}<button type="button" class="sc2-action" data-action="manageConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Manage"}}</button></li>{{else}}<li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoneRunning"}}</li>{{/each}}</ul>
   </details>
+  <details class="gc-section" data-section="organizations"
+    data-view-hidden="{{hiddenSections.organizations}}" data-state="{{sections.organizations.state}}"
+    {{#if sections.organizations.open}}open{{/if}}>
+    <summary>
+      <span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Organizations"}}</span>
+      {{#if organizations.length}}<span class="gc-note">{{organizations.length}}</span>{{/if}}
+    </summary>
+    <p class="controls">
+      <button type="button" class="gc-primary" data-action="addOrganization"
+        data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.AddOrganizationHint"}}">
+        {{localize "SPYCRAFT.Template.AppsGcConsole.AddOrganization"}}</button>
+    </p>
+    <ul data-sc2-display="icon">
+      {{#each organizations}}
+      <li>
+        <b>{{name}}</b>{{#if agency}} ({{localize "SPYCRAFT.Template.AppsGcConsole.TheAgency"}}){{/if}}
+        · {{localize "SPYCRAFT.Template.AppsGcConsole.RatingsTotal"}} {{total}}
+        · <span class="{{#if bad}}bad{{else}}muted{{/if}}">{{status}}</span>
+        <button type="button" class="sc2-action" data-action="organizationCard" data-id="{{id}}"
+          data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.OrganizationCardHint"}}">
+          {{localize "SPYCRAFT.Template.AppsGcConsole.PostSummary"}}</button>
+        <button type="button" class="sc2-action" data-action="editOrganization" data-id="{{id}}">
+          {{localize "SPYCRAFT.Template.AppsGcConsole.Edit"}}</button>
+        <button type="button" class="sc2-action" data-action="removeOrganization" data-id="{{id}}"
+          data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.RemoveOrganizationHint"}}">
+          {{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button>
+      </li>
+      {{else}}
+      <li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoOrganizations"}}</li>
+      {{/each}}
+    </ul>
+  </details>
   <details class="gc-section" data-section="campaign" data-view-hidden="{{hiddenSections.campaign}}" data-state="{{sections.campaign.state}}" {{#if sections.campaign.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQualities"}}</span></summary>
     <p class="controls"><button type="button" class="gc-primary" data-action="seasonQualities">{{localize "SPYCRAFT.Template.AppsGcConsole.SeasonQualities"}}</button></p>
     <ul data-sc2-display="icon">{{#each season}}<li data-tooltip="{{summary}}">{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP3"}} {{summary}}</li>{{else}}<li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoSeasonLongQualities"}}</li>{{/each}}</ul>
-    {{#if effects.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.CombinedNumericEffects"}} {{#each effects}}{{key}} {{value}}{{#unless @last}}; {{/unless}}{{/each}}</p>{{/if}}
+    {{#if ruleLines.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.RulesInForce"}}</p>
+    <ul data-sc2-display="icon">{{#each ruleLines}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
     {{#each effectConflicts}}<p class="bad">{{key}} {{localize "SPYCRAFT.Template.AppsGcConsole.IsSetDifferentlyBy"}} {{qualities}}{{localize "SPYCRAFT.Template.AppsGcConsole.GCRulingNeeded"}}</p>{{/each}}
   </details>
   <details class="gc-section" data-section="reference" data-view-hidden="{{hiddenSections.reference}}" data-state="{{sections.reference.state}}" {{#if sections.reference.open}}open{{/if}}>
