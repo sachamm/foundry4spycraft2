@@ -556,6 +556,19 @@ test("Paranoid gives a special NPC its surprise bonus on a Hide check (p.408)", 
   }
 });
 
+test("Omni-Competent halves Paranoid's persuasion penalty on an NPC check (p.408)", async () => {
+  await state.setCampaign({ qualities: ["paranoid"] });
+  try {
+    let roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", paranoidPersuasion: true });
+    assert.equal(roll.data.total, 9 + 2 - 4);
+    await state.setCampaign({ qualities: ["paranoid", "omni-competent"] });
+    roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", paranoidPersuasion: true });
+    assert.equal(roll.data.total, 9 + 2 - 2);
+  } finally {
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
 test("an animal's trained qualities steady its Morale, and a check off its list warns (p.445)", async () => {
   const system = guard.system,
     kept = { type: system.npcType, effects: system.qualityEffects };

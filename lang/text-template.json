@@ -1138,6 +1138,7 @@
    "BurrowingPermittedByThisQuality_10avcm6": "Burrowing permitted by this quality.",
    "Burst3HurledWeaponsError1_00do69c": "Burst — 3 hurled weapons, error +1 (a Standard Attack)",
    "Burst3ShotsErrorRangeOne_0i15mdd": "Burst: 3 shots, error range +{0}. One shot hits; two if the result beats Defense by 5, all three by 10. A critical hit applies only the first shot to wounds (p.354).",
+   "BurstAutofireAndStrafeSetThe_0savjtv": "Burst, Autofire and Strafe set the fire mode they need. Bottomless Clip: the weapon never runs dry, so no shots are taken (p.405).",
    "BurstAutofireAndStrafeSetThe_1j04npm": "Burst, Autofire and Strafe set the fire mode they need. The shots fired are taken from the weapon.",
    "BurstAutofireAndStrafeSetThe_1y6jt5c": "Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.",
    "BurstBurstMode3ShotsError_1k18o4f": "Burst — Burst mode, 3 shots, error +1 (a Standard Attack)",

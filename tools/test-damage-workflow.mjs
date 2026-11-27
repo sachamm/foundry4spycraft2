@@ -64,7 +64,10 @@ const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
 const { settleGrapple } = await import("../module/apps/combat-actions.mjs");
 const { restAndRecover } = await import("../module/apps/healing.mjs");
-const { reloadWeapon, spendWeaponShots, weaponAmmunition } = await import("../module/apps/ammunition-use.mjs");
+const { reloadWeapon, spendWeaponShots, weaponAmmunition, weaponShotsLeft } =
+  await import("../module/apps/ammunition-use.mjs");
+const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+const { fireActionContent } = await import("../module/apps/combat-actions.mjs");
 const { compareOpposed, recentResults } = await import("../module/apps/opposed-checks.mjs");
 
 const set = (object, path, value) => {
@@ -259,6 +262,26 @@ test("attacks spend counted shots and Reload draws on the reserve", async () => 
   assert.equal(weaponAmmunition(pistol), null);
   game.settings.get = () => true;
   assert.equal(weaponAmmunition(document({ type: "weapon", parent: owner, system: { ammo: "—" } })), null);
+});
+
+test("Bottomless Clip gives fire actions a full load and spends no shots", async () => {
+  reset();
+  const owner = character("Kevin", {});
+  const rifle = document({ type: "weapon", name: "Rifle", isOwner: true, parent: owner, system: { ammo: "30M2" } });
+  setCampaignRulesSource(() => ({ bottomlessClip: true }));
+  try {
+    assert.equal(weaponAmmunition(rifle), null);
+    assert.equal(weaponShotsLeft(rifle), 30);
+    assert.equal(await spendWeaponShots(rifle, 9), null);
+    assert.equal(rifle.system.shotsLoaded, undefined, "no shots are taken");
+    const html = fireActionContent({ firearm: true, modes: ["auto"] }, rifle, owner);
+    assert.match(html, /name="shotsRemaining"[^>]*value="30" readonly/);
+    assert.match(html, /Bottomless Clip/);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+  assert.equal(weaponShotsLeft(rifle), 30, "a counted weapon reports what it holds");
+  assert.equal(weaponShotsLeft(document({ type: "weapon", parent: owner, system: { ammo: "—" } })), null);
 });
 
 test("an opposed check is compared with the other side's posted result and both are confirmed", async () => {

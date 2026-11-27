@@ -43,7 +43,7 @@ import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/st
 import { kickDamageWeapon, unarmedWeapon } from "../../rules/kick.mjs";
 import { inClosedStance } from "../../rules/boxing.mjs";
 import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
-import { spendWeaponShots, weaponAmmunition } from "../../apps/ammunition-use.mjs";
+import { spendWeaponShots, weaponAmmunition, weaponShotsLeft } from "../../apps/ammunition-use.mjs";
 import { loc } from "../../i18n.mjs";
 import { breakdownRows, weaponAttackBreakdown } from "../../rules/bonus-breakdown.mjs";
 
@@ -193,8 +193,9 @@ export const ActorAttackRolls = Base =>
       const feintContext = () => ({ ...options, feintBonusProof, sideStanceProof });
       const w = item.system;
       // Shots are counted: a fire action is limited by what the weapon holds, and the attack spends its shots.
-      const ammunition = weaponAmmunition(item);
-      if (ammunition) options = { ...options, shotsRemaining: ammunition.loaded };
+      const ammunition = weaponAmmunition(item),
+        shotsLeft = weaponShotsLeft(item);
+      if (shotsLeft !== null) options = { ...options, shotsRemaining: shotsLeft };
       const atk = this.weaponAttack(item, feintContext());
       feintBonusProof = atk.feintBonus.attackBonus
         ? { ...atk.feintBonus, attemptId: foundry.utils.randomID() }
@@ -530,8 +531,8 @@ export const ActorAttackRolls = Base =>
         if (!input) return null;
       }
       input = rollPipeline.read({ dialog: "rangedAttack", actor: this, item }, input);
-      const ammunition = weaponAmmunition(item);
-      if (ammunition) input = { ...input, shotsRemaining: ammunition.loaded };
+      const shotsLeft = weaponShotsLeft(item);
+      if (shotsLeft !== null) input = { ...input, shotsRemaining: shotsLeft };
       // Cover Fire and Suppressive Fire take the action without an attack check.
       if (input.fireAction === "coverFire") return coverFire(this, item, input);
       if (input.fireAction === "suppressiveFire") return suppressiveFire(this, item, input);

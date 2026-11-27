@@ -107,7 +107,7 @@ export function npcSkillCheckRows(system, skillKey, check, { ability, modifier =
     rows.push({ label: loc`Size`, value: halve(system.sizeHideModifier) });
   if (Number(modifier)) rows.push({ label: loc`Situational modifier`, value: halve(Number(modifier)) });
   const campaign = campaignSkillPlan(system, skillKey, check ?? {}, { ...input, ability });
-  for (const bonus of campaign.bonuses) rows.push({ label: bonus.source, value: bonus.value });
+  for (const bonus of campaign.bonuses) rows.push({ label: bonus.source, value: halve(bonus.value) });
   return { rows, errorIncrease: campaign.errorIncrease };
 }
 
