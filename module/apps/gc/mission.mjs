@@ -821,7 +821,8 @@ export async function recordInfraction() {
     )}</select></label>
     <label><input type="checkbox" name="preventing" /> ${loc`Committed to prevent an equal or worse infraction (half, rounded up)`}</label>
     <label><input type="checkbox" name="honor" /> ${honorMultiplier === 1 ? loc`Honor-code violation (no campaign quality changes it)` : honorMultiplier > 1 ? loc`Honor-code violation: doubled under the Virtuous campaign quality` : loc`Honor-code violation: halved, rounded down, under the Corrupt campaign quality`}</label>`,
-    loc`Record infraction`
+    loc`Record infraction`,
+    values => (!values.actor || !values.infraction ? loc`Choose a character and an infraction.` : "")
   );
   if (!input) return null;
   const actor = game.actors.get(input.actor),
@@ -992,7 +993,14 @@ export async function awardStanding() {
       effects.gearRules === "freelance" ? "netWorth" : effects.gearRules === "hybrid" ? "byAgent" : "reputation"
     )}</select></label>
     ${anyPaid ? `<label><input type="checkbox" name="again" /> ${loc`Correction: pay everyone the full reward again, including those already paid`}</label>` : ""}`)
-    ]
+    ],
+    // Read again on submit: another GC may have paid while this dialog was open.
+    validate: values => {
+      const now = getMission().standingPaid ?? {};
+      return !values.again && team.length && team.every(actor => now[actor.id])
+        ? loc`Everyone on the team has been paid. Tick the correction box to pay again.`
+        : "";
+    }
   });
   if (!input) return null;
   // The record is read again: another dialog, or another GC, may have paid while this one was open.

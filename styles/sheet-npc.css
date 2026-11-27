@@ -212,21 +212,34 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(5.5em, 1fr));
-  gap: 2px 8px;
+  /* Caption and value side by side, wrapping whole: two short lines at most, so the builder keeps the room. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  max-height: 4.2em;
+  overflow-y: auto;
   margin: 4px 0;
-  padding: 4px 8px;
+  padding: 3px 8px;
+  font-size: var(--sc2-text-s);
   background: var(--sc2-surface-raised);
   border: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 30%, transparent));
   border-radius: var(--sc2-radius);
 }
 .spycraft2.sheet.npc .npc-pinned .sc2-field {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
   min-width: 0;
+  white-space: nowrap;
+}
+.spycraft2.sheet.npc .npc-pinned .sc2-caption {
+  font-size: var(--sc2-text-s);
 }
 .spycraft2.sheet.npc .npc-pinned .sc2-value {
   font-family: var(--sc2-num);
-  overflow-wrap: anywhere;
+  font-size: var(--sc2-text-m);
+}
+/* Keyboard focus never lands on a field hidden under the pinned strip. */
+.spycraft2.sheet.npc .window-content {
+  scroll-padding-top: 5em;
 }

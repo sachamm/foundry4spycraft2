@@ -2400,6 +2400,7 @@
    "DamageThresholdASaveIsWaiting_1al1n1g": "{0} damage {1}, threshold {2}. A save is waiting: click to roll it.",
    "DamageThresholdClickToCheckThe_1njhawm": "{0} damage {1}, threshold {2}. Click to check the thresholds.",
    "DamageToACharacterYouOwn_01y5e38": "Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.",
+   "DamageTrack_1sg0v5l": "damage track {0}",
    "DamageType_1bf5dm0": "Damage type",
    "DamageVitalityWounds_12fvema": "{0}: {1} damage, vitality −{2}, wounds −{3}.",
    "Damage_0cr5ug0": "Damage",

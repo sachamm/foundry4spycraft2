@@ -160,10 +160,13 @@ export function freeCancel(root) {
  * @param {object} [spec.dialog]   Further DialogV2 options
  */
 export function formDialog({ title, intro, fields, ok, validate = null, dialog = {} }) {
+  const content = focusFirstField(optionsMarkup({ intro, fields }));
   return cancellable(systemDialog.input, {
     window: { title },
     rejectClose: false,
-    content: focusFirstField(optionsMarkup({ intro, fields })),
+    content,
+    // The style guide's width for an ordinary dialog (docs/ui-style-guide.md, Dialogs).
+    position: { width: 560 },
     ok: { label: ok ?? loc`Confirm` },
     buttons: [cancelButton()],
     ...dialog,

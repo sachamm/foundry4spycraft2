@@ -791,6 +791,8 @@ export async function openGCConsole({ window: windowed = readSetting("gcConsoleW
   game.spycraft2.gc.console = instance;
   if (windowed && typeof instance.renderPopout === "function") {
     const popout = (await instance.renderPopout()) ?? instance.popout;
+    // A minimised window is opened out again, not just raised as its title bar.
+    if (popout?.minimized) await popout.maximize?.();
     popout?.bringToFront?.();
     return popout ?? instance;
   }

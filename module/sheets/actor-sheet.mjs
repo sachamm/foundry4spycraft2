@@ -1987,7 +1987,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       manualRoles: { "": loc`None`, minion: loc`Minion`, henchman: loc`Henchman`, mastermind: loc`Mastermind` },
       healthChip: npcIsSpecial(this.actor)
         ? loc`vitality ${sys.vitality?.value ?? 0}/${sys.vitality?.max ?? 0} · wounds ${sys.wounds?.value ?? 0}/${sys.wounds?.max ?? 0}`
-        : loc`Damage save: ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
+        : loc`damage track ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
       // The conditions set on the token or the actor, by their Spycraft names.
       conditionStamps: [...(this.actor.statuses ?? [])]
         .map(id => CONFIG.statusEffects?.find(effect => effect.id === id)?.name)
