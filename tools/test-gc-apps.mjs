@@ -565,6 +565,23 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   assert.equal(state.isDramaticScene(), false);
 });
 
+test("a GC spend heals a special NPC's vitality or 2 wounds on the sheet, under the spend's Undo (U9)", async () => {
+  await initializeGCDice({ playersPresent: 4, caliber: 3, replaceExisting: true });
+  const kept = { vitality: boss.system.vitality, wounds: boss.system.wounds };
+  boss.system.vitality = { value: 5, max: 30 };
+  boss.system.wounds = { value: 9, max: 10 };
+  dice(6);
+  await spend.spendGCDice({ id: "healNpc", actor: boss });
+  assert.equal(boss.system.vitality.value, 11, "vitality equal to the die by default");
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo).flags.spycraft2.undo;
+  assert.ok(note.entries[0].restore.some(([path, value]) => path === "system.vitality.value" && value === 5));
+  dice(3);
+  await spend.spendGCDice({ id: "healNpc", actor: boss, healAs: "wounds" });
+  assert.equal(boss.system.wounds.value, 10, "2 wounds, never past the maximum");
+  assert.equal(boss.system.vitality.value, 11);
+  Object.assign(boss.system, kept);
+});
+
 const makeCombat = list => {
   const combatants = new Map();
   const fight = {

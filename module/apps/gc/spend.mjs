@@ -94,6 +94,10 @@ export async function spendGCDice(input = {}) {
       <label data-when="id=event"><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
       <label data-when="id=event"><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
       <label data-when="id=campaignQuality">${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
+      <label data-when="id=healNpc">${loc`A special NPC regains`} <select name="healAs">${options([
+        ["vitality", loc`Vitality equal to the die`],
+        ["wounds", loc`2 wounds`]
+      ])}</select></label>
       <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
       <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
       loc`Spend dice`
@@ -190,8 +194,17 @@ export async function spendGCDice(input = {}) {
         antagonistBefore.id = antagonistRowFor(actor)?.id ?? null;
         break;
       case "healNpc": {
-        if (npcIsSpecial(actor)) lines.push(loc`Restore ${die.total} vitality or 2 wounds on the sheet.`);
-        else {
+        if (npcIsSpecial(actor)) {
+          // Vitality equal to the die, or 2 wounds, as an agent heals with an action die (pp.62, 398); never past the
+          // maximum. The spend's Undo note puts it back.
+          const pool = input.healAs === "wounds" ? "wounds" : "vitality",
+            now = Math.trunc(Number(actor.system[pool]?.value) || 0),
+            max = Number(actor.system[pool]?.max),
+            raised = now + (pool === "wounds" ? 2 : die.total),
+            value = Number.isFinite(max) ? Math.max(now, Math.min(max, raised)) : raised;
+          await actor.update({ [`system.${pool}.value`]: value });
+          lines.push(pool === "wounds" ? loc`Wounds ${now} → ${value}.` : loc`Vitality ${now} → ${value}.`);
+        } else {
           await resetDamageTrack(actor, { heal: die.total });
           lines.push(loc`Accumulated damage is now ${damageSaveState(actor).track.accumulated}.`);
         }
