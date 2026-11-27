@@ -291,3 +291,21 @@ test("a critical hit on a Henchman or Mastermind costs more, and their threat ra
   assert.match(plan.sources.join(), /Henchman target \+1/);
   assert.equal(criticalPlan({}, { ...check, attackContext: {} }, options).cost, 1);
 });
+
+test("Resolve reads the villain role of the target actually hit (pp.447–448)", async () => {
+  const { resolvedTargetRole } = await import("../module/rules/npc-qualities.mjs");
+  const henchman = { qualityEffects: { role: { id: "henchman", threatRangeReduction: 1, extraDiceToActivate: 1 } } };
+  const declared = { id: "henchman", label: "Henchman", threatRangeReduction: 1, extraDiceToActivate: 1 };
+  assert.equal(
+    resolvedTargetRole({ threat: 20, attackContext: { targetRole: declared, baseThreat: 19 } }, henchman),
+    null
+  );
+  assert.deepEqual(resolvedTargetRole({ threat: 20, attackContext: { targetRole: declared, baseThreat: 19 } }, {}), {
+    threat: 19,
+    role: null
+  });
+  const fresh = resolvedTargetRole({ threat: 19, attackContext: {} }, henchman);
+  assert.equal(fresh.threat, 20);
+  assert.equal(fresh.role.id, "henchman");
+  assert.equal(resolvedTargetRole({ threat: 20, attackContext: { targetRole: declared } }, {}).threat, 19);
+});

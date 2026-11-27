@@ -1,3 +1,6 @@
+import { campaignTriumphXPPercent } from "./campaign-rules.mjs";
+import { actionDieTerm } from "./action-die-formula.mjs";
+import { triumphAt } from "./check-candidates.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./check-candidates.mjs";
@@ -80,7 +83,9 @@ export function actionDieBoostPlan(
         kind === "save" ||
         kind === "damage"),
     intelligence: system.abilities?.int?.mod ?? 0,
-    formula: Array(rolls).fill(`1d${die}x>=${explodeAt}`).join(" + "),
+    formula: Array(rolls)
+      .fill(actionDieTerm(die, explodeAt, system.actionDice))
+      .join(" + "),
     wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill",
     // Better Luck Next Time, p.189: a single boosting die on a skill check or save that rolls a natural 1 comes back.
     betterLuck: system.activeFeatNames?.includes("Better Luck Next Time") === true && ["skill", "save"].includes(kind)
@@ -105,7 +110,9 @@ export function actionDieBoostResult(check, plan, dieResults) {
   const resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
     cap,
     threat: check.threat ?? 0,
-    actionDieBonus: boostTotal
+    actionDieBonus: boostTotal,
+    triumphAt: triumphAt(check),
+    ceiling: check.resultCeiling ?? null
   });
   const naturalOne = plan.betterLuck === true && plan.count === 1 && plan.rolls === 1 && Number(dieResults[0]) === 1;
   return {
@@ -148,7 +155,7 @@ export function generousBoostPlan(
   const plan = actionDieBoostPlan(donor, check, { count: 1, errorDeclined, calculating });
   if (plan.blocked) return plan;
   // Generous explicitly uses one donor die; other doubled-die cores do not multiply it.
-  return { ...plan, rolls: 1, formula: `1d${plan.die}x>=${plan.explodeAt}`, wellRounded: false };
+  return { ...plan, rolls: 1, formula: actionDieTerm(plan.die, plan.explodeAt, donor.actionDice), wellRounded: false };
 }
 
 /** Pointman Improved Fortune, p.41: distinct teammates stack with self, maximum three starting dice. */
@@ -255,7 +262,9 @@ export function missionXPPlan(
     modifierReason = "",
     missionCompleteConfirmed = false,
     mission = "initial",
-    at = 0
+    at = 0,
+    triumph = false,
+    crossroads = false
   } = {}
 ) {
   const level = system.level ?? 0;
@@ -279,7 +288,13 @@ export function missionXPPlan(
     combinedBase = baseXP + awardBaseBonus,
     multiplier = Math.min(level, threatLevel),
     coreXP = combinedBase * multiplier,
-    totalXP = coreXP + additionalXP,
+    // A Triumph this mission adds 10% (5% under Common Spectacle) and a Crossroads Title its own share, each rounded
+    // up and worked out on the multiplied reward (pp.53, 97).
+    triumphPercent = triumph ? campaignTriumphXPPercent() : 0,
+    triumphXP = Math.ceil((coreXP * triumphPercent) / 100),
+    crossroadsPercent = crossroads ? Math.max(0, Number(system.crossroads?.xpPercent) || 0) : 0,
+    crossroadsXP = Math.ceil((coreXP * crossroadsPercent) / 100),
+    totalXP = coreXP + triumphXP + crossroadsXP + additionalXP,
     xp = (system.xp ?? 0) + totalXP;
   if (![combinedBase, coreXP, totalXP, xp].every(Number.isSafeInteger))
     throw new Error(loc`The mission reward exceeds a safe whole number.`);
@@ -296,6 +311,10 @@ export function missionXPPlan(
       combinedBase,
       multiplier,
       coreXP,
+      triumphPercent,
+      triumphXP,
+      crossroadsPercent,
+      crossroadsXP,
       additionalXP,
       modifierReason: String(modifierReason).trim(),
       totalXP,

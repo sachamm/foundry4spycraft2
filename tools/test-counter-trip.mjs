@@ -343,3 +343,18 @@ test("a reservation write which commits before rejecting remains held for explic
   assert.equal(f.dm.flags.spycraft2.tripCounterUse.state, "closed");
   assert.equal(game.messages.length, 2);
 });
+test("settling a Trip leaves an Undo note with both characters and the card's settlement mark (round-3 council)", async () => {
+  const f = await fixture(),
+    m = await take(f.d, request()),
+    d = await finishPair(f, m);
+  const notes = [];
+  ChatMessage.create = async data => (data.flags?.spycraft2?.undo && notes.push(data.flags.spycraft2.undo), data);
+  try {
+    await settleTripOutcome(f.d, m, d, { opposedConfirmed: true });
+  } finally {
+    delete ChatMessage.create;
+  }
+  assert.equal(notes.length, 1);
+  assert.ok(notes[0].entries.length >= 1);
+  assert.ok(notes[0].cardMarks?.some(mark => mark.key === "tripSettlement"));
+});

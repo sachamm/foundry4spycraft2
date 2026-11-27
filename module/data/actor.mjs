@@ -1,4 +1,6 @@
+import { loc } from "../i18n.mjs";
 import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
+import { damageSaveAdjustment } from "../rules/gc/npc-damage.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
 import { npcFeatEffects } from "../rules/npc-feat-effects.mjs";
 import { ruleName } from "../rules/rule-name.mjs";
@@ -7,10 +9,22 @@ import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { shakenStateFromActor, shakenRules } from "../rules/shaken.mjs";
 import { getRestraintReleaseReview, getPendingRestraintMoves } from "../rules/restraints.mjs";
 import { getReserveReview } from "../rules/reserve-transactions.mjs";
-import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
+import {
+  conditionContextFromStatuses,
+  conditionNpcProfile,
+  npcSkillConditionContext
+} from "../rules/npc-conditions.mjs";
 import { getBaffledReview } from "../rules/baffled.mjs";
 import { isResourceLock } from "../services/transactions.mjs";
 import { pointmanLevel } from "../rules/action-dice.mjs";
+import {
+  attributeCollapsePlan,
+  attributeDefensePlan,
+  conditionAbilityPenalty,
+  conditionRollPenalties
+} from "../rules/attributes.mjs";
+import { sizeRow, sizeWounds } from "../rules/size.mjs";
+import { deathThreshold } from "../rules/health.mjs";
 import { defaultNpcProfile, computeNpcProfile, npcTableValue } from "../rules/npcs.mjs";
 const missionThreatLevelSetting = () => {
   try {
@@ -125,24 +139,61 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
     const shaken = shakenRules(this);
     this.shakenRules = shaken;
     for (const ability of Object.values(this.abilities)) ability.mod = Math.floor((ability.value - 10) / 2);
+    // Conditions from the token's statuses, read the same way as an agent's (pp.340–342).
+    this.conditionContext ??= npcSkillConditionContext(this.parent);
+    // Size (Table 5.13, p.349): Defense, attack and Stealth/Hide modifiers and the death threshold.
+    const size = sizeRow(this.qualityEffects?.size);
+    this.size = size.size;
+    this.sizeModifier = size.modifier;
+    this.sizeHideModifier = size.hide;
+    this.deathThreshold = deathThreshold(size.size);
+    this.attributeCollapse = attributeCollapsePlan(this);
+    const conditions = conditionRollPenalties(this),
+      drunk = this.conditionContext.drunk === true ? -2 : 0;
+    this.conditionPenalties = conditions;
     for (const [key, save] of Object.entries(this.saves)) {
       const ability = CONFIG.SPYCRAFT.saves[key].ability;
       save.total =
-        save.base + this.abilities[ability].mod + (["ref", "will"].includes(key) ? shaken.reflexWillPenalty : 0);
+        save.base +
+        this.abilities[ability].mod +
+        conditions.save +
+        (["ref", "will"].includes(key) ? shaken.reflexWillPenalty + drunk : 0);
     }
-    this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod;
+    // Flat-footed, sprawled, stunned, blinded, helpless and the rest take away a positive Dexterity (pp.341–342).
+    const defenseState = attributeDefensePlan(this);
+    this.helpless = defenseState.helpless;
+    this.vulnerable = defenseState.vulnerable;
+    this.defense.dexterity = defenseState.dexterity;
+    this.defense.total = 10 + this.defense.bonus + defenseState.dexterity + this.sizeModifier;
     this.underminedCombatContext = underminedCombatContext(this);
     this.underminedState = underminedState(this);
     this.initiative.total =
-      this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty - this.underminedState.penalty;
+      this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty + drunk - this.underminedState.penalty;
+    // conditionRollPenalties' attack figure already holds the Shaken attack penalty.
+    const melee = cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + this.sizeModifier;
     this.attack = {
-      melee: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
-      unarmed: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
-      ranged: cheapShotPenalty(this, "dex") + this.bab + this.abilities.dex.mod + shaken.attackPenalty
+      melee: melee + conditions.attack + conditions.meleeAttack,
+      unarmed: melee + conditions.attack + conditions.meleeAttack,
+      ranged:
+        cheapShotPenalty(this, "dex") +
+        this.bab +
+        this.abilities.dex.mod +
+        this.sizeModifier +
+        conditions.attack +
+        conditionAbilityPenalty(this, "dex")
     };
     this.skillTotals = {};
     this.warnings = [];
   }
+}
+
+const hasNpcQuality = (profile, id) => (profile?.qualities ?? []).some(entry => entry?.id === id);
+
+/** A Commander's statistics: the members' build at a Threat Level 2 higher (p.447). */
+function commanderBlock(profile, type, threatLevel, abilities) {
+  const level = Math.min(20, (Number(threatLevel) || 1) + 2),
+    build = computeNpcProfile(profile, type, level, abilities);
+  return { threatLevel: level, effectiveLevel: build.effectiveLevel, stats: build.stats, health: build.health };
 }
 
 /** The combat an Undermine record is timed in, as the rule reads it. */
@@ -159,9 +210,10 @@ export class NpcData extends BaseActorData {
     this.conditionContext = npcSkillConditionContext(this.parent);
     // The feats an NPC holds, by rule name, so the attack, damage and Defense rules that look for a feat by name
     // (Sharpshooter, Two-Weapon, Combat Expertise and the rest) treat an NPC's feat as they treat an agent's.
-    this.activeFeatNames = [
-      ...new Set([...(this.parent?.items ?? [])].filter(item => item.type === "feat").map(item => ruleName(item)))
-    ].filter(Boolean);
+    const featItems = [...(this.parent?.items ?? [])].filter(item => item.type === "feat");
+    this.activeFeatNames = [...new Set(featItems.map(item => ruleName(item)))].filter(Boolean);
+    // Each feat with its tree, as agents carry them, for the rules that count feats by tree (Gladiators, p.407).
+    this.activeFeatSelections = featItems.map(item => ({ name: ruleName(item), tree: item.system?.tree ?? "" }));
     this.baffledApplicationReview = getBaffledReview(this.parent ?? {});
     // A mission's Threat Level scales every NPC that follows it (p.423); others keep their own number.
     const missionTL = this.followMission ? missionThreatLevelSetting() : null;
@@ -177,6 +229,10 @@ export class NpcData extends BaseActorData {
       this.effectiveThreatLevel = partnerThreatLevel(partnerOwner.system?.level);
       this.usesMissionThreatLevel = false;
     }
+    // Commander (p.447): the squad's leader is built as if the Threat Level were 2 higher.
+    const commanderQuality = !!this.npcProfile?.enabled && hasNpcQuality(this.npcProfile, "commander");
+    this.isCommander = commanderQuality && this.commander === true;
+    if (this.isCommander) this.effectiveThreatLevel = Math.min(20, this.effectiveThreatLevel + 2);
     // p.398: a promoted standard NPC is special until the mission ends.
     this.promoted = !!this.promotion && this.promotion.mission === String(this.usagePeriods?.mission ?? "initial");
     // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
@@ -196,6 +252,19 @@ export class NpcData extends BaseActorData {
       this.conditionContext
     );
     this.npcBuild = result;
+    // The squad's Commander, worked out beside the members' block so the GC can see both (p.447).
+    this.commanderBuild =
+      commanderQuality && !this.isCommander
+        ? commanderBlock(this.npcProfile, this.npcType, this.effectiveThreatLevel, this.abilities)
+        : null;
+    const commanderNote = this.qualityEffects?.notes?.find(note => note.id === "commander");
+    if (commanderNote && this.isCommander)
+      commanderNote.text = loc`This token leads the squad, built at Threat Level ${this.effectiveThreatLevel}.`;
+    else if (commanderNote && this.commanderBuild) {
+      const { threatLevel, stats } = this.commanderBuild,
+        sign = value => (value >= 0 ? `+${value}` : `${value}`);
+      commanderNote.text = loc`One squad member leads, built at Threat Level ${threatLevel}: attack ${sign(stats.attack)}, Defense ${sign(stats.defense)}, Initiative ${sign(stats.initiative)}, saves ${sign(stats.resilience)} before attributes.`;
+    }
     // Table values are base bonuses. Attribute modifiers are applied once by the base model.
     this.bab = result.stats?.attack ?? 0;
     this.defense.bonus = result.stats?.defense ?? 0;
@@ -224,6 +293,8 @@ export class NpcData extends BaseActorData {
         this.damageSave = null;
       }
     }
+    // A special NPC's wounds follow its Size (Table 5.13, p.349); a standard NPC's Damage save does not.
+    if (this.wounds.max > 0) this.wounds.max = sizeWounds(this.wounds.max, this.size);
     this.applyFeatEffects({ health: true });
     this.competence = result.competence;
     this.warnings = [
@@ -252,6 +323,11 @@ export class NpcData extends BaseActorData {
     if (effects.healthApplied) {
       this.vitality.max += effects.vitality;
       this.wounds.max += effects.wounds;
+    } else if (health && Number.isFinite(this.damageSave) && (effects.vitality || effects.wounds)) {
+      // p.452: a standard NPC's Damage save moves by 1 per wound or per 2 vitality a feat adds or takes away.
+      effects.damageSaveFromHealth = damageSaveAdjustment(effects);
+      this.damageSave += effects.damageSaveFromHealth;
+      effects.healthApplied = true;
     }
     this.featEffects = effects;
   }
@@ -260,13 +336,16 @@ export class NpcData extends BaseActorData {
     return {
       ...super.defineSchema(),
       threatLevel: int(1, { min: 1 }),
-      followMission: new BooleanField(),
+      // A new NPC follows the mission's Threat Level (p.423); one saved before keeps its stored choice.
+      followMission: new BooleanField({ initial: true }),
       promotion: record("promotion", { nullable: true, initial: null }),
       manualDamageSave: int(0),
       damageSaveAdjust: int(0),
       damageTrack: record("damageTrack", { nullable: true, initial: null }),
       disposition: record("disposition", { initial: () => ({ base: "neutral", toward: {} }) }),
       manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),
+      // This token is the Commander of its Minion squad (p.447).
+      commander: new BooleanField({ initial: false }),
       npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain", "animal"] }),
       npcProfile: record("npcProfile", { initial: () => defaultNpcProfile() })
     };
@@ -327,7 +406,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       abilities: new SchemaField(abilities),
       pointBuyBudget: int(36, { min: 0 }),
       /** Which attribute each level-based increase went to: { l4: "int", l8: "", … } */
-      abilityIncreases: new SchemaField(Object.fromEntries([4, 8, 12, 16, 20].map(l => [`l${l}`, str()]))),
+      abilityIncreases: new SchemaField(Object.fromEntries(Array.from({ length: 18 }, (_, i) => [`l${i + 3}`, str()]))),
 
       /** One entry per career level, in order. */
       progression: new ArrayField(
@@ -335,6 +414,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           classId: str(),
           vitality: int(0, { min: 0 }),
           careerEntryId: str(),
+          /** The mission period the level was gained in, for the one-level-between-missions limit (p.27). */
+          mission: str(),
           vitalityRollId: str(),
           vitalityReviewId: str(),
           /** INT modifier when points were earned; null reconstructs legacy history. */
@@ -423,6 +504,14 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       startingIntelligenceModifier: new NumberField({ nullable: true, initial: null, integer: true }),
       skillFortes: new ArrayField(new SchemaField({ skill: str(), focus: str(), forte: str() })),
       crossroadsTitle: str(),
+      // Feat Purchase and Modular (pp.406–407): feats bought with XP after missions, and feats traded for
+      // attribute points at creation (positive: feats bought at 2 points each; negative: feats given up for 2 each).
+      featTrades: new SchemaField({
+        purchased: int(0, { min: 0 }),
+        modular: int(0, { min: -20, max: 20 }),
+        // The mission period of the last Feat Purchase: one feat may be bought at the end of each mission (p.407).
+        purchaseMission: str()
+      }),
       relinquishedInterests: int(0, { min: 0 }),
       interests: str(),
       contacts: new ArrayField(
@@ -433,11 +522,23 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           networkingMilestone: int(0, { min: 0 }),
           networkingFeat: str(),
           networkingTheme: str(),
-          networkingFeatConfirmed: new BooleanField()
+          networkingFeatConfirmed: new BooleanField(),
+          // Consultants and specialists this contact knows (pp.458–459); "summoned" holds the mission period used.
+          people: new ArrayField(
+            new SchemaField({
+              kind: str("consultant"),
+              grade: int(1, { min: 1, max: 4 }),
+              skill: str(),
+              ability: str(),
+              summoned: str()
+            })
+          )
         })
       ),
       subplots: new ArrayField(new SchemaField({ name: str(), notes: str(), complete: new BooleanField() })),
       gearPickLosses: record("gearPickLosses"),
+      /** Mission gear picks a Gear Restriction takes (Table 7.8, p.437), by category, chosen at Intel. */
+      gearRestrictionLosses: record("gearRestrictionLosses"),
       missionReserves: record("missionReserves", { nullable: true, initial: null }),
       armorMissionGrant: record("armorMissionGrant", { nullable: true, initial: null }),
       bigStickMissionPick: record("bigStickMissionPick", { nullable: true, initial: null }),
@@ -683,37 +784,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     this.actionDieAwardReview = this.parent.flags?.spycraft2?.actionDieAwardReview ?? null;
     this.actionDiceSettlementReview = getActionDieSettlementReview(this.parent);
     this.worldTime = globalThis.game?.time?.worldTime;
-    const statuses = this.parent.statuses ?? new Set();
-    this.conditionContext = Object.fromEntries(
-      Object.entries({
-        nauseated: ["nauseated"],
-        dazed: ["dazed"],
-        stunned: ["stunned", "stun"],
-        dead: ["dead"],
-        paralyzed: ["paralyzed", "paralysis"],
-        fatigued: ["fatigued"],
-        exhausted: ["exhausted"],
-        unconscious: ["unconscious"],
-        helpless: ["helpless"],
-        vulnerable: ["vulnerable"],
-        sickened: ["sickened"],
-        drunk: ["drunk"],
-        crouched: ["crouched", "crouching"],
-        mute: ["mute"],
-        baffled: ["baffled"],
-        incompetent: ["incompetent"],
-        entangled: ["entangled"],
-        bound: ["bound"],
-        blinded: ["blinded", "blind"],
-        deafened: ["deafened", "deaf"],
-        flatFooted: ["flat-footed", "flatFooted"],
-        sprawled: ["sprawled"],
-        prone: ["prone"],
-        held: ["held"],
-        pinned: ["pinned"],
-        sleeping: ["sleeping", "sleep", "asleep"]
-      }).map(([key, ids]) => [key, ids.some(id => statuses.has(id))])
-    );
+    this.conditionContext = conditionContextFromStatuses(this.parent.statuses);
     this.bonusPoolChecks = {};
     for (const pool of Object.values(this.bonusActionDice ?? {})) {
       if (!pool?.messageUuid) continue;

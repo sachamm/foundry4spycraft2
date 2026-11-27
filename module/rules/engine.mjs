@@ -1,3 +1,26 @@
+import {
+  abilityIncreaseLevels,
+  allClassSkills,
+  campaignActionDice,
+  campaignCqbRange,
+  campaignFeatTrades,
+  campaignLevelRow,
+  campaignStartingAttributeCap,
+  campaignSubplotBonus,
+  campaignDebtSubplot,
+  crossroadsAllowed,
+  campaignPointBuy,
+  campaignFeatTrees,
+  campaignGearCaliber,
+  campaignInterestBase,
+  campaignWealthBonus,
+  fragileVitality
+} from "./campaign-rules.mjs";
+import { periodMoney } from "./period-money.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
+import { applyGearRestrictions, gearRestrictionsInForce } from "./gear-restrictions.mjs";
+import { standingStatus } from "./standing.mjs";
+import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
@@ -261,7 +284,8 @@ function startPass(state) {
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   const todo = [];
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
-  const levelRow = l => T.levels[clamp(l, 0, 20)];
+  // Table 1.3, with the growth season qualities applied (p.407).
+  const levelRow = l => campaignLevelRow(T.levels[clamp(l, 0, 20)]);
   Object.assign(state, { allItems, items, shaken, T, warnings, legalFeatIds, activeFeatIds, todo, plural, levelRow });
 }
 
@@ -673,9 +697,12 @@ function collectBonusSources(state) {
     t1: stepLookup(T.talentBonus.t1, level),
     t2: stepLookup(T.talentBonus.t2, level),
     t3: stepLookup(T.talentBonus.t3, level),
-    interestBase: stepLookup(
-      T.interests.map(r => [r[0], r[1]]),
-      level
+    interestBase: campaignInterestBase(
+      level,
+      stepLookup(
+        T.interests.map(r => [r[0], r[1]]),
+        level
+      )
     ),
     interestTalent: stepLookup(
       T.interests.map(r => [r[0], r[2]]),
@@ -712,7 +739,8 @@ function deriveAttributes(state) {
     tb
   } = state;
   const abilityBonus = new Bonuses(),
-    nonCandidateBonus = new Bonuses();
+    nonCandidateBonus = new Bonuses(),
+    originAbility = new Map();
   sys.unrestrictedBonusPools = unrestrictedBonusPools(sys);
   for (const pool of sys.unrestrictedBonusPools) if (pool.needsReview) warnings.push(pool.reason);
   sys.drunkRepositionState = drunkRepositionHistory(sys);
@@ -751,6 +779,7 @@ function deriveAttributes(state) {
           key = b.target.slice(10);
         abilityBonus.add(key, amount, s.name, b.bonusType);
         if (!s.candidate) nonCandidateBonus.add(key, amount, s.name, b.bonusType);
+        if (s.origin) originAbility.set(key, (originAbility.get(key) ?? 0) + (Number(amount) || 0));
       }
     }
   // Berserker rage, pp.183–184: Strength and Constitution rise while it runs.
@@ -763,7 +792,7 @@ function deriveAttributes(state) {
   let pointCost = 0;
   for (const k of ABILITIES) {
     const a = sys.abilities[k];
-    a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
+    a.increase = abilityIncreaseLevels().filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
     // Where that bonus comes from, for the sheet's breakdown tooltip.
     a.bonusSources = abilityBonus.sources.get(k) ?? [];
@@ -778,6 +807,12 @@ function deriveAttributes(state) {
       warnings.push(loc`${k.toUpperCase()} ${a.base} is outside the creation point-buy range (8–18).`);
     }
     pointCost += a.cost;
+    // Small Screen (p.408): no starting attribute above 18, Origin benefits included.
+    const startingCap = campaignStartingAttributeCap();
+    if (startingCap && a.base + (originAbility.get(k) ?? 0) > startingCap)
+      warnings.push(
+        loc`Small Screen: starting ${k.toUpperCase()} ${a.base + (originAbility.get(k) ?? 0)} with its Origin is above ${startingCap}.`
+      );
   }
   sys.candidateScores = Object.fromEntries(
     ABILITIES.map(k => [
@@ -785,11 +820,19 @@ function deriveAttributes(state) {
       sys.abilities[k].base + sys.abilities[k].increase + (sys.abilities[k].misc ?? 0) + nonCandidateBonus.get(k)
     ])
   );
-  const increasesDue = cfg.abilityIncreaseLevels.filter(l => l <= level);
+  const increasesDue = abilityIncreaseLevels().filter(l => l <= level);
   const increasesMissing = increasesDue.filter(l => !increaseAt(l)).length;
   if (increasesMissing)
     todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
-  sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
+  // Small Screen (p.408) lowers the standard budget; a budget set to something else (a lieutenant's 32) stays.
+  const budget =
+    sys.pointBuyBudget === undefined || sys.pointBuyBudget === null || sys.pointBuyBudget === cfg.pointBuy
+      ? campaignPointBuy(cfg.pointBuy)
+      : sys.pointBuyBudget;
+  // Modular (p.407): each feat bought costs 2 points, each feat given up adds 2.
+  const featTrades = campaignFeatTrades(sys.featTrades);
+  warnings.push(...featTrades.problems);
+  sys.pointBuy = { budget: budget + featTrades.points, spent: pointCost };
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
   if (sys.pointBuy.remaining < 0) {
     warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
@@ -836,9 +879,12 @@ function deriveAttributes(state) {
       t1: stepLookup(T.talentBonus.t1, career),
       t2: stepLookup(T.talentBonus.t2, career),
       t3: stepLookup(T.talentBonus.t3, career),
-      interestBase: stepLookup(
-        T.interests.map(r => [r[0], r[1]]),
-        career
+      interestBase: campaignInterestBase(
+        career,
+        stepLookup(
+          T.interests.map(r => [r[0], r[1]]),
+          career
+        )
       ),
       interestTalent: stepLookup(
         T.interests.map(r => [r[0], r[2]]),
@@ -869,7 +915,7 @@ function deriveAttributes(state) {
     const abilities = Object.fromEntries(
       ABILITIES.map(k => {
         const a = sys.abilities[k];
-        const inc = cfg.abilityIncreaseLevels.filter(x => x <= career && increaseAt(x) === k).length;
+        const inc = abilityIncreaseLevels().filter(x => x <= career && increaseAt(x) === k).length;
         const value = a.base + inc + (a.misc ?? 0) + (sys.aging.modifiers[k] ?? 0) + bonusAt(`abilities.${k}`);
         return [k, { value, mod: mod(value) }];
       })
@@ -882,6 +928,7 @@ function deriveAttributes(state) {
     const override = sys.skills?.[key];
     return (
       item.system.classSkills?.includes(key) ||
+      allClassSkills() ||
       (item.system.identifier === "schemer" && (stageAt(career).classLevels.schemer ?? 0) >= 6) ||
       stageAt(career).bonus(`skills.${key}.classSkill`) > 0 ||
       (override?.classSkill && career >= (override.classSkillAt ?? 1))
@@ -987,7 +1034,7 @@ function deriveSkillRanks(state) {
   };
   const isClassSkillAt = (key, idx) => manualClassSkillAt(key, idx) || ruleClassSkillAt(key, idx);
   const ruleClassSkillAt = (key, idx) => {
-    if (stageAt(idx + 1).bonus(`skills.${key}.classSkill`)) return true;
+    if (allClassSkills() || stageAt(idx + 1).bonus(`skills.${key}.classSkill`)) return true;
     const ci = classAtLevel[idx];
     return (
       !!ci?.system.classSkills?.includes(key) ||
@@ -1215,7 +1262,7 @@ function deriveOtherBonuses(state) {
   );
   rd.actionDice.max +=
     miscActionDice(sys) +
-    (cfg.tables.crossroads?.[sys.crossroadsTitle]?.level <= level
+    (crossroadsAllowed() && cfg.tables.crossroads?.[sys.crossroadsTitle]?.level <= level
       ? cfg.tables.crossroads[sys.crossroadsTitle].actionDice
       : 0);
   for (const source of sources)
@@ -1689,8 +1736,10 @@ function deriveFinalTotals(state) {
   progression.forEach((entry, idx) => {
     const ci = classAtLevel[idx];
     const die = ci?.system.vitalityDie ?? 0;
-    const roll = idx === 0 ? die : Number(entry.vitality) || 0;
-    if (idx > 0 && !entry.vitality) vitMissing.push(idx + 1);
+    // Fragile (p.406): after Level 1 each level gives a fixed amount instead of a roll.
+    const fixed = idx > 0 ? fragileVitality(die) : null;
+    const roll = idx === 0 ? die : (fixed ?? (Number(entry.vitality) || 0));
+    if (idx > 0 && fixed === null && !entry.vitality) vitMissing.push(idx + 1);
     vitalityBreakdown.dice += roll;
     vitalityBreakdown.constitution += abil.con.mod;
     vitalityBreakdown.minimumAdjustment += Math.max(0, 1 - roll - abil.con.mod);
@@ -1712,7 +1761,10 @@ function deriveFinalTotals(state) {
   sys.subdualThreshold = sys.abilities.con.value + B.get("subdualThreshold");
 
   sys.actionDice ??= { value: 0 };
-  const title = cfg.tables.crossroads?.[sys.crossroadsTitle];
+  // Routine (p.408) rules out Crossroads Subplots, and so their Titles.
+  const title = crossroadsAllowed() ? cfg.tables.crossroads?.[sys.crossroadsTitle] : null;
+  if (sys.crossroadsTitle && !crossroadsAllowed())
+    warnings.push(loc`Routine is in force: no Crossroads Subplots, so the Crossroads Title gives nothing.`);
   const earnedTitle = title && level >= title.level ? title : null;
   sys.crossroads = earnedTitle ?? { actionDice: 0, xpPercent: 0 };
   if (title && level < title.level) warnings.push(loc`${title.label}: the minimum Career Level is ${title.level}.`);
@@ -1723,6 +1775,8 @@ function deriveFinalTotals(state) {
     if (sys.actionDice.die === 12) {
       sys.actionDice.die = 6;
       sys.actionDice.max *= 2;
+      // Each die gained from now on arrives as two d6 (p.181), session adjustments included.
+      sys.actionDice.gainMultiplier = 2;
     } else sys.actionDice.die += 2;
   }
   // Personal Lieutenant (p.204): always exactly 1 action die.
@@ -1735,7 +1789,14 @@ function deriveFinalTotals(state) {
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
   sys.combatMovement = combatMovementRules(sys);
   sys.senses = baseSensoryRanges(sys);
-  sys.cqbRange = sys.activeFeatNames.includes("Marksmanship Supremacy") ? 60 : 30;
+  // Gunmen widens CQB Range to 60 ft. and Gladiators narrows it to 20 ft. for everyone (p.407).
+  sys.cqbRange = campaignCqbRange(sys.activeFeatNames.includes("Marksmanship Supremacy"));
+  // Spirited raises player character action dice one type (d12 at most); Bleak stops them exploding and Spirited
+  // makes them explode on a natural 1 as well (pp.406, 408).
+  const campaignDice = campaignActionDice();
+  if (campaignDice.step > 0) sys.actionDice.die = Math.min(12, sys.actionDice.die + 2 * campaignDice.step);
+  sys.actionDice.explodes = !campaignDice.noExplode;
+  sys.actionDice.explodeLow = campaignDice.explodeLow;
   sys.actionDice.explodeAt = sys.activeFeatNames.includes("Lady Luck's Smile")
     ? sys.actionDice.die - 1
     : sys.actionDice.die;
@@ -1775,7 +1836,7 @@ function deriveSkillTotals(state) {
   const anyClass = new Set(
     classItems.filter(c => classLevels[c.system.identifier || c.name]).flatMap(c => c.system.classSkills ?? [])
   );
-  if ((classLevels.schemer ?? 0) >= 6) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
+  if ((classLevels.schemer ?? 0) >= 6 || allClassSkills()) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
   const derivedSkills = {};
   for (const sd of skillDefs) {
     const stored = sys.skills?.[sd.key] ?? {};
@@ -1919,7 +1980,8 @@ function deriveSkillTotals(state) {
 function deriveFeatSlots(state) {
   const { sys, cfg, items, warnings, todo, plural, classItems, classLevels, inherited, lr, featItems, featTrees, B } =
     state;
-  const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") };
+  // Feat Purchase and Modular (pp.406–407) add or remove general feat choices.
+  const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") + campaignFeatTrades(sys.featTrades).feats };
   for (const t of Object.keys(cfg.featTrees)) slots[t] = B.get(`featSlots.${t}`);
   const classGrantCounts = new Map();
   const originGrantNames = new Set(
@@ -1961,11 +2023,28 @@ function deriveFeatSlots(state) {
     overflow += Math.max(0, s - slots[t]);
   }
   for (const [t, s] of Object.entries(spent)) if (!(t in cfg.featTrees)) overflow += s;
+  // The tree season qualities (pp.405–408): a feat from that tree may fill a choice meant for another tree.
+  const openTrees = campaignFeatTrees()
+    .map(label => Object.keys(cfg.featTrees).find(key => cfg.featTrees[key] === label))
+    .filter(Boolean);
+  for (const open of openTrees) {
+    let extra = Math.max(0, trees[open].spent - trees[open].slots);
+    for (const [t, v] of Object.entries(trees)) {
+      if (!extra || t === open) continue;
+      const spare = Math.max(0, v.slots - v.spent - (v.lent ?? 0));
+      const used = Math.min(spare, extra);
+      if (!used) continue;
+      v.lent = (v.lent ?? 0) + used;
+      trees[open].borrowed = (trees[open].borrowed ?? 0) + used;
+      extra -= used;
+      overflow -= used;
+    }
+  }
   sys.feats = { any: { slots: slots.any, spent: overflow, remaining: slots.any - overflow }, trees, replacementGrants };
   if (overflow > slots.any) warnings.push(loc`${overflow - slots.any} more feat(s) taken than available.`);
   const unusedTree = Object.entries(trees)
-    .filter(([, v]) => v.slots > v.spent)
-    .map(([t, v]) => `${v.slots - v.spent} ${cfg.featTrees[t]}`);
+    .filter(([, v]) => v.slots > v.spent + (v.lent ?? 0))
+    .map(([t, v]) => `${v.slots - v.spent - (v.lent ?? 0)} ${cfg.featTrees[t]}`);
   sys.feats.unusedTreeSlots = unusedTree;
   if (sys.feats.any.remaining > 0)
     todo.push({
@@ -2084,6 +2163,8 @@ function deriveProficiencies(state) {
   sys.contactPicks = { available: contactsAvail, used: contactsUsed, remaining: contactsAvail - contactsUsed };
   if (contactsUsed > contactsAvail)
     warnings.push(loc`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`);
+  // Consultants and specialists each contact knows (pp.458–459).
+  for (const contact of sys.contacts ?? []) warnings.push(...reviewContactPeople(contact).problems);
   if (contactsUsed < contactsAvail)
     todo.push({
       order: 53,
@@ -2098,7 +2179,7 @@ function deriveProficiencies(state) {
     row => String(row.name ?? "").trim() || String(row.notes ?? "").trim()
   ).length;
   sys.subplotPicks = {
-    available: (lr?.subplots ?? 0) + B.get("subplots"),
+    available: (lr?.subplots ?? 0) + B.get("subplots") + campaignSubplotBonus(),
     used: subplotsInPlay,
     minimum: minimumSubplots,
     inPlay: subplotsInPlay,
@@ -2108,6 +2189,13 @@ function deriveProficiencies(state) {
     warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);
     todo.push({ order: 54, tab: "training", text: loc`Trouble Magnet: keep at least one unfinished Subplot in play.` });
   }
+  // Shoe String Budget (p.408): each agent begins with a Debt Subplot (p.55); remind until one is recorded.
+  if (campaignDebtSubplot() && !(sys.subplots ?? []).some(row => /\bdebt\b/i.test(String(row.name ?? ""))))
+    todo.push({
+      order: 54,
+      tab: "training",
+      text: loc`Shoe String Budget: record the Debt Subplot every agent starts with (pp.55, 408).`
+    });
   if (sys.subplotPicks.used > sys.subplotPicks.available)
     warnings.push(
       loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`
@@ -2117,7 +2205,8 @@ function deriveProficiencies(state) {
 /** Step 12: wealth and mission gear. */
 function deriveWealthAndGear(state) {
   const { sys, allItems, items, T, warnings, todo, plural, base, gearBase, abil, B, misc } = state;
-  const wealthTotal = base.wealth + B.get("wealth") + Math.max(0, abil.cha.mod) + (misc.wealth ?? 0);
+  const wealthTotal =
+    base.wealth + B.get("wealth") + Math.max(0, abil.cha.mod) + (misc.wealth ?? 0) + campaignWealthBonus();
   const alloc = sys.wealthAllocation ?? {};
   const allocated = (alloc.lifestyle ?? 0) + (alloc.possessions ?? 0) + (alloc.spendingCash ?? 0);
   const lifestyleRaw = 1 + B.get("lifestyle") + (alloc.lifestyle ?? 0);
@@ -2145,7 +2234,8 @@ function deriveWealthAndGear(state) {
       appearanceFeatBonus: B.get("appearance")
     },
     possessions: { rank: possessions, picks: posRow?.picks },
-    spendingCash: { rank: cash, amount: 100 * cash * cash }
+    // Table 7.4 under the Historical quality (p.407).
+    spendingCash: { rank: cash, amount: periodMoney(100 * cash * cash) }
   };
   sys.wealth.possessions.budget = possessionBudget(items, posRow?.picks, sys);
   warnings.push(...sys.wealth.possessions.budget.warnings);
@@ -2156,9 +2246,35 @@ function deriveWealthAndGear(state) {
   const picks = {};
   for (const g of GEAR) picks[g] = { available: gearBase[g] + B.get(`gear.${g}`) + (misc[`gear${g}`] ?? 0), spent: 0 };
   picks.CHA = { available: Math.max(0, abil.cha.mod), spent: 0 };
+  // Big Budget (p.405): a pick pushed past Caliber V also brings one Caliber I item of the same type, at no pick.
+  const missionReserves = currentReserves(sys),
+    overflow = missionReserves ? campaignGearCaliber(missionReserves.caliber).pastV : false,
+    tops = {},
+    ones = {};
   for (const i of items) {
     const p = i.system?.pick;
-    if (p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i)) picks[p].spent += i.system?.pickCount ?? 1;
+    if (!(p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i))) continue;
+    const count = i.system?.pickCount ?? 1;
+    picks[p].spent += count;
+    if (overflow && ["weapon", "armor", "gear"].includes(i.type)) {
+      // The free item must be of the same equipment category as the one pushed past V, from the same pick.
+      const key = `${p}|${equipmentCategory(i)}`;
+      if (i.system.caliber === 5) tops[key] = (tops[key] ?? 0) + count;
+      else if (i.system.caliber === 1) ones[key] = (ones[key] ?? 0) + count;
+    }
+  }
+  for (const key of Object.keys(tops)) {
+    const p = key.split("|")[0],
+      free = Math.min(tops[key], ones[key] ?? 0);
+    if (free) picks[p].spent -= free;
+    picks[p].bigBudgetExtras = (picks[p].bigBudgetExtras ?? 0) + free;
+  }
+  // Shoe String Budget (p.408): a pick that falls below Caliber I is lost, so a Caliber I mission's picks buy nothing.
+  if (missionReserves && campaignGearCaliber(missionReserves.caliber).lost) {
+    for (const key of Object.keys(picks)) picks[key].available = 0;
+    warnings.push(
+      loc`Shoe String Budget: this mission's gear picks fall below Caliber I, so they are lost and buy no gear (p.408).`
+    );
   }
   const reservedAllocations = reserveAllocations(sys);
   for (const key of Object.keys(picks)) picks[key].spent += reservedAllocations[key] ?? 0;
@@ -2187,6 +2303,31 @@ function deriveWealthAndGear(state) {
     picks[key].remaining = picks[key].available - picks[key].spent;
     if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
   }
+  // Negative standing (p.440): a burned agent keeps only personal Possessions, so no mission gear may be held.
+  sys.standingStatus = standingStatus(sys);
+  if (sys.standingStatus.burned) {
+    const held = items.filter(
+      i => ["weapon", "armor", "gear"].includes(i.type) && i.system?.pick && !i.system.possessionSource
+    ).length;
+    warnings.push(
+      sys.standingStatus.liquidation
+        ? loc`Targeted for liquidation (p.440): no mission gear, Requests or Gear checks, only personal Possessions.`
+        : loc`Burned (p.440): no mission gear, Requests or Gear checks, only personal Possessions, until standing is back above 0.`
+    );
+    if (held) warnings.push(loc`Burned: ${held} mission gear pick(s) are still on this sheet (p.440).`);
+  }
+  // Gear Restrictions (Table 7.8, p.437): the mission's lost picks, in the categories chosen at Intel, and any list of
+  // allowed weapons or Mechanisms the GC keeps with the mission.
+  const restriction = gearRestrictionsInForce(),
+    restrictionLosses = sys.gearRestrictionLosses ?? {};
+  warnings.push(...applyGearRestrictions(picks, restrictionLosses, items, restriction));
+  sys.gearRestriction = {
+    picks: restriction?.picks ?? 0,
+    chooser: restriction?.chooser ?? "player",
+    lists: restriction?.lists ?? [],
+    // Shown while picks are lost, or while an earlier mission's losses are left to clear.
+    show: (restriction?.picks ?? 0) > 0 || Object.values(restrictionLosses).some(value => Number(value) > 0)
+  };
   sys.ammunitionConfigurations = {};
   for (const item of items.filter(i => i.type === "weapon")) {
     const configuration = ammunitionConfiguration(item.system);
@@ -2218,8 +2359,20 @@ function deriveWealthAndGear(state) {
   const charismaCategories = sys.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"];
   for (const item of items.filter(item => ["weapon", "armor", "gear"].includes(item.type) && item.system.pick)) {
     const category = equipmentCategory(item),
-      pick = item.system.pick;
-    if (activeReserves && !managedAcquisition(sys, item) && item.system.caliber > activeReserves.caliber) {
+      pick = item.system.pick,
+      // Historical (p.407): an item newer than the campaign year is a gadget one Caliber higher, never past V.
+      era = historicalCaliber(item.system),
+      caliber = era.caliber ?? 6;
+    if (!era.available && !managedAcquisition(sys, item))
+      warnings.push(
+        loc`${item.name}: not yet introduced in the campaign year, and a gadget of it would pass Caliber V, so it cannot be had under Historical (p.407).`
+      );
+    if (
+      activeReserves &&
+      era.available &&
+      !managedAcquisition(sys, item) &&
+      caliber > campaignGearCaliber(activeReserves.caliber).caliber
+    ) {
       const exception =
         bigStickMatches(sys, item) &&
         sys.bigStickMissionPick.missionCaliber === activeReserves.caliber &&
@@ -2234,10 +2387,12 @@ function deriveWealthAndGear(state) {
         !item.system.common &&
         !item.system.ammunitionOnly &&
         !item.system.reserve &&
-        item.system.caliber <= activeReserves.caliber + 1;
+        caliber <= activeReserves.caliber + 1;
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
-          loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
+          era.gadget
+            ? loc`${item.name}: not yet introduced in the campaign year, so it is a Caliber ${["I", "II", "III", "IV", "V"][caliber - 1]} gadget (Historical, p.407), above this mission’s allowance.`
+            : loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
         );
     }
 
@@ -2280,10 +2435,10 @@ function deriveWealthAndGear(state) {
 /** Step 13: experience. */
 function deriveExperience(state) {
   const { sys, T, warnings, level } = state;
-  sys.xpNext = level < 20 ? (T.levels[level + 1]?.xp ?? null) : null;
+  sys.xpNext = level < 20 ? (campaignLevelRow(T.levels[level + 1])?.xp ?? null) : null;
   // Career levels follow XP thresholds (Table 1.3, p.27). A first-level character may start below its threshold,
   // so only later levels are checked; this is a reminder, as the GC may grant levels directly.
-  const xpForLevel = T.levels[level]?.xp;
+  const xpForLevel = campaignLevelRow(T.levels[level])?.xp;
   if (level > 1 && Number.isFinite(xpForLevel) && (Number(sys.xp) || 0) < xpForLevel)
     warnings.push(loc`Career Level ${level} needs ${xpForLevel} XP; this character has ${Number(sys.xp) || 0}.`);
 

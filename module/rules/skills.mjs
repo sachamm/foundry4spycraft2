@@ -1,3 +1,4 @@
+import { campaignRules, campaignTake10Time, omniPenalty } from "./campaign-rules.mjs";
 import { checkFocus, isHideCheck } from "./check-identity.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
@@ -305,8 +306,6 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     grappleContextConfirmed
   });
   check = restraint.check;
-  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
-  const terms = planTerms("skill", { system, skillKey: key, check, method, input });
   const conditionSystem =
     bound === true ? { ...system, conditionContext: { ...system.conditionContext, bound: true } } : system;
   const originalAbility =
@@ -314,6 +313,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const accordingEligible = (system.classLevels?.schemer ?? 0) >= 4;
   const substituted = !!allAccordingToPlan && accordingEligible,
     selected = substituted ? "int" : originalAbility;
+  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
+  // They see the attribute the check actually uses, after any substitution.
+  const terms = planTerms("skill", { system, skillKey: key, check, method, input, ability: selected });
   const originalRow = skill.totals.find(t => t.ability === originalAbility),
     originalTotal =
       originalRow?.normalSkillBonus ?? originalRow?.total - skillConditionCheckPenalty(system, originalAbility);
@@ -483,6 +485,13 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [180, senses.bonuses],
     [190, tracking.bonuses]
   ]);
+  // Omni-Competent (p.408) halves the penalties these entries bring too, not only the situational ones.
+  const halvePenalty = omniPenalty();
+  classEffects.bonuses = classEffects.bonuses.map(entry =>
+    Number(entry?.value) < 0 && halvePenalty(entry.value) !== entry.value
+      ? { ...entry, value: halvePenalty(entry.value) }
+      : entry
+  );
   const solutionEligible = tenSecondSolutionEligible(system, {
     checkKind: "skill",
     ability: selected,
@@ -506,7 +515,12 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const originallySecret = check.mode === "Secret" || (!!secret && check.mode.includes("Secret"));
   const crossCheckAvailable =
     ambush.crossCheckGranted || check.tags.includes("Cross-Check") || (!!attention && originallySecret);
-  const forceActive = activeCore || hailMaryActive || (crossCheckActive && crossCheckAvailable);
+  // Omni-Competent (p.408) makes every check active.
+  const forceActive =
+    activeCore ||
+    hailMaryActive ||
+    (crossCheckActive && crossCheckAvailable) ||
+    campaignRules().allChecksActive === true;
   const mode = forceActive ? "Active" : check.mode;
   const synergy = skillSynergy(
     system,
@@ -567,8 +581,10 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       ambush.errorIncrease +
       tracking.errorIncrease +
       medical.errorIncrease +
+      terms.sum("errorIncrease") +
       Math.max(0, Math.trunc(Number(vehicleErrorIncrease) || 0)) +
-      ((skill.ranks === 0 && !hailMaryUntrained) || missingFocus ? 2 : 0)
+      // A check without the needed focus is made untrained (p.98), so the 1-die Hail Mary lifts its +2 as well.
+      ((skill.ranks === 0 || missingFocus) && !hailMaryUntrained ? 2 : 0)
   );
   const zeroReduction =
     classEffects.errorReductionZero +
@@ -688,7 +704,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   if (crossCheckActive && !crossCheckAvailable) blockedReasons.push(loc`This check does not have the Cross-Check tag.`);
   if (hailMaryActive && !originallySecret && !check.mode.includes("Passive"))
     blockedReasons.push(loc`This Hail Mary option applies only to passive or secret checks.`);
-  if (hailMaryUntrained && skill.ranks > 0)
+  if (hailMaryUntrained && skill.ranks > 0 && !missingFocus)
     blockedReasons.push(loc`This Hail Mary option applies only to untrained checks.`);
   if (synergy.reason) blockedReasons.push(synergy.reason);
   if (cap !== null && cap < 5)
@@ -782,22 +798,25 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     synergyExtra =
       stacked([...skillBonusEntries, ...checkBonusEntries]) - stacked([...skillBonusEntries, ...nonSynergy]),
     condition = skillBonusCondition(system, normalSkillBonus + skillExtra);
-  const checkAdjustment =
-    skillConditionCheckPenalty(conditionSystem, selected) +
-    (isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0) +
-    (hasForte ? 1 : 0) +
-    armor +
-    vision +
-    (Number(modifier) || 0) +
-    skillTags.handPenalty +
-    light.skillModifier +
-    fogSmoke.skillModifier +
-    underwaterContext.penalty +
-    sensoryConditions.skillModifier +
-    restraint.sizeBonus +
-    hideMovementPlanResult.penalty +
-    detectionObserver.penalty +
-    terms.sum("adjustment");
+  // Omni-Competent (p.408) halves each penalty, rounding down and never past −1.
+  const penalty = omniPenalty();
+  const checkAdjustment = [
+    skillConditionCheckPenalty(conditionSystem, selected),
+    isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0,
+    hasForte ? 1 : 0,
+    armor,
+    vision,
+    Number(modifier) || 0,
+    skillTags.handPenalty,
+    light.skillModifier,
+    fogSmoke.skillModifier,
+    underwaterContext.penalty,
+    sensoryConditions.skillModifier,
+    restraint.sizeBonus,
+    hideMovementPlanResult.penalty,
+    detectionObserver.penalty,
+    terms.sum("adjustment")
+  ].reduce((sum, value) => sum + penalty(value), 0);
   const terrainFeat =
     terrainPlan.homeTurf ||
     terrainPlan.bonuses.length ||
@@ -1188,7 +1207,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     blocked: blockedReasons.length > 0,
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
-      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" ? 1 : (skill.take10TimeMultiplier ?? 2),
+      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int"
+        ? 1
+        : campaignTake10Time(skill.take10TimeMultiplier ?? 2),
     notes: noteSegments.join("")
   };
 }

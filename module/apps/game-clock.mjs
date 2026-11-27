@@ -38,6 +38,7 @@ import {
 } from "../rules/timers.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc, locKey } from "../i18n.mjs";
+import { periodMoneyModifier, setCampaignYearSource } from "../rules/period-money.mjs";
 
 const pad = n => String(n).padStart(2, "0");
 const now = () => Math.max(0, Math.floor(Number(game.time?.worldTime) || 0));
@@ -65,6 +66,9 @@ export function clockYear(time = now()) {
 }
 
 /** Players see the clock unless the GC hides it; their timers show time left either way. */
+// Money under the Historical quality follows the year the clock shows (Table 7.4).
+setCampaignYearSource(() => clockYear());
+
 export const clockVisible = () => game.user?.isGM === true || setting("clockVisibleToPlayers") !== false;
 
 /** A world time as the table reads it: a date when the GC has set one, a day count otherwise. */
@@ -692,7 +696,27 @@ function mountClockBadge(app, html) {
   root.prepend(badge);
 }
 
+let lastMoneyModifier = null;
+/** Agents' spending cash follows the clock's year under Historical (Table 7.4): recompute them when that changes. */
+function refreshMoneyForYear() {
+  let modifier;
+  try {
+    modifier = periodMoneyModifier();
+  } catch {
+    return;
+  }
+  const changed = lastMoneyModifier !== null && modifier !== lastMoneyModifier;
+  lastMoneyModifier = modifier;
+  if (!changed) return;
+  for (const actor of game.actors ?? [])
+    if (actor.type === "agent") {
+      actor.reset();
+      if (actor.sheet?.rendered) actor.sheet.render(false);
+    }
+}
+
 function refreshClock() {
+  refreshMoneyForYear();
   for (const span of document.querySelectorAll(".sc2-clock-badge span")) span.textContent = badgeText();
   if (clockWindow?.rendered) clockWindow.render();
   game.spycraft2?.gc?.console?.render?.(false);

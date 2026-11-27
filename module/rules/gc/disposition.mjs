@@ -1,6 +1,7 @@
 /** NPC disposition (pp.457–458, Table 7.14). */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignSkillDC } from "../campaign-rules.mjs";
 
 const D = GC_DATA.core.disposition;
 export const DISPOSITIONS = D.grades;
@@ -109,5 +110,31 @@ export function joinsCombat(gradeId, roll, { foil = 0 } = {}) {
 export function persuadeToJoin(gradeId, result, { triumph = false } = {}) {
   const grade = dispositionGrade(gradeId);
   if (grade.joinDC === null) return { dc: null, success: !!triumph, needsTriumph: true };
-  return { dc: grade.joinDC, success: Number.isFinite(result) && result >= grade.joinDC, needsTriumph: false };
+  // Cakewalk and Comedy of Errors move this DC like any other skill DC (p.406).
+  const dc = campaignSkillDC(grade.joinDC);
+  return { dc, success: Number.isFinite(result) && result >= dc, needsTriumph: false };
+}
+
+/**
+ * Persuading an NPC to join a fight (p.458): each side may try once per combat, and once one side wins the NPC
+ * over nobody else may try. `record` is what is stored for the NPC: { combatId, tried: [side ids], joined }.
+ * @returns {{allowed: boolean, reason?: string, dc?: number|null, success?: boolean, record?: object}}
+ */
+export function persuadeJoinPlan(record, { combatId, side, gradeId, result, triumph = false }) {
+  if (!combatId) return { allowed: false, reason: loc`Start the fight first: this can be tried once per combat.` };
+  const current = record?.combatId === combatId ? record : { combatId, tried: [], joined: null };
+  const key = String(side ?? "");
+  if (current.joined !== null && current.joined !== undefined)
+    return { allowed: false, reason: loc`Another side has already won this NPC over for this fight.` };
+  if (current.tried.includes(key))
+    return { allowed: false, reason: loc`That side has already tried to win this NPC over in this fight.` };
+  if (!Number.isFinite(result)) return { allowed: false, reason: loc`Enter the Impress/Persuasion check result.` };
+  const outcome = persuadeToJoin(gradeId, result, { triumph });
+  return {
+    allowed: true,
+    dc: outcome.dc,
+    needsTriumph: outcome.needsTriumph,
+    success: outcome.success,
+    record: { combatId, tried: [...current.tried, key], joined: outcome.success ? key : null }
+  };
 }

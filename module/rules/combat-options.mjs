@@ -18,6 +18,7 @@
  *
  * The checks join the skill dialogs as named checks; this module is pure.
  */
+import { campaignRules } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { ownCountDurationActive, validOwnCountClock } from "./own-count-duration.mjs";
 import { loc } from "../i18n.mjs";
@@ -190,7 +191,9 @@ const NOTES = {
   "joint-action": system =>
     loc`Joint Action: DC 10 per teammate, at most ${jointActionPlan(system, 1).most}. On a success everyone chosen acts on this Count next round; any failed check ends it (p.357).`,
   "stand-off": () =>
-    loc`Stand Off: opposed. Each loser takes 1d6 + the winner's Wisdom modifier stress; record it with "Stand off" on the sheet (p.359).`,
+    campaignRules().closedStandOffs
+      ? loc`Stand Off: opposed. Each loser takes 1d6 + the winner's Wisdom modifier stress; record it with "Stand off" on the sheet (p.359). Under Gladiators nobody may interrupt or join it (p.407).`
+      : loc`Stand Off: opposed. Each loser takes 1d6 + the winner's Wisdom modifier stress; record it with "Stand off" on the sheet (p.359).`,
   tire: () =>
     loc`Tire: opposed by the adjacent opponent's Resolve (Con). Settle it with "Tire result" on the sheet (p.361).`
 };

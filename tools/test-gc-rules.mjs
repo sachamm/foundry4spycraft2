@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { GC_DATA } from "../module/rules/gc-tables.mjs";
 import {
+  antagonistReward,
   defaultMission,
   defaultThreatLevel,
   threatLevel,
@@ -40,6 +41,7 @@ import {
   loyaltyDecision,
   joinsCombat,
   persuadeToJoin,
+  persuadeJoinPlan,
   dispositionToward,
   DISPOSITIONS
 } from "../module/rules/gc/disposition.mjs";
@@ -60,6 +62,7 @@ import {
   CAMPAIGN_QUALITIES,
   activeQualities,
   qualityAddition,
+  qualityClash,
   qualityXP,
   campaignEffects,
   injuryThresholds,
@@ -707,6 +710,19 @@ test("campaign quality catalog", () => {
   assert.deepEqual([find("gritty").xp, find("gritty").gcDice], [100, 4]);
   assert.deepEqual([find("bulletproof").xp, find("bulletproof").gcDice], [-75, 1]);
 });
+test("Faction and Freelance may never be in force together (p.407)", () => {
+  assert.throws(
+    () => qualityAddition("freelance", { scope: "season", active: activeQualities(["faction"]) }),
+    /Freelance and Faction cannot be in force together \(p\.407\)/
+  );
+  assert.throws(
+    () => qualityAddition("faction", { scope: "season", active: activeQualities(["freelance"]) }),
+    /cannot be in force together/
+  );
+  assert.equal(qualityAddition("hybrid", { scope: "season", active: activeQualities(["faction"]) }).xp, 0);
+  assert.match(qualityClash(["faction", "historical", "freelance"]), /Faction and Freelance/);
+  assert.equal(qualityClash(["faction", "historical"]), "");
+});
 test("adding qualities by scope, XP and combined effects", () => {
   assert.throws(() => qualityAddition("fast-feats", { scope: "scripted" }), /whole season/);
   assert.equal(qualityAddition("fast-feats", { scope: "season" }).xp, -50);
@@ -795,4 +811,64 @@ test("transcribed mission tables are complete", () => {
     t.reputation.byCaliber.map(r => r.reputation),
     GC_DATA.core.mission.reputationByCaliber.map(r => r.reputation)
   );
+});
+
+test("each side may try once per combat to talk an NPC into the fight, until one succeeds (p.458)", () => {
+  assert.equal(persuadeJoinPlan(null, { combatId: "", side: "a", gradeId: "neutral", result: 40 }).allowed, false);
+  const miss = persuadeJoinPlan(null, { combatId: "c1", side: "a", gradeId: "neutral", result: 20 });
+  assert.deepEqual([miss.allowed, miss.success, miss.dc], [true, false, 30]);
+  assert.match(
+    persuadeJoinPlan(miss.record, { combatId: "c1", side: "a", gradeId: "neutral", result: 40 }).reason,
+    /already tried/
+  );
+  const won = persuadeJoinPlan(miss.record, { combatId: "c1", side: "b", gradeId: "friendly", result: 20 });
+  assert.equal(won.success, true);
+  assert.match(
+    persuadeJoinPlan(won.record, { combatId: "c1", side: "c", gradeId: "neutral", result: 40 }).reason,
+    /already won/
+  );
+  assert.equal(
+    persuadeJoinPlan(won.record, { combatId: "c2", side: "a", gradeId: "neutral", result: 40 }).success,
+    true
+  );
+  assert.equal(
+    persuadeJoinPlan(null, { combatId: "c1", side: "a", gradeId: "adversarial", result: 99, triumph: true }).success,
+    true
+  );
+});
+
+test("Delay counts toward the round's ±10 limit; Press does not (p.324)", () => {
+  const delayed = endOfRound(12, [fluidModifier("finalAttack", { times: 3 })], { alreadyApplied: -8 });
+  assert.equal(delayed.delta, -2);
+  assert.equal(delayed.capped, true);
+  assert.equal(endOfRound(12, [fluidModifier("finalAttack", { times: 3 })]).delta, -6);
+});
+
+test("a Delay past 10 Counts stands, and the round's end never gives Counts back (p.356)", () => {
+  assert.equal(endOfRound(10, [], { alreadyApplied: -12 }).count, 10);
+  assert.equal(endOfRound(10, [fluidModifier("finalAttack", { times: 3 })], { alreadyApplied: -12 }).delta, 0);
+});
+
+test("a special antagonist's reward shows its four-times multiplier (p.452)", () => {
+  assert.deepEqual(antagonistReward({ type: "special", xp: 84 }), { xp: 84, multiplier: 4, total: 336, special: true });
+  assert.deepEqual(antagonistReward({ type: "standard", xp: 30 }), {
+    xp: 30,
+    multiplier: 1,
+    total: 30,
+    special: false
+  });
+});
+
+test("Cakewalk and Comedy of Errors shift a device's skill DCs, not its Defense (p.406)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const plain = resolveDevice("acid-jet", 5);
+  setCampaignRulesSource(() => ({ skillDC: 5 }));
+  try {
+    const shifted = resolveDevice("acid-jet", 5);
+    if (Number.isFinite(plain.detectDC)) assert.equal(shifted.detectDC, plain.detectDC + 5);
+    if (Number.isFinite(plain.disableDC)) assert.equal(shifted.disableDC, plain.disableDC + 5);
+    assert.equal(shifted.defense, plain.defense);
+  } finally {
+    setCampaignRulesSource(null);
+  }
 });

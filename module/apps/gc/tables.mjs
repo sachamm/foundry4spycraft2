@@ -1,9 +1,18 @@
-/** GC reference tools: security devices (Table 7.9), hazards and nature's fury (Tables 7.2–7.3), events and random possessions (Table 7.16). */
+/** GC reference tools: security devices (Table 7.9), hazards and nature's fury (Tables 7.2–7.3), events, NPC knowledge (Table 7.15) and random possessions (Table 7.16). */
+import { halfSaveResistsFully, isSpecialCharacter } from "../../rules/campaign-rules.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { SECURITY_DEVICES, resolveDevice, sensorCheck, trapOutcome } from "../../rules/gc/security.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
-import { requireGC, getMission } from "./state.mjs";
+import { requireGC, getMission, getOrganizations } from "./state.mjs";
+import {
+  knowledgeGrade,
+  knowledgeLines,
+  knowledgeRole,
+  knowsNothingCost,
+  npcKnowledge
+} from "../../rules/gc/npc-knowledge.mjs";
+import { RATINGS, RATING_LABELS } from "../../rules/gc/organization.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
@@ -112,6 +121,9 @@ export async function securityDeviceDialog() {
         lines.push(
           loc`Reflex save DC ${result.dc}${Number.isFinite(Number(input.save)) && input.save !== "" ? `: ${result.saved ? loc`saved (half damage)` : "failed"}` : ""}. Damage ${esc(device.damage)}${damage === null ? "" : ` = ${damage}${result.damage !== null && result.saved ? ` → <b>${result.damage}</b>` : ""}`}.`
         );
+        // Blockbuster (p.406): a player character who saves takes none of it.
+        if (result.saved && halfSaveResistsFully())
+          lines.push(loc`Blockbuster: a player character who made the save takes no damage (p.406).`);
       } else lines.push(loc`This trap has no attack bonus or save DC; apply its listed effect.`);
     }
   } catch (error) {
@@ -188,4 +200,69 @@ export async function randomPossessionsDialog() {
       lines.push(`${roll.total}: ${esc(result.text)}`);
   }
   return say(`<b>${esc(table.name)}</b> (${esc(table.source)}, p.${table.page})<br>${lines.join("<br>")}`);
+}
+
+/** Questioning an NPC (p.458, Table 7.15): the opposed check's margin, capped by Competence and the NPC's role. */
+export async function npcKnowledgeDialog() {
+  requireGC();
+  const npcs = [...(game.actors ?? [])].filter(actor => actor.type === "npc"),
+    onScene = new Set((globalThis.canvas?.tokens?.placeables ?? []).map(token => token.actor?.id));
+  npcs.sort((a, b) => Number(onScene.has(b.id)) - Number(onScene.has(a.id)) || a.name.localeCompare(b.name));
+  const enemies = Object.entries(getOrganizations()).filter(([, org]) => !org.agency);
+  const roles = [
+    ["", loc`From the NPC's qualities`],
+    ["other", loc`Not one of the mission's villains`],
+    ["villain", loc`Villain (minion or other)`],
+    ["henchman", loc`Henchman`],
+    ["mastermind", loc`Mastermind`]
+  ];
+  const input = await ask(
+    loc`NPC knowledge — Table 7.15`,
+    `<p>${loc`The team makes an Impress/Persuasion or Intimidate/Coercion check against the NPC's Competence or Sense Motive (p.458).`}</p>
+    <label>${loc`NPC`} <select name="npc"><option value="">${loc`Not listed`}</option>${options(npcs.map(actor => [actor.id, actor.name]))}</select></label>
+    <label>${loc`Role`} <select name="role">${options(roles, "")}</select></label>
+    <label>${loc`Competence grade, if the NPC is not listed (1–10)`} <input type="number" name="competence" min="1" max="10" value="1" /></label>
+    <label>${loc`The team's check result`} <input type="number" name="team" required /></label>
+    <label>${loc`The NPC's opposing result`} <input type="number" name="npcResult" required /></label>
+    ${enemies.length ? `<label>${loc`Enemy organization`} <select name="organization"><option value="">${loc`None recorded`}</option>${options(enemies.map(([id, org]) => [id, org.name || id]))}</select></label><p>${loc`Ratings to reveal first`}</p><p>${RATINGS.map(key => `<label><input type="checkbox" name="rating-${key}" /> ${esc(RATING_LABELS[key])}</label>`).join(" ")}</p>` : ""}`,
+    loc`Find what the NPC knows`
+  );
+  if (!input) return null;
+  const actor = input.npc ? game.actors.get(input.npc) : null,
+    profile = actor?.system?.npcProfile ?? {},
+    // As spendProfile does: a graded NPC's role is among its qualities, a hand-built one names it as its manual role.
+    roleQualities = profile.enabled
+      ? (profile.qualities ?? [])
+      : actor?.system?.manualRole
+        ? [{ id: actor.system.manualRole }]
+        : [],
+    role = input.role || knowledgeRole({ qualities: roleQualities, npcType: actor?.system?.npcType }),
+    competence = actor && profile.enabled ? (profile.grades?.competence ?? 1) : Number(input.competence) || 1;
+  if (!Number.isFinite(Number(input.team)) || !Number.isFinite(Number(input.npcResult)))
+    return refuse(loc`Enter both check results, then ask again.`);
+  const difference = Number(input.team) - Number(input.npcResult),
+    result = npcKnowledge({ difference, competence, role });
+  const organization = getOrganizations()[input.organization] ?? null,
+    chosen = RATINGS.filter(key => input[`rating-${key}`] === true);
+  const name = esc(actor?.name ?? loc`The NPC`);
+  const cost = knowsNothingCost(role, actor && isSpecialCharacter(actor.system) ? "special" : "standard");
+  const notes = [
+    result.limit === "competence"
+      ? loc`Held at grade ${knowledgeGrade(result.grade)} by the NPC's Competence (the margin reached ${knowledgeGrade(result.byMargin)}).`
+      : result.limit === "role"
+        ? loc`Held at grade ${knowledgeGrade(result.grade)}: only villains go past III, and only henchmen and the mastermind past VII.`
+        : "",
+    result.flawed ? loc`Grades I–III may be mistaken or a red herring, as the GC decides.` : "",
+    cost === null
+      ? loc`A mastermind always knows something of value.`
+      : loc`Instead, the GC may spend ${cost} GC action dice to rule that ${actor?.name ?? loc`the NPC`} knows nothing.`
+  ].filter(Boolean);
+  const body = result.grade
+    ? `<ul>${knowledgeLines(result, organization, chosen)
+        .map(line => `<li>${esc(line)}</li>`)
+        .join("")}</ul>`
+    : `<p>${esc(loc`The check did not beat the NPC's: nothing is learned.`)}</p>`;
+  return say(
+    `<b>${loc`${name} talks: grade ${knowledgeGrade(result.grade)}`}</b> ${esc(loc`(margin ${difference}, Table 7.15, p.460)`)}${body}<p>${notes.map(esc).join("<br>")}</p>`
+  );
 }

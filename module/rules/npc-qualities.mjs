@@ -10,6 +10,7 @@
  * Summaries are our own wording. This module is pure.
  */
 import { loc } from "../i18n.mjs";
+import { TRAINED_QUALITIES } from "./companions.mjs";
 
 const SIZES = ["Nuisance", "Fine", "Diminutive", "Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan", "Colossal"];
 const ACTION_DICE = ["d4", "d6", "d8", "d10", "d12"];
@@ -105,6 +106,17 @@ export function npcQualityEffects(profile, { type = "standard", threatLevel = 1,
     note("fearless", loc`Fearless`, loc`+${4 * Math.min(5, units("fearless"))} to Resolve/Morale checks.`, 447);
   if (units("meek")) note("meek", loc`Meek`, loc`–${4 * Math.min(5, units("meek"))} to Resolve/Morale checks.`, 448);
   if (resistModifier) note("strong-minded", loc`Strong-Minded`, loc`+${resistModifier} to Resist skill checks.`, 451);
+  // An animal's training steadies it: a Morale bonus per trained quality, and more at 2 or more (p.445).
+  const trainedQualities = type === "animal" ? TRAINED_QUALITIES.filter(id => has(id)).length : 0;
+  if (trainedQualities)
+    note(
+      "trained",
+      loc`Trained`,
+      trainedQualities >= 2
+        ? loc`+${trainedQualities} to Resolve/Morale checks, error range −1 and a cap raised by twice the rider's Charisma modifier.`
+        : loc`+${trainedQualities} to Resolve/Morale checks.`,
+      445
+    );
 
   // Checks that take a modifier when the situation fits: offered on the NPC's skill check
   const skillOptions = [];
@@ -322,6 +334,7 @@ export function npcQualityEffects(profile, { type = "standard", threatLevel = 1,
     unnervingDice,
     moraleModifier,
     resistModifier,
+    trainedQualities,
     skillOptions,
     senses,
     rangePenaltyReduction,
@@ -338,14 +351,24 @@ export function npcQualityEffects(profile, { type = "standard", threatLevel = 1,
 /**
  * The quality modifiers of one NPC skill check.
  * @param {object} effects   npcQualityEffects(...)
- * @param {object} check     { skillKey, checkId, chosen: ids of the situational options ticked }
- * @returns {{modifier: number, errorIncrease: number, rows: {label: string, value: number}[]}}
+ * @param {object} check     { skillKey, checkId, chosen: ids of the situational options ticked, riderCharisma }
+ * @returns {{modifier: number, errorIncrease: number, capBonus: number, rows: {label: string, value: number}[]}}
  */
-export function npcSkillQualityPlan(effects, { skillKey = "", checkId = "", chosen = [] } = {}) {
+export function npcSkillQualityPlan(effects, { skillKey = "", checkId = "", chosen = [], riderCharisma = 0 } = {}) {
   const rows = [];
-  let errorIncrease = 0;
-  if (effects.moraleModifier && skillKey === "resolve" && checkId === "morale")
+  let errorIncrease = 0,
+    capBonus = 0;
+  const morale = skillKey === "resolve" && checkId === "morale";
+  if (effects.moraleModifier && morale)
     rows.push({ label: effects.moraleModifier > 0 ? loc`Fearless` : loc`Meek`, value: effects.moraleModifier });
+  const trained = effects.trainedQualities ?? 0;
+  if (trained && morale) {
+    rows.push({ label: loc`Trained qualities`, value: trained });
+    if (trained >= 2) {
+      errorIncrease -= 1;
+      capBonus = 2 * Math.max(0, Math.trunc(Number(riderCharisma) || 0));
+    }
+  }
   if (effects.resistModifier && (RESIST_CHECKS[skillKey] ?? []).includes(checkId))
     rows.push({ label: loc`Strong-Minded`, value: effects.resistModifier });
   for (const option of effects.skillOptions) {
@@ -354,7 +377,20 @@ export function npcSkillQualityPlan(effects, { skillKey = "", checkId = "", chos
     if (option.modifier) rows.push({ label: option.label, value: option.modifier });
     if (option.errorIncrease) errorIncrease += option.errorIncrease;
   }
-  return { modifier: rows.reduce((total, row) => total + row.value, 0), errorIncrease, rows };
+  return { modifier: rows.reduce((total, row) => total + row.value, 0), errorIncrease, capBonus, rows };
+}
+
+/**
+ * A Minion squad as the book sets it out (pp.447–448): as many members as the team, twice as many under Horde, and
+ * one of them the Commander when the NPC has that quality. Null for an NPC that is not a Minion.
+ * @param {object[]} qualities  the NPC profile's quality entries
+ * @param {number} teamSize     the number of agents on the team
+ */
+export function minionSquad(qualities = [], teamSize = 0) {
+  const ids = new Set((qualities ?? []).map(entry => entry?.id));
+  if (!ids.has("minion")) return null;
+  const size = Math.max(1, Math.trunc(Number(teamSize) || 0)) * (ids.has("horde") ? 2 : 1);
+  return { size, commander: ids.has("commander") && size > 1 };
 }
 
 /** The situational options that can apply to a skill, for the NPC skill check dialog. */
@@ -378,6 +414,28 @@ export function targetRoleCriticalRules(system) {
   };
 }
 
+/** The GC's note on what a target's role does to an attack with this threat number. */
+export function targetRoleNote(role, threat) {
+  const line = loc`Target is a ${role.label}: threat range ${role.threatRangeReduction} narrower, a critical costs ${role.extraDiceToActivate} more.`;
+  return threatAgainstRole(threat, role) > 20 ? `${line} ${loc`This attack cannot threaten.`}` : line;
+}
+
 /** A threat number with the target's role applied: the range shrinks from its low end, and can vanish. */
 export const threatAgainstRole = (threat, role) =>
   threat > 0 && role?.threatRangeReduction > 0 ? threat + role.threatRangeReduction : threat;
+
+/**
+ * The threat number and role for the target an attack is resolved against, or null when nothing changes. The
+ * threat before any role is the one recorded at the roll (or worked back from the declared target's role).
+ */
+export function resolvedTargetRole(check, targetSystem) {
+  const declared = check.attackContext?.targetRole ?? null,
+    role = targetRoleCriticalRules(targetSystem);
+  if ((declared?.id ?? null) === (role?.id ?? null)) return null;
+  const base = Number.isSafeInteger(check.attackContext?.baseThreat)
+    ? check.attackContext.baseThreat
+    : declared?.threatRangeReduction > 0 && check.threat > 0
+      ? check.threat - declared.threatRangeReduction
+      : check.threat;
+  return { threat: threatAgainstRole(base, role), role };
+}

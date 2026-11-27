@@ -10,7 +10,8 @@ import {
   gearAcquisitionPlan,
   acquisitionOutcome,
   reserveAllocations,
-  managedAcquisition
+  managedAcquisition,
+  reserveCaliberIncrease
 } from "../module/rules/gear-acquisition.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
@@ -2321,4 +2322,57 @@ test("Political Clout, Favors and Immunity: once per mission, automatic, no acti
   s.resourceUses.requestPoliticalImmunity = { epoch: "mission1", used: 1 };
   assert.throws(() => gearAcquisitionPlan(s, input), /no uses/);
   assert.equal(DELIVERY.largeCity.formula, "3d20", "ordinary delivery is unchanged");
+});
+
+test("an Agency Site adds +4 and halves delivery for the Requests it serves (p.394)", () => {
+  const sys = system();
+  sys.missionReserves = reserveInitialization(sys, [], initialize);
+  const site = { id: "classroom", name: "Classroom", request: "Skill training requests", category: "R", bonus: 4 };
+  const plan = gearAcquisitionPlan(sys, { ...request, agencySite: site });
+  assert.equal(plan.bonus, 13);
+  assert.equal(plan.deliveryMultiplier, 0.5);
+  assert.equal(plan.agencySite, "classroom");
+  assert.throws(
+    () => gearAcquisitionPlan(sys, { ...request, agencySite: { ...site, category: "W" } }),
+    /serves Skill training requests/
+  );
+});
+test("Shoe-String Budget on a Caliber I mission loses the Reserve picks (p.408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const sys = system();
+  sys.missionReserves = reserveInitialization(sys, [], { ...initialize, caliber: 1 });
+  setCampaignRulesSource(() => ({ gearCaliberShift: -1 }));
+  try {
+    assert.throws(() => gearAcquisitionPlan(sys, { ...request, caliber: 1 }), /Shoe-String/);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+});
+
+test("reserves take the mission record's Caliber, and a GC increase raises them (p.398)", () => {
+  const sys = system();
+  assert.throws(
+    () => reserveInitialization(sys, [], { ...initialize, caliber: 3, missionCaliber: 2 }),
+    /GC set this mission at Caliber II/
+  );
+  sys.missionReserves = reserveInitialization(sys, [], { ...initialize, missionCaliber: 2 });
+  assert.equal(sys.missionReserves.caliber, 2);
+  assert.deepEqual(reserveCaliberIncrease(sys, 4), { "system.missionReserves.caliber": 4 });
+  assert.equal(reserveCaliberIncrease(sys, 2), null, "not an increase");
+  assert.equal(reserveCaliberIncrease(sys, 6), null);
+  sys.usagePeriods.mission = "next";
+  assert.equal(reserveCaliberIncrease(sys, 4), null, "an earlier mission's reserves are left alone");
+});
+test("a Historical gadget Requested one Caliber higher is claimed as the catalog item at its own Caliber (p.407)", async () => {
+  const actor = new SpycraftActor();
+  await actor.allocateMissionReserves(initialize);
+  const msg = await actor.rollGearAcquisition(request);
+  const id = msg.flags.spycraft2.gearAttempt.id;
+  await actor.finishCheck(msg);
+  // As the Request records it under Historical: the gadget's Caliber, and the item's own.
+  const attempt = actor.system.missionReserves.attempts[id];
+  Object.assign(attempt, { caliber: attempt.caliber + 1, itemCaliber: attempt.caliber, historicalGadget: true });
+  const itemData = { name: request.name, type: "gear", system: { gearCategory: "R", caliber: attempt.itemCaliber } };
+  const item = await actor.claimGearAcquisition({ attemptId: id, itemData, delivered: true, gcConfirmed: true });
+  assert.equal(item.system.caliber, attempt.itemCaliber);
 });

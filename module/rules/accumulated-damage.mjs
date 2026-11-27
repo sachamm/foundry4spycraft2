@@ -133,7 +133,8 @@ export function damageLedgerEventPlan(
     damageMode = "net",
     attackKind,
     armorPiercing = 0,
-    armorPiercingAll = false
+    armorPiercingAll = false,
+    proficiency = ""
   } = {},
   id,
   at
@@ -161,7 +162,12 @@ export function damageLedgerEventPlan(
     criticalHit,
     damageMode,
     ...(damageMode === "subdualBeforeDefenses"
-      ? { attackKind, armorPiercing: armorPiercingAll ? 0 : armorPiercing, armorPiercingAll }
+      ? {
+          attackKind,
+          armorPiercing: armorPiercingAll ? 0 : armorPiercing,
+          armorPiercingAll,
+          ...(proficiency ? { proficiency } : {})
+        }
       : {})
   };
   const previous = records.find(r => r.source === source.trim());
@@ -186,7 +192,14 @@ export function damageLedgerEventPlan(
   const defenseContext = ["stressBeforeResistance", "fireStressBeforeDefenses"].includes(damageMode)
     ? stressDefensePlan(system, newDamage, { fromFire: damageMode === "fireStressBeforeDefenses" })
     : damageMode === "subdualBeforeDefenses"
-      ? subdualDefensePlan(system, { rawDamage: newDamage, attackKind, armorPiercing, armorPiercingAll, criticalHit })
+      ? subdualDefensePlan(system, {
+          rawDamage: newDamage,
+          attackKind,
+          armorPiercing,
+          armorPiercingAll,
+          criticalHit,
+          proficiency
+        })
       : null;
   if (defenseContext?.criticalBruisingReview)
     throw new Error(

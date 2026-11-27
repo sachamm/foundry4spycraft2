@@ -135,3 +135,17 @@ test("prerequisite allowance changes only minimum career level; acquisition-only
     true
   );
 });
+
+test("a feat tree a season quality opens may fill a class bonus-feat source (pp.405–408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const item = scientist(),
+    sources = classFeatSources([item], [{ classId: "scientist" }]),
+    lucky = feat("Fortunate", { acquisitionSource: sources[0].id });
+  assert.equal(featAcquisition(lucky, sources, [item, lucky]).ok, false);
+  setCampaignRulesSource(() => ({ bonusFeatTrees: ["Chance"] }));
+  try {
+    assert.equal(featAcquisition(lucky, sources, [item, lucky]).ok, true);
+  } finally {
+    setCampaignRulesSource(null);
+  }
+});

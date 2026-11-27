@@ -17,9 +17,12 @@ Foundry already supplies scenes, tokens, journals, roll tables and the combat tr
   action dice left of the starting number.
 - **Begin session** (top of the console) starts the session's usage period, sets up the GC pool from the team and the
   mission's Caliber, and applies each agent's starting-dice adjustments in one step. **Next scene** starts a new scene
-  period and counts the scene on the active mission. **Start mission** also starts a mission period.
+  period and counts the scene on the active mission. **Start mission** also starts a mission period, and rolls the
+  liquidation check (p.440) for each agent whose standing is below −20 Reputation or −$1,000,000 Net Worth. An agent
+  below 0 is marked burned on the sheet and beside their name in the console, and cannot allocate reserves, make
+  Requests or Gear checks.
 - Until the GC action dice are set up the console offers **Set up GC action dice**, pre-filled with the players present and the Caliber.
-- On an open NPC card the GC gets **GC boost** and **GC: activate threat**, paid from the GC pool.
+- On an open NPC card the GC gets **GC boost** and **Activate threat (GC dice)**, paid from the GC pool.
 - A player's request to change something they do not own (damage to an NPC, treating a teammate) arrives as a card in
   the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. Unanswered requests are declined
   after about two minutes.
@@ -40,7 +43,7 @@ One mission is stored per world.
 - **Caliber** — I–V. **Caliber +1** also gives the GC pool its 2 dice (p.398).
 - **Objectives** — grade × 25 XP, counted when marked complete. Table 7.6's samples are offered when adding one. One critical objective is free; each extra is +25 XP; none is −50 XP.
 - **Antagonists** — pick an NPC actor to read its XP reward. Each NPC type counts once; special NPCs count ×4; a ‘full’ or promoted special NPC earns 300 XP per scene. An antagonist counts once it is marked as faced.
-- **Complications** — scripted dramatic scenes (first free, +100 XP each extra, −50 XP for none), time limit (+50), campaign qualities, security devices (XP from the device's Power Rating), gear restrictions (Table 7.8), exposure objectives (Table 7.7), mission bundle picks (−10 XP per Caliber, −1 per Common Item) and free-form entries. Marking one **ignored** halves it, rounded up.
+- **Complications** — scripted dramatic scenes (first free, +100 XP each extra, −50 XP for none), time limit (+50), campaign qualities, security devices (XP from the device's Power Rating), gear restrictions (Table 7.8), exposure objectives (Table 7.7), mission bundle picks (−10 XP per Caliber, −1 per Common Item) and free-form entries. Marking one **ignored** halves it, rounded up. While the mission runs, a gear restriction takes its picks off every agent's sheet, where the player (or the GC, as the row says) records which categories lose them; for the two list restrictions, enter the allowed weapons or Mechanisms one per line and the sheet flags picks that are not on the list.
 - **XP report** — posts the base reward and each character's total: (base + 25 per awarded action die, capped at 25 × level) × the lower of career level and Threat Level. The agent sheet's **Settle mission XP** dialog is pre-filled from the record; settlement itself is unchanged.
 - **Exposure** — recording an infraction immediately lowers that agent's Reputation or Net Worth; committing it to prevent an equal or worse one costs half, rounded up.
 - **Standing** — pays Table 7.10's reward by Caliber, shifted by Table 7.5 when the Threat Level was adjusted.
@@ -134,7 +137,7 @@ The sheet also has an NPC **skill check** (the higher of Competence and the skil
 
 ## Disposition (pp.457–458)
 
-Each NPC stores a general disposition and one per character. The dialog shifts it (at most two grades either way per mission, one automatic shift per mission), shows the Intimacy and Fondness check modifiers, and rolls Loyalty and join-the-fight decisions, including the foil modifier.
+Each NPC stores a general disposition and one per character. The dialog shifts it (at most two grades either way per mission, one automatic shift per mission), shows the Intimacy and Fondness check modifiers, and rolls Loyalty and join-the-fight decisions, including the foil modifier. A skill dialog for an Intimacy or Fondness check asks for the targeted NPC's disposition (filled in from the target when the player can see it) and adds its modifier, threat and error changes, plus Diplomatic's +1; villains are immune.
 
 ## Dramatic Conflicts (pp.363–388)
 
@@ -144,6 +147,12 @@ All seven types are supported with their printed Strategies, requirements, modif
 
 All 60 qualities are listed with XP modifier and action die cost. Season qualities apply to every mission; mission qualities are scripted (XP applies) or bought with action dice (no XP).
 
+The qualities in force change the rolls themselves: threat and attack modifiers (Violent, Subtle), Triumph thresholds (the Spectacle qualities), range and blast increments (Gunmen), critical injury bands and costs (Bloodbath and its kin), stress (Tense, Mellow), falling damage (Wire-Fu), the skill caps (Omni-Competent), surprise and persuasion modifiers (Paranoid), error ranges (Comedy of Errors), action dice (Spirited), Lead Advantage and challenge counts (Speed-Frame, Thriller) and the honor exposure penalty (Virtuous, Corrupt). Season qualities that change characters reach the sheets too: the growth schedules (Fast and Slow Attributes, Feats, Interests, Proficiencies and Growth), Small Screen's 32 points, Fragile's fixed vitality, Jack-of-All-Trades, the tree qualities (a feat from that tree may fill another tree's choice), and Big Budget's +4 Wealth. Big Budget and Shoe-String Budget move the Caliber a mission gear pick or Request may reach. Under Historical, money follows Table 7.4 for the year the game clock shows (×0.1 in the 1950s up to ×0.6 in the 1980s): Net Worth awards, Net Worth request costs and Spending Cash. Gear newer than that year stays in the gear browser as a gadget one Caliber up, and mission picks and Requests are checked at that Caliber; an item that would pass Caliber V cannot be had. Play qualities with effects of their own are applied as well: Bottomless Clip stops counting shots in weapons of 5 or more, Omni-Competent halves skill penalties, Comedy of Errors caps skill error activation at 2 dice and slows take 10, Common Spectacle's Triumph share goes into mission XP (with the Crossroads share), and Gladiators sets CQB Range to 20 ft. and gives +1 Defense against ranged attacks per Melee or Unarmed Combat feat, NPCs included. Catch Phrase adds a reminder to threat cards. Feat Purchase puts a **Buy a feat** button on the feats pane (1,000 XP per career level, never below the level's minimum), Modular trades feats for attribute points at 2 each, Soap allows one more Subplot, and Routine turns off Crossroads Titles. The Campaign qualities section lists each change in force.
+
+## Organizations (pp.389–395)
+
+**Add organization** records the Agency or a rival with its five Power Ratings, goals, turning points, Image facets, Sites and Tools. The console shows each one's total and what is over or under its Ratings; **Post summary** whispers its Ratings, the Canvass and Research levels of each facet, the cover and immunity bonuses its people carry, and its goal dice. Marking one as the Agency puts its Sites on the Request dialog (+4 and half the delivery time in the categories each Site serves), and either side of a Dramatic Conflict can take its Ratings from a recorded organization. An NPC built from grades can name its organization; its Tools then cap the Caliber of each equipment pick.
+
 ## Reference
 
 Security devices at any Power Rating with sensor and trap rolls (Table 7.9), hazards and nature's fury by dice spent (Tables 7.2–7.3), event summaries, and random possessions (Table 7.16, also a **GC Tables** roll-table compendium).
@@ -152,7 +161,8 @@ Security devices at any Power Rating with sensor and trap rolls (Table 7.9), haz
 
 - Strategy choices are entered by the GC; players tell the GC their choice privately. Opposed checks are rolled on the sheets and the totals typed in.
 - Advantage effects other than Lead, Swap, Victory and Halt are reported, not applied.
-- Disposition and campaign-quality modifiers are shown but not added to agents' rolls automatically. Of the campaign qualities, only XP, action die cost and starting action dice are applied; the rest is a reference list.
+- Campaign qualities that need a ruling at the table (a DC the GC calls aloud, which side a scene favors, Black & White's sides, a Revolving Door return) appear as card notes or in the Campaign qualities section.
+- Organization goal dice and turning-point morale are listed on the summary card; the GC grants them.
 - Initiative boosts for the dramatic-scene spend change the Count; Defense and DC boosts are reported for the GC to apply.
 - Some printed cells are garbled or inconsistent in the source text; each is listed under `anomalies` in `src/data/gc-tables.json` and `src/data/conflicts.json` and kept as printed.
 

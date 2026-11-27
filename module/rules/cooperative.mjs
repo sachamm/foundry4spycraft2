@@ -6,11 +6,15 @@
  * most; each helper's critical success adds a further +1 that is not a synergy bonus. One helper's critical
  * failure ruins the task. Nobody takes 10 or 20. Table 2.9 says how many helpers a check allows.
  */
+import { triumphAt } from "./check-candidates.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignSkillDC } from "./campaign-rules.mjs";
 
 export const HELPER_BASE_DC = 15;
+/** The helpers' base DC after Cakewalk or Comedy of Errors (p.406). */
+export const helperBaseDC = () => campaignSkillDC(HELPER_BASE_DC);
 export const HELPER_SYNERGY_LIMIT = 5;
 
 /**
@@ -26,11 +30,14 @@ export function helperLimit(check, { charismaMod = 0 } = {}) {
   return { allowed: max === null || max > 0, max, special: false, smallItem: rule.smallItem === true };
 }
 
-/** The DC each helper rolls against. */
+/**
+ * The DC each helper rolls against: 10, or the leader's result less 10 when that is higher (p.91). Cakewalk and
+ * Comedy of Errors shift the whole DC, whichever it is.
+ */
 export function helperDC({ setDC = false, leaderResult = null } = {}) {
-  if (setDC) return HELPER_BASE_DC;
+  if (setDC) return helperBaseDC();
   if (!Number.isFinite(leaderResult)) throw new Error(loc`The leader's result is needed to set the helpers' DC.`);
-  return Math.max(HELPER_BASE_DC, leaderResult - 10);
+  return campaignSkillDC(Math.max(HELPER_BASE_DC, leaderResult - 10));
 }
 
 /**
@@ -88,7 +95,8 @@ export function applyCooperativeBonus(check, helpers, { max = null } = {}) {
   const resolved = resolveSkillResult(rawTotal, check.naturalDie, {
     cap: check.boostCap ?? check.cap ?? null,
     threat: check.threat ?? 0,
-    actionDieBonus: check.boostTotal ?? 0
+    actionDieBonus: check.boostTotal ?? 0,
+    triumphAt: triumphAt(check)
   });
   return {
     ...check,
@@ -109,8 +117,10 @@ export function cooperativeNotes(check) {
   const limit = coop.max === null || coop.max === undefined ? loc`no stated limit` : loc`up to ${coop.max} helper(s)`;
   const notes = [
     coop.setDC
-      ? loc`Cooperative check, leader: ${limit}; each helper rolls against DC ${HELPER_BASE_DC} (p.91).`
-      : loc`Cooperative check, leader: ${limit}; each helper rolls against this result less 10, at least ${HELPER_BASE_DC} (p.91).`
+      ? loc`Cooperative check, leader: ${limit}; each helper rolls against DC ${helperBaseDC()} (p.91).`
+      : Number.isFinite(check.effectiveTotal)
+        ? loc`Cooperative check, leader: ${limit}; each helper rolls against DC ${helperDC({ leaderResult: check.effectiveTotal })} (p.91).`
+        : loc`Cooperative check, leader: ${limit}; each helper rolls against this result less 10, at least ${helperBaseDC()} (p.91).`
   ];
   const result = coop.result;
   if (result?.ruined) notes.push(loc`A helper's critical failure ruined the task; it has to be started again.`);
@@ -136,8 +146,8 @@ export function validateCooperative(cooperative, { check, checkMethod = "roll", 
     );
   if (cooperative.role === "helper") {
     if (!check?.cooperative) throw new Error(loc`This check cannot be made as a cooperative check (Table 2.9).`);
-    if (!Number.isFinite(cooperative.dc) || cooperative.dc < HELPER_BASE_DC)
-      throw new Error(loc`A helper needs the DC set by the leader's check, at least ${HELPER_BASE_DC}.`);
+    if (!Number.isFinite(cooperative.dc) || cooperative.dc < helperBaseDC())
+      throw new Error(loc`A helper needs the DC set by the leader's check, at least ${helperBaseDC()}.`);
   }
 }
 

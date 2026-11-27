@@ -1,4 +1,5 @@
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
+import { actionDieTerm } from "../../rules/action-die-formula.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { messageModeOption } from "../../rolls/message-mode.mjs";
 import { blackCatRollEffect } from "../../rules/black-cat.mjs";
@@ -33,6 +34,7 @@ import { unrestrictedBonusPools } from "../../rules/bonus-pools.mjs";
 import { checkFlavor, rollEvidence } from "../../rules/outcomes.mjs";
 import { weaponAttack } from "../../rules/gear.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
+import { skillCapsLifted, takeTenRefusal, triumphResult } from "../../rules/campaign-rules.mjs";
 import { characterReminders } from "../../rules/feat-reminders.mjs";
 import { loc } from "../../i18n.mjs";
 import { breakdownRows, expandRow, saveBreakdown } from "../../rules/bonus-breakdown.mjs";
@@ -52,6 +54,7 @@ export const ActorRolls = Base =>
         threat = 20,
         error = 1,
         cap = null,
+        resultCeiling = null,
         rollMode,
         actionDiceAllowed = true,
         checkMethod = "roll",
@@ -81,6 +84,15 @@ export const ActorRolls = Base =>
         opponentResult = null,
         requiredBonusPoolId = null
       } = options;
+      // Campaign qualities (pp.406–408): Omni-Competent lifts skill result caps; Tense forbids taking 10.
+      // An NPC skill roll from the GC tools is marked with npcSkill rather than its own check kind.
+      if (["skill", "knowledge"].includes(checkKind) || options.npcSkill) {
+        if (skillCapsLifted()) cap = null;
+      }
+      // Tense forbids taking 10 on any check, saves too (Evasion III's take 10 on Reflex saves).
+      const refusal = takeTenRefusal(checkMethod);
+      if (refusal) throw new Error(refusal);
+      const triumphAt = triumphResult();
       const attributeDamage = attributeDamageEvidence(this.system, checkKind);
       if (Object.hasOwn(options, "attributeDamage"))
         validateAttributeDamageProof(this.system, options.attributeDamage, { checkKind });
@@ -332,7 +344,7 @@ export const ActorRolls = Base =>
       const normalThreat = threat;
       if (twenty) threat = 20;
       const rawTotal = roll.total + minimumAdjustment + (oldSchool?.bonus ?? 0),
-        resolved = resolveSkillResult(rawTotal, die, { cap, threat });
+        resolved = resolveSkillResult(rawTotal, die, { cap, threat, triumphAt, ceiling: resultCeiling });
       const rollCombat = this.participatingCombat,
         recordedCombat = rollCombat?.started ? this.mentalLeapCombatContext(rollCombat) : null;
       const shaken = shakenRules(this.system);
@@ -416,6 +428,7 @@ export const ActorRolls = Base =>
         noForcedReroll: twenty,
         normalThreat: options.normalThreat ?? normalThreat,
         rawTotal,
+        triumphAt,
         rolledTotal: roll.total,
         minimumAdjustment,
         practiceMakesPerfect,
@@ -450,6 +463,7 @@ export const ActorRolls = Base =>
         threat,
         error,
         cap,
+        ...(resultCeiling !== null && resultCeiling !== undefined ? { resultCeiling } : {}),
         baseFlavor: flavor,
         boostTotal: 0,
         boostSpent: 0,
@@ -647,7 +661,7 @@ export const ActorRolls = Base =>
         async payment => {
           const ad = payment.system.actionDice,
             roll = await new Roll(
-              `1d${ad.die}x>=${ad.explodeAt ?? ad.die}${ad.bonus ? ` + ${ad.bonus}` : ""}`
+              `${actionDieTerm(ad.die, ad.explodeAt, ad)}${ad.bonus ? ` + ${ad.bonus}` : ""}`
             ).evaluate();
           if (JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken)
             throw new Error(loc`The Shaken condition changed while rolling this action die.`);

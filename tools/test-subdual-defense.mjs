@@ -243,3 +243,11 @@ test("final-net mode never applies DR/resistance twice, and fully resisted criti
   assert.equal(r.save, null);
   assert.equal(a.system.accumulatedDamage.pending.length, 0);
 });
+test("Foibles adds DR 1/— against subdual damage from the chosen proficiency (p.50)", () => {
+  const sys = { ...prepared(), weaponSpecialist: { proficiencies: ["blunt"], abilities: ["Foibles"] } };
+  const plain = subdualDefensePlan(sys, { ...event, attackKind: "meleeWeapon" });
+  const against = subdualDefensePlan(sys, { ...event, attackKind: "meleeWeapon", proficiency: "blunt" });
+  assert.equal(against.foibles, 1);
+  assert.equal(against.effectiveDR, plain.effectiveDR + 2);
+  assert.equal(subdualDefensePlan(sys, { ...event, attackKind: "meleeWeapon", proficiency: "edged" }).foibles, 0);
+});

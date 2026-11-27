@@ -32,6 +32,7 @@ import {
   senseLimit,
   surfaceMove
 } from "../../rules/gc/combat-reference.mjs";
+import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc, locKey } from "../../i18n.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
@@ -331,12 +332,17 @@ export const costsAction = (kind, handler) =>
   };
 
 /** Apply every combatant's recorded modifiers for the round that just ended. */
-export async function applyEndOfRound(combat, endedRound) {
+export function applyEndOfRound(combat, endedRound) {
+  // Queued with the dramatic-scene doubling, so each reads the Count the other wrote.
+  return queueInitiative(() => endOfRoundWork(combat, endedRound));
+}
+async function endOfRoundWork(combat, endedRound) {
   const lines = [];
   for (const combatant of combat.combatants) {
     const state = fluid(combatant);
     if (state.round !== endedRound || !Number.isFinite(combatant.initiative)) continue;
-    const result = endOfRound(combatant.initiative, state.modifiers);
+    // Delay this round counts toward the ±10 limit with the end-of-round modifiers; only Press is outside it (p.324).
+    const result = endOfRound(combatant.initiative, state.modifiers, { alreadyApplied: -(Number(state.delayed) || 0) });
     const pieces = result.rows.map(row => `${row.label} ${row.amount > 0 ? "+" : ""}${row.amount}`);
     if (!result.delta && !result.reeling && !result.mustPress) {
       if (state.modifiers.length || state.delayed || state.pressed)
@@ -407,10 +413,34 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     groups.set(key, [...(groups.get(key) ?? []), combatant]);
   }
   const lines = [];
-  for (const members of groups.values()) {
-    const roll = await new Roll("1d20").evaluate();
-    for (const combatant of members) await combatant.update({ initiative: roll.total + bonusOf(combatant) });
-    lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${roll.total}`);
+  let rolled = 0;
+  for (const group of groups.values()) {
+    // Each member's own Initiative roll is asked for first, so a Shaken source waiting for review holds that member
+    // back, as it would on a roll of its own.
+    const members = [],
+      held = [];
+    for (const combatant of group) {
+      try {
+        combatant.getInitiativeRoll?.();
+        members.push(combatant);
+      } catch (error) {
+        held.push(loc`${esc(combatant.name)}: not rolled (${esc(error.message)})`);
+      }
+    }
+    lines.push(...held);
+    if (!members.length) continue;
+    // The group's d20 comes from the first member's own roll, so Lightning Reflexes (roll twice, keep one) applies.
+    let roll;
+    try {
+      roll = await (members[0].getInitiativeRoll?.() ?? new Roll("1d20")).evaluate();
+    } catch (error) {
+      lines.push(loc`${esc(members.map(member => member.name).join(", "))}: not rolled (${esc(error.message)})`);
+      continue;
+    }
+    const d20 = Number.isFinite(roll.dice?.[0]?.total) ? roll.dice[0].total : roll.total - bonusOf(members[0]);
+    for (const combatant of members) await combatant.update({ initiative: d20 + bonusOf(combatant) });
+    lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${d20}`);
+    rolled += 1;
   }
   if (left.length)
     lines.push(
@@ -418,7 +448,7 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     );
   if (lines.length) await say(`<b>${loc`Group Initiative`}</b><br>${lines.join("<br>")}`, { whisper: true });
   else ui.notifications?.info(loc`Every NPC in this fight already has an Initiative Count.`);
-  return lines.length - (left.length ? 1 : 0);
+  return rolled;
 }
 
 /** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */
@@ -582,12 +612,16 @@ export function installFluidInitiativeHooks() {
     settling.add(combat.id);
     try {
       const changedCounts = await applyEndOfRound(combat, previous);
-      await rollTiebreaks(combat);
-      // The new round starts from the top of the revised order, not from whoever led the last one.
-      if (changedCounts.length) {
-        combat.setupTurns?.();
-        if (combat.turn !== 0) await combat.update({ turn: 0 });
-      }
+      // Tiebreaks and the turn reset wait their place on the Initiative queue, behind any dramatic doubling the
+      // pass set off, so the new order already holds the doubled Counts.
+      await queueInitiative(async () => {
+        await rollTiebreaks(combat);
+        // The new round starts from the top of the revised order, not from whoever led the last one.
+        if (changedCounts.length) {
+          combat.setupTurns?.();
+          if (combat.turn !== 0) await combat.update({ turn: 0 });
+        }
+      });
       ui.combat?.render();
     } catch (error) {
       ui.notifications.warn(loc`Fluid initiative needs review: ${error.message}`);

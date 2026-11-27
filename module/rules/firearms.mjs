@@ -1,3 +1,4 @@
+import { campaignCqbRange, campaignRules } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
@@ -333,6 +334,13 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
       loc`Guided Weapon Basics: range increment doubled; error –1, minimum 1. On a miss roll deviation twice and keep the better (p.181).`
     );
   }
+  // Gunmen doubles every range increment and widens CQB Range to 60 ft. (p.407); multipliers add (p.329).
+  const campaign = campaignRules(),
+    gunmen = Number.isFinite(campaign.rangeIncrementMultiplier) && campaign.rangeIncrementMultiplier !== 1;
+  if (gunmen && Number(weapon.range) > 0) {
+    factors.push(campaign.rangeIncrementMultiplier);
+    notes.push(loc`Gunmen campaign quality: range increment ×${campaign.rangeIncrementMultiplier} (p.407).`);
+  }
   const multiplier = factors.length ? 1 + factors.reduce((n, f) => n + f - 1, 0) : 1;
   let increment = ((Number(weapon.range) || 0) + flat) * multiplier;
   if (roundToFive) increment = 5 * Math.ceil(increment / 5);
@@ -344,7 +352,7 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
     flat,
     errorReduction,
     notes,
-    cqbRange: feats.has("Marksmanship Supremacy") ? 60 : 30
+    cqbRange: campaignCqbRange(feats.has("Marksmanship Supremacy"), campaign)
   };
 }
 

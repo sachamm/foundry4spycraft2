@@ -57,7 +57,7 @@ function criticalPresetContent(check) {
   const esc = foundry.utils.escapeHTML,
     group = (label, choices) =>
       choices.length
-        ? `<optgroup label="${esc(label)}">${choices.map(c => `<option value="${esc(c.id)}">${esc(loc`${c.cost} die/dice — ${c.label}`)}</option>`).join("")}</optgroup>`
+        ? `<optgroup label="${esc(label)}">${choices.map(c => `<option value="${esc(c.id)}">${esc(`${c.cost === 1 ? loc`Base 1 die` : loc`Base ${c.cost} dice`} — ${c.label}`)}</option>`).join("")}</optgroup>`
         : "";
   const hits = check.threatConfirmed ? criticalHitChoices(check) : [],
     misses = check.errorConfirmed ? criticalMissChoices(check) : [];

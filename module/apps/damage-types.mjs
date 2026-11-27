@@ -27,6 +27,9 @@ import {
   explosiveSavePlan,
   explosiveStunRounds,
   exposureInterval,
+  fallingDC,
+  fallingOutcome,
+  fallingPlan,
   flashOutcome,
   halveAcid,
   survivalFailure,
@@ -34,7 +37,9 @@ import {
   survivalSaveMade,
   survivalSavePlan,
   typedStress,
-  vacuumDamage
+  vacuumDamage,
+  fallDieReduction,
+  reducedFallTotal
 } from "../rules/damage-types.mjs";
 import { hazardState } from "../rules/hazards.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
@@ -48,8 +53,11 @@ import {
   writeHazards
 } from "./hazards.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { nonLethalDamage } from "./non-lethal-damage.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { withUndo } from "./undo.mjs";
+import { campaignRules, halfSaveResistsFully, isSpecialCharacter } from "../rules/campaign-rules.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -72,18 +80,35 @@ async function condition(actor, id, rounds, label) {
   }
 }
 
-/** Record subdual damage through the ledger, so thresholds and the Fortitude save follow. */
-async function sufferSubdual(actor, amount, source) {
+/**
+ * Record subdual damage through the ledger, so thresholds and the Fortitude save follow. The amount is before
+ * defenses: the ledger applies the "other source" DR (doubled against subdual), less any armor piercing, then
+ * subdual resistance, once.
+ */
+async function sufferSubdual(actor, amount, source, { armorPiercing = 0 } = {}) {
   if (!amount) return "";
+  if (actor.type !== "agent") {
+    // A standard NPC takes it through its Damage save; a special NPC keeps a running subdual total and its threshold.
+    if (!(Number(actor.system.vitality?.max) > 0)) return loc`${amount} subdual damage: roll the Damage save for it.`;
+    const { lines } = await nonLethalDamage(actor, "subdual", amount, {
+      source,
+      attackKind: "other",
+      armorPiercing: Math.max(0, Math.trunc(Number(armorPiercing) || 0))
+    });
+    return lines.join(" ");
+  }
   try {
     await applyAccumulatedDamage(actor, {
       source: `${source} [${foundry.utils.randomID(6)}]`,
       kind: "subdual",
       newDamage: amount,
       damageMode: "subdualBeforeDefenses",
+      attackKind: "other",
+      armorPiercing: Math.max(0, Math.trunc(Number(armorPiercing) || 0)),
+      armorPiercingAll: false,
       confirmed: true
     });
-    return loc`${amount} subdual damage recorded; roll any Fortitude save it calls for from the sheet.`;
+    return loc`${amount} subdual damage taken, before DR and subdual resistance; the sheet records what is left. Roll any Fortitude save it calls for from the sheet.`;
   } catch (error) {
     return loc`${amount} subdual damage could not be recorded (${esc(error.message)}); record it by hand.`;
   }
@@ -107,7 +132,7 @@ async function sufferTypedLethal(actor, type, amount, label) {
     rolls.push(flat.roll);
     points += flat.total;
   }
-  lines.push(await sufferStress(actor, points, label));
+  lines.push(await sufferStress(actor, points, label, undefined, { cause: type }));
   return { lines, rolls, lost };
 }
 
@@ -151,10 +176,11 @@ export async function sufferTypedDamage(actor, preset = {}) {
             Object.keys(DAMAGE_TYPES)
               .filter(type => !preset.allowed || preset.allowed.includes(type))
               .map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`])
+              .concat(preset.allowed ? [] : [["falling", loc`Falling (p.336): asks for the distance next`]])
           ),
           known.type
         )}</select></label>
-        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" required /></label>
+        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" /></label>
         <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
         <label>${loc`Armor worn (acid, heat)`} <select name="armor">${options(ARMORS())}</select></label>
         <label>${loc`Acid: half actions given up next Count to shed armor or an item (+1 each)`} <input type="number" name="halfActions" min="0" max="2" step="1" value="0" /></label>
@@ -177,14 +203,23 @@ export async function sufferTypedDamage(actor, preset = {}) {
     });
     if (!input) return null;
   }
+  if (String(input.type) === "falling" && !preset.allowed) return sufferFall(actor, preset.fall ?? {});
+  if (String(input.amount ?? "").trim() === "" && String(input.type) !== "vacuum")
+    return refuse(loc`Enter the damage rolled for this type.`);
   const type = String(input.type),
-    amount = Math.trunc(Number(input.amount)),
+    amount = Math.trunc(Number(input.amount ?? 0)),
     reduction = Math.max(0, Math.trunc(Number(input.reduction) || 0)),
     source = String(input.source ?? "").trim() || DAMAGE_TYPE_LABELS[type] || type;
   if (!DAMAGE_TYPES[type] || (preset.allowed && !preset.allowed.includes(type)))
     return refuse(loc`Choose a listed damage type.`);
   if (!Number.isSafeInteger(amount) || amount < 0) return refuse(loc`Enter the damage as a whole number.`);
   const label = DAMAGE_TYPE_LABELS[type];
+  // A damage card that routes its hit here keeps its own Undo (`undo: false`); otherwise this step leaves one.
+  const take = () => takeTypedDamage(actor, { input, type, amount, reduction, source, label });
+  return preset.undo === false ? take() : withUndo([actor], loc`${label}: ${actor.name}`, take);
+}
+
+async function takeTypedDamage(actor, { input, type, amount, reduction, source, label }) {
   try {
     switch (type) {
       case "bang":
@@ -292,8 +327,12 @@ async function startVacuum(actor, { amount, firstRound, source }) {
   return applyVacuum(actor, rolled, source, rolls);
 }
 
-async function applyVacuum(actor, damage, source, rolls = []) {
-  const result = await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum);
+async function applyVacuum(actor, damage, source, rolls = [], { resisted = false } = {}) {
+  // Blockbuster's full resistance takes no damage this round, but the exposure still starts and the character still
+  // suffocates.
+  const result = resisted
+    ? { lines: [RESISTED()], lost: 0, rolls: [] }
+    : await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum);
   result.lines.push(loc`A character in vacuum is also suffocating (p.349).`);
   const tracked = addExposure(hazardState(actor.system), {
     type: "vacuum",
@@ -350,11 +389,100 @@ async function sufferElectrical(actor, { amount, source }) {
 }
 
 /* -------------------------------------------- */
+/*  Falling                                      */
+/* -------------------------------------------- */
+
+/**
+ * A fall (p.336): roll the dice for the damage distance, take a made Acrobatics/Falling check off the damage, apply
+ * it as lethal or subdual after the fall's armor piercing, then the stress and the sprawl. Wire Fu halves it for a
+ * player or special character (p.408).
+ */
+export async function sufferFall(actor, preset = {}) {
+  if (!owned(actor)) return null;
+  const wireFu =
+      Number.isFinite(campaignRules().fallingDamageMultiplier) && campaignRules().fallingDamageMultiplier < 1,
+    special = actor.type === "agent" || isSpecialCharacter(actor.system);
+  const input =
+    preset.feet !== undefined
+      ? preset
+      : await systemDialog.input({
+          window: { title: loc`Falling damage` },
+          rejectClose: false,
+          ok: { label: loc`Roll the fall` },
+          content: `<div class="spycraft2-roll-options">
+        <label>${loc`Distance fallen for damage (ft.)`} <input type="number" name="feet" min="0" step="1" required /></label>
+        <label>${loc`Landing on`} <select name="surface">${options([
+          ["solid", loc`A solid surface (lethal)`],
+          ["fluid", loc`Water or another fluid (subdual)`]
+        ])}</select></label>
+        <label><input type="checkbox" name="soft" /> ${loc`Soft or yielding landing: counts as 10 ft. shorter`}</label>
+        <label>${loc`Acrobatics/Falling result, if the check succeeded (DC ${fallingDC()})`} <input type="number" name="checkResult" step="1" /></label>
+        <label>${loc`Armor damage reduction`} <input type="number" name="dr" min="0" step="1" value="${Math.max(0, Math.trunc(Number(actor.system?.armor?.dr) || 0))}" /></label>
+        ${wireFu && special ? `<p class="hint">${loc`Wire Fu: the damage is halved, rounded down (p.408).`}</p>` : ""}
+        <p class="hint">${loc`Use the distance after Equilibrium Basics; the Falling skill dialog works it out. Action dice cannot boost falling damage (p.336).`}</p>
+      </div>`
+        });
+  if (!input) return null;
+  try {
+    // The fall's damage, conditions and card leave one Undo note that puts the character back.
+    return await withUndo([actor], loc`Fall: ${actor.name}`, async () => {
+      const plan = fallingPlan({
+        feet: Math.trunc(Number(input.feet)),
+        surface: input.surface ?? "solid",
+        soft: input.soft === true
+      });
+      const result = String(input.checkResult ?? "").trim() === "" ? null : Math.trunc(Number(input.checkResult));
+      if (!plan.dice) return post(actor, [loc`A fall of ${plan.counted} ft. deals no damage (p.336).`]);
+      const roll = await rollTotal(plan.formula),
+        // Spider Mastery and Fall Guy take each die lower, never below 1 (p.196).
+        reduction = fallDieReduction(actor.system),
+        rolled = reducedFallTotal(
+          {
+            total: roll.total,
+            faces: roll.roll?.dice?.flatMap(die => die.results.filter(r => r.active !== false).map(r => r.result)),
+            dice: plan.dice
+          },
+          reduction
+        ),
+        outcome = fallingOutcome(plan, {
+          rolled,
+          checkResult: result,
+          dr: Math.max(0, Math.trunc(Number(input.dr) || 0)),
+          halve: wireFu && special
+        });
+      const lines = [
+        loc`Fall of ${plan.feet} ft.: ${plan.formula} = ${roll.total}${reduction ? loc`, ${rolled} after −${reduction} a die` : ""}${outcome.landed ? loc`, less a quarter of the Falling check (${result})` : ""}${outcome.halved ? loc`, halved by Wire Fu` : ""}: ${outcome.damage} ${outcome.kind} damage, armor piercing ${plan.armorPiercing}.`
+      ];
+      const rolls = [roll.roll];
+      if (outcome.kind === "subdual")
+        lines.push(await sufferSubdual(actor, outcome.damage, loc`Falling`, { armorPiercing: plan.armorPiercing }));
+      else {
+        const loss = await sufferLethal(actor, outcome.net);
+        lines.push(
+          loss
+            ? loc`Falling: ${outcome.net} damage after damage reduction ${outcome.reduction}, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
+            : loc`Falling: ${outcome.net} damage after damage reduction ${outcome.reduction}; the GC applies it (a standard character makes a Damage save).`,
+          ...(loss?.notes ?? [])
+        );
+      }
+      if (outcome.stress) lines.push(await sufferStress(actor, outcome.stress, loc`Falling`));
+      if (outcome.sprawled) lines.push(await condition(actor, "sprawled", 0, loc`Sprawled on landing`));
+      else lines.push(loc`A made Falling check: lands on their feet.`);
+      return post(actor, lines, rolls);
+    });
+  } catch (error) {
+    return refuse(error.message);
+  }
+}
+
+/* -------------------------------------------- */
 /*  Sheet buttons                                */
 /* -------------------------------------------- */
 
 /** Acid on a character: start of round, end of round, washing, the injury save. */
-export async function acidStep(actor, step) {
+export const acidStep = (actor, step) =>
+  owned(actor) ? withUndo([actor], loc`Acid: ${actor.name}`, () => acidStepWork(actor, step)) : null;
+async function acidStepWork(actor, step) {
   if (!owned(actor)) return null;
   const state = hazardState(actor.system);
   if (!state.acid) return refuse(loc`No acid is on this character.`);
@@ -378,7 +506,11 @@ export async function acidStep(actor, step) {
 }
 
 /** Cold, heat or electrical: the Fortitude save against its subdual damage failed. */
-export async function exposureFailedSave(actor) {
+export const exposureFailedSave = actor =>
+  owned(actor)
+    ? withUndo([actor], loc`Failed exposure save: ${actor.name}`, () => exposureFailedSaveWork(actor))
+    : null;
+async function exposureFailedSaveWork(actor) {
   if (!owned(actor)) return null;
   const exposure = hazardState(actor.system).exposure;
   if (!exposure) return null;
@@ -415,7 +547,9 @@ export async function exposureFailedSave(actor) {
 }
 
 /** The character leaves the source of cold, heat, vacuum or the shock. */
-export async function endTypedExposure(actor) {
+export const endTypedExposure = actor =>
+  owned(actor) ? withUndo([actor], loc`Clear of the source: ${actor.name}`, () => endTypedExposureWork(actor)) : null;
+async function endTypedExposureWork(actor) {
   if (!owned(actor)) return null;
   await writeHazards(actor, endExposure(hazardState(actor.system)));
   return post(actor, [loc`The character is clear of the source; its running total ends.`]);
@@ -455,7 +589,9 @@ export async function survivalSave(actor, preset = {}) {
 }
 
 /** The survival hazard has ended: the next save starts at its base DC. */
-export async function endSurvivalHazard(actor, kind) {
+export const endSurvivalHazard = (actor, kind) =>
+  owned(actor) ? withUndo([actor], loc`Hazard over: ${actor.name}`, () => endSurvivalHazardWork(actor, kind)) : null;
+async function endSurvivalHazardWork(actor, kind) {
   if (!owned(actor)) return null;
   await writeHazards(actor, survivalReset(hazardState(actor.system), kind));
   return post(actor, [loc`${SURVIVAL_LABELS[kind]}: over; the next save starts again at its base DC.`]);
@@ -466,18 +602,23 @@ export async function endSurvivalHazard(actor, kind) {
 /* -------------------------------------------- */
 
 const total = check => Number(check?.effectiveTotal);
+/** Blockbuster (p.406): an agent's successful save that would halve damage resists all of it. */
+const resistsFully = (actor, succeeded) => succeeded && actor?.type === "agent" && halfSaveResistsFully();
+const RESISTED = () => loc`Blockbuster: the successful save resists all of it (p.406).`;
 
 async function resolveExplosiveReflex(actor, message, save, succeeded) {
-  const taken = Math.max(0, explosiveDamageTaken(save.damage, succeeded) - Math.max(0, save.reduction ?? 0)),
+  const resisted = resistsFully(actor, succeeded),
+    suffered = resisted ? 0 : explosiveDamageTaken(save.damage, succeeded),
+    taken = Math.max(0, suffered - Math.max(0, save.reduction ?? 0)),
     result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive);
   result.lines.unshift(
     succeeded
       ? loc`The Reflex save succeeds: half damage, and the character moves to the next blast increment out.`
       : loc`The Reflex save fails: full damage.`
   );
+  if (resisted) result.lines.splice(1, 0, RESISTED());
   // More than 20 points suffered, counted after the Reflex save but before damage reduction (p.302).
-  if (explosiveDamageTaken(save.damage, succeeded) > 20)
-    result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
+  if (suffered > 20) result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
   await post(actor, result.lines, result.rolls);
   return actor.rollSave("fort", {
     askContext: true,
@@ -500,7 +641,7 @@ const resolvers = {
       lines.push(await condition(actor, "stun", outcome.stunned, loc`Stunned`));
       lines.push(await condition(actor, "deaf", outcome.deafened, loc`Deafened`));
       const stress = await rollTotal(outcome.stress);
-      lines.push(await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.bang));
+      lines.push(await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.bang, undefined, { cause: "bang" }));
       await post(actor, lines, [stress.roll]);
       lines.length = 0;
     }
@@ -515,18 +656,20 @@ const resolvers = {
       actor,
       [
         await condition(actor, "blind", outcome.blinded, loc`Blinded`),
-        await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.flash)
+        await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.flash, undefined, { cause: "flash" })
       ],
       [stress.roll]
     );
   },
   async acid(actor, message, save, succeeded) {
-    const first = acidFirstDamage(save.damage, succeeded),
+    const resisted = resistsFully(actor, succeeded),
+      first = resisted ? 0 : acidFirstDamage(save.damage, succeeded),
       taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
       result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid);
     result.lines.unshift(
       succeeded ? loc`The Reflex save succeeds: the acid is halved.` : loc`The Reflex save fails: full acid damage.`
     );
+    if (resisted) result.lines.splice(1, 0, RESISTED());
     const next = applyAcid(hazardState(actor.system), { damage: first, suffered: taken, worldTime: now() });
     await writeHazards(actor, next);
     if (next.acid)
@@ -542,8 +685,9 @@ const resolvers = {
     return post(actor, [rounds ? await condition(actor, "stun", rounds, loc`Stunned`) : loc`Explosive: no stun.`]);
   },
   async vacuum(actor, message, save, succeeded) {
-    const damage = vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
-    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum);
+    const resisted = resistsFully(actor, succeeded),
+      damage = resisted ? 0 : vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
+    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum, [], { resisted });
   },
   async typedInjury(actor, message, save, succeeded) {
     const state = hazardState(actor.system);

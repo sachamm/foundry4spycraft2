@@ -19,6 +19,7 @@ import { disarmResponsePlan } from "./disarm-response.mjs";
 import { quirkyWeaponPlan } from "./quirky-weapon.mjs";
 import { superiorAccuracyWeaponPlan } from "./superior-accuracy-weapon.mjs";
 import { weaponDamageExpression } from "./weapon-damage-expression.mjs";
+import { laserDistancePlan, laserWeapon } from "./damage-types.mjs";
 import { trainedOnlyWeaponPlan } from "./trained-only-weapon.mjs";
 import { builtInQuality } from "./origins.mjs";
 import { accurizedWeaponPlan } from "./accurized-weapon.mjs";
@@ -376,6 +377,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     grip,
     stance,
     firing,
+    rangeIncrement: effectiveRange,
     stableSurface: options.stableSurface === true || launcherOperation.usingIntegralTripod === true
   });
   const originalError =
@@ -651,6 +653,8 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
             terms.sum("threat")
         )
       : 0,
+    // A forward observer's relay caps the result (p.300); the lowest cap wins.
+    cap: terms.all("cap").length ? Math.min(...terms.all("cap")) : null,
     notes: notes.join(" "),
     range: effectiveRange
   };
@@ -701,7 +705,14 @@ export function weaponDamage(
       expression: parsed.expression,
       componentReview: true
     };
-  const expression = parsed.expression;
+  // Laser damage loses a die per range increment past the first (p.338).
+  const laser = laserWeapon(weapon)
+    ? laserDistancePlan(parsed.expression, {
+        distanceFeet: options.distanceFeet,
+        increment: weaponRangeEffects(system, weapon, { firearm: true }).increment
+      })
+    : null;
+  const expression = laser?.expression ?? parsed.expression;
   const knuckle = /(?:^|[,\s])NKL(?:[,\s]|$)/.test(weapon.qualities ?? "");
   const melee = ["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"].includes(weapon.proficiency);
   const hurled =
@@ -805,6 +816,7 @@ export function weaponDamage(
     finesseBasic,
     effectiveQualities: meleeArmorPiercing.effectiveQualities,
     cqbRange,
+    laser,
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,

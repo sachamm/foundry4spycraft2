@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { campaignTake10Time } from "./campaign-rules.mjs";
 /** p.102: at most one time-reducing option/effect; p.101 Cross-Check triples required time. */
 export function skillTimingPlan({
   method = "roll",
@@ -11,7 +12,8 @@ export function skillTimingPlan({
   crossCheck = false,
   minimumRequired = 0
 } = {}) {
-  const base = method === "take10" ? 2 : method === "take20" ? 20 : 1;
+  // Taking 10 doubles the time, or more under a campaign quality (Comedy of Errors ×4, p.406).
+  const base = method === "take10" ? campaignTake10Time(2) : method === "take20" ? 20 : 1;
   const choices = [{ id: "none", name: loc`No time reduction`, multiplier: base, minimum: 0, rounding: null }];
   if (method === "take10" && take10Normal)
     choices.push({ id: "take10", name: loc`Normal-time take 10`, multiplier: 1, minimum: 0, rounding: null });

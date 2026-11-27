@@ -125,6 +125,12 @@
   font-weight: 400;
   color: var(--sc2-ink-muted);
 }
+/* The line that names a result cap, under the title. */
+.spycraft2.sc2-result-guide .sc2-guide-cap {
+  margin: var(--sc2-space-1) 0 0;
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
+}
 /* The outcome is told by the word and its icon; the edge colour only repeats it. */
 .spycraft2.sc2-result-guide.sc2-outcome-good {
   border-left-color: var(--sc2-good);

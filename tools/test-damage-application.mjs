@@ -133,11 +133,15 @@ test("damage reduction that stops a hit bruises, and big hits call for a Fortitu
   assert.equal(lethalHitPlan({ vitality: 60, wounds: 12, woundsMax: 12 }, { damage: 24 }).massive, null);
   assert.deepEqual(lethalHitPlan({ vitality: 60, wounds: 12, woundsMax: 12 }, { damage: 31 }).massive, {
     dc: 15,
-    toMinusNine: false
+    toMinusNine: false,
+    min: 25,
+    threshold: 50
   });
   assert.deepEqual(lethalHitPlan({ vitality: 60, wounds: 12, woundsMax: 12 }, { damage: 52, dr: 1 }).massive, {
     dc: 25,
-    toMinusNine: true
+    toMinusNine: true,
+    min: 25,
+    threshold: 50
   });
   const lines = lethalHitLines(
     "Kevin",

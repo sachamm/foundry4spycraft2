@@ -1,10 +1,15 @@
+import { sizeDeathThreshold } from "./size.mjs";
+import { actionDieTerm } from "./action-die-formula.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeCollapsePlan, attributeActionBlock } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
-/** Player/special character thresholds, p.331 and Table 5.13, p.349. Death is based on –10, not Constitution. */
+/**
+ * Player/special character thresholds, p.331 and Table 5.13, p.349. Death is based on –10, not Constitution. Small
+ * and smaller Sizes die sooner (Small −7, Tiny −5, Diminutive −4, …); the table gives larger Sizes no other number.
+ */
 export function deathThreshold(size = "Medium") {
-  return size === "Small" ? -7 : String(size).startsWith("Large") ? -15 : -10;
+  return sizeDeathThreshold(size);
 }
 export function healingPlan(system, { vitalityDice = 0, woundDice = 0, inCombat = false, dead = false } = {}) {
   const cost = vitalityDice + woundDice;
@@ -34,7 +39,7 @@ export function healingPlan(system, { vitalityDice = 0, woundDice = 0, inCombat 
     bonus,
     formula: vitalityDice
       ? Array(vitalityDice)
-          .fill(`1d${die}x>=${explodeAt}${bonus ? ` + (${bonus})` : ""}`)
+          .fill(`${actionDieTerm(die, explodeAt, system.actionDice)}${bonus ? ` + (${bonus})` : ""}`)
           .join(" + ")
       : null
   };
@@ -106,7 +111,11 @@ export function defenseBoostPlan(
   const die = system.actionDice?.die ?? 4,
     explodeAt = system.actionDice?.explodeAt ?? die,
     bonus = system.actionDice?.bonus ?? 0;
-  return { blocked: false, cost: 1, formula: `1d${die}x>=${explodeAt}${bonus ? ` + (${bonus})` : ""}` };
+  return {
+    blocked: false,
+    cost: 1,
+    formula: `${actionDieTerm(die, explodeAt, system.actionDice)}${bonus ? ` + (${bonus})` : ""}`
+  };
 }
 
 /** Refresh's specific initiative action (p.359) takes precedence over the p.62 summary. */

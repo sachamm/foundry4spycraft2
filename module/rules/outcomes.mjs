@@ -7,9 +7,10 @@ import { reminderNote } from "./feat-reminders.mjs";
 import { cooperativeNotes } from "./cooperative.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { describeModifiers } from "./roll-pipeline.mjs";
+import { campaignRules } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 import { formatRange, outcomeLabel } from "./outcome-labels.mjs";
-import { checkCandidates, errorDecisionPending, triumphCheck } from "./check-candidates.mjs";
+import { checkCandidates, errorDecisionPending, triumphAt, triumphCheck } from "./check-candidates.mjs";
 export { checkCandidates, errorDecisionPending };
 export function adjudicateCheck(check, succeeded) {
   if (check.manualAdjustment && !succeeded)
@@ -17,7 +18,7 @@ export function adjudicateCheck(check, succeeded) {
       loc`Manual Adjustment already reversed this failure. Review its recorded effect before changing the outcome.`
     );
   if (typeof succeeded !== "boolean") throw new Error(loc`Confirm whether the check succeeded or failed.`);
-  if (check.checkKind === "attack" && check.effectiveTotal >= 75 && !succeeded)
+  if (check.checkKind === "attack" && check.effectiveTotal >= triumphAt(check) && !succeeded)
     throw new Error(
       loc`An attack Triumph is a critical hit (pp.330–331). Correct the recorded result before marking it a miss.`
     );
@@ -28,7 +29,9 @@ export function adjudicateCheck(check, succeeded) {
     cap,
     threat: check.threat ?? 0,
     actionDieBonus: check.boostTotal ?? 0,
-    succeeded
+    succeeded,
+    triumphAt: triumphAt(check),
+    ceiling: check.resultCeiling ?? null
   });
   const candidates = checkCandidates({ ...check, effectiveTotal: result.total });
   return {
@@ -122,6 +125,15 @@ export function checkFlavor(check) {
   else if (check.threatConfirmed) notes.push(`<span class="spycraft2-threat">${loc`Threat.`}</span>`);
   else if (!known && candidates.threat)
     notes.push(`<span class="spycraft2-threat">${`${outcomeLabel(check, "threat")}.`}</span>`);
+  // Catch Phrase (p.406): a threat on an attack or skill check is the moment for the character's line.
+  if (
+    (check.threatConfirmed || (!known && candidates.threat)) &&
+    ["attack", "skill"].includes(check.checkKind) &&
+    campaignRules().catchPhrase
+  )
+    notes.push(
+      loc`Catch Phrase: once per session a player or special character may say their line as a free action, for a morale bonus of twice their Charisma bonus (+1 at least) to Defense and Resist checks for half their career level in rounds, rounded up.`
+    );
   if (check.triumphed) {
     notes.push(`<strong>${loc`Triumph.`}</strong>`);
     if (check.checkKind === "attack")

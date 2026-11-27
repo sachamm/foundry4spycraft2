@@ -42,7 +42,8 @@ export async function checkIncomingDefense(actor, known = {}) {
     flanked: loc`The attackers otherwise meet the flanking requirements`,
     securityDevice: loc`The attack is made by a security device`,
     adjacent: loc`The attacker is adjacent`,
-    withinMeleeRange: loc`The attacker is within Melee Range`
+    withinMeleeRange: loc`The attacker is within Melee Range`,
+    laser: loc`The attack deals laser damage, which ignores dodge bonuses`
   };
   const esc = foundry.utils.escapeHTML,
     sources = new Map(),
@@ -93,6 +94,13 @@ export async function checkIncomingDefense(actor, known = {}) {
           .join("")
       ),
       raw(whirlingDefenseContent(actor)),
+      // Weapon Specialist Foibles (p.50): the attacking weapon's proficiency, whatever the attacker's feats.
+      raw(
+        actor.system.weaponSpecialist?.abilities?.includes("Foibles") &&
+          actor.system.weaponSpecialist.proficiencies?.length
+          ? `<label>${loc`Foibles: the attacking weapon's proficiency`} <select name="attackerProficiency"><option value="">${loc`Another proficiency or unknown`}</option>${actor.system.weaponSpecialist.proficiencies.map(key => `<option value="${esc(key)}"${known.attackerProficiency === key ? " selected" : ""}>${esc(CONFIG.SPYCRAFT?.proficiencies?.[key]?.label ?? key)}</option>`).join("")}</select></label>`
+          : ""
+      ),
       raw(
         Object.entries(fields)
           .map(
@@ -200,6 +208,8 @@ export async function checkIncomingDefense(actor, known = {}) {
           }
         : undefined,
       whirlingAttackerLevel: whirling.plan.attackerLevel,
+      attackerProficiency:
+        source?.weapon?.system?.proficiency || input.attackerProficiency || known.attackerProficiency || "",
       ...Object.fromEntries(Object.keys(fields).map(k => [k, input[k] === true])),
       invisibleAttacker: input.invisibleAttacker === true || ghostCover?.invisible === true,
       coupDeGraceExceptionSource: input.coupDeGraceExceptionSource ?? ""
@@ -211,7 +221,7 @@ export async function checkIncomingDefense(actor, known = {}) {
   await foundry.applications.api.DialogV2.input({
     window: { title: loc`Incoming attack — result` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p><b>${loc`Defense ${plan.total}`}</b></p>${ghostCover ? `<p>${loc`Ghost attacker: ${esc(ghostCover.context.actorName)}; invisible to ${esc(ghostCover.context.opponentName)}: ${ghostCover.invisible ? "yes" : "no"}.`}</p>${ghostCover.notes.map(n => `<p>${esc(n)}</p>`).join("")}` : ""}<p>${loc`Cover: ${esc(plan.cover.label)}, Defense +${plan.cover.defenseBonus}; ordinary Reflex bonus +${plan.cover.reflexBonus} against effects beyond the cover (apply separately to the save).${plan.cover.precisionReduction ? loc` Precision Takedown reduced attack cover by ${plan.cover.precisionReduction} grade(s).` : ""}${plan.cover.supremacyReduction ? loc` CQB Supremacy reduced the attack cover by one quarter.` : ""}`}</p>${plan.cover.notes.map(n => `<p>${esc(n)}</p>`).join("")}<p>${loc`DEX ${plan.dexterity}; dodge bonuses removed ${plan.dodgeLost + plan.circling.dodgeReduction}; security-device bonus +${plan.securityBonus}; adjacent Eye of the Storm bonus +${plan.eyeOfStorm}.`}</p><p>${loc`Uncanny Dodge grade ${plan.uncanny.grade}; vulnerable ${plan.vulnerable ? "yes" : "no"}; flat-footed ${plan.flatFooted ? "yes" : "no"}; flanked ${plan.flanked ? "yes" : "no"}; helpless ${plan.helpless ? "yes" : "no"}.`}</p><p>${loc`Attacker modifier ${plan.attackerBonus >= 0 ? "+" : ""}${plan.attackerBonus} (pinned target, adjacent melee/unarmed +${plan.pinnedAttackerBonus}; prone target ${plan.proneAttackerPenalty}; crouched target ${plan.crouchedAttackerPenalty}; blinded target +${plan.blindedAttackerBonus}; helpless target within Melee Range +${plan.helplessAttackerBonus}). Coup de Grace target eligible: ${plan.coupDeGraceEligible ? loc`yes, subject to normal action requirements` : "no"}.`}</p><p>${loc`Known sneak attack immunity: ${plan.sneakAttackImmune ? "yes" : "no"}. ${plan.armorMasteryRequiresHelpless ? loc`Armor Mastery requires helplessness even when another option permits Coup de Grace.` : ""}`}</p>${plan.listedDR ? `<p>${loc`Listed DR before armor piercing/type exceptions: melee weapons ${plan.listedDR.meleeWeapon}, unarmed ${plan.listedDR.unarmed}, non-grenade hurled weapons ${plan.listedDR.hurledWeapon}, other ranged weapons ${plan.listedDR.rangedWeapon}, other ${plan.listedDR.other}.`}</p>` : ""}${plan.stickyFingersDR ? `<p>${loc`Sticky Fingers: the listed DR includes DR 5 against this adjacent opponent during Total Defense (p.187).`}</p>` : ""}${plan.coupDeGraceException ? `<p>${loc`Declared exception: ${esc(plan.coupDeGraceExceptionSource)}.`}</p>` : ""}${plan.notes.map(n => `<p>${esc(n)}</p>`).join("")}</div>`
+    content: `<div class="spycraft2-roll-options"><p><b>${loc`Defense ${plan.total}`}</b></p>${ghostCover ? `<p>${loc`Ghost attacker: ${esc(ghostCover.context.actorName)}; invisible to ${esc(ghostCover.context.opponentName)}: ${ghostCover.invisible ? "yes" : "no"}.`}</p>${ghostCover.notes.map(n => `<p>${esc(n)}</p>`).join("")}` : ""}<p>${loc`Cover: ${esc(plan.cover.label)}, Defense +${plan.cover.defenseBonus}; ordinary Reflex bonus +${plan.cover.reflexBonus} against effects beyond the cover (apply separately to the save).${plan.cover.precisionReduction ? loc` Precision Takedown reduced attack cover by ${plan.cover.precisionReduction} grade(s).` : ""}${plan.cover.supremacyReduction ? loc` CQB Supremacy reduced the attack cover by one quarter.` : ""}`}</p>${plan.cover.notes.map(n => `<p>${esc(n)}</p>`).join("")}<p>${loc`DEX ${plan.dexterity}; dodge bonuses removed ${plan.dodgeLost + plan.circling.dodgeReduction}; security-device bonus +${plan.securityBonus}; adjacent Eye of the Storm bonus +${plan.eyeOfStorm}.`}</p><p>${loc`Uncanny Dodge grade ${plan.uncanny.grade}; vulnerable ${plan.vulnerable ? "yes" : "no"}; flat-footed ${plan.flatFooted ? "yes" : "no"}; flanked ${plan.flanked ? "yes" : "no"}; helpless ${plan.helpless ? "yes" : "no"}.`}</p><p>${loc`Attacker modifier ${plan.attackerBonus >= 0 ? "+" : ""}${plan.attackerBonus} (pinned target, adjacent melee/unarmed +${plan.pinnedAttackerBonus}; prone target ${plan.proneAttackerPenalty}; crouched target ${plan.crouchedAttackerPenalty}; blinded target +${plan.blindedAttackerBonus}; helpless target within Melee Range +${plan.helplessAttackerBonus}). Coup de Grace target eligible: ${plan.coupDeGraceEligible ? loc`yes, subject to normal action requirements` : "no"}.`}</p><p>${loc`Known sneak attack immunity: ${plan.sneakAttackImmune ? "yes" : "no"}. ${plan.armorMasteryRequiresHelpless ? loc`Armor Mastery requires helplessness even when another option permits Coup de Grace.` : ""}`}</p>${plan.listedDR ? `<p>${loc`Listed DR before armor piercing/type exceptions: melee weapons ${plan.listedDR.meleeWeapon}, unarmed ${plan.listedDR.unarmed}, non-grenade hurled weapons ${plan.listedDR.hurledWeapon}, other ranged weapons ${plan.listedDR.rangedWeapon}, other ${plan.listedDR.other}.`}</p>` : ""}${plan.foibles?.dodge || plan.foibles?.damageReduction ? `<p>${loc`Foibles: +${plan.foibles.dodge} dodge to Defense and DR 1/— more against this weapon (p.50).`}</p>` : ""}${plan.gladiators ? `<p>${loc`Gladiators: +${plan.gladiators} Defense against this ranged attack (p.407).`}</p>` : ""}${plan.stickyFingersDR ? `<p>${loc`Sticky Fingers: the listed DR includes DR 5 against this adjacent opponent during Total Defense (p.187).`}</p>` : ""}${plan.coupDeGraceException ? `<p>${loc`Declared exception: ${esc(plan.coupDeGraceExceptionSource)}.`}</p>` : ""}${plan.notes.map(n => `<p>${esc(n)}</p>`).join("")}</div>`
   });
   try {
     if (

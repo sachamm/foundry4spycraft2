@@ -122,5 +122,8 @@
   <details><summary>{{localize "SPYCRAFT.Template.ActorAgentGear.CharismaPenaltyRemoveClassGrantedPicks"}}</summary>
   {{#each gearPicks}}{{#unless (sc2eq key "CHA")}}<label>{{key}} <input type="number" min="0" name="system.gearPickLosses.{{key}}" value="{{lookup ../system.gearPickLosses key}}" class="w-2" /></label>{{/unless}}{{/each}}
   </details>
+  {{#if system.gearRestriction.show}}<details open><summary>{{localize "SPYCRAFT.Template.ActorAgentGear.GearRestrictionPicks" count=system.gearRestriction.picks}}</summary>
+  {{#each gearPicks}}{{#unless (sc2eq key "CHA")}}<label>{{key}} <input type="number" min="0" name="system.gearRestrictionLosses.{{key}}" value="{{lookup ../system.gearRestrictionLosses key}}" class="w-2" {{#if (sc2eq ../system.gearRestriction.chooser "gc")}}{{#unless @root.isGM}}disabled data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentGear.GearRestrictionGCChooses'}}"{{/unless}}{{/if}} /></label>{{/unless}}{{/each}}
+  </details>{{/if}}
   </details>
 </section>

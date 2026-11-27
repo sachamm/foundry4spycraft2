@@ -20,6 +20,18 @@ export function weaponAmmunition(item) {
   return state.tracked ? state : null;
 }
 
+/**
+ * The shots a fire action may draw on: what a counted weapon holds, or a full load under Bottomless Clip (p.405),
+ * where shots are never spent. Null when the player has to enter it.
+ */
+export function weaponShotsLeft(item) {
+  if (item?.type !== "weapon") return null;
+  const counted = weaponAmmunition(item);
+  if (counted) return counted.loaded;
+  const state = ammunitionState(item.system);
+  return state.bottomless ? state.capacity : null;
+}
+
 /** Take shots out of a weapon after an attack. Returns the plan, or null when shots are not counted. */
 export async function spendWeaponShots(item, shots) {
   const state = weaponAmmunition(item);

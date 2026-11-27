@@ -2,7 +2,7 @@
 import { esc } from "../html.mjs";
 import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
-import { HELPER_BASE_DC, applyCooperativeBonus, helperDC, helperLimit, helperResult } from "../rules/cooperative.mjs";
+import { helperBaseDC, applyCooperativeBonus, helperDC, helperLimit, helperResult } from "../rules/cooperative.mjs";
 import { checkFlavor } from "../rules/outcomes.mjs";
 import { loc } from "../i18n.mjs";
 
@@ -48,7 +48,7 @@ export function cooperativeContent(key, actor) {
       return `<option value="${esc(message.id)}">${esc(message.speaker?.alias ?? loc`Leader`)}: ${esc(check.focus || check.checkId)} — ${loc`DC ${dc}`}</option>`;
     })
     .join("");
-  return `<details class="spycraft2-cooperative"><summary>${loc`Cooperative check`}</summary><label>${loc`Your part`} <select name="cooperativeRole"><option value="">${loc`Working alone`}</option><option value="leader">${loc`Leader: I roll first, helpers add to my result`}</option><option value="helper">${loc`Helper: I roll to help the leader`}</option></select></label><label><input type="checkbox" name="cooperativeSetDC" /> ${loc`Leader: the task has a set DC (helpers roll against DC ${HELPER_BASE_DC})`}</label><label>${loc`Helper: the leader's check`} <select name="cooperativeLeader"><option value="">${loc`Not posted here — enter the DC`}</option>${options}</select></label><label>${loc`Helper: DC, when the leader's check is not listed`} <input type="number" name="cooperativeDC" min="${HELPER_BASE_DC}" step="1" /></label><p class="hint">${loc`Nobody takes 10 or 20. The leader's own check shows how many helpers it allows; apply the helpers' results from the leader's posted check.`}</p></details>`;
+  return `<details class="spycraft2-cooperative"><summary>${loc`Cooperative check`}</summary><label>${loc`Your part`} <select name="cooperativeRole"><option value="">${loc`Working alone`}</option><option value="leader">${loc`Leader: I roll first, helpers add to my result`}</option><option value="helper">${loc`Helper: I roll to help the leader`}</option></select></label><label><input type="checkbox" name="cooperativeSetDC" /> ${loc`Leader: the task has a set DC (helpers roll against DC ${helperBaseDC()})`}</label><label>${loc`Helper: the leader's check`} <select name="cooperativeLeader"><option value="">${loc`Not posted here — enter the DC`}</option>${options}</select></label><label>${loc`Helper: DC, when the leader's check is not listed`} <input type="number" name="cooperativeDC" min="${helperBaseDC()}" step="1" /></label><p class="hint">${loc`Nobody takes 10 or 20. The leader's own check shows how many helpers it allows; apply the helpers' results from the leader's posted check.`}</p></details>`;
 }
 
 /** What the section's fields mean for the roll. */

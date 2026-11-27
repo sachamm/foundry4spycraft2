@@ -5,8 +5,11 @@ import { installToolSearch } from "../tool-search.mjs";
 import { installResolutionGuide } from "../resolution-guide.mjs";
 /** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
 import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
-import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
+import { antagonistReward, threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
+import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
+import { campaignYear, periodMoney, periodMoneyModifier } from "../../rules/period-money.mjs";
+import { standingStatus } from "../../rules/standing.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
@@ -23,6 +26,7 @@ import * as mission from "./mission.mjs";
 import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
+import * as organizations from "./organizations.mjs";
 import * as tables from "./tables.mjs";
 import { addNpcToScene } from "./add-npc.mjs";
 import * as turn from "./console-turn.mjs";
@@ -102,7 +106,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       awardStanding: guard(() => mission.awardStanding()),
       seasonQualities: guard(() => mission.editSeasonQualities()),
       caliberIncrease: guard(() => spend.recordCaliberIncrease(getMission().caliber + 1)),
-      sceneAdvance: guard(() => updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }))),
+      sceneAdvance: guard(() => mission.correctSceneCount()),
       gcDice: guard(() => {
         const m = getMission();
         return manageGCDice({ playersPresent: teamActors(m).length, caliber: m.caliber });
@@ -127,6 +131,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       actingDamageSave: guard(() => npcDamageSaveWithUndo(game.combat?.combatant?.actor)),
       actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),
       actingReady: guard(() => combat.readyCombatant(game.combat?.combatant)),
+      actingOutcome: guard((event, target) => turn.actingOutcome(game.combat?.combatant?.actor, target.dataset.step)),
       cardNextStep: guard(() => {
         if (!pressNewestCard("button.sc2-primary-action[data-roll-control]"))
           ui.notifications.info(loc`No chat card is waiting for a next step.`);
@@ -134,6 +139,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
       consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
       startConflict: guard(() => conflicts.startConflictDialog()),
+      addOrganization: guard(() => organizations.editOrganization()),
+      editOrganization: guard((event, target) => organizations.editOrganization(target.dataset.id)),
+      organizationCard: guard((event, target) => organizations.organizationCard(target.dataset.id)),
+      removeOrganization: guard((event, target) => organizations.removeOrganization(target.dataset.id)),
       advanceConflict: guard((event, target) => conflicts.advanceConflict(target.dataset.id)),
       manageConflict: guard((event, target) => conflicts.manageConflict(target.dataset.id)),
       clockStep: guard((event, target) => advanceClock(Number(target.dataset.seconds))),
@@ -143,7 +152,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       securityDevice: guard(() => tables.securityDeviceDialog()),
       hazards: guard(() => tables.hazardLookupDialog()),
       events: guard(() => tables.eventReferenceDialog()),
-      possessions: guard(() => tables.randomPossessionsDialog())
+      possessions: guard(() => tables.randomPossessionsDialog()),
+      npcKnowledge: guard(() => tables.npcKnowledgeDialog())
     }
   };
 
@@ -280,7 +290,7 @@ function rememberView(view, state) {
 }
 /** Which sections each view shows. A search looks through all of them. */
 const VIEW_SECTIONS = {
-  prep: ["mission", "objectives", "antagonists", "complications", "campaign", "reference"],
+  prep: ["mission", "objectives", "antagonists", "complications", "organizations", "campaign", "reference"],
   play: ["combat", "dice", "objectives", "antagonists", "conflicts", "clock", "reference"],
   wrap: ["mission", "objectives", "antagonists", "campaign"]
 };
@@ -354,6 +364,7 @@ export function consoleSections({ missionActive, combat, conflictsRunning }, sto
     dice: missionActive ? "active" : "planning",
     combat: combat ? "running" : "idle",
     conflicts: conflictsRunning ? "running" : "idle",
+    organizations: "always",
     campaign: "always",
     reference: "always"
   };
@@ -366,6 +377,7 @@ export function consoleSections({ missionActive, combat, conflictsRunning }, sto
     dice: missionActive,
     combat: !!combat,
     conflicts: conflictsRunning,
+    organizations: false,
     campaign: false,
     reference: false
   };
@@ -481,16 +493,26 @@ export function consoleContext() {
         ? "fixed"
         : `${live.base}${live.adjust ? ` ${signed(live.adjust)}` : ""}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
       bonusDice: threatBonusActionDice(tl, levels),
-      team: team.map(actor => ({
-        name: actor.name,
-        level: actor.system.level,
-        reputation: actor.system.reputation,
-        netWorth: actor.system.netWorth
-      })),
+      team: team.map(actor => {
+        const status = standingStatus(actor.system);
+        return {
+          name: actor.name,
+          level: actor.system.level,
+          reputation: actor.system.reputation,
+          netWorth: actor.system.netWorth,
+          // Negative standing (p.440): shown beside the name, so the GC sees who has lost mission gear.
+          standingStatus: status.liquidation ? loc`targeted for liquidation` : status.burned ? loc`burned` : ""
+        };
+      }),
       standing,
       canRaiseCaliber: m.caliber < 5,
       objectives: m.objectives.map(objective => ({ ...objective, xp: objective.grade * 25 })),
-      antagonists: m.antagonists,
+      antagonists: m.antagonists.map(entry => ({
+        ...entry,
+        perScene: !!(entry.full || entry.promoted),
+        moreScenes: (Number(entry.scenes) || 1) > 1,
+        reward: antagonistReward(entry)
+      })),
       qualities: named(m.qualities, id => campaignQuality(id)?.name).map(entry => ({
         ...entry,
         xp: entry.scripted === false ? 0 : (campaignQuality(entry.id)?.xp ?? 0),
@@ -517,7 +539,16 @@ export function consoleContext() {
     season: qualities
       .filter(quality => quality.source === "season")
       .map(quality => ({ name: quality.name, xp: signed(quality.xp), summary: quality.summary })),
-    effects: Object.entries(effects).map(([key, value]) => ({ key, value: JSON.stringify(value) })),
+    ruleLines: [
+      ...campaignRuleLines(effects, { money: amount => periodMoney(amount, { effects }) }),
+      ...(effects.historicalMoney
+        ? [
+            campaignYear() === null
+              ? loc`Historical: set the clock's date so money follows Table 7.4.`
+              : loc`Money values and costs ×${periodMoneyModifier({ effects })} for ${campaignYear()} (Table 7.4).`
+          ]
+        : [])
+    ],
     effectConflicts,
     combat: combatNow
       ? {
@@ -534,6 +565,7 @@ export function consoleContext() {
         }
       : null,
     conflicts: conflictList,
+    organizations: organizations.organizationRows(),
     counts: {
       objectives: `${m.objectives.filter(objective => objective.complete).length}/${m.objectives.length}`,
       antagonists: m.antagonists.length,

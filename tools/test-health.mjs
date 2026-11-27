@@ -23,7 +23,13 @@ const combat = { id: "combat", started: true, round: 2 };
 test("RAW pp.331,349: death thresholds are size-adjusted negative ten, independent of Constitution and maximum wounds", () => {
   assert.equal(deathThreshold(), -10);
   assert.equal(deathThreshold("Small"), -7);
-  assert.equal(deathThreshold("Large (1×1)"), -15);
+  // Table 5.13's note sets a nearer death point for Small and smaller only (p.349); larger Sizes keep −10.
+  assert.equal(deathThreshold("Large (1×1)"), -10);
+  assert.equal(deathThreshold("Huge"), -10);
+  assert.equal(deathThreshold("Tiny"), -5);
+  assert.equal(deathThreshold("Diminutive"), -4);
+  assert.equal(deathThreshold("Fine"), -3);
+  assert.equal(deathThreshold("Nuisance"), -2);
   const cls = {
     id: "c",
     name: "Test",

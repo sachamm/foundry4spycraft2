@@ -51,6 +51,7 @@ import {
   missionXP
 } from "./module/apps/gc/state.mjs";
 import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
+import { installDramaticInitiative } from "./module/apps/gc/spend.mjs";
 import { registerKeybindings } from "./module/apps/keybindings.mjs";
 import {
   installFluidInitiativeHooks,
@@ -231,6 +232,7 @@ Hooks.once("init", () => {
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
+  installDramaticInitiative();
   installRoundReminders();
   installTargetNotices();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);

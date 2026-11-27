@@ -28,8 +28,11 @@
     </div>{{/each}}
     <div class="npc-section-title"><h3>{{localize "SPYCRAFT.Template.ActorNpcBuilder.EquipmentAllowances"}}</h3></div>
     <p class="npc-note">{{localize "SPYCRAFT.Template.ActorNpcBuilder.StartsWithOneCaliberIWeapon"}}</p>
+    {{#if npc.organizationOptions}}<label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Organization"}}
+      <select name="system.npcProfile.organization">{{selectOptions npc.organizationOptions selected=npc.profile.organization}}</select></label>
+    {{#if npc.result.organizationCaps}}<p class="npc-note">{{npc.organizationCapsNote}}</p>{{/if}}{{/if}}
     {{#each npc.equipment}}<div class="npc-equipment"><strong>{{category}}</strong>
-      {{#each picks}}<label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Caliber"}} <select aria-label="{{category}} pick Caliber" name="npcPick.{{category}}.{{index}}" data-dtype="Number">{{selectOptions ../../npc.caliberOptions selected=caliber}}</select><button type="button" data-action="npcRemoveRow" data-list="equipment" data-category="{{category}}" data-index="{{index}}" aria-label="{{localize 'SPYCRAFT.Action.RemovePick' category=category}}">×</button></label>{{/each}}
+      {{#each picks}}<label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Caliber"}} <select aria-label="{{category}} pick Caliber" name="npcPick.{{category}}.{{index}}" data-dtype="Number">{{selectOptions ../../npc.caliberOptions selected=caliber}}</select><button type="button" data-action="npcRemoveRow" data-list="equipment" data-category="{{category}}" data-index="{{index}}" aria-label="{{localize 'SPYCRAFT.Action.RemovePick' category=category}}">×</button>{{#if budget}} <span class="npc-note">{{budget}}</span>{{/if}}</label>{{/each}}
       <button type="button" data-action="npcAddPick" data-category="{{category}}">{{localize "SPYCRAFT.Template.ActorNpcBuilder.AddPick"}}</button>
     </div>{{/each}}
     <label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.AdditionalAmmunitionPairs"}} <input type="number" min="0" max="100" name="system.npcProfile.extraAmmoPairs" value="{{npc.profile.extraAmmoPairs}}" data-dtype="Number" /></label>

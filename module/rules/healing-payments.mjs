@@ -1,3 +1,4 @@
+import { actionDieTerm } from "./action-die-formula.mjs";
 import { healingPlan } from "./health.mjs";
 import { actionDiceFundingContext } from "./bonus-pools.mjs";
 import { actionDieBenefitQuote } from "./benefit-payments.mjs";
@@ -72,10 +73,12 @@ export function mixedHealingQuote(
       !Number.isFinite(bonus)
     )
       throw new Error(loc`Review the selected healing die type and modifiers.`);
-    return { ...row, die, explodeAt, bonus, label: funding.label };
+    return { ...row, die, explodeAt, bonus, label: funding.label, actionDice: ad };
   });
   const terms = healingSources.flatMap(p =>
-      Array(p.vitalityDice).fill(`1d${p.die}x>=${p.explodeAt}${p.bonus ? ` + (${p.bonus})` : ""}`)
+      Array(p.vitalityDice).fill(
+        `${actionDieTerm(p.die, p.explodeAt, p.actionDice)}${p.bonus ? ` + (${p.bonus})` : ""}`
+      )
     ),
     vitalityBonuses = healingSources.flatMap(p => Array(p.vitalityDice).fill(p.bonus));
   return {

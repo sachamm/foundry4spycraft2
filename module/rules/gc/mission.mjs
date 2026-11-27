@@ -4,10 +4,18 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { periodMoney } from "../period-money.mjs";
 
 const M = GC_DATA.core.mission;
 const whole = (value, min, max) => Number.isSafeInteger(value) && value >= min && value <= max;
 const count = value => (whole(value, 0, 1000) ? value : 0);
+
+/** p.452: what one standard or special antagonist adds to the mission reward (a special one counts 4 times). */
+export function antagonistReward(entry) {
+  const xp = Math.max(0, Math.trunc(Number(entry?.xp) || 0)),
+    multiplier = entry?.type === "special" ? M.specialMultiplier : 1;
+  return { xp, multiplier, total: xp * multiplier, special: multiplier > 1 };
+}
 
 export function defaultMission() {
   return {
@@ -91,7 +99,8 @@ export function missionStanding(mission) {
       : 0;
   return {
     reputation: row.reputation + adjust * M.threatLevel.reputationPerStep,
-    netWorth: row.netWorth + adjust * M.threatLevel.netWorthPerStep
+    // Table 7.4 under the Historical quality (p.407).
+    netWorth: periodMoney(row.netWorth + adjust * M.threatLevel.netWorthPerStep)
   };
 }
 
@@ -250,13 +259,17 @@ export function characterMissionXP({ baseXP, awards = 0, level, threatLevel: tl 
  * Exposure (p.435): an infraction costs its listed penalty; committed to stop an equal or worse
  * infraction it costs half, rounded up. Penalties are negative numbers in the data.
  */
-export function exposurePenalty(infraction, { preventing = false, halve = false } = {}) {
+export function exposurePenalty(infraction, { preventing = false, halve = false, honorMultiplier = 1 } = {}) {
   const scale = value => {
     if (!Number.isFinite(value) || value === 0) return 0;
     let magnitude = Math.abs(value);
     if (preventing) magnitude = Math.ceil(magnitude / 2);
     if (halve) magnitude = Math.floor(magnitude / 2); // Corrupt campaign quality
+    // An honor-code breach: doubled under Virtuous, halved (rounded down) under Corrupt (p.408).
+    if (Number.isFinite(honorMultiplier) && honorMultiplier > 0 && honorMultiplier !== 1)
+      magnitude = Math.floor(magnitude * honorMultiplier);
     return -magnitude;
   };
-  return { reputation: scale(infraction?.reputation), netWorth: scale(infraction?.netWorth) };
+  // Net Worth is in modern dollars; under Historical it follows Table 7.4 like every other amount.
+  return { reputation: scale(infraction?.reputation), netWorth: periodMoney(scale(infraction?.netWorth)) };
 }

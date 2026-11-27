@@ -3,8 +3,12 @@ import { shakenActionDieCost } from "./shaken.mjs";
 import { priorityRequestBonus, localHeroRequestBonus, requestBenefitContext } from "./requests.mjs";
 import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
+import { campaignGearCaliber } from "./campaign-rules.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
+import { standingStatus } from "./standing.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
+const ROMAN = ["I", "II", "III", "IV", "V"];
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
 /** Delivery for a Request that is immediately available (Political Clout, Favors and Immunity). */
 export const IMMEDIATE_DELIVERY = Object.freeze({
@@ -56,6 +60,15 @@ export const hasProcure = system =>
 export const missionEpoch = system => String(system.usagePeriods?.mission ?? "initial");
 export function currentReserves(system) {
   return system.missionReserves?.epoch === missionEpoch(system) ? system.missionReserves : null;
+}
+/**
+ * A mission Caliber increase (p.398) applies to every gear acquisition for the rest of the mission, so it raises the
+ * Caliber on this mission's reserves. Returns the actor update, or null when there are none or they are already there.
+ */
+export function reserveCaliberIncrease(system, caliber) {
+  const record = currentReserves(system);
+  if (!record || !Number.isSafeInteger(caliber) || caliber > 5 || record.caliber >= caliber) return null;
+  return { "system.missionReserves.caliber": caliber };
 }
 /** A free Stash attempt needs a durable claim ledger but does not allocate mission resources. */
 export function provisionalReserves(system) {
@@ -110,7 +123,15 @@ export function reserveAllocations(system) {
 export function reserveInitialization(
   system,
   items,
-  { picks = {}, charismaPicks = {}, common = 0, caliber = 1, intelComplete = false, procureAtIntel = false } = {}
+  {
+    picks = {},
+    charismaPicks = {},
+    common = 0,
+    caliber = 1,
+    intelComplete = false,
+    procureAtIntel = false,
+    missionCaliber = null
+  } = {}
 ) {
   const provisional = currentReserves(system);
   if (provisional && provisional.initialized !== false)
@@ -119,7 +140,14 @@ export function reserveInitialization(
     );
   if (provisional) validateProvisionalReserves(provisional);
   if (!intelComplete) throw new Error(loc`Choose reserves at the end of the Intel Phase.`);
+  if (standingStatus(system).burned)
+    throw new Error(loc`This agent is burned (negative standing, p.440): no mission reserves until it is above 0.`);
   if (!Number.isSafeInteger(caliber) || caliber < 1 || caliber > 5) throw new Error(loc`Mission Caliber must be I–V.`);
+  // The GC sets the mission's Caliber (p.398); reserves take it from the mission record when there is one.
+  if (Number.isSafeInteger(missionCaliber) && caliber !== missionCaliber)
+    throw new Error(
+      loc`The GC set this mission at Caliber ${ROMAN[missionCaliber - 1]}, so reserves use that Caliber.`
+    );
   if (items.some(i => ["weapon", "armor", "gear"].includes(i.type) && i.system.reserve))
     throw new Error(loc`Review legacy reserved-item checkboxes before allocating unassigned reserves.`);
   const selected = {};
@@ -173,7 +201,8 @@ export function gearAcquisitionPlan(
     kind = "request",
     pick = "",
     category = "",
-    caliber = 1,
+    caliber: ownCaliber = 1,
+    itemYear = "",
     name = "",
     location = "largeCity",
     rapidCommunication = false,
@@ -190,11 +219,17 @@ export function gearAcquisitionPlan(
     sourcesOption = "",
     sourcesOptionConfirmed = false,
     atHome = false,
-    usePersonalStash = false
+    usePersonalStash = false,
+    agencySite = null
   } = {}
 ) {
   const existing = currentReserves(system),
     waiver = kind === "common" && usePersonalStash === true;
+  // A burned agent has no access to mission gear or resources (p.440); Personal Stash draws on the agent's own home.
+  if (!waiver && standingStatus(system).burned)
+    throw new Error(
+      loc`This agent is burned (negative standing, p.440): no Requests or Gear checks until it is above 0.`
+    );
   if ((!existing || existing.initialized === false) && !waiver)
     throw new Error(loc`Allocate reserves for the current mission first.`);
   const record = existing ?? provisionalReserves(system);
@@ -244,6 +279,13 @@ export function gearAcquisitionPlan(
   }
   if (usePersonalStash) throw new Error(loc`Personal Stash waives a Common Item Gear check, not a Request.`);
   if (kind !== "request") throw new Error(loc`Choose a Request or Gear check.`);
+  // Historical (p.407): an item not yet introduced by the campaign year is Requested as a gadget one Caliber higher.
+  const era = historicalCaliber({ caliber: ownCaliber, year: itemYear });
+  if (!era.available)
+    throw new Error(
+      loc`${String(name).trim()} was not yet introduced in the campaign year, and as a gadget it would pass Caliber V, so it cannot be Requested under Historical (p.407).`
+    );
+  const caliber = era.gadget ? era.caliber : ownCaliber;
   const benefit = requestAbility
     ? (system.limitedUses ?? []).find(s => s.id === requestAbility && s.workflow === "requestBenefit")
     : null;
@@ -277,13 +319,20 @@ export function gearAcquisitionPlan(
     throw new Error(
       loc`Procure requires the earned Intruder option, a city of at least 10,000 people and quick communication (pp.30,38).`
     );
+  // Shoe-String Budget (p.408): picks pushed below Caliber I are lost, so an ordinary Request has nothing to draw on.
+  // Procure's +1 and the campaign's shift both apply before the ceiling is clamped to Calibers I–V.
+  const ceiling = campaignGearCaliber(record.caliber + (useProcure ? 1 : 0));
+  if (!benefit?.ignoreMissionCaliber && ceiling.lost)
+    throw new Error(
+      loc`Shoe-String Budget takes this mission's Reserve picks below Caliber I, so they are lost (p.408).`
+    );
   // Total Control (p.209): Requests may be for Caliber V gear.
   const maxCaliber = system.activeFeatNames?.includes("Total Control") ? 5 : 4;
   if (
     !Number.isSafeInteger(caliber) ||
     caliber < 1 ||
     caliber > maxCaliber ||
-    (!benefit?.ignoreMissionCaliber && caliber > record.caliber + (useProcure ? 1 : 0))
+    (!benefit?.ignoreMissionCaliber && caliber > ceiling.caliber)
   )
     throw new Error(
       maxCaliber === 5
@@ -304,6 +353,17 @@ export function gearAcquisitionPlan(
   if (!DELIVERY[location]) throw new Error(loc`Choose a source-listed delivery location.`);
   if (!Number.isSafeInteger(availableFunding) || availableFunding < cost)
     throw new Error(loc`Not enough action dice remain in the selected funding.`);
+  // An Agency Site (p.394): +4 on Requests it serves, and they arrive in half the time.
+  if (
+    agencySite &&
+    !String(agencySite.category ?? "")
+      .split("/")
+      .includes(category)
+  )
+    throw new Error(
+      loc`The ${agencySite.name} serves ${agencySite.request}, not category ${category} Requests. Choose another Site or none.`
+    );
+  const site = agencySite ? [{ name: loc`${agencySite.name} (Agency Site)`, value: agencySite.bonus ?? 4 }] : [];
   const priority = priorityRequestBonus(system, category),
     local = localHeroRequestBonus(system, { homeTurf }),
     requestBase =
@@ -320,6 +380,8 @@ export function gearAcquisitionPlan(
     pick,
     category,
     caliber,
+    ownCaliber,
+    historicalGadget: era.gadget,
     cost,
     baseCost,
     surcharge,
@@ -329,10 +391,11 @@ export function gearAcquisitionPlan(
     abilityRecord: use?.record,
     automatic: !!benefit?.automatic,
     dc: 10 * caliber,
-    bonus: requestBase + priority.bonus + local.bonus,
-    bonusSources: [...priority.sources, ...local.sources],
+    bonus: requestBase + priority.bonus + local.bonus + (site[0]?.value ?? 0),
+    bonusSources: [...priority.sources, ...local.sources, ...site],
+    agencySite: agencySite?.id ?? "",
     location,
-    deliveryMultiplier: useProcure ? 0.5 : 1,
+    deliveryMultiplier: (useProcure ? 0.5 : 1) * (agencySite ? 0.5 : 1),
     delivery: benefit?.immediate ? IMMEDIATE_DELIVERY : DELIVERY[location],
     record: {
       ...record,

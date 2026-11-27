@@ -8,7 +8,8 @@
     "gcDice": null,
     "summary": "Every gear pick for any character, NPCs included, rises 1 Caliber; a pick pushed past Caliber V also yields 1 extra Caliber I item of that type. Player and special characters start with +4 Wealth.",
     "effects": {
-      "gearCaliberShift": 1
+      "gearCaliberShift": 1,
+      "wealthBonus": 4
     }
   },
   {
@@ -19,7 +20,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Every character and NPC is labelled Good or Evil. At GC discretion, actions or attacks meant to harm or hinder the opposite side gain +2, and an exemplary act fitting one's nature earns 1 action die.",
-    "effects": {}
+    "effects": {
+      "goodAndEvil": true
+    }
   },
   {
     "id": "bleak",
@@ -43,7 +46,8 @@
     "gcDice": 2,
     "summary": "Explosion blast increments are tripled. A player character whose successful save would halve damage or an effect ignores it completely instead. Interrupted range increments no longer raise explosion damage.",
     "effects": {
-      "blastIncrementMultiplier": 3
+      "blastIncrementMultiplier": 3,
+      "halfSaveResistsFully": true
     }
   },
   {
@@ -66,7 +70,9 @@
     "xp": -25,
     "gcDice": 1,
     "summary": "Weapons that normally hold 5 or more shots never run out of ammunition.",
-    "effects": {}
+    "effects": {
+      "bottomlessClip": true
+    }
   },
   {
     "id": "bulletproof",
@@ -108,7 +114,9 @@
     "xp": -25,
     "gcDice": 1,
     "summary": "1/session, on rolling a threat (attack or skill), a player/special character may deliver a signature line as a free action. Effect: morale bonus on Defense and Resist checks = 2x Charisma bonus (at least +1), lasting half his career level in rounds (round up).",
-    "effects": {}
+    "effects": {
+      "catchPhrase": true
+    }
   },
   {
     "id": "the-circuit",
@@ -143,7 +151,10 @@
     "gcDice": 3,
     "summary": "For everyone, NPCs included: skill DCs rise by 5; error range +2 on skills keyed to a character's lowest attribute; at most 2 action dice may be spent activating a skill error; taking 10 takes 4x standard time instead of 2x.",
     "effects": {
-      "skillDC": 5
+      "skillDC": 5,
+      "lowestAttributeErrorIncrease": 2,
+      "errorActivationDiceMaximum": 2,
+      "take10TimeMultiplier": 4
     }
   },
   {
@@ -167,7 +178,9 @@
     "xp": -25,
     "gcDice": 1,
     "summary": "No GC action dice may be spent to flag characters as honorable in bribes. Honor-code breaches cost half the usual Reputation / Net Worth exposure penalty (round down).",
-    "effects": {}
+    "effects": {
+      "honorExposureMultiplier": 0.5
+    }
   },
   {
     "id": "diplomatic",
@@ -177,7 +190,9 @@
     "xp": -25,
     "gcDice": 1,
     "summary": "Player and special characters get +1 on top of any skill bonus granted by a target's favorable disposition.",
-    "effects": {}
+    "effects": {
+      "favorableDispositionBonus": 1
+    }
   },
   {
     "id": "elite-ops",
@@ -199,6 +214,7 @@
     "xp": 0,
     "gcDice": null,
     "summary": "All player characters serve one large organization and use the Faction gear rules. They earn only Reputation, never Net Worth. Cannot be combined with Freelance.",
+    "excludes": ["freelance"],
     "effects": {
       "gearRules": "faction"
     }
@@ -236,7 +252,8 @@
     "gcDice": null,
     "summary": "XP needed for each level is halved (rounded down), and up to 2 levels may be gained between missions.",
     "effects": {
-      "xpToLevelFraction": 0.5
+      "xpToLevelFraction": 0.5,
+      "levelsBetweenMissions": 2
     }
   },
   {
@@ -271,7 +288,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "After each mission a player character may trade 1,000 XP x career level for 1 extra feat, but cannot drop below the XP minimum for his current career level.",
-    "effects": {}
+    "effects": {
+      "featPurchase": true
+    }
   },
   {
     "id": "fragile",
@@ -281,7 +300,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "After Level 1, player and special characters gain fixed vitality per career level: 2 with a d8 vitality die, 3 with a d10, 4 with a d12.",
-    "effects": {}
+    "effects": {
+      "fixedVitality": true
+    }
   },
   {
     "id": "freelance",
@@ -291,6 +312,7 @@
     "xp": 0,
     "gcDice": null,
     "summary": "PCs are independents backed by a web of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
+    "excludes": ["faction"],
     "effects": {
       "gearRules": "freelance"
     }
@@ -303,7 +325,11 @@
     "xp": 0,
     "gcDice": null,
     "summary": "CQB range covers Melee Range through 20 ft. All characters (NPCs too) gain +1 Defense vs. ranged attacks per Melee or Unarmed Combat feat they hold. Stand Offs cannot be interrupted or joined.",
-    "effects": {}
+    "effects": {
+      "cqbRange": 20,
+      "meleeFeatRangedDefense": true,
+      "closedStandOffs": true
+    }
   },
   {
     "id": "the-great-game",
@@ -368,7 +394,10 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Pick a year for the season. Gear that did not exist yet is available only as a gadget (Housing or effect), at +1 Caliber (cap V). Table 7.4 scales monetary values and actual costs by era: x0.01 for 1875-1900 rising to x1 from 1990.",
-    "effects": {}
+    "effects": {
+      "historicalMoney": true,
+      "historicalGear": true
+    }
   },
   {
     "id": "hybrid",
@@ -390,7 +419,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Every skill counts as a class skill for every class. Skill points gained do not change.",
-    "effects": {}
+    "effects": {
+      "allClassSkills": true
+    }
   },
   {
     "id": "the-market",
@@ -412,7 +443,9 @@
     "xp": -75,
     "gcDice": null,
     "summary": "All stress damage is halved (rounded down, minimum 1).",
-    "effects": {}
+    "effects": {
+      "stressMultiplier": 0.5
+    }
   },
   {
     "id": "mercenary",
@@ -434,7 +467,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "At character creation a player may buy extra feats for 2 attribute-purchase points each, or surrender feat choices to gain 2 extra attribute-purchase points per feat given up.",
-    "effects": {}
+    "effects": {
+      "modularFeats": true
+    }
   },
   {
     "id": "omni-competent",
@@ -444,7 +479,11 @@
     "xp": -100,
     "gcDice": 1,
     "summary": "No result caps on skill checks; every check is treated as active; skill penalties are cut in half (round down, never better than -1).",
-    "effects": {}
+    "effects": {
+      "noSkillResultCaps": true,
+      "halveSkillPenalties": true,
+      "allChecksActive": true
+    }
   },
   {
     "id": "paranoid",
@@ -454,7 +493,10 @@
     "xp": 0,
     "gcDice": 2,
     "summary": "Player and special characters get +4 morale on Blend/Stealth and Sneak/Hide checks that decide surprise rounds. All characters take -4 morale on skill checks to shift disposition or persuade a target into an action.",
-    "effects": {}
+    "effects": {
+      "surpriseHideBonus": 4,
+      "dispositionCheckModifier": -4
+    }
   },
   {
     "id": "rare-spectacle",
@@ -476,7 +518,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "A PC killed in a standard scene, body still whole, can return when the next mission begins for 200 Reputation or $10,000,000.",
-    "effects": {}
+    "effects": {
+      "revolvingDoor": true
+    }
   },
   {
     "id": "routine",
@@ -486,7 +530,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Characters can never take on Crossroads Subplots.",
-    "effects": {}
+    "effects": {
+      "noCrossroads": true
+    }
   },
   {
     "id": "shoe-string-budget",
@@ -497,7 +543,8 @@
     "gcDice": null,
     "summary": "Every gear pick for any character, NPCs included, drops 1 Caliber; a pick pushed below Caliber I is lost. Each PC starts with a Debt Subplot.",
     "effects": {
-      "gearCaliberShift": -1
+      "gearCaliberShift": -1,
+      "debtSubplot": true
     }
   },
   {
@@ -568,7 +615,9 @@
     "xp": 25,
     "gcDice": null,
     "summary": "Player characters get 32 points for starting attributes instead of 36, and no starting attribute may exceed 18, Origin benefits included.",
-    "effects": {}
+    "effects": {
+      "pointBuy": 32
+    }
   },
   {
     "id": "soap",
@@ -578,7 +627,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Each character may be involved in 1 more Subplot at a time than normal.",
-    "effects": {}
+    "effects": {
+      "subplotLimitBonus": 1
+    }
   },
   {
     "id": "speed-frame",
@@ -588,7 +639,10 @@
     "xp": -25,
     "gcDice": 1,
     "summary": "Complex Tasks need 1 fewer Challenge (minimum 1). In Dramatic Conflicts, every Lead Advantage has its effect raised by 1.",
-    "effects": {}
+    "effects": {
+      "complexTaskChallenges": -1,
+      "leadAdvantageShift": 1
+    }
   },
   {
     "id": "spirited",
@@ -599,7 +653,9 @@
     "gcDice": null,
     "summary": "PCs open every session with +2 action dice (class ability use counts based on starting dice unchanged). PC action dice explode on a natural 1 as well, and each die type is 1 step bigger (d4 becomes d6, d6 becomes d8, etc.).",
     "effects": {
-      "startingActionDice": 2
+      "startingActionDice": 2,
+      "actionDiceExplodeLow": true,
+      "actionDieStep": 1
     }
   },
   {
@@ -634,7 +690,9 @@
     "xp": -50,
     "gcDice": 2,
     "summary": "Every attack check by any character, NPCs included, takes a -1 penalty.",
-    "effects": {}
+    "effects": {
+      "attackModifier": -1
+    }
   },
   {
     "id": "tense",
@@ -644,7 +702,10 @@
     "xp": 75,
     "gcDice": 3,
     "summary": "Stress damage x2. Taking 10 on skill checks is off the table for everybody.",
-    "effects": {}
+    "effects": {
+      "stressMultiplier": 2,
+      "noTakeTen": true
+    }
   },
   {
     "id": "thriller",
@@ -654,7 +715,10 @@
     "xp": 25,
     "gcDice": null,
     "summary": "Complex Tasks need 1 more Challenge (may exceed 10). In Dramatic Conflicts, every Lead result has its effect lowered by 1 (minimum 0).",
-    "effects": {}
+    "effects": {
+      "complexTaskChallenges": 1,
+      "leadAdvantageShift": -1
+    }
   },
   {
     "id": "violent",
@@ -664,7 +728,9 @@
     "xp": 50,
     "gcDice": 2,
     "summary": "Threat ranges of all attack checks by any character, NPCs included, widen by 2.",
-    "effects": {}
+    "effects": {
+      "attackThreatIncrease": 2
+    }
   },
   {
     "id": "virtuous",
@@ -674,7 +740,9 @@
     "xp": 25,
     "gcDice": 1,
     "summary": "Honor-code breaches cost double the usual Reputation / Net Worth exposure penalty.",
-    "effects": {}
+    "effects": {
+      "honorExposureMultiplier": 2
+    }
   },
   {
     "id": "wire-fu",
@@ -684,6 +752,8 @@
     "xp": -25,
     "gcDice": 1,
     "summary": "Player and special characters may move in any direction, including straight up or along walls. Ending movement off a stable surface triggers the falling rules, but falling damage is halved (rounded down).",
-    "effects": {}
+    "effects": {
+      "fallingDamageMultiplier": 0.5
+    }
   }
 ]

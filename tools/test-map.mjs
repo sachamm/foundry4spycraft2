@@ -173,6 +173,15 @@ test("an attack is measured from the character's token to the single targeted to
   assert.equal(melee.targetActorUuid, "Actor.g");
   assert.match(measurementLine(melee), /5 ft\. to Guard; adjacent; flanking with Ally; no cover from walls/);
 
+  // Two squares away with an ally opposite: a ranged attacker flanks, a melee one only within its Reach (p.341).
+  const back = token("k", "Hero at range", 3, 5, { controlled: true });
+  canvas.tokens.placeables.push(back);
+  const ranged = { system: { cqbRange: 30 }, getActiveTokens: () => [back] };
+  assert.equal(measureAttack(ranged).flanked, true);
+  assert.equal(measureAttack(ranged, { melee: true }).flanked, false);
+  assert.equal(measureAttack(ranged, { melee: true, reachFeet: 10 }).flanked, true);
+  canvas.tokens.placeables.pop();
+
   // A far target: measured, not adjacent, nobody opposite.
   game.user.targets = new Set([far]);
   const shot = measureAttack(actor);

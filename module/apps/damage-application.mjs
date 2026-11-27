@@ -29,17 +29,20 @@ import {
   knockoutDuration,
   lethalHitLines,
   lethalHitPlan,
-  nonLethalHitPlan,
   reducedDamage,
   woundState
 } from "../rules/damage-application.mjs";
+import { specialistDefense } from "../rules/weapon-specialist.mjs";
+import { campaignStress, gladiatorsDefense } from "../rules/campaign-rules.mjs";
+import { resolvedTargetRole } from "../rules/npc-qualities.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
-import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
+import { criticalInjuryResult, criticalInjuryRollPlan, surgeryDCNow } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration, setCondition as condition, woundConditions } from "./wound-conditions.mjs";
-import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { accumulatedDamageLines, nonLethalDamage, nonLethalTotals } from "./non-lethal-damage.mjs";
+export { accumulatedDamageLines, nonLethalDamage, nonLethalTotals };
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
 import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
@@ -65,7 +68,7 @@ export const tokenInView = actor => {
 const canSee = actor =>
   actor?.isOwner === true || game.user?.isGM === true || actor?.visible === true || tokenInView(actor);
 /** Post a report. `pendingSave` makes it a card with a button that rolls the save it calls for. */
-const post = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
+export const postDamageReport = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
     content: `<div class="spycraft2 chat-note">${lines
@@ -222,7 +225,16 @@ export async function resolveAttack(message, options = {}) {
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
   const cover = coverOnResolution(input.cover);
-  const defense = baseDefense + (cover?.bonus ?? 0);
+  // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies, on top of the sheet's Defense.
+  const foibles = entered && target ? specialistDefense(target.system, check.weaponProficiency).dodge : 0;
+  // Gladiators (p.407): +1 against ranged attacks for each Melee or Unarmed Combat feat the target holds.
+  const gladiators = entered && target ? gladiatorsDefense(target.system, check.attackContext?.ranged === true) : 0;
+  // Laser damage ignores every dodge bonus to Defense (p.338), so a known target's dodge bonuses come off.
+  const laserDodge =
+    entered && target && check.attackContext?.laser === true && !target.system?.vulnerable
+      ? Math.max(0, Number(target.system?.defense?.dodgeBonuses) || 0) + foibles
+      : 0;
+  const defense = baseDefense + (cover?.bonus ?? 0) + foibles + gladiators - laserDodge;
   let outcome;
   try {
     outcome = attackOutcome({
@@ -234,6 +246,19 @@ export async function resolveAttack(message, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
+  // A villain role belongs to the target actually hit, not the one declared (pp.447–448): its threat range and
+  // critical cost are read again for the target chosen here.
+  if (target) {
+    const roleChange = resolvedTargetRole(check, target.system);
+    if (roleChange) {
+      await message.update({
+        "flags.spycraft2.threat": roleChange.threat,
+        "flags.spycraft2.attackContext.targetRole": roleChange.role
+      });
+      check.threat = roleChange.threat;
+      check.attackContext = { ...check.attackContext, targetRole: roleChange.role };
+    }
+  }
   const before = check.attackResolution ?? null;
   const resolution = {
     targetUuid: target?.uuid ?? "",
@@ -242,7 +267,8 @@ export async function resolveAttack(message, options = {}) {
     total: check.effectiveTotal,
     // Updates merge, so resolving again without cover clears what an earlier resolution recorded.
     cover: cover ?? null,
-    hitsCover: cover ? !outcome.hit && check.effectiveTotal >= baseDefense : false,
+    foibles,
+    hitsCover: cover ? !outcome.hit && check.effectiveTotal >= defense - cover.bonus : false,
     // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
@@ -406,109 +432,14 @@ export function damageCardsFor(message, messages = globalThis.game?.messages ?? 
 /* -------------------------------------------- */
 
 const isSpecial = target => target.type === "agent" || (target.type === "npc" && npcIsSpecial(target));
-/** A special NPC's running stress and subdual totals; agents keep a ledger instead. */
-export const nonLethalTotals = actor => ({
-  stress: Math.max(0, Math.trunc(Number(actor.flags?.spycraft2?.nonLethal?.stress) || 0)),
-  subdual: Math.max(0, Math.trunc(Number(actor.flags?.spycraft2?.nonLethal?.subdual) || 0))
-});
 /** Damage types with rules of their own that an agent's hazards track; fire is kept with the other hazards. */
 const TYPED = [...Object.keys(DAMAGE_TYPES), "fire"];
 /** Types a special NPC can take through the same saves: nothing is kept on the character between rounds. */
 const NPC_TYPED = ["bang", "flash", "explosive"];
 const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
 
-/**
- * What an agent's ledger did with a stress or subdual hit: how much got past the agent's defenses, the running
- * total against the threshold, and whether a save is now waiting. `record` is the ledger's receipt.
- */
-export function accumulatedDamageLines(name, kind, amount, record, system = {}) {
-  if (!record || !Number.isSafeInteger(record.newDamage))
-    return [
-      loc`${name}: ${amount} ${kind} damage recorded before defenses. Any save it calls for is waiting on the sheet.`
-    ];
-  const threshold = system[kind + "Threshold"],
-    against = Number.isSafeInteger(threshold) ? loc` (threshold ${threshold})` : "";
-  const lines = [
-    record.newDamage === amount
-      ? loc`${name} takes ${amount} ${kind} damage: ${record.total} in all${against}.`
-      : record.newDamage > 0
-        ? loc`${name}: ${amount} ${kind} damage, ${record.newDamage} after damage reduction and resistance: ${record.total} in all${against}.`
-        : loc`${name}: damage reduction and resistance stop all ${amount} ${kind} damage. The total stays at ${record.total}${against}.`
-  ];
-  lines.push(
-    record.save
-      ? loc`This calls for a save, DC ${record.save.dc}: it is waiting on the sheet, beside the ${kind} total.`
-      : loc`No save is called for yet. Vitality and wounds do not change; the ${kind} total is shown beside them on the sheet.`
-  );
-  return lines;
-}
-
-/**
- * Stress or subdual damage. An agent's goes to the ledger, which works out its own save. A special NPC keeps two
- * running totals; when a threshold or a critical hit calls for a save, the report carries the button for it.
- * @returns {{lines: string[], pendingSave: object|null}}
- */
-async function nonLethalDamage(target, kind, amount, facts) {
-  const { source, attackKind, armorPiercing = 0, armorPiercingAll = false, critical = false } = facts;
-  if (target.type === "agent") {
-    try {
-      const record = await applyAccumulatedDamage(target, {
-        source: `${source} [${foundry.utils.randomID(6)}]`,
-        kind,
-        newDamage: amount,
-        criticalHit: critical === true,
-        confirmed: true,
-        ...(kind === "subdual"
-          ? { damageMode: "subdualBeforeDefenses", attackKind, armorPiercing, armorPiercingAll }
-          : { damageMode: "stressBeforeResistance" })
-      });
-      return {
-        lines: accumulatedDamageLines(esc(target.name), kind, amount, record, target.system),
-        pendingSave: null
-      };
-    } catch (error) {
-      return {
-        lines: [
-          loc`Not applied: ${esc(target.name)}'s ${amount} ${kind} damage could not be recorded (${esc(error.message)}). Record it by hand.`
-        ],
-        pendingSave: null,
-        failed: true
-      };
-    }
-  }
-  const plan = nonLethalHitPlan(target.system, nonLethalTotals(target), {
-    kind,
-    damage: amount,
-    dr: drForAttack(target.system, attackKind),
-    armorPiercing,
-    armorPiercingAll,
-    critical
-  });
-  if (plan.net) await target.update({ "flags.spycraft2.nonLethal": plan.totals });
-  const lines = [
-    plan.stopped
-      ? loc`${esc(target.name)}: damage reduction stops all ${amount} ${kind} damage (it counts twice against subdual damage).`
-      : loc`${esc(target.name)} takes ${plan.net} ${kind} damage: ${plan.total} in all, against a threshold of ${plan.threshold}.`
-  ];
-  if (!plan.saveRequired) return { lines, pendingSave: null };
-  const saveName = plan.saveKey === "will" ? loc`Will` : loc`Fortitude`;
-  lines.push(loc`This calls for a ${saveName} save, DC ${plan.dc}.`);
-  return {
-    lines,
-    pendingSave: {
-      kind: "thresholdSave",
-      saveKey: plan.saveKey,
-      dc: plan.dc,
-      label: kind === "stress" ? loc`Stress damage` : loc`Subdual damage`,
-      damageKind: kind,
-      failureOutcome: plan.failureOutcome,
-      knockoutBase: plan.knockoutBase
-    }
-  };
-}
-
 /** Take a lethal hit off a special character's vitality and wounds and set the conditions that follow. */
-async function lethalOnSpecial(target, hit, source) {
+export async function lethalOnSpecial(target, hit, source) {
   const system = target.system,
     plan = lethalHitPlan(
       {
@@ -539,6 +470,7 @@ async function lethalOnSpecial(target, hit, source) {
         label: loc`Massive damage`,
         damage: plan.net,
         toMinusNine: plan.massive.toMinusNine,
+        threshold: plan.massive.threshold ?? 50,
         source
       }
     : null;
@@ -584,7 +516,9 @@ rollPipeline.register({
 /** A hit of 25 or more (p.331): a failed save means a critical injury, and –9 wounds for a hit of 50 or more. */
 hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded) => {
   if (succeeded)
-    return post(actor, [loc`${esc(actor.name)} makes the save against massive damage: no critical injury.`]);
+    return postDamageReport(actor, [
+      loc`${esc(actor.name)} makes the save against massive damage: no critical injury.`
+    ]);
   const lines = [loc`${esc(actor.name)} fails the save against massive damage.`],
     rolls = [];
   const reference = `massive-${message?.id ?? foundry.utils.randomID(8)}`,
@@ -599,7 +533,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     rolls.push(roll);
     lines.push(
       result.listed
-        ? loc`Critical injury (${result.total}): ${esc(result.name)}. Surgery DC ${result.surgeryDC}.`
+        ? loc`Critical injury (${result.total}): ${esc(result.name)}. Surgery DC ${surgeryDCNow(result)}.`
         : loc`Critical injury (${result.total}): ${esc(result.name)}.`
     );
   }
@@ -607,24 +541,24 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     const wounds = Math.min(-9, Math.trunc(Number(actor.system.wounds?.value) || 0));
     await actor.update({ "system.wounds.value": wounds });
     lines.push(
-      loc`A hit of 50 or more: wounds drop to ${wounds}.`,
+      loc`A hit of ${save.threshold ?? 50} or more: wounds drop to ${wounds}.`,
       ...(await woundConditions(actor, woundState(wounds, actor.system.deathThreshold)))
     );
   }
-  return post(actor, lines, { rolls });
+  return postDamageReport(actor, lines, { rolls });
 });
 
 /** A stress or subdual threshold on a character without a ledger (pp.339–340). */
 hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded, check) => {
-  if (succeeded) return post(actor, [loc`${esc(actor.name)} makes the save: no further effect.`]);
+  if (succeeded) return postDamageReport(actor, [loc`${esc(actor.name)} makes the save: no further effect.`]);
   if (save.damageKind === "stress")
-    return post(actor, [
+    return postDamageReport(actor, [
       save.failureOutcome
         ? loc`${esc(actor.name)} fails the save: ${esc(save.failureOutcome)}. Use "Apply Shaken" on the sheet to record it.`
         : loc`${esc(actor.name)} fails the save from a critical hit below every threshold: the GC decides the effect.`
     ]);
   const time = knockoutDuration(save.knockoutBase, save.dc, Number(check?.effectiveTotal));
-  return post(actor, [
+  return postDamageReport(actor, [
     time
       ? loc`${esc(actor.name)} fails the save and is unconscious for ${time.count} ${time.unit}(s). The game clock ends it.`
       : loc`${esc(actor.name)} fails the save and is unconscious; the GC sets how long.`,
@@ -679,7 +613,8 @@ export function standardReduction(kind, hit) {
       dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, hit.dr - hit.armorPiercing),
       armorPiercing: 0
     });
-  return reducedDamage({ damage: hit.damage });
+  // Stress ignores DR; Tense and Mellow scale it (pp.407–408).
+  return reducedDamage({ damage: campaignStress(hit.damage).amount });
 }
 
 /**
@@ -738,7 +673,14 @@ export async function applyDamage(message, options = {}) {
   if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
   if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
   const source = loc`${weapon?.name ?? loc`Damage`} (${message.id ?? "roll"})`;
-  const hit = { damage, dr: drForAttack(target.system, attackKind), armorPiercing, armorPiercingAll, critical };
+  const proficiency = weapon?.system?.proficiency ?? check.weaponProficiency ?? "";
+  const hit = {
+    damage,
+    dr: drForAttack(target.system, attackKind, { proficiency }),
+    armorPiercing,
+    armorPiercingAll,
+    critical
+  };
   let lines = [],
     pendingSave = null,
     failed = false,
@@ -761,14 +703,15 @@ export async function applyDamage(message, options = {}) {
       const reduction = armorPiercingAll ? 0 : Math.max(0, hit.dr - armorPiercing);
       result =
         type === "fire"
-          ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true })
+          ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true, undo: false })
           : await sufferTypedDamage(target, {
               type,
               amount: damage,
               reduction,
               source: weapon?.name ?? "",
               review: input.reviewType === true,
-              allowed: target.type === "agent" ? undefined : NPC_TYPED
+              allowed: target.type === "agent" ? undefined : NPC_TYPED,
+              undo: false
             });
       if (!result) return null;
     } else if (!isSpecial(target)) {
@@ -819,6 +762,7 @@ export async function applyDamage(message, options = {}) {
       ({ lines, pendingSave, failed } = await nonLethalDamage(target, kind, damage, {
         source,
         attackKind,
+        proficiency,
         armorPiercing,
         armorPiercingAll,
         critical
@@ -845,11 +789,11 @@ export async function applyDamage(message, options = {}) {
     rolls.push(roll);
     lines.push(
       injury.listed
-        ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${injury.surgeryDC}.`
+        ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${surgeryDCNow(injury)}.`
         : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
     );
   }
-  if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
+  if (lines.filter(Boolean).length) await postDamageReport(target, lines, { pendingSave, rolls });
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
   if (failed) return null;
   // When the card cannot be marked the report above is the record.

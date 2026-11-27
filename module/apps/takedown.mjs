@@ -13,6 +13,7 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { withUndo } from "./undo.mjs";
 import { decline } from "../error-notices.mjs";
 const leases = new WeakMap(),
   active = new Map(),
@@ -212,7 +213,14 @@ async function stampOutcome(actor, message, prepared, result = {}) {
   await message.update({ "flags.spycraft2.takedownSettlement": saved.settlement });
   return saved.settlement;
 }
-export async function settleTakedown(actor, message) {
+/** The settlement, with one Undo note for both characters; Undo also clears the card's settled mark. */
+export function settleTakedown(actor, message) {
+  const actors = [actor].filter(Boolean);
+  return withUndo(actors, loc`Takedown save: ${actor.name}`, () => settleTakedownWork(actor, message), {
+    cardMarks: [{ messageId: message?.id, key: "takedownSettlement" }]
+  });
+}
+async function settleTakedownWork(actor, message) {
   if (!actor.isOwner || message?.flags?.spycraft2?.actorUuid !== actor.uuid || (message.blind && !game.user.isGM))
     throw Error(loc`Only an owner or the GC may settle this actual takedown save.`);
   return queueResources(

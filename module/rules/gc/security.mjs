@@ -4,6 +4,7 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignSkillDC } from "../campaign-rules.mjs";
 
 export const SECURITY_DEVICES = GC_DATA.tables.security;
 export const securityDevice = id => SECURITY_DEVICES.find(device => device.id === id) ?? null;
@@ -78,7 +79,9 @@ export function resolveDevice(id, pr) {
   const device = securityDevice(id);
   if (!device) throw new Error(loc`Unknown security device.`);
   const number = key => evaluatePR(device[key], pr);
-  const detectDC = number("detectDC");
+  // The checks against a device take Cakewalk's or Comedy of Errors' DC shift (p.406); its Defense stays as printed.
+  const detectDC = number("detectDC"),
+    skillDC = value => campaignSkillDC(value);
   return {
     id: device.id,
     name: device.name,
@@ -87,11 +90,11 @@ export function resolveDevice(id, pr) {
     powerRating: pr,
     xp: number("xp"),
     xpPrinted: device.xp,
-    detectDC,
-    disableDC: number("disableDC"),
+    detectDC: skillDC(detectDC),
+    disableDC: skillDC(number("disableDC")),
     defense: detectDC, // p.437: when a device may be attacked, its Defense equals its Detect DC
     damageSave: number("damageSave"),
-    openDC: evaluatePR(device.openDC, pr),
+    openDC: skillDC(evaluatePR(device.openDC, pr)),
     openSkill: device.openSkill ?? "",
     breakingOpens: device.breakingOpens ?? null,
     awareness: number("awareness"),

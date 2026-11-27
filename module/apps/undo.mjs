@@ -6,6 +6,7 @@
 import { loc } from "../i18n.mjs";
 import { esc } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { undoHook } from "../documents/undo-hook.mjs";
 
 // An empty record is a value too: without it, a record the step created could not be told from one it filled.
 const leaf = value => value === null || typeof value !== "object" || Array.isArray(value) || !Object.keys(value).length;
@@ -189,7 +190,8 @@ export function restoreUpdate(entry) {
  * @param {object[]} actors
  * @param {string} label           What the step was, as the note will say it
  * @param {() => Promise<any>} work
- * @param {object} [extra]         { gcDice: dice to give back, damageCard: {messageId, targetUuid} }
+ * @param {object} [extra]         { gcDice: dice to give back, damageCard: {messageId, targetUuid},
+ *   cardMarks: [{messageId, key}] marks the step set on a card, cleared so the card's button works again }
  */
 export async function withUndo(actors, label, work, extra = {}) {
   const list = (actors ?? []).filter(actor => actor?.uuid);
@@ -204,15 +206,44 @@ export async function withUndo(actors, label, work, extra = {}) {
   }
   return result;
 }
+// A document step (a mission XP settlement) leaves its Undo note through this.
+undoHook.run = withUndo;
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
-export function postUndo(label, entries, { gcDice = 0, damageCard = null } = {}) {
+export function postUndo(
+  label,
+  entries,
+  {
+    gcDice = 0,
+    damageCard = null,
+    antagonist = null,
+    dcBoost = null,
+    standingPaid = null,
+    cardMarks = null,
+    addedInfractions = null
+  } = {}
+) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
     // The GC sees every note, so a step a player took can be undone by the GC too.
     whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
-    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, done: false } } }
+    flags: {
+      spycraft2: {
+        undo: {
+          label,
+          entries,
+          gcDice,
+          damageCard,
+          antagonist,
+          dcBoost,
+          standingPaid,
+          cardMarks,
+          addedInfractions,
+          done: false
+        }
+      }
+    }
   });
 }
 
@@ -282,6 +313,72 @@ async function undoRecord(message, record) {
     await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>
       ui.notifications.warn(loc`The GC action dice were not given back: ${error.message}`)
     );
+  }
+  // A promotion's antagonist row goes back to what it was; the rest of the mission's list is left alone.
+  // Only within the run of the mission that promoted: a later run keeps its own row as it is.
+  if (record.antagonist?.id && game.user.isGM) {
+    const { getMission, updateMission, missionEpoch } = await import("./gc/state.mjs");
+    const { id, entry: was, period } = record.antagonist,
+      mine = entry => entry.id === id;
+    if (period !== undefined && period !== missionEpoch())
+      ui.notifications.warn(
+        loc`The NPC was put back, but a later mission has begun, so its antagonist row was left as it is.`
+      );
+    else if ((getMission().antagonists ?? []).some(mine))
+      await updateMission(now => ({
+        antagonists: was
+          ? now.antagonists.map(entry => (mine(entry) ? was : entry))
+          : now.antagonists.filter(entry => !mine(entry))
+      })).catch(error => ui.notifications.warn(loc`The antagonist list was not put back: ${error.message}`));
+  }
+  // A standing payout's paid marks go back to what they were, so those agents can be paid again.
+  // Only within the mission that paid: once a later mission has begun, its own marks are left as they are.
+  const standing = record.standingPaid;
+  if (standing?.marks && Object.keys(standing.marks).length && game.user.isGM) {
+    const { updateMission, missionEpoch } = await import("./gc/state.mjs");
+    if (standing.period !== missionEpoch())
+      ui.notifications.warn(
+        loc`The standing was given back, but a later mission has begun, so its paid marks were left as they are.`
+      );
+    else
+      await updateMission(now => {
+        const paid = { ...(now.standingPaid ?? {}) };
+        for (const [id, was] of Object.entries(standing.marks)) {
+          if (was) paid[id] = was;
+          else delete paid[id];
+        }
+        return { standingPaid: paid };
+      }).catch(error => ui.notifications.warn(loc`The standing paid marks were not put back: ${error.message}`));
+  }
+  // Exposure rows the step added come off the mission record, within the mission that added them; rows added
+  // before or since are kept.
+  const added = record.addedInfractions;
+  if (added?.ids?.length && game.user.isGM) {
+    const { updateMission, missionEpoch } = await import("./gc/state.mjs");
+    if (added.period === missionEpoch())
+      await updateMission(now => ({
+        infractions: (now.infractions ?? []).filter(entry => !added.ids.includes(entry?.id))
+      })).catch(error => ui.notifications.warn(loc`The exposure rows were not taken off: ${error.message}`));
+  }
+  // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
+  if (record.dcBoost?.key && game.user.isGM) {
+    const { getSceneState, setSceneState } = await import("./gc/state.mjs");
+    const scene = getSceneState(),
+      counted = scene.dcBoostsByCheck?.[record.dcBoost.key];
+    if (scene.scene === record.dcBoost.scene && counted?.count > 0)
+      await setSceneState({
+        dcBoostsByCheck: { ...scene.dcBoostsByCheck, [record.dcBoost.key]: { ...counted, count: counted.count - 1 } }
+      }).catch(error => ui.notifications.warn(loc`The DC boost count was not put back: ${error.message}`));
+  }
+  // A step that marked a card done (First Aid applied, a grapple settled) can be taken on that card again.
+  for (const mark of record.cardMarks ?? []) {
+    const marked = mark?.messageId && mark.key ? game.messages?.get(mark.messageId) : null;
+    if (!marked || !(marked.isAuthor || game.user.isGM)) continue;
+    const keys = String(mark.key).split("."),
+      last = keys.pop(),
+      holder = keys.reduce((value, key) => value?.[key], marked.flags?.spycraft2);
+    if (holder?.[last] !== undefined)
+      await marked.update({ [`flags.spycraft2.${[...keys, `-=${last}`].join(".")}`]: null }).catch(() => null);
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;

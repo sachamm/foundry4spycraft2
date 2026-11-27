@@ -149,6 +149,7 @@
    "DamageSave": "Damage save…",
    "CardNextStep": "Next step on the newest card",
    "CardNextStepHint": "Presses the main button of the newest chat card, such as Roll damage or Apply",
+   "ActingOutcomes": "Combat outcomes",
    "Unrolled": "Combatants with no Initiative Count yet: {count}.",
    "EndMissionHint": "Asks first. The record is kept for the XP report, XP settlement and standing",
    "ResumeMission": "Resume mission",
@@ -277,6 +278,7 @@
    "ShowFuture": "Show future gear",
    "NotYet": "Not yet",
    "NotYetHint": "This came out after the game clock's year. The GC decides whether it can be had.",
+   "GadgetHint": "Historical: this came out after the game clock's year, so it can only be had as a gadget Housing or effect, one Caliber higher (p.407).",
    "CaliberFilter": "Filter by Caliber",
    "AnyCaliber": "Any Caliber",
    "RestrictedFilter": "Filter restricted items",
@@ -297,7 +299,6 @@
   "Roll": {
    "Threat": "Threat!",
    "Error": "Error!",
-   "Capped": "Result capped at {cap}.",
    "Range": "(error {error}, threat {threat})"
   },
   "ActionDice": {
@@ -602,7 +603,9 @@
     "FreeWeaponActionTwiceRound": "Free weapon action (twice/round)",
     "FreeNonAttackHalfAction": "Free non-attack half action",
     "GCSettleSeductionVictory": "GC: settle seduction victory",
-    "ObserveThreeSkillsFreeAction": "Observe three skills (free action)"
+    "ObserveThreeSkillsFreeAction": "Observe three skills (free action)",
+    "FeatsBoughtWithXP": "Feats bought with XP under Feat Purchase: {count}.",
+    "ModularFeats": "Modular: feats bought with attribute points (2 each), or a negative number for feats given up for 2 points each"
    },
    "ActorAgentGear": {
     "BrowseWeapons": "Browse weapons",
@@ -727,7 +730,9 @@
     "ReviewInvalidWellFundedCashGrant": "Review invalid Well-Funded cash grant records.",
     "ToolShedFindAGradeIII": "Tool Shed: find a Grade III kit",
     "GCReviewToolShedUses": "GC review Tool Shed uses",
-    "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)"
+    "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)",
+    "GearRestrictionPicks": "Gear Restriction: {count} mission gear pick(s) lost this mission (p.437)",
+    "GearRestrictionGCChooses": "The GC chooses which picks this mission's Gear Restriction takes."
    },
    "ActorAgentHeader": {
     "DoneEditingReturnToPlay": "Done editing · Return to play",
@@ -803,6 +808,10 @@
     "Included": "included)",
     "UntilOwnCountInRound": "until own Count in round",
     "CurrentConditions": "Current conditions",
+    "Burned": "Burned",
+    "BurnedHint": "Negative standing (p.440): no mission gear, Requests or Gear checks, only personal Possessions, until standing is back above 0.",
+    "Liquidation": "Targeted for liquidation",
+    "LiquidationHint": "Standing below −20 or −$1,000,000 (p.440): burned, and the GC rolls for a Marked for Death event at each mission's start.",
     "CombatTools": "Combat tools",
     "AttacksReactions": "Attacks & reactions",
     "DisarmTricksAndFinalAttacks": "Disarm, tricks and final attacks",
@@ -920,6 +929,12 @@
     "RollCriticalInjuryTableOfOuch": "Roll critical injury (Table of Ouch)",
     "Injury": "Injury",
     "ReviewShowOriginalResult": "Review / show original result",
+    "InjurySurgery": "Surgery succeeded",
+    "InjurySurgeryHint": "A Surgery check made this injury's DC: its healing time drops by 2 (p.142)",
+    "InjuryHealed": "Mark healed",
+    "InjuryHealedHint": "The healing time has run out, by time or by Surgery",
+    "InjuryHealedState": "Healed",
+    "InjuryShowRoll": "Show the roll",
     "AdrenalineJunkieRecordFinalWoundLoss": "Adrenaline Junkie: record final wound-loss event",
     "BonusDiceAvailableUntil": "bonus dice available until",
     "ActionDie2DefenseThroughRound": "Action die: +2 Defense through round",
@@ -1176,7 +1191,12 @@
     "NetworkingMilestone": "Networking milestone",
     "ContactFeat": "Contact feat",
     "MatchingTheme": "Matching theme",
-    "GCConfirmsThisNewContactWas": "GC confirms this new contact was gained through Networking after taking the feat and has its matching theme"
+    "GCConfirmsThisNewContactWas": "GC confirms this new contact was gained through Networking after taking the feat and has its matching theme",
+    "ContactPeople": "Consultants and specialists",
+    "ContactPeopleHint": "Introduce the consultants and specialists this contact knows: one per grade (p.458).",
+    "CalledThisMission": "called this mission",
+    "Summon": "Summon",
+    "SummonHint": "After a successful Contact check: this person helps once this mission (p.459)."
    },
    "ActorNpcBuilder": {
     "NPCCreation": "NPC creation",
@@ -1247,7 +1267,8 @@
     "Page": "Page",
     "TierITL4IITL": "Tier I: TL−4 · II: TL−2 · III: TL · IV: TL+2 · V: TL+4. Clamp effective TL to 1–20; Tier III is the default. Tiers do not add an invented grade or XP surcharge.",
     "ManualModePreservesExistingNPCStat": "Manual mode preserves existing NPC stat blocks. Enable graded creation to resolve the core tables and calculate XP.",
-    "Skills": "Skills"
+    "Skills": "Skills",
+    "Organization": "Organization (its Tools cap this NPC's gear Calibers)"
    },
    "ActorNpcSheet": {
     "QualitiesInPlay": "Qualities in play",
@@ -1426,8 +1447,6 @@
     "Remove": "Remove",
     "NoneYet": "Nothing recorded yet. Use the buttons above to add the first one.",
     "Antagonists": "Antagonists",
-    "FullSpecial300XP": "full special, 300 XP ×",
-    "SceneS": "scene(s)",
     "XP2": "XP",
     "NotFaced": "Mark not faced",
     "FacedAsAThreat": "Mark faced",
@@ -1448,7 +1467,6 @@
     "Of": "of",
     "Scripted": "scripted",
     "PerScenePlayed": "per scene played (",
-    "CountAScenePlayed": "Count a scene played",
     "XPReport": "XP report",
     "PlannedXP": "Planned XP",
     "RecordExposureInfraction": "Record exposure infraction",
@@ -1494,14 +1512,31 @@
     "SeasonQualities": "Season qualities",
     "XP3": "XP) —",
     "NoSeasonLongQualities": "No season-long qualities. Use Season qualities above to choose them.",
-    "CombinedNumericEffects": "Combined numeric effects:",
     "IsSetDifferentlyBy": "is set differently by",
     "GCRulingNeeded": ": GC ruling needed.",
     "Reference": "Reference",
     "SecurityDevice": "Security device",
     "HazardsNatureSFury": "Hazards / nature's fury",
     "Events": "Events",
-    "RandomPossessions": "Random possessions"
+    "RandomPossessions": "Random possessions",
+    "RulesInForce": "Rules the qualities in force change:",
+    "Organizations": "Organizations",
+    "AddOrganization": "Add organization",
+    "AddOrganizationHint": "Record the Agency or a rival with its five Power Ratings (pp.389–395).",
+    "TheAgency": "the Agency",
+    "RatingsTotal": "Ratings total",
+    "OrganizationCardHint": "Whisper its Ratings, goals, turning points, Image and Sites to the GC.",
+    "PostSummary": "Post summary",
+    "RemoveOrganizationHint": "Delete this organization from the world.",
+    "NoOrganizations": "No organizations. Use Add organization above to record the Agency and its rivals.",
+    "Edit": "Edit",
+    "NpcKnowledge": "What an NPC knows",
+    "PromotedPerScene": "Promoted for this mission, so 300 XP for each of its {scenes} scene(s).",
+    "FullPerScene": "A full special NPC, so 300 XP for each of its {scenes} scene(s).",
+    "AddAScene": "Add a scene",
+    "RemoveAScene": "Remove a scene",
+    "CorrectTheSceneCount": "Correct the scene count",
+    "SpecialXPTimes": "{xp} × {times} = {total} XP (a special antagonist counts 4 times, p.452)"
    },
    "ItemItemArmor": {
     "DRMeleeUnarmedAndNonGrenade": "DR: melee, unarmed and non-grenade hurled attacks / all other attacks. Helmets with a Vision penalty apply it to Vision checks, not Reflex saves.",

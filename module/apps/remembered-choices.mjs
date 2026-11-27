@@ -12,6 +12,8 @@
 import { readSetting } from "../settings.mjs";
 import { loc, locKey } from "../i18n.mjs";
 import { measureAttack, mapAvailable } from "./map.mjs";
+import { cqbRangedWeapon } from "../rules/cqb.mjs";
+import { reachIncreaseFeet } from "../rules/reach.mjs";
 
 const memory = new Map();
 
@@ -123,7 +125,12 @@ export function quickAttackOptions(actor, item) {
     entered.targetActorUuid = targeted[0].actor.uuid;
   if (mapAvailable())
     try {
-      const measured = measureAttack(actor);
+      // A melee weapon flanks only from within its Reach (p.341).
+      const melee = item?.system && !cqbRangedWeapon(item.system);
+      const measured = measureAttack(actor, {
+        melee: !!melee,
+        reachFeet: 5 + (reachIncreaseFeet(item?.system?.qualities ?? "") || 0)
+      });
       if (measured) {
         entered.distanceFeet = measured.distanceFeet;
         entered.targetFlanked = measured.flanked;

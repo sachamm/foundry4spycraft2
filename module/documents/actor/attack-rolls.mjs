@@ -1,6 +1,7 @@
 /** Attacks and damage. */
-import { targetRoleCriticalRules, threatAgainstRole } from "../../rules/npc-qualities.mjs";
+import { targetRoleCriticalRules, threatAgainstRole, targetRoleNote } from "../../rules/npc-qualities.mjs";
 import { refuse } from "../../error-notices.mjs";
+import { laserWeapon } from "../../rules/damage-types.mjs";
 import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { enhanceAttackDialog } from "../../apps/attack-dialog-ux.mjs";
@@ -22,7 +23,7 @@ import {
   observedAttackTargetChoices
 } from "../../apps/character-target.mjs";
 import { validateFinalRoundReservation } from "../../rules/final-round.mjs";
-import { cqbRangePlan, recordedAttackDistance } from "../../rules/cqb.mjs";
+import { cqbRangePlan, cqbRangedWeapon, recordedAttackDistance } from "../../rules/cqb.mjs";
 import { damageTargetChoices, resolveDamageTarget, sneakAttackTargetSnapshot } from "../../apps/damage-target.mjs";
 import { unnervingGrade, unnervingEligible, unnervingPlan } from "../../rules/unnerving.mjs";
 import { hasSneakAttackSource, sneakAttackDamagePlan } from "../../rules/sneak-attack.mjs";
@@ -42,9 +43,22 @@ import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/st
 import { kickDamageWeapon, unarmedWeapon } from "../../rules/kick.mjs";
 import { inClosedStance } from "../../rules/boxing.mjs";
 import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
-import { spendWeaponShots, weaponAmmunition } from "../../apps/ammunition-use.mjs";
+import { spendWeaponShots, weaponAmmunition, weaponShotsLeft } from "../../apps/ammunition-use.mjs";
 import { loc } from "../../i18n.mjs";
 import { breakdownRows, weaponAttackBreakdown } from "../../rules/bonus-breakdown.mjs";
+
+/** Tell the GC alone what the target's villain role does to this attack. */
+async function whisperTargetRole(role, threat) {
+  try {
+    await ChatMessage.create({
+      speaker: { alias: loc`Game Control` },
+      whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id),
+      content: `<p>${foundry.utils.escapeHTML(targetRoleNote(role, threat))}</p>`
+    });
+  } catch {
+    /* the note is a courtesy; the attack card already carries the rules */
+  }
+}
 
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
@@ -124,7 +138,10 @@ export const ActorAttackRolls = Base =>
           ok: { label: loc`Roll attack` },
           render: (event, dialog) => {
             restoreChoices(choiceKey("attack", this, item.id), dialog?.element ?? event?.target);
-            measureInto(this)(event, dialog);
+            measureInto(this, {
+              melee: !cqbRangedWeapon(item.system),
+              reachFeet: 5 + (reachIncreaseFeet(item.system.qualities ?? "") || 0)
+            })(event, dialog);
             enhanceAttackDialog(event, dialog);
           },
           content: rollPipeline.dialog({
@@ -176,8 +193,9 @@ export const ActorAttackRolls = Base =>
       const feintContext = () => ({ ...options, feintBonusProof, sideStanceProof });
       const w = item.system;
       // Shots are counted: a fire action is limited by what the weapon holds, and the attack spends its shots.
-      const ammunition = weaponAmmunition(item);
-      if (ammunition) options = { ...options, shotsRemaining: ammunition.loaded };
+      const ammunition = weaponAmmunition(item),
+        shotsLeft = weaponShotsLeft(item);
+      if (shotsLeft !== null) options = { ...options, shotsRemaining: shotsLeft };
       const atk = this.weaponAttack(item, feintContext());
       feintBonusProof = atk.feintBonus.attackBonus
         ? { ...atk.feintBonus, attemptId: foundry.utils.randomID() }
@@ -346,7 +364,7 @@ export const ActorAttackRolls = Base =>
             { label: loc`Situational modifier`, value: situational }
           ]),
           featReminders: options.featReminders,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}${threatAgainstRole(atk.threat, targetRole) > 20 ? loc` This attack cannot threaten.` : ""}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,
@@ -356,6 +374,8 @@ export const ActorAttackRolls = Base =>
           validateFinalAttack: options.validateFinalAttack,
           validateAttackContext,
           threat: threatAgainstRole(atk.threat, targetRole),
+          // A forward observer's relay is a hard ceiling, not a skill result cap (p.300).
+          resultCeiling: atk.cap ?? null,
           error: cunning?.error ?? atk.error,
           cunningPlan: cunning ?? !!options.cunningPlan,
           chooseTwice: millionDollar,
@@ -372,6 +392,7 @@ export const ActorAttackRolls = Base =>
           cleanAndPolished: cleanAndPolishedApplies(this.system, w),
           gearUuid: item.uuid,
           attackContext: {
+            laser: laserWeapon(w),
             reach: atk.reach,
             reachAdjacent: options.reachAdjacent ?? null,
             reachGeometryConfirmed: options.reachGeometryConfirmed === true,
@@ -403,6 +424,8 @@ export const ActorAttackRolls = Base =>
             combatStance: combatStanceProof(this.system, { ranged: atk.ranged }),
             targetActorUuid: declaredTargetUuid,
             targetRole,
+            // The threat number before any villain role, so Resolve can re-read the role of the actual target.
+            baseThreat: atk.threat,
             missTrickSources: atk.missTrickSources,
             cheapShot: atk.cheapShot?.active ? atk.cheapShot : null,
             quirky,
@@ -466,6 +489,8 @@ export const ActorAttackRolls = Base =>
           improvised: !!item.system.improvised
         }
       );
+      // A villain role is the GC's knowledge: the note goes to the GC alone (pp.447–448).
+      if (message && targetRole) await whisperTargetRole(targetRole, atk.threat);
       if (message && shotsFired) await spendWeaponShots(item, shotsFired);
       return message;
     }
@@ -506,8 +531,8 @@ export const ActorAttackRolls = Base =>
         if (!input) return null;
       }
       input = rollPipeline.read({ dialog: "rangedAttack", actor: this, item }, input);
-      const ammunition = weaponAmmunition(item);
-      if (ammunition) input = { ...input, shotsRemaining: ammunition.loaded };
+      const shotsLeft = weaponShotsLeft(item);
+      if (shotsLeft !== null) input = { ...input, shotsRemaining: shotsLeft };
       // Cover Fire and Suppressive Fire take the action without an attack check.
       if (input.fireAction === "coverFire") return coverFire(this, item, input);
       if (input.fireAction === "suppressiveFire") return suppressiveFire(this, item, input);
@@ -840,7 +865,7 @@ export const ActorAttackRolls = Base =>
         finesseDamage,
         validateAttackContext: validateFinesseDamage,
         weaponQualities: damage.effectiveQualities,
-        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${options.kickTrick === "powerKick" ? loc` — Power Kick: armor-piercing (2), takedown` : ""}${options.doubleJab === true ? loc` — Double Jab: 2 fewer damage per die (minimum 1)` : ""}${options.brush === true ? loc` — Brush: 1d6 subdual; the target’s Initiative Count drops by this amount` : ""}${sneakHalved ? loc` — Dirty Fighting Basics: the target takes half the sneak attack damage, rounded up` : ""}${options.hordeSupremacy === true ? loc` — Horde Supremacy: +2 morale damage` : ""}${options.closedStanceTarget === true ? loc` — Closed Stance: +2 against the opponent in my square` : ""}${options.kickTrick === "guillotine" ? loc` — Guillotine Kick: the target makes a Fortitude save (DC 10 + this damage) or is sent reeling` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
+        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.laser?.note ? `<br><small>${foundry.utils.escapeHTML(damage.laser.note)}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${options.kickTrick === "powerKick" ? loc` — Power Kick: armor-piercing (2), takedown` : ""}${options.doubleJab === true ? loc` — Double Jab: 2 fewer damage per die (minimum 1)` : ""}${options.brush === true ? loc` — Brush: 1d6 subdual; the target’s Initiative Count drops by this amount` : ""}${sneakHalved ? loc` — Dirty Fighting Basics: the target takes half the sneak attack damage, rounded up` : ""}${options.hordeSupremacy === true ? loc` — Horde Supremacy: +2 morale damage` : ""}${options.closedStanceTarget === true ? loc` — Closed Stance: +2 against the opponent in my square` : ""}${options.kickTrick === "guillotine" ? loc` — Guillotine Kick: the target makes a Fortitude save (DC 10 + this damage) or is sent reeling` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
         validateCQBRange,
         cqbRange: damage.cqbRange?.active ? damage.cqbRange : null,
         mortarOperation: damage.mortarOperation?.applicable ? damage.mortarOperation : null,

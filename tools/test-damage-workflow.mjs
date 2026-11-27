@@ -64,7 +64,10 @@ const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
 const { settleGrapple } = await import("../module/apps/combat-actions.mjs");
 const { restAndRecover } = await import("../module/apps/healing.mjs");
-const { reloadWeapon, spendWeaponShots, weaponAmmunition } = await import("../module/apps/ammunition-use.mjs");
+const { reloadWeapon, spendWeaponShots, weaponAmmunition, weaponShotsLeft } =
+  await import("../module/apps/ammunition-use.mjs");
+const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+const { fireActionContent } = await import("../module/apps/combat-actions.mjs");
 const { compareOpposed, recentResults } = await import("../module/apps/opposed-checks.mjs");
 
 const set = (object, path, value) => {
@@ -259,6 +262,26 @@ test("attacks spend counted shots and Reload draws on the reserve", async () => 
   assert.equal(weaponAmmunition(pistol), null);
   game.settings.get = () => true;
   assert.equal(weaponAmmunition(document({ type: "weapon", parent: owner, system: { ammo: "—" } })), null);
+});
+
+test("Bottomless Clip gives fire actions a full load and spends no shots", async () => {
+  reset();
+  const owner = character("Kevin", {});
+  const rifle = document({ type: "weapon", name: "Rifle", isOwner: true, parent: owner, system: { ammo: "30M2" } });
+  setCampaignRulesSource(() => ({ bottomlessClip: true }));
+  try {
+    assert.equal(weaponAmmunition(rifle), null);
+    assert.equal(weaponShotsLeft(rifle), 30);
+    assert.equal(await spendWeaponShots(rifle, 9), null);
+    assert.equal(rifle.system.shotsLoaded, undefined, "no shots are taken");
+    const html = fireActionContent({ firearm: true, modes: ["auto"] }, rifle, owner);
+    assert.match(html, /name="shotsRemaining"[^>]*value="30" readonly/);
+    assert.match(html, /Bottomless Clip/);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+  assert.equal(weaponShotsLeft(rifle), 30, "a counted weapon reports what it holds");
+  assert.equal(weaponShotsLeft(document({ type: "weapon", parent: owner, system: { ammo: "—" } })), null);
 });
 
 test("an opposed check is compared with the other side's posted result and both are confirmed", async () => {
@@ -489,7 +512,7 @@ test("a special damage type is handed to an agent's own rules, with the dialog o
 test("grapple benefits the winner takes change conditions on both sides", async () => {
   reset();
   const kevin = character("Grappler", { activeFeatNames: [] });
-  const foe = character("Foe", {});
+  const foe = character("Foe", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 } });
   const remove = who => async () => who.statuses.clear();
   foe.deleteEmbeddedDocuments = remove(foe);
   await settleGrapple(kevin, { opening: true, total: 20, opponentTotal: 12, opponentUuid: foe.uuid, benefits: [] });
@@ -511,7 +534,26 @@ test("grapple benefits the winner takes change conditions on both sides", async 
     benefits: ["sprawl"]
   });
   assert.deepEqual([foe.statuses.has("sprawled"), kevin.statuses.has("prone")], [true, true]);
-  assert.match(posted.at(-1).content, /1d4 \+ Strength subdual/);
+  assert.match(posted.at(-1).content, /1d4 = \d+ subdual damage/);
+  const before = foe.system.vitality.value;
+  kevin.system.proficiencyTotals = { unarmed: { proficient: true } };
+  await settleGrapple(kevin, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: foe.uuid,
+    benefits: ["injure"]
+  });
+  assert.match(posted.at(-1).content, /Injure[^:]*: 1d4 = \d+ lethal damage/);
+  assert.ok(foe.system.vitality.value < before, "Injure's damage is applied to the loser");
+  const { grappleBenefitDamage } = await import("../module/rules/grapple-check.mjs");
+  const str = { abilities: { str: { mod: 2 } } };
+  assert.deepEqual(grappleBenefitDamage(str, "injure"), { formula: "1d3 + 2", kind: "subdual", minimum: 1 });
+  assert.deepEqual(grappleBenefitDamage(str, "throw", { proficient: true }), {
+    formula: "1d4 + 4",
+    kind: "lethal",
+    minimum: 1
+  });
 });
 
 test("rest wears off a special NPC's stress and subdual damage", async () => {
@@ -765,4 +807,271 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
     ouch: { targetUuid: mine.uuid, name: "Latch", damage: 6, kind: "lethal", ouch: true, net: 6 }
   };
   assert.deepEqual(ids(damage), ["ouchInjury"]);
+});
+
+test("rest, a dying roll, Stabilize, a hazard save's result and a grapple each leave an Undo note (U1)", async () => {
+  reset();
+  undoNotes.length = 0;
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  const { applyStabilize, rollDying } = await import("../module/apps/healing.mjs");
+  const { resolveHazardSave } = await import("../module/apps/hazards.mjs");
+  const cards = new Map();
+  const keptMessages = game.messages;
+  game.messages = Object.assign([], { get: id => cards.get(id) });
+  const noteOf = data => document({ id: `n${undoNotes.length}`, flags: structuredClone(data.flags) });
+
+  const rester = character("Sleeper", {
+    vitality: { value: 4, max: 30 },
+    wounds: { value: 10, max: 12 },
+    abilities: { con: { value: 12 }, wis: { value: 10 } },
+    effectiveThreatLevel: 3,
+    npcType: "special"
+  });
+  rester.type = "npc";
+  await restAndRecover(rester, { hours: 2, days: 0 });
+  assert.ok(rester.system.vitality.value > 4);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Rest: Sleeper");
+  await applyUndo(noteOf(undoNotes.at(-1)));
+  assert.equal(rester.system.vitality.value, 4, "Undo puts the vitality back");
+
+  const dying = character("Faller", {
+    vitality: { value: 0, max: 30 },
+    wounds: { value: -3, max: 12 },
+    deathThreshold: -10,
+    abilities: { con: { value: 12 } }
+  });
+  await rollDying(dying);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Dying roll: Faller");
+
+  const medic = card("st1", { actorUuid: "Actor.Medic", checkKind: "skill", successConfirmed: true });
+  cards.set(medic.id, medic);
+  dying.system.wounds.value = -4;
+  await applyStabilize(medic, { patient: dying });
+  assert.equal(dying.system.wounds.value, 0);
+  assert.ok(medic.flags.spycraft2.stabilized);
+  const stabilize = undoNotes.at(-1);
+  assert.deepEqual(stabilize.flags.spycraft2.undo.cardMarks, [{ messageId: "st1", key: "stabilized" }]);
+  await applyUndo(noteOf(stabilize));
+  assert.equal(dying.system.wounds.value, -4);
+  assert.equal(medic.flags.spycraft2.stabilized, undefined, "the card can be used again");
+
+  // A failed Coup de Grace save, applied from its card: the wounds and the card's mark both go back.
+  const victim = character("Victim", { vitality: { value: 0, max: 30 }, wounds: { value: 5, max: 12 } });
+  const save = card("cg1", {
+    actorUuid: victim.uuid,
+    checkKind: "save",
+    effectiveTotal: 3,
+    successConfirmed: false,
+    hazardSave: { kind: "coupDeGrace", label: "Coup de Grace", dc: 10 }
+  });
+  cards.set(save.id, save);
+  await resolveHazardSave(victim, save);
+  assert.equal(victim.system.wounds.value, -10);
+  assert.equal(save.flags.spycraft2.hazardSave.resolved, true);
+  await applyUndo(noteOf(undoNotes.at(-1)));
+  assert.equal(victim.system.wounds.value, 5);
+  assert.equal(save.flags.spycraft2.hazardSave.resolved, undefined);
+
+  // A grapple: both wrestlers' conditions are on one note.
+  const tracked = name => {
+    const who = character(name, {});
+    who.createEmbeddedDocuments = async (kind, rows) => {
+      for (const row of rows) {
+        for (const status of row.statuses) who.statuses.add(status);
+        const id = `${name}-${who.effects.length}`;
+        who.effects.push({ id, ...row, toObject: () => ({ _id: id, ...row }) });
+      }
+      return rows;
+    };
+    return who;
+  };
+  CONFIG.statusEffects.push({ id: "vulnerable", name: "vulnerable", img: "" });
+  const grappler = tracked("Holder"),
+    held = tracked("Held");
+  await settleGrapple(grappler, { opening: true, total: 20, opponentTotal: 12, opponentUuid: held.uuid, benefits: [] });
+  const grapple = undoNotes.at(-1).flags.spycraft2.undo;
+  assert.equal(grapple.label, "Grapple: Holder");
+  assert.deepEqual(grapple.entries.map(entry => entry.name).sort(), ["Held", "Holder"]);
+  game.messages = keptMessages;
+});
+
+test("a grapple is settled from the two check cards, with the Size bonus read once from inside the total (U7)", async () => {
+  reset();
+  const keptMessages = game.messages;
+  const big = character("Big", { activeFeatNames: [] }),
+    small = character("Small", {});
+  // Big is a category larger: its card's 21 already holds the +4 (p.357).
+  const mine = card("g1", {
+      actorUuid: big.uuid,
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "grapple",
+      rawTotal: 21,
+      effectiveTotal: 21,
+      grappleFeats: { version: 1, sizeDifference: -1, checkId: "grapple" }
+    }),
+    theirs = card("g2", {
+      actorUuid: small.uuid,
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "grapple",
+      rawTotal: 19,
+      effectiveTotal: 19,
+      criticalSuccess: true
+    });
+  mine.speaker = { alias: "Big" };
+  theirs.speaker = { alias: "Small" };
+  game.messages = [mine, theirs];
+  const { grappleInputFromCards } = await import("../module/apps/combat-actions.mjs");
+  const { recentResults } = await import("../module/apps/opposed-checks.mjs");
+  const filled = grappleInputFromCards({ cardUuid: mine.uuid, opponentCardUuid: theirs.uuid }, recentResults());
+  assert.deepEqual(
+    [filled.total, filled.opponentTotal, filled.opponentCritical, filled.opponentUuid, filled.cardSizeBonus],
+    [21, 19, true, small.uuid, 4]
+  );
+  const outcome = await settleGrapple(big, {
+    cardUuid: mine.uuid,
+    opponentCardUuid: theirs.uuid,
+    opening: false,
+    benefits: []
+  });
+  assert.equal(outcome.winner, "actor", "21 against 19: the Size bonus is not counted twice");
+  assert.match(posted.find(data => /Grapple: 21 against 19/.test(data.content)).content, /includes \+4/);
+  // A side with no card is typed.
+  const typed = grappleInputFromCards({ cardUuid: "", opponentCardUuid: theirs.uuid, total: "15" }, recentResults());
+  assert.deepEqual([typed.total, typed.opponentTotal, typed.critical], [15, 19, false]);
+  // A Climb card is not a Grapple check: it is not taken as the character's own result.
+  const climb = card("g3", {
+    actorUuid: big.uuid,
+    checkKind: "skill",
+    skillKey: "athletics",
+    checkId: "climb",
+    rawTotal: 30,
+    effectiveTotal: 30
+  });
+  climb.speaker = { alias: "Big" };
+  game.messages = [mine, theirs, climb];
+  const wrong = grappleInputFromCards(
+    { cardUuid: climb.uuid, opponentCardUuid: theirs.uuid, total: "" },
+    recentResults()
+  );
+  assert.ok(Number.isNaN(wrong.total));
+  game.messages = keptMessages;
+});
+
+test("round-3 council: an NPC's grapple damage follows its profile, a special loser's save gets a button, the relay checks its input", async () => {
+  reset();
+  undoNotes.length = 0;
+  const { askGC } = await import("../module/apps/gc-relay.mjs");
+  const injure = (winner, loser) =>
+    settleGrapple(winner, {
+      opening: false,
+      total: 22,
+      opponentTotal: 12,
+      opponentUuid: loser.uuid,
+      benefits: ["injure"]
+    });
+  const npc = (name, npcType, qualities = [], enabled = true) => {
+    const who = character(name, { npcType, npcProfile: { enabled, qualities }, activeFeatNames: [] });
+    who.type = "npc";
+    return who;
+  };
+  const victim = character("Victim", { vitality: { value: 30, max: 30 }, wounds: { value: 12, max: 12 } });
+  victim.deleteEmbeddedDocuments = async () => victim.statuses.clear();
+  await injure(npc("Clerk", "standard", [{ id: "non-combatant" }]), victim);
+  assert.match(posted.at(-1).content, /1d3 = \d+ subdual damage/, "a Non-Combatant has no Unarmed proficiency");
+  await injure(npc("Dog", "animal"), victim);
+  assert.match(posted.at(-1).content, /1d3 = \d+ subdual damage/, "an animal with no natural attack");
+  await injure(npc("Wolf", "animal", [{ id: "natural-attack" }]), victim);
+  assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/);
+  await injure(npc("Hound", "animal", [{ id: "non-combatant" }], false), victim);
+  assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/, "a profile that is off has no qualities");
+  await injure(npc("Thug", "standard"), victim);
+  assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/);
+
+  // A Throw big enough for a massive damage save on a special NPC posts the save as a card with its button.
+  const brute = character("Brute", {
+    abilities: { str: { mod: 20 } },
+    proficiencyTotals: { unarmed: { proficient: true } }
+  });
+  const boss = npc("Boss", "special");
+  Object.assign(boss.system, {
+    vitality: { value: 60, max: 60 },
+    wounds: { value: 10, max: 10 },
+    abilities: { con: { value: 10, mod: 0 } }
+  });
+  await settleGrapple(brute, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: boss.uuid,
+    benefits: ["throw"]
+  });
+  const saveCard = posted.find(data => data.flags?.spycraft2?.pendingSave);
+  assert.ok(saveCard, "the save card is posted");
+  assert.equal(saveCard.flags.spycraft2.pendingSave.kind, "massiveDamage");
+  assert.equal(saveCard.flags.spycraft2.actorUuid, boss.uuid);
+
+  // The GC's relay applies the damage under its own Undo note, and refuses what it cannot apply.
+  const guard = npc("Guard", "special");
+  Object.assign(guard.system, { vitality: { value: 20, max: 20 }, wounds: { value: 10, max: 10 } });
+  await askGC("grappleDamage", { actorUuid: guard.uuid, amount: 4, kind: "lethal", name: "Injure" });
+  assert.equal(guard.system.vitality.value, 16);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Grapple damage: Guard");
+  await assert.rejects(
+    askGC("grappleDamage", { actorUuid: guard.uuid, amount: 0, kind: "lethal" }),
+    /cannot be applied/
+  );
+  await assert.rejects(askGC("grappleDamage", { actorUuid: guard.uuid, amount: 3, kind: "acid" }), /cannot be applied/);
+  await assert.rejects(
+    askGC("grappleDamage", { actorUuid: "Actor.nobody", amount: 3, kind: "lethal" }),
+    /cannot be applied/
+  );
+});
+
+test("round-3 council: a player's grapple Undo note leaves out an opponent the player does not own", async () => {
+  reset();
+  undoNotes.length = 0;
+  const holder = character("Owner", {}),
+    other = character("Unowned", {});
+  other.isOwner = false;
+  const user = game.user,
+    users = game.users;
+  game.user = { ...user, id: "player", isGM: false };
+  game.users = { activeGM: { query: async () => ({ value: true }) }, get: () => null };
+  try {
+    await settleGrapple(holder, {
+      opening: true,
+      total: 20,
+      opponentTotal: 12,
+      opponentUuid: other.uuid,
+      benefits: []
+    });
+  } finally {
+    game.user = user;
+    game.users = users;
+  }
+  const note = undoNotes.at(-1)?.flags.spycraft2.undo;
+  assert.ok(!note || !note.entries.some(entry => entry.name === "Unowned"));
+});
+
+test("the grapple's Undo note does not take in changes made while the benefit dialog is open (Codex)", async () => {
+  reset();
+  undoNotes.length = 0;
+  const winner = character("Picker", { vitality: { value: 10, max: 10 } }),
+    loser = character("Picked", {});
+  const dialogs = foundry.applications.api.DialogV2,
+    input = dialogs.input;
+  dialogs.input = async () => {
+    winner.system.vitality.value = 5;
+    return null;
+  };
+  try {
+    await settleGrapple(winner, { opening: false, total: 22, opponentTotal: 12, opponentUuid: loser.uuid });
+  } finally {
+    dialogs.input = input;
+  }
+  assert.equal(winner.system.vitality.value, 5);
+  const note = undoNotes.at(-1)?.flags.spycraft2.undo;
+  assert.ok(!note || !JSON.stringify(note.entries).includes('"vitality"'), "the vitality loss is not on the note");
 });

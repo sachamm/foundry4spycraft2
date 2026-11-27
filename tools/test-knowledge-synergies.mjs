@@ -413,3 +413,18 @@ test("RAW pp.198–199: the complete fifteen-feat Basic Skill mapping grants +2 
     }
   }
 });
+
+test("Omni-Competent (p.408) makes a Knowledge check active, with action dice, and no Photographic Memory needed", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const system = { knowledge: 0, skillTotals: { analysis: skill(10) } };
+  setCampaignRulesSource(() => ({ allChecksActive: true }));
+  try {
+    const result = resolveKnowledgeCheck(system, { skill: "analysis" });
+    assert.equal(result.blocked, false);
+    assert.equal(result.rollMode, undefined);
+    assert.equal(result.actionDiceAllowed, true);
+    assert.equal(resolveKnowledgeCheck(system, { skill: "analysis", active: true }).blocked, false);
+  } finally {
+    setCampaignRulesSource(null);
+  }
+});

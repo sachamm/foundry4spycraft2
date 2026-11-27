@@ -9,6 +9,12 @@
     <span class="slot {{#if (sc2lt system.feats.any.remaining 0)}}bad{{/if}}"><b>{{localize "SPYCRAFT.Feat.Any"}}</b> {{system.feats.any.spent}} / {{system.feats.any.slots}}</span>
     {{#each featTrees}}<span class="slot"><b>{{label}}</b> {{#if slots}}{{spent}} / {{slots}}{{else}}{{owned}}{{/if}}</span>{{/each}}
   </div>
+  {{#if featTrades}}<div class="feat-trades">
+    {{#if featTrades.purchase}}<p>{{localize "SPYCRAFT.Template.ActorAgentFeats.FeatsBoughtWithXP" count=featTrades.purchased}}
+      <button type="button" class="sc2-action" data-action="buyFeatWithXP"{{#if featTrades.purchaseHint}} disabled data-tooltip="{{featTrades.purchaseHint}}"{{/if}}>{{featTrades.purchaseLabel}}</button></p>{{/if}}
+    {{#if featTrades.modular}}<label>{{localize "SPYCRAFT.Template.ActorAgentFeats.ModularFeats"}}
+      <input type="number" name="system.featTrades.modular" value="{{featTrades.modularValue}}" min="-20" max="20" data-dtype="Number" class="w-2" /></label>{{/if}}
+  </div>{{/if}}
   {{#each system.feats.replacementGrants}}<p>{{name}} {{localize "SPYCRAFT.Template.ActorAgentFeats.WasAlsoGrantedByAClass"}} {{count}} {{localize "SPYCRAFT.Template.ActorAgentFeats.ReplacementFeatChoiceSIn"}} {{tree}} (p.171).</p>{{/each}}
   </div>
   {{#if featFreeActions.length}}<ul class="plain">{{#each featFreeActions}}<li>{{name}} <b class="sc2-uses">{{remaining}}/{{limit}}</b> {{localize "SPYCRAFT.Template.ActorAgentFeats.Per"}} {{period}}{{#if counterReview}} · <span class="bad">{{localize "SPYCRAFT.Template.ActorAgentFeats.SavedUseCountNeedsGCReview"}}</span>{{else}}{{#if roundAction}}{{#if remaining}} <button type="button" class="sc2-action" data-action="useFeatFreeAction" data-resource="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentFeats.UseRoundAction"}}</button>{{/if}}{{/if}}{{/if}}</li>{{/each}}</ul>{{/if}}

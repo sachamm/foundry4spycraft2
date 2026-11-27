@@ -4,6 +4,7 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignErrorActivationCap } from "../campaign-rules.mjs";
 
 const G = GC_DATA.core.gcDice;
 export const GC_SPENDS = G.spends;
@@ -68,9 +69,14 @@ export function planSpend(id, context = {}) {
       cost = whole(context.dice, 1) ? context.dice : 1;
       break;
     }
-    case "activateError":
+    case "activateError": {
       cost = whole(context.dice, 1) ? context.dice : 1;
+      // Comedy of Errors (p.406): a skill error costs at most this many dice to activate.
+      const cap = campaignErrorActivationCap();
+      if (context.checkKind !== "attack" && cap !== null && cost > cap)
+        throw new Error(loc`Comedy of Errors: a skill error takes at most ${cap} action dice to activate (p.406).`);
       break;
+    }
     case "promote":
       if (npc.baseType !== "standard" || npc.promoted)
         throw new Error(loc`Only a standard NPC that is not already promoted can be promoted.`);

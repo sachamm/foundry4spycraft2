@@ -104,7 +104,12 @@ import { rollCheapShot } from "../apps/cheap-shot.mjs";
 import { rollDisarm } from "../apps/disarm.mjs";
 import { declareTwoWeapon, reviewTwoWeapon, takeTwoWeaponFinalAttack } from "../apps/two-weapon.mjs";
 import { checkNumericalAdvantage } from "../apps/numerical-advantage.mjs";
-import { criticalInjuryReviews } from "../apps/critical-injuries.mjs";
+import {
+  criticalInjuryReviews,
+  criticalInjuryRows,
+  markInjuryHealed,
+  recordInjurySurgery
+} from "../apps/critical-injuries.mjs";
 import { takeTotalDefense } from "../apps/total-defense.mjs";
 import { checkCombatMovement } from "../apps/combat-movement.mjs";
 import { activateCombatExpertise } from "../apps/combat-expertise.mjs";
@@ -127,6 +132,7 @@ import { brightIdeaPoolStatus } from "../rules/bright-idea.mjs";
 import { queueResources, isResourceLock } from "../services/transactions.mjs";
 import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
 import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
+import { organizationChoices } from "../rules/npc-organization.mjs";
 import { reviewActorRules } from "../apps/rules-refresh.mjs";
 import { classSkillSelections, orderedClassChoices } from "../rules/class-skills.mjs";
 import { armorSlot } from "../rules/gear.mjs";
@@ -148,6 +154,9 @@ import { loc } from "../i18n.mjs";
 import { featActions } from "./feat-actions.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
+import { abilityIncreaseLevels } from "../rules/campaign-rules.mjs";
+import { contactPeopleRows, editContactPeople, summonContactPerson } from "../apps/contact-people.mjs";
+import { buyFeatWithXP, featTradeContext } from "../apps/feat-purchase.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -163,13 +172,27 @@ function weaponShots(item) {
   return state ? { ...state, label: ammunitionLabel(state), empty: state.loaded === 0 } : null;
 }
 /** What an NPC's feat items add, as the sheet shows it. */
+/** What a campaign budget quality does to one NPC pick (pp.405, 408), or "" when the pick is carried as chosen. */
+function npcPickBudgetNote(pick) {
+  if (!pick || (!pick.lost && !pick.pastV && pick.carried === pick.caliber)) return "";
+  const roman = n => NPC_RULES.grades[n - 1] ?? String(n);
+  if (pick.lost) return loc`Lost under Shoe-String Budget`;
+  if (pick.pastV) return loc`Carried at V, with an extra Caliber I item`;
+  return loc`Carried at Caliber ${roman(pick.carried)}`;
+}
+
 function npcFeatPlay(effects) {
   if (!effects?.rows?.length && !effects?.uncounted?.length) return null;
   const signed = value => (value >= 0 ? `+${value}` : `${value}`);
   const healthLeft = !effects.healthApplied && (effects.vitality || effects.wounds);
   return {
     title: loc`Feats in play`,
-    rows: effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
+    rows: [
+      ...effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
+      ...(effects.damageSaveFromHealth
+        ? [loc`Damage save ${signed(effects.damageSaveFromHealth)} from the feats' vitality and wounds (p.452)`]
+        : [])
+    ],
     health: healthLeft
       ? loc`Vitality ${signed(effects.vitality)} and wounds ${signed(effects.wounds)} are not added to typed-in maximums: include them in the numbers above.`
       : "",
@@ -452,6 +475,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       reviewCriticalInjury(event, target) {
         return this.actor.reviewCriticalInjury(target.dataset.injury);
       },
+      recordInjurySurgery(event, target) {
+        return recordInjurySurgery(this.actor, target.dataset.injury);
+      },
+      markInjuryHealed(event, target) {
+        return markInjuryHealed(this.actor, target.dataset.injury);
+      },
       takeTotalDefense: costsAction("full", function () {
         return takeTotalDefense(this.actor);
       }),
@@ -520,6 +549,15 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       reviewLimitedUseCounter(event, target) {
         return this.actor.reviewLimitedUseCounter(target.dataset.resource);
+      },
+      editContactPeople(event, target) {
+        return editContactPeople(this.actor, Number(target.dataset.index));
+      },
+      buyFeatWithXP() {
+        return buyFeatWithXP(this.actor);
+      },
+      summonContactPerson(event, target) {
+        return summonContactPerson(this.actor, Number(target.dataset.index), Number(target.dataset.person));
       },
       chooseTemporaryFocuses(event, target) {
         return this.actor.chooseTemporaryFocuses({ featId: target.dataset.itemId });
@@ -689,6 +727,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         ].map(name => `${TPL}/play/${name}.hbs`),
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/parts/use-counter.hbs`
       ],
       scrollable: [""]
@@ -895,7 +934,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ...sys.abilities[key],
       tip: abilityTip(sys, key, game.i18n.localize(label))
     }));
-    context.increaseLevels = cfg.abilityIncreaseLevels.map(l => ({
+    context.increaseLevels = abilityIncreaseLevels().map(l => ({
       level: l,
       key: `l${l}`,
       value: sys.abilityIncreases[`l${l}`],
@@ -1187,7 +1226,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       .filter(([, v]) => v.slots || v.spent || v.owned)
       .map(([k, v]) => ({ key: k, label: cfg.featTrees[k], ...v }));
     context.coreAbilities = sys.coreAbilities ?? [];
-    context.criticalInjuryReviews = criticalInjuryReviews(this.actor);
+    // A rolled injury is a row with its effect and care; only a record that needs the GC stays a review line.
+    context.criticalInjuries = criticalInjuryRows(this.actor);
+    context.criticalInjuryReviews = criticalInjuryReviews(this.actor).filter(
+      review => !context.criticalInjuries.some(row => row.id === review.id)
+    );
     context.startedCharacterCombat = this.actor.participatingCombat?.started === true;
     context.mobileOffense = uses.find(s => s.id === "mobileOffense");
     context.contempt = uses.find(s => s.id === "contempt");
@@ -1279,6 +1322,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ...[...contactMilestones].sort((a, b) => a - b).map(n => [n, "Networking " + n + " purchased ranks"])
     ]);
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
+    context.contactPeople = contactPeopleRows(sys);
+    context.featTrades = featTradeContext(sys);
 
     // Gear
     context.weapons = byType("weapon").map(w => ({
@@ -1773,7 +1818,16 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         sufferTypedDamage,
         survivalSave,
         exposureFailedSave,
-        endTypedExposure
+        endTypedExposure,
+        // The same combat outcomes as the agent's Play tab, so the GC can settle them for an NPC.
+        manageTripOutcomes,
+        manageFeintOutcomes,
+        settleGrapple,
+        recordAnticipate,
+        standOff,
+        tireResult,
+        coupDeGraceSave,
+        cancelReady
       }),
       toggleEditMode() {
         if (!this.isEditable) return;
@@ -1792,7 +1846,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       rollNpcSkill(event, target) {
         // A skill named on the sheet rolls at once with the usual defaults; "Skill check" opens the full dialog.
         const key = target?.dataset?.skill;
-        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0, error: 1 } : null);
+        // No error range is named, so the skill's first check rolls with its own.
+        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0 } : null);
       },
       callQualitySave(event, target) {
         return callQualitySave(this.actor, target.dataset.id);
@@ -1851,6 +1906,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       templates: [
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/npc-graded-play.hbs`,
         `${TPL}/npc-builder.hbs`,
         "systems/spycraft2/templates/parts/editor.hbs"
@@ -1965,6 +2021,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         ])
       ),
       caliberOptions: Object.fromEntries(NPC_RULES.grades.slice(0, 5).map((g, i) => [i + 1, g])),
+      // Tools (p.394): the organization this NPC serves caps its gear Calibers.
+      organizationOptions: organizationChoices().length
+        ? { "": loc`None recorded`, ...Object.fromEntries(organizationChoices()) }
+        : null,
+      organizationCapsNote: result.organizationCaps
+        ? loc`${result.organizationCaps.name}'s Tools: weapons up to Caliber ${NPC_RULES.grades[result.organizationCaps.weapons - 1]}, gear up to ${NPC_RULES.grades[result.organizationCaps.gear - 1]}, vehicles up to ${NPC_RULES.grades[result.organizationCaps.vehicles - 1]}.`
+        : "",
       skillOptions,
       grades: Object.entries(NPC_STATS)
         .filter(([key]) => !(result.type === "animal" && ["competence", "wealth"].includes(key)))
@@ -1982,7 +2045,12 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       })),
       equipment: NPC_CATEGORIES.map(category => ({
         category,
-        picks: (profile.equipment[category] ?? []).map((caliber, index) => ({ caliber, index, category }))
+        picks: (profile.equipment[category] ?? []).map((caliber, index) => ({
+          caliber,
+          index,
+          category,
+          budget: npcPickBudgetNote(result.carriedEquipment?.[category]?.picks?.[index])
+        }))
       })),
       qualityOptions: Object.fromEntries(
         NPC_RULES.qualities

@@ -4,6 +4,7 @@
  * This module tracks the round structure and the numbers; each Advantage's narrative effect is
  * reported for the GC to apply.
  */
+import { leadAdvantageShift } from "../campaign-rules.mjs";
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
 
@@ -287,12 +288,15 @@ export function chooseAdvantages(conflict, picks, { leadShift = null } = {}) {
     if (!found) throw new Error(loc`That Advantage is not listed with the winning Strategy.`);
     return found;
   });
-  const counts = {};
+  const counts = {},
+    campaignShift = leadAdvantageShift();
   for (const advantage of chosen) counts[advantage.id] = (counts[advantage.id] ?? 0) + 1;
   // The Lead Advantage moves the Lead once, plus once more per `repeatEvery` further picks in the same round.
   const computed = Object.entries(counts).reduce((sum, [id, times]) => {
     const advantage = options.find(option => option.id === id),
-      base = advantage.leadShift ?? 0;
+      printed = advantage.leadShift ?? 0,
+      // Speed-Frame raises every Lead Advantage's effect by 1 and Thriller lowers it by 1, minimum 0 (p.408).
+      base = printed ? Math.max(0, printed + campaignShift) : 0;
     return (
       sum + (base ? base * (1 + (advantage.repeatEvery ? Math.floor((times - 1) / advantage.repeatEvery) : 0)) : 0)
     );

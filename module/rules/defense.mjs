@@ -1,3 +1,5 @@
+import { specialistDefense } from "./weapon-specialist.mjs";
+import { gladiatorsDefense } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
@@ -102,16 +104,13 @@ export function incomingDefensePlan(system, options = {}) {
       : invisibleAttacker && !uncanny.retainDexterity
         ? Math.min(0, system.abilities.dex.mod)
         : system.abilities.dex.mod;
-  const dodgeLost = vulnerable ? (system.defense.dodgeBonuses ?? 0) : 0;
+  // Laser damage ignores every dodge bonus (p.338), as if the defender were vulnerable to them alone.
+  const noDodge = vulnerable || options.laser === true;
+  const dodgeLost = noDodge ? (system.defense.dodgeBonuses ?? 0) : 0;
   const securityBonus = securityDevice ? uncanny.securityBonus : 0;
   const triggerman = system.classLevels?.triggerman ?? 0,
     eyeOfStorm = adjacent && triggerman >= 4 ? 3 : 0;
-  const extraDodge = vulnerable ? 0 : eyeOfStorm;
-  const circling = circlingDefensePlan({
-    ...options.circling,
-    ranged,
-    dodgeBonus: vulnerable ? 0 : (system.defense.dodgeBonuses ?? 0) + extraDodge
-  });
+  const extraDodge = noDodge ? 0 : eyeOfStorm;
   const cover = coverPlan({ ...options.cover, defenderSystem: system, ranged });
   const sharpshooter = sharpshooterDefensePlan(system, { ...options.cover, ranged }),
     greatSword = greatSwordDefensePlan(system, { ranged }),
@@ -119,12 +118,23 @@ export function incomingDefensePlan(system, options = {}) {
     wrestling = wrestlingDefense(system, { adjacent, ranged }),
     // Whatever's Handy (Brawler): the same bonus to Defense while an improvised weapon is readied.
     whateversHandy = system.readiedImprovised === true ? whateversHandyBonus(system) : 0,
-    dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
+    dueling = noDodge ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
     // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
-    anticipate =
-      vulnerable || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
+    anticipate = noDodge || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
+  // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies.
+  const foibles = specialistDefense(system, options.attackerProficiency ?? "", { vulnerable: noDodge });
+  // Circling Stance halves every dodge bonus the defender has against this attack, these ones included.
+  const circling = circlingDefensePlan({
+    ...options.circling,
+    ranged,
+    dodgeBonus: noDodge ? 0 : (system.defense.dodgeBonuses ?? 0) + extraDodge + foibles.dodge + dueling + anticipate
+  });
+  // Gladiators (p.407): +1 against ranged attacks for each Melee or Unarmed Combat feat.
+  const gladiators = gladiatorsDefense(system, ranged);
   const total =
-    -circling.dodgeReduction -
+    foibles.dodge +
+    gladiators -
+    circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
     whateversHandy +
@@ -166,6 +176,8 @@ export function incomingDefensePlan(system, options = {}) {
     anticipate,
     // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
     stickyFingersDR: stickyFingers ? 5 : 0,
+    foibles,
+    gladiators,
     listedDR:
       stickyFingers && system.armorDRByAttack
         ? Object.fromEntries(Object.entries(system.armorDRByAttack).map(([k, v]) => [k, v + 5]))
@@ -284,7 +296,7 @@ export function evasionSaveContext(system, { flatFooted = false, reflexReducesDa
 /** Evasion adjustment only: apply other damage reductions and health settlement separately. */
 export function reflexDamagePlan(
   check,
-  { damage, normalSuccessDamage, succeeded = check.successConfirmed, confirmed = false } = {}
+  { damage, normalSuccessDamage, succeeded = check.successConfirmed, confirmed = false, blockbuster = false } = {}
 ) {
   const context = check.evasionContext;
   if (
@@ -318,8 +330,22 @@ export function reflexDamagePlan(
     eligible = context.reflexReducesDamage && !context.flatFooted && context.grade >= 1;
   const evaded = eligible && succeeded,
     halved = eligible && !succeeded && context.grade >= 2;
-  const total = evaded ? 0 : halved ? Math.floor(damage / 2) : ordinary;
-  return { damage, normalSuccessDamage, succeeded, ordinary, total, evaded, halved, eligible, context: { ...context } };
+  // Blockbuster (p.406): a player character's successful save that would halve the damage resists all of it.
+  const resisted =
+    blockbuster === true && succeeded && normalSuccessDamage > 0 && normalSuccessDamage <= Math.ceil(damage / 2);
+  const total = evaded || resisted ? 0 : halved ? Math.floor(damage / 2) : ordinary;
+  return {
+    damage,
+    normalSuccessDamage,
+    succeeded,
+    ordinary,
+    total,
+    evaded,
+    halved,
+    resisted,
+    eligible,
+    context: { ...context }
+  };
 }
 
 // Uncanny Dodge against a security device as part of a Reflex save plan.

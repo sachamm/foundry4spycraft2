@@ -9,8 +9,19 @@ import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { loc } from "../i18n.mjs";
+import { withUndo } from "./undo.mjs";
 const now = () => game.time.worldTime;
-export async function settleCheapShot(actor, message) {
+/** The settlement, with one Undo note for both characters; Undo also clears the card's settled mark. */
+export function settleCheapShot(actor, message) {
+  const actors = [
+    actor,
+    globalThis.fromUuidSync?.(message?.flags?.spycraft2?.attackContext?.cheapShot?.targetUuid ?? "")
+  ].filter(Boolean);
+  return withUndo(actors, loc`Cheap Shot: ${actor.name}`, () => settleCheapShotWork(actor, message), {
+    cardMarks: [{ messageId: message?.id, key: "cheapShotSettlement" }]
+  });
+}
+async function settleCheapShotWork(actor, message) {
   const original = message?.flags?.spycraft2,
     p = original?.attackContext?.cheapShot;
   if (!actor.isOwner || original?.actorUuid !== actor.uuid || !p?.active)

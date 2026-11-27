@@ -59,10 +59,12 @@ test("listed and unlisted bonuses use the higher original bonus; NPC effective r
     assert.equal(conditionNpcSkillBonus(r, { incompetent: true }).bonus, 0);
     assert.deepEqual(conditionNpcSkillBonus(r, {}), conditionNpcSkillBonus(row, {}));
   }
-  assert.deepEqual(npcSkillConditionContext({ statuses: new Set(["baffled", "bound"]) }), {
-    baffled: true,
-    incompetent: false
-  });
+  const context = npcSkillConditionContext({ statuses: new Set(["baffled", "bound", "flat-footed"]) });
+  assert.equal(context.baffled, true);
+  assert.equal(context.incompetent, false);
+  assert.equal(context.bound, true);
+  assert.equal(context.flatFooted, true);
+  assert.equal(context.sickened, false);
 });
 class StubSheet {
   constructor(actor) {
@@ -120,10 +122,8 @@ test("the actual graded data model and NPC sheet agree after apply, coexistence,
     assert.equal(result.competence, m.competence);
     assert.deepEqual(result.skills, m.npcBuild.skills);
     assert.deepEqual(m.npcProfile, before);
-    assert.deepEqual(m.conditionContext, {
-      baffled: statuses.includes("baffled"),
-      incompetent: statuses.includes("incompetent")
-    });
+    assert.equal(m.conditionContext.baffled, statuses.includes("baffled"));
+    assert.equal(m.conditionContext.incompetent, statuses.includes("incompetent"));
   }
   const normal = computeNpcProfile(m.npcProfile, m.npcType, m.threatLevel, m.abilities);
   assert.equal(m.competence, Math.ceil(normal.competence / 2));
@@ -136,4 +136,98 @@ test("manual NPCs expose actual skill-condition/save context without replacing t
   m.prepareDerivedData();
   assert.equal(m.bab, 7);
   assert.equal(m.conditionContext.baffled, true);
+});
+test("an NPC's statuses reach its Defense, attacks, saves and initiative as an agent's do (pp.340–342)", () => {
+  const m = model();
+  m.abilities.dex.value = 16;
+  const prepare = statuses => {
+    m.parent.statuses = new Set(statuses);
+    m.prepareDerivedData();
+    return {
+      defense: m.defense.total,
+      melee: m.attack.melee,
+      ranged: m.attack.ranged,
+      fort: m.saves.fort.total,
+      ref: m.saves.ref.total,
+      will: m.saves.will.total,
+      init: m.initiative.total
+    };
+  };
+  const base = prepare([]);
+  assert.equal(base.defense, 10 + m.defense.bonus + 3);
+  for (const status of ["flat-footed", "sprawled", "stunned", "blinded", "helpless"])
+    assert.equal(prepare([status]).defense, base.defense - 3, status);
+  const sick = prepare(["sickened"]);
+  for (const key of ["melee", "ranged", "fort", "ref", "will"]) assert.equal(sick[key], base[key] - 2, key);
+  assert.equal(prepare(["entangled"]).melee, base.melee - 2);
+  const prone = prepare(["prone"]);
+  assert.equal(prone.melee, base.melee - 2);
+  assert.equal(prone.ranged, base.ranged);
+  const drunk = prepare(["drunk"]);
+  assert.equal(drunk.ranged, base.ranged - 2);
+  assert.equal(drunk.melee, base.melee);
+  assert.equal(drunk.fort, base.fort);
+  for (const key of ["ref", "will", "init"]) assert.equal(drunk[key], base[key] - 2, key);
+  // A negative Dexterity stays even when flat-footed.
+  m.abilities.dex.value = 6;
+  assert.equal(prepare(["flat-footed"]).defense, prepare([]).defense);
+});
+test("a Minion squad's Commander is built at Threat Level +2, and the members' sheet shows its numbers (p.447)", () => {
+  const member = model(),
+    leader = model();
+  for (const m of [member, leader]) {
+    m.parent.statuses = new Set();
+    m.npcProfile.qualities = [{ id: "minion" }, { id: "commander" }];
+    m.npcProfile.grades = { ...m.npcProfile.grades, attack: 5, defense: 5 };
+    m.threatLevel = 6;
+  }
+  leader.commander = true;
+  member.prepareDerivedData();
+  leader.prepareDerivedData();
+  assert.equal(member.isCommander, false);
+  assert.equal(leader.isCommander, true);
+  assert.equal(member.npcBuild.effectiveLevel, 6);
+  assert.equal(leader.npcBuild.effectiveLevel, 8);
+  assert.deepEqual(member.commanderBuild.stats, leader.npcBuild.stats);
+  assert.equal(leader.commanderBuild, null);
+  assert.match(member.qualityEffects.notes.find(n => n.id === "commander").text, /Threat Level 8/);
+  // Without the quality the mark does nothing.
+  leader.npcProfile.qualities = [{ id: "minion" }];
+  leader.prepareDerivedData();
+  assert.equal(leader.npcBuild.effectiveLevel, 6);
+});
+test("Hulking and Undersized give an NPC the Size table's Defense, attack, Hide, wounds and death point (pp.349, 448, 452)", () => {
+  const m = model();
+  m.parent.statuses = new Set();
+  m.npcType = "special";
+  m.prepareDerivedData();
+  const medium = { defense: m.defense.total, melee: m.attack.melee, wounds: m.wounds.max, save: m.saves.fort.total };
+  assert.ok(medium.wounds > 0);
+  assert.equal(m.sizeModifier, 0);
+  assert.equal(m.deathThreshold, -10);
+  m.npcProfile.qualities = [{ id: "hulking", units: 1 }];
+  m.prepareDerivedData();
+  assert.equal(m.size, "Large");
+  assert.equal(m.defense.total, medium.defense - 1);
+  assert.equal(m.attack.melee, medium.melee - 1);
+  assert.equal(m.sizeHideModifier, -4);
+  assert.equal(m.wounds.max, Math.floor(medium.wounds * 1.5));
+  assert.equal(m.saves.fort.total, medium.save);
+  assert.equal(m.deathThreshold, -10);
+  m.npcProfile.qualities = [{ id: "undersized", units: 2 }];
+  m.prepareDerivedData();
+  assert.equal(m.size, "Tiny");
+  assert.equal(m.defense.total, medium.defense + 2);
+  assert.equal(m.sizeHideModifier, 8);
+  assert.equal(m.wounds.max, Math.ceil(medium.wounds / 2));
+  assert.equal(m.deathThreshold, -5);
+  // A standard NPC keeps its Damage save whatever its Size.
+  m.npcType = "standard";
+  m.npcProfile.qualities = [];
+  m.prepareDerivedData();
+  const save = m.damageSave;
+  m.npcProfile.qualities = [{ id: "hulking", units: 2 }];
+  m.prepareDerivedData();
+  assert.equal(m.damageSave, save);
+  assert.equal(m.sizeModifier, -2);
 });

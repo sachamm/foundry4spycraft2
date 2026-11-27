@@ -1,3 +1,5 @@
+import { triumphAt } from "./check-candidates.mjs";
+import { campaignErrorActivationCap, criticalInjuryCostShift, threatsAutoActivate } from "./campaign-rules.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { cleaveCriticalPlan } from "./cleave.mjs";
 import { finesseCriticalEligible } from "./finesse.mjs";
@@ -49,7 +51,9 @@ export function criticalPlan(
     return reject(loc`An opponent within line of sight must pay to activate this error (p.62).`);
   if (kind === "failure" && check.boostSpent > 0)
     return reject(loc`Error activation must be decided before the acting character boosts the result.`);
-  if (!Number.isSafeInteger(baseCost) || baseCost < 1 || (check.checkKind === "attack" && baseCost > 4))
+  // Gritty (p.406) can bring a Table of Ouch injury down to a table cost of 0 on an attack.
+  const lowestCost = kind === "success" && check.checkKind === "attack" && criticalInjuryCostShift() < 0 ? 0 : 1;
+  if (!Number.isSafeInteger(baseCost) || baseCost < lowestCost || (check.checkKind === "attack" && baseCost > 4))
     return reject(loc`Choose the effect’s whole-number table cost (1–4 for attack results).`);
   if (!effectConfirmed || !String(effect).trim())
     return reject(
@@ -117,7 +121,7 @@ export function criticalPlan(
       adjustment--;
       sources.push(loc`Most Lethal (vehicle-mounted weapon) –1`);
     }
-    if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= 75) {
+    if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= triumphAt(check)) {
       adjustment--;
       sources.push(loc`Attack Triumph: one-die critical hit included`);
     }
@@ -147,6 +151,13 @@ export function criticalPlan(
       adjustment--;
       sources.push("Overkill –1");
     }
+    // Laser damage (p.338): a threat costs 1 action die less to activate.
+    if (check.attackContext?.laser === true) {
+      adjustment--;
+      sources.push(loc`Laser damage –1`);
+    }
+    // Bloodbath (p.406): a player or special character's threat on a hit is a critical hit outright, whatever its
+    // usual price; it is the attacker who must pay 1 die to stop it. Its cost is set to 0 below.
   }
   if (kind === "failure") {
     if (check.cleanAndPolished) {
@@ -203,7 +214,23 @@ export function criticalPlan(
     adjustment += role.extraDiceToActivate;
     sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
   }
-  const cost = Math.max(minimum, baseCost + adjustment);
+  let cost = Math.max(minimum, baseCost + adjustment);
+  if (
+    kind === "success" &&
+    check.checkKind === "attack" &&
+    threatsAutoActivate() &&
+    !["standard", "animal"].includes(system.npcType)
+  ) {
+    cost = 0;
+    sources.push(loc`Bloodbath: a critical hit at no cost; the attacker may spend 1 action die to stop it (p.406)`);
+  }
+  // Comedy of Errors (p.406): no more than 2 action dice may be spent activating a skill error, so an effect that
+  // costs more cannot be bought.
+  const errorCap = campaignErrorActivationCap();
+  if (kind === "failure" && check.checkKind === "skill" && errorCap !== null && cost > errorCap)
+    return reject(
+      loc`Comedy of Errors: a skill error takes at most ${errorCap} action dice to activate, and this effect costs ${cost} (p.406).`
+    );
   if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {
     blocked: false,
