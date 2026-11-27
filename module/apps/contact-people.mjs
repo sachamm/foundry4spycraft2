@@ -21,6 +21,26 @@ import { withUndo } from "./undo.mjs";
 const GRADES = ["Acquaintance", "Associate", "Confederate", "Partner"];
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 const contactsOf = actor => (actor.system.contacts ?? []).map(row => ({ ...row, people: [...(row.people ?? [])] }));
+const personKey = person => `${person.kind}|${person.grade}|${person.skill}|${person.ability}`;
+/**
+ * Write one contact's people from the sheet as it is now, one change at a time: other contacts, and the summon
+ * marks written while a dialog was open, are kept. `people(current)` returns the new list from the current one.
+ */
+function saveContactPeople(actor, index, name, people) {
+  return queueRuleState(actor, async () => {
+    const now = contactsOf(actor),
+      current = now[index];
+    if (!current || current.name !== name)
+      throw new Error(loc`That contact changed while the dialog was open. Open it again.`);
+    const marks = new Map(current.people.map(person => [personKey(person), person.summoned]));
+    current.people = people(current).map(person => ({
+      ...person,
+      summoned: marks.get(personKey(person)) ?? person.summoned ?? ""
+    }));
+    now[index] = current;
+    return actor.update({ "system.contacts": now });
+  });
+}
 /** The same contact on other agents' sheets, for shared contacts (p.459). */
 const otherContacts = actor =>
   [...(globalThis.game?.actors ?? [])]
