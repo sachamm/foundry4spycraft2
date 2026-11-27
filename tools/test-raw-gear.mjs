@@ -424,9 +424,9 @@ test("legacy typed gear cannot bypass Charisma restrictions or spend a mismatche
   );
 });
 
-test("visual PDF anchors retain wrapped rows, correct model matches and AP damage annotations across 52 corrected records", () => {
+test("visual PDF anchors retain wrapped rows, correct model matches and AP damage annotations across 68 corrected records", () => {
   const corrections = JSON.parse(readFileSync(new URL("./fixtures/raw/gear-pdf-corrections.json", import.meta.url)));
-  assert.equal(Object.keys(corrections.weapons).length, 52);
+  assert.equal(Object.keys(corrections.weapons).length, 68);
   for (const [name, patch] of Object.entries(corrections.weapons)) {
     const item = equipment.weapons.find(w => w.name === name);
     for (const [field, value] of Object.entries(patch)) assert.equal(item[field], value, `${name}: ${field}`);
@@ -444,6 +444,7 @@ test("visual PDF anchors retain wrapped rows, correct model matches and AP damag
     assert.equal((item.qualities.match(/\(/g) ?? []).length, (item.qualities.match(/\)/g) ?? []).length, item.name);
     assert.doesNotMatch(item.errorThreat, /AP|subsonic/, item.name);
     assert.doesNotMatch(item.ammo, /AP \d/, item.name);
+    assert.doesNotMatch(item.damage, /\b(?:NATO|Russian|ACP|BMG)\b|\dmm\b/i, item.name);
   }
 });
 

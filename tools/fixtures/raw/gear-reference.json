@@ -6710,7 +6710,7 @@
    "caliber": "III",
    "cells": [
     "AI AW Covert",
-    "2d6 7.62×51mm NATO",
+    "2d6",
     "1/19–20",
     "10M50",
     "2",
@@ -6834,7 +6834,7 @@
    "caliber": "II",
    "cells": [
     "C.G. Haenel StG.44",
-    "4d4 7.92x33mm",
+    "4d4",
     "1–4/20",
     "30M5",
     "8",
@@ -6855,7 +6855,7 @@
    "caliber": "III",
    "cells": [
     "Colt Commando",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "16",
@@ -6876,7 +6876,7 @@
    "caliber": "III",
    "cells": [
     "Colt M16",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–4/20",
     "20M8 or 30M5",
     "13 30M5",
@@ -6901,7 +6901,7 @@
    "caliber": "III",
    "cells": [
     "Colt M16A1",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–4/20",
     "20M8 or 30M5",
     "13 30M5",
@@ -6926,7 +6926,7 @@
    "caliber": "III",
    "cells": [
     "Colt M16A2/M16A4",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5 or 100D1",
     "10",
@@ -6956,7 +6956,7 @@
    "caliber": "III",
    "cells": [
     "Colt M16A3",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5 or 100D1",
     "10 100D1",
@@ -6981,7 +6981,7 @@
    "caliber": "III",
    "cells": [
     "Colt M4",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5 or 100D1",
     "12 100D1",
@@ -7032,7 +7032,7 @@
    "caliber": "III",
    "cells": [
     "Colt M4A1",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5 or 100D1",
     "12 100D1",
@@ -7057,7 +7057,7 @@
    "caliber": "III",
    "cells": [
     "Enfield L85A1",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–4/20",
     "30M5",
     "9",
@@ -7082,7 +7082,7 @@
    "caliber": "III",
    "cells": [
     "Enfield L85A2",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "9",
@@ -7107,7 +7107,7 @@
    "caliber": "IV",
    "cells": [
     "FN FAL “Para”",
-    "4d4+2 7.62x51mm NATO",
+    "4d4+2",
     "1–3/19–20",
     "20M7",
     "21",
@@ -7128,7 +7128,7 @@
    "caliber": "IV",
    "cells": [
     "FN FAL",
-    "4d4+2 7.62x51mm NATO",
+    "4d4+2",
     "1–3/19–20",
     "20M7",
     "17",
@@ -7174,7 +7174,7 @@
    "caliber": "III",
    "cells": [
     "GIAT FAMAS F1",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "25M6",
     "11",
@@ -7195,7 +7195,7 @@
    "caliber": "III",
    "cells": [
     "GIAT FAMAS G2",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "10",
@@ -7216,7 +7216,7 @@
    "caliber": "IV",
    "cells": [
     "H&K G3 SG/1",
-    "4d4+2 7.62x51mm NATO",
+    "4d4+2",
     "1–2/19–20",
     "20M7",
     "18",
@@ -7319,7 +7319,7 @@
    "caliber": "IV",
    "cells": [
     "H&K G3A3",
-    "4d4+2 7.62x51mm NATO",
+    "4d4+2",
     "1–2/19–20",
     "20M7",
     "17",
@@ -7340,7 +7340,7 @@
    "caliber": "IV",
    "cells": [
     "H&K G3A4",
-    "4d4+2 7.62x51mm NATO",
+    "4d4+2",
     "1–2/19–20",
     "20M7",
     "18",
@@ -7361,7 +7361,7 @@
    "caliber": "III",
    "cells": [
     "H&K HK33A2",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–2/20",
     "30M5 or 40M4",
     "10 40M4",
@@ -7386,7 +7386,7 @@
    "caliber": "III",
    "cells": [
     "H&K HK33A3",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–2/20",
     "30M5 or 40M4",
     "10 40M4",
@@ -7437,7 +7437,7 @@
    "caliber": "III",
    "cells": [
     "H&K HK53A2",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–2/20",
     "30M5 or 40M4",
     "14 40M4",
@@ -7462,7 +7462,7 @@
    "caliber": "III",
    "cells": [
     "H&K HK53A3",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–2/20",
     "30M5 or 40M4",
     "15 40M4",
@@ -7513,7 +7513,7 @@
    "caliber": "IV",
    "cells": [
     "KAC SR25",
-    "4d4+2 7.62×51mm NATO",
+    "4d4+2",
     "1–2/19–20",
     "20M3",
     "14",
@@ -7610,7 +7610,7 @@
    "caliber": "III",
    "cells": [
     "NORINCO QBZ-95",
-    "3d6+1 5.8x42mm",
+    "3d6+1",
     "1–3/19–20",
     "30M4",
     "21",
@@ -7631,7 +7631,7 @@
    "caliber": "III",
    "cells": [
     "NORINCO QBZ-97",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "12",
@@ -7719,7 +7719,7 @@
    "caliber": "III",
    "cells": [
     "RSA AK-101",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "12",
@@ -7740,7 +7740,7 @@
    "caliber": "III",
    "cells": [
     "RSA AK-47",
-    "3d6 7.62x39mm Russian",
+    "3d6",
     "1–2/20",
     "30M5 or 75D2",
     "11 75D2",
@@ -7765,7 +7765,7 @@
    "caliber": "III",
    "cells": [
     "RSA AK-74",
-    "2d8+1 5.45x39mm Russian",
+    "2d8+1",
     "1–2/20",
     "30M5",
     "10",
@@ -7786,7 +7786,7 @@
    "caliber": "III",
    "cells": [
     "RSA AKS",
-    "3d6 7.62x39mm Russian",
+    "3d6",
     "1–2/20",
     "30M5 or 75D2",
     "11 75D2",
@@ -7811,7 +7811,7 @@
    "caliber": "III",
    "cells": [
     "RSA AKS-74",
-    "2d8+1 5.45x39mm Russian",
+    "2d8+1",
     "1–2/20",
     "30M5",
     "10",
@@ -7832,7 +7832,7 @@
    "caliber": "III",
    "cells": [
     "RSA AKS-74U",
-    "2d8+1 5.45x39mm Russian",
+    "2d8+1",
     "1–3/20",
     "30M5",
     "12",
@@ -7853,7 +7853,7 @@
    "caliber": "III",
    "cells": [
     "RSA AKS-74U-UBN",
-    "2d8+1 5.45x39mm Russian",
+    "2d8+1",
     "1–3/20",
     "30M5",
     "12",
@@ -7878,7 +7878,7 @@
    "caliber": "III",
    "cells": [
     "RSA Dragunov SVD",
-    "2d10+1 7.62×54mm Russian",
+    "2d10+1",
     "1–2/19–20",
     "10M5",
     "21",
@@ -7903,7 +7903,7 @@
    "caliber": "II",
    "cells": [
     "RSA SVU",
-    "1d8+2 7.62×54mm Russian",
+    "1d8+2",
     "1–2/19–20",
     "10M5",
     "14",
@@ -7928,7 +7928,7 @@
    "caliber": "IV",
    "cells": [
     "Springfield Armory M14",
-    "4d4+2 7.62x51mm NATO",
+    "4d4+2",
     "1–3/19–20",
     "20M7",
     "15",
@@ -7974,7 +7974,7 @@
    "caliber": "III",
    "cells": [
     "Springfield Armory M21",
-    "4d4+2 7.62×51mm NATO",
+    "4d4+2",
     "1–2/19–20",
     "20M3",
     "15",
@@ -7999,7 +7999,7 @@
    "caliber": "III",
    "cells": [
     "Steyr AUG",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "10",
@@ -8024,7 +8024,7 @@
    "caliber": "III",
    "cells": [
     "Steyr AUG Carbine",
-    "4d4 5.56x45mm NATO",
+    "4d4",
     "1–3/20",
     "30M5",
     "11",
@@ -8049,7 +8049,7 @@
    "caliber": "II",
    "cells": [
     "Steyr AUG Para",
-    "1d10+1 9mm P",
+    "1d10+1",
     "1–3/20",
     "32M7",
     "4",
@@ -8279,9 +8279,9 @@
   },
   "Smith & Wesson Chief's Special .38 Spec": {
    "name": "Smith & Wesson Chief’s Special .38 Special",
-   "page": 257,
-   "table": "Table 4.42: Backup Revolvers",
-   "caliber": "II",
+   "page": 256,
+   "table": "Table 4.40: Backup Revolvers",
+   "caliber": "I",
    "cells": [
     ".38 Special",
     "1d8+1",

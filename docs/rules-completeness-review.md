@@ -1515,3 +1515,30 @@ figures and actual rolls. All **4,315** Node tests, **988** fixture assertions,
 **265** layouts and **13** pack checks pass; schemas, lint, formatting,
 bundling and copy checks also pass. Remaining source auditing and the combat
 workflows listed in the backlog continue to prevent the requested 9.9 score.
+
+## Pass 50: visually verified equipment corrections
+
+Both areas remain **9.6/10**. Direct inspection of the supplied second-printing
+PDF confirmed 42 field corrections across 40 weapon records. The Chief's Special
+is **Caliber I**, printed page **256**, Table **4.40**; its previous Caliber II
+and source reference were incorrect. This changes mission-pick eligibility.
+The other 39 records contained ammunition-caliber text inside their damage
+fields. Their fields now contain the printed damage expressions. Dice, flat
+bonuses and genuine AP annotations are retained; the existing parser already
+excluded caliber metadata from arithmetic.
+
+Independent source fixtures now record these verified values and PDF page
+references. There are 68 weapon correction anchors in total, including earlier
+corrections. The catalog regression rejects caliber text in damage fields.
+Native Foundry loaded the rebuilt Chief's Special as Caliber I and a backup
+revolver. Actual damage rolls from rebuilt M16 and AW Covert entries produced
+**4d4** and **2d6**, respectively, without browser errors or diagnostics.
+All **4,315** Node tests, **988** fixture assertions and **13** pack checks pass;
+schemas, bundling and copy checks pass. The preceding 265-layout pass still
+applies; this pass changes data and source fixtures only.
+
+The broad equipment source comparison remains unfinished. Both supplied text
+extractions have wrapped and merged table cells; an unmatched row or extraction
+disagreement is not evidence of a data bug. Disputed values require PDF layout
+inspection. Complete the remaining weapon/armor comparison and origin/feat
+mechanics audit, then reassess the scores alongside the open combat workflows.

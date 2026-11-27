@@ -1,5 +1,13 @@
 {
   "source": "Spycraft_2.0_Hyperlinked.pdf",
+  "secondPrintingSource": "Spycraft_2.0_Rulebook_Second_Printing.pdf",
+  "secondPrintingPages": [
+    256,
+    259,
+    260,
+    261,
+    262
+  ],
   "printedPages": [
     250,
     253,
@@ -14,11 +22,18 @@
     263
   ],
   "weapons": {
+    "Smith & Wesson Chief's Special .38 Spec": {
+      "caliber": "I",
+      "sourcePage": 256,
+      "sourceTable": "Table 4.40: Backup Revolvers"
+    },
     "Colt M16 5.56mm NATO": {
-      "ammo": "20M8 or 30M5"
+      "ammo": "20M8 or 30M5",
+      "damage": "4d4"
     },
     "Colt M16A1 5.56mm NATO": {
-      "ammo": "20M8 or 30M5"
+      "ammo": "20M8 or 30M5",
+      "damage": "4d4"
     },
     "Colt M16A2/A4 5.56mm NATO": {
       "ammo": "30M5 or 100D1",
@@ -26,20 +41,24 @@
       "errorThreat": "1–3/20",
       "recoil": 10,
       "weight": 8.3,
-      "qualities": "NFM (S/B)"
+      "qualities": "NFM (S/B)",
+      "damage": "4d4"
     },
     "Colt M16A3 5.56mm NATO": {
-      "ammo": "30M5 or 100D1"
+      "ammo": "30M5 or 100D1",
+      "damage": "4d4"
     },
     "Colt M4 5.56mm NATO": {
-      "ammo": "30M5 or 100D1"
+      "ammo": "30M5 or 100D1",
+      "damage": "4d4"
     },
     "Colt M4 SOPMOD 5.56mm NATO": {
       "ammo": "30M5 or 100D1",
       "qualities": "CLS, NUL (3R/1U), TBR, UPG (4x day/night sight, infrared laser sight, advanced combat sight, laser sight, removable suppressor, tactical flashlight, tactical sling, vertical foregrip)"
     },
     "Colt M4A1 5.56mm NATO": {
-      "ammo": "30M5 or 100D1"
+      "ammo": "30M5 or 100D1",
+      "damage": "4d4"
     },
     "H&K G36 5.56mm NATO": {
       "ammo": "30M5 or 100D1",
@@ -54,26 +73,32 @@
       "qualities": "CLS, CMP, DEP, DST, UPG (advanced combat sight)"
     },
     "H&K HK33A2 5.56mm NATO": {
-      "ammo": "30M5 or 40M4"
+      "ammo": "30M5 or 40M4",
+      "damage": "4d4"
     },
     "H&K HK33A3 5.56mm NATO": {
-      "ammo": "30M5 or 40M4"
+      "ammo": "30M5 or 40M4",
+      "damage": "4d4"
     },
     "H&K HK33SG1 5.56mm NATO": {
       "ammo": "30M5 or 40M4",
       "qualities": "ACC, SPA, RGD, UPG (6x telescopic sight, bipod)"
     },
     "H&K HK53A2 5.56mm NATO": {
-      "ammo": "30M5 or 40M4"
+      "ammo": "30M5 or 40M4",
+      "damage": "4d4"
     },
     "H&K HK53A3 5.56mm NATO": {
-      "ammo": "30M5 or 40M4"
+      "ammo": "30M5 or 40M4",
+      "damage": "4d4"
     },
     "RSA AK-47 7.62mm Russian": {
-      "ammo": "30M5 or 75D2"
+      "ammo": "30M5 or 75D2",
+      "damage": "3d6"
     },
     "RSA AKS 7.62mm Russian": {
-      "ammo": "30M5 or 75D2"
+      "ammo": "30M5 or 75D2",
+      "damage": "3d6"
     },
     "H&K PSG-1 7.62mm NATO": {
       "ammo": "5M10 or 20M3",
@@ -102,7 +127,8 @@
       "qualities": "DST, FRG, INA (–2), MAC (–1), TRO"
     },
     "AI AW Covert 7.62": {
-      "qualities": "ACC, CLS, INS, MAC (–2), UPG (bipod)"
+      "qualities": "ACC, CLS, INS, MAC (–2), UPG (bipod)",
+      "damage": "2d6"
     },
     "AMP DSR-1 7.62mm Subsonic": {
       "qualities": "ACC, INS, MAC (–2), UPG (bipod)",
@@ -125,10 +151,12 @@
       "qualities": "INJ, INS, MAC (–2), UPG (2.5× telescopic sight, integral suppressor)"
     },
     "Enfield L85A1 5.56mm NATO": {
-      "qualities": "DST, UNR, UPG (4x telescopic sight)"
+      "qualities": "DST, UNR, UPG (4x telescopic sight)",
+      "damage": "4d4"
     },
     "Enfield L85A2 5.56mm NATO": {
-      "qualities": "DST, UNR, UPG (4x telescopic sight)"
+      "qualities": "DST, UNR, UPG (4x telescopic sight)",
+      "damage": "4d4"
     },
     "FN Hecate II .50 BMG": {
       "qualities": "ACC, BLK, CLS, MAC (–2), SAF, SLA, TKD, UPG (10x telescopic sight, bipod)",
@@ -146,10 +174,12 @@
       "qualities": "ACC, CLS, MAC (–2), UPG (10x telescopic sight, bipod)"
     },
     "H&K G3 SG/1 7.62mm NATO": {
-      "qualities": "ACC, SPA, RGD, UPG (6x telescopic sight, bipod)"
+      "qualities": "ACC, SPA, RGD, UPG (6x telescopic sight, bipod)",
+      "damage": "4d4+2"
     },
     "KAC SR25 7.62mm NATO": {
-      "qualities": "ACC, INS, UPG (10× telescopic sight)"
+      "qualities": "ACC, INS, UPG (10× telescopic sight)",
+      "damage": "4d4+2"
     },
     "Mauser Model 1898 7.62mm NATO": {
       "qualities": "MAC (–2), SPA, UPG (10x telescopic sight)"
@@ -164,28 +194,35 @@
       "qualities": "MAC (–2), SPA, UPG (4x telescopic sight)"
     },
     "RSA Dragunov SVD 7.62mm Russian": {
-      "qualities": "ACC, UPG (4× telescopic sight)"
+      "qualities": "ACC, UPG (4× telescopic sight)",
+      "damage": "2d10+1"
     },
     "RSA AKS-74U-UBN 5.45mm Russian": {
-      "qualities": "CLS, TBR, UPG (removable suppressor)"
+      "qualities": "CLS, TBR, UPG (removable suppressor)",
+      "damage": "2d8+1"
     },
     "RSA SVU 7.62mm Russian": {
-      "qualities": "ACC, DST, INS, UPG (10× telescopic sight, bipod)"
+      "qualities": "ACC, DST, INS, UPG (10× telescopic sight, bipod)",
+      "damage": "1d8+2"
     },
     "Springfield Armory M1903A4 .30-06": {
       "qualities": "MAC (–2), SPA, UPG (2.5× telescopic sight)"
     },
     "Springfield Armory M21 7.62mm NATO": {
-      "qualities": "ACC, DEP, UPG (9× telescopic sight, bipod)"
+      "qualities": "ACC, DEP, UPG (9× telescopic sight, bipod)",
+      "damage": "4d4+2"
     },
     "Steyr AUG 5.56mm NATO": {
-      "qualities": "DST, UPG (1.5x telescopic sight, vertical foregrip)"
+      "qualities": "DST, UPG (1.5x telescopic sight, vertical foregrip)",
+      "damage": "4d4"
     },
     "Steyr AUG Carbine 5.56mm NATO": {
-      "qualities": "DST, UPG (1.5x telescopic sight, vertical foregrip)"
+      "qualities": "DST, UPG (1.5x telescopic sight, vertical foregrip)",
+      "damage": "4d4"
     },
     "Steyr AUG Para 9mm": {
-      "qualities": "UPG (1.5x telescopic sight, vertical foregrip)"
+      "qualities": "UPG (1.5x telescopic sight, vertical foregrip)",
+      "damage": "1d10+1"
     },
     "FN P90 5.7x28mm": {
       "qualities": "CMP, DST, NUL (2R), QKY, TBR, UPG (red dot sight)",
@@ -199,6 +236,51 @@
     },
     "Steyr TMP 9mm": {
       "qualities": "CMP, UPG (permanent vertical foregrip)"
+    },
+    "C.G. Haenel StG.44 7.92mm": {
+      "damage": "4d4"
+    },
+    "Colt Commando 5.56mm NATO": {
+      "damage": "4d4"
+    },
+    "GIAT FAMAS F1 5.56mm NATO": {
+      "damage": "4d4"
+    },
+    "GIAT FAMAS G2 5.56mm NATO": {
+      "damage": "4d4"
+    },
+    "Norinco QBZ-97 5.56mm NATO": {
+      "damage": "4d4"
+    },
+    "RSA AK-101 5.56mm NATO": {
+      "damage": "4d4"
+    },
+    "FN FAL \"Para\" 7.62mm NATO": {
+      "damage": "4d4+2"
+    },
+    "FN FAL 7.62mm NATO": {
+      "damage": "4d4+2"
+    },
+    "H&K G3A3 7.62mm NATO": {
+      "damage": "4d4+2"
+    },
+    "H&K G3A4 7.62mm NATO": {
+      "damage": "4d4+2"
+    },
+    "Springfield Armory M14 7.62mm NATO": {
+      "damage": "4d4+2"
+    },
+    "Norinco QBZ-95 5.8mm": {
+      "damage": "3d6+1"
+    },
+    "RSA AK-74 5.45mm Russian": {
+      "damage": "2d8+1"
+    },
+    "RSA AKS-74 5.45mm Russian": {
+      "damage": "2d8+1"
+    },
+    "RSA AKS-74U 5.45mm Russian": {
+      "damage": "2d8+1"
     }
   }
 }
