@@ -406,7 +406,13 @@ export async function planNextMission() {
     folder: folder?.id ?? null,
     pages: [{ name, type: "text", text: { content: missionRecordHtml(mission, { xp, team }) } }]
   });
-  await setMission({ ...defaultMission(), team: [...(mission.team ?? [])], caliber: mission.caliber });
+  await setMission({
+    ...defaultMission(),
+    // A new record: Undo notes from the filed mission no longer reach it.
+    recordId: foundry.utils.randomID(),
+    team: [...(mission.team ?? [])],
+    caliber: mission.caliber
+  });
   ui.notifications.info(loc`${name} is filed under Mission records. The new mission keeps the team and Caliber.`);
   return entry;
 }

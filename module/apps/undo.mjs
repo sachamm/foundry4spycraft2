@@ -138,6 +138,10 @@ export function undoEntry(actor, before, after) {
       const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat),
         entry = { ...was };
       for (const key of ["actions", "readied"]) if (same(now?.[key] ?? null, was[key] ?? null)) delete entry[key];
+      // What the step left, so Undo can tell a later spend apart and leave it in place.
+      const changed = ["actions", "readied"].filter(key => key in entry);
+      if (changed.length)
+        entry.left = Object.fromEntries(changed.map(key => [key, structuredClone(now?.[key] ?? null)]));
       return entry;
     });
   if (!Object.keys(restore).length && !unset.length && !created.length && !removed.length && !combatants.length)
@@ -329,8 +333,17 @@ async function undoRecord(message, record) {
       if (!combatant) continue;
       const change = { defeated: was.defeated, initiative: was.initiative };
       if ("fluid" in was) change[was.fluid ? "flags.spycraft2.==fluid" : "flags.spycraft2.-=fluid"] = was.fluid;
-      for (const key of ["actions", "readied"])
-        if (key in was) change[was[key] ? `flags.spycraft2.==${key}` : `flags.spycraft2.-=${key}`] = was[key];
+      for (const key of ["actions", "readied"]) {
+        if (!(key in was)) continue;
+        // A later spend or ready on the same turn changed it again: putting the earlier value back would erase it.
+        if (was.left && key in was.left && !same(combatant.flags?.spycraft2?.[key] ?? null, was.left[key])) {
+          ui.notifications.warn(
+            loc`${combatant.name}'s turn changed again since, so its actions were left as they are.`
+          );
+          continue;
+        }
+        change[was[key] ? `flags.spycraft2.==${key}` : `flags.spycraft2.-=${key}`] = was[key];
+      }
       await combatant.update(change);
     }
   }

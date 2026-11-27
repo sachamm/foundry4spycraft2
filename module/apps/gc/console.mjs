@@ -595,7 +595,8 @@ export function consoleContext() {
     combatSeen: (m.scenesPlayed ?? 0) > 0 || (m.active && [...(game.combats ?? [])].some(c => c.started))
   });
   // Done once is done for good: a new mission or session does not bring the list back.
-  if (readSetting("gcFirstSessionDone", false)) checklist.complete = true;
+  // The checklist's own Start mission button stands in for the plain one only while the checklist is shown.
+  if (readSetting("gcFirstSessionDone", false)) Object.assign(checklist, { complete: true, startIsNext: false });
   else if (checklist.complete && game.user?.isGM)
     Promise.resolve(game.settings.set("spycraft2", "gcFirstSessionDone", true)).catch(() => {});
   // The session's own starting number, once begun: what it was set up with, not what the team would give now.

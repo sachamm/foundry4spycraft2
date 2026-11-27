@@ -186,7 +186,12 @@ export function missionXP({ planned = false } = {}) {
 /** Scene state follows the system's scene usage period: a new scene is standard until made dramatic. */
 export const sceneEpoch = () => String(read("usagePeriods", {})?.scene ?? "initial");
 /** The current mission usage period, which names the mission a payout or other per-mission record belongs to. */
-export const missionEpoch = () => String(read("usagePeriods", {})?.mission ?? "initial");
+// The usage period and the record's own id: planning the next mission is a new record before Start mission runs.
+export const missionEpoch = () => {
+  const period = String(read("usagePeriods", {})?.mission ?? "initial"),
+    record = read("mission", {})?.recordId;
+  return record ? `${period}:${record}` : period;
+};
 export function getSceneState() {
   const saved = read("sceneState", {}),
     scene = sceneEpoch();

@@ -224,3 +224,36 @@ test("a pool that moved again gets back what the step took, not its old number",
   const still = { system: { vitality: { value: 0, max: 6 }, wounds: { value: 15, max: 19 } } };
   assert.deepEqual(poolsGivenBack(entry, still), {});
 });
+
+test("undoing a first spend leaves a later spend on the same turn in place", async () => {
+  const actor = makeActor({ vitality: { value: 20 } });
+  const combatant = {
+    id: "c1",
+    name: "Guard",
+    actor,
+    parent: { id: "fight" },
+    defeated: false,
+    initiative: 10,
+    flags: { spycraft2: { actions: { half: 2 } } },
+    updates: [],
+    async update(change) {
+      this.updates.push(change);
+    }
+  };
+  const fight = { id: "fight", combatants: Object.assign([combatant], { get: () => combatant }) };
+  game.combats = Object.assign([fight], { get: () => fight });
+  const before = snapshot(actor);
+  combatant.flags = { spycraft2: { actions: { half: 1 } } };
+  const entry = undoEntry(actor, before, snapshot(actor));
+  // A second spend after the step: the first one's Undo must not hand both half actions back.
+  combatant.flags = { spycraft2: { actions: { half: 0 } } };
+  globalThis.fromUuid = async () => actor;
+  game.messages = { get: () => null };
+  let warned = 0;
+  globalThis.ui = { notifications: { warn: () => (warned += 1), info: () => null } };
+  const note = { id: "note2", flags: { spycraft2: { undo: { label: "x", entries: [entry] } } }, async update() {} };
+  await applyUndo(note);
+  assert.equal(warned, 1);
+  assert.ok(combatant.updates.every(change => !Object.keys(change).some(key => key.includes("actions"))));
+  game.combats = [];
+});
