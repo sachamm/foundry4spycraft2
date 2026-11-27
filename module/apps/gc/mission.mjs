@@ -101,12 +101,13 @@ export async function editMission() {
 
 /** Begin the mission: the Threat Level is calculated once, now (p.423), and NPCs that follow the mission rescale. */
 /** Ask once before a step that resets characters' uses. */
-const confirmStep = (title, lines, yes = title) =>
+// With a warning, the warning leads and Cancel is the default, so Enter does not take a step that loses something.
+const confirmStep = (title, lines, yes = title, { warning = "" } = {}) =>
   systemDialog.confirm({
     window: { title },
-    content: `<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>`,
-    yes: { label: yes },
-    no: { label: loc`Cancel` },
+    content: `${warning ? `<p class="bad" role="alert">${esc(warning)}</p>` : ""}<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>`,
+    yes: { label: yes, ...(warning ? { default: false } : {}) },
+    no: { label: loc`Cancel`, ...(warning ? { default: true } : {}) },
     rejectClose: false
   });
 
@@ -342,6 +343,8 @@ export async function planNextMission() {
   const mission = getMission();
   if (mission.active) return refuse(loc`End the mission first; its record is kept for the XP report until then.`);
   const name = mission.name || loc`Unnamed mission`;
+  const team = teamActors(mission),
+    unpaid = team.filter(actor => !mission.standingPaid?.[actor.id]).length;
   const ok = await confirmStep(
     loc`Plan the next mission`,
     [
@@ -349,11 +352,15 @@ export async function planNextMission() {
       loc`A new mission record starts with the same team and Caliber; objectives, antagonists, complications, exposure and scenes start empty.`,
       loc`Settle every agent's XP and standing before this: the new record no longer holds the old figures.`
     ],
-    loc`Plan the next mission`
+    loc`Plan the next mission`,
+    {
+      warning: unpaid
+        ? loc`Standing is paid to ${team.length - unpaid} of ${team.length} agents. Award it from Wrap-up first.`
+        : ""
+    }
   );
   if (!ok) return null;
-  const xp = missionXP().total,
-    team = teamActors(mission);
+  const xp = missionXP().total;
   let folder = [...(game.folders ?? [])].find(
     entry => entry.type === "JournalEntry" && entry.name === loc`Mission records`
   );
@@ -516,7 +523,7 @@ export async function addObjective({ another = false } = {}) {
   return addObjective({ another: true });
 }
 
-export async function addAntagonist({ uuid = "" } = {}) {
+export async function addAntagonist({ uuid = "", another = false } = {}) {
   requireGC();
   const npcs = [...game.actors].filter(actor => actor.type === "npc");
   const input = await ask(
@@ -541,8 +548,10 @@ export async function addAntagonist({ uuid = "" } = {}) {
       ""
     )}</select></label>
     <label><input type="checkbox" name="full" /> ${loc`‘Full’ special NPC (300 XP per scene)`}</label>
-    <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="1" /></label>`,
-    loc`Record for XP`
+    <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="1" /></label>
+    <label><input type="checkbox" name="another"${another ? " checked" : ""} /> ${loc`Add another after this one`}</label>`,
+    loc`Record for XP`,
+    values => (!values.uuid && !String(values.name ?? "").trim() ? loc`Choose an NPC, or name the antagonist.` : "")
   );
   if (!input) return null;
   const actor = input.uuid ? await fromUuid(input.uuid) : null;
@@ -557,7 +566,10 @@ export async function addAntagonist({ uuid = "" } = {}) {
     scenes: Math.max(1, Number(input.scenes) || 1),
     encountered: false
   };
-  return updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
+  const saved = await updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
+  if (!input.another) return saved;
+  ui.notifications.info(loc`Added ${antagonist.name}.`);
+  return addAntagonist({ another: true });
 }
 
 /** The key an NPC's type is listed under: an unlinked token's base actor, so its copies count once (p.398). */
@@ -608,7 +620,26 @@ export async function recordAntagonist(actor, { encountered = false } = {}) {
   return antagonist;
 }
 
-export async function addComplication() {
+/** A complication the dialog would refuse once closed, said while it is still open; "" when it can be saved. */
+function complicationRefusal(values) {
+  if (!(Number(values.count) >= 1)) return loc`How many must be 1 or more.`;
+  try {
+    if (values.kind === "quality") qualityAddition(values.quality, { scope: "scripted", active: qualitiesInForce() });
+    if (values.kind === "security") {
+      const device = resolveDevice(values.security, Number(values.pr));
+      if (device.xp === null || device.xp === undefined) {
+        if (values.deviceXP === "" || values.deviceXP === null || values.deviceXP === undefined)
+          return loc`${device.name}: its XP is printed as “${device.xpPrinted}”; enter the XP by hand.`;
+      }
+    }
+  } catch (error) {
+    return error.message;
+  }
+  if (values.kind === "other" && !String(values.name ?? "").trim()) return loc`Name the complication.`;
+  return "";
+}
+
+export async function addComplication({ another = false } = {}) {
   requireGC();
   const mission = getMission();
   const qualityRows = GC_DATA.campaignQualities
@@ -639,10 +670,20 @@ export async function addComplication() {
     <label data-when="kind=bundle|other">${loc`Bundle pick or other complication name`} <input name="name" /></label>
     <label data-when="kind=bundle">${loc`Bundle pick Caliber (−10 XP per Caliber)`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
     <label data-when="kind=other">${loc`Other complication XP`} <input type="number" name="xp" value="0" /></label>
-    <label>${loc`How many`} <input type="number" name="count" min="1" value="1" /></label>`,
-    loc`Add complication`
+    <label>${loc`How many`} <input type="number" name="count" min="1" value="1" /></label>
+    <label><input type="checkbox" name="another"${another ? " checked" : ""} /> ${loc`Add another after this one`}</label>`,
+    loc`Add complication`,
+    complicationRefusal
   );
   if (!input) return null;
+  const saved = await saveComplication(input, mission);
+  if (!input.another || !saved) return saved;
+  ui.notifications.info(loc`Complication added.`);
+  return addComplication({ another: true });
+}
+
+/** Write one complication from the dialog's values onto the mission record. */
+async function saveComplication(input, mission) {
   const count = Math.max(1, Number(input.count) || 1),
     id = foundry.utils.randomID();
   try {

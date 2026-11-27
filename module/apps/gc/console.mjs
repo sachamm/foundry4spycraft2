@@ -125,12 +125,23 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         if (
           await systemDialog.confirm({
             window: { title: loc`Clear the mission record` },
-            content: `<p>${loc`Remove every objective, complication and antagonist from the mission record?`}</p>`
+            content: `<p class="bad">${loc`This cannot be undone.`}</p><p>${loc`Remove every objective, complication and antagonist from the mission record? To keep a copy, use Plan the next mission after the mission ends: it files the record in a journal entry.`}</p>`,
+            yes: { label: loc`Clear the record`, default: false },
+            no: { label: loc`Cancel`, default: true }
           })
         )
           await mission.endMission({ clear: true });
       }),
-      recalculateTL: guard(() => fixThreatLevel()),
+      recalculateTL: guard(async () => {
+        const before = getMission().threatLevel,
+          result = await fixThreatLevel();
+        ui.notifications.info(
+          result.value === before
+            ? loc`Threat Level unchanged at ${result.value}.`
+            : loc`Threat Level ${before ?? "—"} → ${result.value}.`
+        );
+        return result;
+      }),
       addObjective: guard(() => mission.addObjective()),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
@@ -383,16 +394,19 @@ export function captureConsoleState(root) {
     scrollTop: scrolled?.scrollTop ?? 0,
     focus: controlKey(active, root),
     selection: active?.matches?.("input") ? [active.selectionStart, active.selectionEnd] : null,
-    more: [...root.querySelectorAll("details.gc-more")].map(details => details.open)
+    // Kept by their summary's words, so a list that is drawn or left out does not shift the others.
+    more: [...root.querySelectorAll("details.gc-more")].filter(details => details.open).map(moreKey)
   };
 }
+
+const moreKey = details =>
+  `${details.closest?.("[data-section]")?.dataset?.section ?? ""}:${details.querySelector("summary")?.textContent?.trim() ?? ""}`;
 
 /** Put the kept state back onto a freshly drawn console. */
 export function restoreConsoleState(root, kept) {
   if (!root?.querySelector || !kept) return;
-  [...root.querySelectorAll("details.gc-more")].forEach((details, index) => {
-    if (kept.more[index]) details.open = true;
-  });
+  for (const details of root.querySelectorAll("details.gc-more"))
+    if (kept.more?.includes(moreKey(details))) details.open = true;
   if (kept.focus) {
     const same = kept.focus.action ? twins(root, kept.focus) : [];
     const heading = kept.focus.section
@@ -513,8 +527,7 @@ export function consoleContext() {
     }),
     session: {
       begun: !!dice.current,
-      at: sessionAt,
-      note: dice.current ? (sessionAt ? loc`Session begun ${sessionAt}` : loc`Session begun`) : ""
+      at: sessionAt
     },
     // Each tooltip says what the button changes, then its key, so the shortcuts are learnt where they are used.
     tips: {
@@ -558,20 +571,13 @@ export function consoleContext() {
         : scene.dramatic
           ? loc`Dramatic`
           : loc`Standard`,
-      turn: combatNow
-        ? combatNow.started
-          ? loc`Round ${combatNow.round}: ${combatNow.combatant?.name ?? "—"}`
-          : loc`Fight not begun`
-        : loc`No combat`,
       // Awards can take the pool past its starting number; "left of" would then read oddly.
       dice: !dice.current
         ? loc`not set up`
         : dice.value > starting
           ? loc`${dice.value} left`
           : loc`${dice.value} left of ${starting}`,
-      session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`,
-      // While planning, the strip shows what the mission will be, not a fight that cannot be running yet.
-      threat: loc`${tl} · Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`
+      session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
     },
     wrap: {
       standing:
@@ -680,12 +686,16 @@ export function consoleContext() {
           surprise: combatNow.flags?.spycraft2?.surprise ?? null,
           acting,
           combatants: turn.combatRows(combatNow),
-          // Before the fight begins a mob cannot attack: the buttons wait for it.
+          // Before the fight begins a mob cannot attack, and it attacks on a member's turn: only the acting
+          // combatant's own mob gets a button.
           mobs: started
-            ? turn.mobGroups(combatNow).map(group => ({
-                key: group.key,
-                label: loc`Mob attack: ${group.name} ×${group.count}`
-              }))
+            ? turn
+                .mobGroups(combatNow)
+                .filter(group => group.members.some(member => member.id === combatNow.combatant?.id))
+                .map(group => ({
+                  key: group.key,
+                  label: loc`Mob attack: ${group.name} ×${group.count}`
+                }))
             : [],
           unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
           unrolledNames: combatNow.turns

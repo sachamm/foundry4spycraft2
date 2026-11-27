@@ -44,6 +44,7 @@ function withState(context, { view, active, ended, combat = null, firstSession =
   context.mission.ended = ended;
   context.status.missionState = active ? "active" : ended ? "ended" : "not started";
   context.xp.label = active || ended ? "Base XP earned so far" : "Planned base XP";
+  context.xp.started = active || ended;
   for (const id of Object.keys(context.hiddenSections))
     context.hiddenSections[id] = !(VIEW_SECTIONS[view].includes(id) || (id === "combat" && !!combat?.started));
   context.sections = consoleSections({ missionActive: active, combat: !!combat, conflictsRunning: false });
@@ -70,9 +71,9 @@ function withState(context, { view, active, ended, combat = null, firstSession =
 const names = [
   ["Agent Morrow", 22, ""],
   ["Agent Vasquez", 19, ""],
-  ["Guard (Rook)", 17, "wounded"],
-  ["Guard (Rook)", 17, ""],
-  ["Guard (Rook)", 14, ""],
+  ["Guard (Rook) #1", 17, "wounded"],
+  ["Guard (Rook) #2", 17, ""],
+  ["Guard (Rook) #3", 14, ""],
   ["Colonel Dragan", 12, ""],
   ["Agent Okafor", 9, "readied action"],
   ["Driver", 5, ""]
@@ -86,7 +87,7 @@ function fight(context, { started = true } = {}) {
       ? {
           defeated: false,
           id: "c3",
-          name: "Guard (Rook)",
+          name: "Guard (Rook) #1",
           npc: true,
           standard: true,
           defense: 14,
@@ -94,8 +95,8 @@ function fight(context, { started = true } = {}) {
           conditions: "flat-footed",
           halfActions: "2 half actions left",
           weapons: [
-            { id: "w1", name: "Service pistol" },
-            { id: "w2", name: "Truncheon" }
+            { id: "w1", name: "Service pistol", facts: "+4 · 2d6" },
+            { id: "w2", name: "Truncheon", facts: "+3 · 1d6" }
           ],
           outcomes: ["TripOutcomes", "FeintOutcomes", "SettleAGrapple", "AnticipateResult", "StandOff"].map(key => ({
             step: key,
@@ -118,7 +119,6 @@ function fight(context, { started = true } = {}) {
     scene: "Embassy",
     elsewhere: false
   };
-  context.status.turn = started ? "Round 2: Guard (Rook)" : "Fight not begun";
   return context;
 }
 

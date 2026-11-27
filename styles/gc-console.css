@@ -122,6 +122,8 @@
   overflow-y: auto;
   overflow-wrap: anywhere;
   padding: 0 0.6rem 0.75rem;
+  /* The sticky turn bar never covers the control that keyboard focus moves to. */
+  scroll-padding-top: 56px;
 }
 .gc-console-body .controls button {
   max-width: 100%;
@@ -290,15 +292,19 @@
 /* What is true right now, before any section is opened. */
 .gc-console-body .gc-now {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  margin: 0.6rem 0;
+  gap: 2px;
+  margin: 0.5rem 0;
 }
+/* Caption, value and note on one line; a long mission name wraps under its caption instead of growing a tile. */
 .gc-console-body .gc-now .sc2-field {
-  padding: 4px 8px;
+  display: grid;
+  grid-template-columns: 7em minmax(0, 1fr);
+  column-gap: 6px;
+  align-items: baseline;
+  padding: 2px 8px;
 }
 .gc-console-body .gc-now .sc2-value {
-  font-size: 15px;
+  font-size: var(--sc2-text-m);
   overflow-wrap: anywhere;
 }
 /* Section headings are bars, as on the sheets. */
@@ -383,7 +389,7 @@
 /* Prep, Play and Wrap-up: one console, three views. A search looks through every section whatever the view. */
 .gc-console-body .gc-views {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   gap: 4px;
   margin: 0.4rem 0;
 }
@@ -400,7 +406,7 @@
   display: none;
 }
 .gc-console-body .gc-now .gc-note {
-  display: block;
+  grid-column: 2;
   font-size: var(--sc2-text-s);
 }
 /* The first-session steps, the wrap-up steps and the acting combatant are raised panels above the sections. */
@@ -524,9 +530,18 @@
   font-weight: 600;
 }
 /* The weapons are the acting combatant's main choices: drawn heavier than the bookkeeping buttons. */
+/* One weapon per row: its name, then its bonus and damage under it. */
+.gc-console-body details.gc-section .controls.gc-weapons {
+  grid-template-columns: minmax(0, 1fr);
+}
 .gc-console-body .gc-weapons button {
+  display: block;
   font-weight: 700;
   border-color: var(--sc2-rule-strong);
+}
+.gc-console-body .gc-weapons button .gc-note {
+  font-weight: 400;
+  margin-inline-start: 0.4em;
 }
 .gc-console-body ul.gc-combat-rows .gc-row-button {
   display: grid;
@@ -584,7 +599,8 @@
   background: var(--sc2-action-tint);
   border-color: var(--sc2-action);
 }
-.gc-console-body button[aria-pressed="true"].sc2-action[data-change="critical"]::before {
+.gc-console-body .gc-row-actions button[aria-pressed="true"].sc2-action::before,
+.gc-console-body li > button[aria-pressed="true"].sc2-action::before {
   content: "✓ ";
 }
 .gc-console-body button.gc-danger {
@@ -594,18 +610,9 @@
 .gc-console-body button.gc-danger:hover {
   background: var(--sc2-danger-tint);
 }
-.gc-console-body .gc-session-note {
-  grid-column: 1 / -1;
-  align-self: center;
-}
-.gc-console-body .gc-window-link {
-  margin: 0 0 4px;
-  text-align: end;
-}
-.gc-console-body .gc-window-link button {
+.gc-console-body .gc-views .gc-window-link {
   width: auto;
-  min-height: 24px;
-  font-size: var(--sc2-text-s);
+  min-width: 32px;
 }
 
 /* A dialog's refusal stays inside the dialog, beside the button, and what was typed is kept. */
@@ -628,4 +635,9 @@
 }
 .gc-console-body .gc-checklist-next button {
   width: auto;
+}
+
+/* Before the fight: Begin combat takes its own row under the Initiative buttons, so it never wraps across the fold. */
+.gc-console-body details.gc-section .controls.gc-turn-controls {
+  grid-template-columns: minmax(0, 1fr);
 }

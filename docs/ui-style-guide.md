@@ -603,8 +603,8 @@ Only show controls that are legal now (principle 4). Boost Defense outside the r
 | Next turn / Previous turn                   | Alt+N / P | GC  |
 | Open or focus the GC Console                | Alt+G     | GC  |
 | Open the active combatant's sheet           | Alt+S     | GC  |
-| Press the primary button on the newest card | Alt+Enter | All |
-| GC boost on the newest open NPC card        | Alt+B     | GC  |
+| Press the primary button on the acting combatant's newest card, else the newest card | Alt+Enter | All |
+| GC boost on the newest open NPC card (second press confirms) | Alt+B     | GC  |
 | Spend GC action dice (acting NPC chosen)    | Alt+D     | GC  |
 
 A new shortcut is added to that file's table, marked `restricted` when it is for the GC, and listed in `docs/gc-tools.md`. Card shortcuts find their button by `.sc2-primary-action` or `data-roll-key`, not by its text.

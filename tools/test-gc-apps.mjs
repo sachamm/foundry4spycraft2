@@ -1002,9 +1002,9 @@ test("each view has one filled button, chosen from the state", async () => {
   assert.equal(primaryAction({ ...base, view: "prep", checklistShown: true }), "checklist");
   assert.equal(primaryAction({ ...base, view: "prep", missionActive: false }), "startMission");
   assert.equal(primaryAction({ ...base, view: "prep" }), "editMission");
-  assert.equal(primaryAction({ ...base, view: "prep", missionActive: false, missionEnded: true }), "resumeMission");
+  assert.equal(primaryAction({ ...base, view: "prep", missionActive: false, missionEnded: true }), "planNextMission");
   assert.equal(primaryAction({ ...base, view: "play", diceCurrent: false }), "beginSession");
-  assert.equal(primaryAction({ ...base, view: "play" }), "spendDice");
+  assert.equal(primaryAction({ ...base, view: "play" }), "nextScene");
   assert.equal(primaryAction({ ...base, view: "play", combat: { started: false, unrolled: 2 } }), "groupInitiative");
   assert.equal(primaryAction({ ...base, view: "play", combat: { started: false, unrolled: 0 } }), "nextTurn");
   assert.equal(primaryAction({ ...base, view: "wrap", combat: { started: true } }), "nextTurn");
@@ -1105,6 +1105,11 @@ test("the Combat section names the acting combatant, words each row and finds th
       ["g2", "Count 15", false],
       ["b", "not rolled", false]
     ]
+  );
+  // Two combatants named alike are numbered in turn order; a unique name stays as it is.
+  assert.deepEqual(
+    rows.map(row => row.name),
+    ["a1", "Guard #1", "Guard #2", fight.combatants.get("b").name]
   );
   const mobs = turnTools.mobGroups(fight);
   assert.deepEqual(

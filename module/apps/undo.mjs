@@ -244,8 +244,11 @@ export function postUndo(
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
-    // The GC sees every note, so a step a player took can be undone by the GC too.
-    whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
+    // A player's note also goes to the GC, who can undo it too; a GC's note stays with that GC, so in a world with two
+    // GCs neither is offered the other's steps.
+    whisper: game.user.isGM
+      ? [game.user.id]
+      : [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
     flags: {
       spycraft2: {
@@ -433,9 +436,16 @@ async function undoRecord(message, record) {
 /** The Undo button on a note (the `renderChatMessageHTML` hook). */
 export function renderUndo(message, html) {
   const record = message.flags?.spycraft2?.undo;
-  if (!record || !(message.isAuthor || game.user?.isGM)) return;
+  if (!record || !(message.isAuthor || (game.user?.isGM && !message.author?.isGM))) return;
   const row = document.createElement("div");
   row.className = "spycraft2 roll-controls";
+  if (!message.isAuthor && message.author?.name) {
+    // A GC looking at a player's note: say whose step it was.
+    const by = document.createElement("p");
+    by.className = "hint";
+    by.textContent = loc`Step taken by ${message.author.name}.`;
+    row.append(by);
+  }
   if (record.done) {
     const note = document.createElement("p");
     note.className = "hint";

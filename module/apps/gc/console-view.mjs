@@ -18,7 +18,8 @@ export function consoleView(state, stored = null, key = null) {
 export const VIEW_SECTIONS = {
   prep: ["mission", "objectives", "antagonists", "complications", "organizations", "campaign", "reference"],
   play: ["combat", "dice", "objectives", "antagonists", "conflicts", "clock", "reference"],
-  wrap: ["mission", "objectives", "antagonists", "campaign"]
+  // The Wrap-up panel holds the mission's end steps, so the Mission section stays in Prep.
+  wrap: ["objectives", "antagonists", "campaign"]
 };
 
 /**
@@ -30,37 +31,43 @@ export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatS
       id: "mission",
       label: loc`Record the mission: name, team and Caliber`,
       done: !!mission.name,
-      action: "editMission"
+      action: "editMission",
+      button: loc`Edit mission…`
     },
     {
       id: "objectives",
       label: loc`Add at least one objective`,
       done: (mission.objectives ?? []).length > 0,
-      action: "addObjective"
+      action: "addObjective",
+      button: loc`Add objective…`
     },
     {
       id: "npcs",
       label: loc`Prepare the opposition: make an NPC and place it`,
       done: npcActors > 0,
-      action: "addNpcToScene"
+      action: "addNpcToScene",
+      button: loc`Add NPC to scene…`
     },
     {
       id: "start",
       label: loc`Start mission (fixes the Threat Level)`,
       done: !!mission.active || !!mission.ended,
-      action: "startMission"
+      action: "startMission",
+      button: loc`Start mission`
     },
     {
       id: "session",
       label: loc`Begin session (GC dice and starting action dice)`,
       done: !!diceCurrent,
-      action: "beginSession"
+      action: "beginSession",
+      button: loc`Begin session`
     },
     {
       id: "combat",
       label: loc`First combat: add tokens to the tracker, roll Initiative`,
       done: !!combatSeen,
       action: "consoleView",
+      button: loc`Go to Play`,
       view: "play"
     }
   ];
@@ -126,9 +133,10 @@ export function primaryAction({ view, checklistShown, missionActive, missionEnde
       : missionActive
         ? "editMission"
         : missionEnded
-          ? "resumeMission"
+          ? "planNextMission"
           : "startMission";
   if (view === "wrap") return missionActive ? "endMission" : "missionReport";
   if (combat) return combat.unrolled ? "groupInitiative" : "nextTurn";
-  return diceCurrent ? "spendDice" : "beginSession";
+  // Between fights a session moves scene by scene; the dice are spent from the turn bar or the dice section.
+  return diceCurrent ? "nextScene" : "beginSession";
 }

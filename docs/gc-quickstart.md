@@ -17,7 +17,7 @@ status strip:
 - **Wrap-up**: the XP report, exposure, standing and End mission.
 
 Each view has one filled button: the step you most likely take next. The **First session** list at the top of Prep
-mirrors this page and goes away once every step is done; each step has a **Do this step** button. Every button's
+mirrors this page, shows only the steps left, and goes away once every step is done; each step has its own button. Every button's
 tooltip says what it changes, and its key when it has one. The keys are listed under Reference.
 
 ## Before the players arrive (Prep)
@@ -30,14 +30,15 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
 3. **Prepare the opposition.** Create NPC actors (see [npc-creation.md](npc-creation.md)) and place them with
    **Add NPC to scene** in the Antagonists section.
 
-## When play begins (Play)
+## When play begins
 
-1. Press **Start mission** (in Prep, the Mission section) the first time the mission is played. This fixes the Threat
-   Level from the team.
-2. Press **Begin session** at the start of every session. This starts the session, sets up the GC action dice and
+1. Press **Start mission** in Prep's Mission section the first time the mission is played. This fixes the Threat
+   Level from the team. The console then opens in Play.
+2. Press **Begin session** at the start of every session (once one has begun, the button reads **Begin a new
+   session…**). This starts the session, sets up the GC action dice and
    gives each agent its starting action dice, with any Threat Level bonus. The status strip then shows when the
    session began. The two can be pressed in either order: whichever comes second adds only what the first could not.
-3. Press **Next scene** each time the scene changes. A notice confirms it.
+3. Press **Next scene** each time the scene changes; between fights it is Play's filled button. A notice confirms it.
 
 ## The first combat
 
@@ -50,14 +51,18 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
    goes straight to hit or miss), then **Next step on this combatant's card**, which presses the main button of the
    newest card about that combatant and says which one. Spend, Delay, Ready and the Damage save are under **Turn
    actions**. A player's turn is rolled from their own sheet; the card's top line names its state and its main button
-   is the next step (Alt+Enter presses it).
-5. For an NPC's result, **GC boost** on its card (Alt+B) spends a GC action die.
+   is the next step. During a fight Alt+Enter presses the acting combatant's newest card, or the newest card when that
+   combatant has none, and marks the card it pressed.
+5. For an NPC's result, **GC boost** on its card spends a GC action die. Alt+B does the same: the first press marks
+   the card it would boost, a second press within three seconds spends the die.
 6. Click a name in the order to select its token and centre the map on it; double-click to open its sheet.
 
 ## After the session (Wrap-up)
 
 The Wrap-up view's filled button is **End mission** while the mission runs, and **XP report** once it has ended.
-Exposure infractions and the standing payout are in the same list.
+Exposure infractions and the standing payout are in the same list. When everyone is paid, **Plan the next mission**
+files the record as a journal entry under Mission records and starts a new one with the same team and Caliber; it is
+then Prep's filled button too.
 
 ## What stays with you
 

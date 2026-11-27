@@ -45,17 +45,36 @@ export function pressNewestCard(selector, { notify = false } = {}) {
     const { label, who } = describePress(button);
     ui.notifications.info(loc`${label}: ${who}.`);
   }
+  showPressed(button);
   button.click();
   return true;
 }
-const press = selector => () => (pressNewestCard(selector, { notify: true }), true);
+
+/** Bring the pressed card into view and mark it for a moment, so a GC sees which card a key or button acted on. */
+function showPressed(button) {
+  const card = button.closest?.("[data-message-id]");
+  if (!card) return;
+  card.scrollIntoView?.({ block: "nearest" });
+  card.classList?.add("sc2-pressed");
+  setTimeout(() => card.classList?.remove("sc2-pressed"), 1500);
+}
+
+/**
+ * Alt+Enter: during a fight, the acting combatant's newest card with a next step; otherwise, or when that combatant
+ * has none, the newest card in the log. The console's "Next step on this combatant's card" uses the first half alone.
+ */
+export function pressNextStep(selector) {
+  const acting = globalThis.game?.combat?.started ? game.combat.combatant : null;
+  if (acting && pressActorCard(acting, selector, { quiet: true })) return true;
+  return pressNewestCard(selector, { notify: true });
+}
 
 /**
  * Press the next step on the newest card about this combatant: its actor posted it, or the card is about its token.
  * Another combatant's card, or a player's card about someone else, is never pressed in its place.
  * @param {Combatant} combatant
  */
-export function pressActorCard(combatant, selector) {
+export function pressActorCard(combatant, selector, { quiet = false } = {}) {
   const actorId = combatant?.actor?.id,
     tokenId = combatant?.tokenId ?? combatant?.token?.id;
   const about = card => {
@@ -70,10 +89,12 @@ export function pressActorCard(combatant, selector) {
       if (!button) continue;
       const { label } = describePress(button);
       ui.notifications.info(loc`${label}: ${combatant.name}.`);
+      showPressed(button);
       button.click();
       return true;
     }
   }
+  if (quiet) return false;
   ui.notifications.info(loc`No card of ${combatant?.name ?? loc`this combatant`} is waiting for a next step.`);
   return false;
 }
@@ -128,11 +149,21 @@ function gcBoostShortcut() {
   const id = button.closest("[data-message-id]")?.dataset.messageId,
     message = messages?.get(id),
     who = message?.speaker?.alias ?? message?.alias ?? loc`the newest result`;
-  // Say which card takes the die: the spend cannot be taken back from here.
+  // A die spent cannot be taken back from here, so the first press names the card and a second press spends.
+  const now = Date.now();
+  if (boostArmed?.button !== button || now > boostArmed.until) {
+    boostArmed = { button, until: now + BOOST_CONFIRM_MS };
+    showPressed(button);
+    ui.notifications.info(loc`GC boost on ${who}? Press the key again to spend the die.`);
+    return true;
+  }
+  boostArmed = null;
   ui.notifications.info(loc`GC boost on ${who}.`);
   button.click();
   return true;
 }
+const BOOST_CONFIRM_MS = 3000;
+let boostArmed = null;
 
 // A turn change is still on its way to the server when the next key arrives, so the sheet shortcut waits for it.
 let turnChange = null;
@@ -213,10 +244,10 @@ const bindings = ({ openConsole }) => [
   [
     "cardPrimary",
     locKey`Press the next step on the newest card`,
-    locKey`Presses the main button of the newest chat card that has one.`,
+    locKey`Presses the main button of the acting combatant's newest card during a fight, else of the newest card that has one.`,
     [{ key: "Enter", modifiers: ["Alt"] }],
     false,
-    press("button.sc2-primary-action[data-roll-control]")
+    () => (pressNextStep("button.sc2-primary-action[data-roll-control]"), true)
   ],
   [
     "spendDice",
@@ -235,7 +266,7 @@ const bindings = ({ openConsole }) => [
   [
     "gcBoost",
     locKey`GC boost on your newest NPC card`,
-    locKey`Spends a GC action die on the card under the pointer, or on the newest result you posted that can still be boosted.`,
+    locKey`Spends a GC action die on the card under the pointer, or on the newest result you posted that can still be boosted. Press twice: the first press names the card.`,
     [{ key: "KeyB", modifiers: ["Alt"] }],
     true,
     gcBoostShortcut

@@ -75,7 +75,7 @@ export function actingBlock(combat) {
   return {
     defeated,
     id: combatant.id,
-    name: combatant.name,
+    name: combatantLabels(combat).get(combatant.id) ?? combatant.name,
     npc: actor.type === "npc",
     standard: actor.type === "npc" && !npcIsSpecial(actor),
     defense: actor.system?.defense?.total ?? null,
@@ -88,14 +88,46 @@ export function actingBlock(combat) {
         : loc`${left} half actions left`,
     weapons: [...(defeated ? [] : (actor.items ?? []))]
       .filter(item => item.type === "weapon")
-      .map(item => ({ id: item.id, name: item.name })),
+      .map(item => weaponButton(actor, item)),
     outcomes: ACTING_OUTCOMES.map(([step, label]) => ({ step, label: `${OUTCOME_KEY}${label}` }))
   };
+}
+
+/** One attack button's facts: the bonus and damage the GC would otherwise open the sheet to read. */
+function weaponButton(actor, item) {
+  let total = null;
+  try {
+    total = actor.weaponAttack?.(item)?.total ?? null;
+  } catch {
+    total = null;
+  }
+  const facts = [Number.isFinite(total) ? signed(total) : "", item.system?.damage ?? ""].filter(Boolean).join(" · ");
+  return { id: item.id, name: item.name, facts };
+}
+
+/**
+ * Each combatant's name as the console shows it: a name several combatants share gets "#1", "#2"… in turn order, so
+ * three "Guard" rows, the acting heading and a notice can be told apart.
+ */
+export function combatantLabels(combat) {
+  const turns = [...(combat?.turns ?? [])],
+    totals = new Map(),
+    seen = new Map();
+  for (const combatant of turns) totals.set(combatant.name, (totals.get(combatant.name) ?? 0) + 1);
+  return new Map(
+    turns.map(combatant => {
+      if (totals.get(combatant.name) < 2) return [combatant.id, combatant.name];
+      const number = (seen.get(combatant.name) ?? 0) + 1;
+      seen.set(combatant.name, number);
+      return [combatant.id, `${combatant.name} #${number}`];
+    })
+  );
 }
 
 /** The combat list, one row per combatant, with the words a GC reads at a glance. */
 export function combatRows(combat) {
   if (!combat) return [];
+  const labels = combatantLabels(combat);
   return combat.turns.map(combatant => {
     const fluid = combatant.flags?.spycraft2?.fluid,
       pending = fluid?.round === combat.round ? fluid.modifiers.reduce((sum, entry) => sum + entry.amount, 0) : 0,
@@ -108,7 +140,7 @@ export function combatRows(combat) {
     if (combatant.flags?.spycraft2?.mustPress) notes.push(loc`must Press`);
     return {
       id: combatant.id,
-      name: combatant.name,
+      name: labels.get(combatant.id) ?? combatant.name,
       current,
       defeated: !!combatant.isDefeated,
       count: Number.isFinite(combatant.initiative) ? loc`Count ${combatant.initiative}` : loc`not rolled`,

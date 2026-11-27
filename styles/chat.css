@@ -239,3 +239,10 @@
   padding-top: 2px;
   border-top: 1px solid var(--sc2-rule);
 }
+
+/* The card a key or console button just pressed, marked for a moment (keybindings.mjs showPressed). */
+.chat-message.sc2-pressed,
+[data-message-id].sc2-pressed {
+  outline: 2px solid var(--sc2-action);
+  outline-offset: -2px;
+}
