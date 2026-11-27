@@ -217,6 +217,8 @@ export async function startMission() {
   await startUsagePeriod("mission");
   await updateMission(mission => ({
     active: true,
+    // When this run began: a Triumph on a card after it counts for the team's XP (p.331).
+    startedAt: Date.now(),
     ended: false,
     infractions: [],
     scenesPlayed: 0,
@@ -246,6 +248,12 @@ export async function endMission({ clear = false } = {}) {
   const mission = getMission();
   if (clear) return setMission(defaultMission());
   const open = (mission.objectives ?? []).filter(objective => !objective.complete).length;
+  // A critical objective left undone is exposure for every agent, by its grade (pp.435–436).
+  const criticalRow = T.exposure.find(row => row.id === "complete-critical-objective-complication");
+  const failedCritical = (mission.objectives ?? [])
+    .filter(objective => objective.critical && !objective.complete)
+    .map(objective => ({ objective, infraction: criticalRow?.infractions?.[Number(objective.grade) - 1] }))
+    .filter(entry => entry.infraction);
   const lines = [
     loc`The mission stops being active: NPCs that follow the mission's Threat Level go back to their own.`,
     loc`The record is kept, so the XP report, each agent's XP settlement and the standing payout still work.`,
@@ -261,7 +269,21 @@ export async function endMission({ clear = false } = {}) {
         check: "countFinalScene",
         label: loc`Count the scene being played now as the mission's last (scene ${(mission.scenesPlayed ?? 0) + 1})`,
         checked: true
-      }
+      },
+      ...(failedCritical.length
+        ? [
+            {
+              check: "recordCritical",
+              label: loc`Record exposure for each agent for the critical objectives not completed: ${failedCritical
+                .map(({ objective, infraction }) => {
+                  const penalty = exposurePenalty(infraction);
+                  return `${objective.name} (${penalty.reputation} / −${money(-penalty.netWorth)})`;
+                })
+                .join("; ")}`,
+              checked: true
+            }
+          ]
+        : [])
     ],
     ok: loc`End the mission`
   });
@@ -272,6 +294,27 @@ export async function endMission({ clear = false } = {}) {
     ended: true,
     ...(input.countFinalScene === true ? { scenesPlayed: (now.scenesPlayed ?? 0) + 1 } : {})
   }));
+  if (input.recordCritical === true && failedCritical.length) {
+    // Each agent pays in their own affiliation's currency; the Undo note gives the standing back.
+    const team = teamActors(getMission()),
+      recorded = [];
+    await withUndo(team, loc`Critical objectives: exposure recorded`, async () => {
+      for (const actor of team) {
+        const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation";
+        let total = 0;
+        for (const { infraction } of failedCritical) total += exposurePenalty(infraction)[currency];
+        await actor.update({ [`system.${currency}`]: (actor.system[currency] ?? 0) + total });
+        recorded.push({
+          actor: actor.id,
+          name: loc`Critical objectives not completed`,
+          currency,
+          penalty: total,
+          at: Date.now()
+        });
+      }
+      await updateMission(m => ({ infractions: [...(m.infractions ?? []), ...recorded] }));
+    });
+  }
   await say(
     `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`
   );

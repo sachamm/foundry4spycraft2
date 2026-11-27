@@ -13,18 +13,33 @@ export const missionCatalog = {
   }
 };
 
+/** Whether an agent's card shows a Triumph since this mission run began (p.331), for the settlement's default. */
+function missionTriumph(mission) {
+  if (!Number.isFinite(mission?.startedAt)) return false;
+  return [...(globalThis.game?.messages ?? [])].some(message => {
+    const check = message.flags?.spycraft2;
+    if (!check?.triumphed || check.superseded || (message.timestamp ?? 0) < mission.startedAt) return false;
+    const actor = globalThis.game?.actors?.get?.(message.speaker?.actor);
+    return actor?.type === "agent";
+  });
+}
+
 export function missionSettlementDefaults() {
   try {
     const mission = globalThis.game?.settings?.get("spycraft2", "mission");
     // An ended mission still settles: its record is kept until the next one starts.
-    if (!mission?.active && !mission?.ended) return { baseXP: 0, threatLevel: null };
+    if (!mission?.active && !mission?.ended) return { baseXP: 0, threatLevel: null, triumph: false };
     const season = (globalThis.game.settings.get("spycraft2", "campaign")?.qualities ?? []).map(id => ({
       id,
       scripted: true
     }));
     const xp = missionBaseXP({ ...mission, qualities: [...season, ...(mission.qualities ?? [])] }, missionCatalog);
-    return { baseXP: xp.total, threatLevel: Number.isSafeInteger(mission.threatLevel) ? mission.threatLevel : null };
+    return {
+      baseXP: xp.total,
+      threatLevel: Number.isSafeInteger(mission.threatLevel) ? mission.threatLevel : null,
+      triumph: missionTriumph(mission)
+    };
   } catch {
-    return { baseXP: 0, threatLevel: null };
+    return { baseXP: 0, threatLevel: null, triumph: false };
   }
 }

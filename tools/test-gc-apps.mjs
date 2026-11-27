@@ -229,7 +229,7 @@ const lastMessage = () => messages.at(-1)?.content ?? "";
 
 test("mission record: Threat Level is fixed at mission start and feeds the XP defaults", async () => {
   assert.equal(state.missionThreatLevel(), null);
-  assert.deepEqual(missionSettlementDefaults(), { baseXP: 0, threatLevel: null });
+  assert.deepEqual(missionSettlementDefaults(), { baseXP: 0, threatLevel: null, triumph: false });
   answer({
     name: "Cold Open",
     caliber: 3,
@@ -271,7 +271,7 @@ test("mission record: Threat Level is fixed at mission start and feeds the XP de
   await mission.changeEntry("objectives", m.objectives[0].id, "complete");
   await mission.changeEntry("antagonists", m.antagonists[1].id, "encountered");
   assert.equal(state.missionXP().total, 50 + 75 + 200);
-  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6 });
+  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6, triumph: false });
   await mission.missionReport();
   assert.match(lastMessage(), /\(325 \+ 25\) × 5 = <b>1750<\/b>/);
 });
@@ -341,7 +341,11 @@ test("End mission asks first, keeps the record for settlement, and Resume reopen
   let m = state.getMission();
   assert.deepEqual([m.active, m.ended], [false, true]);
   assert.match(lastMessage(), /ended/);
-  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6 }, "settlement still has the totals");
+  assert.deepEqual(
+    missionSettlementDefaults(),
+    { baseXP: 325, threatLevel: 6, triumph: false },
+    "settlement still has the totals"
+  );
   assert.equal(consoleContext().mission.ended, true);
   await mission.resumeMission();
   m = state.getMission();
@@ -1063,4 +1067,41 @@ test("a dramatic scene doubles hostile combatants only (p.424)", () => {
   assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: 0 } }), false, "neutral");
   assert.equal(spend.dramaticOpponent({ hasPlayerOwner: true, token: { disposition: -1 } }), false);
   assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false }), true, "no token: any NPC");
+});
+
+test("an agent's Triumph since the mission began ticks the settlement's Triumph box (p.331)", async () => {
+  const saved = state.getMission();
+  await state.updateMission({ active: true, startedAt: 1000 });
+  try {
+    game.messages = [{ timestamp: 2000, speaker: { actor: "guard" }, flags: { spycraft2: { triumphed: true } } }];
+    assert.equal(missionSettlementDefaults().triumph, false, "an NPC's Triumph does not count");
+    game.messages.push({ timestamp: 500, speaker: { actor: "a1" }, flags: { spycraft2: { triumphed: true } } });
+    assert.equal(missionSettlementDefaults().triumph, false, "one from before the mission does not count");
+    game.messages.push({ timestamp: 2000, speaker: { actor: "a1" }, flags: { spycraft2: { triumphed: true } } });
+    assert.equal(missionSettlementDefaults().triumph, true);
+  } finally {
+    delete game.messages;
+    await state.setMission(saved);
+  }
+});
+
+test("End mission can record exposure for a critical objective left undone (pp.435–436)", async () => {
+  const saved = state.getMission(),
+    before = actors.get("a1").system.reputation;
+  await state.setMission({
+    ...saved,
+    active: true,
+    ended: false,
+    objectives: [{ id: "c1", name: "Recover the ledger", grade: 2, critical: true, complete: false, scenes: 1 }],
+    infractions: []
+  });
+  try {
+    dialogAnswers.push({ countFinalScene: false, recordCritical: true });
+    assert.equal(await mission.endMission(), true);
+    assert.equal(actors.get("a1").system.reputation, before - 2, "Grade II costs 2 Reputation");
+    assert.equal(state.getMission().infractions.length, state.teamActors().length);
+  } finally {
+    for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
+    await state.setMission(saved);
+  }
 });
