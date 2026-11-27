@@ -27,3 +27,4 @@ packs/*/
 # Browser layout regression artifacts
 test-results/
 playwright-report/
+tools/ui-lab/out/
