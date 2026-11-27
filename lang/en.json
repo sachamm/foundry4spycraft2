@@ -77,6 +77,9 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Npc": {
+   "DamageHeading": "Damage",
+   "ActionsHeading": "Actions",
+   "ItemsAndNotes": "Items and notes",
    "PinnedResults": "What these choices give",
    "PinnedXP": "XP reward",
    "PinnedHealth": "Health",

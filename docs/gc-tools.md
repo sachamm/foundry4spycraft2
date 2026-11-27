@@ -127,6 +127,12 @@ rebind them under Configure Controls (the button sits in the console's Reference
 
 Every control is also reachable with Tab; Enter submits a dialog and Esc cancels it.
 
+### What a hit did
+
+When damage is applied, what it did to each target is written on the damage card itself, under the total, so a hit
+reads as its attack card and its damage card. An outcome that calls for a save, shows dice, or comes from a whispered
+card still gets a card of its own.
+
 ### Undo
 
 Applying damage from a card, rolling a standard NPC's Damage save and spending GC action dice each leave a short
@@ -138,7 +144,7 @@ critical bought from a card changes the card itself and leaves no Undo note.
 
 ## Standard NPC damage (pp.331–332, 452)
 
-Standard NPCs and animals show a Damage save line on their sheet. **Suffer damage** rolls against DC 10 + half of all damage taken this scene. A failure kills (lethal) or knocks out (subdual, stress); blast damage adds a failed save per 10 points missed; each die spent activating a critical hit is an automatic failure; each *tough* grade ignores one failed save per scene. Accumulated damage clears when a save fails or a new scene starts. The **save adjustment** field holds the +1 per wound / per 2 vitality conversion.
+Standard NPCs and animals have a Damage section under their weapons. **Roll Damage save…** rolls against DC 10 + half of all damage taken this scene. A failure kills (lethal) or knocks out (subdual, stress); blast damage adds a failed save per 10 points missed; each die spent activating a critical hit is an automatic failure; each *tough* grade ignores one failed save per scene. Accumulated damage clears when a save fails or a new scene starts. The **save adjustment** field holds the +1 per wound / per 2 vitality conversion.
 
 The sheet also has an NPC **skill check** (the higher of Competence and the skilled bonus, which also sets the result cap) and **Disposition**.
 

@@ -486,6 +486,20 @@ test("an NPC sheet may be narrower than an agent sheet", async () => {
   assert.equal(sheetPlacement({ width: 860, height: 760 }, { ...room, width: 1000 }, "agent").width, 640);
   assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "npc").width, 420);
   assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "agent").width, 640);
+  // The GC Console in its own window at the left: a new sheet opens beside it when the map has room for both.
+  const wide = { ...room, width: 1920, height: 1080 };
+  assert.equal(
+    sheetPlacement({ width: 480, height: 640 }, { ...wide, avoid: { left: 110, width: 720 } }, "npc").left,
+    842
+  );
+  assert.equal(
+    sheetPlacement({ width: 480, height: 640 }, { ...room, avoid: { left: 110, width: 720 } }, "npc").left,
+    110
+  );
+  assert.equal(
+    sheetPlacement({ width: 480, height: 640 }, { ...wide, avoid: { left: 1200, width: 300 } }, "npc").left,
+    110
+  );
 });
 
 test("a dialog field marked for one choice shows only while that choice is made", async () => {

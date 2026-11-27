@@ -91,6 +91,50 @@
   <ul class="item-list compact">
     {{#each weapons}}{{> "systems/spycraft2/templates/actor/parts/weapon-row.hbs" removable=true}}{{else}}<li class="muted">{{localize "SPYCRAFT.Npc.NoWeapons"}}</li>{{/each}}
   </ul>
+  {{!-- A standard NPC is hit as often as it attacks: its Damage save sits right under the weapons. --}}
+  {{#unless gcPlay.special}}<div class="npc-damage-save">
+    <h3>{{localize "SPYCRAFT.Npc.DamageHeading"}}</h3>
+    <div class="npc-results">
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.DamageSave"}}</span><b class="sc2-value">{{signed gcPlay.damage.bonus}}</b></div>
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.DamageTaken"}}</span><b class="sc2-value">{{gcPlay.damage.track.accumulated}}</b></div>
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.NextDC"}}</span><b class="sc2-value">{{gcPlay.damage.nextDC}}</b></div>
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.FailedSaves"}}</span><b class="sc2-value">{{gcPlay.damage.track.failures}}</b></div>
+      {{#if gcPlay.damage.tough}}<div
+        class="sc2-field"><span
+        class="sc2-caption">{{localize "SPYCRAFT.Npc.Tough"}}</span><b
+        class="sc2-value">{{gcPlay.damage.track.ignored}}/{{gcPlay.damage.tough}}</b></div>{{/if}}
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.State"}}</span><b class="sc2-value">{{gcPlay.damage.stateLabel}}</b></div>
+    </div>
+    <p><button type="button"
+      class="sc2-primary-action sc2-action"
+      data-action="npcDamageSave"
+      data-tooltip="{{localize 'SPYCRAFT.Npc.RollDamageSaveHint'}}">{{localize "SPYCRAFT.Npc.RollDamageSave"}}</button> <button type="button"
+      class="sc2-action edit-only"
+      data-action="resetDamageTrack"
+      data-tooltip="{{localize 'SPYCRAFT.Npc.ResetTrackHint'}}">{{localize "SPYCRAFT.Npc.ResetTrack"}}</button></p>
+    <p>
+    <label class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.SaveAdjustmentVitalityWoundEffectsP"}} <input
+      name="system.damageSaveAdjust" type="number" value="{{system.damageSaveAdjust}}" class="w-2" /></label>
+    {{#unless system.npcProfile.enabled}}<label class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRole"}} <select
+      name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label>
+    <label
+      class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.DamageSaveBonus"}} <input
+      name="system.manualDamageSave" type="number" value="{{system.manualDamageSave}}"
+      class="w-2" /></label>{{/unless}}</p></div>{{/unless}}
+  <h3>{{localize "SPYCRAFT.Npc.ActionsHeading"}}</h3>
+  <div class="npc-play">
+    {{#if gcPlay.special}}{{#unless system.npcProfile.enabled}}<p class="edit-only"><label>{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRoleSetsTheGCS"}} <select
+      name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label></p>{{/unless}}{{/if}}
+    <p><button type="button" class="sc2-action" data-action="rollNpcSkill">{{localize "SPYCRAFT.Template.ActorNpcSheet.SkillCheck"}}</button> <button
+      type="button" class="sc2-action" data-action="manageDisposition">{{localize "SPYCRAFT.Template.ActorNpcSheet.Disposition"}}{{gcPlay.baseDisposition}}{{#each gcPlay.dispositions}}; {{name}}: {{grade}}{{/each}})</button>{{#if system.promoted}} · <b>{{localize "SPYCRAFT.Template.ActorNpcSheet.PromotedToSpecialForThisMission"}}</b> <button
+      type="button" class="sc2-action" data-action="endPromotion">{{localize "SPYCRAFT.Template.ActorNpcSheet.End"}}</button>{{/if}}</p>
+    {{#if gcPlay.special}}<p><label>{{playLabels.stress}} <input name="flags.spycraft2.nonLethal.stress"
+      type="number" min="0" step="1" value="{{nonLethal.stress}}" class="w-2" /></label> <label>{{playLabels.subdual}} <input
+      name="flags.spycraft2.nonLethal.subdual" type="number" min="0" step="1" value="{{nonLethal.subdual}}"
+      class="w-2" /></label> <button type="button" class="sc2-action" data-action="restAndRecover">{{playLabels.rest}}</button>{{#if dying}} <button
+      type="button" data-action="rollDying" class="bad sc2-action">{{playLabels.dying}}</button>{{/if}}</p>{{/if}}
+    {{> "systems/spycraft2/templates/actor/parts/hazards.hbs"}}
+  </div>
   <div class="npc-actions" role="group" aria-labelledby="{{appId}}-npc-actions">
     <details class="npc-more-actions" data-key="npcActions"><summary id="{{appId}}-npc-actions">{{localize "SPYCRAFT.Template.ActorNpcSheet.MoreActions"}}</summary>
     <div class="npc-action-buttons">
@@ -121,47 +165,6 @@
       data-combatant-id="{{id}}">{{localize "SPYCRAFT.Template.ActorNpcSheet.ReviewIncludedPenalty"}}</button>{{/if}}</p>{{/each}}
     {{#each system.cheapShotActive}}<p class="bad">{{localize "SPYCRAFT.Template.ActorNpcSheet.CheapShot"}} {{#if (sc2eq choice "speed")}}{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed10FtApplyToThe"}}{{else}}{{choice}} {{localize "SPYCRAFT.Template.ActorNpcSheet.AttackSkillChecks2"}}{{/if}}{{localize "SPYCRAFT.Template.ActorNpcSheet.EndsWithTheSceneOrA"}}</p>{{/each}}
   </div>
-  <div class="npc-play">
-    {{#if gcPlay.special}}{{#unless system.npcProfile.enabled}}<p class="edit-only"><label>{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRoleSetsTheGCS"}} <select
-      name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label></p>{{/unless}}{{/if}}
-    <p><button type="button" class="sc2-action" data-action="rollNpcSkill">{{localize "SPYCRAFT.Template.ActorNpcSheet.SkillCheck"}}</button> <button
-      type="button" class="sc2-action" data-action="manageDisposition">{{localize "SPYCRAFT.Template.ActorNpcSheet.Disposition"}}{{gcPlay.baseDisposition}}{{#each gcPlay.dispositions}}; {{name}}: {{grade}}{{/each}})</button>{{#if system.promoted}} · <b>{{localize "SPYCRAFT.Template.ActorNpcSheet.PromotedToSpecialForThisMission"}}</b> <button
-      type="button" class="sc2-action" data-action="endPromotion">{{localize "SPYCRAFT.Template.ActorNpcSheet.End"}}</button>{{/if}}</p>
-    {{#if gcPlay.special}}<p><label>{{playLabels.stress}} <input name="flags.spycraft2.nonLethal.stress"
-      type="number" min="0" step="1" value="{{nonLethal.stress}}" class="w-2" /></label> <label>{{playLabels.subdual}} <input
-      name="flags.spycraft2.nonLethal.subdual" type="number" min="0" step="1" value="{{nonLethal.subdual}}"
-      class="w-2" /></label> <button type="button" class="sc2-action" data-action="restAndRecover">{{playLabels.rest}}</button>{{#if dying}} <button
-      type="button" data-action="rollDying" class="bad sc2-action">{{playLabels.dying}}</button>{{/if}}</p>{{/if}}
-    {{#unless gcPlay.special}}<div class="npc-damage-save">
-      <div class="npc-results">
-        <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.DamageSave"}}</span><b class="sc2-value">{{signed gcPlay.damage.bonus}}</b></div>
-        <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.DamageTaken"}}</span><b class="sc2-value">{{gcPlay.damage.track.accumulated}}</b></div>
-        <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.NextDC"}}</span><b class="sc2-value">{{gcPlay.damage.nextDC}}</b></div>
-        <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.FailedSaves"}}</span><b class="sc2-value">{{gcPlay.damage.track.failures}}</b></div>
-        {{#if gcPlay.damage.tough}}<div
-          class="sc2-field"><span
-          class="sc2-caption">{{localize "SPYCRAFT.Npc.Tough"}}</span><b
-          class="sc2-value">{{gcPlay.damage.track.ignored}}/{{gcPlay.damage.tough}}</b></div>{{/if}}
-        <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.State"}}</span><b class="sc2-value">{{gcPlay.damage.stateLabel}}</b></div>
-      </div>
-      <p><button type="button"
-        class="sc2-primary-action sc2-action"
-        data-action="npcDamageSave"
-        data-tooltip="{{localize 'SPYCRAFT.Npc.RollDamageSaveHint'}}">{{localize "SPYCRAFT.Npc.RollDamageSave"}}</button> <button type="button"
-        class="sc2-action edit-only"
-        data-action="resetDamageTrack"
-        data-tooltip="{{localize 'SPYCRAFT.Npc.ResetTrackHint'}}">{{localize "SPYCRAFT.Npc.ResetTrack"}}</button></p>
-      <p>
-      <label class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.SaveAdjustmentVitalityWoundEffectsP"}} <input
-        name="system.damageSaveAdjust" type="number" value="{{system.damageSaveAdjust}}" class="w-2" /></label>
-      {{#unless system.npcProfile.enabled}}<label class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRole"}} <select
-        name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label>
-      <label
-        class="edit-only">{{localize "SPYCRAFT.Template.ActorNpcSheet.DamageSaveBonus"}} <input
-        name="system.manualDamageSave" type="number" value="{{system.manualDamageSave}}"
-        class="w-2" /></label>{{/unless}}</p></div>{{/unless}}
-    {{> "systems/spycraft2/templates/actor/parts/hazards.hbs"}}
-  </div>
   {{#if system.qualityEffects.notes.length}}<div class="npc-qualities-play">
     <h3>{{localize "SPYCRAFT.Template.ActorNpcSheet.QualitiesInPlay"}}</h3>
     <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>
@@ -175,7 +178,8 @@
     {{#if featPlay.health}}<p>{{featPlay.health}}</p>{{/if}}
     {{#if featPlay.uncounted}}<p>{{featPlay.uncounted}}</p>{{/if}}
   </div>{{/if}}
-  <h3>{{localize "SPYCRAFT.Items"}}</h3>
+  {{!-- Gear and notes are rarely needed mid-fight, so they fold away; Edit opens them. --}}
+  <details class="npc-notes" data-key="npcNotes"{{#if editMode}} open{{/if}}><summary>{{localize "SPYCRAFT.Npc.ItemsAndNotes"}}</summary>
   <ul class="item-list compact">
     {{#each otherItems}}<li data-item-id="{{id}}"><button type="button" data-action="itemEdit" class="name sc2-action">{{name}}</button> <span
       class="muted">{{localize (concat "TYPES.Item." type)}}</span>
@@ -190,4 +194,5 @@
         aria-hidden="true"></i></button></span></li>{{/each}}
   </ul>
   {{> "systems/spycraft2/templates/parts/editor.hbs" field="system.biography" value=system.biography enriched=enrichedBiography}}
+  </details>
 </section>
