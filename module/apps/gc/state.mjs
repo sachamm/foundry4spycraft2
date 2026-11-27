@@ -14,7 +14,16 @@ const refresh = () => {
     actor.reset();
     renderOpenSheet(actor);
   }
-  for (const token of globalThis.canvas?.tokens?.placeables ?? []) if (token.actor?.isToken) token.actor.reset();
+  // Unlinked tokens on every scene, not just the one in view: a fight elsewhere must read the new numbers too.
+  const seen = new Set();
+  const resetToken = actor => {
+    if (!actor?.isToken || seen.has(actor)) return;
+    seen.add(actor);
+    actor.reset();
+    renderOpenSheet(actor);
+  };
+  for (const scene of globalThis.game?.scenes ?? []) for (const token of scene.tokens ?? []) resetToken(token.actor);
+  for (const token of globalThis.canvas?.tokens?.placeables ?? []) resetToken(token.actor);
   globalThis.game?.spycraft2?.gc?.console?.render(false);
 };
 

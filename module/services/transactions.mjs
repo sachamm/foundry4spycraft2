@@ -404,7 +404,8 @@ export function periodResourceActors() {
   for (const scene of globalThis.game?.scenes ?? [])
     for (const token of scene.tokens ?? []) {
       const actor = token.actor;
-      if (actor?.type === "agent" && actor.isToken) actors.push(actor);
+      // NPC tokens too: an unlinked NPC's promotion and other per-mission state follow the new period (p.398).
+      if (["agent", "npc"].includes(actor?.type) && actor.isToken) actors.push(actor);
     }
   return [...new Map(actors.map(actor => [actor.uuid, actor])).values()];
 }
