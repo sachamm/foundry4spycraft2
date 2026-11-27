@@ -79,3 +79,16 @@ test("the targeted NPC's disposition toward the roller fills the dialog", () => 
   assert.equal(targetedNpc({ id: "a2" }, [token]).grade, "neutral");
   assert.equal(targetedNpc({ id: "a1" }, []), null);
 });
+
+test("a hand-built mastermind is a villain for disposition, and a graded NPC's disabled profile is ignored", () => {
+  const manual = { name: "Boss", actor: { type: "npc", system: { npcType: "special", manualRole: "mastermind" } } };
+  assert.equal(targetedNpc({ id: "a1" }, [manual]).villain, true);
+  const stale = {
+    name: "Clerk",
+    actor: {
+      type: "npc",
+      system: { npcType: "standard", npcProfile: { enabled: false, qualities: [{ id: "henchman" }] } }
+    }
+  };
+  assert.equal(targetedNpc({ id: "a1" }, [stale]).villain, false);
+});

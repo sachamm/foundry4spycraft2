@@ -15,6 +15,8 @@ import {
 import { missionEpoch } from "../rules/gear-acquisition.mjs";
 import { missionThreatLevel } from "./gc/state.mjs";
 import { loc } from "../i18n.mjs";
+import { queueRuleState } from "./rule-resource-scope.mjs";
+import { withUndo } from "./undo.mjs";
 
 const GRADES = ["Acquaintance", "Associate", "Confederate", "Partner"];
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
@@ -127,19 +129,28 @@ export async function summonContactPerson(actor, index, personIndex) {
     ok: loc`Summon`
   });
   if (!input) return null;
+  // Planned again from the sheet as it is now, one summon at a time, so a second dialog left open cannot call the
+  // same person twice in a mission. The write leaves an Undo note that gives the use back.
   let plan;
   try {
-    plan = summonPlan(contact, personIndex, {
-      mission: missionEpoch(actor.system),
-      threatLevel: missionThreatLevel(),
-      checkSucceeded: input.checkSucceeded === true
+    plan = await queueRuleState(actor, async () => {
+      const now = contactsOf(actor),
+        current = now[index];
+      if (!current?.people?.[personIndex] || personLabel(current.people[personIndex]) !== personLabel(person))
+        throw new Error(loc`That consultant or specialist is no longer listed. Open the sheet again.`);
+      const planned = summonPlan(current, personIndex, {
+        mission: missionEpoch(actor.system),
+        threatLevel: missionThreatLevel(),
+        checkSucceeded: input.checkSucceeded === true
+      });
+      current.people[personIndex] = planned.after;
+      now[index] = current;
+      await withUndo([actor], loc`Summon: ${personLabel(person)}`, () => actor.update({ "system.contacts": now }));
+      return planned;
     });
   } catch (error) {
     return refuse(error.message);
   }
-  contact.people[personIndex] = plan.after;
-  contacts[index] = contact;
-  await actor.update({ "system.contacts": contacts });
   const who = esc(contact.name || loc`A contact`),
     npc = loc`Other numbers as an NPC of Grade ${ROMAN[personNpcGrade(plan.grade) - 1]}.`;
   if (plan.kind === "specialist")

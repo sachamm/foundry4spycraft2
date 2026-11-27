@@ -13,7 +13,12 @@ export function targetedNpc(actor, targets = globalThis.game?.user?.targets ?? [
     const npc = token?.actor;
     if (npc?.type !== "npc") continue;
     const record = npc.system?.disposition;
-    const qualities = (npc.system?.npcProfile?.qualities ?? []).map(quality => quality.id ?? quality);
+    // A graded NPC's role is one of its qualities; a hand-built one names it as its manual role.
+    const qualities = npc.system?.npcProfile?.enabled
+      ? (npc.system.npcProfile.qualities ?? []).map(quality => quality.id ?? quality)
+      : npc.system?.manualRole
+        ? [npc.system.manualRole]
+        : [];
     return {
       name: token.name ?? npc.name,
       grade: record ? dispositionToward(record, actor?.id) : "",

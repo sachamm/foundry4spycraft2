@@ -37,8 +37,9 @@ export function registerGCSettings() {
     hidden({ scene: null, dramatic: false, source: null, dcBoosts: 0 }, refreshConsole)
   );
   game.settings.register(SYSTEM, "conflicts", hidden({}, refreshConsole));
-  // The Agency and the other enduring organizations (pp.389–395), by id.
-  game.settings.register(SYSTEM, "organizations", hidden({}, refreshConsole));
+  // The Agency and the other enduring organizations (pp.389–395), by id. Their Tools cap affiliated NPCs' gear, so a
+  // change recomputes the characters too.
+  game.settings.register(SYSTEM, "organizations", hidden({}));
   // Which console sections this GC has opened or closed, kept in the browser rather than the world.
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
