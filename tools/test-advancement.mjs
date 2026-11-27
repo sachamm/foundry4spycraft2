@@ -74,7 +74,12 @@ test("mission snapshots include independent PCs, exclude companions/NPCs, and re
     ],
     "first"
   );
-  assert.deepEqual(snapshot, { version: 1, mission: "first", levels: { "Actor.level": 4 } });
+  assert.deepEqual(snapshot, {
+    version: 1,
+    mission: "first",
+    levels: { "Actor.level": 4 },
+    crossroadsTitles: { "Actor.level": "" }
+  });
   assert.throws(() => missionLevelSnapshot([{ ...a, system: { level: -1 } }], "first"), /Review character levels/);
 });
 

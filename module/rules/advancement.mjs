@@ -1,19 +1,22 @@
 import { loc } from "../i18n.mjs";
 import { campaignXP } from "./campaign-creation.mjs";
+import { ownedCrossroadsTitle } from "./crossroads-xp.mjs";
 
 const levelOf = system => system.progression?.length ?? system.level ?? 0;
 const careerLevel = value => Number.isSafeInteger(value) && value >= 0 && value <= 20;
 
 /** Kept in the same settings transaction as the mission period, including its rollback journal. */
 export function missionLevelSnapshot(actors, mission) {
-  const levels = {};
+  const levels = {},
+    crossroadsTitles = {};
   for (const actor of actors.filter(a => a.type === "agent" && !a.system.companionOf?.ownerUuid)) {
     const level = levelOf(actor.system);
     if (!careerLevel(level) || typeof actor.uuid !== "string" || !actor.uuid)
       throw new Error(loc`Review character levels before starting the mission.`);
     levels[actor.uuid] = level;
+    crossroadsTitles[actor.uuid] = ownedCrossroadsTitle({ ...actor.system, level });
   }
-  return { version: 1, mission, levels };
+  return { version: 1, mission, levels, crossroadsTitles };
 }
 
 export function advancementPlan(

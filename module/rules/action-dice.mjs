@@ -4,6 +4,7 @@ import { errorDecisionPending } from "./check-candidates.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { trademarkBoost } from "./favored-gear.mjs";
 import { loc } from "../i18n.mjs";
+import { crossroadsMissionXPPolicy, crossroadsMissionXPBonus } from "./crossroads-xp.mjs";
 /** Doubled-die abilities never exceed two dice per die spent (pp.29,62), including Card Shark p.202. */
 export function actionDieBoostPlan(
   system,
@@ -255,6 +256,8 @@ export function missionXPPlan(
     modifierReason = "",
     missionCompleteConfirmed = false,
     mission = "initial",
+    actorUuid = system.actorUuid,
+    additionalExcludesCrossroads = false,
     at = 0
   } = {}
 ) {
@@ -275,14 +278,20 @@ export function missionXPPlan(
   if (system.missionXPRewards?.[key]) throw new Error(loc`This mission’s XP was already settled.`);
   const count = system.actionDieAwards?.[key]?.count ?? 0;
   if (!Number.isSafeInteger(count) || count < 0) throw new Error(loc`Review the mission’s action-die award ledger.`);
+  const crossroads = crossroadsMissionXPPolicy(system, { mission, actorUuid });
+  if (crossroads.needsReview)
+    throw Error(loc`The GC must review which Crossroads XP benefit was eligible when this mission began.`);
   const awardBaseBonus = 25 * Math.min(count, level),
     combinedBase = baseXP + awardBaseBonus,
     multiplier = Math.min(level, threatLevel),
     coreXP = combinedBase * multiplier,
-    totalXP = coreXP + additionalXP,
+    crossroadsXP = crossroadsMissionXPBonus(coreXP, crossroads),
+    totalXP = coreXP + crossroadsXP + additionalXP,
     xp = (system.xp ?? 0) + totalXP;
   if (![combinedBase, coreXP, totalXP, xp].every(Number.isSafeInteger))
     throw new Error(loc`The mission reward exceeds a safe whole number.`);
+  if (crossroadsXP > 0 && additionalXP > 0 && additionalExcludesCrossroads !== true)
+    throw Error(loc`Confirm that other post-multiplier XP excludes the automatically calculated Crossroads bonus.`);
   return {
     key,
     xp,
@@ -296,6 +305,9 @@ export function missionXPPlan(
       combinedBase,
       multiplier,
       coreXP,
+      ...(crossroads.source !== "no-xp-difference"
+        ? { crossroads: { ...crossroads, bonusXP: crossroadsXP, rounding: "up" } }
+        : {}),
       additionalXP,
       modifierReason: String(modifierReason).trim(),
       totalXP,

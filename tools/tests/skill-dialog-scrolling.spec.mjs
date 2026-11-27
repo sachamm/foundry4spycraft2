@@ -19,6 +19,8 @@ import {
   recordFavoredGearLevelChoices
 } from "../../module/apps/favored-gear-session.mjs";
 import { npcDamageSave } from "../../module/apps/gc/npc-play.mjs";
+import { reviewCrossroadsMissionXP } from "../../module/apps/crossroads-xp.mjs";
+import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -217,6 +219,60 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+for (const mode of ["eligibility", "settlement"])
+  test(`Crossroads XP ${mode} keeps actual source fields and confirmation reachable at720px`, async ({ page }) => {
+    const prior = content,
+      oldGame = game;
+    try {
+      globalThis.game = { ...game, user: { id: "gc", isGM: true } };
+      const system = {
+        level: 19,
+        crossroadsTitle: "crafty",
+        xp: 1000,
+        worldTime: 8,
+        usagePeriods: {
+          mission: "m",
+          session: "s",
+          missionCareerLevels: {
+            version: 1,
+            mission: "m",
+            levels: { "Actor.title-layout": 19 },
+            crossroadsTitles: { "Actor.title-layout": "crafty" }
+          }
+        }
+      };
+      const actor = {
+        uuid: "Actor.title-layout",
+        name: "QA Crossroads",
+        type: "agent",
+        isOwner: true,
+        system,
+        usagePeriods: system.usagePeriods,
+        flags: {}
+      };
+      if (mode === "eligibility") await reviewCrossroadsMissionXP(actor);
+      else await ActorActionDice(class {}).prototype.settleMissionXP.call(actor);
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      if (mode === "eligibility") {
+        await page.getByRole("combobox", { name: "Title eligible for this mission" }).selectOption("weathered");
+        await page.locator('[name="note"]').fill("Actual title eligibility checked");
+        await page.locator('[name="confirmed"]').check();
+      } else {
+        await page.locator('[name="additionalXP"]').fill("100");
+        await page.locator('[name="additionalExcludesCrossroads"]').check();
+        await page.locator('[name="missionCompleteConfirmed"]').check();
+      }
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+    }
+  });
+
 test("new-level favored items keep the full selection and confirmation reachable at 720px", async ({ page }) => {
   const prior = content,
     oldGame = game;

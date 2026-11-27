@@ -1,5 +1,7 @@
 /** Mission record dialogs (pp.423–440): Threat Level, Caliber, objectives, complications, antagonists, exposure and rewards. */
 import { esc } from "../../html.mjs";
+import { crossroadsXPContext } from "./mission-defaults.mjs";
+import { crossroadsMissionXPPolicy } from "../../rules/crossroads-xp.mjs";
 import { settleFavoredGearSession } from "../favored-gear-session.mjs";
 import { refuse, decline } from "../../error-notices.mjs";
 import {
@@ -597,10 +599,22 @@ export async function missionReport({ planned = false, whisper = true } = {}) {
       const awards = actor.system.actionDieAwardSummary?.count ?? 0,
         level = actor.system.level;
       try {
-        const result = characterMissionXP({ baseXP: xp.total, awards, level, threatLevel: tl });
-        return `${esc(actor.name)}: (${xp.total} + ${result.awardXP}) × ${result.multiplier} = <b>${result.total}</b>`;
-      } catch {
-        return loc`${esc(actor.name)}: finish the character's level first`;
+        const policy = crossroadsMissionXPPolicy(crossroadsXPContext(actor));
+        const result = characterMissionXP({
+          baseXP: xp.total,
+          awards,
+          level,
+          threatLevel: tl,
+          crossroadsPolicy: policy.needsReview ? null : policy
+        });
+        const titleBonus = policy.needsReview
+          ? loc`Crossroads XP eligibility needs GC review before settlement.`
+          : result.crossroadsXP
+            ? loc`Crossroads +${result.crossroadsXP} XP (${policy.percent}%, rounded up).`
+            : "";
+        return `${esc(actor.name)}: (${xp.total} + ${result.awardXP}) × ${result.multiplier}${result.crossroadsXP ? ` + ${result.crossroadsXP}` : ""} = <b>${result.total}</b>${policy.needsReview ? loc` core XP; total pending eligibility review` : ""}${titleBonus ? `<br>${esc(titleBonus)}` : ""}`;
+      } catch (error) {
+        return loc`${esc(actor.name)}: review this character before settlement (${esc(error.message)})`;
       }
     })
     .join("<br>");

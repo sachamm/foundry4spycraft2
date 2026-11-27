@@ -319,6 +319,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         "claimGearAcquisition",
         "recoverResourceTransaction",
         "settleMissionXP",
+        "reviewCrossroadsMissionXP",
         "purchaseFeatChoice",
         "reviewStartingAttributes",
         "reviewCreationPolicy",
@@ -1321,6 +1322,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       Object.entries(cfg.tables.crossroads).map(([key, value]) => [key, value.label])
     );
     context.subplotKindLabel = loc`Subplot type`;
+    context.crossroadsXPReviewLabel = loc`Review mission title XP`;
     context.subplotNameLabel = loc`Subplot name`;
     context.subplotNotesLabel = loc`Subplot notes`;
     context.subplotCompleteLabel = loc`Completed Subplot`;

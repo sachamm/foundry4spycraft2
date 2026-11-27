@@ -4,6 +4,7 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { crossroadsMissionXPBonus } from "../crossroads-xp.mjs";
 
 const M = GC_DATA.core.mission;
 const whole = (value, min, max) => Number.isSafeInteger(value) && value >= min && value <= max;
@@ -238,12 +239,16 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
 }
 
 /** p.440: (base + 25 per awarded die, capped at 25 × level) × the lower of career level and Threat Level. */
-export function characterMissionXP({ baseXP, awards = 0, level, threatLevel: tl }) {
+export function characterMissionXP({ baseXP, awards = 0, level, threatLevel: tl, crossroadsPolicy = null }) {
   if (!Number.isFinite(baseXP) || baseXP < 0 || !whole(level, 1, 20) || !whole(tl, 1, 20) || !whole(awards, 0, 10000))
     throw new Error(loc`Enter the base XP, award count, career level and Threat Level.`);
   const awardXP = Math.min(awards * M.actionDieAwardXP, level * M.actionDieAwardXP);
   const multiplier = Math.min(level, tl);
-  return { awardXP, multiplier, total: (Math.trunc(baseXP) + awardXP) * multiplier };
+  const coreXP = (Math.trunc(baseXP) + awardXP) * multiplier;
+  const crossroadsXP = crossroadsPolicy ? crossroadsMissionXPBonus(coreXP, crossroadsPolicy) : 0;
+  const total = coreXP + crossroadsXP;
+  if (!Number.isSafeInteger(total)) throw Error(loc`The mission reward exceeds a safe whole number.`);
+  return { awardXP, multiplier, total, ...(crossroadsPolicy ? { coreXP, crossroadsXP } : {}) };
 }
 
 /**

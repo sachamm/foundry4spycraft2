@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **9.4/10**;
+**Continuing review, 27 November 2026:** PC creation **9.4/10**;
 combat play **9.5/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -810,3 +810,31 @@ pass with the existing warnings; bundling and the text-copy check pass. Native
 workflows had no browser errors. Scores remain **PC creation 9.4/10 and
 combat 9.5/10**. The title award/history gap and broader B-193 source audit remain
 open; the implementation/review cycle continues toward 9.9/10 in both areas.
+
+### Continuing pass: Crossroads mission XP eligibility and settlement
+
+Mission starts now capture each PC's held Crossroads title, including an empty
+selection. Later titles cannot improve that mission's XP. Older missions and
+characters without a usable snapshot require an owning-GC eligibility review;
+corrections retain the earlier record and an Undo entry. A review changes
+eligibility history only, without replaying an existing XP settlement.
+
+Mission settlement and the GC preview now apply the highest eligible title's
+percentage after the normal mission multiplier. **User ruling: round the
+Crossroads XP bonus up.** This is separate from other declared post-multiplier
+modifiers. If both an automatic Crossroads bonus and other XP are present, the GC
+must confirm the other amount excludes Crossroads. The existing user-confirmed
+p.440 action-die/base-XP order remains unchanged. Settled missions reject a second
+attempt before opening another eligibility review.
+
+The actual Foundry dialogs reviewed a Weathered title, then settled 101 base XP
+at Career/Threat Level 7: 707 core XP plus 36 Crossroads XP credited 743 once.
+The card retained the breakdown and policy. A repeated settlement was blocked;
+subsequent eligibility correction and Undo left paid XP and the original reward
+record unchanged. Native checks reported no browser errors.
+
+All **4,155** Node tests, **988** independent fixture assertions, **238** layout
+checks and **13** pack checks pass. Lint, formatting, bundling and the text-copy
+check pass with the existing warnings. Scores remain **PC creation 9.4/10 and
+combat 9.5/10**. Next-session starting-die eligibility and the title-award workflow
+remain open, along with the broader source and play gaps in the backlog.

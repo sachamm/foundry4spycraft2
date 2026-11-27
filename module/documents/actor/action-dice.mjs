@@ -2,7 +2,12 @@
 import { recordReplacementPatch } from "../../rules/record-patch.mjs";
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
-import { missionSettlementDefaults } from "../../apps/gc/mission-defaults.mjs";
+import {
+  missionSettlementDefaults,
+  reviewCrossroadsMissionXP,
+  crossroadsXPContext
+} from "../../apps/gc/mission-defaults.mjs";
+import { crossroadsMissionXPPolicy } from "../../rules/crossroads-xp.mjs";
 import {
   mixedHealingFundingControl,
   mixedHealingFundingInput,
@@ -56,6 +61,9 @@ import { same } from "../../rules/equal.mjs";
 
 export const ActorActionDice = Base =>
   class ActorActionDice extends Base {
+    reviewCrossroadsMissionXP(options = {}) {
+      return reviewCrossroadsMissionXP(this, options);
+    }
     get actionDiceFundingSystem() {
       return {
         ...this.system,
@@ -1132,6 +1140,11 @@ export const ActorActionDice = Base =>
         throw new Error(loc`Review the interrupted award before settling mission XP.`);
       if (!game.user?.isGM) throw new Error(loc`Only the GC can settle mission XP.`);
       if (this.type !== "agent" || !this.isOwner) return null;
+      const existingMissionKey = encodeURIComponent(String(this.usagePeriods.mission ?? "initial")).replaceAll(
+        ".",
+        "%2E"
+      );
+      if (this.system.missionXPRewards?.[existingMissionKey]) throw Error(loc`This mission’s XP was already settled.`);
       const settlementContext = () => {
           const mission = String(this.usagePeriods.mission ?? "initial"),
             key = encodeURIComponent(mission).replaceAll(".", "%2E");
@@ -1140,16 +1153,25 @@ export const ActorActionDice = Base =>
             level: this.system.level,
             xp: this.system.xp,
             awards: this.system.actionDieAwards?.[key] ?? null,
-            reward: this.system.missionXPRewards?.[key] ?? null
+            reward: this.system.missionXPRewards?.[key] ?? null,
+            crossroads: crossroadsMissionXPPolicy(crossroadsXPContext(this), { mission, actorUuid: this.uuid })
           });
         },
-        expectedContext = settlementContext();
-      let input = options;
+        ensureEligibility = crossroadsMissionXPPolicy(crossroadsXPContext(this));
+      if (ensureEligibility.needsReview) {
+        const reviewed = await reviewCrossroadsMissionXP(this, options.crossroadsReview ?? {});
+        if (!reviewed) return null;
+      }
+      const expectedContext = settlementContext();
+      const { crossroadsReview: _review, ...settlementOptions } = options;
+      let input = settlementOptions;
       if (!Object.keys(input).length) {
+        const xpPolicy = crossroadsMissionXPPolicy(crossroadsXPContext(this));
         input = await systemDialog.input({
           window: { title: loc`Settle mission XP — p.440` },
+          ok: { label: loc`Settle mission XP` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${loc`Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.`}</p><label>${loc`Base mission XP before action-die awards`} <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>${loc`Team Threat Level`} <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label>${loc`Additional post-multiplier XP`} <input type="number" name="additionalXP" min="0" value="0" /></label><label>${loc`Source of additional XP`} <input name="modifierReason" placeholder="${loc`GC-calculated Crossroads, Triumph or other bonus`}" /></label><p>${loc`Crossroads and Triumph percentages are not calculated by this control. Review their eligibility and rounding, then enter their final XP contribution above. A Crossroads Title first earned this mission starts its benefits next mission.`}</p><label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The mission has ended; all post-multiplier modifiers were reviewed and included`}</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.`}</p><label>${loc`Base mission XP before action-die awards`} <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>${loc`Team Threat Level`} <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label>${loc`Other post-multiplier XP (exclude Crossroads)`} <input type="number" name="additionalXP" min="0" value="0" /></label><label>${loc`Source of additional XP`} <input name="modifierReason" placeholder="${loc`GC-calculated Triumph or other bonus`}" /></label><p>${loc`Crossroads adds ${xpPolicy.percent}% of the multiplied base automatically, rounded up. A title first earned this mission starts its XP benefit next mission. Enter Triumph and other separately calculated modifiers as other XP; exclude Crossroads from that amount.`}</p>${xpPolicy.percent > 0 ? `<label><input type="checkbox" name="additionalExcludesCrossroads" /> ${loc`If other XP is entered, it excludes the automatic Crossroads bonus`}</label>` : ""}<label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The mission has ended; all post-multiplier modifiers were reviewed and included`}</label></div>`
         });
         if (!input) return null;
       }
@@ -1164,13 +1186,15 @@ export const ActorActionDice = Base =>
             loc`Mission, level, XP or award counts changed while settlement was being prepared. Review the current mission.`
           );
         const mission = this.usagePeriods.mission ?? "initial",
-          plan = missionXPPlan(this.system, {
+          plan = missionXPPlan(crossroadsXPContext(this), {
             baseXP: Number(input.baseXP ?? 0),
             threatLevel: Number(input.threatLevel ?? 1),
             additionalXP: Number(input.additionalXP ?? 0),
             modifierReason: input.modifierReason,
             missionCompleteConfirmed: !!input.missionCompleteConfirmed,
             mission,
+            actorUuid: this.uuid,
+            additionalExcludesCrossroads: input.additionalExcludesCrossroads === true,
             at: Date.now()
           });
         const settlementId = foundry.utils.randomID(),
@@ -1207,7 +1231,7 @@ export const ActorActionDice = Base =>
         try {
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
+            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier} + ${plan.record.crossroads?.bonusXP ?? 0} Crossroads XP (rounded up) + ${plan.record.additionalXP} declared other post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
             flags: { spycraft2: { actorUuid: this.uuid, checkKind: "missionXP", ...record, actionDiceAllowed: false } }
           });
         } catch (error) {

@@ -2,6 +2,7 @@
 import { missionBaseXP } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
+export { reviewCrossroadsMissionXP, crossroadsXPContext } from "../crossroads-xp.mjs";
 
 export const missionCatalog = {
   quality: id => campaignQuality(id),

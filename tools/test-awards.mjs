@@ -461,6 +461,39 @@ test("a committed final review-marker error returns the completed reconciliation
 });
 
 const xpOptions = { baseXP: 100, threatLevel: 3, missionCompleteConfirmed: true };
+
+test("actual mission XP settlement saves and credits the rounded eligible Crossroads bonus exactly once", async () => {
+  reset();
+  const a = new SpycraftActor();
+  a.system.level = 7;
+  a.system.crossroadsTitle = "weathered";
+  settings.usagePeriods.missionCareerLevels = {
+    version: 1,
+    mission: "m",
+    levels: { [a.uuid]: 7 },
+    crossroadsTitles: { [a.uuid]: "weathered" }
+  };
+  await a.settleMissionXP({ baseXP: 101, threatLevel: 7, missionCompleteConfirmed: true });
+  assert.equal(a.system.xp, 753);
+  assert.equal(a.system.missionXPRewards.m.crossroads.bonusXP, 36);
+  assert.equal(a.system.missionXPRewards.m.totalXP, 743);
+  await assert.rejects(
+    a.settleMissionXP({ baseXP: 101, threatLevel: 7, missionCompleteConfirmed: true }),
+    /already settled/
+  );
+  assert.equal(a.system.xp, 753);
+});
+
+test("an already settled legacy mission does not open a new Crossroads review or change eligibility history", async () => {
+  reset();
+  const a = new SpycraftActor();
+  a.system.level = 7;
+  a.system.crossroadsTitle = "weathered";
+  a.system.missionXPRewards.m = { totalXP: 100 };
+  await assert.rejects(a.settleMissionXP(xpOptions), /already settled/);
+  assert.equal(a.flags?.spycraft2?.crossroadsMissionReviews, undefined);
+  assert.equal(a.system.xp, 10);
+});
 async function pendingXP() {
   reset();
   const a = new SpycraftActor(),
