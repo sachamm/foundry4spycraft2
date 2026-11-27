@@ -90,6 +90,10 @@ export function checkFlavor(check) {
       loc`Error range ${formatRange("error", check.error)}; threat range ${formatRange("threat", check.threat)}.`
     );
   if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);
+  if (check.campaignDC)
+    notes.push(
+      loc`Campaign DC: ${Number(check.campaignDC.baseDC)} before campaign modifiers, ${Number(check.campaignDC.dc)} after them; final result ${Number(check.campaignDC.total)}.`
+    );
   if (check.cunningPlan)
     notes.push(
       loc`Cunning Plan: free action; error range ${check.cunningPlan.originalError} → ${check.cunningPlan.error}; one scene use spent.`

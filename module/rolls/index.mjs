@@ -56,6 +56,7 @@ import "../rules/bull-rush.mjs";
 import "../rules/bullseye.mjs";
 import "../rules/called-shot.mjs";
 import "../rules/card-shark.mjs";
+import "../rules/campaign-skill-dc.mjs";
 import "../rules/cheap-shot-effects.mjs";
 import "../rules/cheap-shot.mjs";
 import "../rules/class-checks.mjs";

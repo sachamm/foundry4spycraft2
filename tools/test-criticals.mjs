@@ -147,6 +147,40 @@ test("actual injury activation quotes the live campaign policy and records its p
     game.settings = before;
   }
 });
+
+test("posted skill cards can resolve a campaign DC with frozen policy and preserve the numeric explanation", async () => {
+  const { resolveCampaignSkillDC } = await import("../module/apps/campaign-skill-dc.mjs");
+  const oldFoundry = globalThis.foundry;
+  const oldWarn = ui.notifications.warn;
+  let warning;
+  ui.notifications.warn = text => {
+    warning = text;
+  };
+  globalThis.foundry = {
+    applications: { api: { DialogV2: { input: async () => ({ baseDC: "20", confirmed: true }) } } }
+  };
+  try {
+    const actor = new SpycraftActor();
+    const msg = message({
+      checkKind: "skill",
+      skillKey: "medicine",
+      checkId: "first-aid",
+      rawTotal: 15,
+      effectiveTotal: 15,
+      campaignSkillDCPolicy: { version: 1, skillDC: 0, skillDCMinimum: null, medicineDC: -5 }
+    });
+    const result = await resolveCampaignSkillDC(actor, msg);
+    assert.ok(result, warning);
+    assert.equal(msg.flags.spycraft2.successConfirmed, true);
+    assert.equal(msg.flags.spycraft2.campaignDC.baseDC, 20);
+    assert.equal(msg.flags.spycraft2.campaignDC.dc, 15);
+    assert.match(msg.flavor, /Campaign DC/);
+  } finally {
+    ui.notifications.warn = oldWarn;
+    if (oldFoundry === undefined) delete globalThis.foundry;
+    else globalThis.foundry = oldFoundry;
+  }
+});
 test("the campaign skill-error ceiling includes Shaken payment surcharges and refuses before spending", async () => {
   const before = game.settings;
   game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["comedy-of-errors"] } : {}) };

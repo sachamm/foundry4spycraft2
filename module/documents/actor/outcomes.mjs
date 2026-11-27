@@ -15,6 +15,7 @@ import { boostPaymentQuote, paidBoostSurcharge, generousSurchargeQuote } from ".
 import { applyPaidCheckBoost } from "../../apps/paid-check-boost.mjs";
 import { getActionDieSettlementReview } from "../../rules/action-die-payments.mjs";
 import { shakenRules, shakenActionDieCost } from "../../rules/shaken.mjs";
+import { campaignSkillDCPlan } from "../../rules/campaign-skill-dc.mjs";
 import { brightIdeaPoolStatus, brightIdeaMigrationPlan } from "../../rules/bright-idea.mjs";
 import { hintSources, hintResponsePlan } from "../../rules/hints.mjs";
 import {
@@ -591,12 +592,22 @@ export const ActorOutcomes = Base =>
           return refuseStep(loc`The pressure outcome must match its final result and recorded Challenge DC.`);
         if (check.damageSave && succeeded !== check.effectiveTotal >= check.damageSave.dc)
           return refuseStep(loc`The confirmed outcome must match this damage save’s final result and recorded DC.`);
+        if (options.campaignDC) {
+          const planned = campaignSkillDCPlan(check, { baseDC: options.campaignDC.baseDC, confirmed: true });
+          if (
+            JSON.stringify(planned) !== JSON.stringify(options.campaignDC) ||
+            planned.succeeded !== succeeded ||
+            planned.dc !== difficultyClass
+          )
+            return refuseStep(loc`The campaign DC or result changed before resolution. Review the current check.`);
+        }
         let next = {
           ...check,
           ...adjudicateCheck(check, succeeded),
           flawlessSearch: null,
           automaticSkillSuccess: null
         };
+        if (options.campaignDC) next.campaignDC = options.campaignDC;
         const automatic = automaticSkillSuccessPlan(this.system, next, { difficultyClass });
         if (automatic)
           next = {

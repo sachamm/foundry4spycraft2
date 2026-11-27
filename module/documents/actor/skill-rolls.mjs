@@ -33,6 +33,7 @@ import { knowledgeCheckBreakdown, skillCheckBreakdown } from "../../rules/bonus-
 
 /** Plan fields a skill check records as the rules returned them. */
 const SKILL_PLAN_FIELDS = [
+  "campaignSkillDCPolicy",
   "stalkingStance",
   "feint",
   "meleeSkillFeats",

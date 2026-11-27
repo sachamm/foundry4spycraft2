@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Skill cards with campaign DC changes now offer Resolve against campaign DC. The GC confirms the source's
+  fixed DC; the system applies the recorded campaign modifiers, resolves the check, and shows both DC values.
+  Opposed checks continue to use their opposing result.
+
 - Campaign Medicine error modifiers now affect actual skill plans. Comedy of Errors adds its lowest-attribute
   error penalty, uses four-times base time for taking 10, and refuses skill-error activations costing more
   than two action dice. Specific normal-time take-10 benefits remain available.

@@ -1,4 +1,5 @@
 import { checkFocus, isHideCheck } from "./check-identity.mjs";
+import { campaignSkillDCPolicy } from "./campaign-skill-dc.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
 import "./stalking-stance.mjs";
@@ -1144,6 +1145,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
         }
       : null,
     weaponFocusWork: weaponFocusWork.applicable ? weaponFocusWork : null,
+    campaignSkillDCPolicy: campaignSkillDCPolicy(campaign),
     gamblingDice,
     mode,
     sleepingCoreReview,
