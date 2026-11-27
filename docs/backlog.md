@@ -280,7 +280,6 @@ own line on the card, and checked against the page first.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-180 | Disposition modifiers (Intimacy, Fondness, Diplomatic) are not added to rolls. (pp.406, 457–458) | R-01 | S |
 | B-181 | Weapon Specialist +1 Defense / +1 damage reduction never applied. | R-02 | S |
 | B-182 | Laser: die loss per range increment is reminder text; its lower critical cost is not applied (the attack record does not carry the damage type). (p.338) | R-03, RW-286 | S |
 | B-184 | No control for persuading an NPC to join a fight. | R-05 | S |

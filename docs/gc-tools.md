@@ -134,7 +134,7 @@ The sheet also has an NPC **skill check** (the higher of Competence and the skil
 
 ## Disposition (pp.457–458)
 
-Each NPC stores a general disposition and one per character. The dialog shifts it (at most two grades either way per mission, one automatic shift per mission), shows the Intimacy and Fondness check modifiers, and rolls Loyalty and join-the-fight decisions, including the foil modifier.
+Each NPC stores a general disposition and one per character. The dialog shifts it (at most two grades either way per mission, one automatic shift per mission), shows the Intimacy and Fondness check modifiers, and rolls Loyalty and join-the-fight decisions, including the foil modifier. A skill dialog for an Intimacy or Fondness check asks for the targeted NPC's disposition (filled in from the target when the player can see it) and adds its modifier, threat and error changes, plus Diplomatic's +1; villains are immune.
 
 ## Dramatic Conflicts (pp.363–388)
 
@@ -158,7 +158,7 @@ Security devices at any Power Rating with sensor and trap rolls (Table 7.9), haz
 
 - Strategy choices are entered by the GC; players tell the GC their choice privately. Opposed checks are rolled on the sheets and the totals typed in.
 - Advantage effects other than Lead, Swap, Victory and Halt are reported, not applied.
-- Disposition modifiers are shown but not added to agents' rolls automatically. Campaign qualities that need a ruling at the table (a DC the GC calls aloud, which side a scene favors) appear as card notes.
+- Campaign qualities that need a ruling at the table (a DC the GC calls aloud, which side a scene favors) appear as card notes.
 - Organization goal dice and turning-point morale are listed on the summary card; the GC grants them.
 - Initiative boosts for the dramatic-scene spend change the Count; Defense and DC boosts are reported for the GC to apply.
 - Some printed cells are garbled or inconsistent in the source text; each is listed under `anomalies` in `src/data/gc-tables.json` and `src/data/conflicts.json` and kept as printed.
