@@ -3,7 +3,8 @@ import { enrich } from "../sheets/enrich.mjs";
 import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { loc } from "../i18n.mjs";
-import { availableIn } from "../rules/gear-era.mjs";
+import { availableIn, historicalCaliber } from "../rules/gear-era.mjs";
+import { campaignRules } from "../rules/campaign-rules.mjs";
 import { clockYear } from "./game-clock.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -208,6 +209,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     const search = this.filters.search.toLowerCase();
     const dated = DATED.has(this.itemType),
       year = dated ? clockYear() : null,
+      effects = campaignRules(),
       caliber = Number(this.filters.caliber) || 0;
     let later = 0;
 
@@ -302,14 +304,17 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
           break;
       }
       groups[group] = groupLabel;
+      // Historical (p.407): an item newer than the year is still on offer, as a gadget one Caliber higher (never past V).
+      const era = dated ? historicalCaliber(s, { effects, year }) : { caliber: Number(s.caliber), gadget: false };
       if (this.filters.group && group !== this.filters.group) continue;
-      if (caliber && Number(s.caliber) !== caliber) continue;
+      if (caliber && (era.caliber ?? Number(s.caliber)) !== caliber) continue;
       if (this.filters.restricted === "hide" && s.restricted) continue;
       if (this.filters.restricted === "only" && !s.restricted) continue;
-      const future = dated && !availableIn(s.year, year);
+      const future = dated && !availableIn(s.year, year) && !(era.gadget && era.available);
       if (future) later += 1;
       if (future && !this.filters.showFuture) continue;
       if (dated && s.year) extra = extra ? loc`${extra} · from ${s.year}` : loc`From ${s.year}`;
+      const gadget = era.gadget && era.available ? loc`Gadget, Caliber ${cfg.calibers[era.caliber]}` : "";
       let summary = this.summaries.get(e.uuid);
       if (summary === undefined) this.summaries.set(e.uuid, (summary = plainText(s.description)));
       if (search && !e.name.toLowerCase().includes(search) && !summary.toLowerCase().includes(search)) continue;
@@ -336,7 +341,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
         unmet: check.unmet.join("; "),
         prereq: req ? describe(req) : "",
         notChecked: s.prerequisitesNotChecked,
-        future
+        future,
+        gadget
       });
     }
     rows.sort((a, b) => a.groupLabel.localeCompare(b.groupLabel) || a.name.localeCompare(b.name));

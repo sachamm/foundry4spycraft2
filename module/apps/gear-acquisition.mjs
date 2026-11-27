@@ -30,6 +30,8 @@ import { equipmentCategory } from "../rules/gear.mjs";
 import { organizationSite, siteForRequest } from "../rules/gc/organization.mjs";
 import { agencyOrganization } from "./gc/state.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignRules } from "../rules/campaign-rules.mjs";
+import { gearYearByName } from "../rules/gear-era.mjs";
 
 /** The Agency's Sites a Request may go through (p.394): +4 and half the delivery time. */
 function agencySiteSelect() {
@@ -127,6 +129,7 @@ export async function rollGearAcquisition(actor, options = {}) {
    <label>${loc`Sources option`} <select name="sourcesOption"><option value="">${loc`Select only with Sources`}</option><option value="dossier">${loc`Dossier (Sources I+)`}</option><option value="skillTraining">${loc`Skill training (Sources II+)`}</option><option value="legalImmunity">${loc`Legal immunity (Sources III)`}</option></select></label>
    <label><input type="checkbox" name="sourcesOptionConfirmed" /> ${loc`The GC confirms this is that actual Resource option (Sources only)`}</label>
    <label>${loc`Exact item or option`} <input name="name" required /></label>
+   ${campaignRules().historicalGear ? `<label>${loc`Year introduced (Historical; leave blank to look it up by name)`} <input name="itemYear" /></label>` : ""}
    <label>${loc`Reserve pick`} <select name="pick">${PICK_CATEGORIES.map(k => `<option value="${k}">${loc`${k}: ${record.picks[k] ?? 0} remaining`}</option>`).join("")}</select></label>
    <label>${loc`Requested category`} <select name="category">${PICK_CATEGORIES.filter(k => k !== "CHA")
      .map(k => `<option value="${k}">${k}</option>`)
@@ -175,6 +178,8 @@ export async function rollGearAcquisition(actor, options = {}) {
       ])
       .filter(f => f.count);
   }
+  // Historical (p.407): an item the campaign year has not reached yet is Requested as a gadget one Caliber higher.
+  input.itemYear = String(input.itemYear ?? "").trim() || gearYearByName(input.name);
   const preview = gearAcquisitionPlan(actor.system, {
       ...input,
       agencySite: chosenSite(input.agencySite),

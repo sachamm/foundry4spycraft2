@@ -16,6 +16,7 @@ import {
   fragileVitality
 } from "./campaign-rules.mjs";
 import { periodMoney } from "./period-money.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
 import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
@@ -2313,11 +2314,19 @@ function deriveWealthAndGear(state) {
   const charismaCategories = sys.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"];
   for (const item of items.filter(item => ["weapon", "armor", "gear"].includes(item.type) && item.system.pick)) {
     const category = equipmentCategory(item),
-      pick = item.system.pick;
+      pick = item.system.pick,
+      // Historical (p.407): an item newer than the campaign year is a gadget one Caliber higher, never past V.
+      era = historicalCaliber(item.system),
+      caliber = era.caliber ?? 6;
+    if (!era.available && !managedAcquisition(sys, item))
+      warnings.push(
+        loc`${item.name}: not yet introduced in the campaign year, and a gadget of it would pass Caliber V, so it cannot be had under Historical (p.407).`
+      );
     if (
       activeReserves &&
+      era.available &&
       !managedAcquisition(sys, item) &&
-      item.system.caliber > campaignGearCaliber(activeReserves.caliber).caliber
+      caliber > campaignGearCaliber(activeReserves.caliber).caliber
     ) {
       const exception =
         bigStickMatches(sys, item) &&
@@ -2333,10 +2342,12 @@ function deriveWealthAndGear(state) {
         !item.system.common &&
         !item.system.ammunitionOnly &&
         !item.system.reserve &&
-        item.system.caliber <= activeReserves.caliber + 1;
+        caliber <= activeReserves.caliber + 1;
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
-          loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
+          era.gadget
+            ? loc`${item.name}: not yet introduced in the campaign year, so it is a Caliber ${caliber} gadget (Historical, p.407), above this mission’s allowance.`
+            : loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
         );
     }
 

@@ -277,6 +277,7 @@
    "ShowFuture": "Show future gear",
    "NotYet": "Not yet",
    "NotYetHint": "This came out after the game clock's year. The GC decides whether it can be had.",
+   "GadgetHint": "Historical: this came out after the game clock's year, so it can only be had as a gadget Housing or effect, one Caliber higher (p.407).",
    "CaliberFilter": "Filter by Caliber",
    "AnyCaliber": "Any Caliber",
    "RestrictedFilter": "Filter restricted items",

@@ -4,6 +4,7 @@ import { priorityRequestBonus, localHeroRequestBonus, requestBenefitContext } fr
 import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import { campaignGearCaliber } from "./campaign-rules.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
@@ -174,7 +175,8 @@ export function gearAcquisitionPlan(
     kind = "request",
     pick = "",
     category = "",
-    caliber = 1,
+    caliber: ownCaliber = 1,
+    itemYear = "",
     name = "",
     location = "largeCity",
     rapidCommunication = false,
@@ -246,6 +248,13 @@ export function gearAcquisitionPlan(
   }
   if (usePersonalStash) throw new Error(loc`Personal Stash waives a Common Item Gear check, not a Request.`);
   if (kind !== "request") throw new Error(loc`Choose a Request or Gear check.`);
+  // Historical (p.407): an item not yet introduced by the campaign year is Requested as a gadget one Caliber higher.
+  const era = historicalCaliber({ caliber: ownCaliber, year: itemYear });
+  if (!era.available)
+    throw new Error(
+      loc`${String(name).trim()} was not yet introduced in the campaign year, and as a gadget it would pass Caliber V, so it cannot be Requested under Historical (p.407).`
+    );
+  const caliber = era.gadget ? era.caliber : ownCaliber;
   const benefit = requestAbility
     ? (system.limitedUses ?? []).find(s => s.id === requestAbility && s.workflow === "requestBenefit")
     : null;
@@ -340,6 +349,8 @@ export function gearAcquisitionPlan(
     pick,
     category,
     caliber,
+    ownCaliber,
+    historicalGadget: era.gadget,
     cost,
     baseCost,
     surcharge,

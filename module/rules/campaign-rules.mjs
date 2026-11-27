@@ -158,6 +158,8 @@ export function campaignRuleLines(effects = campaignRules()) {
         ? loc`Gear picks: +${gear} Caliber over the mission's (past V, an extra Caliber I item of that type).`
         : loc`Gear picks: ${gear} Caliber under the mission's (below I, the pick is lost).`
     );
+  if (effects.historicalGear)
+    lines.push(loc`Gear not yet introduced in the campaign year: a gadget at +1 Caliber, none past V (p.407).`);
   if (campaignWealthBonus(effects)) lines.push(loc`Starting Wealth +${campaignWealthBonus(effects)}.`);
   const growth = campaignGrowth(effects);
   if (growth.xpFraction !== 1) lines.push(loc`XP for each level ×${growth.xpFraction}.`);
