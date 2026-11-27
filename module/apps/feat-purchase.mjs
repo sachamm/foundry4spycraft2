@@ -48,7 +48,8 @@ export async function buyFeatWithXP(actor) {
     await withUndo([actor], loc`Feat bought with XP: ${actor.name}`, () =>
       actor.update({
         "system.xp": now.xp,
-        "system.featTrades.purchased": (actor.system.featTrades?.purchased ?? 0) + 1
+        "system.featTrades.purchased": (actor.system.featTrades?.purchased ?? 0) + 1,
+        "system.featTrades.purchaseMission": now.mission
       })
     );
     return now;

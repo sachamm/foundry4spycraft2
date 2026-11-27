@@ -1,4 +1,5 @@
 /** GC reference tools: security devices (Table 7.9), hazards and nature's fury (Tables 7.2–7.3), events, NPC knowledge (Table 7.15) and random possessions (Table 7.16). */
+import { halfSaveResistsFully, isSpecialCharacter } from "../../rules/campaign-rules.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { SECURITY_DEVICES, resolveDevice, sensorCheck, trapOutcome } from "../../rules/gc/security.mjs";
@@ -120,6 +121,9 @@ export async function securityDeviceDialog() {
         lines.push(
           loc`Reflex save DC ${result.dc}${Number.isFinite(Number(input.save)) && input.save !== "" ? `: ${result.saved ? loc`saved (half damage)` : "failed"}` : ""}. Damage ${esc(device.damage)}${damage === null ? "" : ` = ${damage}${result.damage !== null && result.saved ? ` → <b>${result.damage}</b>` : ""}`}.`
         );
+        // Blockbuster (p.406): a player character who saves takes none of it.
+        if (result.saved && halfSaveResistsFully())
+          lines.push(loc`Blockbuster: a player character who made the save takes no damage (p.406).`);
       } else lines.push(loc`This trap has no attack bonus or save DC; apply its listed effect.`);
     }
   } catch (error) {
@@ -241,7 +245,7 @@ export async function npcKnowledgeDialog() {
   const organization = getOrganizations()[input.organization] ?? null,
     chosen = RATINGS.filter(key => input[`rating-${key}`] === true);
   const name = esc(actor?.name ?? loc`The NPC`);
-  const cost = knowsNothingCost(role, actor?.system?.npcType === "special" ? "special" : "standard");
+  const cost = knowsNothingCost(role, actor && isSpecialCharacter(actor.system) ? "special" : "standard");
   const notes = [
     result.limit === "competence"
       ? loc`Held at grade ${knowledgeGrade(result.grade)} by the NPC's Competence (the margin reached ${knowledgeGrade(result.byMargin)}).`

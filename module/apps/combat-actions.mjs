@@ -27,7 +27,7 @@ import { spendWeaponShots, weaponAmmunition } from "./ammunition-use.mjs";
 import { recentResults, recentResultsHint } from "./opposed-checks.mjs";
 import { grappleBenefitDamage, grappleCardFacts } from "../rules/grapple-check.mjs";
 import { drForAttack } from "../rules/damage-application.mjs";
-import { rollTotal, sufferLethal } from "./hazards.mjs";
+import { rollTotal } from "./hazards.mjs";
 import { nonLethalDamage } from "./non-lethal-damage.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
@@ -401,33 +401,75 @@ async function grappleBenefitsChosen(actor, input, outcome) {
   return lines;
 }
 
+/** Whether a grapple winner deals lethal unarmed damage: an agent's Unarmed proficiency, or any armed NPC (p.453). */
+const unarmedProficient = actor =>
+  actor?.type === "agent"
+    ? actor.system?.proficiencyTotals?.unarmed?.proficient === true
+    : !(actor?.system?.qualities ?? []).some(quality => (quality?.id ?? quality) === "non-combatant");
+
 /**
- * Roll a damaging grapple benefit (Injure, Throw, Sprawl, pp.357–358) and apply it to the loser this user owns,
- * inside the grapple's Undo note. A loser owned by someone else gets the rolled number for the GC to apply.
+ * A grapple benefit's damage onto the loser, through the same steps as a damage card: damage reduction, then a
+ * Damage save for a standard NPC, vitality and wounds (and a massive damage save) for a special character, or the
+ * non-lethal totals. Run on the loser owner's client.
+ */
+export async function applyGrappleHit(loser, { amount, kind, name }) {
+  const { lethalOnSpecial } = await import("./damage-application.mjs");
+  const { npcDamageSave, npcIsSpecial } = await import("./gc/npc-play.mjs");
+  if (kind === "subdual" && (loser.type === "agent" || npcIsSpecial(loser)))
+    return (await nonLethalDamage(loser, "subdual", amount, { source: name, attackKind: "unarmed" })).lines;
+  const dr = Math.max(0, Number(drForAttack(loser.system, "unarmed")) || 0);
+  if (loser.type !== "agent" && !npcIsSpecial(loser)) {
+    // A standard NPC or animal: its Damage save takes what gets past damage reduction (subdual counts it twice).
+    const net = Math.max(0, amount - (kind === "subdual" ? 2 * dr : dr));
+    if (!net) return [loc`${esc(loser.name)}: damage reduction ${dr} stops all ${amount} damage.`];
+    const saved = await npcDamageSave(loser, { damage: net, kind });
+    return saved ? [] : [loc`${esc(loser.name)}: ${net} damage after damage reduction; roll its Damage save.`];
+  }
+  const { lines, pendingSave } = await lethalOnSpecial(loser, { damage: amount, dr }, name);
+  if (pendingSave) lines.push(loc`This calls for a Fortitude save against massive damage, DC ${pendingSave.dc}.`);
+  return lines;
+}
+
+registerRelay("grappleDamage", {
+  async describe({ actorUuid, amount, kind }, user) {
+    const who = actorUuid ? await fromUuid(actorUuid) : null;
+    if (!who) throw new Error(loc`That character is no longer there.`);
+    return loc`${esc(user.name)}'s grapple deals ${esc(String(amount))} ${kind === "subdual" ? loc`subdual` : loc`lethal`} damage to ${esc(who.name)}. Allow it?`;
+  },
+  async run({ actorUuid, amount, kind, name }) {
+    const who = actorUuid ? await fromUuid(actorUuid) : null;
+    const whole = Math.trunc(Number(amount));
+    if (!who || !Number.isSafeInteger(whole) || whole < 1 || whole > 200 || !["lethal", "subdual"].includes(kind))
+      throw new Error(loc`That grapple damage cannot be applied.`);
+    const plain = typeof name === "string" && /^[\p{L}\p{N} '’-]{1,60}$/u.test(name) ? name : loc`Grapple`;
+    return withUndo([who], loc`Grapple damage: ${who.name}`, () =>
+      applyGrappleHit(who, { amount: whole, kind, name: plain })
+    );
+  }
+});
+
+/**
+ * Roll a damaging grapple benefit (Injure, Throw, Sprawl, pp.357–358) and apply it to the loser, inside the grapple's
+ * Undo note when this user owns the loser, otherwise through the GC's client.
  */
 async function grappleBenefitHit(winner, loser, id) {
-  const damage = winner ? grappleBenefitDamage(winner.system, id) : null;
+  const damage = winner ? grappleBenefitDamage(winner.system, id, { proficient: unarmedProficient(winner) }) : null;
   if (!damage) return [];
   const [name] = grappleBenefitText(id),
     { total } = await rollTotal(damage.formula),
     amount = Math.max(damage.minimum, total);
   const rolled = loc`${esc(name)}: ${damage.formula} = ${amount} ${damage.kind === "subdual" ? loc`subdual` : loc`lethal`} damage.`;
   if (!loser) return [rolled, loc`Apply it to the opponent from the damage tools.`];
-  if (!loser.isOwner) return [rolled, loc`The GC applies it to ${esc(loser.name)}.`];
-  if (damage.kind === "subdual") {
-    const { lines } = await nonLethalDamage(loser, "subdual", amount, { source: name, attackKind: "unarmed" });
-    return [rolled, ...lines];
+  try {
+    if (loser.isOwner) return [rolled, ...(await applyGrappleHit(loser, { amount, kind: damage.kind, name }))];
+    if (gcAvailable()) {
+      const lines = await askGC("grappleDamage", { actorUuid: loser.uuid, amount, kind: damage.kind, name });
+      return [rolled, ...(Array.isArray(lines) ? lines : [loc`Sent to the GC: damage to ${esc(loser.name)}.`])];
+    }
+  } catch (error) {
+    return [rolled, loc`${esc(loser.name)}: the damage could not be applied (${esc(error.message)}).`];
   }
-  const dr = Math.max(0, Number(drForAttack(loser.system, "unarmed")) || 0),
-    net = Math.max(0, amount - dr);
-  const loss = await sufferLethal(loser, net);
-  return [
-    rolled,
-    loss
-      ? loc`${esc(loser.name)}: ${net} after damage reduction ${dr}, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-      : loc`${esc(loser.name)}: ${net} after damage reduction ${dr}; a standard character makes a Damage save for it.`,
-    ...(loss?.notes ?? [])
-  ];
+  return [rolled, loc`No GC is here: apply it to ${esc(loser.name)} by hand.`];
 }
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */

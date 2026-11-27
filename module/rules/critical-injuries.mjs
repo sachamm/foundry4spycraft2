@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { campaignMedicineDC } from "./campaign-rules.mjs";
 /** Table 5.5 p.332; injury rolls p.331; Guts p.174. Higher totals have no printed row. */
 const rows = [
   [35, "bleeding", "Bleeding", 20, "1 scene", "Gain 1d8 stress damage; heals when the scene ends."],
@@ -86,7 +87,8 @@ export function criticalInjuryResult(plan, dieResult) {
     listed: !!row,
     injuryId: row?.[1] ?? null,
     name: row?.[2] ?? loc`Unlisted result — GC adjudication required`,
-    surgeryDC: row?.[3] ?? null,
+    // Surgery is a Medicine check, so the campaign's Medicine and skill DC qualities move it (pp.406–407).
+    surgeryDC: Number.isFinite(row?.[3]) ? campaignMedicineDC(row[3]) : (row?.[3] ?? null),
     healingTime: row?.[4] ?? null,
     notes:
       row?.[5] ??

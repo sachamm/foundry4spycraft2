@@ -55,7 +55,7 @@ import { nonLethalDamage } from "./non-lethal-damage.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { withUndo } from "./undo.mjs";
-import { campaignRules } from "../rules/campaign-rules.mjs";
+import { campaignRules, halfSaveResistsFully, isSpecialCharacter } from "../rules/campaign-rules.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -395,7 +395,7 @@ export async function sufferFall(actor, preset = {}) {
   if (!owned(actor)) return null;
   const wireFu =
       Number.isFinite(campaignRules().fallingDamageMultiplier) && campaignRules().fallingDamageMultiplier < 1,
-    special = actor.type === "agent" || !["standard", "animal"].includes(actor.system?.npcType);
+    special = actor.type === "agent" || isSpecialCharacter(actor.system);
   const input =
     preset.feet !== undefined
       ? preset
@@ -586,18 +586,23 @@ async function endSurvivalHazardWork(actor, kind) {
 /* -------------------------------------------- */
 
 const total = check => Number(check?.effectiveTotal);
+/** Blockbuster (p.406): an agent's successful save that would halve damage resists all of it. */
+const resistsFully = (actor, succeeded) => succeeded && actor?.type === "agent" && halfSaveResistsFully();
+const RESISTED = () => loc`Blockbuster: the successful save resists all of it (p.406).`;
 
 async function resolveExplosiveReflex(actor, message, save, succeeded) {
-  const taken = Math.max(0, explosiveDamageTaken(save.damage, succeeded) - Math.max(0, save.reduction ?? 0)),
+  const resisted = resistsFully(actor, succeeded),
+    suffered = resisted ? 0 : explosiveDamageTaken(save.damage, succeeded),
+    taken = Math.max(0, suffered - Math.max(0, save.reduction ?? 0)),
     result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive);
   result.lines.unshift(
     succeeded
       ? loc`The Reflex save succeeds: half damage, and the character moves to the next blast increment out.`
       : loc`The Reflex save fails: full damage.`
   );
+  if (resisted) result.lines.splice(1, 0, RESISTED());
   // More than 20 points suffered, counted after the Reflex save but before damage reduction (p.302).
-  if (explosiveDamageTaken(save.damage, succeeded) > 20)
-    result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
+  if (suffered > 20) result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
   await post(actor, result.lines, result.rolls);
   return actor.rollSave("fort", {
     askContext: true,
@@ -641,12 +646,14 @@ const resolvers = {
     );
   },
   async acid(actor, message, save, succeeded) {
-    const first = acidFirstDamage(save.damage, succeeded),
+    const resisted = resistsFully(actor, succeeded),
+      first = resisted ? 0 : acidFirstDamage(save.damage, succeeded),
       taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
       result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid);
     result.lines.unshift(
       succeeded ? loc`The Reflex save succeeds: the acid is halved.` : loc`The Reflex save fails: full acid damage.`
     );
+    if (resisted) result.lines.splice(1, 0, RESISTED());
     const next = applyAcid(hazardState(actor.system), { damage: first, suffered: taken, worldTime: now() });
     await writeHazards(actor, next);
     if (next.acid)
@@ -662,6 +669,7 @@ const resolvers = {
     return post(actor, [rounds ? await condition(actor, "stun", rounds, loc`Stunned`) : loc`Explosive: no stun.`]);
   },
   async vacuum(actor, message, save, succeeded) {
+    if (resistsFully(actor, succeeded)) return post(actor, [RESISTED()]);
     const damage = vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
     return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum);
   },

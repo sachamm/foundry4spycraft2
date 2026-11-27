@@ -32,6 +32,7 @@ import {
   senseLimit,
   surfaceMove
 } from "../../rules/gc/combat-reference.mjs";
+import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc, locKey } from "../../i18n.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
@@ -331,7 +332,11 @@ export const costsAction = (kind, handler) =>
   };
 
 /** Apply every combatant's recorded modifiers for the round that just ended. */
-export async function applyEndOfRound(combat, endedRound) {
+export function applyEndOfRound(combat, endedRound) {
+  // Queued with the dramatic-scene doubling, so each reads the Count the other wrote.
+  return queueInitiative(() => endOfRoundWork(combat, endedRound));
+}
+async function endOfRoundWork(combat, endedRound) {
   const lines = [];
   for (const combatant of combat.combatants) {
     const state = fluid(combatant);

@@ -58,7 +58,14 @@ export const ActorProgression = Base =>
           needed = campaignLevelRow(CONFIG.SPYCRAFT.tables?.levels?.[next])?.xp,
           gained = sys.progression.slice(1).filter(entry => entry.mission === mission).length,
           allowed = levelsBetweenMissions();
+        let missionActive = false;
+        try {
+          missionActive = globalThis.game?.settings?.get("spycraft2", "mission")?.active === true;
+        } catch {
+          /* settings not registered yet: no mission is running */
+        }
         const problems = [
+          ...(missionActive ? [loc`A mission is under way, and levels are gained between missions.`] : []),
           ...(Number.isFinite(needed) && (Number(sys.xp) || 0) < needed
             ? [loc`Career Level ${next} needs ${needed} XP; this character has ${Number(sys.xp) || 0}.`]
             : []),

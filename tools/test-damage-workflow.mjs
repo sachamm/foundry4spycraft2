@@ -513,6 +513,7 @@ test("grapple benefits the winner takes change conditions on both sides", async 
   assert.deepEqual([foe.statuses.has("sprawled"), kevin.statuses.has("prone")], [true, true]);
   assert.match(posted.at(-1).content, /1d4 = \d+ subdual damage/);
   const before = foe.system.vitality.value;
+  kevin.system.proficiencyTotals = { unarmed: { proficient: true } };
   await settleGrapple(kevin, {
     opening: false,
     total: 22,
@@ -520,8 +521,16 @@ test("grapple benefits the winner takes change conditions on both sides", async 
     opponentUuid: foe.uuid,
     benefits: ["injure"]
   });
-  assert.match(posted.at(-1).content, /Injure[^:]*: 1d3 = \d+ lethal damage/);
+  assert.match(posted.at(-1).content, /Injure[^:]*: 1d4 = \d+ lethal damage/);
   assert.ok(foe.system.vitality.value < before, "Injure's damage is applied to the loser");
+  const { grappleBenefitDamage } = await import("../module/rules/grapple-check.mjs");
+  const str = { abilities: { str: { mod: 2 } } };
+  assert.deepEqual(grappleBenefitDamage(str, "injure"), { formula: "1d3 + 2", kind: "subdual", minimum: 1 });
+  assert.deepEqual(grappleBenefitDamage(str, "throw", { proficient: true }), {
+    formula: "1d4 + 4",
+    kind: "lethal",
+    minimum: 1
+  });
 });
 
 test("rest wears off a special NPC's stress and subdual damage", async () => {

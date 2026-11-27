@@ -7,7 +7,7 @@
  * when this client can read it); this module turns it into the check's terms.
  */
 import { SKILLS } from "./tables.mjs";
-import { campaignRules } from "./campaign-rules.mjs";
+import { campaignRules, isSpecialCharacter } from "./campaign-rules.mjs";
 import { dispositionCheckModifier, dispositionGrade } from "./gc/disposition.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
@@ -42,7 +42,7 @@ export function dispositionSkillPlan(system, skillKey, check, input = {}, effect
     notes = [];
   if (effect.modifier)
     bonuses.push({ type: "", value: effect.modifier, source: loc`${grade.name} disposition (${kind})` });
-  const special = !["standard", "animal"].includes(system?.npcType);
+  const special = isSpecialCharacter(system);
   const diplomatic = Math.trunc(Number(effects.favorableDispositionBonus) || 0);
   if (diplomatic && special && effect.modifier > 0)
     bonuses.push({ type: "", value: diplomatic, source: loc`Diplomatic` });

@@ -506,7 +506,12 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       crossroadsTitle: str(),
       // Feat Purchase and Modular (pp.406–407): feats bought with XP after missions, and feats traded for
       // attribute points at creation (positive: feats bought at 2 points each; negative: feats given up for 2 each).
-      featTrades: new SchemaField({ purchased: int(0, { min: 0 }), modular: int(0, { min: -20, max: 20 }) }),
+      featTrades: new SchemaField({
+        purchased: int(0, { min: 0 }),
+        modular: int(0, { min: -20, max: 20 }),
+        // The mission period of the last Feat Purchase: one feat may be bought at the end of each mission (p.406).
+        purchaseMission: str()
+      }),
       relinquishedInterests: int(0, { min: 0 }),
       interests: str(),
       contacts: new ArrayField(

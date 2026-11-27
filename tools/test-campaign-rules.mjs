@@ -283,3 +283,29 @@ test("Cakewalk and Comedy of Errors move the Falling and forward-observer DCs (p
     assert.match(relay.reason, /DC 20/);
   });
 });
+
+test("round-2 council: campaign DCs reach helpers, Surgery and bleeding; promotion counts as special; one Feat Purchase per mission", async () => {
+  const { helperDC } = await import("../module/rules/cooperative.mjs");
+  const { campaignMedicineDC, isSpecialCharacter, featPurchasePlan } =
+    await import("../module/rules/campaign-rules.mjs");
+  withQualities(["cakewalk"], () => assert.equal(helperDC({ setDC: true }), 10));
+  withQualities(["comedy-of-errors"], () => assert.equal(helperDC({ leaderResult: 18 }), 20));
+  withQualities(["gritty"], effects => assert.equal(campaignMedicineDC(20, effects), 20 + effects.medicineDC));
+  assert.equal(isSpecialCharacter({ npcType: "standard" }), false);
+  assert.equal(
+    isSpecialCharacter({ npcType: "standard", promotion: { mission: "m2" }, usagePeriods: { mission: "m2" } }),
+    true,
+    "promoted for this mission"
+  );
+  assert.equal(
+    isSpecialCharacter({ npcType: "standard", promotion: { mission: "m1" }, usagePeriods: { mission: "m2" } }),
+    false
+  );
+  const system = { level: 3, xp: 20000, usagePeriods: { mission: "m2" }, featTrades: { purchaseMission: "m2" } };
+  assert.equal(featPurchasePlan(system, { xp: 3000 }, { featPurchase: true }).allowed, false);
+  assert.equal(
+    featPurchasePlan({ ...system, featTrades: { purchaseMission: "m1" } }, { xp: 3000 }, { featPurchase: true })
+      .allowed,
+    true
+  );
+});

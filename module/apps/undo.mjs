@@ -213,7 +213,15 @@ undoHook.run = withUndo;
 export function postUndo(
   label,
   entries,
-  { gcDice = 0, damageCard = null, antagonist = null, dcBoost = null, standingPaid = null, cardMarks = null } = {}
+  {
+    gcDice = 0,
+    damageCard = null,
+    antagonist = null,
+    dcBoost = null,
+    standingPaid = null,
+    cardMarks = null,
+    missionFields = null
+  } = {}
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
@@ -222,7 +230,18 @@ export function postUndo(
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
     flags: {
       spycraft2: {
-        undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, standingPaid, cardMarks, done: false }
+        undo: {
+          label,
+          entries,
+          gcDice,
+          damageCard,
+          antagonist,
+          dcBoost,
+          standingPaid,
+          cardMarks,
+          missionFields,
+          done: false
+        }
       }
     }
   });
@@ -325,6 +344,15 @@ async function undoRecord(message, record) {
         }
         return { standingPaid: paid };
       }).catch(error => ui.notifications.warn(loc`The standing paid marks were not put back: ${error.message}`));
+  }
+  // Mission record fields the step changed (exposure rows) go back, but only within the mission that changed them.
+  const fields = record.missionFields;
+  if (fields?.values && game.user.isGM) {
+    const { updateMission, missionEpoch } = await import("./gc/state.mjs");
+    if (fields.period === missionEpoch())
+      await updateMission(fields.values).catch(error =>
+        ui.notifications.warn(loc`The mission record was not put back: ${error.message}`)
+      );
   }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {

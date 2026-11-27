@@ -439,7 +439,7 @@ const NPC_TYPED = ["bang", "flash", "explosive"];
 const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
 
 /** Take a lethal hit off a special character's vitality and wounds and set the conditions that follow. */
-async function lethalOnSpecial(target, hit, source) {
+export async function lethalOnSpecial(target, hit, source) {
   const system = target.system,
     plan = lethalHitPlan(
       {

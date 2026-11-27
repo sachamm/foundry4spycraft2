@@ -16,6 +16,9 @@ import { threatsAutoActivate } from "../../rules/campaign-rules.mjs";
 import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
+import { esc } from "../../html.mjs";
+import { systemDialog } from "../dialog-theme.mjs";
+import { criticalHitChoices } from "../../rules/critical-effects.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
@@ -71,39 +74,67 @@ const laserCriticalAllowed = actor => {
   }
 };
 
-/** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */
-export async function gcActivateThreat(message, actor) {
-  const check = message.flags.spycraft2;
-  // Bloodbath (p.406): a special character's attack threat becomes a critical hit without paying a die.
-  if (check.checkKind === "attack" && threatsAutoActivate() && actor && npcIsSpecial(actor)) {
-    await message.update({
+/** Ask which critical hit an NPC's attack buys (p.329), with its price; null when the GC backs out. */
+async function chooseNpcCritical(check, preset) {
+  const choices = criticalHitChoices(check);
+  if (!choices.length) return null;
+  if (preset) return choices.find(choice => choice.id === preset) ?? null;
+  const picked = await systemDialog.input({
+    window: { title: loc`Activate the critical hit` },
+    rejectClose: false,
+    ok: { label: loc`Activate` },
+    content: `<div class="spycraft2-roll-options"><label>${loc`Effect`} <select name="preset">${choices
+      .map(
+        choice => `<option value="${esc(choice.id)}">${esc(loc`${choice.cost} die/dice — ${choice.label}`)}</option>`
+      )
+      .join(
+        ""
+      )}</select></label><p class="hint">${loc`Choose by the target: a special character with vitality left, one at 0 vitality, or a standard character (p.329).`}</p></div>`
+  });
+  return picked ? (choices.find(choice => choice.id === picked.preset) ?? null) : null;
+}
+
+/**
+ * Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. An attack's critical is
+ * chosen from the p.329 list at its own price; a skill check's costs 1 die.
+ */
+export async function gcActivateThreat(message, actor, { preset = null } = {}) {
+  const check = message.flags.spycraft2,
+    attack = check.checkKind === "attack";
+  const choice = attack ? await chooseNpcCritical(check, preset) : null;
+  if (attack && !choice) return null;
+  const record = (cost, extra = {}) =>
+    message.update({
       "flags.spycraft2.criticalSuccess": true,
-      "flags.spycraft2.criticalActivation": { cost: 0, payer: "gc", source: "Bloodbath" }
+      "flags.spycraft2.criticalActivation": {
+        cost,
+        payer: "gc",
+        ...(choice ? { kind: "success", effect: choice.label, preset: choice.id, baseCost: choice.cost } : {}),
+        ...extra
+      }
     });
+  // Bloodbath (p.406): a special character's attack threat becomes a critical hit without paying a die.
+  if (attack && threatsAutoActivate() && actor && npcIsSpecial(actor)) {
+    await record(0, { source: "Bloodbath" });
     return true;
   }
-  // Laser damage (p.338): a threat costs 1 action die less to activate, so an NPC's laser critical is free. Only an
-  // NPC that may activate attack criticals at all (special, or treacherous) gets it; any other goes on to the usual
-  // spend, which refuses it.
-  if (check.checkKind === "attack" && check.attackContext?.laser === true && laserCriticalAllowed(actor)) {
-    await message.update({
-      "flags.spycraft2.criticalSuccess": true,
-      "flags.spycraft2.criticalActivation": { cost: 0, payer: "gc", source: loc`Laser damage –1` }
-    });
+  // Laser damage (p.338): a threat costs 1 action die less to activate. Only an NPC that may activate attack
+  // criticals at all (special, or treacherous) gets it; any other goes on to the usual spend, which refuses it.
+  const laser = attack && check.attackContext?.laser === true && laserCriticalAllowed(actor);
+  const cost = Math.max(0, (choice?.cost ?? 1) - (laser ? 1 : 0));
+  if (laser && cost === 0) {
+    await record(0, { source: loc`Laser damage –1` });
     return true;
   }
   const result = await spendGCDice({
     id: "activateThreat",
     actor,
     onCard: true,
-    dice: 1,
-    checkKind: check.checkKind === "attack" ? "attack" : "skill"
+    dice: Math.max(1, cost),
+    checkKind: attack ? "attack" : "skill"
   });
   if (!result?.plan) return null;
-  await message.update({
-    "flags.spycraft2.criticalSuccess": true,
-    "flags.spycraft2.criticalActivation": { cost: result.plan.cost, payer: "gc" }
-  });
+  await record(result.plan.cost, laser ? { source: loc`Laser damage –1` } : {});
   return true;
 }
 

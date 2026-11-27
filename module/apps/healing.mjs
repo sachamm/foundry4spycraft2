@@ -21,6 +21,7 @@ import { nonLethalTotals, targetChoices } from "./damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignMedicineDC } from "../rules/campaign-rules.mjs";
 import { refuse } from "../error-notices.mjs";
 import { withUndo } from "./undo.mjs";
 
@@ -342,8 +343,9 @@ async function treatFirstAid(message, check, patient, scene) {
       loc`First Aid on ${esc(patient.name)}: accumulated damage ${state.track.accumulated} → ${plan.accumulated}.`
     );
   }
-  // The same check at DC 20 also stops bleeding (p.340).
-  if (Number(check.effectiveTotal) >= 20) lines.push(await clear(patient, "bleeding", loc`Bleeding`));
+  // The same check at DC 20 also stops bleeding (p.340), a DC the campaign's qualities move.
+  if (Number(check.effectiveTotal) >= campaignMedicineDC(20))
+    lines.push(await clear(patient, "bleeding", loc`Bleeding`));
   await patient.update({ "flags.spycraft2.firstAidScene": scene });
   await post(patient, lines, rolls);
   await markCard(message, "firstAid", { patientUuid: patient.uuid, name: patient.name });

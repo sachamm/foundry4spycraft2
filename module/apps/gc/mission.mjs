@@ -346,25 +346,32 @@ export async function endMission({ clear = false } = {}) {
     // Each agent pays in their own affiliation's currency; the Undo note gives the standing back.
     const team = teamActors(getMission()),
       recorded = [];
-    await withUndo(team, loc`Critical objectives: exposure recorded`, async () => {
-      for (const actor of team) {
-        const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation",
-          due = dueFor(actor);
-        if (!due.length) continue;
-        let total = 0;
-        for (const { infraction } of due) total += exposurePenalty(infraction)[currency];
-        await actor.update({ [`system.${currency}`]: (actor.system[currency] ?? 0) + total });
-        recorded.push({
-          actor: actor.id,
-          name: loc`Critical objectives not completed`,
-          currency,
-          penalty: total,
-          criticalObjectives: due.map(({ objective }) => objective.id),
-          at: Date.now()
-        });
-      }
-      await updateMission(m => ({ infractions: [...(m.infractions ?? []), ...recorded] }));
-    });
+    const infractionsBefore = structuredClone(getMission().infractions ?? []);
+    await withUndo(
+      team,
+      loc`Critical objectives: exposure recorded`,
+      async () => {
+        for (const actor of team) {
+          const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation",
+            due = dueFor(actor);
+          if (!due.length) continue;
+          let total = 0;
+          for (const { infraction } of due) total += exposurePenalty(infraction)[currency];
+          await actor.update({ [`system.${currency}`]: (actor.system[currency] ?? 0) + total });
+          recorded.push({
+            actor: actor.id,
+            name: loc`Critical objectives not completed`,
+            currency,
+            penalty: total,
+            criticalObjectives: due.map(({ objective }) => objective.id),
+            at: Date.now()
+          });
+        }
+        await updateMission(m => ({ infractions: [...(m.infractions ?? []), ...recorded] }));
+      },
+      // Undo takes the exposure rows off too, so a later End mission can record them again.
+      () => ({ missionFields: { period: missionEpoch(), values: { infractions: infractionsBefore } } })
+    );
   }
   await say(
     `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`

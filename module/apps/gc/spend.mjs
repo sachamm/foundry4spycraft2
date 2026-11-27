@@ -19,6 +19,7 @@ import {
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
 import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
+import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
@@ -78,7 +79,7 @@ export async function spendGCDice(input = {}) {
       `
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
       <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
-      <label data-when="id=activateThreat">${loc`Threat scored with`} <select name="checkKind">${options(
+      <label data-when="id=activateThreat|activateError">${loc`Threat or error scored with`} <select name="checkKind">${options(
         [
           ["attack", "an attack"],
           ["skill", "a skill check"]
@@ -322,7 +323,7 @@ export function installDramaticInitiative() {
     if (game.users?.activeGM?.id !== game.user.id || !Object.hasOwn(changed, "initiative")) return;
     if (!Number.isFinite(changed.initiative) || combatant.flags?.spycraft2?.dramaticDoubled) return;
     if (!isDramaticScene() || !dramaticOpponent(combatant)) return;
-    doubleOpponentInitiative(combatant.combat, { quiet: true }).catch(error =>
+    queueInitiative(() => doubleOpponentInitiative(combatant.combat, { quiet: true })).catch(error =>
       console.warn("Field Agent's Handbook | A dramatic Initiative Count was not doubled.", error)
     );
   });

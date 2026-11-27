@@ -109,6 +109,19 @@ export function campaignSkillDC(dc, effects = campaignRules()) {
   return dc + shift;
 }
 
+/**
+ * Whether a character counts as a player or special character for a campaign quality: an agent, a special NPC or
+ * villain, or a standard NPC promoted for this mission (p.398).
+ */
+export function isSpecialCharacter(system) {
+  if (!["standard", "animal"].includes(system?.npcType)) return true;
+  return !!system?.promotion && system.promotion.mission === String(system.usagePeriods?.mission ?? "initial");
+}
+
+/** A Medicine DC after Cakewalk or Comedy of Errors and after Gritty or Bulletproof (pp.406–407). */
+export const campaignMedicineDC = (dc, effects = campaignRules()) =>
+  campaignSkillDC(dc, effects) + Math.trunc(number(effects.medicineDC, 0));
+
 /** Blockbuster (p.406): a player character's successful save that would halve damage resists it entirely. */
 export const halfSaveResistsFully = (effects = campaignRules()) => effects.halfSaveResistsFully === true;
 
@@ -273,7 +286,7 @@ export function campaignSkillPlan(system, skillKey, check, input = {}, effects =
   const bonuses = [],
     notes = [];
   let errorIncrease = 0;
-  const special = !["standard", "animal"].includes(system?.npcType);
+  const special = isSpecialCharacter(system);
   const surpriseCheck = input.surprise === true && SURPRISE_CHECKS[skillKey] === check?.id;
   const dispositionCheck = input.paranoidPersuasion === true || input.shiftingDisposition === true;
   for (const row of paranoidModifier({ surpriseCheck, dispositionCheck, special }, effects)) {
@@ -514,6 +527,12 @@ export function featPurchasePlan(system, levelRow, effects = campaignRules()) {
   if (!effects.featPurchase) return { allowed: false, reason: loc`Feat Purchase is not in force this season.` };
   const level = Number(system?.level) || 0;
   if (level < 1) return { allowed: false, reason: loc`Finish Level 1 before buying a feat.` };
+  const mission = String(system?.usagePeriods?.mission ?? "initial");
+  if (system?.featTrades?.purchaseMission && system.featTrades.purchaseMission === mission)
+    return {
+      allowed: false,
+      reason: loc`A feat has already been bought for this mission; one may be bought after each.`
+    };
   const cost = 1000 * level,
     xp = Number(system?.xp) || 0,
     minimum = Number(levelRow?.xp) || 0;
@@ -523,7 +542,7 @@ export function featPurchasePlan(system, levelRow, effects = campaignRules()) {
       cost,
       reason: loc`A feat costs ${cost} XP at Level ${level}, which would take XP below ${minimum}, this level's minimum.`
     };
-  return { allowed: true, cost, xp: xp - cost };
+  return { allowed: true, cost, xp: xp - cost, mission };
 }
 
 /** Soap (p.408): extra Subplots each character may have in play. */
