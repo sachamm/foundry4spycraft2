@@ -778,3 +778,35 @@ reported no browser errors. All **4,136** Node tests and **988** independent
 fixture assertions pass; lint, formatting, bundling and text-copy checks pass
 with the existing warnings. Review scores remain **PC creation 9.4/10 and
 combat 9.5/10**. The broader source audit in B-193 remains open.
+
+### Continuing pass: typed Crossroads attempts and Routine
+
+Subplots now distinguish standard stories from each Crossroads title sought.
+Free-text names do not determine that classification. Active Crossroads require
+the printed career level, explicitly completed standard Subplots and all lower
+GC-confirmed titles; a held title or duplicate active attempt is rejected. Saved
+invalid types and titles remain visible for correction. Completed history is
+retained rather than retroactively requalified.
+
+Routine prevents new Crossroads choices and puts an existing active attempt on
+the setup correction list. An older active row needs classification when Routine
+matters. New rows start as standard Subplots. Invalid attempts do not satisfy
+Trouble Magnet, while all named unfinished rows still count against the normal
+limit. Existing Crossroads titles keep their benefits. Awarding a title and its
+mission/session benefit timing and XP adjustment still need further work.
+
+The new controls use the real Training row template in layout checks at 264px
+and 480px column widths. Native testing exercised minimum prerequisites, the
+Routine hold, a correction through the actual selector, legacy classification and
+completed history, with accessible controls at 1280×720. The known Foundry core
+minimum-resolution advisory remains; it is not a claim of full core support at
+that size. Native favored-item advancement now also checks actual Soldier 17,
+not only Career Level 17, and a class-progression mismatch prevents new-level
+favored choices.
+
+All **4,143** Node tests, **988** independent fixture assertions, **236** layout
+checks, native schema preparation and **13** pack checks pass. Lint and formatting
+pass with the existing warnings; bundling and the text-copy check pass. Native
+workflows had no browser errors. Scores remain **PC creation 9.4/10 and
+combat 9.5/10**. The title award/history gap and broader B-193 source audit remain
+open; the implementation/review cycle continues toward 9.9/10 in both areas.

@@ -5,6 +5,7 @@ export default defineConfig({
   testMatch: [
     "agent-ux.spec.mjs",
     "sheet-scrolling.spec.mjs",
+    "subplots.spec.mjs",
     "skill-dialog-scrolling.spec.mjs",
     "vehicle-sheets.spec.mjs",
     "npc-packages.spec.mjs",

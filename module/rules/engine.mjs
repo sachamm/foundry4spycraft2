@@ -1,5 +1,6 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
+import { subplotPlan } from "./subplots.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import { purchasedFeatSources } from "./feat-purchase.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
@@ -1864,10 +1865,18 @@ function deriveFinalTotals(state) {
   sys.subdualThreshold = sys.abilities.con.value + B.get("subdualThreshold");
 
   sys.actionDice ??= { value: 0 };
-  const title = cfg.tables.crossroads?.[sys.crossroadsTitle];
+  const title = Object.hasOwn(cfg.tables.crossroads ?? {}, sys.crossroadsTitle)
+    ? cfg.tables.crossroads[sys.crossroadsTitle]
+    : null;
   const earnedTitle = title && level >= title.level ? title : null;
   sys.crossroads = earnedTitle ?? { actionDice: 0, xpPercent: 0 };
-  if (title && level < title.level) warnings.push(loc`${title.label}: the minimum Career Level is ${title.level}.`);
+  if ((title && level < title.level) || (!title && sys.crossroadsTitle)) {
+    const text = title
+      ? loc`${title.label}: the minimum Career Level is ${title.level}.`
+      : loc`Review the saved Crossroads title; choose a known GC-confirmed title or clear it.`;
+    warnings.push(text);
+    todo.push({ order: 54, tab: "training", always: true, error: true, text });
+  }
   sys.actionDice.max =
     (lr?.actionDice ?? 0) + B.get("actionDice.count") + (misc.actionDice ?? 0) + (earnedTitle?.actionDice ?? 0);
   sys.actionDice.die = lr?.actionDie ?? 4;
@@ -2278,12 +2287,17 @@ function deriveProficiencies(state) {
   const subplotsInPlay = unfinishedSubplots.filter(
     row => String(row.name ?? "").trim() || String(row.notes ?? "").trim()
   ).length;
+  const subplotValidation = subplotPlan(sys, cfg.tables.crossroads);
+  for (const { text } of subplotValidation.errors) {
+    warnings.push(text);
+    todo.push({ order: 54, tab: "training", error: true, always: true, text });
+  }
   sys.subplotPicks = {
     available: (lr?.subplots ?? 0) + B.get("subplots") + (sys.campaignEffects.extraSubplots ?? 0),
     used: subplotsInPlay,
     minimum: minimumSubplots,
-    inPlay: subplotsInPlay,
-    needsSubplot: subplotsInPlay < minimumSubplots
+    inPlay: subplotValidation.active.length,
+    needsSubplot: subplotValidation.active.length < minimumSubplots
   };
   if (sys.subplotPicks.needsSubplot) {
     warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);

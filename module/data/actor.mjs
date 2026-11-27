@@ -511,7 +511,14 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           networkingFeatConfirmed: new BooleanField()
         })
       ),
-      subplots: new ArrayField(new SchemaField({ name: str(), notes: str(), complete: new BooleanField() })),
+      subplots: new ArrayField(
+        new SchemaField({
+          name: str(),
+          notes: str(),
+          complete: new BooleanField(),
+          kind: str()
+        })
+      ),
       gearPickLosses: record("gearPickLosses"),
       missionReserves: record("missionReserves", { nullable: true, initial: null }),
       armorMissionGrant: record("armorMissionGrant", { nullable: true, initial: null }),

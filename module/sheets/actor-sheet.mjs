@@ -1320,6 +1320,42 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.crossroadsTitles = Object.fromEntries(
       Object.entries(cfg.tables.crossroads).map(([key, value]) => [key, value.label])
     );
+    context.subplotKindLabel = loc`Subplot type`;
+    context.subplotNameLabel = loc`Subplot name`;
+    context.subplotNotesLabel = loc`Subplot notes`;
+    context.subplotCompleteLabel = loc`Completed Subplot`;
+    context.routineSubplotHint =
+      sys.campaignEffects?.forbidCrossroads === true
+        ? loc`Routine: choose standard Subplots. Completed Crossroads history and existing titles remain recorded.`
+        : "";
+    context.subplotRows = sys.subplots.map(row => ({
+      ...row,
+      kindLabel: Object.hasOwn(cfg.tables.crossroads, row.kind)
+        ? loc`Crossroads: ${cfg.tables.crossroads[row.kind].label}`
+        : row.kind === "standard"
+          ? loc`Standard Subplot`
+          : loc`Review Subplot type`,
+      kinds: [
+        { value: "", label: loc`Choose actual Subplot type` },
+        { value: "standard", label: loc`Standard Subplot` },
+        ...(row.kind && row.kind !== "standard" && !Object.hasOwn(cfg.tables.crossroads, row.kind)
+          ? [{ value: row.kind, label: loc`${row.kind} — review saved type` }]
+          : []),
+        ...Object.entries(cfg.tables.crossroads).map(([value, title]) => ({
+          value,
+          label: loc`Crossroads: ${title.label}`
+        }))
+      ].map(option => ({
+        ...option,
+        selected: option.value === (row.kind ?? ""),
+        disabled:
+          sys.campaignEffects?.forbidCrossroads === true &&
+          !row.complete &&
+          option.value !== "" &&
+          option.value !== "standard" &&
+          option.value !== row.kind
+      }))
+    }));
     context.fortesText = sys.focuses.fortes.join("\n");
     context.hasContactFeatUpgrades =
       !!sys.contactFeatBindings?.length || sys.contacts.some(c => c.networkingFeat || c.networkingMilestone);
@@ -1726,7 +1762,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         ? { name: "", rank: 1, notes: "" }
         : key === "skillFortes"
           ? { skill: "drive", focus: "", forte: "" }
-          : { name: "", notes: "", complete: false };
+          : { name: "", notes: "", complete: false, kind: "standard" };
     return this.actor.update({ [`system.${key}`]: [...(this.actor.system[key] ?? []).map(r => ({ ...r })), row] });
   }
   static async #onRemoveRow(event, target) {

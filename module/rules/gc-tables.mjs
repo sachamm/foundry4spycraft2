@@ -10978,7 +10978,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Characters can never take on Crossroads Subplots.",
-   "effects": {}
+   "effects": {
+    "forbidCrossroads": true
+   }
   },
   {
    "id": "shoe-string-budget",

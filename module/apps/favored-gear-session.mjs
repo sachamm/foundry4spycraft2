@@ -36,6 +36,7 @@ export async function recordFavoredGearLevelChoices(actor, options = {}) {
   const fingerprint = system =>
     structuredClone({
       level: system.level,
+      classes: system.classLevels,
       periods: system.usagePeriods,
       feats: system.activeFeatSelections,
       sessions: system.favoredGearSessions,

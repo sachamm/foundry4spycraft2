@@ -143,6 +143,8 @@ export function favoredGearLevelChoicePlan(
   const level = system.level,
     saved = current(system),
     reset = system.sessionDiceReset;
+  if (system.classLevels && Object.values(system.classLevels).reduce((sum, n) => sum + n, 0) !== level)
+    throw Error(loc`Finish the actual class progression before recording new-level favored items.`);
   if (
     !Number.isSafeInteger(level) ||
     level < 1 ||

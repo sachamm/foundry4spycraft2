@@ -138,6 +138,9 @@ test("level replacements require a new level, complete approved selections and b
   f.settle();
   assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, levelInput), /new level/);
   f.system.level = 10;
+  f.system.classLevels = { soldier: 9 };
+  assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, levelInput), /actual class progression/);
+  f.system.classLevels.soldier = 10;
   for (const patch of [{ confirmed: false }, { note: "" }, { userId: "" }, { note: "x".repeat(501) }])
     assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, { ...levelInput, ...patch }));
   f.items[0].system.possessionSource = "";
