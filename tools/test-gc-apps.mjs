@@ -1171,6 +1171,20 @@ test("End mission can record exposure for a critical objective left undone (pp.4
     assert.equal(await mission.endMission(), true);
     assert.equal(actors.get("a1").system.reputation, before - 2, "charged once per mission");
     assert.equal(state.getMission().infractions.length, state.teamActors().length);
+    // Undo gives the standing back and takes off only the rows it added, so End can charge them again.
+    await state.updateMission(m => ({ infractions: [...m.infractions, { id: "other", actor: "a2", penalty: -1 }] }));
+    const note = messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions);
+    const { applyUndo } = await import("../module/apps/undo.mjs");
+    await applyUndo({ id: "exposure-undo", flags: structuredClone(note.flags), update: async () => null });
+    assert.equal(actors.get("a1").system.reputation, before);
+    assert.deepEqual(
+      state.getMission().infractions.map(entry => entry.id),
+      ["other"]
+    );
+    await mission.resumeMission();
+    dialogAnswers.push({ countFinalScene: false, recordCritical: true });
+    await mission.endMission();
+    assert.equal(actors.get("a1").system.reputation, before - 2, "charged again after Undo");
   } finally {
     for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
     await state.setMission(saved);

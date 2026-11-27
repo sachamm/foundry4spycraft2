@@ -190,13 +190,13 @@ test("Grapple Size limits, the bigger side's +4, the second-opponent and Mute pe
     unarmed: { die: 4, extraDice: 0, damageBonus: 2 }
   };
   const check = { ...GRAPPLE_CHECK };
-  assert.match(grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: 2 }).blockedReason, /at most 1 Size/);
-  const smaller = grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: "-2" });
+  assert.match(grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: 2 }).blockedReason, /at most 1 Size/);
+  const smaller = grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: "-2" });
   assert.deepEqual(
     smaller.bonuses.map(b => b.value),
     [8]
   );
-  const bigger = grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: 1 });
+  const bigger = grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: 1 });
   assert.ok(bigger.notes.some(note => note.includes("gains +4")));
   const both = grappleCheckPlan(sys, "athletics", check, { grappleSecondOpponent: true, grappleMute: true });
   assert.deepEqual(
@@ -210,7 +210,7 @@ test("Grapple Size limits, the bigger side's +4, the second-opponent and Mute pe
         "Benefits that deal damage: Injure 1d4+2 (or a 1-handed weapon's); Throw 1d4+4, and the opponent is sprawled and free; Sprawl 1d4+2 subdual, and you become prone."
     )
   );
-  const escape = grappleCheckPlan(sys, "athletics", { id: "restraint-escape" }, { grappleSizeDifference: 2 });
+  const escape = grappleCheckPlan(sys, "athletics", { id: "restraint-escape" }, { grappleOpponentSize: 2 });
   assert.equal(escape.blockedReason, "");
 });
 
@@ -222,13 +222,13 @@ test("Grapple: 2, 4 or 8 grapplers at most, by the target's Size (p.357)", () =>
   };
   const check = { ...GRAPPLE_CHECK };
   assert.match(
-    grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: -1, grappleOthers: 2 }).blockedReason,
+    grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: -1, grappleOthers: 2 }).blockedReason,
     /At most 2/
   );
   assert.equal(grappleCheckPlan(sys, "athletics", check, { grappleOthers: "3" }).blockedReason, "");
   assert.match(grappleCheckPlan(sys, "athletics", check, { grappleOthers: 4 }).blockedReason, /At most 4/);
   assert.equal(
-    grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: 1, grappleOthers: 7 }).blockedReason,
+    grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: 1, grappleOthers: 7 }).blockedReason,
     ""
   );
 });
@@ -248,7 +248,7 @@ test("Omni-Competent halves the grapple penalties too (p.408)", async () => {
 test("a Grapple check records its Size on the card, and the card's facts give the bonus already in the total (U7)", async () => {
   const { grappleCardFacts } = await import("../module/rules/grapple-check.mjs");
   const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
-  const bigger = roll(state([]), { grappleSizeDifference: -2 });
+  const bigger = roll(state([]), { grappleOpponentSize: -2 });
   assert.equal(bigger.grappleFeats.sizeDifference, -2);
   assert.deepEqual(
     rollPipeline.flags({ options: { grappleFeats: bigger.grappleFeats } }).grappleFeats,

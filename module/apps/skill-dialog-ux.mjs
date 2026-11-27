@@ -23,7 +23,7 @@ const CHECK_SECTIONS = {
   skillTrick: ["trip", "bull-rush", "feint", "grapple"],
   // The Grapple section holds every grapple control, so it is shown for both checks; the rules ignore the ones that
   // do not apply to the chosen check.
-  grappleSizeDifference: ["grapple", "restraint-escape"],
+  grappleOpponentSize: ["grapple", "restraint-escape"],
   trackingSurface: ["tracking"],
   nest: ["hide"],
   hideMovement: ["hide"],

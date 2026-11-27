@@ -63,7 +63,7 @@ export function grappleCheckPlan(
     grappleAdvantageConfirmed = false,
     grappleGarrote = false,
     grappleJointLock = false,
-    grappleSizeDifference = 0,
+    grappleOpponentSize = 0,
     grappleSecondOpponent = false,
     grappleMute = false,
     grappleOthers = 0
@@ -78,7 +78,8 @@ export function grappleCheckPlan(
     // Joint Lock (Submission Moves, p.188): the grappler's trick gives −4 to this character's escape checks.
     jointLock = check.id === "restraint-escape" && grappleJointLock === true;
   // Size (p.357): an opponent at most 1 category bigger; the bigger side gains +4 per category of difference.
-  const sizeDifference = Math.trunc(Number(grappleSizeDifference) || 0);
+  // The opponent's Size less this character's; the escape check reads its own Size field the other way round.
+  const sizeDifference = Math.trunc(Number(grappleOpponentSize) || 0);
   if (check.id === "grapple" && sizeDifference > 1)
     return {
       ...empty,
@@ -176,7 +177,7 @@ rollPipeline.register({
     return [
       {
         at: 207,
-        html: `<details><summary>${loc`Grapple`}</summary><label>${loc`Opponent's Size compared with mine`} <select name="grappleSizeDifference"><option value="0">${loc`The same`}</option><option value="-1">${loc`1 smaller`}</option><option value="-2">${loc`2 smaller`}</option><option value="-3">${loc`3 smaller`}</option><option value="1">${loc`1 bigger`}</option><option value="2">${loc`2 or more bigger (no Grapple)`}</option></select></label><label>${loc`Others already grappling this opponent`} <input name="grappleOthers" type="number" min="0" max="7" step="1" value="0" class="w-2" /></label><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`I am grappling or holding a second opponent (−4)`}</label><label><input name="grappleMute" type="checkbox" /> ${loc`My hand is over an opponent's mouth (−2)`}</label><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
+        html: `<details><summary>${loc`Grapple`}</summary><label>${loc`Opponent's Size compared with mine`} <select name="grappleOpponentSize"><option value="0">${loc`The same`}</option><option value="-1">${loc`1 smaller`}</option><option value="-2">${loc`2 smaller`}</option><option value="-3">${loc`3 smaller`}</option><option value="1">${loc`1 bigger`}</option><option value="2">${loc`2 or more bigger (no Grapple)`}</option></select></label><label>${loc`Others already grappling this opponent`} <input name="grappleOthers" type="number" min="0" max="7" step="1" value="0" class="w-2" /></label><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`I am grappling or holding a second opponent (−4)`}</label><label><input name="grappleMute" type="checkbox" /> ${loc`My hand is over an opponent's mouth (−2)`}</label><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
       }
     ];
   }

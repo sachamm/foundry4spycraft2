@@ -1,6 +1,7 @@
 /** NPC disposition (pp.457–458, Table 7.14). */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignSkillDC } from "../campaign-rules.mjs";
 
 const D = GC_DATA.core.disposition;
 export const DISPOSITIONS = D.grades;
@@ -109,7 +110,9 @@ export function joinsCombat(gradeId, roll, { foil = 0 } = {}) {
 export function persuadeToJoin(gradeId, result, { triumph = false } = {}) {
   const grade = dispositionGrade(gradeId);
   if (grade.joinDC === null) return { dc: null, success: !!triumph, needsTriumph: true };
-  return { dc: grade.joinDC, success: Number.isFinite(result) && result >= grade.joinDC, needsTriumph: false };
+  // Cakewalk and Comedy of Errors move this DC like any other skill DC (p.406).
+  const dc = campaignSkillDC(grade.joinDC);
+  return { dc, success: Number.isFinite(result) && result >= dc, needsTriumph: false };
 }
 
 /**

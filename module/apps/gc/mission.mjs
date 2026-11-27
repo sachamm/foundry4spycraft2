@@ -346,7 +346,6 @@ export async function endMission({ clear = false } = {}) {
     // Each agent pays in their own affiliation's currency; the Undo note gives the standing back.
     const team = teamActors(getMission()),
       recorded = [];
-    const infractionsBefore = structuredClone(getMission().infractions ?? []);
     await withUndo(
       team,
       loc`Critical objectives: exposure recorded`,
@@ -359,6 +358,7 @@ export async function endMission({ clear = false } = {}) {
           for (const { infraction } of due) total += exposurePenalty(infraction)[currency];
           await actor.update({ [`system.${currency}`]: (actor.system[currency] ?? 0) + total });
           recorded.push({
+            id: foundry.utils.randomID(),
             actor: actor.id,
             name: loc`Critical objectives not completed`,
             currency,
@@ -370,7 +370,7 @@ export async function endMission({ clear = false } = {}) {
         await updateMission(m => ({ infractions: [...(m.infractions ?? []), ...recorded] }));
       },
       // Undo takes the exposure rows off too, so a later End mission can record them again.
-      () => ({ missionFields: { period: missionEpoch(), values: { infractions: infractionsBefore } } })
+      () => ({ addedInfractions: { period: missionEpoch(), ids: recorded.map(entry => entry.id) } })
     );
   }
   await say(

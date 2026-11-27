@@ -220,7 +220,7 @@ export function postUndo(
     dcBoost = null,
     standingPaid = null,
     cardMarks = null,
-    missionFields = null
+    addedInfractions = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -239,7 +239,7 @@ export function postUndo(
           dcBoost,
           standingPaid,
           cardMarks,
-          missionFields,
+          addedInfractions,
           done: false
         }
       }
@@ -345,14 +345,15 @@ async function undoRecord(message, record) {
         return { standingPaid: paid };
       }).catch(error => ui.notifications.warn(loc`The standing paid marks were not put back: ${error.message}`));
   }
-  // Mission record fields the step changed (exposure rows) go back, but only within the mission that changed them.
-  const fields = record.missionFields;
-  if (fields?.values && game.user.isGM) {
+  // Exposure rows the step added come off the mission record, within the mission that added them; rows added
+  // before or since are kept.
+  const added = record.addedInfractions;
+  if (added?.ids?.length && game.user.isGM) {
     const { updateMission, missionEpoch } = await import("./gc/state.mjs");
-    if (fields.period === missionEpoch())
-      await updateMission(fields.values).catch(error =>
-        ui.notifications.warn(loc`The mission record was not put back: ${error.message}`)
-      );
+    if (added.period === missionEpoch())
+      await updateMission(now => ({
+        infractions: (now.infractions ?? []).filter(entry => !added.ids.includes(entry?.id))
+      })).catch(error => ui.notifications.warn(loc`The exposure rows were not taken off: ${error.message}`));
   }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {
