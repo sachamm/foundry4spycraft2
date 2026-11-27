@@ -6,6 +6,7 @@
  * module/apps/damage-application.mjs.
  */
 import { criticalInjuryBand } from "./campaign-rules.mjs";
+import { specialistDefense } from "./weapon-specialist.mjs";
 import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
@@ -200,14 +201,18 @@ export function lethalHitLines(name, plan) {
   return lines;
 }
 
-/** Which DR column an attack uses: armor lists one value against melee and another against everything else. */
-export function drForAttack(system = {}, attackKind = "other") {
+/**
+ * Which DR column an attack uses: armor lists one value against melee and another against everything else. The
+ * attacking weapon's proficiency adds Weapon Specialist Foibles (DR 1/—, p.50) where it applies.
+ */
+export function drForAttack(system = {}, attackKind = "other", { proficiency = "" } = {}) {
+  const foibles = specialistDefense(system, proficiency).damageReduction;
   const listed = system.armorDRByAttack?.[attackKind];
-  if (whole(listed)) return listed;
+  if (whole(listed)) return listed + foibles;
   const melee = ["unarmed", "meleeWeapon"].includes(attackKind);
   const fromArmor = melee ? system.dr?.melee : system.dr?.other;
-  if (whole(fromArmor)) return fromArmor;
-  return whole(system.qualityEffects?.damageReduction) ? system.qualityEffects.damageReduction : 0;
+  if (whole(fromArmor)) return fromArmor + foibles;
+  return (whole(system.qualityEffects?.damageReduction) ? system.qualityEffects.damageReduction : 0) + foibles;
 }
 
 /** The DR category of a weapon, from its proficiency and whether the attack was ranged. */

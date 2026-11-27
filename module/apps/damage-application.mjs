@@ -33,6 +33,7 @@ import {
   reducedDamage,
   woundState
 } from "../rules/damage-application.mjs";
+import { specialistDefense } from "../rules/weapon-specialist.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
@@ -222,7 +223,9 @@ export async function resolveAttack(message, options = {}) {
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
   const cover = coverOnResolution(input.cover);
-  const defense = baseDefense + (cover?.bonus ?? 0);
+  // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies, on top of the sheet's Defense.
+  const foibles = entered && target ? specialistDefense(target.system, check.weaponProficiency).dodge : 0;
+  const defense = baseDefense + (cover?.bonus ?? 0) + foibles;
   let outcome;
   try {
     outcome = attackOutcome({
@@ -242,6 +245,7 @@ export async function resolveAttack(message, options = {}) {
     total: check.effectiveTotal,
     // Updates merge, so resolving again without cover clears what an earlier resolution recorded.
     cover: cover ?? null,
+    foibles,
     hitsCover: cover ? !outcome.hit && check.effectiveTotal >= baseDefense : false,
     // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
@@ -479,7 +483,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
   const plan = nonLethalHitPlan(target.system, nonLethalTotals(target), {
     kind,
     damage: amount,
-    dr: drForAttack(target.system, attackKind),
+    dr: drForAttack(target.system, attackKind, { proficiency: facts.proficiency }),
     armorPiercing,
     armorPiercingAll,
     critical
@@ -739,7 +743,14 @@ export async function applyDamage(message, options = {}) {
   if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
   if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
   const source = loc`${weapon?.name ?? loc`Damage`} (${message.id ?? "roll"})`;
-  const hit = { damage, dr: drForAttack(target.system, attackKind), armorPiercing, armorPiercingAll, critical };
+  const proficiency = weapon?.system?.proficiency ?? check.weaponProficiency ?? "";
+  const hit = {
+    damage,
+    dr: drForAttack(target.system, attackKind, { proficiency }),
+    armorPiercing,
+    armorPiercingAll,
+    critical
+  };
   let lines = [],
     pendingSave = null,
     failed = false,
@@ -820,6 +831,7 @@ export async function applyDamage(message, options = {}) {
       ({ lines, pendingSave, failed } = await nonLethalDamage(target, kind, damage, {
         source,
         attackKind,
+        proficiency,
         armorPiercing,
         armorPiercingAll,
         critical

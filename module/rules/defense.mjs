@@ -1,3 +1,4 @@
+import { specialistDefense } from "./weapon-specialist.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
@@ -123,8 +124,11 @@ export function incomingDefensePlan(system, options = {}) {
     // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
     anticipate =
       vulnerable || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
+  // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies.
+  const foibles = specialistDefense(system, options.attackerProficiency ?? "", { vulnerable });
   const total =
-    -circling.dodgeReduction -
+    foibles.dodge -
+    circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
     whateversHandy +
@@ -166,6 +170,7 @@ export function incomingDefensePlan(system, options = {}) {
     anticipate,
     // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
     stickyFingersDR: stickyFingers ? 5 : 0,
+    foibles,
     listedDR:
       stickyFingers && system.armorDRByAttack
         ? Object.fromEntries(Object.entries(system.armorDRByAttack).map(([k, v]) => [k, v + 5]))

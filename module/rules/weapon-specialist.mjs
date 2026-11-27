@@ -57,10 +57,13 @@ export function specialistApplies(system, weapon, ability) {
     system.weaponSpecialist.abilities.includes(ability)
   );
 }
-export function specialistDefense(system, proficiency) {
-  return specialistApplies(system, { proficiency }, "Foibles")
-    ? { dodge: 1, damageReduction: 1 }
-    : { dodge: 0, damageReduction: 0 };
+/**
+ * Foibles (p.50): +1 dodge bonus to Defense and DR 1/— more against attacks with weapons of the chosen proficiencies.
+ * A character who has lost dodge bonuses (flat-footed, helpless) keeps only the DR.
+ */
+export function specialistDefense(system, proficiency, { vulnerable = system?.vulnerable === true } = {}) {
+  if (!proficiency || !specialistApplies(system, { proficiency }, "Foibles")) return { dodge: 0, damageReduction: 0 };
+  return { dodge: vulnerable ? 0 : 1, damageReduction: 1 };
 }
 
 // Weapon Specialist "No Worries" as part of an attack plan.
