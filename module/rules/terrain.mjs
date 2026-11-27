@@ -272,7 +272,13 @@ export function characterSurvivalStats(system) {
     if (resistances.stress !== "all") resistances.stress = (resistances.stress ?? 0) + noFear.resistance;
   }
   for (const [key, value] of Object.entries(quality)) {
-    resistanceSources.push({ source: loc`Test Subject damage resistance`, key, value });
+    resistanceSources.push({
+      source: system.qualityEffects?.resistances?.length
+        ? loc`NPC damage resistance`
+        : loc`Test Subject damage resistance`,
+      key,
+      value
+    });
     if (resistances[key] !== "all") resistances[key] = Math.max(resistances[key] ?? 0, value);
   }
   // The p.446 restriction names gear/class benefits; independent feat benefits remain additive.

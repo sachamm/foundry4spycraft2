@@ -23,6 +23,8 @@ const missionThreatLevelSetting = () => {
   }
 };
 import { computeAgent } from "../rules/engine.mjs";
+import { characterSurvivalStats } from "../rules/terrain.mjs";
+import { qualityResistanceReview } from "../rules/resistances.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { campaignCQBRange, campaignNpcHealthReview } from "../rules/campaign-combat.mjs";
 import { characterCampaignPolicy } from "../rules/creation-policy.mjs";
@@ -251,6 +253,7 @@ export class NpcData extends BaseActorData {
       this.applyFeatEffects({ health: false });
       this.warnings.push(
         ...partnerWarnings,
+        ...this.resistanceReview,
         ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : [])
       );
       this.warnings.push(
@@ -307,6 +310,7 @@ export class NpcData extends BaseActorData {
     this.competence = result.competence;
     this.warnings = [
       ...(result.warnings ?? []),
+      ...this.resistanceReview,
       ...partnerWarnings,
       ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : []),
       ...campaignNpcHealthReview({
@@ -372,6 +376,8 @@ export class NpcData extends BaseActorData {
       this.wounds.max += effects.wounds;
     }
     this.featEffects = effects;
+    this.survivalStats = characterSurvivalStats(this);
+    this.resistanceReview = qualityResistanceReview(this);
   }
 
   static defineSchema() {

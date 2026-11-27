@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { RESISTANCE_TYPES, resistanceType } from "../module/rules/resistances.mjs";
+import {
+  RESISTANCE_TYPES,
+  resistanceType,
+  damageResistanceSource,
+  damageResistancePlan,
+  qualityResistanceReview
+} from "../module/rules/resistances.mjs";
 import { characterSurvivalStats } from "../module/rules/terrain.mjs";
 import { armorTotals } from "../module/rules/gear.mjs";
 import { resolveOriginChoices } from "../module/rules/origins.mjs";
@@ -32,6 +38,51 @@ const origins = JSON.parse(await readFile(new URL("../src/data/origins.json", im
     }
   }),
   items = [{ id: "scout", name: "Scout", type: "class", system: { ...scout, identifier: "scout", vitalityDie: 10 } }];
+test("damage resistance validates its original policy and uses that policy after later gear changes", () => {
+  const system = { survivalStats: { resistances: { AD: 4 }, resistanceSources: [] } };
+  const source = damageResistanceSource(system, "acid");
+  system.survivalStats.resistances.AD = 0;
+  assert.equal(damageResistancePlan(system, "acid", 7, source).net, 3);
+  assert.equal(damageResistancePlan(system, "acid", 4, source).negatesEffects, true);
+  assert.equal(damageResistancePlan(system, "acid", 0, source).negatesEffects, false);
+  assert.equal(damageResistancePlan(system, "acid", 4).net, 4);
+  for (const patch of [{ key: "FR" }, { resistance: -1 }, { resistance: 0.5 }, { sources: [{}] }, { version: 2 }])
+    assert.throws(() => damageResistancePlan(system, "acid", 7, { ...source, ...patch }));
+  assert.throws(() => damageResistancePlan(system, "acid", 0.5, source));
+});
+
+test("NPC quality resistances share the prepared maximum and independent feat stacking", () => {
+  const system = {
+    qualityEffects: {
+      resistances: [
+        { type: "cold", value: 4 },
+        { type: "CD", value: 2 }
+      ]
+    },
+    armor: { resistances: { CD: 3 } },
+    activeFeatNames: ["Arctic Training"]
+  };
+  const stats = characterSurvivalStats(system);
+  assert.equal(stats.resistances.CD, 11);
+  assert.ok(stats.resistanceSources.some(row => row.source === "NPC damage resistance" && row.value === 6));
+  assert.deepEqual(qualityResistanceReview(system), []);
+  assert.equal(
+    qualityResistanceReview({ qualityEffects: { resistances: [{ type: "custom protection", value: 4 }] } }).length,
+    1
+  );
+  assert.equal(
+    qualityResistanceReview({
+      qualityEffects: {
+        resistances: [
+          { type: "acid", value: 8 },
+          { type: "fire", value: 1 }
+        ]
+      }
+    }).length,
+    1
+  );
+});
+
 test("all sixteen effective damage-resistance types support exact names/codes, both printed acid aliases and electrical names without guessing ambiguous prose", () => {
   assert.equal(Object.keys(RESISTANCE_TYPES).length, 16);
   for (const [key, label] of Object.entries(RESISTANCE_TYPES)) {

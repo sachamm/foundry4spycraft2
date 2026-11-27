@@ -44,6 +44,7 @@ import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { damageResistancePlan } from "../rules/resistances.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -405,7 +406,8 @@ async function resolveContagionSave(actor, message, save, succeeded) {
 
 /** Fire damage taken now: vitality and wounds, matching stress, and the running total for this fire. */
 async function sufferFire(actor, state, damage, reduction, label, hitContext = {}) {
-  const taken = Math.max(0, damage - Math.max(0, reduction)),
+  const resistance = damageResistancePlan(actor.system, "fire", Math.max(0, damage - Math.max(0, reduction))),
+    taken = resistance.net,
     loss = await sufferLethal(actor, taken, hitContext),
     plan = fireDamagePlan(state.fire, taken);
   if (!loss)
@@ -426,7 +428,8 @@ async function sufferFire(actor, state, damage, reduction, label, hitContext = {
     lines.push(
       loc`This fire has now done ${plan.fire.suffered} damage: make the Fortitude save (DC ${SCAR_SAVE_DC}) against scarring from the sheet.`
     );
-  return { lines, fire: plan.fire };
+  if (resistance.resisted) lines.push(loc`Fire resistance prevents ${resistance.resisted} damage.`);
+  return { lines, fire: plan.fire, negatesEffects: resistance.negatesEffects };
 }
 
 /** A fire in the character's square, contact with a fire, or a fire attack: damage now, then a save or catch fire. */
@@ -461,7 +464,7 @@ export async function exposeToFire(actor, options = {}) {
     );
   if (result.fire) await writeHazards(actor, { ...state, fire: result.fire });
   await post(actor, result.lines);
-  if (input.save === false || input.damage < 10) return true;
+  if (result.negatesEffects || input.save === false || input.damage < 10) return true;
   return actor.rollSave("ref", {
     askContext: true,
     hazardSave: { kind: "fire", label: loc`Catch fire`, dc: input.damage, damage: input.damage, ap: input.ap ?? 0 }
@@ -485,12 +488,13 @@ export async function burningRound(actor, options = {}) {
   }
   const plan = burningRoundPlan(state),
     result = await sufferFire(actor, state, plan.damage, reduction, loc`Burning (AP ${state.fire.ap})`);
-  await writeHazards(actor, { ...state, fire: result.fire });
-  result.lines.push(
-    loc`To do anything but leave the fire, drop prone and roll, make a Will save against DC ${state.fire.damage} (p.337).`
-  );
+  await writeHazards(actor, { ...state, fire: result.negatesEffects ? null : result.fire });
+  if (!result.negatesEffects)
+    result.lines.push(
+      loc`To do anything but leave the fire, drop prone and roll, make a Will save against DC ${state.fire.damage} (p.337).`
+    );
   await post(actor, result.lines);
-  return result.fire;
+  return result.negatesEffects ? null : result.fire;
 }
 
 /** Fight the fire on a character: roll on the ground, or take dice off it with water, a blanket or an extinguisher. */

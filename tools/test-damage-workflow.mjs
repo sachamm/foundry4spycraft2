@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { evasionSaveContext } from "../module/rules/save-avoidance.mjs";
+import { damageResistanceSource } from "../module/rules/resistances.mjs";
 
 /* Foundry stand-ins: enough for the attack, damage, ammunition and opposed-check workflows to run. */
 const registry = new Map();
@@ -93,7 +94,7 @@ function character(name, system, extra = {}) {
     name,
     type: "agent",
     isOwner: true,
-    system,
+    system: { survivalStats: { resistances: {}, resistanceSources: [] }, ...system },
     flags: {},
     statuses: new Set(),
     effects: [],
@@ -112,6 +113,7 @@ function character(name, system, extra = {}) {
     },
     ...extra
   });
+  actor.system.survivalStats ??= { resistances: {}, resistanceSources: [] };
   registry.set(actor.uuid, actor);
   return actor;
 }
@@ -702,7 +704,18 @@ test("a special damage type is handed to an agent's own rules, with the dialog o
   agent.rollSave = async (key, options) => (asked.push([key, options.hazardSave]), { flags: {} });
   const damage = card("d6", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 18 });
   await applyDamage(damage, { targetUuid: agent.uuid, damage: 18, kind: "lethal", type: "bang", attackKind: "other" });
-  assert.deepEqual(asked, [["fort", { kind: "bang", label: asked[0][1].label, dc: 18 }]]);
+  assert.deepEqual(asked, [
+    [
+      "fort",
+      {
+        kind: "bang",
+        label: asked[0][1].label,
+        dc: 18,
+        originalDamage: 18,
+        resistanceSource: damageResistanceSource(agent.system, "bang")
+      }
+    ]
+  ]);
   assert.equal(agent.system.vitality.value, 40, "bang damage is a save, not lost vitality");
 });
 
@@ -950,7 +963,18 @@ test("typed Reflex damage uses recorded Evasion, retains earlier acid and preser
       successConfirmed: succeeded,
       evasionContext: { version: 1, grade, flatFooted, reflexReducesDamage: true }
     };
-    await hazardSaveResolvers.get(kind)(actor, null, { damage: 14, reduction: 0, dc: 14 }, succeeded, check);
+    await hazardSaveResolvers.get(kind)(
+      actor,
+      null,
+      {
+        damage: 14,
+        reduction: 0,
+        dc: 14,
+        resistanceSource: damageResistanceSource(actor.system, kind === "acid" ? "acid" : "explosive")
+      },
+      succeeded,
+      check
+    );
     assert.equal(actor.system.vitality.value, 100 - impact);
     if (kind === "acid") assert.equal(actor.system.hazards.acid.damage, impact || 3);
     else {
@@ -1028,6 +1052,145 @@ test("acid armor removal and unknown protection are declared before dice", async
   });
   assert.equal(saves[0].reduction, 4);
   assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0, "removed armor needs no random coverage check");
+});
+
+test("typed resistance prevents primary damage and accompanying effects for agents and both NPC health models", async () => {
+  for (const role of ["agent", "special", "standard"])
+    for (const type of ["acid", "explosive", "vacuum", "collision", "laser", "fire", "bang", "flash"]) {
+      reset();
+      const codes = {
+        acid: "AD",
+        explosive: "EX",
+        vacuum: "VC",
+        collision: "collision",
+        laser: "LA",
+        fire: "FR",
+        bang: "BN",
+        flash: "FL"
+      };
+      const actor = character(`Resistance-${role}-${type}`, {
+        npcType: role,
+        damageSave: 30,
+        vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+        wounds: { value: 20, max: 20 },
+        survivalStats: { resistances: { [codes[type]]: 8 }, resistanceSources: [] }
+      });
+      actor.type = role === "agent" ? "agent" : "npc";
+      const pending = [];
+      actor.rollSave = async (key, options) => (
+        pending.push({ key, save: structuredClone(options.hazardSave) }),
+        { flags: {} }
+      );
+      const hit = card(`resistance-hit-${role}-${type}`, {
+        actorUuid: "Actor.Kevin",
+        checkKind: "damage",
+        effectiveTotal: 6
+      });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 6, kind: "lethal", type });
+      if (["acid", "explosive", "vacuum"].includes(type) && pending.length) {
+        const first = pending.shift();
+        assert.ok(first);
+        const result = card(`resistance-save-${role}-${type}`, {
+          actorUuid: actor.uuid,
+          checkKind: "save",
+          checkId: first.key,
+          rawTotal: 1,
+          effectiveTotal: 1,
+          resolved: true,
+          successConfirmed: false,
+          evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true }),
+          hazardSave: first.save
+        });
+        await resolveHazardSave(actor, result);
+      }
+      assert.equal(pending.length, 0, `${role} ${type}: resistance prevents the accompanying save`);
+      assert.equal(actor.system.vitality.value, 100);
+      assert.equal(actor.system.wounds.value, 20);
+      assert.equal(actor.system.damageTrack, undefined);
+      assert.equal(actor.system.hazards?.acid ?? null, null);
+      assert.equal(actor.system.hazards?.exposure ?? null, null);
+      assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0, "no secondary dice after resistance stops the damage");
+    }
+});
+
+test("pending acid and explosive damage retain resistance from the original hit after current gear changes", async () => {
+  for (const role of ["agent", "special", "standard"])
+    for (const type of ["acid", "explosive"]) {
+      reset();
+      const code = type === "acid" ? "AD" : "EX";
+      const actor = character(`Frozen-resistance-${role}-${type}`, {
+        stressThreshold: 10,
+        subdualThreshold: 10,
+        npcType: role,
+        damageSave: 30,
+        dr: { other: 3 },
+        vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+        wounds: { value: 20, max: 20 },
+        survivalStats: { resistances: { [code]: 8 }, resistanceSources: [] }
+      });
+      actor.type = role === "agent" ? "agent" : "npc";
+      const pending = [];
+      actor.rollSave = async (key, options) => (
+        pending.push({ key, save: structuredClone(options.hazardSave) }),
+        { flags: {} }
+      );
+      const hit = card(`frozen-resistance-hit-${role}-${type}`, {
+        actorUuid: "Actor.Kevin",
+        checkKind: "damage",
+        effectiveTotal: 14
+      });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type });
+      const first = pending.shift();
+      actor.system.survivalStats.resistances[code] = 0;
+      const result = card(`frozen-resistance-save-${role}-${type}`, {
+        actorUuid: actor.uuid,
+        checkKind: "save",
+        checkId: first.key,
+        rawTotal: 1,
+        effectiveTotal: 1,
+        resolved: true,
+        successConfirmed: false,
+        evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true }),
+        hazardSave: first.save
+      });
+      await resolveHazardSave(actor, result);
+      if (role === "standard")
+        assert.equal(posted.find(m => m.flags?.spycraft2?.npcDamageSave)?.flags.spycraft2.npcDamageSave.damage, 3);
+      else assert.equal(actor.system.vitality.value, 97, "14 - DR 3 - original resistance 8");
+      if (type === "acid") assert.equal(actor.system.hazards.acid.suffered, 3);
+    }
+});
+
+test("ongoing acid and fire use current resistance and count only damage that gets through", async () => {
+  reset();
+  const { acidStep, sufferTypedDamage } = await import("../module/apps/damage-types.mjs");
+  const { burningRound } = await import("../module/apps/hazards.mjs");
+  const actor = character("Ongoing-resistance", {
+    npcType: "special",
+    vitality: { value: 100, max: 100 },
+    wounds: { value: 20, max: 20 },
+    stressThreshold: 10,
+    subdualThreshold: 10,
+    survivalStats: { resistances: { AD: 4, FR: 4 }, resistanceSources: [] },
+    hazards: { acid: { damage: 7, suffered: 10, injuryChecked: false, startedAt: 0 } }
+  });
+  actor.type = "npc";
+  await acidStep(actor, "round");
+  assert.equal(actor.system.vitality.value, 97);
+  assert.equal(actor.system.hazards.acid.suffered, 13);
+  actor.system.survivalStats.resistances.AD = 8;
+  await sufferTypedDamage(actor, { type: "acid", amount: 6, armor: "none" });
+  assert.equal(actor.system.hazards.acid.damage, 7, "a separate fully resisted hit leaves earlier acid alone");
+  await acidStep(actor, "round");
+  assert.equal(actor.system.hazards.acid, null);
+  actor.system.hazards.fire = { damage: 7, ap: 0, suffered: 10, scarChecked: false, startedAt: 0 };
+  await burningRound(actor, { reduction: 0 });
+  assert.equal(actor.system.vitality.value, 94);
+  assert.equal(actor.system.hazards.fire.suffered, 13);
+  actor.system.survivalStats.resistances.FR = 8;
+  await burningRound(actor, { reduction: 0 });
+  assert.equal(actor.system.hazards.fire, null);
+  assert.equal(actor.system.vitality.value, 94);
 });
 
 test("typed electrical subdual retains its original melee DR column and tracks only net exposure", async () => {

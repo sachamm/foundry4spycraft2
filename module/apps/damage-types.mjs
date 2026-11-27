@@ -55,6 +55,7 @@ import { drForAttack, reducedDamage } from "../rules/damage-application.mjs";
 import { npcDamageSave } from "./gc/npc-damage-save.mjs";
 import { npcIsSpecial } from "../rules/gc/npc-state.mjs";
 import { evasionSaveContext, reflexDamagePlan } from "../rules/save-avoidance.mjs";
+import { damageResistanceSource, damageResistancePlan } from "../rules/resistances.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
@@ -141,7 +142,9 @@ async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = 
 }
 
 /** Lethal damage now and the stress its type adds for what was lost. Returns the report lines. */
-async function sufferTypedLethal(actor, type, amount, label, hitContext = {}) {
+async function sufferTypedLethal(actor, type, amount, label, hitContext = {}, resistanceSource) {
+  const resistance = damageResistancePlan(actor.system, type, amount, resistanceSource);
+  amount = resistance.net;
   const loss = await sufferLethal(actor, amount, hitContext);
   if (!loss)
     throw Error(
@@ -159,13 +162,14 @@ async function sufferTypedLethal(actor, type, amount, label, hitContext = {}) {
     stress = typedStress(type, lost);
   let points = stress.points;
   const rolls = [];
-  if (stress.formula) {
+  if (stress.formula && !resistance.negatesEffects) {
     const flat = await rollTotal(stress.formula);
     rolls.push(flat.roll);
     points += flat.total;
   }
-  lines.push(await sufferStress(actor, points, label));
-  return { lines, rolls, lost };
+  if (resistance.resisted) lines.push(loc`Resistance prevents ${resistance.resisted} ${label} damage.`);
+  if (!resistance.negatesEffects) lines.push(await sufferStress(actor, points, label));
+  return { lines, rolls, lost, damage: amount, resistance };
 }
 
 /** Ask for an injury save that a running total of one type has earned. */
@@ -251,10 +255,24 @@ export async function sufferTypedDamage(actor, preset = {}) {
     switch (type) {
       case "bang":
         if (has(actor, "deaf")) return post(actor, [loc`Bang: a deafened character is not affected (p.334).`]);
-        return actor.rollSave("fort", { askContext: true, hazardSave: { kind: "bang", label, dc: amount } });
+        {
+          const plan = damageResistancePlan(actor.system, type, amount);
+          if (!plan.net) return post(actor, [loc`Resistance prevents the bang damage and its accompanying effects.`]);
+          return actor.rollSave("fort", {
+            askContext: true,
+            hazardSave: { kind: "bang", label, dc: plan.net, originalDamage: amount, resistanceSource: plan.source }
+          });
+        }
       case "flash":
         if (has(actor, "blind")) return post(actor, [loc`Flash: a blinded character is not affected (p.338).`]);
-        return actor.rollSave("fort", { askContext: true, hazardSave: { kind: "flash", label, dc: amount } });
+        {
+          const plan = damageResistancePlan(actor.system, type, amount);
+          if (!plan.net) return post(actor, [loc`Resistance prevents the flash damage and its accompanying effects.`]);
+          return actor.rollSave("fort", {
+            askContext: true,
+            hazardSave: { kind: "flash", label, dc: plan.net, originalDamage: amount, resistanceSource: plan.source }
+          });
+        }
       case "acid":
         if (
           !Number.isSafeInteger(Number(input.halfActions ?? 0)) ||
@@ -316,7 +334,12 @@ async function startAcid(
   { amount, reduction, armor, halfActions, unarmoredReduction, removeArmor, hitContext }
 ) {
   const lines = [],
-    rolls = [];
+    rolls = [],
+    resistanceSource = damageResistanceSource(actor.system, "acid");
+  if (damageResistancePlan(actor.system, "acid", amount, resistanceSource).negatesEffects)
+    return post(actor, [
+      loc`Acid resistance prevents this hit and its accompanying effects; earlier acid is unchanged.`
+    ]);
   let dr = reduction;
   if (removeArmor) {
     dr = unarmoredReduction;
@@ -340,6 +363,7 @@ async function startAcid(
     reflexReducesDamage: true,
     hazardSave: {
       kind: "acid",
+      resistanceSource,
       ...halfSavePolicy(actor),
       label: DAMAGE_TYPE_LABELS.acid,
       dc: plan.dc,
@@ -353,6 +377,9 @@ async function startAcid(
 }
 
 async function startExplosive(actor, input) {
+  const resistanceSource = damageResistanceSource(actor.system, "explosive");
+  if (damageResistancePlan(actor.system, "explosive", input.amount, resistanceSource).negatesEffects)
+    return post(actor, [loc`Explosive resistance prevents the damage and its accompanying effects.`]);
   const plan = explosiveSavePlan(input.amount, {
     moved: input.moved ?? "none",
     cannotMove: input.cannotMove === true,
@@ -360,6 +387,7 @@ async function startExplosive(actor, input) {
   });
   const save = {
     kind: "explosiveReflex",
+    resistanceSource,
     ...halfSavePolicy(actor),
     label: loc`Explosive (Reflex)`,
     dc: plan.dc,
@@ -382,6 +410,9 @@ async function startExplosive(actor, input) {
 }
 
 async function startVacuum(actor, { amount, firstRound, source, hitContext }) {
+  const resistanceSource = damageResistanceSource(actor.system, "vacuum");
+  if (damageResistancePlan(actor.system, "vacuum", amount, resistanceSource).negatesEffects)
+    return post(actor, [loc`Vacuum resistance prevents this damage and its accompanying effects.`]);
   const rolled = amount;
   const rolls = [];
   if (firstRound) {
@@ -390,6 +421,7 @@ async function startVacuum(actor, { amount, firstRound, source, hitContext }) {
       askContext: true,
       hazardSave: {
         kind: "vacuum",
+        resistanceSource,
         ...halfSavePolicy(actor),
         label: DAMAGE_TYPE_LABELS.vacuum,
         dc: VACUUM.saveDC,
@@ -402,8 +434,16 @@ async function startVacuum(actor, { amount, firstRound, source, hitContext }) {
   return applyVacuum(actor, rolled, source, rolls, hitContext);
 }
 
-async function applyVacuum(actor, damage, source, rolls = [], hitContext = {}) {
-  const result = await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum, hitContext);
+async function applyVacuum(actor, damage, source, rolls = [], hitContext = {}, resistanceSource) {
+  const result = await sufferTypedLethal(
+    actor,
+    "vacuum",
+    damage,
+    DAMAGE_TYPE_LABELS.vacuum,
+    hitContext,
+    resistanceSource
+  );
+  if (result.resistance.negatesEffects) return post(actor, result.lines, [...rolls, ...result.rolls]);
   result.lines.push(loc`A character in vacuum is also suffocating (p.349).`);
   const tracked = addExposure(hazardState(actor.system), {
     type: "vacuum",
@@ -489,8 +529,11 @@ export async function acidStep(actor, step) {
   if (step === "round") {
     const plan = acidRoundPlan(state),
       result = await sufferTypedLethal(actor, "acid", plan.damage, loc`Acid (lingering)`);
-    await writeHazards(actor, plan.hazards);
-    if (plan.injurySaveDue) result.lines.push(loc`This acid has now done 25 or more damage: roll the injury save.`);
+    const suffered = state.acid.suffered + result.damage,
+      acid = result.resistance.negatesEffects ? null : { ...plan.hazards.acid, suffered };
+    await writeHazards(actor, { ...plan.hazards, acid });
+    if (acid && !acid.injuryChecked && suffered >= 25)
+      result.lines.push(loc`This acid has now done 25 or more damage: roll the injury save.`);
     return post(actor, result.lines, result.rolls);
   }
   if (step === "end" || step === "wash") {
@@ -603,11 +646,27 @@ function typedReflexDamage(save, succeeded, check, normalSuccessDamage) {
   return reflexDamagePlan(check, { damage: save.damage, normalSuccessDamage, succeeded, confirmed: true });
 }
 
+function savedResistance(save) {
+  if (!save.resistanceSource)
+    throw Error(
+      loc`This damage save lacks its original resistance policy. Apply the verified original outcome by hand, then review and keep its actual effects.`
+    );
+  return save.resistanceSource;
+}
+
 async function resolveExplosiveReflex(actor, message, save, succeeded, check) {
   if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
   const adjustment = typedReflexDamage(save, succeeded, check, explosiveDamageTaken(save.damage, true)),
     taken = Math.max(0, adjustment.total - Math.max(0, save.reduction ?? 0)),
-    result = await sufferTypedLethal(actor, "explosive", taken, DAMAGE_TYPE_LABELS.explosive, save.hitContext);
+    result = await sufferTypedLethal(
+      actor,
+      "explosive",
+      taken,
+      DAMAGE_TYPE_LABELS.explosive,
+      save.hitContext,
+      savedResistance(save)
+    );
+  if (result.resistance.negatesEffects) return post(actor, result.lines, result.rolls);
   result.lines.unshift(
     adjustment.evaded
       ? loc`Evasion prevents the explosive impact damage; successful Reflex movement still applies.`
@@ -667,7 +726,14 @@ const resolvers = {
     const adjustment = typedReflexDamage(save, succeeded, check, acidFirstDamage(save.damage, true)),
       first = adjustment.total,
       taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
-      result = await sufferTypedLethal(actor, "acid", taken, DAMAGE_TYPE_LABELS.acid, save.hitContext);
+      result = await sufferTypedLethal(
+        actor,
+        "acid",
+        taken,
+        DAMAGE_TYPE_LABELS.acid,
+        save.hitContext,
+        savedResistance(save)
+      );
     result.lines.unshift(
       adjustment.evaded
         ? loc`Evasion prevents this acid damage; any earlier acid remains.`
@@ -677,7 +743,11 @@ const resolvers = {
             ? loc`The Reflex save succeeds: the acid is halved.`
             : loc`The Reflex save fails: full acid damage.`
     );
-    const next = applyAcid(hazardState(actor.system), { damage: first, suffered: taken, worldTime: now() });
+    const next = applyAcid(hazardState(actor.system), {
+      damage: result.resistance.negatesEffects ? 0 : first,
+      suffered: result.damage,
+      worldTime: now()
+    });
     await writeHazards(actor, next);
     if (next.acid)
       result.lines.push(
@@ -694,7 +764,14 @@ const resolvers = {
   async vacuum(actor, message, save, succeeded) {
     if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
     const damage = vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
-    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum, [], save.hitContext);
+    return applyVacuum(
+      actor,
+      damage,
+      save.source ?? DAMAGE_TYPE_LABELS.vacuum,
+      [],
+      save.hitContext,
+      savedResistance(save)
+    );
   },
   async typedInjury(actor, message, save, succeeded) {
     const state = hazardState(actor.system);

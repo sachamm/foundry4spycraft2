@@ -37,7 +37,58 @@ export function qualityResistances(system) {
   for (const effect of system.originEffects ?? [])
     if (effect.qualityKey === "damageResistance" && Object.hasOwn(RESISTANCE_TYPES, effect.resistanceType))
       out[effect.resistanceType] = (out[effect.resistanceType] ?? 0) + 4;
+  for (const entry of system.qualityEffects?.resistances ?? []) {
+    const key = resistanceType(entry.type);
+    if (key && Number.isSafeInteger(entry.value) && entry.value > 0)
+      out[key] = Math.min(8, (out[key] ?? 0) + entry.value);
+  }
   return out;
+}
+
+/** Unclassified custom types and excess applications need GC review instead of invisible protection. */
+export function qualityResistanceReview(system) {
+  const entries = system.qualityEffects?.resistances ?? [],
+    warnings = [];
+  if (entries.some(row => !resistanceType(row.type)))
+    warnings.push(
+      loc`NPC damage resistance: choose a recognized damage type or adjudicate the custom protection with the GC.`
+    );
+  if (entries.reduce((total, row) => total + row.value, 0) > 8)
+    warnings.push(
+      loc`NPC damage resistance exceeds eight quality applications; review this build with the GC (p.447).`
+    );
+  return warnings;
+}
+
+/** Keep the prepared resistance used by a pending damage save, independent of later gear changes. */
+export function damageResistanceSource(system, type) {
+  const key = resistanceType(type);
+  if (!key) throw new Error(loc`Choose a known damage-resistance type.`);
+  return { version: 1, key, ...preparedResistanceSource(system, key) };
+}
+
+/** p.333: subtract resistance after DR; reducing damage to zero also prevents its accompanying effects. */
+export function damageResistancePlan(system, type, damage, source = damageResistanceSource(system, type)) {
+  const valid = value => value === "all" || (Number.isSafeInteger(value) && value >= 0);
+  if (
+    !Number.isSafeInteger(damage) ||
+    damage < 0 ||
+    source?.version !== 1 ||
+    source.key !== resistanceType(type) ||
+    !valid(source.resistance) ||
+    !valid(source.armorResistance) ||
+    !Array.isArray(source.sources) ||
+    source.sources.some(row => !row || typeof row.source !== "string" || !valid(row.value))
+  )
+    throw new Error(loc`Review the original damage and prepared resistance before applying it.`);
+  const net = source.resistance === "all" ? 0 : Math.max(0, damage - source.resistance);
+  return {
+    damage,
+    net,
+    resisted: damage - net,
+    source: structuredClone(source),
+    negatesEffects: net === 0 && (source.resistance === "all" || (damage > 0 && source.resistance > 0))
+  };
 }
 
 /** Read the actual prepared aggregate and its audit without adding nonstacking sources again. */

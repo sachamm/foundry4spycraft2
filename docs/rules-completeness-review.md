@@ -1852,3 +1852,38 @@ source evidence, without recreating the card. The only diagnostic was Foundry's
 minimum-resolution warning. All **4,356** Node tests pass, including missing-
 source keep/release, player refusal and normal-card sheet review. Continue the
 remaining hazard mechanics, resistance delivery and source/build audits.
+
+## Pass 63: Prepared resistance reaches typed lethal and sensory damage
+
+PC creation remains **9.6/10** and combat **9.7/10**. NPCs now prepare survival
+resistance totals from their quality benefits and relevant feats, respecting the
+quality/gear maximum and independent feat additions. Unclassified custom types
+and more than eight quality applications require GC review. Typed lethal damage
+subtracts resistance after DR, for both NPC health models and agents. Bang and
+flash reduce their effective save DCs before rolling. Complete protection avoids
+unnecessary saves and negates accompanying effects. Acid, explosive and vacuum
+pending saves retain original resistance alongside their saved hit policy;
+unrecorded legacy policies require GC handling rather than current-policy replay.
+
+Resistance can stop new acid persistence, explosive stress/stun, vacuum exposure
+and fire ignition. Ongoing acid and fire use current resistance, count only damage
+getting through, and end when resistance negates that continuing damage. A new
+fully resisted acid hit leaves earlier acid unchanged. Partial resistance retains
+the remaining consequences and standard-character actual Damage saves.
+
+Native Foundry verified 14 cases: acid, explosive, vacuum, fire, laser, bang and
+flash on standard and special NPCs. Each used a real eight-point resistance
+quality. Pending acid/explosive/vacuum results survived removal of that quality
+before settlement. A failed standard explosive Reflex save produced three lethal
+and one stress damage plus the separate stun save; successful special Reflex
+damage was fully resisted with no follow-up save. Vacuum took six damage after
+resistance, fire three, and sensory save DCs became six. Standard Damage saves
+used an explicit QA-only +30 adjustment to isolate damage accounting; first saves
+used their actual normal modifiers and dice. These are controlled combat cases,
+not additional complete PC builds. No browser errors or diagnostics occurred.
+
+All **4,361** Node tests and **988** reference assertions pass, with schema,
+lint, formatting, bundling and copy checks. Cold/heat/electrical and ordinary NPC
+stress/subdual resistance still need delivery; initial fire totals, broader
+recovery timing and the remaining source/build audits remain open. Neither area
+meets 9.9 yet.
