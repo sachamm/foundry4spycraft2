@@ -11507,7 +11507,11 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "CQB range covers Melee Range through 20 ft. All characters (NPCs too) gain +1 Defense vs. ranged attacks per Melee or Unarmed Combat feat they hold. Stand Offs cannot be interrupted or joined.",
-   "effects": {}
+   "effects": {
+    "cqbRange": 20,
+    "meleeFeatRangedDefense": true,
+    "closedStandOffs": true
+   }
   },
   {
    "id": "the-great-game",

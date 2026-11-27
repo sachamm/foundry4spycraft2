@@ -2,6 +2,7 @@ import {
   abilityIncreaseLevels,
   allClassSkills,
   campaignActionDice,
+  campaignCqbRange,
   campaignLevelRow,
   campaignPointBuy,
   campaignRules,
@@ -1765,9 +1766,8 @@ function deriveFinalTotals(state) {
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
   sys.combatMovement = combatMovementRules(sys);
   sys.senses = baseSensoryRanges(sys);
-  // Gunmen widens CQB Range to 60 ft. for everyone (p.407).
-  const gunmenCqb = (campaignRules().rangeIncrementMultiplier ?? 1) !== 1;
-  sys.cqbRange = sys.activeFeatNames.includes("Marksmanship Supremacy") || gunmenCqb ? 60 : 30;
+  // Gunmen widens CQB Range to 60 ft. and Gladiators narrows it to 20 ft. for everyone (p.407).
+  sys.cqbRange = campaignCqbRange(sys.activeFeatNames.includes("Marksmanship Supremacy"));
   // Spirited raises player character action dice one type (d12 at most); Bleak stops them exploding and Spirited
   // makes them explode on a natural 1 as well (pp.406, 408).
   const campaignDice = campaignActionDice();

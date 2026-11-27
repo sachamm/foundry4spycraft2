@@ -100,6 +100,7 @@ import "../rules/hide-circumstances.mjs";
 import "../rules/hide-movement.mjs";
 import "../rules/improvised-weapons.mjs";
 import "../rules/intense-stance.mjs";
+import "../rules/indirect-fire.mjs";
 import "../rules/kick.mjs";
 import "../rules/knowledge.mjs";
 import "../rules/living-cipher.mjs";

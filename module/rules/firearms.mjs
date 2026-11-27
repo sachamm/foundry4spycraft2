@@ -1,4 +1,4 @@
-import { campaignRules } from "./campaign-rules.mjs";
+import { campaignCqbRange, campaignRules } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
@@ -352,7 +352,7 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
     flat,
     errorReduction,
     notes,
-    cqbRange: feats.has("Marksmanship Supremacy") || gunmen ? 60 : 30
+    cqbRange: campaignCqbRange(feats.has("Marksmanship Supremacy"), campaign)
   };
 }
 

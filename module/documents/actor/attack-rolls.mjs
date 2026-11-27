@@ -356,6 +356,7 @@ export const ActorAttackRolls = Base =>
           validateFinalAttack: options.validateFinalAttack,
           validateAttackContext,
           threat: threatAgainstRole(atk.threat, targetRole),
+          cap: atk.cap ?? null,
           error: cunning?.error ?? atk.error,
           cunningPlan: cunning ?? !!options.cunningPlan,
           chooseTwice: millionDollar,

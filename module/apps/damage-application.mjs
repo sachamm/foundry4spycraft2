@@ -34,6 +34,7 @@ import {
   woundState
 } from "../rules/damage-application.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
+import { gladiatorsDefense } from "../rules/campaign-rules.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
@@ -225,7 +226,9 @@ export async function resolveAttack(message, options = {}) {
   const cover = coverOnResolution(input.cover);
   // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies, on top of the sheet's Defense.
   const foibles = entered && target ? specialistDefense(target.system, check.weaponProficiency).dodge : 0;
-  const defense = baseDefense + (cover?.bonus ?? 0) + foibles;
+  // Gladiators (p.407): +1 against ranged attacks for each Melee or Unarmed Combat feat the target holds.
+  const gladiators = entered && target ? gladiatorsDefense(target.system, check.attackContext?.ranged === true) : 0;
+  const defense = baseDefense + (cover?.bonus ?? 0) + foibles + gladiators;
   let outcome;
   try {
     outcome = attackOutcome({

@@ -159,9 +159,10 @@ export class NpcData extends BaseActorData {
     this.conditionContext = npcSkillConditionContext(this.parent);
     // The feats an NPC holds, by rule name, so the attack, damage and Defense rules that look for a feat by name
     // (Sharpshooter, Two-Weapon, Combat Expertise and the rest) treat an NPC's feat as they treat an agent's.
-    this.activeFeatNames = [
-      ...new Set([...(this.parent?.items ?? [])].filter(item => item.type === "feat").map(item => ruleName(item)))
-    ].filter(Boolean);
+    const featItems = [...(this.parent?.items ?? [])].filter(item => item.type === "feat");
+    this.activeFeatNames = [...new Set(featItems.map(item => ruleName(item)))].filter(Boolean);
+    // Each feat with its tree, as agents carry them, for the rules that count feats by tree (Gladiators, p.407).
+    this.activeFeatSelections = featItems.map(item => ({ name: ruleName(item), tree: item.system?.tree ?? "" }));
     this.baffledApplicationReview = getBaffledReview(this.parent ?? {});
     // A mission's Threat Level scales every NPC that follows it (p.423); others keep their own number.
     const missionTL = this.followMission ? missionThreatLevelSetting() : null;

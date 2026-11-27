@@ -1,15 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  campaignCqbRange,
   campaignErrorActivationCap,
   campaignTake10Time,
   campaignTriumphXPPercent,
+  gladiatorsDefense,
   omniPenalty,
   setCampaignRulesSource
 } from "../module/rules/campaign-rules.mjs";
 import { ammunitionState } from "../module/rules/ammunition-use.mjs";
 import { criticalPlan } from "../module/rules/criticals.mjs";
 import { missionXPPlan } from "../module/rules/action-dice.mjs";
+import { incomingDefensePlan } from "../module/rules/defense.mjs";
 
 const withRules = (effects, fn) => {
   setCampaignRulesSource(() => effects);
@@ -76,4 +79,37 @@ test("a Triumph adds 10% of the multiplied reward, 5% under Common Spectacle", (
   plan = withRules({ triumphXPPercent: 5 }, () => missionXPPlan(sys(), { ...base, triumph: true }));
   assert.equal(plan.record.triumphXP, 26);
   assert.equal(plan.record.totalXP, 531);
+});
+
+test("Gladiators narrows CQB Range to 20 ft. unless a 60 ft. source applies", () => {
+  assert.equal(campaignCqbRange(false, {}), 30);
+  assert.equal(campaignCqbRange(true, {}), 60);
+  assert.equal(campaignCqbRange(false, { cqbRange: 20 }), 20);
+  assert.equal(campaignCqbRange(true, { cqbRange: 20 }), 60);
+  assert.equal(campaignCqbRange(false, { rangeIncrementMultiplier: 2 }), 60);
+});
+
+test("Gladiators adds 1 Defense against ranged attacks per Melee or Unarmed Combat feat", () => {
+  const system = {
+    activeFeatSelections: [
+      { name: "A", tree: "Melee Combat" },
+      { name: "B", tree: "unarmedCombat" },
+      { name: "C", tree: "Ranged Combat" }
+    ]
+  };
+  const effects = { meleeFeatRangedDefense: true };
+  assert.equal(gladiatorsDefense(system, true, {}), 0);
+  assert.equal(gladiatorsDefense(system, true, effects), 2);
+  assert.equal(gladiatorsDefense(system, false, effects), 0);
+  const defender = {
+    ...system,
+    abilities: { dex: { mod: 0 } },
+    defense: { total: 14, dodgeBonuses: 0, dexterity: 0 },
+    classLevels: {}
+  };
+  const plain = incomingDefensePlan(defender, { ranged: true }).total;
+  withRules(effects, () => {
+    assert.equal(incomingDefensePlan(defender, { ranged: true }).total, plain + 2);
+    assert.equal(incomingDefensePlan(defender, { ranged: false }).total, plain);
+  });
 });

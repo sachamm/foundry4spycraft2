@@ -201,6 +201,19 @@ export function campaignRuleLines(effects = campaignRules()) {
     lines.push(
       loc`Dramatic Conflict Lead Advantages ${leadAdvantageShift(effects) > 0 ? "+" : "−"}${Math.abs(leadAdvantageShift(effects))}.`
     );
+  if (effects.bottomlessClip) lines.push(loc`Weapons that hold 5 or more shots never run out.`);
+  if (effects.halveSkillPenalties) lines.push(loc`Skill check penalties are halved, rounding down, to −1 at least.`);
+  if (campaignErrorActivationCap(effects))
+    lines.push(loc`A skill error costs at most ${campaignErrorActivationCap(effects)} action dice to activate.`);
+  if (campaignTake10Time(2, effects) > 2)
+    lines.push(loc`Taking 10 takes ${campaignTake10Time(2, effects)} times as long.`);
+  if (campaignTriumphXPPercent(10, effects) !== 10)
+    lines.push(loc`A Triumph adds ${campaignTriumphXPPercent(10, effects)}% to the mission's XP.`);
+  if (campaignCqbRange(false, effects) !== 30)
+    lines.push(loc`CQB Range reaches ${campaignCqbRange(false, effects)} ft.`);
+  if (effects.meleeFeatRangedDefense)
+    lines.push(loc`Each Melee or Unarmed Combat feat gives +1 Defense against ranged attacks, NPCs included.`);
+  if (effects.closedStandOffs) lines.push(loc`Nobody may interrupt or join a Stand Off.`);
   return lines;
 }
 
@@ -402,4 +415,30 @@ export function campaignTake10Time(standard = 2, effects = campaignRules()) {
 /** The share of mission XP a Triumph adds (p.440): 10%, or 5% under Common Spectacle (p.406). */
 export function campaignTriumphXPPercent(standard = 10, effects = campaignRules()) {
   return Number.isFinite(effects.triumphXPPercent) ? effects.triumphXPPercent : standard;
+}
+
+/**
+ * CQB Range in feet (p.327): 30, or 60 with Marksmanship Supremacy or under Gunmen (p.407). Gladiators (p.407) sets
+ * it to 20 for everyone without a 60 ft. source.
+ */
+export function campaignCqbRange(supremacy = false, effects = campaignRules()) {
+  if (supremacy || number(effects.rangeIncrementMultiplier, 1) !== 1) return 60;
+  return Number.isSafeInteger(effects.cqbRange) && effects.cqbRange > 0 ? effects.cqbRange : 30;
+}
+
+const MELEE_TREES = new Set(["meleecombat", "unarmedcombat"]);
+
+/**
+ * Gladiators (p.407): +1 Defense against ranged attacks for each Melee or Unarmed Combat feat a character holds.
+ * `system.activeFeatSelections` lists each feat with its tree, for agents and NPCs alike.
+ */
+export function gladiatorsDefense(system, ranged = true, effects = campaignRules()) {
+  if (!ranged || !effects.meleeFeatRangedDefense) return 0;
+  return (system?.activeFeatSelections ?? []).filter(feat =>
+    MELEE_TREES.has(
+      String(feat.tree ?? "")
+        .toLowerCase()
+        .replace(/[^a-z]/g, "")
+    )
+  ).length;
 }
