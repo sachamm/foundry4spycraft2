@@ -952,6 +952,59 @@ test("console context summarises everything without throwing", async () => {
     (await import("node:fs")).writeFileSync(process.env.GC_CONTEXT_OUT, JSON.stringify(context));
 });
 
+test("removing a mission row leaves an Undo note that puts it back in its place", async () => {
+  const before = state.getMission().objectives;
+  assert.ok(before.length, "the test world has objectives");
+  const extra = { id: "obj-extra", name: "Photograph the plans", grade: 2, complete: false, critical: false };
+  await state.updateMission(m => ({ objectives: [extra, ...m.objectives] }));
+  await mission.changeEntry("objectives", "obj-extra", "remove", { notify: true });
+  assert.ok(!state.getMission().objectives.some(entry => entry.id === "obj-extra"));
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo?.missionRow);
+  assert.equal(note.flags.spycraft2.undo.label, "Removed from the mission: Photograph the plans");
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  await applyUndo({ id: "row-undo", flags: structuredClone(note.flags), update: async () => null });
+  assert.equal(state.getMission().objectives[0].id, "obj-extra", "back where it was");
+  await state.updateMission(m => ({ objectives: m.objectives.filter(entry => entry.id !== "obj-extra") }));
+  assert.deepEqual(state.getMission().objectives, before);
+});
+
+test("each view has one filled button, chosen from the state", async () => {
+  const { primaryAction } = await import("../module/apps/gc/console-view.mjs");
+  const base = { checklistShown: false, missionActive: true, missionEnded: false, diceCurrent: true, combat: null };
+  assert.equal(primaryAction({ ...base, view: "prep", checklistShown: true }), "checklist");
+  assert.equal(primaryAction({ ...base, view: "prep", missionActive: false }), "startMission");
+  assert.equal(primaryAction({ ...base, view: "prep" }), "editMission");
+  assert.equal(primaryAction({ ...base, view: "prep", missionActive: false, missionEnded: true }), "resumeMission");
+  assert.equal(primaryAction({ ...base, view: "play", diceCurrent: false }), "beginSession");
+  assert.equal(primaryAction({ ...base, view: "play" }), "spendDice");
+  assert.equal(primaryAction({ ...base, view: "play", combat: { started: false, unrolled: 2 } }), "groupInitiative");
+  assert.equal(primaryAction({ ...base, view: "play", combat: { started: false, unrolled: 0 } }), "nextTurn");
+  assert.equal(primaryAction({ ...base, view: "wrap", combat: { started: true } }), "nextTurn");
+  assert.equal(primaryAction({ ...base, view: "wrap" }), "endMission");
+  assert.equal(primaryAction({ ...base, view: "wrap", missionActive: false, missionEnded: true }), "missionReport");
+});
+
+test("an acting button drawn for one combatant does nothing once the turn has moved", async () => {
+  const calls = [];
+  const acting = { id: "c2", name: "Colonel Dragan", actor: { uuid: "Actor.d", items: { get: () => null } } };
+  const previous = game.combat;
+  game.combat = { started: true, combatant: acting, nextTurn: () => calls.push("next") };
+  try {
+    const warned = [];
+    const keep = ui.notifications.warn;
+    ui.notifications.warn = message => warned.push(message);
+    await GCConsole.DEFAULT_OPTIONS.actions.actingDelay.call(
+      { render: () => null },
+      { detail: 1 },
+      { dataset: { combatant: "c1" } }
+    );
+    ui.notifications.warn = keep;
+    assert.deepEqual(warned, ["The turn has moved to Colonel Dragan; nothing was done."]);
+  } finally {
+    game.combat = previous;
+  }
+});
+
 test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's choice for that state", async () => {
   const { consoleView, firstSessionChecklist } = await import("../module/apps/gc/console.mjs");
   assert.equal(consoleView("planning"), "prep");

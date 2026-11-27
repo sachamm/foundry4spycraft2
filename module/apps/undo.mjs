@@ -108,7 +108,10 @@ export function snapshot(actor) {
       defeated: !!combatant.defeated,
       initiative: combatant.initiative ?? null,
       // Damage can record a fluid initiative event on the combatant; Undo takes that back too.
-      fluid: structuredClone(combatant.flags?.spycraft2?.fluid ?? null)
+      fluid: structuredClone(combatant.flags?.spycraft2?.fluid ?? null),
+      // The turn's half actions and a readied action, so a mistaken Spend, Ready or Delay can be taken back.
+      actions: structuredClone(combatant.flags?.spycraft2?.actions ?? null),
+      readied: structuredClone(combatant.flags?.spycraft2?.readied ?? null)
     }))
   };
 }
@@ -118,10 +121,25 @@ export function undoEntry(actor, before, after) {
   const { restore, unset, expect, whole } = differences(before.data, after.data);
   const created = [...after.effects.keys()].filter(id => !before.effects.has(id)),
     removed = [...before.effects].filter(([id]) => !after.effects.has(id)).map(([, data]) => data);
-  const combatants = before.combatants.filter(was => {
-    const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat);
-    return now && (now.defeated !== was.defeated || now.initiative !== was.initiative || !same(now.fluid, was.fluid));
-  });
+  const combatants = before.combatants
+    .filter(was => {
+      const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat);
+      return (
+        now &&
+        (now.defeated !== was.defeated ||
+          now.initiative !== was.initiative ||
+          !same(now.fluid, was.fluid) ||
+          !same(now.actions ?? null, was.actions ?? null) ||
+          !same(now.readied ?? null, was.readied ?? null))
+      );
+    })
+    // The turn's actions and readied mark go back only when this step changed them: a later Spend stays.
+    .map(was => {
+      const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat),
+        entry = { ...was };
+      for (const key of ["actions", "readied"]) if (same(now?.[key] ?? null, was[key] ?? null)) delete entry[key];
+      return entry;
+    });
   if (!Object.keys(restore).length && !unset.length && !created.length && !removed.length && !combatants.length)
     return null;
   // Stored as pairs: a chat message expands dotted keys in its flags, which would turn each path into a nest.
@@ -306,6 +324,8 @@ async function undoRecord(message, record) {
       if (!combatant) continue;
       const change = { defeated: was.defeated, initiative: was.initiative };
       if ("fluid" in was) change[was.fluid ? "flags.spycraft2.==fluid" : "flags.spycraft2.-=fluid"] = was.fluid;
+      for (const key of ["actions", "readied"])
+        if (key in was) change[was[key] ? `flags.spycraft2.==${key}` : `flags.spycraft2.-=${key}`] = was[key];
       await combatant.update(change);
     }
   }

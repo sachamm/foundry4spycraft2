@@ -218,7 +218,8 @@
    "SetScenes": "Set scenes played…",
    "NoObjectives": "No objectives yet. Add one to set the mission's XP.",
    "NoAntagonists": "No antagonists recorded. Add an NPC to the scene, or record one for XP.",
-   "ThreatValue": "{level} ({note})"
+   "ThreatValue": "{level} ({note})",
+   "FirstSessionNext": "First session, next: {step}"
   },
   "Ability": {
    "str": "Strength",

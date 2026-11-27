@@ -519,11 +519,12 @@ A PR that pushes one of these over budget explains why.
 
 - **Prep | Play switch** at the top. Play hides mission editing and keeps one summary line (TL, Caliber, XP so far); Prep shows the mission, objectives, antagonists, complications and campaign qualities.
 - **Status strip** (`gc-now`): Scene, GC dice, Round, and "Pending N" (player requests + unresolved attack cards + open threats and errors), which jumps to the oldest. Add the team's action dice. Time already shows on the clock badge.
-- **During a combat, Combat comes first**, directly under the strip (`templates/apps/gc-console-combat.hbs`, rendered at the top while a combat exists and in its usual place otherwise). For the acting combatant it shows a mini stat block: Defense, health, conditions, half actions left, one button per weapon ("Attack +5 · 2d6", Shift-click semantics against the T-target), "Apply last damage to target", and Next. Each list row pans to the token and opens the sheet on click.
-- **One primary per section and state:** before the fight, "Roll NPC Initiative"; during it, "Next turn".
+- **During a combat, Combat comes first**, directly under the strip (`templates/apps/gc-console-combat.hbs`, rendered at the top while a combat exists and in its usual place otherwise). A running fight opens with the **turn bar** (Next turn, Previous turn, Spend GC dice), sticky at the top of the console, so Next turn never moves. Then the acting combatant: Defense, half actions left, health and conditions as one compact block, one button per weapon ("Attack +5 · 2d6", Shift-click semantics against the T-target), "Next step on this combatant's card", and the bookkeeping (Spend, Give back, Delay, Ready, Damage save) under "Turn actions". Every acting button carries `data-combatant` and does nothing, with a notice, once the turn has moved. The order is a name and Count list; a row press selects and pans to the token, a double press (or the acting name) opens the sheet, and hovering a row lights its token. Before the fight: the Initiative rolls first, then the list, then Begin combat, which says how many have not rolled.
+- **One primary per view and state**, chosen by `primaryAction()` in `module/apps/gc/console-view.mjs`: the first-session step, else Start/Edit mission in Prep; Roll NPC Initiative before a fight and Next turn during one; Begin session, else Spend dice, in Play; End mission, else XP report, in Wrap-up. Section "Add" buttons are secondary and name their object.
+- Alt+G opens the console as a window by default, so the chat log stays in the sidebar (client setting "GC Console in its own window"); the sidebar tab sits after Combat.
 - Rare tools (Recalculate TL, Clear record, exposure infractions) sit under "More mission tools".
 - Facts are label and value pairs in a `.gc-facts` grid of `.sc2-field` tiles (Threat Level, Caliber, standing reward, XP, GC action dice). A value with several parts is one string with placeholders (`SPYCRAFT.Console.*`).
-- Row buttons are verbs in sentence case with no dash before them: "Mark complete", "Mark faced", "Remove".
+- Row buttons are verbs in sentence case with no dash before them: "Mark done", "Mark faced", "Remove". A toggle carries `aria-pressed` and shows its on state; each row button's accessible name includes the row ("Remove Steal the ledger"). Remove is `.gc-danger`, set apart, shown in Prep only, and leaves an Undo note.
 - Section titles are 13px sentence case, set by one rule.
 - Every button that changes world state has a tooltip saying what it changes (the `Console.NextSceneHint` style).
 - Console search matches labels and hidden synonyms (`data-search-terms`): "npc", "add enemy", "initiative", "turn", "damage", "xp", "dice".
@@ -604,6 +605,7 @@ Only show controls that are legal now (principle 4). Boost Defense outside the r
 | Open the active combatant's sheet           | Alt+S     | GC  |
 | Press the primary button on the newest card | Alt+Enter | All |
 | GC boost on the newest open NPC card        | Alt+B     | GC  |
+| Spend GC action dice (acting NPC chosen)    | Alt+D     | GC  |
 
 A new shortcut is added to that file's table, marked `restricted` when it is for the GC, and listed in `docs/gc-tools.md`. Card shortcuts find their button by `.sc2-primary-action` or `data-roll-key`, not by its text.
 

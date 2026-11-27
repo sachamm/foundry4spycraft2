@@ -616,3 +616,16 @@
   background: var(--sc2-danger-tint, rgba(163, 38, 47, 0.08));
   border-inline-start: 3px solid currentColor;
 }
+.gc-console-body .gc-checklist-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0.4rem 0;
+  padding: 4px 8px;
+  border-inline-start: 3px solid var(--sc2-action);
+  background: var(--sc2-surface-raised);
+}
+.gc-console-body .gc-checklist-next button {
+  width: auto;
+}

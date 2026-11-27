@@ -227,7 +227,8 @@ export function holdUntilValid(root, validate) {
           }
           alert?.remove();
           passed = true;
-          form.requestSubmit(submitter ?? undefined);
+          // After the refused submission has finished: a form ignores a new submit while it is still firing one.
+          setTimeout(() => form.requestSubmit(submitter ?? undefined), 0);
         })
         .catch(error => console.warn("Field Agent's Handbook | A dialog check failed.", error));
     },

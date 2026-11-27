@@ -39,6 +39,7 @@ import {
   primaryAction
 } from "./console-view.mjs";
 import { npcDamageSaveWithUndo } from "./npc-play.mjs";
+import { withUndo } from "../undo.mjs";
 import { pressActorCard, shortcutLabel } from "../keybindings.mjs";
 import {
   advanceClock,
@@ -75,6 +76,14 @@ const guard = work => {
     this.render();
   };
 };
+
+/** What an Undo note calls a turn-action step. */
+const stepLabel = (kind, name) =>
+  kind === "half"
+    ? loc`Half action spent: ${name}`
+    : kind === "full"
+      ? loc`Full action spent: ${name}`
+      : loc`Actions given back: ${name}`;
 
 /**
  * The combatant an acting-block button was drawn for, while it is still the one acting. When the turn has moved on
@@ -189,7 +198,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       actingSpend: guard(async (event, target) => {
         const acting = actingCombatant(target);
         if (!acting) return null;
-        const result = await combat.spendTurnAction(acting, target.dataset.kind);
+        const kind = target.dataset.kind;
+        const result = await withUndo([acting.actor], stepLabel(kind, acting.name), () =>
+          combat.spendTurnAction(acting, kind)
+        );
         if (result && target.dataset.kind === "reset")
           ui.notifications.info(loc`${acting.name} has this turn's actions back.`);
         return result;
@@ -200,11 +212,13 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       }),
       actingDelay: guard((event, target) => {
         const acting = actingCombatant(target);
-        return acting && combat.delayCombatant(acting);
+        return acting && withUndo([acting.actor], loc`Delay: ${acting.name}`, () => combat.delayCombatant(acting));
       }),
       actingReady: guard((event, target) => {
         const acting = actingCombatant(target);
-        return acting && combat.readyCombatant(acting);
+        return (
+          acting && withUndo([acting.actor], loc`Ready an action: ${acting.name}`, () => combat.readyCombatant(acting))
+        );
       }),
       actingOutcome: guard((event, target) => {
         const acting = actingCombatant(target);
@@ -568,7 +582,7 @@ export function consoleContext() {
           standingStatus: status.liquidation ? loc`targeted for liquidation` : status.burned ? loc`burned` : ""
         };
       }),
-      standing,
+      standing: { ...standing, netWorthLabel: Number(standing?.netWorth ?? 0).toLocaleString() },
       canRaiseCaliber: m.caliber < 5,
       nextCaliberLabel: ROMAN[m.caliber] ?? m.caliber + 1,
       objectives: m.objectives.map(objective => ({ ...objective, xp: objective.grade * 25 })),
@@ -596,6 +610,7 @@ export function consoleContext() {
     xp: {
       // Before the mission starts nothing is earned yet: the figure is what the mission plans to give.
       label: m.active || m.ended ? loc`Base XP earned so far` : loc`Planned base XP`,
+      started: !!(m.active || m.ended),
       earned: earned.total,
       planned: planned.total,
       warnings: planned.warnings,
@@ -660,9 +675,25 @@ export function consoleContext() {
 
 // The Combat section shows the acting combatant, so the console follows the fight instead of waiting for a press.
 let refreshTimer = null;
+// A redraw between pressing and releasing a button would swallow the click: it waits for the release.
+let pointerHeld = false;
+function holdWhilePressed() {
+  if (holdWhilePressed.done || !globalThis.document?.addEventListener) return;
+  holdWhilePressed.done = true;
+  document.addEventListener("pointerdown", event => (pointerHeld = !!event.target?.closest?.(".gc-console-body")), {
+    capture: true
+  });
+  document.addEventListener("pointerup", () => (pointerHeld = false), { capture: true });
+  document.addEventListener("pointercancel", () => (pointerHeld = false), { capture: true });
+}
 function refreshSoon() {
   if (refreshTimer) return;
-  refreshTimer = setTimeout(() => {
+  holdWhilePressed();
+  refreshTimer = setTimeout(function redraw() {
+    if (pointerHeld) {
+      refreshTimer = setTimeout(redraw, 120);
+      return;
+    }
     refreshTimer = null;
     // The sidebar console and a popped-out copy both follow the fight.
     for (const instance of new Set([game.spycraft2?.gc?.console, ui.gc, ui.gc?.popout]))

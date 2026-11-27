@@ -3,36 +3,61 @@
 A short path from an empty world to the first combat. [gc-tools.md](gc-tools.md) is the full reference; page numbers
 are printed page numbers of the rulebook.
 
-## Before the players arrive
+## The console in one minute
+
+Press **Alt+G** to open the GC Console. It opens in its own window, so the chat log, where you resolve the cards,
+stays in the sidebar beside it. (The GC tab after Combat in the sidebar opens it there instead; the setting "GC
+Console in its own window" changes what Alt+G does.)
+
+The console has three views, chosen for you from the state of the game and switched with the buttons under the
+status strip:
+
+- **Prep**: the mission record, objectives, antagonists, complications, organizations and campaign qualities.
+- **Play**: the fight, the scene and the GC action dice.
+- **Wrap-up**: the XP report, exposure, standing and End mission.
+
+Each view has one filled button: the step you most likely take next. The **First session** list at the top of Prep
+mirrors this page and goes away once every step is done; each step has a **Do this step** button. Every button's
+tooltip says what it changes, and its key when it has one. The keys are listed under Reference.
+
+## Before the players arrive (Prep)
 
 1. **Make or import the agents.** Each player creates an agent actor and follows the setup list on its sheet. The
    Sample Agents compendium has finished characters if you want to start at once.
-2. **Open the GC Console** from the first sidebar tab (GC only), or press Alt+G.
-3. **Record the mission.** In the Mission section press **Edit mission** and enter the name, the team and the
-   Caliber. Add objectives and any complications you have planned; these set the XP award.
-4. **Prepare the opposition.** Create NPC actors (see [npc-creation.md](npc-creation.md)) and place them with
+2. **Record the mission.** Press **Edit mission** and enter the name, the team and the Caliber. Add objectives
+   (**Add objective**) and any complications you have planned; these set the XP award. A row's **Remove** leaves an
+   Undo note in the chat, so a slip costs nothing.
+3. **Prepare the opposition.** Create NPC actors (see [npc-creation.md](npc-creation.md)) and place them with
    **Add NPC to scene** in the Antagonists section.
 
-## When play begins
+## When play begins (Play)
 
-1. Press **Start mission** the first time the mission is played. This fixes the Threat Level from the team.
+1. Press **Start mission** (in Prep, the Mission section) the first time the mission is played. This fixes the Threat
+   Level from the team.
 2. Press **Begin session** at the start of every session. This starts the session, sets up the GC action dice and
-   gives each agent its starting action dice, with any Threat Level bonus. The two can be pressed in either order:
-   whichever comes second adds only what the first could not.
-3. Press **Next scene** each time the scene changes.
+   gives each agent its starting action dice, with any Threat Level bonus. The status strip then shows when the
+   session began. The two can be pressed in either order: whichever comes second adds only what the first could not.
+3. Press **Next scene** each time the scene changes. A notice confirms it.
 
 ## The first combat
 
 1. Add the tokens to Foundry's combat tracker and have the players roll Initiative from their sheets.
-2. In the console's Combat section roll Initiative for the NPCs, then press **Begin combat**.
-3. On each turn, roll from the acting character's sheet and work down the chat card: the line at the top names the
-   state and the main button is the next step. Press **Finish** when the card is done.
-4. Press **Next turn** (Alt+N).
-5. For an NPC's result, **GC boost** on its card spends a GC action die.
+2. In the console's Combat section, press **Roll NPC Initiative by type**, then **Begin combat**. Until everyone has
+   rolled, the button says how many have not.
+3. The **turn bar** at the top of the fight holds **Next turn** (Alt+N), **Previous turn** (Alt+P) and **Spend GC
+   dice** with the acting NPC already chosen (Alt+D).
+4. On an NPC's turn, the acting block under it has an **Attack** button for each weapon (Shift-click with one target
+   goes straight to hit or miss), then **Next step on this combatant's card**, which presses the main button of the
+   newest card about that combatant and says which one. Spend, Delay, Ready and the Damage save are under **Turn
+   actions**. A player's turn is rolled from their own sheet; the card's top line names its state and its main button
+   is the next step (Alt+Enter presses it).
+5. For an NPC's result, **GC boost** on its card (Alt+B) spends a GC action die.
+6. Click a name in the order to select its token and centre the map on it; double-click to open its sheet.
 
-## After the session
+## After the session (Wrap-up)
 
-Press **XP report** in the Mission section for the award, and **End mission** when the mission is over.
+The Wrap-up view's filled button is **End mission** while the mission runs, and **XP report** once it has ended.
+Exposure infractions and the standing payout are in the same list.
 
 ## What stays with you
 

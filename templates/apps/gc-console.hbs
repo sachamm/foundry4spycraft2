@@ -22,6 +22,10 @@
     <p class="gc-note">{{localize "SPYCRAFT.Console.QuickstartPointer"}}</p>
   </section>
   {{/unless}}{{/if}}
+  {{#if shown.play}}{{#unless checklist.complete}}
+  <p class="gc-checklist-next">{{#each checklist.steps}}{{#if next}}<span>{{localize "SPYCRAFT.Console.FirstSessionNext" step=label}}</span>
+    {{#if action}}<button type="button" class="sc2-action" data-action="{{action}}"{{#if view}} data-view="{{view}}"{{/if}}>{{localize "SPYCRAFT.Console.DoThis"}}</button>{{/if}}{{/if}}{{/each}}</p>
+  {{/unless}}{{/if}}
   {{#if shown.play}}{{#unless combat}}{{> "systems/spycraft2/templates/apps/gc-console-session.hbs"}}{{/unless}}{{/if}}
   {{#if shown.wrap}}
   <section class="gc-wrap" aria-label="{{localize 'SPYCRAFT.Console.WrapUp'}}">
@@ -61,7 +65,7 @@
         class="sc2-value">{{mission.threatLevel}}</b>{{#if mission.threatNote}}<span class="gc-note">{{mission.threatNote}}</span>{{/if}}</div>
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span
-        class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorth}}</span></div>
+        class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorthLabel}}</span></div>
       {{#if mission.bonusDice}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingDice"}}</span><span
         class="sc2-value">{{localize "SPYCRAFT.Console.StartingDiceValue" dice=mission.bonusDice}}</span></div>{{/if}}
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Team"}}</span><span
@@ -82,7 +86,7 @@
         <button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>{{/if}}
     </p>
     <div class="gc-facts">
-      <div class="sc2-field"><span class="sc2-caption">{{xp.label}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.XPValue" earned=xp.earned planned=xp.planned}}</span></div>
+      <div class="sc2-field"><span class="sc2-caption">{{xp.label}}</span><span class="sc2-value">{{#if xp.started}}{{localize "SPYCRAFT.Console.XPValue" earned=xp.earned planned=xp.planned}}{{else}}{{xp.planned}}{{/if}}</span></div>
       {{#if xp.perScene}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.XPPerScene"}}</span><span
         class="sc2-value">{{localize "SPYCRAFT.Console.XPPerSceneValue" xp=xp.perScene scenes=mission.scenesPlayed}}</span></div>{{/if}}
     </div>

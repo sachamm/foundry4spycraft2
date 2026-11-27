@@ -404,6 +404,30 @@ test("a card shortcut presses the newest enabled matching button, skipping cards
   assert.equal(newestCardButton({ querySelectorAll: () => [] }, "button"), null);
 });
 
+test("the console's next step presses only the acting combatant's newest card and says which", async () => {
+  const { pressActorCard } = await import("../module/apps/keybindings.mjs");
+  const pressed = [];
+  const button = name => ({ disabled: false, textContent: name, click: () => pressed.push(name) });
+  const card = (id, buttons) => ({ dataset: { messageId: id }, querySelectorAll: () => buttons });
+  const cards = [card("g1", [button("Roll damage")]), card("p1", [button("Apply")]), card("g2", [])];
+  const speakers = { g1: { actor: "guard", token: "t1" }, p1: { actor: "agent", token: "t9" }, g2: { token: "t1" } };
+  const previous = { document: globalThis.document, game: globalThis.game, ui: globalThis.ui };
+  const notes = [];
+  globalThis.document = { querySelector: () => ({ querySelectorAll: () => cards }) };
+  globalThis.game = { messages: { get: id => ({ speaker: speakers[id] }) } };
+  globalThis.ui = { notifications: { info: message => notes.push(message) }, chat: {} };
+  try {
+    const guard = { name: "Guard (Rook)", tokenId: "t1", actor: { id: "guard" } };
+    assert.equal(pressActorCard(guard, "button"), true);
+    assert.deepEqual(pressed, ["Roll damage"], "the agent's newer card is passed over");
+    assert.deepEqual(notes, ["Roll damage: Guard (Rook)."]);
+    assert.equal(pressActorCard({ name: "Driver", tokenId: "t5", actor: { id: "driver" } }, "button"), false);
+    assert.equal(notes.at(-1), "No card of Driver is waiting for a next step.");
+  } finally {
+    Object.assign(globalThis, previous);
+  }
+});
+
 test("the GC boost shortcut takes the card under the pointer, else the newest card this user posted", async () => {
   const { boostCardButton } = await import("../module/apps/keybindings.mjs");
   const card = (id, buttons) => ({ dataset: { messageId: id }, querySelectorAll: () => buttons });
