@@ -167,6 +167,15 @@ function weaponShots(item) {
   return state ? { ...state, label: ammunitionLabel(state), empty: state.loaded === 0 } : null;
 }
 /** What an NPC's feat items add, as the sheet shows it. */
+/** What a campaign budget quality does to one NPC pick (pp.405, 408), or "" when the pick is carried as chosen. */
+function npcPickBudgetNote(pick) {
+  if (!pick || (!pick.lost && !pick.pastV && pick.carried === pick.caliber)) return "";
+  const roman = n => NPC_RULES.grades[n - 1] ?? String(n);
+  if (pick.lost) return loc`Lost under Shoe-String Budget`;
+  if (pick.pastV) return loc`Carried at V, with an extra Caliber I item`;
+  return loc`Carried at Caliber ${roman(pick.carried)}`;
+}
+
 function npcFeatPlay(effects) {
   if (!effects?.rows?.length && !effects?.uncounted?.length) return null;
   const signed = value => (value >= 0 ? `+${value}` : `${value}`);
@@ -1812,7 +1821,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       rollNpcSkill(event, target) {
         // A skill named on the sheet rolls at once with the usual defaults; "Skill check" opens the full dialog.
         const key = target?.dataset?.skill;
-        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0, error: 1 } : null);
+        // No error range is named, so the skill's first check rolls with its own.
+        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0 } : null);
       },
       callQualitySave(event, target) {
         return callQualitySave(this.actor, target.dataset.id);
@@ -2009,7 +2019,12 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       })),
       equipment: NPC_CATEGORIES.map(category => ({
         category,
-        picks: (profile.equipment[category] ?? []).map((caliber, index) => ({ caliber, index, category }))
+        picks: (profile.equipment[category] ?? []).map((caliber, index) => ({
+          caliber,
+          index,
+          category,
+          budget: npcPickBudgetNote(result.carriedEquipment?.[category]?.picks?.[index])
+        }))
       })),
       qualityOptions: Object.fromEntries(
         NPC_RULES.qualities

@@ -8,6 +8,7 @@ import {
   npcSkillBonus,
   npcQualityCost,
   npcEquipmentCost,
+  npcCarriedPicks,
   computeNpcProfile
 } from "../module/rules/npcs.mjs";
 const profile = () => ({ ...defaultNpcProfile(), enabled: true });
@@ -143,4 +144,23 @@ test("the two Table 7.11 misprints are corrected, and the builder says so", () =
 test("legacy manual mode is the default; villain resolves as a special role", () => {
   assert.equal(defaultNpcProfile().enabled, false);
   assert.equal(computeNpcProfile(example(), "villain", 1).multiplier, 4);
+});
+test("Big Budget and Shoe-String Budget shift what an NPC carries, not the XP it is worth (pp.405, 408)", () => {
+  const big = { gearCaliberShift: 1 },
+    small = { gearCaliberShift: -1 };
+  assert.deepEqual(npcCarriedPicks([1, 3, 5], {}).carried, [1, 3, 5]);
+  assert.deepEqual(npcCarriedPicks([1, 3, 5], big).carried, [2, 4, 5, 1]);
+  assert.equal(npcCarriedPicks([5], big).picks[0].pastV, true);
+  const shoe = npcCarriedPicks([1, 3], small);
+  assert.deepEqual(shoe.carried, [2]);
+  assert.equal(shoe.picks[0].lost, true);
+  assert.equal(shoe.picks[0].carried, null);
+  const p = { ...example(), equipment: { weapons: [1, 2], gear: [1], vehicles: [] } };
+  const plain = npcEquipmentCost(p, "standard"),
+    budget = npcEquipmentCost(p, "standard", NPC_RULES, big);
+  assert.equal(budget.total, plain.total);
+  assert.deepEqual(budget.carried.weapons.carried, [2, 3]);
+  assert.deepEqual(budget.carried.gear.carried, [2]);
+  assert.deepEqual(plain.carried.weapons.carried, [1, 2]);
+  assert.deepEqual(computeNpcProfile(p, "standard", 5).carriedEquipment.weapons.carried, [1, 2]);
 });

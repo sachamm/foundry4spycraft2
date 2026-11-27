@@ -3,6 +3,7 @@ import { stepLookup } from "./formula.mjs";
 import { NPC_RULES } from "./npc-tables.mjs";
 import { loc } from "../i18n.mjs";
 import { organizationNpcCaps } from "./npc-organization.mjs";
+import { campaignGearCaliber } from "./campaign-rules.mjs";
 export { NPC_RULES };
 export const NPC_STATS = {
   initiative: "Initiative",
@@ -58,10 +59,31 @@ export function npcQualityCost(entry, catalog = NPC_RULES.qualities) {
   if (rule.mode === "movement") return (entry.limited ? Math.sign(rule.cost) : rule.cost) * units;
   return rule.cost * units;
 }
+/**
+ * What an NPC actually carries for its picks under Big Budget or Shoe-String Budget (pp.405, 408): each pick shifted
+ * by the campaign, a pick pushed below I lost, and one pushed past V kept at V with an extra Caliber I item. The XP
+ * stays on the Calibers as chosen. Returns { carried: [Calibers], picks: [{ caliber, carried, lost, pastV }] }.
+ */
+export function npcCarriedPicks(picks = [], effects) {
+  const rows = picks.map(chosen => {
+    const shifted = campaignGearCaliber(chosen, ...(effects ? [effects] : []));
+    return {
+      caliber: chosen,
+      carried: shifted.lost ? null : shifted.caliber,
+      lost: shifted.lost,
+      pastV: shifted.pastV
+    };
+  });
+  return {
+    carried: rows.flatMap(row => (row.lost ? [] : row.pastV ? [row.carried, 1] : [row.carried])),
+    picks: rows
+  };
+}
 /** Equipment is fixed at every TL; vehicle pick belongs to the group for standard NPCs. */
-export function npcEquipmentCost(profile, type, rules = NPC_RULES) {
+export function npcEquipmentCost(profile, type, rules = NPC_RULES, effects) {
   const rows = [],
     warnings = [],
+    carried = {},
     // Tools (p.394): an organization's NPCs carry gear no higher than its Calibers.
     caps = organizationNpcCaps(profile.organization);
   let total = 0;
@@ -87,6 +109,7 @@ export function npcEquipmentCost(profile, type, rules = NPC_RULES) {
       upgrades * rules.equipment.caliberRaiseXP;
     rows.push({ label: category, xp });
     total += xp;
+    carried[category] = npcCarriedPicks(picks, effects);
   }
   if (!integer(profile.extraAmmoPairs ?? 0, 0, 100))
     warnings.push(loc`Additional ammunition must be entered in pairs of stockpiles.`);
@@ -94,7 +117,7 @@ export function npcEquipmentCost(profile, type, rules = NPC_RULES) {
     total += profile.extraAmmoPairs ?? 0;
     rows.push({ label: loc`Additional ammunition`, xp: profile.extraAmmoPairs ?? 0 });
   }
-  return { total, rows, warnings, caps };
+  return { total, rows, warnings, caps, carried };
 }
 export function computeNpcProfile(profile, type = "standard", threatLevel = 1, abilities = {}, rules = NPC_RULES) {
   // Legacy villain selection maps to special; villain roles are qualities in new profiles.
@@ -233,6 +256,7 @@ export function computeNpcProfile(profile, type = "standard", threatLevel = 1, a
     qualityFloor: floor,
     equipmentXP: equipment.total,
     organizationCaps: equipment.caps,
+    carriedEquipment: equipment.carried,
     breakdown,
     complete,
     xp: complete ? reward : null,

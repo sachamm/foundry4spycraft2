@@ -21,7 +21,10 @@ import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
-import { campaignSkillPlan } from "../../rules/campaign-rules.mjs";
+import { campaignRules, campaignSkillPlan, omniPenalty } from "../../rules/campaign-rules.mjs";
+import { skillConditionCheckPenalty } from "../../rules/skill-conditions.mjs";
+import { isHideCheck } from "../../rules/check-identity.mjs";
+import { formatRange } from "../../rules/outcome-labels.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
@@ -67,31 +70,76 @@ export function npcSkillPlan(actor, key) {
   return { key, bonus, listed: !!listed, cap: stepLookup(TABLES.skillCap, bonus) };
 }
 
-/** The part of the NPC skill check dialog that comes from its qualities. */
+/** The part of the NPC skill check dialog that comes from its qualities: the boxes for situational ones. */
 export function qualityCheckContent(effects) {
   if (!effects) return "";
-  const kinds = [
-    ...(effects.moraleModifier
-      ? [["morale", loc`Resolve/Morale (${signed(effects.moraleModifier)} from qualities)`]]
-      : []),
-    ...(effects.resistModifier
-      ? [
-          ["resist-impress", loc`Resolve/Resist Impress (${signed(effects.resistModifier)})`],
-          ["resist-intimidate", loc`Resolve/Resist Intimidate (${signed(effects.resistModifier)})`],
-          ["resist-manipulate", loc`Sense Motive/Resist Manipulate (${signed(effects.resistModifier)})`]
-        ]
-      : [])
-  ];
   const boxes = effects.skillOptions
     .map(option => `<label><input type="checkbox" name="quality-${esc(option.id)}" /> ${esc(option.label)}</label>`)
     .join("");
-  if (!kinds.length && !boxes) return "";
-  return `<fieldset><legend>${loc`Qualities`}</legend>${
-    kinds.length
-      ? `<label>${loc`This check is`} <select name="qualityCheck">${options([["", loc`another check`], ...kinds], "")}</select></label>`
-      : ""
-  }${boxes}</fieldset>`;
+  const rider =
+    effects.trainedQualities >= 2
+      ? `<label data-when="skillCheck=resolve:morale">${loc`Rider's Charisma modifier`} <input type="number" name="riderCharisma" value="0" /></label>`
+      : "";
+  if (!boxes && !rider) return "";
+  return `<fieldset><legend>${loc`Qualities`}</legend>${rider}${boxes}</fieldset>`;
 }
+
+/** The named check of a skill an NPC makes: the one asked for, or else the skill's first. */
+export function npcSkillCheck(skillKey, checkId = "") {
+  const checks = CONFIG.SPYCRAFT?.skills?.[skillKey]?.checks ?? [];
+  return checks.find(check => check.id === checkId) ?? checks[0] ?? null;
+}
+
+/** Whether a check's result takes the Size table's Stealth/Hide modifier (p.349). */
+const sizeStealthCheck = (skillKey, check) =>
+  (skillKey === "blend" && check?.id === "stealth") || isHideCheck(skillKey, check);
+
+/**
+ * The parts of an NPC skill check that come from its conditions, its Size and the campaign's qualities: labelled rows
+ * and an error range change (pp.340–342, 349, 406–408). Omni-Competent halves the penalties.
+ */
+export function npcSkillCheckRows(system, skillKey, check, { ability, modifier = 0, ...input } = {}) {
+  const halve = omniPenalty(),
+    rows = [];
+  const conditions = skillConditionCheckPenalty(system, ability);
+  if (conditions) rows.push({ label: loc`Conditions`, value: halve(conditions) });
+  if (sizeStealthCheck(skillKey, check) && system.sizeHideModifier)
+    rows.push({ label: loc`Size`, value: halve(system.sizeHideModifier) });
+  if (Number(modifier)) rows.push({ label: loc`Situational modifier`, value: halve(Number(modifier)) });
+  const campaign = campaignSkillPlan(system, skillKey, check ?? {}, { ...input, ability });
+  for (const bonus of campaign.bonuses) rows.push({ label: bonus.source, value: bonus.value });
+  return { rows, errorIncrease: campaign.errorIncrease };
+}
+
+/** Whether an animal may make this check (p.445). */
+export const animalMayMake = (skillKey, checkId) => ANIMAL_CHECKS.includes(`${skillKey}:${checkId}`);
+const ANIMAL_CHECKS = [
+  "tactics:ambush",
+  "notice:awareness",
+  "acrobatics:balance",
+  "athletics:climb",
+  "intimidate:coercion",
+  "athletics:escape",
+  "acrobatics:falling",
+  "survival:foraging",
+  "athletics:forced-march",
+  "acrobatics:jump",
+  "sneak:hide",
+  "athletics:maneuver",
+  "resolve:morale",
+  "athletics:power-lifting",
+  "resolve:resist-impress",
+  "resolve:resist-intimidate",
+  "senseMotive:resist-manipulate",
+  "search:perception",
+  "athletics:smash",
+  "athletics:speed-push",
+  "sneak:stash-item",
+  "blend:stealth",
+  "athletics:swim",
+  "acrobatics:tumble",
+  "survival:tracking"
+];
 
 /** Ask the characters who meet this NPC for the save one of its qualities forces. */
 export async function callQualitySave(actor, id) {
@@ -107,48 +155,66 @@ export async function rollNpcSkill(actor, input = null) {
   if (!actor.isOwner) return null;
   const graded = actor.system.npcProfile?.enabled === true;
   if (!input) {
-    const skillRows = SKILLS.map(skill => [
-      skill.key,
-      `${skill.name}${graded ? ` ${signed(npcSkillPlan(actor, skill.key).bonus)}` : ""}`
-    ]);
+    // One picker for the skill and the named check, so the check's own error range and rules apply.
+    const groups = SKILLS.map(skill => {
+      const label = `${skill.name}${graded ? ` ${signed(npcSkillPlan(actor, skill.key).bonus)}` : ""}`,
+        checks = CONFIG.SPYCRAFT.skills?.[skill.key]?.checks ?? [];
+      return `<optgroup label="${esc(label)}">${checks
+        .map(
+          check =>
+            `<option value="${esc(`${skill.key}:${check.id}`)}" data-detail="${esc(loc`${check.attributes.join("/").toUpperCase()} · error range ${formatRange("error", check.error)}`)}">${esc(`${skill.name}/${check.name.replace(/ Check$/, "")}`)}</option>`
+        )
+        .join("")}</optgroup>`;
+    }).join("");
     const abilityRows = Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => [
       key,
       game.i18n.localize(label)
     ]);
-    input = await ask(
-      loc`${actor.name}: skill check`,
-      `
+    const rules = campaignRules();
+    input = await formDialog({
+      title: loc`${actor.name}: skill check`,
+      ok: loc`Roll`,
+      fields: [
+        raw(`
       <p>${loc`An NPC uses the higher of Competence and its skilled bonus, which also sets the result cap (p.452). The key attribute modifier is added.`}</p>
-      <label>${loc`Skill`} <select name="key">${options(skillRows)}</select></label>
-      <label>${loc`Attribute`} <select name="ability">${options([["", loc`First listed for the skill`], ...abilityRows], "")}</select></label>
+      <label>${loc`Check`} <select name="skillCheck">${groups}</select></label>
+      <p class="hint sc2-check-detail"></p>
+      <label>${loc`Attribute`} <select name="ability">${options([["", loc`First listed for the check`], ...abilityRows], "")}</select></label>
       ${graded ? "" : `<label>${loc`Skill bonus (manual stat block)`} <input type="number" name="manualBonus" value="0" /></label>`}
       <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
-      <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" value="1" /></label>
+      <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" placeholder="${esc(loc`the check's own`)}" /></label>
+      ${rules.surpriseHideBonus ? `<label data-when="skillCheck=blend:stealth|sneak:hide"><input type="checkbox" name="surprise" /> ${loc`This check determines surprise`}</label>` : ""}
+      ${rules.dispositionCheckModifier ? `<label><input type="checkbox" name="paranoidPersuasion" /> ${loc`This check shifts a disposition or talks someone into acting (Paranoid −4)`}</label>` : ""}
       ${qualityCheckContent(actor.system.qualityEffects)}
-      <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`,
-      loc`Roll`
-    );
+      <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`)
+      ],
+      dialog: { render: (event, app) => showCheckDetail(app?.element ?? event?.target) }
+    });
     if (!input) return null;
   }
-  const skill = SKILLS.find(entry => entry.key === input.key);
+  const [pickedKey, pickedCheck] = String(input.skillCheck ?? "").split(":");
+  const skill = SKILLS.find(entry => entry.key === (pickedKey || input.key));
   if (!skill) return refuse(loc`Choose a skill.`);
-  if (
-    actor.system.npcType === "animal" &&
-    graded &&
-    !actor.system.npcBuild?.skills?.some(entry => entry.key === skill.key)
-  )
+  // A macro may name the check as `check` or, as before, `qualityCheck`; without one the skill's first is made.
+  const check = npcSkillCheck(skill.key, pickedCheck || input.check || input.qualityCheck || "");
+  const animal = actor.system.npcType === "animal";
+  if (animal && check && !animalMayMake(skill.key, check.id))
+    ui.notifications.warn(loc`Animals may not normally make the ${check.name} (p.445). Rolled as asked.`);
+  else if (animal && graded && !actor.system.npcBuild?.skills?.some(entry => entry.key === skill.key))
     ui.notifications.info(loc`Animals have no Competence: only their listed skills carry a bonus (p.445).`);
   const plan = graded
     ? npcSkillPlan(actor, skill.key)
     : { bonus: Number(input.manualBonus) || 0, cap: stepLookup(TABLES.skillCap, Number(input.manualBonus) || 0) };
+  const attributes = check?.attributes ?? skill.abilities;
   const ability =
-    skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
+    attributes.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
       ? input.ability
-      : skill.abilities[0];
-  // Qualities: Fearless, Meek and Strong-Minded by the kind of check, the rest by the boxes ticked.
+      : attributes[0];
+  // Qualities: Fearless, Meek, Strong-Minded and an animal's training by the check, the rest by the boxes ticked.
   const quality = npcSkillQualityPlan(actor.system.qualityEffects ?? { skillOptions: [] }, {
     skillKey: skill.key,
-    checkId: input.qualityCheck ?? "",
+    checkId: check?.id ?? "",
+    riderCharisma: Number(input.riderCharisma) || 0,
     chosen: Object.keys(input)
       .filter(key => key.startsWith("quality-") && input[key] === true)
       .map(key => key.slice("quality-".length))
@@ -156,15 +222,23 @@ export async function rollNpcSkill(actor, input = null) {
   // Feat items on the NPC that add a plain number to this skill.
   const featBonus = Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0);
   if (featBonus) quality.rows.push({ label: loc`Feats`, value: featBonus });
-  // Comedy of Errors widens the error range of a check made with the NPC's lowest attribute (p.406).
-  const campaignError = campaignSkillPlan(actor.system, skill.key, { attributes: skill.abilities }, { ability });
-  if (campaignError.errorIncrease) quality.errorIncrease += campaignError.errorIncrease;
+  // Conditions, Size and the campaign: Comedy of Errors widens the error range of a check made with the NPC's
+  // lowest attribute (p.406), Paranoid adds its surprise bonus (p.408). Counted here once.
+  const situation = npcSkillCheckRows(actor.system, skill.key, check, {
+    ability,
+    modifier: input.modifier,
+    surprise: input.surprise === true,
+    paranoidPersuasion: input.paranoidPersuasion === true
+  });
+  const rows = [...situation.rows, ...quality.rows],
+    errorIncrease = quality.errorIncrease + situation.errorIncrease;
   const total =
-    plan.bonus +
-    (actor.system.abilities[ability]?.mod ?? 0) +
-    (Number(input.modifier) || 0) +
-    quality.modifier +
-    featBonus;
+    plan.bonus + (actor.system.abilities[ability]?.mod ?? 0) + rows.reduce((sum, row) => sum + row.value, 0);
+  const typedError =
+    input.error === undefined || input.error === null || input.error === "" || !Number.isFinite(Number(input.error))
+      ? null
+      : Math.max(0, Number(input.error));
+  const cap = plan.cap + (quality.capBonus ?? 0);
   return actor.rollCheck(
     "1d20 + @total",
     { total },
@@ -172,10 +246,10 @@ export async function rollNpcSkill(actor, input = null) {
       // Players see the card too: the NPC's bonus, cap and modifiers are printed only on a roll kept to the GC.
       flavor:
         (input.secret
-          ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`
+          ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${cap}`
           : loc`${skill.name} (${ability.toUpperCase()})`) +
-        (input.secret && (quality.rows.length || quality.errorIncrease)
-          ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
+        (input.secret && (rows.length || errorIncrease)
+          ? `<br><small>${esc([...rows.map(row => `${row.label} ${signed(row.value)}`), ...(errorIncrease ? [loc`error range ${signed(errorIncrease)}`] : [])].join("; "))}</small>`
           : ""),
       ability,
       // The card shows these parts only to someone who may open the NPC (module/rolls/chat-breakdown.mjs).
@@ -183,24 +257,33 @@ export async function rollNpcSkill(actor, input = null) {
         [
           { label: loc`Skill bonus`, value: plan.bonus, keep: true },
           { label: ability.toUpperCase(), value: actor.system.abilities[ability]?.mod, keep: true },
-          { label: loc`Situational modifier`, value: Number(input.modifier) || 0 },
-          ...quality.rows
+          ...rows
         ],
         total
       ),
-      cap: plan.cap,
-      // A macro that names no error range gets the base one, 1 (p.88).
-      error:
-        (input.error === undefined ||
-        input.error === null ||
-        input.error === "" ||
-        !Number.isFinite(Number(input.error))
-          ? 1
-          : Math.max(0, Number(input.error))) + quality.errorIncrease,
+      cap,
+      // The check's own error range unless one is typed (p.88), then the qualities' and campaign's changes.
+      error: Math.max(0, (typedError ?? check?.error ?? 1) + errorIncrease),
+      // Posted as a skill check, so the card's skill rules (and Comedy of Errors' activation cap) apply.
+      checkKind: "skill",
+      skillKey: skill.key,
+      checkId: check?.id ?? "",
       npcSkill: skill.key,
       ...(input.secret ? { rollMode: "gmroll" } : {})
     }
   );
+}
+
+/** One line under the check picker saying what the chosen check uses (style guide 7.4). */
+function showCheckDetail(root) {
+  const select = root?.querySelector?.('[name="skillCheck"]'),
+    detail = root?.querySelector?.(".sc2-check-detail");
+  if (!select || !detail) return;
+  const update = () => {
+    detail.textContent = select.selectedOptions?.[0]?.dataset.detail ?? "";
+  };
+  select.addEventListener("change", update);
+  update();
 }
 
 const toughGrades = actor => spendProfile(actor).tough;

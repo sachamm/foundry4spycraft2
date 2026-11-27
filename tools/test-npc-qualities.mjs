@@ -93,6 +93,7 @@ test("Fearless and Meek change Morale checks, Strong-Minded the Resist checks, e
   assert.deepEqual(npcSkillQualityPlan(brave, { skillKey: "resolve", checkId: "morale" }), {
     modifier: 8,
     errorIncrease: 0,
+    capBonus: 0,
     rows: [{ label: "Fearless", value: 8 }]
   });
   assert.equal(npcSkillQualityPlan(brave, { skillKey: "resolve", checkId: "concentration" }).modifier, 0);
@@ -170,4 +171,26 @@ test("villain roles set the GC's die and what it costs to hurt them; Story-Criti
     attack: true
   });
   assert.equal(effects(["treacherous"], { type: "special" }).canCriticalWithoutDice.attack, false);
+});
+
+test("an animal counts its trained qualities for Morale; other NPCs do not (p.445)", () => {
+  const trained = ["guard-on-command", "attack-on-command", "fearless"];
+  assert.equal(effects(trained, { type: "animal" }).trainedQualities, 3);
+  assert.equal(effects(trained, { type: "standard" }).trainedQualities, 0);
+  assert.equal(effects(["flight"], { type: "animal" }).trainedQualities, 0);
+  const one = effects(["guard-on-command"], { type: "animal" });
+  assert.deepEqual(npcSkillQualityPlan(one, { skillKey: "resolve", checkId: "morale", riderCharisma: 3 }), {
+    modifier: 1,
+    errorIncrease: 0,
+    capBonus: 0,
+    rows: [{ label: "Trained qualities", value: 1 }]
+  });
+  const two = effects(["guard-on-command", "rescue"], { type: "animal" });
+  const plan = npcSkillQualityPlan(two, { skillKey: "resolve", checkId: "morale", riderCharisma: 3 });
+  assert.equal(plan.modifier, 2);
+  assert.equal(plan.errorIncrease, -1);
+  assert.equal(plan.capBonus, 6);
+  assert.equal(npcSkillQualityPlan(two, { skillKey: "resolve", checkId: "morale", riderCharisma: -1 }).capBonus, 0);
+  assert.equal(npcSkillQualityPlan(two, { skillKey: "resolve", checkId: "concentration" }).modifier, 0);
+  assert.ok(two.notes.some(note => note.id === "trained" && note.page === 445));
 });
