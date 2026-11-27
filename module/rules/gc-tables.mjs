@@ -10917,7 +10917,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "At character creation a player may buy extra feats for 2 attribute-purchase points each, or surrender feat choices to gain 2 extra attribute-purchase points per feat given up.",
-   "effects": {}
+   "effects": {
+    "modularCreation": 1
+   }
   },
   {
    "id": "omni-competent",

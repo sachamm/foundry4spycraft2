@@ -4,6 +4,8 @@ import { taskPressureUseSpec } from "../../module/rules/task-pressure.mjs";
 import { readFileSync } from "node:fs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 import { SPYCRAFT as cfg } from "../../module/config.mjs";
+import { ActorProgression } from "../../module/documents/actor/progression.mjs";
+import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -137,6 +139,66 @@ const recoveryContent = content;
 content = ordinaryContent;
 
 const css = readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8");
+test("Modular's actual creation trade keeps every tree, review note and confirmation reachable at 720px", async ({
+  page
+}) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { id: "gc", isGM: true }, settings: { get: () => ({}) } };
+    const C = ActorProgression(class {});
+    const a = Object.assign(new C(), {
+      type: "agent",
+      uuid: "Actor.modular-layout",
+      isOwner: true,
+      system: {
+        level: 1,
+        abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+        progression: [{ classId: "test", skills: {}, vitality: 8 }]
+      },
+      flags: {
+        spycraft2: {
+          creationPolicy: creationPolicyRecord(
+            { modularCreation: 1 },
+            { confirmed: true, note: "Original campaign checked" }
+          )
+        }
+      },
+      items: [
+        {
+          id: "test",
+          type: "class",
+          name: "Test",
+          system: {
+            identifier: "test",
+            table: [],
+            bonuses: Object.keys(cfg.featTrees).map(tree => ({ target: `featSlots.${tree}`, value: "1", level: 1 }))
+          }
+        }
+      ]
+    });
+    await a.configureModularCreation();
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByLabel("Additional feats", { exact: true }).fill("2");
+    for (const tree of Object.keys(cfg.featTrees)) {
+      const input = page.locator(`[name="surrender-${tree}"]`);
+      await input.scrollIntoViewIfNeeded();
+      await expect(input).toBeVisible();
+    }
+    await page.getByLabel("Source or review note", { exact: true }).fill("Original creation sheet checked");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    await page.locator("#confirm").focus();
+    await expect(page.locator("#confirm")).toBeFocused();
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
 async function render(page, height, markup = content) {
   await page.setViewportSize({ width: 1100, height });
   await page.setContent(

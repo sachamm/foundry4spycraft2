@@ -11,7 +11,8 @@ export function campaignCharacterEffects(system, effects = {}) {
       "featPurchase",
       "bonusFeatTree",
       "bonusFeatTrees",
-      "creationPointBuy"
+      "creationPointBuy",
+      "modularCreation"
     ])
       delete result[key];
   return result;

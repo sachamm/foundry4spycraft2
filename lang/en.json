@@ -17,6 +17,7 @@
  },
  "SPYCRAFT": {
   "CampaignGear": {
+   "ModularTrade": "Modular creation trade",
    "CreationRules": "Campaign creation rules",
    "ReviewCreationRules": "Review original creation rules",
    "ReviewStartingAttributes": "Review starting attribute scores",

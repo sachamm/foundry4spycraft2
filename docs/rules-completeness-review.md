@@ -312,8 +312,18 @@ This uses the stated creation-only interpretation while the history ruling is
 pending. The full Node run passes **3,994** tests; native schema preparation,
 formatting, lint and the copied-text check pass.
 
-The next implementation work includes Modular creation trades and the Growth
-limit on level gains between missions. These source-verified gaps keep the
+Modular now has a guarded creation trade: each additional feat costs two
+attribute points, or surrendered first-level choices add two points each.
+Both budgets and feat acquisition sources update together; later-level choices
+and named granted feats are excluded. Invalid records grant no credit, and
+existing over-budget choices remain visible for correction. The saved original
+policy preserves trades across seasons; later revisions require GC review.
+All **3,999** Node tests, 13 pack checks, native schema preparation, formatting,
+lint and copied-text checks pass. The actual trade dialog also passes the
+720px layout and keyboard-focus check, following the previous full 220-test run.
+
+Remaining creation work includes the Growth limit on level gains between
+missions and the source-data audit. These source-verified gaps keep the
 scores below the requested threshold; the scores remain **8.8/10** and **8.9/10**.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,

@@ -2,7 +2,7 @@ import { loc } from "../i18n.mjs";
 import { CAMPAIGN_QUALITIES, campaignEffects } from "./gc/campaign.mjs";
 import { campaignCharacterEffects } from "./campaign-creation.mjs";
 
-export const CREATION_POLICY_KEYS = ["creationPointBuy", "startingAttributeCap", "startingWealth"];
+export const CREATION_POLICY_KEYS = ["creationPointBuy", "startingAttributeCap", "startingWealth", "modularCreation"];
 export const CREATION_QUALITIES = CAMPAIGN_QUALITIES.filter(q =>
   CREATION_POLICY_KEYS.some(k => Object.hasOwn(q.effects, k))
 );
@@ -46,7 +46,10 @@ export function creationPolicyValid(record) {
     return false;
   try {
     const expected = creationEffectsForQualities(record.qualityIds);
-    if (record.role !== "pc") delete expected.creationPointBuy;
+    if (record.role !== "pc") {
+      delete expected.creationPointBuy;
+      delete expected.modularCreation;
+    }
     if (record.role === "standard") delete expected.startingWealth;
     return (
       Object.keys(expected).length === Object.keys(record.effects).length &&
@@ -64,7 +67,10 @@ export function creationPolicyRecord(
   const chosen = Object.fromEntries(
     CREATION_POLICY_KEYS.filter(k => Object.hasOwn(effects, k)).map(k => [k, effects[k]])
   );
-  if (role !== "pc") delete chosen.creationPointBuy;
+  if (role !== "pc") {
+    delete chosen.creationPointBuy;
+    delete chosen.modularCreation;
+  }
   if (role === "standard") delete chosen.startingWealth;
   const record = {
     version: 1,

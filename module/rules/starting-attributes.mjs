@@ -17,6 +17,7 @@ export function startingAttributeSignature(system, items = []) {
   const cls = items.find(i => i.type === "class" && (i.system.identifier || i.name) === first?.classId);
   return JSON.stringify({
     base: CREATION_ABILITIES.map(k => system.abilities?.[k]?.base),
+    modularTrade: system.modularTrade ?? null,
     firstClass: first ? [first.classId, first.careerEntryId ?? ""] : null,
     firstChoices: (cls?.system.choiceSchedule ?? []).flatMap((slot, i) =>
       slot.level === 1 ? [[i, cls.system.choices?.[i] ?? null]] : []

@@ -4,6 +4,7 @@ import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import { purchasedFeatSources } from "./feat-purchase.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
 import { startingAttributeReview } from "./starting-attributes.mjs";
+import { modularCreationPlan } from "./modular-creation.mjs";
 import { characterCampaignPolicy, CREATION_POLICY_KEYS } from "./creation-policy.mjs";
 import {
   campaignAttributeLevels,
@@ -235,6 +236,10 @@ function startPass(state) {
   if (Object.hasOwn(options, "creationAttributes")) {
     if (options.creationAttributes) sys.creationAttributes = options.creationAttributes;
     else delete sys.creationAttributes;
+  }
+  if (Object.hasOwn(options, "modularTrade")) {
+    if (options.modularTrade) sys.modularTrade = options.modularTrade;
+    else delete sys.modularTrade;
   }
   sys.abilityIncreaseLevels = campaignAttributeLevels(sys.campaignEffects, cfg.abilityIncreaseLevels);
   const warnings = [...shaken.warnings];
@@ -878,25 +883,6 @@ function deriveAttributes(state) {
       todo.push({ order: 9, always: true, error: true, tab: "main", text });
     }
   } else delete sys.startingAttributeReview;
-  sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
-  if (sys.pointBuy.remaining < 0) {
-    warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
-    // Keep the guidance on attributes until the spend is legal again.
-    todo.push({
-      order: 9,
-      always: true,
-      error: true,
-      tab: "main",
-      text: loc`Attribute points overspent by ${-sys.pointBuy.remaining}: lower an attribute.`
-    });
-  }
-  if (sys.pointBuy.remaining > 0)
-    todo.push({
-      order: 10,
-      always: true,
-      tab: "main",
-      text: loc`${plural(sys.pointBuy.remaining, "attribute point")} left to spend.`
-    });
   const abil = Object.fromEntries(
     ABILITIES.map(k => [k, { value: sys.abilities[k].value, mod: sys.abilities[k].mod }])
   );
@@ -970,6 +956,45 @@ function deriveAttributes(state) {
     stageCache.set(career, stage);
     return stage;
   };
+  if (sys.campaignEffects.modularCreation || sys.modularTrade) {
+    const available = Object.fromEntries(
+      ["any", ...Object.keys(cfg.featTrees)].map(tree => [
+        tree,
+        (level > 0 ? stageAt(1).bonus(`featSlots.${tree}`) : 0) + (tree === "any" && level > 0 ? 1 : 0)
+      ])
+    );
+    const plan = modularCreationPlan(
+      sys.modularTrade,
+      available,
+      sys.pointBuy.budget,
+      !!sys.campaignEffects.modularCreation
+    );
+    sys.modularCreation = { ...plan, available, originalBudget: sys.pointBuy.budget };
+    sys.pointBuy.budget += plan.pointAdjustment;
+    sys.featAcquisitionSources.push(...plan.sources);
+    for (const text of plan.warnings) {
+      warnings.push(text);
+      todo.push({ order: 9, always: true, error: true, tab: "main", text });
+    }
+  } else delete sys.modularCreation;
+  sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
+  if (sys.pointBuy.remaining < 0) {
+    warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
+    todo.push({
+      order: 9,
+      always: true,
+      error: true,
+      tab: "main",
+      text: loc`Attribute points overspent by ${-sys.pointBuy.remaining}: lower an attribute.`
+    });
+  }
+  if (sys.pointBuy.remaining > 0)
+    todo.push({
+      order: 10,
+      always: true,
+      tab: "main",
+      text: loc`${plural(sys.pointBuy.remaining, "attribute point")} left to spend.`
+    });
   const targeted = resolveClassSkillSelections(items, progression, cfg, (key, career, item) => {
     const override = sys.skills?.[key];
     return (
@@ -2028,6 +2053,10 @@ function deriveFeatSlots(state) {
       sys.featAcquisitionSources.filter(s => s.kind === "featPurchase").length
   };
   for (const t of Object.keys(cfg.featTrees)) slots[t] = B.get(`featSlots.${t}`);
+  if (sys.modularCreation?.valid) {
+    slots.any += sys.modularCreation.bought;
+    for (const [tree, count] of Object.entries(sys.modularCreation.surrendered)) slots[tree] -= count;
+  }
   const classGrantCounts = new Map();
   const originGrantNames = new Set(
     items
@@ -2476,7 +2505,8 @@ function settlePrerequisites(state) {
           campaignEffects: sys.campaignEffects,
           featPurchases: sys.featPurchases,
           creationAttributes: sys.creationAttributes,
-          creationPolicy: sys.creationPolicy
+          creationPolicy: sys.creationPolicy,
+          modularTrade: sys.modularTrade
         }
       )
     : sys;
@@ -2543,7 +2573,8 @@ function settlePrerequisites(state) {
           campaignEffects: sys.campaignEffects,
           featPurchases: sys.featPurchases,
           creationAttributes: sys.creationAttributes,
-          creationPolicy: sys.creationPolicy
+          creationPolicy: sys.creationPolicy,
+          modularTrade: sys.modularTrade
         }
       )
     : permanentSystem;

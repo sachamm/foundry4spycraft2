@@ -14,6 +14,7 @@ import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { campaignVitalityDie, campaignCharacterEffects } from "../../rules/campaign-creation.mjs";
 import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
 import { same } from "../../rules/equal.mjs";
+import { modularCreationPlan } from "../../rules/modular-creation.mjs";
 import {
   CREATION_ABILITIES,
   startingAttributeSignature,
@@ -29,6 +30,88 @@ import {
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
+    async configureModularCreation(options = {}) {
+      if (this.type !== "agent" || !this.isOwner || this.system.companionOf?.ownerUuid) return null;
+      const context = () => ({
+        system: this.system.toObject?.() ?? structuredClone(this.system),
+        items: this.items.map(i => ({
+          id: i.id,
+          name: i.name,
+          type: i.type,
+          system: i.system.toObject?.() ?? structuredClone(i.system)
+        })),
+        effects: currentCampaignRules().effects,
+        policy: this.flags?.spycraft2?.creationPolicy ?? null,
+        trade: this.flags?.spycraft2?.modularTrade ?? null,
+        mission: game.settings?.get("spycraft2", "mission") ?? {},
+        period: String(this.usagePeriods?.mission ?? "initial")
+      });
+      const expected = context();
+      const allowed = () =>
+        this.isOwner &&
+        (game.user?.isGM ||
+          (this.system.level <= 1 &&
+            String(this.usagePeriods?.mission ?? "initial") === "initial" &&
+            !game.settings?.get("spycraft2", "mission")?.active));
+      if (!allowed()) throw new Error(loc`Only the GC can revise Modular trades after character creation.`);
+      const prepared = computeAgent(structuredClone(expected.system), expected.items, CONFIG.SPYCRAFT, {
+        campaignEffects: expected.effects,
+        creationPolicy: expected.policy,
+        modularTrade: null,
+        creationAttributes: this.flags?.spycraft2?.creationAttributes,
+        featPurchases: this.flags?.spycraft2?.featPurchases
+      });
+      if (!prepared.campaignEffects.modularCreation)
+        throw new Error(loc`Modular must be part of this character's original creation rules.`);
+      const available = prepared.modularCreation.available,
+        budget = prepared.modularCreation.originalBudget;
+      let input = options;
+      if (input.bought === undefined) {
+        input = await systemDialog.input({
+          window: { title: loc`Modular creation trade` },
+          rejectClose: false,
+          ok: { label: loc`Record creation trade` },
+          content: `<div class="spycraft2-roll-options"><p>${loc`Each additional feat costs 2 attribute points. Alternatively, each surrendered creation feat choice adds 2 attribute points. Named granted feats and later-level choices cannot be surrendered.`}</p><label>${loc`Additional feats`} <input name="bought" type="number" min="0" max="${Math.floor(budget / 2)}" step="1" value="${Number(expected.trade?.bought ?? 0)}" /></label>${Object.entries(
+            available
+          )
+            .filter(([, count]) => count > 0)
+            .map(
+              ([tree, count]) =>
+                `<label>${esc(tree === "any" ? loc`Any feat choices surrendered` : loc`${CONFIG.SPYCRAFT.featTrees[tree]} choices surrendered`)} <input name="surrender-${tree}" type="number" min="0" max="${count}" step="1" value="${Number(expected.trade?.surrendered?.[tree] ?? 0)}" /></label>`
+            )
+            .join(
+              ""
+            )}<label>${loc`Source or review note`} <input name="note" required /></label><label><input type="checkbox" name="confirmed" /> ${loc`Confirm this original creation trade and review the resulting attribute and feat budgets`}</label></div>`
+        });
+        if (!input) return null;
+        input.bought = String(input.bought ?? "").trim() ? Number(input.bought) : NaN;
+        input.surrendered = Object.fromEntries(
+          Object.keys(available).map(tree => [tree, Number(input[`surrender-${tree}`] ?? 0)])
+        );
+      }
+      return queueResources([this], async () => {
+        if (!allowed() || !same(context(), expected))
+          throw new Error(loc`The character, campaign or trade changed. Review the current creation trade again.`);
+        const record = {
+          version: 1,
+          bought: input.bought,
+          surrendered: input.surrendered,
+          confirmed: input.confirmed,
+          note: typeof input.note === "string" ? input.note.trim() : "",
+          at: Date.now(),
+          reviewedBy: game.user.id ?? "creator"
+        };
+        const plan = modularCreationPlan(record, available, budget, true);
+        if (!plan.valid) throw new Error(plan.warnings.join(" "));
+        try {
+          await this.update({ "flags.spycraft2.modularTrade": record });
+        } catch (error) {
+          if (!same(this.flags?.spycraft2?.modularTrade, record)) throw error;
+        }
+        return record;
+      });
+    }
+
     async reviewCreationPolicy(options = {}) {
       if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       if (!game.user?.isGM) throw new Error(loc`The GC reviews original campaign creation rules.`);
@@ -259,7 +342,8 @@ export const ActorProgression = Base =>
           campaignEffects: currentCampaignRules().effects,
           featPurchases: this.flags?.spycraft2?.featPurchases,
           creationAttributes: this.flags?.spycraft2?.creationAttributes,
-          creationPolicy: this.flags?.spycraft2?.creationPolicy
+          creationPolicy: this.flags?.spycraft2?.creationPolicy,
+          modularTrade: this.flags?.spycraft2?.modularTrade
         }
       );
       progression.at(-1).intelligenceModifier = Math.floor(
@@ -492,7 +576,8 @@ export const ActorProgression = Base =>
             campaignEffects: currentCampaignRules().effects,
             featPurchases: this.flags?.spycraft2?.featPurchases,
             creationAttributes: this.flags?.spycraft2?.creationAttributes,
-            creationPolicy: this.flags?.spycraft2?.creationPolicy
+            creationPolicy: this.flags?.spycraft2?.creationPolicy,
+            modularTrade: this.flags?.spycraft2?.modularTrade
           }
         );
         featNames.clear();

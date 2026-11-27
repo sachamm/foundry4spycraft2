@@ -803,7 +803,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       campaignConflicts: campaign.conflicts,
       featPurchases: this.parent?.flags?.spycraft2?.featPurchases,
       creationAttributes: this.parent?.flags?.spycraft2?.creationAttributes,
-      creationPolicy: this.parent?.flags?.spycraft2?.creationPolicy
+      creationPolicy: this.parent?.flags?.spycraft2?.creationPolicy,
+      modularTrade: this.parent?.flags?.spycraft2?.modularTrade
     });
   }
 
