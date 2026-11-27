@@ -1668,3 +1668,25 @@ test("objectives typed as lines read a leading grade and a closing ! for critica
   assert.equal(await mission.addObjectiveLines("   \n"), 0);
   await state.updateMission(m => ({ objectives: m.objectives.slice(0, before) }));
 });
+
+test("an objective half typed in the inline field survives a console redraw", async () => {
+  const { captureConsoleState, restoreConsoleState } = await import("../module/apps/gc/console.mjs");
+  const keep = globalThis.document;
+  globalThis.document = { activeElement: null };
+  try {
+    const root = field => ({
+      querySelector: selector => (selector === "input[name='quickObjective']" ? field : null),
+      querySelectorAll: () => [],
+      contains: () => false,
+      scrollHeight: 0,
+      clientHeight: 0
+    });
+    const kept = captureConsoleState(root({ value: "3 Tap the line" }));
+    assert.equal(kept.draft, "3 Tap the line");
+    const fresh = { value: "" };
+    restoreConsoleState(root(fresh), kept);
+    assert.equal(fresh.value, "3 Tap the line");
+  } finally {
+    globalThis.document = keep;
+  }
+});
