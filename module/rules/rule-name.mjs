@@ -15,6 +15,7 @@ export function ruleName(item) {
  * name until the GC refreshes them from the compendium, so the rules accept either.
  */
 export const LEGACY_ORIGIN_NAMES = Object.freeze({
+  Priviledged: "Privileged",
   Mercenary: "Soldier of Fortune",
   Recruit: "Serviceman",
   "Thrill Seeker": "Thrill-Seeker"

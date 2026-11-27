@@ -131,9 +131,29 @@ core("restraintEscapeControl", 9000, ctx => {
 
 core("gearAcquisitionControl", 9010, ctx => {
   const { message, check, actor } = ctx;
-  if (!resolved(ctx) || check.restraintEscape?.sourceSnapshot) return null;
   const receipt = check.gearAttempt?.settlement;
   const attempt = actor.system.missionReserves?.attempts?.[check.gearAttempt?.id];
+  if (
+    check.checkKind === "request" &&
+    check.requestBenefit?.source?.freePick &&
+    attempt?.freePick &&
+    attempt.requestAbility === check.requestBenefit.id &&
+    attempt.epoch === check.gearAttempt.epoch &&
+    actor.isOwner &&
+    (message.isAuthor || ctx.user.isGM)
+  ) {
+    if (check.superseded || (receipt && attempt.settlementId === receipt.id)) return null;
+    if (!check.resolved)
+      return [
+        {
+          ...card(loc`Resolve delivery`, () => actor.finishCheck(message), "primary")[0],
+          labelKey: "SPYCRAFT.RollControl.ResolveDelivery"
+        }
+      ];
+    if (receipt) return content("Complete acquisition record", () => actor.finishCheck(message));
+    return null;
+  }
+  if (!resolved(ctx) || check.restraintEscape?.sourceSnapshot) return null;
   if (!receipt || check.superseded || attempt?.settlementId === receipt.id) return null;
   return content("Complete acquisition record", () => actor.finishCheck(message));
 });
@@ -261,7 +281,7 @@ core("finishControl", 9180, ctx => {
 
 /** A button's text: the translation keyed by its contributor id, or the contributor's own English label. */
 export function localizedLabel(control, i18n = globalThis.game?.i18n) {
-  const key = `SPYCRAFT.RollControl.${control.id}`;
+  const key = control.labelKey ?? `SPYCRAFT.RollControl.${control.id}`;
   return i18n?.has?.(key) ? i18n.localize(key) : control.label;
 }
 

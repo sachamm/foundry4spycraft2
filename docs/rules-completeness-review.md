@@ -1542,3 +1542,36 @@ extractions have wrapped and merged table cells; an unmatched row or extraction
 disagreement is not evidence of a data bug. Disputed values require PDF layout
 inspection. Complete the remaining weapon/armor comparison and origin/feat
 mechanics audit, then reassess the scores alongside the open combat workflows.
+
+## Pass 51: missing free origin Resource benefits
+
+Both areas remain **9.6/10**. Privileged and Rescuer previously offered no
+executable path for their once-per-mission Caliber II legal-immunity and
+medical-assistance Resource picks. Both now appear in the Request workflow,
+bind the exact approved Resource and consume one independent mission use.
+They need no Reserve allocation and spend no Reserve pick. The confirmed
+ruling permits their fixed Caliber II benefit in any mission. The normal
+Shaken surcharge still applies after the base action-die waiver.
+
+These benefits do not create a Request check, die or numeric check total.
+Their chat action resolves delivery through the existing journaled settlement,
+retaining actual dice and providing GC recovery for an interrupted result.
+Posting refusal before delivery restores the unrolled ability use; duplicates
+cannot consume another benefit. A claimed Resource keeps its acquisition
+receipt, spends no mission pick and survives later Reserve allocation.
+The legacy Talent spelling is recognized without changing an item's identity.
+
+Native Foundry exercised both actual forms, the translated delivery control,
+actual delivery dice and claims. Each used its mission allowance once, rolled
+no Request dice, retained one delivery Roll after retry and left all eight
+Reserve balances at zero. Duplicate requests were refused. The completed run
+had no browser errors or diagnostics. All **4,321** Node tests, **988** fixture
+assertions and **267** layouts pass; schemas, lint, formatting, bundling and
+copy checks pass. The Omni condition fixtures now use the actual Shaken-grade
+field, keeping their morale-source assertions meaningful.
+
+The remaining origin/feat and equipment audit is still open. This work also
+identified earlier delivery RNG in the other automatic Request paths, before
+their acquisition reservation; those paths still need durable-result review.
+The free origin paths added here use deferred, journaled delivery instead.
+Neither score yet meets the requested 9.9 target.

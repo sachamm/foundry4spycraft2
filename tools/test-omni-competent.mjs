@@ -67,7 +67,7 @@ test("named skills reduce independent ability, misc, gear, condition, armor, vis
   s.skills = { acrobatics: { misc: -3 } };
   s.skillTotals.acrobatics.bonusEntries = [{ source: "Gear", type: "gear", value: -3 }];
   s.skillTotals.acrobatics.totals = [{ ability: "dex", total: -4, normalSkillBonus: -4 }];
-  s.conditionContext = { sickened: true, drunk: true, entangled: true, shakenI: true };
+  s.conditionContext = { sickened: true, drunk: true, entangled: true, shakenGrade: 1 };
   s.armor = { check: -3, visionCheck: -3 };
   const check = {
     id: "test",
@@ -134,7 +134,7 @@ test("NPC skill rolls preserve the strongest morale source and reduce quality, a
       npcType: "standard",
       npcProfile: { enabled: true },
       competence: 5,
-      conditionContext: { shakenI: true },
+      conditionContext: { shakenGrade: 1 },
       qualityEffects: { skillOptions: [{ id: "penalty", label: "Quality", modifier: -3, skills: ["impress"] }] }
     },
     rollCheck: async (_formula, data, options) => ({ data, options })

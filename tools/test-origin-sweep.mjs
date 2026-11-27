@@ -93,9 +93,9 @@ test("Table 1.2: every Talent and Specialty is offered under the book's name", (
   for (const name of [...TALENTS, ...SPECIALTIES]) assert.ok(summaries[name], `${name} has a summary`);
 });
 
-test("renamed specialties keep their old ids and are still recognised under their old names", () => {
+test("renamed origins keep their old ids and are still recognised under their old names", () => {
   for (const [old, current] of Object.entries(LEGACY_ORIGIN_NAMES)) {
-    const entry = origins.specialties.find(o => o.name === current);
+    const entry = [...origins.talents, ...origins.specialties].find(o => o.name === current);
     assert.equal(entry?.legacyName, old, current);
     assert.equal(originRuleName({ type: "origin", name: old }), current);
   }

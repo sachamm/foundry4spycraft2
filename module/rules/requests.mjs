@@ -1,9 +1,40 @@
 import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { originRuleName } from "./rule-name.mjs";
+export const ORIGIN_RESOURCE_PICKS = {
+  requestPrivileged: { origin: "Privileged", type: "talent", resource: "legalImmunity", page: 20 },
+  requestRescuer: { origin: "Rescuer", type: "specialty", resource: "medicalAssistance", page: 24 }
+};
 /** Request-check exceptions: Veteran p.21, Geek p.23, Executive Decision p.77, Sources p.45. */
 export function requestSources(system, items = []) {
   const sources = [];
+  for (const [id, definition] of Object.entries(ORIGIN_RESOURCE_PICKS))
+    if (
+      items.some(
+        item =>
+          item.type === "origin" &&
+          item.system?.originType === definition.type &&
+          originRuleName(item) === definition.origin
+      )
+    )
+      sources.push({
+        id,
+        name:
+          definition.resource === "legalImmunity"
+            ? loc`Privileged: free Caliber II legal immunity Resource`
+            : loc`Rescuer: free Caliber II medical assistance Resource`,
+        category: "R",
+        fixedCaliber: 2,
+        originResource: definition.resource,
+        freePick: true,
+        automatic: true,
+        ignoreMissionCaliber: true,
+        period: "mission",
+        limit: 1,
+        cost: 0,
+        workflow: "requestBenefit"
+      });
   if (system.activeFeatNames?.includes("Office Gossip"))
     sources.push({
       id: "requestOfficeGossip",
@@ -69,7 +100,7 @@ export function requestSources(system, items = []) {
     ["Veteran", "talent", ""],
     ["Geek", "specialty", "E"]
   ])
-    if (items.some(i => i.type === "origin" && i.name === name && i.system?.originType === type))
+    if (items.some(i => i.type === "origin" && originRuleName(i) === name && i.system?.originType === type))
       sources.push({
         id: `request${name}`,
         name: loc`${name}: Request without action-die cost`,

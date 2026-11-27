@@ -102,13 +102,19 @@ export async function rollGearAcquisition(actor, options = {}) {
     const funders = [...(game.actors ?? [])].filter(a => a.type === "agent" && a.isOwner);
     const record =
       currentReserves(actor.system) ??
-      (actor.system.activeFeatNames?.includes("Personal Stash") ? provisionalReserves(actor.system) : null);
+      (actor.system.activeFeatNames?.includes("Personal Stash") ||
+      actor.system.limitedUses?.some(source => source.freePick)
+        ? provisionalReserves(
+            actor.system,
+            actor.system.activeFeatNames?.includes("Personal Stash") ? "personalStash" : "originFreePick"
+          )
+        : null);
     if (!record) return refuse(loc`Allocate this mission’s unassigned reserves first.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Request or Gear check` },
       rejectClose: false,
       content: `<div class="spycraft2-roll-options">
-   ${record.initialized === false ? `<p>${loc`Personal Stash can supply one Common Item without a Reserve item. Allocate mission reserves before making ordinary Gear checks or Requests.`}</p>` : ""}
+   ${record.initialized === false ? `<p>${loc`An earned free origin Resource pick or Personal Stash does not need a Reserve allocation. Allocate mission reserves before making ordinary Gear checks or Requests.`}</p>` : ""}
    <label>${loc`Check`} <select name="kind"><option value="request">${loc`Request a gear pick`}</option><option value="common">${loc`Gear check for a Common Item`}</option></select></label>
    <label>${loc`Request benefit`} <select name="requestAbility"><option value="">${loc`Ordinary Request`}</option>${(
      actor.system.limitedUses ?? []
@@ -120,8 +126,10 @@ export async function rollGearAcquisition(actor, options = {}) {
    <label><input type="checkbox" name="hourAvailable" /> ${loc`Spend one hour preparing: Sources consultation (in person/by phone) or Behind the Scenes city supporters`}</label>
    <label>${loc`Sources option`} <select name="sourcesOption"><option value="">${loc`Select only with Sources`}</option><option value="dossier">${loc`Dossier (Sources I+)`}</option><option value="skillTraining">${loc`Skill training (Sources II+)`}</option><option value="legalImmunity">${loc`Legal immunity (Sources III)`}</option></select></label>
    <label><input type="checkbox" name="sourcesOptionConfirmed" /> ${loc`The GC confirms this is that actual Resource option (Sources only)`}</label>
+   <label>${loc`Free origin Resource`} <select name="originResource"><option value="">${loc`Select only with Privileged or Rescuer`}</option><option value="legalImmunity">${loc`Privileged: Caliber II legal immunity`}</option><option value="medicalAssistance">${loc`Rescuer: Caliber II medical assistance`}</option></select></label>
+   <label><input type="checkbox" name="originResourceConfirmed" /> ${loc`The GC confirms the exact Resource and its Caliber II source. This benefit works in any mission and consumes no Reserve pick.`}</label>
    <label>${loc`Exact item or option`} <input name="name" required /></label>
-   <label>${loc`Reserve pick`} <select name="pick">${PICK_CATEGORIES.map(k => `<option value="${k}">${loc`${k}: ${record.picks[k] ?? 0} remaining`}</option>`).join("")}</select></label>
+   <label>${loc`Reserve pick`} <select name="pick"><option value="">${loc`No Reserve pick (free origin benefit only)`}</option>${PICK_CATEGORIES.map(k => `<option value="${k}">${loc`${k}: ${record.picks[k] ?? 0} remaining`}</option>`).join("")}</select></label>
    <label>${loc`Requested category`} <select name="category">${PICK_CATEGORIES.filter(k => k !== "CHA")
      .map(k => `<option value="${k}">${k}</option>`)
      .join("")}</select></label>
@@ -156,7 +164,7 @@ export async function rollGearAcquisition(actor, options = {}) {
        ""
      )}<label><input type="checkbox" name="teammatesConfirmed" /> ${loc`Other funders are teammates`}</label></details>
    <p>${loc`Sources uses one hour consulting contacts in person or by phone, its earned Resource option, and class level in place of Career Level.`}</p>
-   <p>${loc`Current Shaken surcharge for a Request: ${shakenRules(actor.actionDiceFundingSystem).extraDice} action dice, including after a class/origin cost waiver. A Request consumes its Reserve pick. Its base action-die cost equals Caliber unless a selected benefit waives that base cost. Executive Decision also succeeds automatically and ignores the mission Caliber limit (Requests remain I–IV). A Gear check consumes one Reserve Common Item. These checks have no threat/error range. Boost before resolving the result.`}</p></div>`
+   <p>${loc`Current Shaken surcharge for a Request: ${shakenRules(actor.actionDiceFundingSystem).extraDice} action dice, including after a class/origin cost waiver. An ordinary Request consumes its Reserve pick. Privileged and Rescuer instead supply their exact Caliber II Resource once per mission, including Caliber I missions, without consuming a Reserve pick or rolling a Request check. Its base action-die cost equals Caliber unless a selected benefit waives that base cost. Executive Decision also succeeds automatically and ignores the mission Caliber limit (Requests remain I–IV). A Gear check consumes one Reserve Common Item. These checks have no threat/error range. Boost before resolving the result.`}</p></div>`
     });
     if (!input) return null;
     input.funding = funders
@@ -242,7 +250,10 @@ export async function rollGearAcquisition(actor, options = {}) {
         throw new Error(loc`The Request cost changed before payment. Review its funding again.`);
       const abilityId = plan.abilityId ?? plan.requestAbility,
         beforeUse = abilityId ? structuredClone(actor.system.resourceUses?.[abilityId]) : null;
-      const deliveryRoll = plan.automatic ? await new Roll(plan.delivery.formula).evaluate() : null;
+      const deferredDelivery = plan.automatic && plan.freePick;
+      // Free origin benefits use the existing journaled delivery settlement after posting; no Request dice are rolled.
+      const deliveryRoll =
+        plan.automatic && !deferredDelivery ? await new Roll(plan.delivery.formula).evaluate() : null;
       const attempt = {
         id,
         epoch: missionEpoch(actor.system),
@@ -271,9 +282,11 @@ export async function rollGearAcquisition(actor, options = {}) {
               unit: plan.delivery.unit
             }
           : null,
-        status: plan.automatic ? "succeeded" : "pending",
-        success: plan.automatic ? true : null,
+        status: plan.automatic && !deferredDelivery ? "succeeded" : "pending",
+        success: plan.automatic && !deferredDelivery ? true : null,
         requestAbility: plan.requestAbility,
+        freePick: plan.freePick ?? false,
+        originResource: plan.originResource ?? "",
         abilityId,
         gearAbility: plan.gearAbility ?? null,
         commonCost: plan.commonCost ?? null,
@@ -325,7 +338,7 @@ export async function rollGearAcquisition(actor, options = {}) {
             if (plan.automatic)
               message = await ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor }),
-                content: `<p>${loc`${esc(plan.abilityName)}: ${esc(plan.name)} requested automatically; one ${esc(plan.pick)} Reserve pick consumed, ${plan.cost ? loc`${plan.cost} action dice spent (${plan.surcharge} Shaken surcharge)` : loc`no action dice spent`}. Available after ${attempt.delivery.total} ${attempt.delivery.unit}. ${plan.preparationHours ? loc` One hour of preparation completed before the Request.` : ""} Claim on Gear after delivery.`}</p>`,
+                content: `<p>${loc`${esc(plan.abilityName)}: ${esc(plan.name)} requested automatically; ${plan.freePick ? loc`no Reserve pick consumed` : loc`one ${esc(plan.pick)} Reserve pick consumed`}, ${plan.cost ? loc`${plan.cost} action dice spent (${plan.surcharge} Shaken surcharge)` : loc`no action dice spent`}. ${deferredDelivery ? loc`No Request check is rolled. Resolve delivery once from this card, then claim the Resource after it arrives.` : loc`Available after ${attempt.delivery.total} ${attempt.delivery.unit}.`} ${plan.preparationHours ? loc` One hour of preparation completed before the Request.` : ""} Claim on Gear after delivery.`}</p>`,
                 // The delivery-time roll, so its dice can be seen behind the time given.
                 rolls: deliveryRoll ? [deliveryRoll] : [],
                 flags: {
@@ -334,9 +347,14 @@ export async function rollGearAcquisition(actor, options = {}) {
                     checkKind: "request",
                     requestBenefit: plan.requestBenefit ?? null,
                     actionDiceAllowed: false,
-                    resolved: true,
-                    successConfirmed: true,
-                    gearAttempt: { id, epoch: attempt.epoch, success: true, delivery: attempt.delivery }
+                    resolved: !deferredDelivery,
+                    ...(!deferredDelivery ? { successConfirmed: true } : {}),
+                    gearAttempt: {
+                      id,
+                      epoch: attempt.epoch,
+                      success: deferredDelivery ? null : true,
+                      delivery: attempt.delivery
+                    }
                   }
                 }
               });
@@ -731,7 +749,7 @@ export function finishGearAcquisition(actor, message, options = {}) {
             "flags.spycraft2.resolved": true,
             "flags.spycraft2.successConfirmed": result.success,
             "flags.spycraft2.gearAttempt": gearAttempt,
-            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${loc`Final result ${check.effectiveTotal} recorded; delivery settlement follows.`}</strong>`
+            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${attempt.freePick ? loc`Automatic origin Resource benefit recorded; delivery settlement follows.` : loc`Final result ${check.effectiveTotal} recorded; delivery settlement follows.`}</strong>`
           });
         } catch (error) {
           const current = message.flags?.spycraft2;

@@ -77,6 +77,49 @@ const labels = (msg, user = game.user) =>
     .chatControls({ message: msg, check: msg.flags.spycraft2, actor, user, checkKind: msg.flags.spycraft2.checkKind })
     .map(c => `${c.placement}:${c.label}`);
 
+test("an automatic origin Resource with no check total offers only delivery and can finish an interrupted receipt", async () => {
+  const { localizedLabel } = await import("../module/rolls/chat-controls.mjs");
+  actor = makeActor();
+  const attempt = { id: "a", epoch: "mission", requestAbility: "requestPrivileged", freePick: true, automatic: true };
+  actor.system.missionReserves = { epoch: "mission", attempts: { a: attempt } };
+  const msg = message({
+    rawTotal: undefined,
+    checkKind: "request",
+    actionDiceAllowed: false,
+    requestBenefit: { id: "requestPrivileged", source: { freePick: true } },
+    gearAttempt: { id: "a", epoch: "mission" }
+  });
+  assert.deepEqual(labels(msg), ["card:Resolve delivery"]);
+  const controls = rollPipeline.chatControls({
+    message: msg,
+    check: msg.flags.spycraft2,
+    actor,
+    user: game.user,
+    checkKind: "request"
+  });
+  assert.equal(controls[0].emphasis, "primary");
+  assert.equal(
+    localizedLabel(controls[0], {
+      has: key => key === "SPYCRAFT.RollControl.ResolveDelivery",
+      localize: () => "Translated delivery"
+    }),
+    "Translated delivery"
+  );
+  await controls[0].run();
+  assert.equal(actor.calls[0][0], "finishCheck");
+  msg.flags.spycraft2.resolved = true;
+  msg.flags.spycraft2.gearAttempt.settlement = { id: "settlement", version: 2, stage: "rolling" };
+  assert.deepEqual(labels(msg), ["content:Complete acquisition record"]);
+  attempt.settlementId = "settlement";
+  assert.deepEqual(labels(msg), []);
+  delete attempt.settlementId;
+  actor.isOwner = false;
+  assert.deepEqual(labels(msg), []);
+  actor.isOwner = true;
+  msg.flags.spycraft2.requestBenefit = { id: "requestPrivileged" };
+  assert.deepEqual(labels(msg), []);
+});
+
 test("an open check offers boosting and resolution, in one row under the card", () => {
   actor = makeActor();
   assert.deepEqual(labels(message({})), [

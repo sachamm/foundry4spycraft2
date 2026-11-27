@@ -475,6 +475,7 @@
    "rerollControl": "Reroll with ability",
    "confirmControl": "Confirm result",
    "finishControl": "Finish",
+   "ResolveDelivery": "Resolve delivery",
    "unnervingControl": "Resolve Unnerving stress",
    "strutControl": "Strut: posture next half action"
   },

@@ -4984,6 +4984,52 @@ for (const height of [720, 768])
     }
   });
 
+for (const height of [720, 768])
+  test(`free origin Resource, category and confirmation controls remain reachable at ${height}px`, async ({ page }) => {
+    const previous = content,
+      oldGame = game;
+    try {
+      const { rollGearAcquisition } = await import("../../module/apps/gear-acquisition.mjs");
+      const { requestSources } = await import("../../module/rules/requests.mjs");
+      const system = {
+        activeFeatNames: [],
+        classLevels: {},
+        usagePeriods: { mission: "qa" },
+        actionDice: { value: 0 },
+        missionCaliber: 1
+      };
+      system.limitedUses = requestSources(system, [
+        { name: "Privileged", type: "origin", system: { originType: "talent" } }
+      ]);
+      const source = {
+        id: "a",
+        uuid: "Actor.a",
+        name: "Origin character",
+        type: "agent",
+        isOwner: true,
+        flags: {},
+        system,
+        actionDiceFundingSystem: system,
+        usagePeriods: system.usagePeriods
+      };
+      globalThis.game = { ...oldGame, actors: [source] };
+      await rollGearAcquisition(source);
+      await render(page, height);
+      await page.locator("[name=requestAbility]").selectOption("requestPrivileged");
+      await page.locator("[name=originResource]").selectOption("legalImmunity");
+      await page.locator("[name=originResourceConfirmed]").check();
+      await page.locator("[name=pick]").selectOption("");
+      await page.locator("[name=caliber]").fill("2");
+      await page.locator("[name=networkConfirmed]").check();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y + rect.height).toBeLessThanOrEqual(height);
+    } finally {
+      content = previous;
+      globalThis.game = oldGame;
+    }
+  });
+
 test("routine attack shows target, action and range while retaining every optional form value", async ({ page }) => {
   const previous = content;
   const source = new SpycraftActor();

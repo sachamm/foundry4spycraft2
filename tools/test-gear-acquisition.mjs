@@ -542,6 +542,94 @@ const withRequestBenefits = () => {
   s.missionReserves = reserveInitialization(s, [], initialize);
   return s;
 };
+const originPick = id => ({
+  ...request,
+  pick: "",
+  requestAbility: id,
+  networkConfirmed: true,
+  originResourceConfirmed: true,
+  originResource: id === "requestPrivileged" ? "legalImmunity" : "medicalAssistance",
+  name: id === "requestPrivileged" ? "Legal immunity" : "Medical assistance"
+});
+function freeOriginSystem(id = "requestPrivileged") {
+  const s = system();
+  s.missionCaliber = 1;
+  s.actionDice.value = 0;
+  s.resourceUses = {};
+  const origin =
+    id === "requestPrivileged"
+      ? { name: "Privileged", type: "origin", system: { originType: "talent" } }
+      : { name: "Rescuer", type: "origin", system: { originType: "specialty" } };
+  s.limitedUses = requestSources(s, [origin]);
+  return s;
+}
+
+test("Privileged and Rescuer grant exactly one independent mission use, including legacy Talent names", () => {
+  const sources = requestSources({}, [
+    { name: "Priviledged", type: "origin", system: { originType: "talent" } },
+    { name: "Rescuer", type: "origin", system: { originType: "specialty" } },
+    { name: "Rescuer", type: "origin", system: { originType: "specialty" } }
+  ]);
+  assert.deepEqual(
+    sources.map(s => [s.id, s.period, s.limit, s.fixedCaliber, s.category, s.freePick]),
+    [
+      ["requestPrivileged", "mission", 1, 2, "R", true],
+      ["requestRescuer", "mission", 1, 2, "R", true]
+    ]
+  );
+  assert.equal(
+    requestSources({}, [{ name: "Privileged", type: "origin", system: { originType: "specialty" } }]).length,
+    0
+  );
+});
+
+test("free origin Resources need no reserves, ignore mission Caliber and bind the exact Caliber II option", () => {
+  for (const id of ["requestPrivileged", "requestRescuer"]) {
+    const s = freeOriginSystem(id),
+      input = originPick(id);
+    const p = gearAcquisitionPlan(s, input);
+    assert.equal(p.freePick, true);
+    assert.equal(p.pick, "");
+    assert.equal(p.caliber, 2);
+    assert.equal(p.cost, 0);
+    assert.equal(p.automatic, true);
+    assert.equal(p.record.initialized, false);
+    assert.equal(p.record.initializationSource, "originFreePick");
+    assert.equal(
+      Object.values(p.record.picks).reduce((a, b) => a + b, 0),
+      0
+    );
+    for (const patch of [
+      { caliber: 1 },
+      { caliber: 3 },
+      { category: "W" },
+      { originResource: "dossier" },
+      { originResourceConfirmed: false },
+      { networkConfirmed: false }
+    ])
+      assert.throws(() => gearAcquisitionPlan(s, { ...input, ...patch }));
+    s.missionReserves = p.record;
+    assert.throws(() => gearAcquisitionPlan(s, request), /Allocate/);
+    s.resourceUses[id] = p.abilityRecord;
+    assert.throws(() => gearAcquisitionPlan(s, input), /no uses/);
+  }
+});
+
+test("origin Resource waivers preserve every Reserve balance and pay only the normal Shaken surcharge", () => {
+  const s = freeOriginSystem();
+  s.missionReserves = reserveInitialization(s, [], { ...initialize, caliber: 1 });
+  const before = structuredClone(s.missionReserves);
+  const p = gearAcquisitionPlan(s, { ...originPick("requestPrivileged"), pick: "CHA" });
+  assert.deepEqual(p.record, before);
+  s.conditionContext = { shakenGrade: 2 };
+  assert.throws(() => gearAcquisitionPlan(s, originPick("requestPrivileged")), /Not enough action dice/);
+  const funded = gearAcquisitionPlan(s, { ...originPick("requestPrivileged"), availableFunding: 1 });
+  assert.equal(funded.baseCost, 0);
+  assert.equal(funded.cost, 1);
+  assert.equal(funded.surcharge, 1);
+  assert.deepEqual(funded.record, before);
+});
+
 test("all three Request sources enforce actual origin types, class milestone, unique copies and independent limits", () => {
   const items = requestOrigins(),
     specs = requestSources({ classLevels: { politico: 10 } }, [...items, ...items]);
@@ -643,6 +731,93 @@ test("free rolled Request consumes one use/pick even on failure; posting failure
     /total/
   );
 });
+test("actual free origin acquisition posts without check RNG, settles delivery once and claims a Resource without spending a pick", async () => {
+  const oldCreate = ChatMessage.create,
+    oldEvaluate = Roll.prototype.evaluate;
+  let evaluations = 0;
+  ChatMessage.create = async data => ({
+    ...data,
+    uuid: "ChatMessage.origin" + ++serial,
+    rolls: data.rolls ?? [],
+    async update(patch) {
+      update(this, patch);
+    }
+  });
+  Roll.prototype.evaluate = async function (...args) {
+    evaluations++;
+    return oldEvaluate.apply(this, args);
+  };
+  try {
+    for (const id of ["requestPrivileged", "requestRescuer"]) {
+      const a = new SpycraftActor();
+      a.system = freeOriginSystem(id);
+      const input = originPick(id),
+        before = evaluations;
+      const m = await a.rollGearAcquisition(input),
+        attemptId = m.flags.spycraft2.gearAttempt.id;
+      assert.equal(evaluations, before);
+      assert.equal(m.rolls.length, 0);
+      assert.equal(m.flags.spycraft2.rawTotal, undefined);
+      assert.equal(m.flags.spycraft2.resolved, false);
+      assert.equal(a.system.resourceUses[id].used, 1);
+      assert.equal(a.system.actionDice.value, 0);
+      await assert.rejects(a.rollGearAcquisition(input), /no uses/);
+      const result = await a.finishCheck(m);
+      assert.equal(result.success, true);
+      assert.equal(evaluations, before + 1);
+      await a.finishCheck(m);
+      assert.equal(evaluations, before + 1);
+      const item = await a.claimGearAcquisition({
+        attemptId,
+        itemData: { name: input.name, type: "gear", system: { caliber: 2, gearCategory: "R" } },
+        delivered: true,
+        gcConfirmed: true
+      });
+      assert.equal(item.system.pick, "");
+      assert.equal(managedAcquisition(a.system, item), true);
+      assert.equal(
+        Object.values(a.system.missionReserves.spent).reduce((a, b) => a + b, 0),
+        0
+      );
+      const allocated = reserveInitialization(a.system, a.items, initialize);
+      assert.equal(allocated.picks.R, 1);
+      assert.equal(allocated.attempts[attemptId].claimedItemId, item.id);
+    }
+  } finally {
+    ChatMessage.create = oldCreate;
+    Roll.prototype.evaluate = oldEvaluate;
+  }
+});
+
+test("free origin posting refusal restores its unrolled use and does not allocate a Reserve ledger", async () => {
+  const oldCreate = ChatMessage.create,
+    oldEvaluate = Roll.prototype.evaluate;
+  let evaluations = 0;
+  ChatMessage.create = async () => {
+    throw Error("origin post failed");
+  };
+  Roll.prototype.evaluate = async function (...args) {
+    evaluations++;
+    return oldEvaluate.apply(this, args);
+  };
+  try {
+    const a = new SpycraftActor();
+    a.system = freeOriginSystem();
+    await assert.rejects(a.rollGearAcquisition(originPick("requestPrivileged")), /origin post failed/);
+    assert.equal(a.system.resourceUses.requestPrivileged, undefined);
+    assert.equal(a.system.missionReserves.initialized, false);
+    assert.deepEqual(a.system.missionReserves.attempts, {});
+    assert.equal(
+      Object.values(a.system.missionReserves.picks).reduce((a, b) => a + b, 0),
+      0
+    );
+    assert.equal(evaluations, 0);
+  } finally {
+    ChatMessage.create = oldCreate;
+    Roll.prototype.evaluate = oldEvaluate;
+  }
+});
+
 test("automatic Request rolls delivery, consumes one use and pick, is immediately claimable after delivery, and duplicate use is blocked", async () => {
   const a = new SpycraftActor();
   a.system = withRequestBenefits();

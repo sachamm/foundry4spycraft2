@@ -1,6 +1,11 @@
 import { gearCheckPlan } from "./gear-checks.mjs";
 import { shakenActionDieCost } from "./shaken.mjs";
-import { priorityRequestBonus, localHeroRequestBonus, requestBenefitContext } from "./requests.mjs";
+import {
+  priorityRequestBonus,
+  localHeroRequestBonus,
+  requestBenefitContext,
+  ORIGIN_RESOURCE_PICKS
+} from "./requests.mjs";
 import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import { loc } from "../i18n.mjs";
@@ -59,7 +64,7 @@ export function currentReserves(system) {
   return system.missionReserves?.epoch === missionEpoch(system) ? system.missionReserves : null;
 }
 /** A free Stash attempt needs a durable claim ledger but does not allocate mission resources. */
-export function provisionalReserves(system) {
+export function provisionalReserves(system, initializationSource = "personalStash") {
   const caliber =
     Number.isSafeInteger(system.missionCaliber) && system.missionCaliber >= 1 && system.missionCaliber <= 5
       ? system.missionCaliber
@@ -67,7 +72,7 @@ export function provisionalReserves(system) {
   return {
     epoch: missionEpoch(system),
     initialized: false,
-    initializationSource: "personalStash",
+    initializationSource,
     caliber,
     procureAtIntel: false,
     picks: Object.fromEntries(PICK_CATEGORIES.map(k => [k, 0])),
@@ -82,7 +87,7 @@ function validateProvisionalReserves(record) {
   const zeroMap = value =>
     value && typeof value === "object" && !Array.isArray(value) && Object.values(value).every(n => n === 0);
   if (
-    record.initializationSource !== "personalStash" ||
+    !["personalStash", "originFreePick"].includes(record.initializationSource) ||
     record.common !== 0 ||
     record.spentCommon !== 0 ||
     !["picks", "spent", "charismaPicks"].every(k => zeroMap(record[k])) ||
@@ -94,13 +99,23 @@ function validateProvisionalReserves(record) {
         !a ||
         a.id !== id ||
         a.epoch !== record.epoch ||
-        a.kind !== "common" ||
-        a.gearAbility !== "personalStash" ||
-        a.commonCost !== 0 ||
-        a.cost !== 0
+        !(
+          (a.kind === "common" && a.gearAbility === "personalStash" && a.commonCost === 0 && a.cost === 0) ||
+          (a.kind === "request" &&
+            a.freePick === true &&
+            a.automatic === true &&
+            a.category === "R" &&
+            a.pick === "" &&
+            a.caliber === 2 &&
+            ORIGIN_RESOURCE_PICKS[a.requestAbility]?.resource === a.originResource &&
+            a.baseCost === 0 &&
+            Number.isSafeInteger(a.cost) &&
+            a.cost >= 0 &&
+            a.cost === a.surcharge)
+        )
     )
   )
-    throw new Error(loc`Review the provisional Personal Stash ledger before allocating or using mission resources.`);
+    throw new Error(loc`Review the provisional free-acquisition ledger before allocating or using mission resources.`);
 }
 export function reserveAllocations(system) {
   const record = currentReserves(system);
@@ -187,6 +202,8 @@ export function gearAcquisitionPlan(
     useProcure = false,
     availableFunding = system.actionDice?.value ?? 0,
     requestAbility = "",
+    originResource = "",
+    originResourceConfirmed = false,
     networkConfirmed = false,
     hourAvailable = false,
     homeTurf = false,
@@ -196,13 +213,18 @@ export function gearAcquisitionPlan(
     usePersonalStash = false
   } = {}
 ) {
+  const benefit =
+    kind === "request" && requestAbility
+      ? (system.limitedUses ?? []).find(s => s.id === requestAbility && s.workflow === "requestBenefit")
+      : null;
+  const freePick = benefit?.freePick === true;
   const existing = currentReserves(system),
-    waiver = kind === "common" && usePersonalStash === true;
+    waiver = (kind === "common" && usePersonalStash === true) || freePick;
   const affiliationProblem = campaignAffiliationProblem(system, system.campaignEffects);
   if (affiliationProblem) throw new Error(affiliationProblem);
   if ((!existing || existing.initialized === false) && !waiver)
     throw new Error(loc`Allocate reserves for the current mission first.`);
-  const record = existing ?? provisionalReserves(system);
+  const record = existing ?? provisionalReserves(system, freePick ? "originFreePick" : "personalStash");
   if (record.initialized === false) validateProvisionalReserves(record);
   if (!notIntel) throw new Error(loc`Field acquisition takes place after the Intel Phase.`);
   if (!String(name).trim()) throw new Error(loc`Name the exact item or option before rolling.`);
@@ -249,10 +271,17 @@ export function gearAcquisitionPlan(
   }
   if (usePersonalStash) throw new Error(loc`Personal Stash waives a Common Item Gear check, not a Request.`);
   if (kind !== "request") throw new Error(loc`Choose a Request or Gear check.`);
-  const benefit = requestAbility
-    ? (system.limitedUses ?? []).find(s => s.id === requestAbility && s.workflow === "requestBenefit")
-    : null;
   if (requestAbility && !benefit) throw new Error(loc`This Request benefit is not currently available.`);
+  if (
+    freePick &&
+    (!ORIGIN_RESOURCE_PICKS[benefit.id] ||
+      originResource !== benefit.originResource ||
+      originResourceConfirmed !== true ||
+      caliber !== benefit.fixedCaliber)
+  )
+    throw Error(
+      loc`Confirm the origin's exact Caliber II Resource: legal immunity for Privileged, or medical assistance for Rescuer.`
+    );
   if (benefit?.category && benefit.category !== category)
     throw new Error(loc`This Request benefit requires its specified equipment category.`);
   if (benefit?.automatic && !networkConfirmed)
@@ -295,14 +324,14 @@ export function gearAcquisitionPlan(
         ? loc`A Request must be Caliber I–V and cannot exceed the current mission Caliber.`
         : loc`A Request must be Caliber I–IV and cannot exceed the current mission Caliber.`
     );
-  if (!PICK_CATEGORIES.includes(pick) || (record.picks?.[pick] ?? 0) < 1)
+  if (!freePick && (!PICK_CATEGORIES.includes(pick) || (record.picks?.[pick] ?? 0) < 1))
     throw new Error(loc`Choose an available Reserve gear pick.`);
   if (!PICK_CATEGORIES.includes(category) || category === "CHA" || (!categoryConfirmed && !benefit?.outsideFaction))
     throw new Error(loc`Confirm the item’s actual equipment category and Faction availability.`);
   const allowed = system.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"];
-  if (pick === "CHA" ? !allowed.includes(category) : pick !== category)
+  if (!freePick && (pick === "CHA" ? !allowed.includes(category) : pick !== category))
     throw new Error(loc`The Reserve pick must match the requested category and affiliation restrictions.`);
-  if (pick === "CHA" && (record.charismaPicks?.[category] ?? 0) < 1)
+  if (!freePick && pick === "CHA" && (record.charismaPicks?.[category] ?? 0) < 1)
     throw new Error(
       loc`No Charisma Reserve pick remains in this category; its category was fixed during the Intel Phase.`
     );
@@ -322,7 +351,10 @@ export function gearAcquisitionPlan(
     localHeroFeats: local.feats,
     kind,
     name: String(name).trim(),
-    pick,
+    pick: freePick ? "" : pick,
+    freePick,
+    ...(freePick ? { provisionalCreated: !existing } : {}),
+    originResource: freePick ? originResource : "",
     category,
     caliber,
     cost,
@@ -339,18 +371,31 @@ export function gearAcquisitionPlan(
     location,
     deliveryMultiplier: useProcure ? 0.5 : 1,
     delivery: benefit?.immediate ? IMMEDIATE_DELIVERY : DELIVERY[location],
-    record: {
-      ...record,
-      charismaPicks:
-        pick === "CHA"
-          ? { ...record.charismaPicks, [category]: record.charismaPicks[category] - 1 }
-          : record.charismaPicks,
-      picks: { ...record.picks, [pick]: record.picks[pick] - 1 },
-      spent: { ...record.spent, [pick]: (record.spent?.[pick] ?? 0) + 1 }
-    }
+    record: freePick
+      ? structuredClone(record)
+      : {
+          ...record,
+          charismaPicks:
+            pick === "CHA"
+              ? { ...record.charismaPicks, [category]: record.charismaPicks[category] - 1 }
+              : record.charismaPicks,
+          picks: { ...record.picks, [pick]: record.picks[pick] - 1 },
+          spent: { ...record.spent, [pick]: (record.spent?.[pick] ?? 0) + 1 }
+        }
   };
 }
 export function acquisitionOutcome(attempt, total) {
+  if (attempt.freePick === true) {
+    if (
+      !attempt.automatic ||
+      attempt.kind !== "request" ||
+      attempt.caliber !== 2 ||
+      attempt.category !== "R" ||
+      ORIGIN_RESOURCE_PICKS[attempt.requestAbility]?.resource !== attempt.originResource
+    )
+      throw Error(loc`Review the saved automatic origin Resource benefit.`);
+    return { success: true, status: "succeeded" };
+  }
   if (!Number.isFinite(total)) throw new Error(loc`A finite final check result is required.`);
   return { success: total >= attempt.dc, status: total >= attempt.dc ? "succeeded" : "failed" };
 }
