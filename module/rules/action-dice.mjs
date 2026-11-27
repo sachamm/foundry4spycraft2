@@ -1,3 +1,4 @@
+import { campaignTriumphXPPercent } from "./campaign-rules.mjs";
 import { actionDieTerm } from "./action-die-formula.mjs";
 import { triumphAt } from "./check-candidates.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
@@ -260,7 +261,9 @@ export function missionXPPlan(
     modifierReason = "",
     missionCompleteConfirmed = false,
     mission = "initial",
-    at = 0
+    at = 0,
+    triumph = false,
+    crossroads = false
   } = {}
 ) {
   const level = system.level ?? 0;
@@ -284,7 +287,13 @@ export function missionXPPlan(
     combinedBase = baseXP + awardBaseBonus,
     multiplier = Math.min(level, threatLevel),
     coreXP = combinedBase * multiplier,
-    totalXP = coreXP + additionalXP,
+    // A Triumph this mission adds 10% (5% under Common Spectacle) and a Crossroads Title its own share, each rounded
+    // up and worked out on the multiplied reward (pp.53, 97).
+    triumphPercent = triumph ? campaignTriumphXPPercent() : 0,
+    triumphXP = Math.ceil((coreXP * triumphPercent) / 100),
+    crossroadsPercent = crossroads ? Math.max(0, Number(system.crossroads?.xpPercent) || 0) : 0,
+    crossroadsXP = Math.ceil((coreXP * crossroadsPercent) / 100),
+    totalXP = coreXP + triumphXP + crossroadsXP + additionalXP,
     xp = (system.xp ?? 0) + totalXP;
   if (![combinedBase, coreXP, totalXP, xp].every(Number.isSafeInteger))
     throw new Error(loc`The mission reward exceeds a safe whole number.`);
@@ -301,6 +310,10 @@ export function missionXPPlan(
       combinedBase,
       multiplier,
       coreXP,
+      triumphPercent,
+      triumphXP,
+      crossroadsPercent,
+      crossroadsXP,
       additionalXP,
       modifierReason: String(modifierReason).trim(),
       totalXP,

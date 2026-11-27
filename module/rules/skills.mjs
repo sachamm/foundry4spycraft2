@@ -1,3 +1,4 @@
+import { campaignTake10Time, omniPenalty } from "./campaign-rules.mjs";
 import { checkFocus, isHideCheck } from "./check-identity.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
@@ -783,22 +784,25 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     synergyExtra =
       stacked([...skillBonusEntries, ...checkBonusEntries]) - stacked([...skillBonusEntries, ...nonSynergy]),
     condition = skillBonusCondition(system, normalSkillBonus + skillExtra);
-  const checkAdjustment =
-    skillConditionCheckPenalty(conditionSystem, selected) +
-    (isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0) +
-    (hasForte ? 1 : 0) +
-    armor +
-    vision +
-    (Number(modifier) || 0) +
-    skillTags.handPenalty +
-    light.skillModifier +
-    fogSmoke.skillModifier +
-    underwaterContext.penalty +
-    sensoryConditions.skillModifier +
-    restraint.sizeBonus +
-    hideMovementPlanResult.penalty +
-    detectionObserver.penalty +
-    terms.sum("adjustment");
+  // Omni-Competent (p.408) halves each penalty, rounding down and never past −1.
+  const penalty = omniPenalty();
+  const checkAdjustment = [
+    skillConditionCheckPenalty(conditionSystem, selected),
+    isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0,
+    hasForte ? 1 : 0,
+    armor,
+    vision,
+    Number(modifier) || 0,
+    skillTags.handPenalty,
+    light.skillModifier,
+    fogSmoke.skillModifier,
+    underwaterContext.penalty,
+    sensoryConditions.skillModifier,
+    restraint.sizeBonus,
+    hideMovementPlanResult.penalty,
+    detectionObserver.penalty,
+    terms.sum("adjustment")
+  ].reduce((sum, value) => sum + penalty(value), 0);
   const terrainFeat =
     terrainPlan.homeTurf ||
     terrainPlan.bonuses.length ||
@@ -1189,7 +1193,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     blocked: blockedReasons.length > 0,
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
-      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" ? 1 : (skill.take10TimeMultiplier ?? 2),
+      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int"
+        ? 1
+        : campaignTake10Time(skill.take10TimeMultiplier ?? 2),
     notes: noteSegments.join("")
   };
 }

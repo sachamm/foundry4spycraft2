@@ -1,4 +1,5 @@
 /** Action dice: spending, healing and refresh, awards, mission XP and starting dice. */
+import { campaignTriumphXPPercent } from "../../rules/campaign-rules.mjs";
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { missionSettlementDefaults } from "../../apps/gc/mission-defaults.mjs";
@@ -1166,7 +1167,7 @@ export const ActorActionDice = Base =>
         input = await systemDialog.input({
           window: { title: loc`Settle mission XP — p.440` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${loc`Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.`}</p><label>${loc`Base mission XP before action-die awards`} <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>${loc`Team Threat Level`} <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label>${loc`Additional post-multiplier XP`} <input type="number" name="additionalXP" min="0" value="0" /></label><label>${loc`Source of additional XP`} <input name="modifierReason" placeholder="${loc`GC-calculated Crossroads, Triumph or other bonus`}" /></label><p>${loc`Crossroads and Triumph percentages are not calculated by this control. Review their eligibility and rounding, then enter their final XP contribution above. A Crossroads Title first earned this mission starts its benefits next mission.`}</p><label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The mission has ended; all post-multiplier modifiers were reviewed and included`}</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.`}</p><label>${loc`Base mission XP before action-die awards`} <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>${loc`Team Threat Level`} <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label><input type="checkbox" name="triumph" /> ${loc`Someone on the team scored a Triumph this mission (+${campaignTriumphXPPercent()}%, once per mission)`}</label>${(this.system.crossroads?.xpPercent ?? 0) > 0 ? `<label><input type="checkbox" name="crossroads" checked /> ${loc`Crossroads Title held before this mission began (+${this.system.crossroads.xpPercent}%)`}</label>` : ""}<label>${loc`Additional post-multiplier XP`} <input type="number" name="additionalXP" min="0" value="0" /></label><label>${loc`Source of additional XP`} <input name="modifierReason" placeholder="${loc`GC-awarded bonus`}" /></label><p>${loc`The Triumph and Crossroads shares are worked out on the multiplied reward and rounded up. A Crossroads Title first earned this mission starts its benefits next mission.`}</p><label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The mission has ended; all post-multiplier modifiers were reviewed and included`}</label></div>`
         });
         if (!input) return null;
       }
@@ -1188,7 +1189,9 @@ export const ActorActionDice = Base =>
             modifierReason: input.modifierReason,
             missionCompleteConfirmed: !!input.missionCompleteConfirmed,
             mission,
-            at: Date.now()
+            at: Date.now(),
+            triumph: input.triumph === true,
+            crossroads: input.crossroads === true
           });
         const settlementId = foundry.utils.randomID(),
           record = { ...plan.record, settlementId },
@@ -1224,7 +1227,7 @@ export const ActorActionDice = Base =>
         try {
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
+            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier}${plan.record.triumphXP ? loc` + ${plan.record.triumphXP} Triumph (${plan.record.triumphPercent}%)` : ""}${plan.record.crossroadsXP ? loc` + ${plan.record.crossroadsXP} Crossroads (${plan.record.crossroadsPercent}%)` : ""} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
             flags: { spycraft2: { actorUuid: this.uuid, checkKind: "missionXP", ...record, actionDiceAllowed: false } }
           });
         } catch (error) {
@@ -1288,7 +1291,7 @@ export const ActorActionDice = Base =>
         r.combinedBase !== r.baseXP + baseBonus ||
         r.multiplier !== multiplier ||
         r.coreXP !== (r.baseXP + baseBonus) * multiplier ||
-        r.totalXP !== r.coreXP + r.additionalXP ||
+        r.totalXP !== r.coreXP + (r.triumphXP ?? 0) + (r.crossroadsXP ?? 0) + r.additionalXP ||
         r.source !== "p.440 (user-confirmed)"
       )
         throw new Error(loc`The saved mission XP formula is invalid; review its source before restoring it.`);

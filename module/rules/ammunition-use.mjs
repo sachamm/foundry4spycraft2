@@ -6,6 +6,7 @@
  * and then hold the counts.
  */
 import { ammunitionConfiguration } from "./ammunition.mjs";
+import { campaignRules } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
@@ -20,6 +21,8 @@ const SINGLE_FED_SHOTS = 3;
 export function ammunitionState(weapon = {}) {
   const code = weapon.ammunitionOnly ? null : ammunitionConfiguration(weapon).selected;
   if (!code || !whole(code.capacity) || code.capacity < 1) return { tracked: false };
+  // Bottomless Clip (p.405): a weapon that holds 5 or more shots never runs out, so its shots are not counted.
+  if (code.capacity >= 5 && campaignRules().bottomlessClip) return { tracked: false, bottomless: true };
   const capacity = code.capacity,
     counted = whole(weapon.shotsLoaded) || whole(weapon.shotsSpare);
   return {

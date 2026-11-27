@@ -1,5 +1,5 @@
 import { triumphAt } from "./check-candidates.mjs";
-import { threatsAutoActivate } from "./campaign-rules.mjs";
+import { campaignErrorActivationCap, threatsAutoActivate } from "./campaign-rules.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { cleaveCriticalPlan } from "./cleave.mjs";
 import { finesseCriticalEligible } from "./finesse.mjs";
@@ -210,7 +210,13 @@ export function criticalPlan(
     adjustment += role.extraDiceToActivate;
     sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
   }
-  const cost = Math.max(minimum, baseCost + adjustment);
+  let cost = Math.max(minimum, baseCost + adjustment);
+  // Comedy of Errors (p.406): no more than 2 action dice may be spent activating a skill error.
+  const errorCap = campaignErrorActivationCap();
+  if (kind === "failure" && check.checkKind === "skill" && errorCap !== null && cost > errorCap) {
+    cost = errorCap;
+    sources.push(loc`Comedy of Errors: at most ${errorCap}`);
+  }
   if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {
     blocked: false,

@@ -380,3 +380,26 @@ export function campaignGearCaliber(caliber, effects = campaignRules()) {
     raw = caliber + shift;
   return { caliber: Math.max(1, Math.min(5, raw)), shift, pastV: raw > 5, lost: raw < 1 };
 }
+
+/** Omni-Competent (p.408): a function that halves a skill penalty (rounded down, never past −1), or leaves it. */
+export function omniPenalty(effects = campaignRules()) {
+  if (!effects.halveSkillPenalties) return value => value;
+  return value => (value < 0 ? Math.min(-1, -Math.floor(-value / 2)) : value);
+}
+
+/** Comedy of Errors (p.406): the most action dice a skill error may cost to activate, or null. */
+export function campaignErrorActivationCap(effects = campaignRules()) {
+  const cap = effects.errorActivationDiceMaximum;
+  return Number.isSafeInteger(cap) && cap > 0 ? cap : null;
+}
+
+/** Take 10's time: ×2 normally, ×4 under Comedy of Errors (p.406). `standard` is the skill's own multiplier. */
+export function campaignTake10Time(standard = 2, effects = campaignRules()) {
+  const multiplier = effects.take10TimeMultiplier;
+  return Number.isFinite(multiplier) && multiplier > standard ? multiplier : standard;
+}
+
+/** The share of mission XP a Triumph adds (p.440): 10%, or 5% under Common Spectacle (p.406). */
+export function campaignTriumphXPPercent(standard = 10, effects = campaignRules()) {
+  return Number.isFinite(effects.triumphXPPercent) ? effects.triumphXPPercent : standard;
+}

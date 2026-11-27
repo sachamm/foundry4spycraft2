@@ -795,6 +795,8 @@ export const RECORD_SHAPES = {
       baseXP: "number",
       combinedBase: "number",
       coreXP: "number",
+      crossroadsPercent: "number",
+      crossroadsXP: "number",
       level: "number",
       mission: "string",
       modifierReason: "string",
@@ -802,7 +804,9 @@ export const RECORD_SHAPES = {
       settlementId: "string",
       source: "string",
       threatLevel: "number",
-      totalXP: "number"
+      totalXP: "number",
+      triumphPercent: "number",
+      triumphXP: "number"
     }
   },
   noFearBoost: {
