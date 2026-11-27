@@ -115,6 +115,7 @@ These shortcuts are listed under Configure Controls, where each can be changed o
 | Alt+Enter | Press the main button on the acting combatant's newest card during a fight, else on the newest card | All |
 | Alt+B     | GC boost on the card under the pointer, else your newest NPC card; press twice (the first press marks the card) | GC  |
 | Alt+D     | Spend GC action dice, with the acting NPC chosen   | GC  |
+| Alt+M | Mob attack for the acting NPC's group | GC |
 | Alt+1, Alt+2 | Attack with the acting NPC's first or second weapon | GC |
 
 A button clicked with the mouse lets go of the focus, so the shortcuts keep working after a click. Alt+S follows the

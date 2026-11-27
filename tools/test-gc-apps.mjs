@@ -1039,6 +1039,57 @@ test("the console starts a fight with the selected tokens and adds late arrivals
   }
 });
 
+test("season qualities save what is ticked and keep the campaign's others out", async () => {
+  const kept = structuredClone(state.getCampaign());
+  try {
+    const id = (await import("../module/rules/gc-tables.mjs")).GC_DATA.campaignQualities[0].id;
+    answer({ [`q-${id}`]: true, qualitySearch: "" });
+    await mission.editSeasonQualities();
+    assert.deepEqual(state.getCampaign().qualities, [id]);
+  } finally {
+    await state.setCampaign(kept);
+  }
+});
+
+test("Undo after Add NPC takes the placed tokens and their combatants off, and nothing else", async () => {
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  const deleted = [];
+  const holder = (type, ids) => ({
+    get: id => (ids.includes(id) ? { id } : null),
+    ids
+  });
+  const scene = {
+    tokens: holder("Token", ["t1", "t2", "keep"]),
+    deleteEmbeddedDocuments: async (type, ids) => deleted.push([type, ids])
+  };
+  const fight = {
+    combatants: holder("Combatant", ["c1"]),
+    deleteEmbeddedDocuments: async (type, ids) => deleted.push([type, ids])
+  };
+  const previous = { scenes: game.scenes, combats: game.combats };
+  game.scenes = { get: id => (id === "s1" ? scene : null) };
+  game.combats = Object.assign([fight], { get: id => (id === "f1" ? fight : null) });
+  try {
+    const flags = {
+      spycraft2: {
+        undo: {
+          label: "Placed 2 × Guard",
+          entries: [],
+          placedTokens: { scene: "s1", ids: ["t1", "t2", "gone"], combat: "f1", combatants: ["c1", "c9"] }
+        }
+      }
+    };
+    await applyUndo({ id: "placed", flags, update: async () => null });
+    assert.deepEqual(deleted, [
+      ["Combatant", ["c1"]],
+      ["Token", ["t1", "t2"]]
+    ]);
+  } finally {
+    game.scenes = previous.scenes;
+    game.combats = previous.combats;
+  }
+});
+
 test("each view has one filled button, chosen from the state", async () => {
   const { primaryAction } = await import("../module/apps/gc/console-view.mjs");
   const base = { checklistShown: false, missionActive: true, missionEnded: false, diceCurrent: true, combat: null };

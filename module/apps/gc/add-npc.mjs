@@ -11,6 +11,7 @@ import { cancellable, cancelButton, freeCancel, holdUntilValid } from "../dialog
 import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
 import { getMission, teamActors } from "./state.mjs";
 import { minionSquad } from "../../rules/npc-qualities.mjs";
+import { postUndo } from "../undo.mjs";
 
 const kindLabel = type =>
   ({ standard: loc`standard`, special: loc`special`, villain: loc`special`, animal: loc`animal` })[type] ?? "";
@@ -298,10 +299,12 @@ export async function addNpcToScene({ uuid = null } = {}) {
   const done = [loc`${tokens.length} × ${actor.name} added to ${scene.name}`];
   if (!typed && squad) done.push(loc`a Minion squad the team's size`);
   if (squad?.commander && corners.length > 1) done.push(loc`led by its Commander at Threat Level +2`);
-  let joined = false;
+  let joined = false,
+    combatants = null;
   if (input.join && fight) {
     // A fight deleted meanwhile leaves the tokens placed; the notice says they did not join.
-    joined = !!game.combats?.get?.(fight.id) && !!(await joinFight(fight, tokens).catch(() => null));
+    combatants = game.combats?.get?.(fight.id) ? await joinFight(fight, tokens).catch(() => null) : null;
+    joined = !!combatants;
     done.push(joined ? loc`joined the fight` : loc`the fight is gone, so they did not join it`);
   }
   if (input.record && !antagonistRecorded(actor)) {
@@ -312,5 +315,14 @@ export async function addNpcToScene({ uuid = null } = {}) {
   // A type already on the list is faced once it walks into a fight.
   if (joined) await markAntagonistsFaced([actor]).catch(() => 0);
   ui.notifications.info(`${done.join("; ")}.`);
+  // A slip (the wrong NPC, too many) is taken back from the note: the tokens go, and their combatants with them.
+  await postUndo(loc`Placed ${tokens.length} × ${actor.name}`, [], {
+    placedTokens: {
+      scene: scene.id,
+      ids: tokens.map(token => token.id),
+      combat: joined ? fight.id : null,
+      combatants: (combatants ?? []).map(combatant => combatant.id)
+    }
+  }).catch(() => null);
   return tokens.length === 1 ? tokens[0] : tokens;
 }

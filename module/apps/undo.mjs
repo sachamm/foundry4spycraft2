@@ -239,7 +239,8 @@ export function postUndo(
     standingPaid = null,
     cardMarks = null,
     addedInfractions = null,
-    missionRow = null
+    missionRow = null,
+    placedTokens = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -263,6 +264,7 @@ export function postUndo(
           cardMarks,
           addedInfractions,
           missionRow,
+          placedTokens,
           done: false
         }
       }
@@ -399,6 +401,23 @@ async function undoRecord(message, record) {
         rows.splice(Math.min(Number(row.index) || 0, rows.length), 0, row.entry);
         return { [row.list]: rows };
       }).catch(error => ui.notifications.warn(loc`The mission row was not put back: ${error.message}`));
+  }
+  // Tokens Add NPC placed come off their scene, and with them the combatants they joined as; other tokens stay.
+  const placed = record.placedTokens;
+  if (placed?.ids?.length && game.user.isGM) {
+    const scene = game.scenes?.get(placed.scene),
+      fight = placed.combat ? game.combats?.get(placed.combat) : null;
+    const joinedNow = (placed.combatants ?? []).filter(id => fight?.combatants?.get(id));
+    if (joinedNow.length)
+      await fight
+        .deleteEmbeddedDocuments("Combatant", joinedNow)
+        .catch(error => ui.notifications.warn(loc`The combatants were not taken off: ${error.message}`));
+    const there = placed.ids.filter(id => scene?.tokens?.get(id));
+    if (!there.length) ui.notifications.warn(loc`Those tokens are no longer on the scene.`);
+    else
+      await scene
+        .deleteEmbeddedDocuments("Token", there)
+        .catch(error => ui.notifications.warn(loc`The tokens were not taken off: ${error.message}`));
   }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {

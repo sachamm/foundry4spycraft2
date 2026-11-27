@@ -1071,17 +1071,40 @@ export async function editSeasonQualities() {
   requireGC();
   const campaign = getCampaign(),
     current = new Set(campaign.qualities);
-  const boxes = GC_DATA.campaignQualities
+  // The qualities in force come first, so the season's choices are in sight before the other sixty.
+  const ordered = [...GC_DATA.campaignQualities].sort((a, b) => Number(current.has(b.id)) - Number(current.has(a.id)));
+  const boxes = ordered
     .map(
       quality =>
         `<label title="${esc(quality.summary)}"><input type="checkbox" name="q-${quality.id}" ${current.has(quality.id) ? "checked" : ""} /> ${loc`${esc(quality.name)} (${signed(quality.xp)} XP${quality.seasonOnly ? "; seasons only" : ""}) — ${esc(quality.summary)}`}</label>`
     )
     .join("");
-  const input = await ask(
-    loc`Season campaign qualities — pp.405–408`,
-    `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward.`}</p><div class="sc2-scroll-list">${boxes}</div>`,
-    loc`Save qualities`
-  );
+  const chosen = values =>
+    GC_DATA.campaignQualities.filter(quality => values[`q-${quality.id}`]).map(quality => quality.id);
+  const input = await formDialog({
+    title: loc`Season campaign qualities — pp.405–408`,
+    ok: loc`Save qualities`,
+    fields: [
+      raw(
+        `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward. Those in force are listed first.`}</p>
+    <label>${loc`Find a quality`} <input name="qualitySearch" type="search" autocomplete="off" /></label>
+    <div class="sc2-scroll-list">${boxes}</div>`
+      )
+    ],
+    // Two qualities that cannot stand together are refused here, with the ticks kept.
+    validate: values => qualityClash(chosen(values)) || "",
+    dialog: {
+      render: (event, app) => {
+        const root = app?.element ?? event?.target,
+          search = root?.querySelector?.('[name="qualitySearch"]');
+        search?.addEventListener("input", () => {
+          const words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+          for (const label of root.querySelectorAll(".sc2-scroll-list > label"))
+            label.hidden = !words.every(word => label.textContent.toLowerCase().includes(word));
+        });
+      }
+    }
+  });
   if (!input) return null;
   const qualities = GC_DATA.campaignQualities.filter(quality => input[`q-${quality.id}`]).map(quality => quality.id);
   const clash = qualityClash(qualities);

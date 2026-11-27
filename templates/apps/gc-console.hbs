@@ -51,7 +51,8 @@
   {{!-- Play reads top down: session steps, the fight, then the dice. During a fight the session steps follow it. --}}
   {{> "systems/spycraft2/templates/apps/gc-console-combat.hbs"}}{{#if combat}}{{#if shown.play}}{{> "systems/spycraft2/templates/apps/gc-console-session.hbs"}}{{/if}}{{/if}}
   <details class="gc-section" data-section="dice" data-view-hidden="{{hiddenSections.dice}}" data-state="{{sections.dice.state}}" {{#if sections.dice.open}}open{{/if}}>
-    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.SceneAndGCActionDice"}}</span><span class="gc-note">{{#if dice.current}}{{localize "SPYCRAFT.Console.DiceLeft" dice=dice.value}}{{/if}}</span></summary>
+    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.SceneAndGCActionDice"}}</span><span
+      class="gc-note">{{#if dice.current}}{{localize "SPYCRAFT.Console.DiceLeft" dice=dice.value}}{{/if}}</span></summary>
     <div class="gc-facts">
       <div class="sc2-field" data-tooltip="{{dice.formula}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingNumber"}}</span><span
         class="sc2-value">{{dice.expected}}</span></div>
@@ -253,7 +254,7 @@
       <button type="button" data-action="events">{{localize "SPYCRAFT.Template.AppsGcConsole.Events"}}</button>
       <button type="button" data-action="possessions">{{localize "SPYCRAFT.Template.AppsGcConsole.RandomPossessions"}}</button>
     <button type="button" data-action="npcKnowledge">{{localize "SPYCRAFT.Template.AppsGcConsole.NpcKnowledge"}}</button></p>
-    <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole}}
+    <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole mob=shortcuts.mobAttack}}
       </p>
     <p class="controls"><button type="button" data-action="openControls">{{localize "SPYCRAFT.Console.OpenControls"}}</button></p>
   </details>

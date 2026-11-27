@@ -427,9 +427,16 @@ const controlKey = (element, root = null) => {
   return {
     ...wanted,
     nth: Math.max(0, twins(root, wanted).indexOf(element)),
+    // Its place among the same buttons of other rows: after a Remove, the next row's button takes that place.
+    row: list ? siblings(root, wanted).indexOf(element) : -1,
     section: element.closest?.("details[data-section]")?.dataset.section ?? null
   };
 };
+/** The same button on every row of one mission list (Remove, Done…), whatever the row. */
+const siblings = (root, wanted) =>
+  [...(root?.querySelectorAll?.(`[data-action="${wanted.action}"]`) ?? [])].filter(
+    element => element.dataset.list === wanted.list && element.dataset.change === wanted.change
+  );
 
 /** Read the parts of the console's state that a redraw would otherwise drop. */
 export function captureConsoleState(root) {
@@ -452,6 +459,13 @@ export function captureConsoleState(root) {
 const moreKey = details =>
   `${details.closest?.("[data-section]")?.dataset?.section ?? ""}:${details.querySelector("summary")?.textContent?.trim() ?? ""}`;
 
+/** After a row went away, the same button on the row that took its place, else on the row before it. */
+function nextRow(root, focus) {
+  if (!(focus.row >= 0)) return null;
+  const rows = siblings(root, focus);
+  return rows[focus.row] ?? rows[focus.row - 1] ?? null;
+}
+
 /** Put the kept state back onto a freshly drawn console. */
 export function restoreConsoleState(root, kept) {
   if (!root?.querySelector || !kept) return;
@@ -465,7 +479,7 @@ export function restoreConsoleState(root, kept) {
     const target = kept.focus.search
       ? root.querySelector(".sc2-tool-search input")
       : kept.focus.action
-        ? (same[kept.focus.nth ?? 0] ?? same[0] ?? heading)
+        ? (same[kept.focus.nth ?? 0] ?? same[0] ?? nextRow(root, kept.focus) ?? heading)
         : heading;
     target?.focus?.({ preventScroll: true });
     if (kept.selection && target?.setSelectionRange)
@@ -591,10 +605,9 @@ export function consoleContext() {
       )
     },
     shortcuts: Object.fromEntries(
-      ["nextTurn", "previousTurn", "cardPrimary", "gcConsole", "gcBoost", "activeSheet", "spendDice"].map(id => [
-        id,
-        shortcutLabel(id)
-      ])
+      ["nextTurn", "previousTurn", "cardPrimary", "gcConsole", "gcBoost", "activeSheet", "spendDice", "mobAttack"].map(
+        id => [id, shortcutLabel(id)]
+      )
     ),
     view,
     views: [

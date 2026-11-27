@@ -307,6 +307,28 @@ const bindings = ({ openConsole }) => [
     () => actingWeapon(number - 1)
   ]),
   [
+    "mobAttack",
+    locKey`Mob attack for the acting NPC's group`,
+    locKey`Opens the mob attack for the group of standard NPCs the acting combatant belongs to.`,
+    [{ key: "KeyM", modifiers: ["Alt"] }],
+    true,
+    () => {
+      const fight = game.combat?.started ? game.combat : null;
+      if (!fight?.combatant) return false;
+      import("./gc/console-turn.mjs")
+        .then(module => {
+          const group = module.mobGroups(fight).find(entry => entry.members.some(m => m.id === fight.combatant.id));
+          if (!group) {
+            ui.notifications.info(loc`${fight.combatant.name} is not part of a mob in this fight.`);
+            return null;
+          }
+          return module.mobAttackDialog(fight, group.key);
+        })
+        .catch(error => ui.notifications.warn(error.message));
+      return true;
+    }
+  ],
+  [
     "gcBoost",
     locKey`GC boost on your newest NPC card`,
     locKey`Spends a GC action die on the card under the pointer, or on the newest result you posted that can still be boosted. Press twice: the first press names the card.`,

@@ -7,10 +7,13 @@
     {{#if combat.started}}
     {{!-- The turn bar comes first and stays in view while the section scrolls: Next turn never moves. --}}
     <div class="gc-turn-bar" role="group" aria-label="{{localize 'SPYCRAFT.Console.Round'}}">
-      <button type="button" class="gc-primary" data-action="nextTurn" data-tooltip="{{tips.nextTurn}}"{{#if shortcuts.nextTurn}} aria-keyshortcuts="{{shortcuts.nextTurn}}"{{/if}}>{{localize "SPYCRAFT.Template.AppsGcConsole.NextTurn"}}</button>
-      <button type="button" data-action="previousTurn" data-tooltip="{{tips.previousTurn}}"{{#if shortcuts.previousTurn}} aria-keyshortcuts="{{shortcuts.previousTurn}}"{{/if}}>{{localize "SPYCRAFT.Template.AppsGcConsole.PreviousTurn"}}</button>
+      <button type="button" class="gc-primary" data-action="nextTurn" data-tooltip="{{tips.nextTurn}}"{{#if shortcuts.nextTurn}}
+        aria-keyshortcuts="{{shortcuts.nextTurn}}"{{/if}}>{{localize "SPYCRAFT.Template.AppsGcConsole.NextTurn"}}</button>
+      <button type="button" data-action="previousTurn" data-tooltip="{{tips.previousTurn}}"{{#if shortcuts.previousTurn}}
+        aria-keyshortcuts="{{shortcuts.previousTurn}}"{{/if}}>{{localize "SPYCRAFT.Template.AppsGcConsole.PreviousTurn"}}</button>
       {{#if dice.current}}
-        <button type="button" data-action="actingSpendDice" data-combatant="{{combat.acting.id}}" data-tooltip="{{tips.spendDice}}"{{#if shortcuts.spendDice}} aria-keyshortcuts="{{shortcuts.spendDice}}"{{/if}}>{{localize "SPYCRAFT.Console.SpendDiceActing" dice=dice.value}}</button>{{/if}}
+        <button type="button" data-action="actingSpendDice" data-combatant="{{combat.acting.id}}" data-tooltip="{{tips.spendDice}}"{{#if shortcuts.spendDice}}
+          aria-keyshortcuts="{{shortcuts.spendDice}}"{{/if}}>{{localize "SPYCRAFT.Console.SpendDiceActing" dice=dice.value}}</button>{{/if}}
     </div>
     {{#if combat.surprise}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound"}} {{combat.surprise.winners}} {{localize "SPYCRAFT.Template.AppsGcConsole.Act"}}</p>{{/if}}
     {{#with combat.acting}}
@@ -25,22 +28,29 @@
         {{#if conditions}}<div class="gc-wide"><dt>{{localize "SPYCRAFT.Console.Conditions"}}</dt><dd>{{conditions}}</dd></div>{{/if}}
       </dl>
       {{#if weapons.length}}<p class="controls gc-weapons">{{#each weapons}}
-        <button type="button" data-action="actingAttack" data-id="{{id}}" data-combatant="{{../id}}" data-tooltip="{{tip}}"{{#if key}} aria-keyshortcuts="{{key}}"{{/if}}>{{localize "SPYCRAFT.Console.AttackWith" weapon=name}}{{#if facts}} <span class="gc-note">{{facts}}</span>{{/if}}</button>{{/each}}
+        <button type="button" data-action="actingAttack" data-id="{{id}}" data-combatant="{{../id}}" data-tooltip="{{tip}}"{{#if key}}
+          aria-keyshortcuts="{{key}}"{{/if}}>{{localize "SPYCRAFT.Console.AttackWith" weapon=name}}{{#if facts}} <span
+          class="gc-note">{{facts}}</span>{{/if}}</button>{{/each}}
         </p>{{/if}}
-      <p class="controls">{{#each @root.combat.mobs}}<button type="button" data-action="mobAttack" data-key="{{key}}"
-        data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}} aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button>{{#unless defeated}}
+      <p class="controls">{{#each @root.combat.mobs}}<button type="button" data-action="mobAttack" data-key="{{key}}"{{#if @root.shortcuts.mobAttack}}
+        aria-keyshortcuts="{{@root.shortcuts.mobAttack}}"{{/if}}
+        data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button
+          type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
+          aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button>{{#unless defeated}}
         <button type="button" data-action="actingDelay" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DelayHint'}}">{{localize "SPYCRAFT.Console.Delay"}}</button>
         <button type="button" data-action="actingReady" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.ReadyHint'}}">{{localize "SPYCRAFT.Console.Ready"}}</button>{{/unless}}</p>
       {{#unless defeated}}<details class="gc-more">
         <summary>{{localize "SPYCRAFT.Console.TurnActions"}}</summary>
-        <p class="controls"><button type="button" data-action="actingSpend" data-kind="half" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.SpendHalfHint'}}">{{localize "SPYCRAFT.Console.SpendHalf"}}</button>
+        <p class="controls"><button type="button" data-action="actingSpend" data-kind="half" data-combatant="{{id}}"
+          data-tooltip="{{localize 'SPYCRAFT.Console.SpendHalfHint'}}">{{localize "SPYCRAFT.Console.SpendHalf"}}</button>
           <button type="button" data-action="actingSpend" data-kind="full" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.SpendFullHint'}}">{{localize "SPYCRAFT.Console.SpendFull"}}</button>
           <button type="button" data-action="actingSpend" data-kind="reset" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.GiveBackHint'}}">{{localize "SPYCRAFT.Console.GiveBack"}}</button>{{#if standard}}
           <button type="button" data-action="actingDamageSave" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DamageSaveHint'}}">{{localize "SPYCRAFT.Console.DamageSave"}}</button>{{/if}}</p>
       </details>
       <details class="gc-more">
         <summary>{{localize "SPYCRAFT.Console.ActingOutcomes"}}</summary>
-        <p class="controls">{{#each outcomes}}<button type="button" data-action="actingOutcome" data-step="{{step}}" data-combatant="{{../id}}" data-tooltip="{{hint}}">{{localize label}}</button>{{/each}}</p>
+        <p class="controls">{{#each outcomes}}<button type="button" data-action="actingOutcome" data-step="{{step}}"
+          data-combatant="{{../id}}" data-tooltip="{{hint}}">{{localize label}}</button>{{/each}}</p>
       </details>{{/unless}}
     </section>
     {{/with}}
