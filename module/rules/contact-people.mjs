@@ -106,24 +106,31 @@ const sameContact = (a, b) =>
       .toLowerCase() && String(a ?? "").trim() !== "";
 
 /**
- * Shared contacts (p.459): when two characters have the same contact, the first to introduce its consultants and
- * specialists sets them for good. `others` lists [{ owner, contact }] from the other characters' sheets; the first
- * with people for a contact of the same name is the one who introduced them. A character reaches only the people
- * at or below the grade of their own relationship.
- * @returns {null|{owner: string, people: object[], reachable: object[], problems: string[]}}
+ * Shared contacts (p.459): when two characters have the same contact, the people one introduces are fixed for both.
+ * `others` lists [{ owner, contact }] from the other characters' sheets. Their people for a contact of the same name
+ * are pooled; a person only this sheet has is its own introduction and is kept, unless the pooled list and this
+ * sheet's extras together exceed what the best relationship allows, in which case the earlier introductions stand.
+ * A character reaches only the people at or below the grade of their own relationship.
+ * @returns {null|{owner: string, people: object[], reachable: object[], extras: object[], problems: string[]}}
  */
 export function sharedContactPeople(contact, others = []) {
-  const source = others.find(other => sameContact(other.contact?.name, contact?.name) && other.contact?.people?.length);
-  if (!source) return null;
+  const sources = others.filter(
+    other => sameContact(other.contact?.name, contact?.name) && other.contact?.people?.length
+  );
+  if (!sources.length) return null;
+  const key = person => `${person.kind}|${grade(person.grade)}|${person.skill ?? ""}|${person.ability ?? ""}`,
+    pooled = new Map();
+  for (const source of sources)
+    for (const person of source.contact.people) if (!pooled.has(key(person))) pooled.set(key(person), person);
   const rank = grade(contact?.rank),
-    people = source.contact.people,
+    people = [...pooled.values()],
     reachable = people.filter(person => grade(person.grade) <= rank).map(person => ({ ...person, summoned: "" })),
-    key = person => `${person.kind}|${grade(person.grade)}|${person.skill ?? ""}|${person.ability ?? ""}`,
-    theirs = new Set(people.map(key)),
+    extras = (contact?.people ?? []).filter(person => !pooled.has(key(person))),
+    most = Math.max(rank, ...sources.map(source => grade(source.contact.rank))),
     problems = [];
-  if ((contact?.people ?? []).some(person => !theirs.has(key(person))))
+  if (extras.length && people.length + extras.length > most)
     problems.push(
-      loc`${contact.name} is shared with ${source.owner}, who introduced its consultants and specialists first. Use theirs (p.459).`
+      loc`${contact.name} is shared with ${sources[0].owner}, who introduced its consultants and specialists first. Use theirs (p.459).`
     );
-  return { owner: source.owner, people, reachable, problems };
+  return { owner: sources.map(source => source.owner).join(", "), people, reachable, extras, problems };
 }

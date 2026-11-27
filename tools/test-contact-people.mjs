@@ -82,3 +82,14 @@ test("a shared contact's people come from whoever introduced them, within the re
   );
   assert.equal(differing.problems.length, 1);
 });
+
+test("a person introduced after the lists matched is kept, not overwritten by an older copy (p.459)", async () => {
+  const { sharedContactPeople } = await import("../module/rules/contact-people.mjs");
+  const first = { kind: "consultant", grade: 1, skill: "Analysis", ability: "" },
+    second = { kind: "specialist", grade: 2, skill: "", ability: "Behind the Scenes I" };
+  const shared = sharedContactPeople({ name: "Backstage", rank: 2, people: [first, second] }, [
+    { owner: "Ben", contact: { name: "Backstage", rank: 2, people: [first] } }
+  ]);
+  assert.deepEqual(shared.problems, []);
+  assert.deepEqual(shared.extras, [second]);
+});

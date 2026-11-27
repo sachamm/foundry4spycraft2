@@ -484,6 +484,13 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [180, senses.bonuses],
     [190, tracking.bonuses]
   ]);
+  // Omni-Competent (p.408) halves the penalties these entries bring too, not only the situational ones.
+  const halvePenalty = omniPenalty();
+  classEffects.bonuses = classEffects.bonuses.map(entry =>
+    Number(entry?.value) < 0 && halvePenalty(entry.value) !== entry.value
+      ? { ...entry, value: halvePenalty(entry.value) }
+      : entry
+  );
   const solutionEligible = tenSecondSolutionEligible(system, {
     checkKind: "skill",
     ability: selected,

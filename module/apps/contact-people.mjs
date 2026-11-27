@@ -99,10 +99,14 @@ async function shareContactPeople(actor, contacts, index, shared) {
       person.summoned
     ])
   );
-  contact.people = shared.reachable.map(person => ({
-    ...person,
-    summoned: kept.get(`${person.kind}|${person.grade}|${person.skill}|${person.ability}`) ?? ""
-  }));
+  // People only this sheet introduced are kept, unless they clash with the earlier introductions.
+  contact.people = [
+    ...shared.reachable.map(person => ({
+      ...person,
+      summoned: kept.get(`${person.kind}|${person.grade}|${person.skill}|${person.ability}`) ?? ""
+    })),
+    ...(shared.problems.length ? [] : shared.extras)
+  ];
   contacts[index] = contact;
   return actor.update({ "system.contacts": contacts });
 }

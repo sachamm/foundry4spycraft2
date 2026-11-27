@@ -232,3 +232,15 @@ test("Grapple: 2, 4 or 8 grapplers at most, by the target's Size (p.357)", () =>
     ""
   );
 });
+
+test("Omni-Competent halves the grapple penalties too (p.408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const plain = roll(state([])).total;
+  assert.equal(roll(state([]), { grappleSecondOpponent: true }).total, plain - 4);
+  setCampaignRulesSource(() => ({ halveSkillPenalties: true }));
+  try {
+    assert.equal(roll(state([]), { grappleSecondOpponent: true }).total, plain - 2);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+});

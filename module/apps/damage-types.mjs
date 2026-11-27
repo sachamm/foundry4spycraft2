@@ -76,22 +76,24 @@ async function condition(actor, id, rounds, label) {
 }
 
 /**
- * Record subdual damage through the ledger, so thresholds and the Fortitude save follow. Damage already reduced
- * (a fall works out its own DR) is recorded as it is; anything else meets the "other source" DR and resistance.
+ * Record subdual damage through the ledger, so thresholds and the Fortitude save follow. The amount is before
+ * defenses: the ledger applies the "other source" DR (doubled against subdual), less any armor piercing, then
+ * subdual resistance, once.
  */
-async function sufferSubdual(actor, amount, source, { net = false } = {}) {
+async function sufferSubdual(actor, amount, source, { armorPiercing = 0 } = {}) {
   if (!amount) return "";
   try {
     await applyAccumulatedDamage(actor, {
       source: `${source} [${foundry.utils.randomID(6)}]`,
       kind: "subdual",
       newDamage: amount,
-      ...(net
-        ? { damageMode: "net" }
-        : { damageMode: "subdualBeforeDefenses", attackKind: "other", armorPiercing: 0, armorPiercingAll: false }),
+      damageMode: "subdualBeforeDefenses",
+      attackKind: "other",
+      armorPiercing: Math.max(0, Math.trunc(Number(armorPiercing) || 0)),
+      armorPiercingAll: false,
       confirmed: true
     });
-    return loc`${amount} subdual damage recorded; roll any Fortitude save it calls for from the sheet.`;
+    return loc`${amount} subdual damage taken, before DR and subdual resistance; the sheet records what is left. Roll any Fortitude save it calls for from the sheet.`;
   } catch (error) {
     return loc`${amount} subdual damage could not be recorded (${esc(error.message)}); record it by hand.`;
   }
@@ -415,7 +417,8 @@ export async function sufferFall(actor, preset = {}) {
       loc`Fall of ${plan.feet} ft.: ${plan.formula} = ${roll.total}${outcome.landed ? loc`, less a quarter of the Falling check (${result})` : ""}${outcome.halved ? loc`, halved by Wire Fu` : ""}: ${outcome.damage} ${outcome.kind} damage, armor piercing ${plan.armorPiercing}.`
     ];
     const rolls = [roll.roll];
-    if (outcome.kind === "subdual") lines.push(await sufferSubdual(actor, outcome.net, loc`Falling`, { net: true }));
+    if (outcome.kind === "subdual")
+      lines.push(await sufferSubdual(actor, outcome.damage, loc`Falling`, { armorPiercing: plan.armorPiercing }));
     else {
       const loss = await sufferLethal(actor, outcome.net);
       lines.push(
