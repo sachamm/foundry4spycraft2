@@ -530,6 +530,11 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     const participatingCombat = () =>
       foundCombat === undefined ? (foundCombat = this.parent.participatingCombat ?? null) : foundCombat;
     this.actorUuid = this.parent.uuid;
+    this.favoredGearSessions = this.parent.flags?.spycraft2?.favoredGearSessions ?? {};
+    this.favoredGearForfeits = this.parent.flags?.spycraft2?.favoredGearForfeits ?? {};
+    this.favoredGearPendingSession = this.parent.flags?.spycraft2?.sessionDiceReset?.favoredGearPending
+      ? this.parent.flags.spycraft2.sessionDiceReset.session
+      : null;
     this.shakenState = shakenStateFromActor(this.parent);
     this.restraintReleaseReview = getRestraintReleaseReview(this.parent);
     this.pendingRestraintMoves = getPendingRestraintMoves(this.parent);
@@ -537,7 +542,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     this.baffledApplicationReview = getBaffledReview(this.parent);
     const items = this.parent.items
       .filter(i => !isResourceLock(i))
-      .map(i => ({ id: i.id, name: i.name, type: i.type, system: i.system }));
+      .map(i => ({ id: i.id, uuid: i.uuid, name: i.name, type: i.type, system: i.system }));
     const combat = this.defenseBoost?.combatId
       ? globalThis.game?.combats?.get?.(this.defenseBoost.combatId)
       : globalThis.game?.combat;

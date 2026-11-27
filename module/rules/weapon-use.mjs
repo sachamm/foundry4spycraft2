@@ -53,6 +53,7 @@ export function weaponUnavailable(weapon) {
 
 /** Possessions wait for the GC; mixed acquisition records need a review first. */
 export function possessionUnavailable(gear) {
+  if (gear.favoredGearUnavailableReason) return gear.favoredGearUnavailableReason;
   if (gear.possessionSource && !gear.possessionApproved)
     return loc`The GC must approve this Possession before it enters play (p.216).`;
   if (gear.possessionSource && (gear.pick || gear.reserveAcquisition))

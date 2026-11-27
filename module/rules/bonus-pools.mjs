@@ -3,6 +3,7 @@ import { shakenRules } from "./shaken.mjs";
 import { actionDiceGain, actionDieBoostPlan } from "./action-dice.mjs";
 import { validFortunatePool } from "./fortunate.mjs";
 import { loc } from "../i18n.mjs";
+import { favoredGearPoolStatus } from "./favored-gear-session.mjs";
 const epoch = (periods, key) => String(periods?.[key] ?? "initial");
 /** Bonus pools that may pay any action-die cost, each with its own expiry. */
 export const UNRESTRICTED_POOL_SOURCES = Object.freeze(["masterPlan", "strut", "adrenalineJunkie", "fortunate"]);
@@ -45,6 +46,8 @@ export function checkBonusPool(
   };
 }
 export function bonusPoolForCheck(system, id, message, { periods = system.usagePeriods } = {}) {
+  if (system.bonusActionDice?.[id]?.source === "favoredGear")
+    return favoredGearPoolStatus({ ...system, usagePeriods: periods }, id, { check: message?.flags?.spycraft2 });
   if (UNRESTRICTED_POOL_SOURCES.includes(system.bonusActionDice?.[id]?.source))
     return unrestrictedBonusPoolForCheck(system, id, message, { periods });
   const pool = system.bonusActionDice?.[id],
@@ -100,6 +103,19 @@ export function availableCheckBonusPools(system, message, periods = system.usage
     .map(id => bonusPoolForCheck(system, id, message, { periods }))
     .filter(pool => pool.available);
 }
+export function availableThreatBonusPools(system, message, periods = system.usagePeriods) {
+  return [
+    ...unrestrictedBonusPools(system, periods),
+    ...Object.keys(system.bonusActionDice ?? {})
+      .filter(id => system.bonusActionDice[id]?.source === "favoredGear")
+      .map(id =>
+        favoredGearPoolStatus({ ...system, usagePeriods: periods }, id, {
+          check: message?.flags?.spycraft2,
+          purpose: "threat"
+        })
+      )
+  ].filter(pool => pool.available);
+}
 
 /** Stuntman 8, p.81: one unrestricted session die per activated error, not per die spent. */
 export function hardKnocksGainPlan(system, check, { kind, careerDie = 4 } = {}) {
@@ -130,7 +146,7 @@ export function transferableCheckBonusPool(system, message, periods = system.usa
     { uuid: message.uuid ?? message.id, flags: { spycraft2: { ...check, criticalFailure: false } } },
     { periods }
   );
-  return pending.available ? pending : null;
+  return pending.available && pending.source !== "favoredGear" ? pending : null;
 }
 
 /** Schemer 8, p.79: fixed d4 bonus dice, one mission use, lost at scene end. */
@@ -304,13 +320,21 @@ export function actionDicePoolFingerprint(pool) {
             "combatantId",
             "combatRound",
             "nextHalfActionConfirmed",
-            "woundEventKey"
+            "woundEventKey",
+            "actorUuid",
+            "itemUuid",
+            "itemCaliber",
+            "missionCaliber",
+            "receiptId"
           ].map(k => [k, pool[k]])
         )
       : null
   );
 }
-export function actionDiceFundingContext(system, { bonusPoolId = "", periods = system.usagePeriods } = {}) {
+export function actionDiceFundingContext(
+  system,
+  { bonusPoolId = "", periods = system.usagePeriods, message = null, purpose = "" } = {}
+) {
   if (system.actionDieAwardReview?.needsReview)
     return { blocked: true, reason: loc`The GC must review the interrupted award before spending more action dice.` };
   if (system.actionDiceSettlementReview?.needsReview)
@@ -334,7 +358,13 @@ export function actionDiceFundingContext(system, { bonusPoolId = "", periods = s
       system: { ...system, actionDice: { ...ad, value: balance, die } }
     };
   }
-  const pool = unrestrictedBonusPoolStatus(system, bonusPoolId, { periods });
+  const pool =
+    purpose === "threat" && message && system.bonusActionDice?.[bonusPoolId]?.source === "favoredGear"
+      ? favoredGearPoolStatus({ ...system, usagePeriods: periods }, bonusPoolId, {
+          check: message.flags?.spycraft2,
+          purpose: "threat"
+        })
+      : unrestrictedBonusPoolStatus(system, bonusPoolId, { periods });
   if (!pool.available) return { blocked: true, reason: pool.reason };
   const threshold = Math.max(2, pool.die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
   return {
@@ -408,6 +438,13 @@ export function possessedActionDice(system, { periods = system.usagePeriods } = 
       if (status.needsReview) throw new Error(status.reason);
       if (status.available)
         sources.push({ id, source: pool.source, label: status.label, die: pool.die, count: status.available });
+      continue;
+    }
+    if (pool?.source === "favoredGear") {
+      const status = favoredGearPoolStatus({ ...system, usagePeriods: periods }, id);
+      if (status.needsReview) throw new Error(status.reason);
+      if (status.available)
+        sources.push({ id, source: pool.source, label: pool.label, die: pool.die, count: status.available });
       continue;
     }
     if (pool?.source === "iKnowWhatDoing") {

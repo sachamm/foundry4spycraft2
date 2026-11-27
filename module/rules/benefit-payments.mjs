@@ -11,7 +11,9 @@ export function actionDieBenefitQuote(
     surchargeBonusPoolId = "same",
     purpose = "Action-die benefit",
     allocations,
-    surchargeAllocations
+    surchargeAllocations,
+    benefit = "",
+    message = null
   } = {}
 ) {
   if (!Number.isSafeInteger(baseCost) || baseCost < 0)
@@ -42,20 +44,43 @@ export function actionDieBenefitQuote(
     const total = allocations.reduce((n, p) => n + (p?.count ?? NaN), 0);
     if (!Number.isSafeInteger(total) || total !== cost.cost)
       throw new Error(loc`Split contributions must total the final ${cost.cost}-die cost.`);
-    const parts = allocations.map(p => ({ bonusPoolId: p.bonusPoolId ?? "", count: p.count, scope: "general" })),
+    const restricted = p => system.bonusActionDice?.[p.bonusPoolId]?.source === "favoredGear";
+    if (allocations.filter(restricted).reduce((sum, p) => sum + p.count, 0) > baseCost)
+      throw Error(loc`Favored Gear dice cannot pay a Shaken surcharge.`);
+    const parts = allocations.map(p => ({
+        bonusPoolId: p.bonusPoolId ?? "",
+        count: p.count,
+        scope: benefit === "criticalSuccess" && restricted(p) ? "threat" : "general"
+      })),
       payment = multipartActionDicePlan(system, parts, {
         id: "benefitQuote",
         actorUuid: actor.uuid,
         periods: actor.usagePeriods,
+        message,
         purpose
       });
     return { ...cost, allocations: parts, payments: payment.payments };
   }
   if (!cost.cost) return { ...cost, allocations: [], payments: [] };
   const feeSource =
-    surchargeBonusPoolId === "same" || surchargeBonusPoolId === undefined ? bonusPoolId : surchargeBonusPoolId;
+    surchargeBonusPoolId === "same" || surchargeBonusPoolId === undefined
+      ? system.bonusActionDice?.[bonusPoolId]?.source === "favoredGear"
+        ? ""
+        : bonusPoolId
+      : surchargeBonusPoolId;
   const selected = [
-    ...(baseCost ? [{ bonusPoolId, count: baseCost, scope: "general" }] : []),
+    ...(baseCost
+      ? [
+          {
+            bonusPoolId,
+            count: baseCost,
+            scope:
+              benefit === "criticalSuccess" && system.bonusActionDice?.[bonusPoolId]?.source === "favoredGear"
+                ? "threat"
+                : "general"
+          }
+        ]
+      : []),
     ...(surchargeAllocations?.length
       ? surchargeAllocations.map(p => ({ bonusPoolId: p.bonusPoolId ?? "", count: p.count, scope: "surcharge" }))
       : cost.surcharge
@@ -66,6 +91,7 @@ export function actionDieBenefitQuote(
     id: "benefitQuote",
     actorUuid: actor.uuid,
     periods: actor.usagePeriods,
+    message,
     purpose
   });
   return { ...cost, allocations: selected, payments: payment.payments };

@@ -129,6 +129,9 @@ export async function startUsagePeriod(period) {
               previousSession: String(beforePeriods.session ?? "initial"),
               die: p.starting > 0 && p.die ? sessionGain(p.actor.system, p.starting).die : p.die,
               level: p.level ?? null,
+              ...([...(p.actor.items ?? [])].some(i => i.system?.possessionSource === "favoredGear")
+                ? { favoredGearPending: true }
+                : {}),
               at
             };
       }

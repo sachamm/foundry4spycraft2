@@ -13,6 +13,7 @@ import { resolveFallingDamage, recordUncontrolledFall } from "../../module/apps/
 import { rollEvidence } from "../../module/rules/outcomes.mjs";
 import { finishGearAcquisition } from "../../module/apps/gear-acquisition.mjs";
 import { manageCombatPersuasion } from "../../module/apps/gc/combat-persuasion.mjs";
+import { settleFavoredGearSession, reviewFavoredGearSession } from "../../module/apps/favored-gear-session.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -230,6 +231,75 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     content = prior;
   }
 });
+for (const review of [false, true])
+  test(`favored item ${review ? "history review" : "session settlement"} keeps its final choices reachable at 720px`, async ({
+    page
+  }) => {
+    const prior = content,
+      oldGame = globalThis.game,
+      oldConfig = globalThis.CONFIG,
+      oldRandom = foundry.utils.randomID;
+    try {
+      foundry.utils.randomID = () => "favoredlayout";
+      game = { user: { isGM: true, id: "gc" }, combats: [], settings: { get: () => ({}) } };
+      const items = Array.from({ length: 12 }, (_, i) => ({
+        uuid: `Actor.layout.Item.${i}`,
+        id: `item${i}`,
+        name: `Favored item ${i}`,
+        type: "gear",
+        system: { possessionSource: "favoredGear", possessionApproved: true, caliber: review ? 1 : 3 }
+      }));
+      const system = {
+        level: 9,
+        worldTime: 0,
+        activeFeatSelections: items.map(() => ({ name: "Favored Gear" })),
+        actionDice: { value: 30, die: 6 },
+        usagePeriods: { session: "layout", mission: "m" },
+        bonusActionDice: {}
+      };
+      const actor = {
+        uuid: "Actor.layout",
+        name: "Layout agent",
+        type: "agent",
+        isOwner: true,
+        items,
+        system,
+        actionDiceFundingSystem: system,
+        flags: {},
+        usagePeriods: system.usagePeriods,
+        async update(patch) {
+          for (const [path, value] of Object.entries(patch)) {
+            const keys = path.split(".");
+            let node = this;
+            for (const key of keys.slice(0, -1)) node = node[key] ??= {};
+            node[keys.at(-1)] = structuredClone(value);
+          }
+          return this;
+        }
+      };
+      CONFIG = { SPYCRAFT: { tables: { levels: { 9: { actionDie: 6 } } } } };
+      if (review) await reviewFavoredGearSession(actor, { missionCaliber: 2 });
+      else await settleFavoredGearSession(actor, { missionCaliber: 1, fresh: true });
+      await render(page, 720);
+      if (review) {
+        await page.locator('[name="access_11"]').selectOption("available");
+        await page.locator('[name="remaining_11"]').fill("1");
+        await page.locator('[name="note"]').fill("Actual balances verified");
+        await page.locator('[name="confirmed"]').check();
+      } else await page.locator('[name="choice_11"]').selectOption("forfeit");
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+      await page.locator("#confirm").click();
+      await expect(page.locator("#confirm")).toBeFocused();
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+      globalThis.CONFIG = oldConfig;
+      foundry.utils.randomID = oldRandom;
+    }
+  });
 test("combat persuasion side assignments remain reachable with a large cast at 720px", async ({ page }) => {
   const prior = content,
     oldGame = globalThis.game;

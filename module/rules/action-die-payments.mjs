@@ -90,7 +90,7 @@ export function multipartActionDicePlan(
       (bonusPoolId && !paymentIdValid(bonusPoolId)) ||
       !Number.isSafeInteger(count) ||
       count < 1 ||
-      !["general", "boost", "surcharge"].includes(scope)
+      !["general", "boost", "threat", "surcharge"].includes(scope)
     )
       throw new Error(loc`Choose whole positive amounts from valid action-die sources.`);
     let funding;
@@ -122,7 +122,12 @@ export function multipartActionDicePlan(
         if (check.actionDiceAllowed === false) throw new Error(loc`Ordinary action dice cannot fund this result.`);
         funding = actionDiceFundingContext(system, { periods });
       }
-    } else funding = actionDiceFundingContext(system, { bonusPoolId, periods });
+    } else
+      funding = actionDiceFundingContext(system, {
+        bonusPoolId,
+        periods,
+        ...(scope === "threat" ? { message, purpose: "threat" } : {})
+      });
     if (funding.blocked) throw new Error(funding.reason);
     const existing = groups.get(bonusPoolId),
       total = (existing?.count ?? 0) + count;

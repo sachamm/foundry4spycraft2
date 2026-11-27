@@ -25,6 +25,7 @@ import { knifeBasicsPlan } from "./knife-basics.mjs";
 import { swordBasicsPlan } from "./sword-basics.mjs";
 import { berserkerRageState } from "./berserker.mjs";
 import { favoredGearState, featPossessionWarnings } from "./favored-gear.mjs";
+import { favoredGearAccess } from "./favored-gear-session.mjs";
 import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { notTheFaceDR } from "./not-the-face.mjs";
@@ -206,7 +207,13 @@ function startPass(state) {
   const { sys, givenItems, cfg, options } = state;
   sys.cheapShotActive = cheapShotRecords(sys).filter(r => !r.recovered);
   sys.cheapShotSpeedPenalty = cheapShotSpeedPenalty(sys);
-  const allItems = givenItems.filter(i => !isResourceLock(i));
+  const allItems = givenItems
+    .filter(i => !isResourceLock(i))
+    .map(item => {
+      if (!["weapon", "armor", "gear"].includes(item.type)) return item;
+      const reason = favoredGearAccess(sys, item.uuid, item.system);
+      return reason ? { ...item, system: { ...item.system, favoredGearUnavailableReason: reason } } : item;
+    });
   const items = allItems.filter(i => !toolShedKitState(sys, i).expired);
   if (sys.shakenState?.sourceKind !== "effects") sys.shakenState = shakenStateFromContext(sys.conditionContext);
   const shaken = shakenRules(sys);

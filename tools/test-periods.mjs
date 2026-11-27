@@ -45,6 +45,14 @@ test("prepared Fortune Favors the Bold starting dice are reset once at each care
     assert.equal(plan.value, system.actionDice.max);
   }
 });
+test("session reset reserves the Favored Gear review before new-session item use", async () => {
+  reset();
+  game.actors[0].items = [{ system: { possessionSource: "favoredGear" } }];
+  await startUsagePeriod("session");
+  assert.equal(game.actors[0].flags.spycraft2.sessionDiceReset.favoredGearPending, true);
+  assert.equal(game.actors[0].flags.spycraft2.sessionDiceReset.session, periods.session);
+  assert.equal(game.actors[1].flags.spycraft2.sessionDiceReset.favoredGearPending, undefined);
+});
 function actor(id, value, max, type = "agent") {
   return {
     id,

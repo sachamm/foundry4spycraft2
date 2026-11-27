@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **9.2/10**;
+**Continuing review, 26 November 2026:** PC creation **9.3/10**;
 combat play **9.3/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -632,3 +632,33 @@ Regression tests prepare real engine characters in every career die band before
 building reset plans; native Foundry confirms a level-16 character retains six
 d12 dice in its reset plan, with no page errors or transaction diagnostics.
 This fixes the session boundary independently of the continuing Favored Gear work.
+
+Favored Gear's session rules now execute from session start and the Gear planning
+controls. The actual item and mission Calibers determine a separate item wallet,
+an ordinary-die discard or mission-long loss of access. The session reset marks
+unresolved choices before play; cancellation or a failed write retains the item
+hold. A durable actor receipt saves the balances and access together, and retries
+reuse that record. Restricted wallets fund only the item's skill boosts and
+threat activation; other items, attack/damage boosts, general costs and Shaken
+fees cannot use them. Fortune Favors the Bold applies once to each new wallet.
+
+GC history review records the original session context and actual remaining
+ordinary/item dice, preserves the previous records, retires the superseded
+wallets, and corrects access with an Undo note. It does not replay earlier fees
+or gains. Native Foundry verifies an item boost, a restricted critical payment,
+a one-die discard, preserved armor when paid, and removal of armor DR when
+forfeited while retaining class DR. It also verifies actual-history review after
+the wallet is spent. The native item snapshot now retains UUIDs: a qualifying
+Trademark Gear item is recognized for a two-die boost costing one wallet die.
+Both long dialogs remain keyboard reachable at 720px. All **4,106** tests,
+**988** fixture assertions and **232** layout tests pass, along with native
+schemas, lint, formatting, bundling and the text-copy check.
+
+Creation rises to **9.3/10**; combat remains **9.3/10**. Current dimensions are
+attributes/health 1.95, origins/classes 1.85, skill purchases 1.95, feats/training
+1.75 and gear/finalization 1.80 for creation; initiative/actions 1.90,
+attacks/Defense 1.90, damage/recovery 1.90, conditions/resources 1.85 and
+conditional options/environments 1.75 for combat. The remaining recommendations
+are the source audit and additional acquisition histories, current-session
+favored-item reselection after advancement, campaign-quality gaps, group combat
+actions, environmental rules and the remaining special options in the backlog.

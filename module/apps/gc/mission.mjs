@@ -1,5 +1,6 @@
 /** Mission record dialogs (pp.423–440): Threat Level, Caliber, objectives, complications, antagonists, exposure and rewards. */
 import { esc } from "../../html.mjs";
+import { settleFavoredGearSession } from "../favored-gear-session.mjs";
 import { refuse, decline } from "../../error-notices.mjs";
 import {
   threatLevel,
@@ -137,6 +138,8 @@ export async function beginSession() {
   await startUsagePeriod("session");
   await initializeGCDice({ playersPresent: players, caliber, replaceExisting: gcDiceStatus().current });
   await applySessionDiceAdjustments();
+  for (const actor of teamActors(getMission()))
+    await settleFavoredGearSession(actor, { missionCaliber: caliber, fresh: true });
   return true;
 }
 

@@ -1,4 +1,5 @@
 import { esc } from "../html.mjs";
+export { settleFavoredGearSession, reviewFavoredGearSession } from "./favored-gear-session.mjs";
 import { refuse, refuseStep } from "../error-notices.mjs";
 import { requestBenefitContext } from "../rules/requests.mjs";
 import { gearCheckPlan } from "../rules/gear-checks.mjs";

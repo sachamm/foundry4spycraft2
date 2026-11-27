@@ -1,6 +1,7 @@
 import { weaponDamageExpression } from "../rules/weapon-damage-expression.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
+import { favoredGearAccess } from "../rules/favored-gear-session.mjs";
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 const int = (initial = 0, opts = {}) =>
@@ -139,6 +140,23 @@ export class FeatData extends BaseItemData {
 }
 
 export class GearData extends BaseItemData {
+  get favoredGearUnavailableReason() {
+    const item = this.parent,
+      actor = item?.parent;
+    if (actor?.type !== "agent") return "";
+    return favoredGearAccess(
+      {
+        usagePeriods: actor.system.usagePeriods,
+        favoredGearSessions: actor.flags?.spycraft2?.favoredGearSessions,
+        favoredGearPendingSession: actor.flags?.spycraft2?.sessionDiceReset?.favoredGearPending
+          ? actor.flags.spycraft2.sessionDiceReset.session
+          : null,
+        favoredGearForfeits: actor.flags?.spycraft2?.favoredGearForfeits
+      },
+      item.uuid,
+      this
+    );
+  }
   static defineSchema() {
     return {
       ...super.defineSchema(),

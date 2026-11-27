@@ -22,6 +22,7 @@ import {
   actionDiceFundingContext,
   actionDicePoolFingerprint,
   unrestrictedBonusPools,
+  availableThreatBonusPools,
   bonusPoolForCheck,
   checkBonusBoostPlan,
   availableCheckBonusPools,
@@ -86,13 +87,13 @@ export const ActorOutcomes = Base =>
           );
         let input = options;
         if (!Object.keys(input).length || input.askOptions) {
-          const pools = availableCheckBonusPools(this.system, message, this.usagePeriods),
+          const pools = availableCheckBonusPools(this.actionDiceFundingSystem, message, this.usagePeriods),
             esc = foundry.utils.escapeHTML;
           input = await systemDialog.input({
             window: { title: loc`Boost result before its outcome is described` },
             rejectClose: false,
             content: `<div class="spycraft2-roll-options">
-          <label>${loc`Funding`} <select name="bonusPoolId"><option value="" ${!input.bonusPoolId ? "selected" : ""} ${check.actionDiceAllowed === false ? "disabled" : ""}>${loc`Ordinary action dice`}</option>${pools.map(pool => `<option value="${pool.id}" ${input.bonusPoolId === pool.id ? "selected" : ""}>${esc(pool.label)}: ${pool.remaining} d${pool.die}${pool.unrestricted ? ", until scene end" : ", this check only"}</option>`).join("")}</select></label>
+          <label>${loc`Funding`} <select name="bonusPoolId"><option value="" ${!input.bonusPoolId ? "selected" : ""} ${check.actionDiceAllowed === false ? "disabled" : ""}>${loc`Ordinary action dice`}</option>${pools.map(pool => `<option value="${pool.id}" ${input.bonusPoolId === pool.id ? "selected" : ""}>${esc(pool.label)}: ${pool.remaining} d${pool.die}, ${esc(pool.restrictionLabel ?? (pool.unrestricted ? loc`until scene end` : loc`this check only`))}</option>`).join("")}</select></label>
           ${
             currentShaken.extraDice
               ? `<p>${loc`Shaken surcharge: ${Math.max(0, currentShaken.extraDice - paidBoostSurcharge(this, message))} extra action dice for this check. Surcharge dice do not add to the result; later boosts of this check pay only any remaining surcharge.`}</p><label>${loc`Surcharge funding`} <select name="surchargeBonusPoolId"><option value="same">${loc`Boost source if unrestricted, otherwise ordinary dice`}</option><option value="">${loc`Ordinary action dice`}</option>${unrestrictedBonusPools(
@@ -127,7 +128,7 @@ export const ActorOutcomes = Base =>
         if (rollEvidence(check) !== expected)
           throw new Error(loc`This result changed while the boost was being prepared. Review the current result.`);
         const plan = input.bonusPoolId
-          ? checkBonusBoostPlan(this.system, message, {
+          ? checkBonusBoostPlan(this.actionDiceFundingSystem, message, {
               ...input,
               count: Number(input.count ?? 1),
               periods: this.usagePeriods
@@ -681,6 +682,14 @@ export const ActorOutcomes = Base =>
                 )
             )
             .join("");
+        const threatPoolOptions = fundingActors
+          .flatMap(a =>
+            availableThreatBonusPools(a.actionDiceFundingSystem, message, a.usagePeriods).map(
+              p =>
+                `<option value="${esc(a.uuid + "|" + p.id)}">${esc(a.name)} — ${esc(p.label)} (${p.available} d${p.die})</option>`
+            )
+          )
+          .join("");
         const errorOnly = check.errorConfirmed && !check.threatConfirmed,
           defaultGC = errorOnly && game.user?.isGM;
         input = await systemDialog.input({
@@ -713,13 +722,14 @@ export const ActorOutcomes = Base =>
         <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1 cost, minimum 0; one Chance-based session use)`}</label>
         </details>
         <details><summary>${loc`Pay from bonus dice or several wallets`}</summary>
-        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC action dice`}</option>${poolOptions}</select></label>
-        <label>${loc`Shaken surcharge funding`} <select name="feeFunding"><option value="same">${loc`Same source as the base cost`}</option><option value="">${loc`Paying character's ordinary dice`}</option>${poolOptions}</select></label>
+        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC action dice`}</option>${threatPoolOptions}</select></label>
+        <label>${loc`Shaken surcharge funding`} <select name="feeFunding"><option value="same">${loc`Base source if unrestricted, otherwise ordinary dice`}</option><option value="">${loc`Paying character's ordinary dice`}</option>${poolOptions}</select></label>
         <p>${loc`If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.`}</p>${fundingActors
           .map(
             a =>
-              `<label>${loc`${esc(a.name)}: ordinary dice (${a.system.actionDice?.value ?? 0})`} <input name="criticalFund_${a.id}" type="number" min="0" value="0" /></label>${unrestrictedBonusPools(
+              `<label>${loc`${esc(a.name)}: ordinary dice (${a.system.actionDice?.value ?? 0})`} <input name="criticalFund_${a.id}" type="number" min="0" value="0" /></label>${availableThreatBonusPools(
                 a.actionDiceFundingSystem,
+                message,
                 a.usagePeriods
               )
                 .filter(p => p.available)
@@ -736,7 +746,7 @@ export const ActorOutcomes = Base =>
         input.splitFunding = fundingActors
           .flatMap(a => [
             { actorUuid: a.uuid, bonusPoolId: "", count: Number(input["criticalFund_" + a.id] ?? 0) },
-            ...unrestrictedBonusPools(a.actionDiceFundingSystem, a.usagePeriods)
+            ...availableThreatBonusPools(a.actionDiceFundingSystem, message, a.usagePeriods)
               .filter(p => p.available)
               .map(p => ({
                 actorUuid: a.uuid,
@@ -823,7 +833,12 @@ export const ActorOutcomes = Base =>
         if (plan.cost && !allocations?.length) {
           const funding = useGC
             ? { blocked: false, balance: gcDiceStatus().value }
-            : actionDiceFundingContext(payer.actionDiceFundingSystem, { bonusPoolId, periods: payer.usagePeriods });
+            : actionDiceFundingContext(payer.actionDiceFundingSystem, {
+                bonusPoolId,
+                periods: payer.usagePeriods,
+                message,
+                purpose: plan.kind === "success" ? "threat" : ""
+              });
           if (funding.blocked) return refuseStep(funding.reason);
           if (plan.jinx) {
             if (plan.cost > funding.balance)

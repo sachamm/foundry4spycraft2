@@ -16,12 +16,24 @@ import { improvisationPlan } from "../../rules/class-gear.mjs";
 import { missionCaliberOptions, missionCaliberPlan } from "../../rules/mission-gear.mjs";
 import { masterThiefPlan } from "../../rules/class-checks.mjs";
 import { queueResources, isResourceLock } from "../../services/transactions.mjs";
-import { allocateMissionReserves, rollGearAcquisition, claimGearAcquisition } from "../../apps/gear-acquisition.mjs";
+import {
+  allocateMissionReserves,
+  rollGearAcquisition,
+  claimGearAcquisition,
+  settleFavoredGearSession,
+  reviewFavoredGearSession
+} from "../../apps/gear-acquisition.mjs";
 import { armorGrantPlan, bigStickPlan } from "../../rules/gear.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorGear = Base =>
   class ActorGear extends Base {
+    settleFavoredGearSession(options = {}) {
+      return settleFavoredGearSession(this, options);
+    }
+    reviewFavoredGearSession(options = {}) {
+      return reviewFavoredGearSession(this, options);
+    }
     async useMasterThief(options = {}) {
       if (this.type !== "agent" || !this.isOwner) throw new Error(loc`You must own the agent using Master Thief.`);
       let input = options;

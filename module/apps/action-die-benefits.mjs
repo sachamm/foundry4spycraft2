@@ -47,7 +47,9 @@ export async function payActionDieBenefitLocked(
       surchargeBonusPoolId,
       purpose,
       allocations,
-      surchargeAllocations
+      surchargeAllocations,
+      benefit,
+      message
     });
   } catch (error) {
     return refuse(error.message);
@@ -55,7 +57,8 @@ export async function payActionDieBenefitLocked(
   if (!quote.cost) return perform(null);
   const run = payment =>
     perform({ ...payment, baseCost, benefitCount, surcharge: quote.surcharge, cost: quote.cost, shakenSignature });
-  if (!quote.surcharge && !allocations?.length) return actor.payActionDiceLocked(baseCost, run, { bonusPoolId });
+  if (!quote.surcharge && !allocations?.length && !quote.allocations.some(p => p.scope === "threat"))
+    return actor.payActionDiceLocked(baseCost, run, { bonusPoolId });
   return actor.payMultipartActionDiceLocked(quote.allocations, run, {
     message,
     purpose,

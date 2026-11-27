@@ -312,6 +312,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         "selectArmorUseGear",
         "reviewReserveTransaction",
         "allocateMissionReserves",
+        "settleFavoredGearSession",
+        "reviewFavoredGearSession",
         "findImprovisedWeapon",
         "claimGearAcquisition",
         "recoverResourceTransaction",
@@ -1264,6 +1266,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.brightIdeaLegacy = brightStatus.needsReview;
     context.brightIdeaLegacyMalformed = brightStatus.legacyUsed === null;
     context.isGM = game.user.isGM;
+    context.favoredGearSessionControl =
+      game.user.isGM && this.actor.items.some(i => i.system?.possessionSource === "favoredGear");
+    context.favoredGearSessionLabel = loc`Settle favored items for session`;
+    context.canSettleFavoredGear = !Object.values(this.actor.flags?.spycraft2?.favoredGearSessions ?? {}).some(
+      r =>
+        r?.session === String(this.actor.usagePeriods?.session ?? "initial") &&
+        r.state === "complete" &&
+        r.actorUuid === this.actor.uuid
+    );
+    context.favoredGearReviewLabel = loc`Review favored item history`;
     context.hazards = hazardsView(this.actor);
     context.professor = sys.coreClassIds?.includes("scientist");
     context.trailblazer = sys.coreClassIds?.includes("scout");

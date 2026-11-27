@@ -60,6 +60,10 @@ export const ActorActionDice = Base =>
       return {
         ...this.system,
         ...this.attributeRuleContext,
+        actorUuid: this.uuid,
+        favoredGearSessions: this.flags?.spycraft2?.favoredGearSessions ?? {},
+        favoredGearForfeits: this.flags?.spycraft2?.favoredGearForfeits ?? {},
+        favoredGearSources: [...(this.items ?? [])].filter(i => ["weapon", "armor", "gear"].includes(i.type)),
         bonusPoolCombats: Object.fromEntries(
           [...(game.combats ?? [])].map(c => [c.id, { id: c.id, started: c.started, round: c.round }])
         ),
