@@ -159,8 +159,8 @@ test("Martial Arts counts as armed for Intimidate; Fortune Favors the Bold impro
   assert.doesNotMatch(plan.check.tags, /Gear \(weapon\)/);
   const { sessionGain } = await import("../module/services/periods.mjs");
   assert.deepEqual(sessionGain({ activeFeatNames: ["Fortune Favors the Bold"], actionDice: { die: 12 } }, 3), {
-    die: 6,
-    units: 6
+    die: 12,
+    units: 3
   });
   assert.equal(sessionGain({ activeFeatNames: [], actionDice: { die: 8 } }, 3).units, 3);
 });

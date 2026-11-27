@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { readFileSync } from "node:fs";
 import {
   sessionDicePlan,
   startUsagePeriod,
@@ -8,6 +11,40 @@ import {
   reviewUsagePeriod
 } from "../module/services/periods.mjs";
 let periods, review, gcPool, serial, failSetting, failActor, warnings;
+test("prepared Fortune Favors the Bold starting dice are reset once at each career die band", () => {
+  const definition = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))).find(
+    c => c.key === "soldier"
+  );
+  const cls = {
+    id: "soldier",
+    name: "Soldier",
+    type: "class",
+    system: { ...definition, identifier: "soldier", vitalityDie: 12 }
+  };
+  for (const [level, count, die] of [
+    [1, 3, 6],
+    [6, 4, 8],
+    [11, 5, 10],
+    [16, 6, 12],
+    [20, 6, 12]
+  ]) {
+    const system = computeAgent(
+      {
+        abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+        progression: Array.from({ length: level }, () => ({ classId: "soldier", vitality: 6, skills: {} })),
+        misc: {},
+        actionDice: { value: 0 }
+      },
+      [cls, { id: "bold", name: "Fortune Favors the Bold", type: "feat", system: { granted: true, bonuses: [] } }],
+      cfg
+    );
+    const prepared = { type: "agent", uuid: "Actor.bold", name: "Bold", system };
+    const plan = sessionDicePlan([prepared])[0];
+    assert.equal(plan.value, count, `L${level} count`);
+    assert.equal(plan.die, die, `L${level} die`);
+    assert.equal(plan.value, system.actionDice.max);
+  }
+});
 function actor(id, value, max, type = "agent") {
   return {
     id,

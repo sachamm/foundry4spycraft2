@@ -623,3 +623,12 @@ so that check establishes this sheet flow rather than general core compatibility
 at 720px. All **4,081** tests, **988** fixture assertions, native schemas, lint,
 formatting, bundling and the text-copy check pass. Creation rises to **9.2/10**;
 combat remains **9.3/10**. Broader source and option coverage remains outstanding.
+
+The Favored Gear audit found a separate starting-dice boundary error: session
+reset applied Fortune Favors the Bold to values the engine had already improved.
+At Career Level 16–20 that could turn the prepared six d12 starting dice into a
+twelve-die balance. Session reset now uses the prepared count and die unchanged.
+Regression tests prepare real engine characters in every career die band before
+building reset plans; native Foundry confirms a level-16 character retains six
+d12 dice in its reset plan, with no page errors or transaction diagnostics.
+This fixes the session boundary independently of the continuing Favored Gear work.

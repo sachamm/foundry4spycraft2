@@ -5,7 +5,6 @@ import { getReserveReview } from "../rules/reserve-transactions.mjs";
 import { getBaffledReview } from "../rules/baffled.mjs";
 import { queueResources, periodResourceActors } from "./transactions.mjs";
 import { withGCPeriodLock } from "./gc-dice.mjs";
-import { actionDiceGain } from "../rules/action-dice.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "../rules/equal.mjs";
 import { missionLevelSnapshot } from "../rules/advancement.mjs";
@@ -47,11 +46,10 @@ const individualReview = actor =>
   ["actionDieAwardReview", "actionDiceSettlementReview", "missionXPReview"].some(
     key => actor.flags?.spycraft2?.[key]?.needsReview
   );
-/** The session's starting dice as gained: Fortune Favors the Bold improves their type (a d12 becomes two d6). */
+/** The engine has already applied Fortune Favors the Bold to the prepared starting count and die. */
 export function sessionGain(system, starting) {
   const die = system?.actionDice?.die;
-  if (!starting || ![4, 6, 8, 10, 12].includes(die)) return { units: starting, die };
-  return actionDiceGain(system, die, starting);
+  return { units: starting, die };
 }
 /** p.27: discard old ordinary dice and use starting counts. */
 export function sessionDicePlan(actors) {
