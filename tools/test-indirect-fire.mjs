@@ -68,3 +68,10 @@ test("the attack term carries the cap, the bonus and a hang time note", () => {
   });
   assert.ok(failed.merge("blocked").length);
 });
+
+test("a forward observer's relay is a hard ceiling, even on a threat or with action dice (p.300)", async () => {
+  const { resolveSkillResult } = await import("../module/rules/checks.mjs");
+  assert.equal(resolveSkillResult(30, 20, { threat: 19, ceiling: 22 }).total, 22);
+  assert.equal(resolveSkillResult(18, 10, { actionDieBonus: 8, ceiling: 22 }).total, 22);
+  assert.equal(resolveSkillResult(18, 10, { actionDieBonus: 2, ceiling: 22 }).total, 20);
+});

@@ -94,6 +94,13 @@ export async function checkIncomingDefense(actor, known = {}) {
           .join("")
       ),
       raw(whirlingDefenseContent(actor)),
+      // Weapon Specialist Foibles (p.50): the attacking weapon's proficiency, whatever the attacker's feats.
+      raw(
+        actor.system.weaponSpecialist?.abilities?.includes("Foibles") &&
+          actor.system.weaponSpecialist.proficiencies?.length
+          ? `<label>${loc`Foibles: the attacking weapon's proficiency`} <select name="attackerProficiency"><option value="">${loc`Another proficiency or unknown`}</option>${actor.system.weaponSpecialist.proficiencies.map(key => `<option value="${esc(key)}"${known.attackerProficiency === key ? " selected" : ""}>${esc(CONFIG.SPYCRAFT?.proficiencies?.[key]?.label ?? key)}</option>`).join("")}</select></label>`
+          : ""
+      ),
       raw(
         Object.entries(fields)
           .map(
@@ -201,7 +208,8 @@ export async function checkIncomingDefense(actor, known = {}) {
           }
         : undefined,
       whirlingAttackerLevel: whirling.plan.attackerLevel,
-      attackerProficiency: source?.weapon?.system?.proficiency ?? "",
+      attackerProficiency:
+        source?.weapon?.system?.proficiency || input.attackerProficiency || known.attackerProficiency || "",
       ...Object.fromEntries(Object.keys(fields).map(k => [k, input[k] === true])),
       invisibleAttacker: input.invisibleAttacker === true || ghostCover?.invisible === true,
       coupDeGraceExceptionSource: input.coupDeGraceExceptionSource ?? ""

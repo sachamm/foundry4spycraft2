@@ -3,7 +3,7 @@ import { triumphResult } from "./campaign-rules.mjs";
 export function resolveSkillResult(
   rawTotal,
   naturalDie,
-  { cap = null, threat = 20, actionDieBonus = 0, succeeded = null, triumphAt = triumphResult() } = {}
+  { cap = null, threat = 20, actionDieBonus = 0, succeeded = null, triumphAt = triumphResult(), ceiling = null } = {}
 ) {
   // A missing outcome is provisional; a confirmed failure cannot retain threat/Triumph cap exceptions.
   const isThreat = succeeded !== false && threat > 0 && naturalDie >= threat;
@@ -13,7 +13,12 @@ export function resolveSkillResult(
   const triumph = succeeded !== false && rawTotal >= triumphAt;
   const base = capped && !isThreat && !triumph ? Math.min(rawTotal, numericCap) : rawTotal;
   // Action dice increase the capped result, rather than the otherwise discarded overflow.
-  const total = base + actionDieBonus;
+  // A hard ceiling (a forward observer's relayed result, p.300) holds whatever the die or action dice say.
+  const ceilingValue = Number(ceiling),
+    total =
+      ceiling !== null && ceiling !== undefined && Number.isFinite(ceilingValue)
+        ? Math.min(base + actionDieBonus, ceilingValue)
+        : base + actionDieBonus;
   return {
     rawTotal,
     total,

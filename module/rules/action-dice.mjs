@@ -111,7 +111,8 @@ export function actionDieBoostResult(check, plan, dieResults) {
     cap,
     threat: check.threat ?? 0,
     actionDieBonus: boostTotal,
-    triumphAt: triumphAt(check)
+    triumphAt: triumphAt(check),
+    ceiling: check.resultCeiling ?? null
   });
   const naturalOne = plan.betterLuck === true && plan.count === 1 && plan.rolls === 1 && Number(dieResults[0]) === 1;
   return {

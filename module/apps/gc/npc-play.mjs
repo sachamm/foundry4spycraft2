@@ -413,7 +413,10 @@ export async function manageDisposition(actor) {
         triumph: input.triumph === true
       });
       if (!plan.allowed) return refuse(plan.reason);
-      await actor.setFlag("spycraft2", "persuadedJoin", plan.record);
+      // An Undo note gives the attempt back if the GC recorded the wrong result or side.
+      await withUndo([actor], loc`Persuade to join: ${actor.name}`, () =>
+        actor.setFlag("spycraft2", "persuadedJoin", plan.record)
+      );
       const against = plan.needsTriumph ? loc`a Triumph` : loc`DC ${plan.dc}`;
       return say(
         actor,

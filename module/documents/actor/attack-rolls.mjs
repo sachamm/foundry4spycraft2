@@ -373,7 +373,8 @@ export const ActorAttackRolls = Base =>
           validateFinalAttack: options.validateFinalAttack,
           validateAttackContext,
           threat: threatAgainstRole(atk.threat, targetRole),
-          cap: atk.cap ?? null,
+          // A forward observer's relay is a hard ceiling, not a skill result cap (p.300).
+          resultCeiling: atk.cap ?? null,
           error: cunning?.error ?? atk.error,
           cunningPlan: cunning ?? !!options.cunningPlan,
           chooseTwice: millionDollar,

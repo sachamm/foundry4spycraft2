@@ -49,7 +49,8 @@ export async function gcBoostCard(message, actor) {
       cap: check.cap ?? null,
       threat: check.threat ?? 0,
       actionDieBonus: boostTotal,
-      triumphAt: triumphAt(check)
+      triumphAt: triumphAt(check),
+      ceiling: check.resultCeiling ?? null
     });
   await message.update({
     "flags.spycraft2.effectiveTotal": resolved.total,

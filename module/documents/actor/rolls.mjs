@@ -54,6 +54,7 @@ export const ActorRolls = Base =>
         threat = 20,
         error = 1,
         cap = null,
+        resultCeiling = null,
         rollMode,
         actionDiceAllowed = true,
         checkMethod = "roll",
@@ -342,7 +343,7 @@ export const ActorRolls = Base =>
       const normalThreat = threat;
       if (twenty) threat = 20;
       const rawTotal = roll.total + minimumAdjustment + (oldSchool?.bonus ?? 0),
-        resolved = resolveSkillResult(rawTotal, die, { cap, threat, triumphAt });
+        resolved = resolveSkillResult(rawTotal, die, { cap, threat, triumphAt, ceiling: resultCeiling });
       const rollCombat = this.participatingCombat,
         recordedCombat = rollCombat?.started ? this.mentalLeapCombatContext(rollCombat) : null;
       const shaken = shakenRules(this.system);
@@ -461,6 +462,7 @@ export const ActorRolls = Base =>
         threat,
         error,
         cap,
+        ...(resultCeiling !== null && resultCeiling !== undefined ? { resultCeiling } : {}),
         baseFlavor: flavor,
         boostTotal: 0,
         boostSpent: 0,

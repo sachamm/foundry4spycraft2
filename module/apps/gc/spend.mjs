@@ -114,7 +114,8 @@ export async function spendGCDice(input = {}) {
   const earlierBoosts =
     input.alreadyBoostedDC !== undefined
       ? Number(input.alreadyBoostedDC) || 0
-      : Number(scene.dcBoostsByCheck?.[dcKey]?.count) || 0;
+      : // Read again now the dialog is closed: a boost made while it was open counts too.
+        Number(getSceneState().dcBoostsByCheck?.[dcKey]?.count) || 0;
   let plan;
   try {
     if (quality) qualityAddition(quality.id, { scope: "spend", active: qualitiesInForce() });
