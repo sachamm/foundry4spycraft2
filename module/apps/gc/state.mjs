@@ -68,7 +68,7 @@ export function registerGCSettings() {
   // Set once every first-session step has been done, so the list does not return with each new mission. Each GC
   // keeps their own: a second GC joining a world still sees the list until they have done the steps.
   game.settings.register(SYSTEM, "gcFirstSessionDone", {
-    scope: "client",
+    scope: "user",
     config: false,
     type: Boolean,
     default: false

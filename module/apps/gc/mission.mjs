@@ -135,17 +135,38 @@ export async function beginSession() {
       : []),
     ...(fights ? [loc`A fight is running (${fights}).`] : []),
     loc`Start a new session: abilities usable once per session come back and each agent's action dice reset.`,
-    loc`GC action dice: player characters at the table + 2 × Caliber ${caliber} (team of ${players}: ${players + 2 * caliber}).`,
+    loc`GC action dice: player characters at the table + 2 × Caliber ${caliber}.`,
     loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
   ];
+  const gcDiceTotal = (present, cal) => loc`GC action dice: ${present} + 2 × ${cal} = ${present + 2 * cal}.`;
   // The GC's pool counts the player characters present this session, which can be fewer than the team (p.397).
-  const input = await ask(
-    loc`Begin a session`,
-    `<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>
-    <label>${loc`Player characters present`} <input type="number" name="present" min="1" value="${Math.max(1, players)}" /></label>`,
-    loc`Begin session`,
-    values => (Number(values.present) >= 1 ? "" : loc`At least one player character must be present.`)
-  );
+  const input = await formDialog({
+    title: loc`Begin a session`,
+    ok: loc`Begin session`,
+    fields: [
+      raw(`<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>
+    <label>${loc`Player characters present`} <input type="number" name="present" min="1"${players ? ` max="${players}"` : ""} value="${Math.max(1, players)}" /></label>
+    <p class="hint" data-gc-dice-total aria-live="polite">${esc(gcDiceTotal(players, caliber))}</p>`)
+    ],
+    validate: values =>
+      !(Number(values.present) >= 1)
+        ? loc`At least one player character must be present.`
+        : players && Number(values.present) > players
+          ? loc`The team has ${players} agents: no more than that can be present.`
+          : "",
+    dialog: {
+      // The total follows the number typed, so the GC sees the pool before beginning.
+      render: (event, app) => {
+        const root = app?.element ?? event?.target,
+          field = root?.querySelector?.('[name="present"]'),
+          total = root?.querySelector?.("[data-gc-dice-total]");
+        field?.addEventListener("input", () => {
+          const present = Math.max(0, Math.trunc(Number(field.value)) || 0);
+          if (total) total.textContent = gcDiceTotal(present, caliber);
+        });
+      }
+    }
+  });
   if (!input) return null;
   const present = Math.max(1, Math.trunc(Number(input.present)) || players || 1);
   await startUsagePeriod("session");
@@ -591,8 +612,17 @@ export async function addAntagonist({ uuid = "", another = false, dropped = null
 /** The key an NPC's type is listed under: an unlinked token's base actor, so its copies count once (p.398). */
 const typeKeyOf = actor => (actor.isToken ? (actor.token?.baseActor?.uuid ?? actor.uuid) : actor.uuid);
 /** Whether an antagonist row is this NPC's: by its type, or by the actor or token recorded. */
-const rowOf = actor => entry =>
-  entry.typeKey === actor.uuid || entry.uuid === actor.uuid || entry.typeKey === typeKeyOf(actor);
+// A world copy imported from a compendium matches a row recorded from that compendium entry, and the other way round.
+const sourceOf = actor => actor?._stats?.compendiumSource ?? actor?.baseActor?._stats?.compendiumSource ?? null;
+const rowOf = actor => entry => {
+  const source = sourceOf(actor);
+  return (
+    entry.typeKey === actor.uuid ||
+    entry.uuid === actor.uuid ||
+    entry.typeKey === typeKeyOf(actor) ||
+    (!!source && (entry.typeKey === source || entry.uuid === source))
+  );
+};
 
 /** This NPC's antagonist row on the mission's XP record, or null. */
 export const antagonistRowFor = actor => (actor ? (getMission().antagonists.find(rowOf(actor)) ?? null) : null);
@@ -1088,6 +1118,7 @@ export async function editSeasonQualities() {
       raw(
         `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward. Those in force are listed first.`}</p>
     <label>${loc`Find a quality`} <input name="qualitySearch" type="search" autocomplete="off" /></label>
+    <p class="hint" data-quality-count aria-live="polite"></p>
     <div class="sc2-scroll-list">${boxes}</div>`
       )
     ],
@@ -1097,11 +1128,28 @@ export async function editSeasonQualities() {
       render: (event, app) => {
         const root = app?.element ?? event?.target,
           search = root?.querySelector?.('[name="qualitySearch"]');
+        const count = root?.querySelector?.("[data-quality-count]");
+        const tally = () => {
+          const labels = [...root.querySelectorAll(".sc2-scroll-list > label")],
+            shown = labels.filter(label => !label.hidden).length,
+            ticked = labels.filter(label => label.querySelector("input")?.checked).length;
+          if (count)
+            count.textContent = shown
+              ? loc`${shown} shown · ${ticked} ticked`
+              : loc`No quality matches · ${ticked} ticked`;
+        };
+        // Enter in the search box searches; it does not save the dialog.
+        search?.addEventListener("keydown", event => {
+          if (event.key === "Enter") event.preventDefault();
+        });
         search?.addEventListener("input", () => {
           const words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
           for (const label of root.querySelectorAll(".sc2-scroll-list > label"))
             label.hidden = !words.every(word => label.textContent.toLowerCase().includes(word));
+          tally();
         });
+        root?.querySelector?.(".sc2-scroll-list")?.addEventListener("change", tally);
+        tally();
       }
     }
   });

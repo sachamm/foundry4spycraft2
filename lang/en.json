@@ -210,7 +210,7 @@
    "AddComplication": "Add complication",
    "RecordAntagonist": "Record for XP",
    "Shortcuts": "Keyboard shortcuts",
-   "ShortcutsLine": "Next turn {next} · Previous turn {previous} · Card next step {card} · GC boost {boost} · Spend dice {spend} · Acting sheet {sheet} · Console {console} · Mob attack {mob} · Attack with weapon 1 or 2: Alt+1, Alt+2. Holding Alt also lights every token's border on the map (Foundry's own highlight).",
+   "ShortcutsLine": "Next turn {next} · Previous turn {previous} · Card next step {card} · GC boost {boost} · Spend dice {spend} · Acting sheet {sheet} · Console {console} · Mob attack {mob} · Weapons {weapon1}, {weapon2}. Holding Alt also lights every token's border on the map (Foundry's own highlight); in some browsers Alt with a digit switches tabs, so rebind those keys if they clash.",
    "OpenWindow": "Open in a window",
    "OpenWindowHint": "Opens the console as a window, so the chat log stays in the sidebar",
    "AdjustPool": "Adjust or award GC dice…",
@@ -254,7 +254,8 @@
    "FightTools": "Fight tools",
    "HiddenCombatant": "Hidden from the players",
    "OpenControls": "Configure Controls…",
-   "ApplyDamageTo": "Card: apply damage to {target}"
+   "ApplyDamageTo": "Apply damage: {target}",
+   "NextUp": "Next: {name}"
   },
   "Ability": {
    "str": "Strength",

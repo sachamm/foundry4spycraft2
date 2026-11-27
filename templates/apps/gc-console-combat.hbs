@@ -21,6 +21,7 @@
       <h3>
         <button type="button" class="gc-row-button" data-action="openCombatant" data-id="{{id}}" data-sheet="true"
           data-tooltip="{{localize 'SPYCRAFT.Console.OpenCombatantHint'}}">{{name}}</button></h3>
+      {{#if next}}<p class="gc-note gc-next-up">{{localize "SPYCRAFT.Console.NextUp" name=next}}</p>{{/if}}
       <dl class="gc-acting-facts">
         {{#if defense}}<div><dt>{{localize "SPYCRAFT.Console.Defense"}}</dt><dd>{{defense}}</dd></div>{{/if}}
         <div><dt>{{localize "SPYCRAFT.Console.TurnLeft"}}</dt><dd>{{halfActions}}</dd></div>
@@ -35,7 +36,7 @@
       <p class="controls">{{#each @root.combat.mobs}}<button type="button" data-action="mobAttack" data-key="{{key}}"{{#if @root.shortcuts.mobAttack}}
         aria-keyshortcuts="{{@root.shortcuts.mobAttack}}"{{/if}}
         data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button
-          type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
+          type="button"{{#if applyTarget}} class="gc-apply-first"{{/if}} data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
           aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{#if applyTarget}}{{localize "SPYCRAFT.Console.ApplyDamageTo" target=applyTarget}}{{else}}{{localize "SPYCRAFT.Console.CardNextStep"}}{{/if}}</button>{{#unless defeated}}
         <button type="button" data-action="actingDelay" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DelayHint'}}">{{localize "SPYCRAFT.Console.Delay"}}</button>
         <button type="button" data-action="actingReady" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.ReadyHint'}}">{{localize "SPYCRAFT.Console.Ready"}}</button>{{/unless}}</p>

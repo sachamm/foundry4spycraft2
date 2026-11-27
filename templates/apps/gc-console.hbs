@@ -6,7 +6,7 @@
       class="sc2-value">{{status.mission}}</b><span class="gc-note">{{status.missionState}}</span></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.ScenePeriod"}}</span><b class="sc2-value">{{status.scene}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.GCActionDice"}}</span><b
-      class="sc2-value">{{status.dice}}</b>{{#if session.begun}}<span class="gc-note">{{localize "SPYCRAFT.Console.Session"}} {{status.session}}</span>{{/if}}</div>
+      class="sc2-value">{{status.dice}}</b>{{#if session.begun}}{{#unless mission.ended}}<span class="gc-note">{{localize "SPYCRAFT.Console.Session"}} {{status.session}}</span>{{/unless}}{{/if}}</div>
   </div>
   <div class="gc-views" role="group" aria-label="{{localize 'SPYCRAFT.Console.Views'}}">{{#each views}}
     <button type="button" data-action="consoleView" data-view="{{id}}" aria-pressed="{{active}}" data-tooltip="{{hint}}">{{label}}</button>{{/each}}{{#unless windowed}}
@@ -74,7 +74,7 @@
   <details class="gc-section" data-section="mission" data-view-hidden="{{hiddenSections.mission}}" data-state="{{sections.mission.state}}" {{#if sections.mission.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}{{#if mission.name}}: {{mission.name}}{{/if}} {{#if mission.active}}<span
       class="tag">{{localize "SPYCRAFT.Template.AppsGcConsole.Active"}}</span>{{else if mission.ended}}<span
-      class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span>{{else}}<span class="tag muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</span></summary>
+      class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span>{{/if}}</span></summary>
     <div class="gc-facts">
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b
         class="sc2-value">{{mission.threatLevel}}</b>{{#if mission.threatNote}}<span class="gc-note">{{mission.threatNote}}</span>{{/if}}</div>
@@ -254,7 +254,7 @@
       <button type="button" data-action="events">{{localize "SPYCRAFT.Template.AppsGcConsole.Events"}}</button>
       <button type="button" data-action="possessions">{{localize "SPYCRAFT.Template.AppsGcConsole.RandomPossessions"}}</button>
     <button type="button" data-action="npcKnowledge">{{localize "SPYCRAFT.Template.AppsGcConsole.NpcKnowledge"}}</button></p>
-    <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole mob=shortcuts.mobAttack}}
+    <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole mob=shortcuts.mobAttack weapon1=shortcuts.actingWeapon1 weapon2=shortcuts.actingWeapon2}}
       </p>
     <p class="controls"><button type="button" data-action="openControls">{{localize "SPYCRAFT.Console.OpenControls"}}</button></p>
   </details>

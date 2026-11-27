@@ -64,7 +64,7 @@ export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatS
     },
     {
       id: "combat",
-      label: loc`First combat: select the tokens, start a fight here, roll Initiative`,
+      label: loc`First combat: in Play, select the tokens, start a fight, roll Initiative`,
       done: !!combatSeen,
       action: "consoleView",
       button: loc`Go to Play`,
@@ -129,7 +129,15 @@ export function consoleSections({ missionActive, combat, conflictsRunning }, sto
  * The one filled button a view shows: the step the GC most likely takes next in that view and state.
  * @returns {string} the button's data-action (a checklist step uses "checklist")
  */
-export function primaryAction({ view, checklistShown, missionActive, missionEnded, diceCurrent, combat }) {
+export function primaryAction({
+  view,
+  checklistShown,
+  missionActive,
+  missionEnded,
+  diceCurrent,
+  combat,
+  settled = false
+}) {
   if (combat?.started) return "nextTurn";
   if (view === "prep")
     return checklistShown
@@ -139,7 +147,9 @@ export function primaryAction({ view, checklistShown, missionActive, missionEnde
         : missionEnded
           ? "planNextMission"
           : "startMission";
-  if (view === "wrap") return missionActive ? "endMission" : "missionReport";
+  // Once the mission has ended and every agent's standing is paid, what is left is the next mission.
+  if (view === "wrap")
+    return missionActive ? "endMission" : missionEnded && settled ? "planNextMission" : "missionReport";
   if (combat) return combat.unrolled ? "groupInitiative" : "nextTurn";
   // Between fights a session moves scene by scene; the dice are spent from the turn bar or the dice section.
   return diceCurrent ? "nextScene" : "beginSession";

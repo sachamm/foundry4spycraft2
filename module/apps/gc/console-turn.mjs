@@ -123,12 +123,29 @@ export function actingBlock(combat) {
       .map(item => weaponButton(actor, item)),
     // The newest card about this combatant is its damage, not yet applied: the next-step button says so.
     applyTarget: defeated ? "" : pendingDamageTarget(combatant),
+    // Who acts after this one, so the GC can look ahead without scrolling to the order.
+    next: nextUp(combat),
     outcomes: ACTING_OUTCOMES.map(([step, label]) => ({
       step,
       label: `${OUTCOME_KEY}${label}`,
       hint: OUTCOME_HINTS[step]
     }))
   };
+}
+
+/** The next combatant in the order who is not defeated, as "Name (Count)"; "" when there is none. */
+function nextUp(combat) {
+  const turns = [...(combat?.turns ?? [])],
+    at = turns.findIndex(entry => entry.id === combat?.combatant?.id);
+  if (at < 0) return "";
+  const labels = combatantLabels(combat);
+  for (let step = 1; step < turns.length; step++) {
+    const entry = turns[(at + step) % turns.length];
+    if (entry.isDefeated) continue;
+    const name = labels.get(entry.id) ?? entry.name;
+    return Number.isFinite(entry.initiative) ? `${name} (${entry.initiative})` : name;
+  }
+  return "";
 }
 
 /** The target named on this combatant's newest card when that card is damage nobody has applied yet; else "". */
@@ -177,7 +194,11 @@ export function combatRows(combat) {
     return {
       id: combatant.id,
       name: labels.get(combatant.id) ?? combatant.name,
-      img: combatant.img || combatant.token?.texture?.src || combatant.actor?.img || "",
+      // A video token image cannot sit in an <img>: the actor's portrait stands in.
+      img:
+        [combatant.img, combatant.token?.texture?.src, combatant.actor?.img].find(
+          src => src && !/\.(webm|mp4|m4v|ogv)$/i.test(src)
+        ) ?? "",
       // Hidden from the players in the tracker: marked here, so the GC knows the table cannot see it.
       hidden: !!combatant.hidden,
       current,

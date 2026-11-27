@@ -19,8 +19,7 @@ import {
   getSceneState,
   qualitiesInForce,
   currentCampaignEffects,
-  fixThreatLevel,
-  updateMission
+  fixThreatLevel
 } from "./state.mjs";
 import * as mission from "./mission.mjs";
 import * as spend from "./spend.mjs";
@@ -292,6 +291,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
   /** What the GC was looking at, kept across a redraw: the scroll position, the focused control and open sub-lists. */
   _preRender(context, options) {
+    // The row under the pointer is about to be replaced: its token is not left lit on the map.
+    this._clearHover();
     this._kept = captureConsoleState(this.element);
     // A keyboard press that opened a dialog left the focus on the page; the pressed control gets it back.
     if (this._kept && this._pressed && !this._kept.focus) this._kept.focus = this._pressed;
@@ -315,8 +316,11 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     // Combat rows follow the tracker: a double press opens the sheet, and the pointer over a row lights its token.
     for (const row of this.element.querySelectorAll('.gc-combat-rows [data-action="openCombatant"]')) {
       row.addEventListener("dblclick", () => turn.openCombatant(game.combat, row.dataset.id, { sheet: true }));
-      row.addEventListener("pointerenter", () => turn.hoverCombatant(game.combat, row.dataset.id, true));
-      row.addEventListener("pointerleave", () => turn.hoverCombatant(game.combat, row.dataset.id, false));
+      row.addEventListener("pointerenter", () => {
+        this._hovered = row.dataset.id;
+        turn.hoverCombatant(game.combat, row.dataset.id, true);
+      });
+      row.addEventListener("pointerleave", () => this._clearHover());
     }
     this._wireActorDrops();
     this._announceTurn(context);
@@ -324,6 +328,28 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
     restoreConsoleState(this.element, this._kept);
     this._kept = null;
+  }
+
+  _clearHover() {
+    if (this._hovered) turn.hoverCombatant(game.combat, this._hovered, false);
+    this._hovered = null;
+  }
+
+  async close(options) {
+    this._clearHover();
+    return super.close(options);
+  }
+
+  /** The window's place is kept as it moves, so a reload or a crash does not lose it. */
+  _onPosition(position) {
+    super._onPosition?.(position);
+    if (!this.isPopout || !game.user?.isGM) return;
+    clearTimeout(this._positionTimer);
+    this._positionTimer = setTimeout(() => {
+      const { left, top, width, height } = this.position ?? {};
+      if (Number.isFinite(left) && Number.isFinite(top))
+        game.settings.set("spycraft2", "gcConsolePosition", { left, top, width, height }).catch(() => null);
+    }, 400);
   }
 
   /**
@@ -585,6 +611,7 @@ export function consoleContext() {
       missionActive: !!m.active,
       missionEnded: !!m.ended,
       diceCurrent: !!dice.current,
+      settled: team.length > 0 && paid >= team.length,
       combat: combatNow
         ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length }
         : null
@@ -600,14 +627,23 @@ export function consoleContext() {
       spendDice: withKey(loc`Opens Spend dice with the acting NPC chosen`, "spendDice"),
       spendDiceAny: withKey(loc`Opens Spend dice: choose what the GC action dice buy and for whom`, "spendDice"),
       cardNextStep: withKey(
-        loc`Presses the main button (Roll damage, Apply) on this combatant's newest chat card, and says which. The key also presses your own newest card when this combatant has none waiting`,
+        loc`Their newest chat card: presses its main button (Roll damage, Apply) and says which. The key also presses your own newest card when this combatant has none waiting`,
         "cardPrimary"
       )
     },
     shortcuts: Object.fromEntries(
-      ["nextTurn", "previousTurn", "cardPrimary", "gcConsole", "gcBoost", "activeSheet", "spendDice", "mobAttack"].map(
-        id => [id, shortcutLabel(id)]
-      )
+      [
+        "nextTurn",
+        "previousTurn",
+        "cardPrimary",
+        "gcConsole",
+        "gcBoost",
+        "activeSheet",
+        "spendDice",
+        "mobAttack",
+        "actingWeapon1",
+        "actingWeapon2"
+      ].map(id => [id, shortcutLabel(id)])
     ),
     view,
     views: [
@@ -819,6 +855,19 @@ export function registerGCConsoleTab() {
   Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());
   for (const hook of ["createCombatant", "deleteCombatant", "updateCombatant"])
     Hooks.on(hook, combatant => viewed(combatant?.parent) && refreshSoon());
+  // A card about the acting combatant changes what its next-step button says (Apply damage to …).
+  const aboutFight = message => {
+    const speaker = message?.speaker ?? {};
+    return [...(game.combat?.combatants ?? [])].some(
+      combatant =>
+        (speaker.token && combatant.tokenId === speaker.token) ||
+        (!speaker.token && speaker.actor && combatant.actorId === speaker.actor)
+    );
+  };
+  for (const hook of ["createChatMessage", "updateChatMessage", "deleteChatMessage"])
+    Hooks.on(hook, message => {
+      if (game.user?.isGM && game.combat?.started && aboutFight(message)) refreshSoon();
+    });
   // Only a change the console shows: a flag-only write (a card's bookkeeping, a remembered choice) is not redrawn.
   Hooks.on("updateActor", (actor, changed) => {
     if (inFight(actor) && (changed?.system || changed?.name || changed?.img)) refreshSoon();

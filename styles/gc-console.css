@@ -699,3 +699,18 @@
   border: 0;
   border-radius: 2px;
 }
+
+/* Damage waiting on this combatant's card: its button leads the row at full width. */
+.gc-console-body details.gc-section .controls .gc-apply-first {
+  grid-column: 1 / -1;
+  order: -1;
+  font-weight: 700;
+}
+.gc-console-body .gc-next-up {
+  margin: 0 0 4px;
+}
+/* The acting name opens the sheet but reads as a heading, not a field. */
+.gc-console-body .gc-acting h3 .gc-row-button {
+  background: none;
+  border-color: transparent;
+}

@@ -9,7 +9,7 @@ import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
 import { cancellable, cancelButton, freeCancel, holdUntilValid } from "../dialog-kit.mjs";
 import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
-import { getMission, teamActors } from "./state.mjs";
+import { getMission, missionEpoch, teamActors } from "./state.mjs";
 import { minionSquad } from "../../rules/npc-qualities.mjs";
 import { postUndo } from "../undo.mjs";
 
@@ -300,7 +300,8 @@ export async function addNpcToScene({ uuid = null } = {}) {
   if (!typed && squad) done.push(loc`a Minion squad the team's size`);
   if (squad?.commander && corners.length > 1) done.push(loc`led by its Commander at Threat Level +2`);
   let joined = false,
-    combatants = null;
+    combatants = null,
+    recorded = null;
   if (input.join && fight) {
     // A fight deleted meanwhile leaves the tokens placed; the notice says they did not join.
     combatants = game.combats?.get?.(fight.id) ? await joinFight(fight, tokens).catch(() => null) : null;
@@ -309,7 +310,8 @@ export async function addNpcToScene({ uuid = null } = {}) {
   }
   if (input.record && !antagonistRecorded(actor)) {
     // An NPC that walks straight into a fight has been faced.
-    const entry = await recordAntagonist(actor, { encountered: joined });
+    recorded = await recordAntagonist(actor, { encountered: joined });
+    const entry = recorded;
     done.push(entry?.xp ? loc`recorded for mission XP` : loc`recorded for mission XP with 0 XP: enter its reward`);
   }
   // A type already on the list is faced once it walks into a fight.
@@ -317,6 +319,8 @@ export async function addNpcToScene({ uuid = null } = {}) {
   ui.notifications.info(`${done.join("; ")}.`);
   // A slip (the wrong NPC, too many) is taken back from the note: the tokens go, and their combatants with them.
   await postUndo(loc`Placed ${tokens.length} × ${actor.name}`, [], {
+    // The antagonist row this placing recorded goes too; a row that was there before stays.
+    ...(recorded ? { antagonist: { id: recorded.id, entry: null, period: missionEpoch() } } : {}),
     placedTokens: {
       scene: scene.id,
       ids: tokens.map(token => token.id),

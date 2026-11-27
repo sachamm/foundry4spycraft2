@@ -50,7 +50,9 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
 3. The **turn bar** at the top of the fight holds **Next turn** (Alt+N), **Previous turn** (Alt+P) and **Spend GC
    dice** with the acting NPC already chosen (Alt+D).
 4. On an NPC's turn, the acting block under it has an **Attack** button for each weapon, with its bonus and damage
-   (Shift-click with one target goes straight to hit or miss; Alt+1 and Alt+2 attack with the first two), then
+   (Shift-click with one target goes straight to hit or miss; Alt+1 and Alt+2 attack with the first two, and Alt+M
+   opens the mob attack for the acting mob; in some browsers Alt with a digit switches tabs, so rebind it in Configure
+   Controls if it clashes), then
    **Card: next step**, which presses the main button of that combatant's newest card and says which one, and
    **Delay** and **Ready**. Spending actions and the Damage save are under **Turn actions**. A player's turn is rolled
    from their own sheet; the card's top line names its state and its main button is the next step. During a fight
