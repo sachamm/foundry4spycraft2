@@ -25,7 +25,6 @@ execFileSync(process.execPath, ["--test", "--test-reporter=dot", join(ROOT, "too
 const base = JSON.parse(readFileSync(contextFile, "utf8"));
 const clone = value => JSON.parse(JSON.stringify(value));
 
-const VIEWS = { prep: "Prep", play: "Play", wrap: "Wrap-up" };
 function withView(context, view, combatStarted = false) {
   context.view = view;
   context.views = context.views.map(entry => ({ ...entry, active: entry.id === view }));
@@ -155,7 +154,7 @@ const measures = {};
 for (const [name, make] of Object.entries(scenarios)) {
   const context = make();
   const body = template(context);
-  for (const [frame, width, height] of [
+  for (const [frame, , height] of [
     ["sidebar", 300, 768],
     ["popout", 720, 800]
   ]) {
