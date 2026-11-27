@@ -1,9 +1,9 @@
 # PC creation and combat rules review
 
-**Expanded-review checkpoint, 26 November 2026:** PC creation **8.7/10**;
-combat play **8.5/10**. The requested **9.9/10 target is not met**. The original
-8/10 review is preserved below; the expanded findings and required remaining work
-follow it. Current branch: `codex/rules-completeness-99`, based on `475afa5`.
+**Continuing review, 26 November 2026:** PC creation **8.8/10**;
+combat play **8.9/10**. Implementation continues toward the requested **9.9/10**
+in both areas. Earlier reviews are preserved below; the latest pass follows them.
+Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
 Reviewed 26 November 2026 on `codex/rules-completeness`, starting from `cf911e2`
 (v0.8.7). An upstream fetch confirmed that revision was current on `origin/main`.
@@ -241,3 +241,54 @@ Required remaining recommendations before considering 9.9:
 
 The known gaps above prevent a defensible 9.9 score. This checkpoint does not
 claim completion of the requested higher target.
+
+## Continuing implementation and review
+
+The next review scores PC creation **8.8/10** and combat play **8.9/10**. Creation's
+gear/finalization dimension rises to 1.7/2 with enforced campaign affiliation;
+the other creation dimensions retain the preceding scores. Combat's conditions/
+resources dimension rises to 1.7/2 and conditional options/environments to 1.7/2;
+the other combat dimensions retain the preceding scores. These judgments remain
+bounded by the source-audit and native-play evidence still missing.
+
+Changes now exercised by regression workflows:
+
+- Bulletproof/Gritty modify actual critical-injury activation costs, including
+  custom injuries declared explicitly. Live cost revalidation also works for GC
+  payments and zero-cost effects. An additional full-suite failure exposed a GC
+  wallet lookup regression; it was corrected and the payment/refund tests pass.
+- Gunmen and Gladiators affect range/CQB calculations. Campaign range factors
+  combine with feat factors under the normal multiplier rule. Blockbuster uses
+  the same tripled blast increment in map previews and damage application.
+- Bottomless Clip bypasses spending and firing-action ammunition limits for PCs
+  and NPCs, preserving stored counts when the quality ends. Source reinspection
+  corrected the eligibility test from loaded capacity to printed stockpile size;
+  single-shot weapons with a qualifying stockpile are covered.
+- Blockbuster successful hazard saves prevent acid, explosive and first-round
+  vacuum damage and secondary effects. The recorded-save tool supports all three
+  save types, requires an explicit half-damage source declaration, and retains
+  Evasion's independent rules. Pending saves retain their original policy.
+- Faction/Freelance/Hybrid validate creation and gear acquisition. Mixed Hybrid
+  teams receive each character's standing currency; incompatible affiliations
+  and conflicting campaign policies stop payouts before paying anyone.
+- The user ruled that Fragile retains grade-built NPC Health-table vitality.
+  Special NPC sheets flag class-die exceptions for GC review.
+- Campaign Medicine error modifiers execute. Comedy of Errors affects tied
+  lowest attributes, take-10 timing and the maximum payment for a skill error,
+  including Shaken surcharges. Specific normal-time benefits remain available.
+- Campaign skill cards can resolve against a confirmed fixed source DC using
+  their recorded policy. The adjusted DC feeds outcome confirmation and class
+  automatic-success eligibility; the card records the arithmetic. Opposed checks
+  use the separate opposing-result workflow.
+
+All **3,969** Node regressions pass after these changes. The native schema/model
+checks, 13 pack checks, bundle, formatting and lint also pass; the allowed warning
+counts remain unchanged. The last full layout pass passed all 219 tests. This is
+standalone-harness evidence, not a native multiplayer session.
+
+The next implementation work is Feat Purchase and campaign gear Caliber handling.
+Remaining requirements also include Cakewalk Intel selections, other campaign
+effects, the specialist combat options listed above, Grapple benefit settlement,
+falling stress, special NPC conditions/damage, cover, durable trigger receipts,
+source-to-data auditing and native creation/combat play-throughs. The backlog
+remains the authoritative list. Work continues; neither score meets 9.9 yet.
