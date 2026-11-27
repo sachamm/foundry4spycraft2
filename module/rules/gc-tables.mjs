@@ -10650,7 +10650,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Player and special characters get +1 on top of any skill bonus granted by a target's favorable disposition.",
-   "effects": {}
+   "effects": {
+    "positiveDispositionBonus": 1
+   }
   },
   {
    "id": "elite-ops",

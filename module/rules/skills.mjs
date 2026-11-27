@@ -18,6 +18,7 @@ import { hideCircumstancePlan } from "./hide-circumstances.mjs";
 import { detectionObserverPlan } from "./detection-observer.mjs";
 import { hideMovementPlan } from "./hide-movement.mjs";
 import { targetSkillEffectPlan, targetSkillTimingPlan } from "./target-skill-effects.mjs";
+import { dispositionSkillPlan, dispositionTimingPlan } from "./disposition-skills.mjs";
 import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
 import "./threaten.mjs";
@@ -188,6 +189,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     targetSkillActorName = "",
     targetSkillConfirmed = false,
     targetSkillPurpose = "",
+    dispositionTarget = null,
     stanceDistanceFeet = null,
     hideMovement = false,
     hideDistanceFeet = 0,
@@ -289,6 +291,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     confirmed: targetSkillConfirmed,
     purpose: targetSkillPurpose
   });
+  const disposition = dispositionSkillPlan(system, key, check, dispositionTarget);
   const analysisTask = analysisTaskCheckPlan(system, key, check, {
     analysisTaskId,
     inCombat,
@@ -476,6 +479,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [110, appearancePlan.bonuses],
     [150, qualityChecks.bonuses],
     [155, campaignChecks.bonuses],
+    [156, disposition.bonus ? [{ source: "Disposition", type: "", value: disposition.bonus }] : []],
     [
       160,
       [
@@ -578,6 +582,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       detectionObserver.errorIncrease +
       hideMovementPlanResult.errorIncrease +
       targetSkillEffect.errorIncrease +
+      disposition.errorIncrease +
       (analysisTask.context?.pressureErrorIncrease ?? 0) +
       (contactFeat.errorIncrease ?? 0) +
       appearancePlan.errorIncrease +
@@ -630,6 +635,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
         : ""
     ],
     [150, targetSkillEffect.blockedReason],
+    [151, disposition.blockedReason],
     [
       200,
       analysisTask.context?.stage && method !== "roll"
@@ -744,6 +750,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     timing = skillTimingPlan({ method, time: listedTime, take10Base: campaign.take10Base ?? 2 });
   }
   timing = targetSkillTimingPlan(timing, targetSkillEffect);
+  timing = dispositionTimingPlan(timing, disposition);
   if (timing.blockedReason) blockedReasons.push(timing.blockedReason);
   const { timeMultiplier, minimumTimeSeconds, minimumTime } = timing;
   const requiredPreparationSeconds = ambush.applicable
@@ -813,6 +820,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     skillConditionCheckPenalty(conditionSystem, selected) +
     moralePenalty -
     shakenPenalty +
+    disposition.penalty +
     (isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0) +
     (hasForte ? 1 : 0) +
     armor +
@@ -980,6 +988,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [460, `${underwaterContext.notes.join(" ")} `],
     [470, `${qualityChecks.notes.join(" ")} `],
     [471, `${campaignChecks.notes.join(" ")} `],
+    [472, `${disposition.notes.join(" ")} `],
     [480, `${medical.notes.join(" ")} `],
     [490, `${details.notes.join(" ")} `],
     [500, `${skillTags.notes.join(" ")} `],
@@ -1061,6 +1070,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     detectionObserver: detectionObserver.evidence,
     hideMovement: hideMovementPlanResult.evidence,
     targetSkillEffect: targetSkillEffect.evidence,
+    dispositionSkill: disposition.evidence,
     stoneCold: stoneCold.evidence,
     analysisTask: analysisTask.context,
     trackingFeat: trackingFeatEvidence(system, key, check, {
@@ -1225,7 +1235,10 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     threat: taking
       ? 0
       : conditionalThreat
-        ? Math.max(1, conditionalThreat - ambush.threatIncrease - terms.sum("threatIncrease"))
+        ? Math.max(
+            1,
+            conditionalThreat - ambush.threatIncrease - terms.sum("threatIncrease") - disposition.threatIncrease
+          )
         : 0,
     error: taking ? 0 : error,
     cap: method === "take20" && attention ? null : cap,

@@ -6,6 +6,15 @@ const D = GC_DATA.core.disposition;
 export const DISPOSITIONS = D.grades;
 const index = id => D.grades.findIndex(grade => grade.id === id);
 export const dispositionGrade = id => D.grades[index(id)] ?? D.grades[index(D.default)];
+export function npcUsesSceneDisposition(system) {
+  const roles = ["minion", "henchman", "mastermind"];
+  return (
+    system.npcType === "villain" ||
+    (system.npcProfile?.enabled === true
+      ? (system.npcProfile.qualities ?? []).some(q => roles.includes(q.id))
+      : roles.includes(system.manualRole))
+  );
+}
 
 /** An NPC's disposition toward one character or group; anything not recorded is Neutral. */
 export function dispositionToward(record, targetId) {
@@ -15,7 +24,7 @@ export function dispositionToward(record, targetId) {
 /**
  * Shift by whole grades toward Helpful (+) or Adversarial (−).
  * No NPC may move more than 2 grades either way during one mission, and only one ability per
- * mission may shift it automatically. Villains ignore disposition altogether.
+ * mission may shift it automatically. Villains use scene effects instead of persistent grades (p.458).
  */
 export function shiftDisposition(
   record,
@@ -23,7 +32,7 @@ export function shiftDisposition(
   steps,
   { mission = "initial", automatic = false, villain = false } = {}
 ) {
-  if (villain) throw new Error(loc`Villains are immune to disposition effects (p.457).`);
+  if (villain) throw new Error(loc`Use the separate scene effects for a villain's disposition shift (p.458).`);
   if (!Number.isSafeInteger(steps) || steps === 0) throw new Error(loc`Enter a whole number of grades to shift.`);
   const current = record?.toward?.[targetId] ?? {};
   const sameMission = current.mission === mission;

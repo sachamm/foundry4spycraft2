@@ -74,6 +74,7 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
       const rule = Object.entries(CHECK_SECTIONS).find(([name]) => section.querySelector(`[name="${name}"]`));
       const relevant =
         rule?.[1].includes(check.value) ||
+        (section.querySelector('[name="dispositionTargetUuid"]') && /Disposition/.test(selected?.tags ?? "")) ||
         (section.querySelector('[name="gearStatus"]') && /Gear/.test(selected?.tags ?? ""));
       section.hidden = !!rule && !relevant;
       section.dataset.optionExcluded = String(!!rule && !relevant);

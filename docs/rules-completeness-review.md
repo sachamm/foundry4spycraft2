@@ -920,3 +920,33 @@ All **4,174** Node tests, **988** independent fixture assertions, **241** layout
 checks and **13** pack checks pass. Lint, formatting, bundling and copy checks
 pass with existing warnings. Scores remain **PC creation 9.4/10 and combat
 9.5/10**. Disposition effects and the other documented gaps remain under review.
+
+### Continuing pass: actual NPC disposition on PC skill checks
+
+A PC skill dialog can now select one readable NPC target and confirm its
+recorded disposition toward the acting character. The actual target document
+replaces caller-supplied records. Result, threat and error modifiers apply to
+the named Intimacy/Fondness uses; Disposition-tagged ordinary checks use the
+priority multiplier. Supportive uses an exact one-third multiplier, with reduced
+times rounded up. Diplomatic adds one only to a positive disposition bonus for
+an eligible acting character. Negative modifiers remain separate check penalties.
+
+Access checks precede private target reads. Posting guards bind the real acting
+character, named check, target, attitude and campaign bonus. Saved rolls retain
+their original evidence after an attitude changes. Villain roles are excluded
+from persistent-grade effects; their temporary scene rules remain separate.
+Misleading text that described villains as immune to all disposition effects
+was corrected to identify that distinction.
+
+The real Foundry Persuasion dialog selected Friendly attitude toward the actual
+PC, despite the NPC's Adversarial base attitude. Diplomatic changed `1d20 + 1`
+to `1d20 + 4`; threat began at 19 and priority was 0.5. A later attitude change
+left the card's original evidence intact. Native errors and diagnostics were
+empty. The applicable target controls stay beside the named check.
+
+All **4,179** Node tests, **988** independent fixture assertions, **242** layout
+checks and **13** pack checks pass; subsequent role/access regressions also pass.
+Lint, formatting, bundling and copy checks pass with existing warnings. Scores
+remain **PC creation 9.4/10 and combat 9.5/10**. NPC acting checks, the frozen
+combat-persuasion target handoff, combined timing and PC/villain scene effects
+remain explicit B-180 work. This pass does not claim those paths are complete.

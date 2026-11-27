@@ -412,7 +412,7 @@ export async function manageDisposition(actor) {
   const input = await ask(
     loc`${actor.name}: disposition`,
     `
-    ${villain ? `<p class="bad">${loc`Villains are immune to disposition effects (p.457); this record is for reference only.`}</p>` : ""}
+    ${villain ? `<p class="hint">${loc`Villains use temporary skill-check effects for disposition shifts (p.458). This grade record does not apply those scene effects.`}</p>` : ""}
     <p>${loc`No NPC shifts more than ${D.maxShiftPerMission} grades either way in one mission. Intimacy checks: ${esc(D.intimacyChecks.join(", "))}. Fondness checks: ${esc(D.fondnessChecks.join(", "))}.`}</p>
     <label>${loc`Toward`} <select name="target">${options(targets, "")}</select></label>
     <label>${loc`Action`} <select name="action">${options(

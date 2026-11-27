@@ -223,6 +223,45 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+test("actual NPC disposition target selection and confirmation remain reachable at720px", async ({ page }) => {
+  const prior = content,
+    oldGame = game;
+  try {
+    globalThis.game = {
+      ...oldGame,
+      user: { id: "gc", isGM: true },
+      actors: [
+        {
+          uuid: "Actor.disposition-target",
+          type: "npc",
+          name: "Actual target NPC",
+          isOwner: true,
+          system: { npcType: "special", disposition: { base: "friendly" } }
+        }
+      ]
+    };
+    const a = new SpycraftActor();
+    a.items = [];
+    a.system = {
+      skillTotals: { impress: { name: "Impress", ability: "cha", totals: [{ ability: "cha", total: 3 }] } }
+    };
+    await a.rollSkill("impress", "cha", { initialCheck: "persuasion" });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page
+      .getByRole("combobox", { name: "NPC disposition target", exact: true })
+      .selectOption("Actor.disposition-target");
+    await page.locator('[name="dispositionTargetConfirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("Paranoid NPC skill circumstances and roll confirmation remain reachable at720px", async ({ page }) => {
   const prior = content,
     oldGame = game;

@@ -12,7 +12,7 @@ import { tripAttackTargetInput } from "../../apps/trip-attack.mjs";
 import { feintTargetInput } from "../../apps/feint.mjs";
 import { tripDefenseTargetInput } from "../../apps/trip.mjs";
 import { detectionObserverContext } from "../../apps/detection-observer.mjs";
-import { targetSkillContext } from "../../apps/target-skill-effects.mjs";
+import { targetSkillContext, dispositionSkillContext } from "../../apps/target-skill-effects.mjs";
 import { oneHandManeuverUseProof } from "../../rules/maneuver-actions.mjs";
 import { actionDieBenefitQuote } from "../../rules/benefit-payments.mjs";
 import { surchargeFundingInput, unrolledPaymentFundingInput } from "../../apps/action-die-benefits.mjs";
@@ -33,6 +33,7 @@ import { knowledgeCheckBreakdown, skillCheckBreakdown } from "../../rules/bonus-
 
 /** Plan fields a skill check records as the rules returned them. */
 const SKILL_PLAN_FIELDS = [
+  "dispositionSkill",
   "campaignSkillChecks",
   "campaignSkillDCPolicy",
   "stalkingStance",
@@ -107,6 +108,7 @@ const SKILL_PLAN_FIELDS = [
 
 /** Plan fields whose sources have to be the same when the check is posted as when it was planned. */
 const GUARDED_SKILL_FIELDS = [
+  "dispositionSkill",
   "campaignSkillChecks",
   "stalkingStance",
   "feint",
@@ -260,6 +262,7 @@ export const ActorSkillRolls = Base =>
           ...tripAttackTargetInput(input, this, { key, check }),
           ...tripDefenseTargetInput(input, this, { key, check }),
           ...targetSkillContext(input, key),
+          ...dispositionSkillContext(input, key, this),
           ...detectionObserverContext(input),
           gearItem: gear,
           weaponWorkItem: workTarget(),
