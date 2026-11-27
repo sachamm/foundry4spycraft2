@@ -1615,5 +1615,31 @@ Schemas, lint, formatting, bundling and copy checks pass. A live form experiment
 using a qualified Advocate stalled during its Freelance setup before the form
 opened; it is not counted as successful native evidence. This verification gap
 remains in B-193 alongside the wider character/source audit.
+
+## Pass 54: special NPC typed damage and hazard threshold reports
+
+Both areas remain **9.6/10**. Weapon damage now routes every supported special
+damage type through the shared hazard rules for special NPCs, including stored
+acid, exposure and fire state. NPC cold, heat and electrical damage uses the
+same running totals and Fortitude-save reports as NPC weapon subdual damage.
+Stress caused by lethal hazards now produces its actual Will-save report,
+instead of a reminder to compare the total manually. The existing threshold
+resolver handles these reports, including Shaken and knockout duration.
+
+Source review also corrected typed armor piercing: cold and heat bypass
+character DR, electrical AP equals the original damage, and the weapon handoff
+retains automatic damage-type AP for its reduction. Shared subdual handling
+applies these rules for agents too. The extracted helper preserves existing
+weapon reports and agent ledgers. Duplicate typed-hit delivery is refused by
+the target's existing application receipt.
+
+Native grade-built special NPCs took fixed, actually recorded 14-point hits.
+Cold, heat and electrical each retained vitality, stored 14 subdual and their
+own exposure, and posted Fortitude DC 12. Laser lost 14 vitality, stored 3 stress
+and posted Will DC 12. No browser errors or diagnostics occurred. All **4,326**
+Node tests, **988** fixture assertions and **267** layouts pass; schema, lint,
+formatting, bundling and copy checks pass. Standard-NPC typed damage, hazard
+secondary-effect timing, Drained, broader resistance/ability coverage and the
+remaining combat gaps still prevent the requested score.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.

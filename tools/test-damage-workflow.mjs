@@ -73,6 +73,7 @@ const set = (object, path, value) => {
   for (const key of keys.slice(0, -1)) at = at[key] ??= {};
   const last = keys.at(-1);
   if (last.startsWith("-=")) delete at[last.slice(2)];
+  else if (last.startsWith("==")) at[last.slice(2)] = value;
   else at[last] = value;
 };
 const document = data => ({
@@ -604,6 +605,51 @@ test("a special NPC's stress and subdual damage is totalled and its threshold sa
   assert.equal(stressSave.stressGrade, 1);
   assert.equal(stressSave.failureOutcome, "Shaken I");
   assert.equal(typeof stressSave.eventId, "string");
+});
+
+test("special NPC weapon hazards keep typed damage, exposure and executable threshold saves", async () => {
+  for (const type of ["cold", "heat", "electrical"]) {
+    reset();
+    const boss = character(`Typed-${type}`, {
+      vitality: { value: 30, max: 30 },
+      wounds: { value: 10, max: 10 },
+      abilities: { con: { value: 10 }, wis: { value: 10 } },
+      npcType: "special",
+      dr: 5
+    });
+    boss.type = "npc";
+    const damage = card(`typed-${type}`, { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+    await applyDamage(damage, { targetUuid: boss.uuid, damage: 14, kind: "lethal", type });
+    assert.equal(boss.system.vitality.value, 30, `${type} is subdual`);
+    assert.equal(nonLethalTotals(boss).subdual, 14, `${type} applies its own AP before doubled subdual DR`);
+    assert.equal(boss.system.hazards.exposure.type, type);
+    const report = posted.find(m => m.flags?.spycraft2?.pendingSave);
+    assert.equal(report.flags.spycraft2.pendingSave.saveKey, "fort");
+    assert.equal(report.flags.spycraft2.pendingSave.dc, 12);
+    const before = posted.length;
+    await assert.rejects(
+      applyDamage(damage, { targetUuid: boss.uuid, damage: 14, kind: "lethal", type }),
+      /already reached/
+    );
+    assert.equal(posted.length, before, "the delivered typed hit cannot repeat");
+    assert.equal(nonLethalTotals(boss).subdual, 14);
+  }
+});
+
+test("special NPC lethal hazards also produce stress threshold save reports", async () => {
+  reset();
+  const boss = character("Typed-laser", {
+    vitality: { value: 60, max: 60 },
+    wounds: { value: 10, max: 10 },
+    abilities: { con: { value: 10 }, wis: { value: 2 } },
+    npcType: "special"
+  });
+  boss.type = "npc";
+  const damage = card("typed-laser", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+  await applyDamage(damage, { targetUuid: boss.uuid, damage: 14, kind: "lethal", type: "laser" });
+  assert.equal(boss.system.vitality.value, 46);
+  assert.equal(nonLethalTotals(boss).stress, 3);
+  assert.equal(posted.find(m => m.flags?.spycraft2?.pendingSave)?.flags.spycraft2.pendingSave.saveKey, "will");
 });
 
 test("a blast is applied to each character caught, halved by distance", async () => {

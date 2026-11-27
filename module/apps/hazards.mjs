@@ -30,6 +30,7 @@ import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS } from "../rules/damage-types.mjs";
 import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { postNonLethalDamage } from "./nonlethal-damage.mjs";
 import { markCard } from "./gc-relay.mjs";
 import { setCondition, woundConditions } from "./wound-conditions.mjs";
 import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
@@ -149,10 +150,8 @@ export async function sufferStress(actor, amount, source, damageMode = "stressBe
       return campaignStressPolicy(actor.system.campaignEffects)
         ? loc`${amount} stress damage after campaign modifiers: roll the Damage save and mark that these modifiers are already included.`
         : loc`${amount} stress damage: roll the Damage save for it.`;
-    const totals = actor.flags?.spycraft2?.nonLethal ?? {},
-      stress = Math.max(0, Math.trunc(Number(totals.stress) || 0)) + amount;
-    await actor.update({ "flags.spycraft2.nonLethal.stress": stress });
-    return loc`${amount} stress damage: ${stress} in all. Check it against the stress threshold.`;
+    await postNonLethalDamage(actor, "stress", amount, source, { campaignStressAdjusted: true });
+    return loc`${amount} stress damage recorded; any required Will save is on its damage report.`;
   }
   try {
     await applyAccumulatedDamage(actor, {

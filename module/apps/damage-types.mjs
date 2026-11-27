@@ -49,6 +49,7 @@ import {
   writeHazards
 } from "./hazards.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { postNonLethalDamage } from "./nonlethal-damage.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
@@ -83,14 +84,19 @@ async function condition(actor, id, rounds, label) {
 }
 
 /** Record subdual damage through the ledger, so thresholds and the Fortitude save follow. */
-async function sufferSubdual(actor, amount, source) {
+async function sufferSubdual(actor, amount, source, defenses = {}) {
   if (!amount) return "";
+  if (actor.type === "npc" && Number(actor.system.vitality?.max) > 0) {
+    await postNonLethalDamage(actor, "subdual", amount, source, defenses);
+    return loc`${amount} subdual damage recorded; any required Fortitude save is on its damage report.`;
+  }
   try {
     await applyAccumulatedDamage(actor, {
       source: `${source} [${foundry.utils.randomID(6)}]`,
       kind: "subdual",
       newDamage: amount,
       damageMode: "subdualBeforeDefenses",
+      ...defenses,
       confirmed: true
     });
     return loc`${amount} subdual damage recorded; roll any Fortitude save it calls for from the sheet.`;
@@ -328,7 +334,7 @@ async function applyVacuum(actor, damage, source, rolls = []) {
 }
 
 async function sufferSurroundings(actor, type, { amount, source, temperature, medium, armor }) {
-  const lines = [await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS[type])];
+  const lines = [await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS[type], { armorPiercingAll: true })];
   let interval = null;
   if (temperature !== undefined && temperature !== null && String(temperature).trim() !== "") {
     interval = exposureInterval(type, Number(temperature), medium ?? "air");
@@ -352,7 +358,7 @@ async function sufferSurroundings(actor, type, { amount, source, temperature, me
 
 async function sufferElectrical(actor, { amount, source }) {
   const lines = [
-    await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS.electrical),
+    await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS.electrical, { armorPiercing: amount }),
     loc`If that Fortitude save fails, use "Failed save" on the sheet: nauseated for 1d6 rounds and Initiative Count −${Math.floor(amount / 2)}.`
   ];
   // Electrical injuries count a single attack, so each attack is its own source.
