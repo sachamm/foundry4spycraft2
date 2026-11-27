@@ -1074,7 +1074,7 @@ export function damageCardTarget(check) {
 }
 
 /** Characters targeted on the canvas that damage can be applied to (this user's own, or any through the GC). */
-const targetedForDamage = () =>
+export const targetedForDamage = () =>
   values(game.user?.targets)
     .map(token => token.actor)
     .filter(actor => actor && TARGET_TYPES.includes(actor.type) && (actor.isOwner || gcAvailable()));

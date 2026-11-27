@@ -611,7 +611,7 @@ export function consoleContext() {
       missionActive: !!m.active,
       missionEnded: !!m.ended,
       diceCurrent: !!dice.current,
-      settled: team.length > 0 && paid >= team.length,
+      settled: !!m.reportPosted && team.length > 0 && paid >= team.length,
       combat: combatNow
         ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length }
         : null
@@ -672,11 +672,13 @@ export function consoleContext() {
           ? loc`Dramatic`
           : loc`Standard`,
       // Awards can take the pool past its starting number; "left of" would then read oddly.
-      dice: !dice.current
-        ? loc`none until Begin session`
-        : dice.value > starting
-          ? loc`${dice.value} left`
-          : loc`${dice.value} left of ${starting}`,
+      dice: m.ended
+        ? loc`mission ended`
+        : !dice.current
+          ? loc`none until Begin session`
+          : dice.value > starting
+            ? loc`${dice.value} left`
+            : loc`${dice.value} left of ${starting}`,
       session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
     },
     wrap: {
@@ -856,18 +858,21 @@ export function registerGCConsoleTab() {
   for (const hook of ["createCombatant", "deleteCombatant", "updateCombatant"])
     Hooks.on(hook, combatant => viewed(combatant?.parent) && refreshSoon());
   // A card about the acting combatant changes what its next-step button says (Apply damage to …).
+  // Only the acting combatant's cards: the console names no one else's.
   const aboutFight = message => {
-    const speaker = message?.speaker ?? {};
-    return [...(game.combat?.combatants ?? [])].some(
-      combatant =>
-        (speaker.token && combatant.tokenId === speaker.token) ||
-        (!speaker.token && speaker.actor && combatant.actorId === speaker.actor)
-    );
+    const speaker = message?.speaker ?? {},
+      acting = game.combat?.combatant;
+    if (!acting) return false;
+    return speaker.token ? acting.tokenId === speaker.token : !!speaker.actor && acting.actorId === speaker.actor;
   };
   for (const hook of ["createChatMessage", "updateChatMessage", "deleteChatMessage"])
     Hooks.on(hook, message => {
       if (game.user?.isGM && game.combat?.started && aboutFight(message)) refreshSoon();
     });
+  // The GC's own targets decide whom Apply damage names, so a change of target redraws during a fight.
+  Hooks.on("targetToken", user => {
+    if (user?.isSelf && game.user?.isGM && game.combat?.started) refreshSoon();
+  });
   // Only a change the console shows: a flag-only write (a card's bookkeeping, a remembered choice) is not redrawn.
   Hooks.on("updateActor", (actor, changed) => {
     if (inFight(actor) && (changed?.system || changed?.name || changed?.img)) refreshSoon();

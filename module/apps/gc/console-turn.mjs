@@ -7,7 +7,7 @@ import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { quickAttackHasTarget, quickAttackOptions, skipDialog } from "../remembered-choices.mjs";
-import { damageCardTarget, resolveQuickAttack } from "../damage-application.mjs";
+import { damageCardTarget, resolveQuickAttack, targetedForDamage } from "../damage-application.mjs";
 import { appliedDamageEntries } from "../../rules/damage-application.mjs";
 import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
 import { combatantLabels, halfActionsLeft, markActionSpent, trackerRowStates } from "./combat.mjs";
@@ -143,7 +143,7 @@ function nextUp(combat) {
     const entry = turns[(at + step) % turns.length];
     if (entry.isDefeated) continue;
     const name = labels.get(entry.id) ?? entry.name;
-    return Number.isFinite(entry.initiative) ? `${name} (${entry.initiative})` : name;
+    return Number.isFinite(entry.initiative) ? loc`${name} · count ${entry.initiative}` : name;
   }
   return "";
 }
@@ -157,9 +157,14 @@ export function pendingDamageTarget(combatant) {
     (!message.speaker?.token && actorId && message.speaker?.actor === actorId);
   const newest = [...(globalThis.game?.messages ?? [])].reverse().find(about);
   const check = newest?.flags?.spycraft2;
-  if (check?.checkKind !== "damage" || check.superseded || appliedDamageEntries(check).length) return "";
+  if (check?.checkKind !== "damage" || check.superseded) return "";
+  // The same choice the card's own main button makes: several targeted tokens get one press each, else the named one.
   try {
-    return damageCardTarget(check)?.name ?? "";
+    const targeted = targetedForDamage();
+    if (targeted.length > 1) return loc`${targeted.length} targets`;
+    const named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
+    const applied = appliedDamageEntries(check);
+    return named && !applied.some(entry => entry.targetUuid === named.uuid) ? named.name : "";
   } catch {
     return "";
   }

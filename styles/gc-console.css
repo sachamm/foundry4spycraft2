@@ -69,6 +69,13 @@
 .gc-console-body h3 {
   margin: 0.6em 0 0.2em;
 }
+/* In the pop-out the sheets' section bar would box every console heading like a field; here they are plain text. */
+.spycraft2.application .gc-console-body h3 {
+  color: inherit;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
 .gc-console-body h2 button,
 .gc-console-body h3 button {
   width: auto;
@@ -703,7 +710,6 @@
 /* Damage waiting on this combatant's card: its button leads the row at full width. */
 .gc-console-body details.gc-section .controls .gc-apply-first {
   grid-column: 1 / -1;
-  order: -1;
   font-weight: 700;
 }
 .gc-console-body .gc-next-up {
@@ -713,4 +719,7 @@
 .gc-console-body .gc-acting h3 .gc-row-button {
   background: none;
   border-color: transparent;
+}
+.gc-console-body .gc-acting h3 .gc-row-button:hover {
+  text-decoration: underline;
 }

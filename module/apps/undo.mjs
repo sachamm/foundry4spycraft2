@@ -349,7 +349,9 @@ async function undoRecord(message, record) {
       mine = entry => entry.id === id;
     if (period !== undefined && period !== missionEpoch())
       ui.notifications.warn(
-        loc`The NPC was put back, but a later mission has begun, so its antagonist row was left as it is.`
+        record.placedTokens
+          ? loc`The placed tokens were taken off, but a later mission has begun, so the antagonist row was kept.`
+          : loc`The NPC was put back, but a later mission has begun, so its antagonist row was left as it is.`
       );
     else if ((getMission().antagonists ?? []).some(mine))
       await updateMission(now => ({

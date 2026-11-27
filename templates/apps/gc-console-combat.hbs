@@ -33,11 +33,15 @@
           aria-keyshortcuts="{{key}}"{{/if}}>{{localize "SPYCRAFT.Console.AttackWith" weapon=name}}{{#if facts}} <span
           class="gc-note">{{facts}}</span>{{/if}}</button>{{/each}}
         </p>{{/if}}
-      <p class="controls">{{#each @root.combat.mobs}}<button type="button" data-action="mobAttack" data-key="{{key}}"{{#if @root.shortcuts.mobAttack}}
+      {{!-- Damage waiting puts the card button first, in the DOM too, so Tab order matches what the GC sees. --}}
+      <p class="controls">{{#if applyTarget}}<button type="button" class="gc-apply-first" data-action="cardNextStep"
+        data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
+          aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.ApplyDamageTo" target=applyTarget}}</button>{{/if}}{{#each @root.combat.mobs}}<button
+            type="button" data-action="mobAttack" data-key="{{key}}"{{#if @root.shortcuts.mobAttack}}
         aria-keyshortcuts="{{@root.shortcuts.mobAttack}}"{{/if}}
-        data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button
-          type="button"{{#if applyTarget}} class="gc-apply-first"{{/if}} data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
-          aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{#if applyTarget}}{{localize "SPYCRAFT.Console.ApplyDamageTo" target=applyTarget}}{{else}}{{localize "SPYCRAFT.Console.CardNextStep"}}{{/if}}</button>{{#unless defeated}}
+        data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}{{#unless applyTarget}}<button
+          type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}}
+          aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button>{{/unless}}{{#unless defeated}}
         <button type="button" data-action="actingDelay" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DelayHint'}}">{{localize "SPYCRAFT.Console.Delay"}}</button>
         <button type="button" data-action="actingReady" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.ReadyHint'}}">{{localize "SPYCRAFT.Console.Ready"}}</button>{{/unless}}</p>
       {{#unless defeated}}<details class="gc-more">

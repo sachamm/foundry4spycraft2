@@ -262,6 +262,7 @@ export async function startMission() {
     infractions: [],
     scenesPlayed: 0,
     standingPaid: {},
+    reportPosted: false,
     objectives: (mission.objectives ?? []).map(objective => ({ ...objective, complete: false })),
     // A promotion lasts one mission (p.398), so a new run starts the NPC as standard again.
     antagonists: (mission.antagonists ?? []).map(({ promoted: _promoted, ...antagonist }) => ({
@@ -636,7 +637,12 @@ export const antagonistRecorded = actor => !!actor && getMission().antagonists.s
  */
 export async function markAntagonistsFaced(actors) {
   // A token's own uuid and its base actor's both count, so rows keyed either way are found.
-  const uuids = new Set([...(actors ?? [])].filter(Boolean).flatMap(actor => [actor.uuid, typeKeyOf(actor)]));
+  const uuids = new Set(
+    [...(actors ?? [])]
+      .filter(Boolean)
+      .flatMap(actor => [actor.uuid, typeKeyOf(actor), sourceOf(actor)])
+      .filter(Boolean)
+  );
   const open = entry => !entry.encountered && (uuids.has(entry.typeKey) || uuids.has(entry.uuid));
   const mission = getMission();
   if (!game.user?.isGM || !mission.active || !uuids.size || !mission.antagonists.some(open)) return 0;
@@ -997,6 +1003,8 @@ export async function missionReport({ planned = false, whisper = true } = {}) {
     `<b>${loc`${planned ? "Planned" : "Earned"} mission XP — ${esc(mission.name || "mission")}`}</b> ${loc`(Threat Level ${tl}, Caliber ${mission.caliber})`}<br>${table || "Nothing recorded yet."}<br><b>${loc`Base reward: ${xp.total}`}</b>${xp.warnings.length ? `<br><span class="bad">${xp.warnings.map(esc).join("<br>")}</span>` : ""}<br><br><b>${loc`Per character`}</b> (p.440)<br>${characters}<br><br>${loc`Standing: Reputation ${signed(standing?.reputation ?? 0)} or Net Worth +${money(standing?.netWorth ?? 0)} each. Settle XP from each agent's Classes tab; the dialog is pre-filled from this record.`}`,
     whisper
   );
+  // The earned report of an ended mission is part of settling it: Wrap-up then points on to the next mission.
+  if (!planned && mission.ended && !mission.reportPosted) await updateMission({ reportPosted: true });
   return xp;
 }
 
