@@ -1103,6 +1103,12 @@ test("End mission can record exposure for a critical objective left undone (pp.4
     assert.equal(await mission.endMission(), true);
     assert.equal(actors.get("a1").system.reputation, before - 2, "Grade II costs 2 Reputation");
     assert.equal(state.getMission().infractions.length, state.teamActors().length);
+    // Resume and End again: the objective already charged is not charged a second time.
+    await mission.resumeMission();
+    dialogAnswers.push({ countFinalScene: false, recordCritical: true });
+    assert.equal(await mission.endMission(), true);
+    assert.equal(actors.get("a1").system.reputation, before - 2, "charged once per mission");
+    assert.equal(state.getMission().infractions.length, state.teamActors().length);
   } finally {
     for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
     await state.setMission(saved);

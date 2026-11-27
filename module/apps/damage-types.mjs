@@ -51,6 +51,7 @@ import {
   writeHazards
 } from "./hazards.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { nonLethalDamage } from "./non-lethal-damage.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { withUndo } from "./undo.mjs";
@@ -84,6 +85,16 @@ async function condition(actor, id, rounds, label) {
  */
 async function sufferSubdual(actor, amount, source, { armorPiercing = 0 } = {}) {
   if (!amount) return "";
+  if (actor.type !== "agent") {
+    // A standard NPC takes it through its Damage save; a special NPC keeps a running subdual total and its threshold.
+    if (!(Number(actor.system.vitality?.max) > 0)) return loc`${amount} subdual damage: roll the Damage save for it.`;
+    const { lines } = await nonLethalDamage(actor, "subdual", amount, {
+      source,
+      attackKind: "other",
+      armorPiercing: Math.max(0, Math.trunc(Number(armorPiercing) || 0))
+    });
+    return lines.join(" ");
+  }
   try {
     await applyAccumulatedDamage(actor, {
       source: `${source} [${foundry.utils.randomID(6)}]`,

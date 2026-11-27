@@ -62,6 +62,15 @@ export async function gcBoostCard(message, actor) {
   return resolved.total;
 }
 
+const laserCriticalAllowed = actor => {
+  try {
+    const profile = spendProfile(actor);
+    return profile.type === "special" || profile.treacherous === true;
+  } catch {
+    return false;
+  }
+};
+
 /** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */
 export async function gcActivateThreat(message, actor) {
   const check = message.flags.spycraft2;
@@ -73,8 +82,10 @@ export async function gcActivateThreat(message, actor) {
     });
     return true;
   }
-  // Laser damage (p.338): a threat costs 1 action die less to activate, so an NPC's laser critical is free.
-  if (check.checkKind === "attack" && check.attackContext?.laser === true) {
+  // Laser damage (p.338): a threat costs 1 action die less to activate, so an NPC's laser critical is free. Only an
+  // NPC that may activate attack criticals at all (special, or treacherous) gets it; any other goes on to the usual
+  // spend, which refuses it.
+  if (check.checkKind === "attack" && check.attackContext?.laser === true && laserCriticalAllowed(actor)) {
     await message.update({
       "flags.spycraft2.criticalSuccess": true,
       "flags.spycraft2.criticalActivation": { cost: 0, payer: "gc", source: loc`Laser damage –1` }

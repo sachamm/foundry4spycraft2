@@ -255,6 +255,15 @@ export async function endMission({ clear = false } = {}) {
     .filter(objective => objective.critical && !objective.complete)
     .map(objective => ({ objective, infraction: criticalRow?.infractions?.[Number(objective.grade) - 1] }))
     .filter(entry => entry.infraction);
+  // An objective already charged to an agent (an earlier End before Resume) is not charged to that agent again.
+  const charged = actorId =>
+    new Set(
+      (mission.infractions ?? [])
+        .filter(entry => entry.actor === actorId)
+        .flatMap(entry => entry.criticalObjectives ?? [])
+    );
+  const dueFor = actor => failedCritical.filter(({ objective }) => !charged(actor.id).has(objective.id));
+  const pendingCritical = teamActors(mission).some(actor => dueFor(actor).length);
   const lines = [
     loc`The mission stops being active: NPCs that follow the mission's Threat Level go back to their own.`,
     loc`The record is kept, so the XP report, each agent's XP settlement and the standing payout still work.`,
@@ -271,7 +280,7 @@ export async function endMission({ clear = false } = {}) {
         label: loc`Count the scene being played now as the mission's last (scene ${(mission.scenesPlayed ?? 0) + 1})`,
         checked: true
       },
-      ...(failedCritical.length
+      ...(pendingCritical
         ? [
             {
               check: "recordCritical",
@@ -295,21 +304,24 @@ export async function endMission({ clear = false } = {}) {
     ended: true,
     ...(input.countFinalScene === true ? { scenesPlayed: (now.scenesPlayed ?? 0) + 1 } : {})
   }));
-  if (input.recordCritical === true && failedCritical.length) {
+  if (input.recordCritical === true && pendingCritical) {
     // Each agent pays in their own affiliation's currency; the Undo note gives the standing back.
     const team = teamActors(getMission()),
       recorded = [];
     await withUndo(team, loc`Critical objectives: exposure recorded`, async () => {
       for (const actor of team) {
-        const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation";
+        const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation",
+          due = dueFor(actor);
+        if (!due.length) continue;
         let total = 0;
-        for (const { infraction } of failedCritical) total += exposurePenalty(infraction)[currency];
+        for (const { infraction } of due) total += exposurePenalty(infraction)[currency];
         await actor.update({ [`system.${currency}`]: (actor.system[currency] ?? 0) + total });
         recorded.push({
           actor: actor.id,
           name: loc`Critical objectives not completed`,
           currency,
           penalty: total,
+          criticalObjectives: due.map(({ objective }) => objective.id),
           at: Date.now()
         });
       }
