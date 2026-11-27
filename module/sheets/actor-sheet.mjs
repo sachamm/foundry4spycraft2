@@ -60,6 +60,7 @@ import { careerFormPlan, mergeCareerForm } from "../rules/career-form.mjs";
 import { settlePendingDamageSave } from "../apps/damage-settlement.mjs";
 import { rollPendingDamageSave } from "../apps/damage-saves.mjs";
 import { reviewDamageLedger, applyAccumulatedDamage } from "../apps/damage-ledger.mjs";
+import { reviewHazardResolution } from "../apps/hazard-resolution-records.mjs";
 import { checkAccumulatedDamage } from "../apps/accumulated-damage.mjs";
 import { nonLethalMeters } from "../rules/accumulated-damage.mjs";
 import { settleGrapple } from "../apps/combat-actions.mjs";
@@ -537,6 +538,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       fightFire(event, target) {
         return fightFire(this.actor, target.dataset.method);
+      },
+      reviewHazardResolution(event, target) {
+        return reviewHazardResolution(this.actor, target.dataset.hazard);
       },
       rollFireSave(event, target) {
         return rollFireSave(this.actor, target.dataset.kind);
@@ -1977,6 +1981,9 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       },
       fightFire(event, target) {
         return fightFire(this.actor, target.dataset.method);
+      },
+      reviewHazardResolution(event, target) {
+        return reviewHazardResolution(this.actor, target.dataset.hazard);
       },
       rollFireSave(event, target) {
         return rollFireSave(this.actor, target.dataset.kind);

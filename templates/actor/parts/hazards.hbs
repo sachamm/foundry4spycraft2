@@ -1,5 +1,11 @@
 {{!-- Contagions, fire and the other damage types at work on a character; shared by the agent and NPC sheets. --}}
 <div class="hazards">
+  {{#each hazards.interrupted}}
+    <p class="hazard due"><b>{{label}}</b> — {{localize "SPYCRAFT.Hazards.InterruptedResult"}}
+      {{#if sourceMissing}}{{localize "SPYCRAFT.Hazards.SourceMissing"}}{{/if}}
+      <button type="button" class="sc2-action" data-action="reviewHazardResolution" data-hazard="{{id}}">{{localize "SPYCRAFT.Hazards.ReviewInterrupted"}}</button>
+    </p>
+  {{/each}}
   <p><button type="button" class="sc2-action" data-action="trackFall"
     {{#if fallTiming}}disabled title="{{localize 'SPYCRAFT.Hazards.FinishFallFirst'}}"{{/if}}
     >{{localize "SPYCRAFT.Hazards.TrackFall"}}</button></p>

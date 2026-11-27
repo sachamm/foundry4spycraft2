@@ -4,6 +4,7 @@ import { recordReplacementPatch } from "../rules/record-patch.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { markCard } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { esc } from "../html.mjs";
 
 const records = actor => actor?.flags?.spycraft2?.hazardResolutions ?? {};
 const owned = actor => actor?.isOwner === true;
@@ -129,16 +130,39 @@ export async function finishHazardResolution(actor, message, lease) {
 /** Keep actual outcomes, or release only after the GC verifies that nothing happened, including dice. */
 export async function reviewHazardResolution(actor, message, options = {}) {
   if (!owned(actor) || !game.user?.isGM) return null;
+  const byId = typeof message === "string";
+  if (byId) message = game.messages?.get?.(message) ?? { id: message };
   const key = keyOf(message),
     expected = structuredClone(records(actor)[key] ?? null);
   if (expected?.state !== "started") return null;
+  const sourceMissing = byId && !game.messages?.get?.(key);
+  if (sourceMissing) {
+    const proof = expected.evidence;
+    if (!proof || !proof.save || expected.actorUuid !== actor.uuid)
+      throw Error(loc`This interrupted hazard lacks readable original evidence. Preserve it for GC correction.`);
+    message = {
+      id: key,
+      uuid: expected.messageUuid,
+      flags: {
+        spycraft2: {
+          actorUuid: proof.actorUuid,
+          resolved: proof.resolved,
+          effectiveTotal: proof.total,
+          successConfirmed: proof.succeeded,
+          hazardSave: structuredClone(proof.save),
+          evasionContext: structuredClone(proof.evasionContext ?? null)
+        }
+      }
+    };
+  }
+  requireOriginal(actor, message, expected);
   let input = options;
   if (!Object.keys(input).length) {
     input = await systemDialog.input({
       window: { title: loc`Review interrupted hazard` },
       rejectClose: false,
       ok: { label: loc`Record review` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Review the actual conditions, health, attributes, dice and reports first. Keep the existing outcome without replaying it. Release only if applying this result produced no effects or dice.`}</p><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects and close this result`}</option><option value="release">${loc`Verified no effects and no dice; release this result`}</option></select></label><label><input name="noEffects" type="checkbox" /> ${loc`No effects of this result were applied`}</label><label><input name="noDice" type="checkbox" /> ${loc`No dice were rolled while applying this result`}</label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label></div>`
+      content: `<div class="spycraft2-roll-options"><p><b>${esc(expected.evidence.save.label ?? expected.evidence.save.kind)}</b> — ${loc`Saved result`} ${esc(expected.evidence.total)}; ${expected.evidence.succeeded ? loc`success` : loc`failure`}</p>${sourceMissing ? `<p class="inventory-warning">${loc`The original chat card is missing. This review uses the character's saved receipt; it cannot replay the result.`}</p>` : ""}<p>${loc`Review the actual conditions, health, attributes, dice and reports first. Keep the existing outcome without replaying it. Release only if applying this result produced no effects or dice.`}</p><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects and close this result`}</option><option value="release">${loc`Verified no effects and no dice; release this result`}</option></select></label><label><input name="noEffects" type="checkbox" /> ${loc`No effects of this result were applied`}</label><label><input name="noDice" type="checkbox" /> ${loc`No dice were rolled while applying this result`}</label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label></div>`
     });
     if (!input) return null;
   }
@@ -157,6 +181,8 @@ export async function reviewHazardResolution(actor, message, options = {}) {
     async () => {
       if (!owned(actor) || !game.user?.isGM || !game.user.id || !same(records(actor)[key], expected))
         throw Error(loc`The hazard receipt or GC ownership changed during review.`);
+      if (sourceMissing && game.messages?.get?.(key))
+        throw Error(loc`The source card is available again. Review that original card instead.`);
       requireOriginal(actor, message, expected);
       const next = {
         ...expected,
@@ -168,14 +194,15 @@ export async function reviewHazardResolution(actor, message, options = {}) {
             decision: input.decision,
             note: input.note.trim(),
             noEffects: input.noEffects === true,
-            noDice: input.noDice === true
+            noDice: input.noDice === true,
+            sourceMissing
           }
         ]
       };
       await commit(actor, key, next, expected);
-      if (input.decision === "keep") await closeCard(message);
+      if (input.decision === "keep" && !sourceMissing) await closeCard(message);
       return next;
     },
-    { messages: [message] }
+    { messages: sourceMissing ? [] : [message] }
   );
 }

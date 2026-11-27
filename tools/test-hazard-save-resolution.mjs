@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { hazardSaveResolvers, resolveHazardSave } from "../module/apps/hazards.mjs";
+import { hazardSaveResolvers, resolveHazardSave, hazardsView } from "../module/apps/hazards.mjs";
 import { reviewHazardResolution } from "../module/apps/hazard-resolution-records.mjs";
 
 globalThis.game = { user: { id: "gc", isGM: true } };
@@ -254,4 +254,81 @@ test("legacy completed hazard receipts still repair cards without replaying effe
   delete f.check.hazardSave.resolved;
   assert.equal(await resolveHazardSave(f.actor, f.message), false);
   assert.equal(f.calls.filter(c => c === "failure").length, 1);
+});
+
+test("an owning GC can retain actual interrupted effects after deletion of the original card", async () => {
+  const f = fixture({ resolved: true, successConfirmed: false });
+  f.actor.system = {};
+  let dice = 0;
+  hazardSaveResolvers.set("resolution-test", async () => {
+    dice++;
+    throw Error("lost after dice");
+  });
+  await assert.rejects(resolveHazardSave(f.actor, f.message), /lost after dice/);
+  game.messages = new Map();
+  try {
+    assert.deepEqual(hazardsView(f.actor).interrupted, [
+      { id: "hazard1", label: "resolution-test", sourceMissing: true }
+    ]);
+    game.user.isGM = false;
+    assert.deepEqual(hazardsView(f.actor).interrupted, []);
+    assert.equal(
+      await reviewHazardResolution(f.actor, "hazard1", { decision: "keep", note: "Player cannot review" }),
+      null
+    );
+    game.user.isGM = true;
+    const result = await reviewHazardResolution(f.actor, "hazard1", {
+      decision: "keep",
+      note: "Verified actual dice and effects after source deletion"
+    });
+    assert.equal(result.state, "complete");
+    assert.equal(result.reviews.at(-1).sourceMissing, true);
+    assert.equal(dice, 1);
+    assert.deepEqual(hazardsView(f.actor).interrupted, []);
+    assert.equal(f.calls.includes("applied"), false, "a deleted card cannot receive a replacement update");
+  } finally {
+    game.user.isGM = true;
+    delete game.messages;
+  }
+});
+
+test("orphan release still requires both actual-effects and dice verification", async () => {
+  const f = fixture({ resolved: true, successConfirmed: false });
+  hazardSaveResolvers.set("resolution-test", async () => {
+    throw Error("before effects");
+  });
+  await assert.rejects(resolveHazardSave(f.actor, f.message), /before effects/);
+  game.messages = new Map();
+  try {
+    await assert.rejects(
+      reviewHazardResolution(f.actor, "hazard1", { decision: "release", note: "Missing card is not proof" }),
+      /both no effects and no dice/
+    );
+    const row = await reviewHazardResolution(f.actor, "hazard1", {
+      decision: "release",
+      note: "Verified failure before any effects or dice",
+      noEffects: true,
+      noDice: true
+    });
+    assert.equal(row.state, "released");
+    assert.equal(row.reviews.at(-1).sourceMissing, true);
+  } finally {
+    delete game.messages;
+  }
+});
+
+test("a review selected from the sheet uses the original card when it still exists", async () => {
+  const f = fixture({ resolved: true, successConfirmed: false });
+  hazardSaveResolvers.set("resolution-test", async () => {
+    throw Error("interrupted");
+  });
+  await assert.rejects(resolveHazardSave(f.actor, f.message), /interrupted/);
+  game.messages = new Map([[f.message.id, f.message]]);
+  try {
+    await reviewHazardResolution(f.actor, "hazard1", { decision: "keep", note: "Retained actual outcome" });
+    assert.equal(f.check.hazardSave.resolved, true);
+    assert.equal(f.actor.flags.spycraft2.hazardResolutions.hazard1.reviews.at(-1).sourceMissing, false);
+  } finally {
+    delete game.messages;
+  }
 });

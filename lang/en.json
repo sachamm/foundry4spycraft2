@@ -93,6 +93,9 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Hazards": {
+   "InterruptedResult": "interrupted result",
+   "SourceMissing": "Original chat card missing.",
+   "ReviewInterrupted": "Review interrupted result",
    "FallWithoutCheck": "Fall without a check",
    "TrackFall": "Track a fall",
    "FinishFallFirst": "Finish or review the existing fall first",

@@ -1833,3 +1833,22 @@ bundle and copy checks pass; the native run had no errors or diagnostics.
 
 Continue with initial fire scarring/recovery timing, orphaned hazard recovery,
 broader NPC resistance delivery and the outstanding source-data/build audits.
+
+## Pass 62: Interrupted hazard review survives source deletion
+
+PC creation remains **9.6/10** and combat **9.7/10**. Owning GCs can now review
+interrupted hazards from both character sheets. The list shows the saved hazard
+and identifies missing source cards. Review uses the original card when present;
+after deletion it uses the actor-held evidence, records that the source was
+missing, and closes only the receipt. Keeping never replays effects or dice;
+release still needs explicit no-effects/no-dice verification and a GC note.
+Players and non-owners cannot use this correction.
+
+Native Foundry created a failed sensory save with two actual secondary dice,
+injected a response loss after effects, deleted the source, and reloaded. At
+1280×720 the NPC sheet's actual review button was reachable. The actual GC
+dialog retained the existing track and saved a completed receipt with missing-
+source evidence, without recreating the card. The only diagnostic was Foundry's
+minimum-resolution warning. All **4,356** Node tests pass, including missing-
+source keep/release, player refusal and normal-card sheet review. Continue the
+remaining hazard mechanics, resistance delivery and source/build audits.

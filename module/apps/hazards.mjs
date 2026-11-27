@@ -85,6 +85,16 @@ export function hazardsView(actor) {
   const state = hazardState(actor.system),
     time = now();
   return {
+    interrupted:
+      owned(actor) && game.user?.isGM
+        ? Object.entries(actor.flags?.spycraft2?.hazardResolutions ?? {})
+            .filter(([id, row]) => /^[A-Za-z0-9_-]{1,80}$/.test(id) && row.state === "started")
+            .map(([id, row]) => ({
+              id,
+              label: row.evidence?.save?.label ?? row.evidence?.save?.kind ?? loc`Hazard`,
+              sourceMissing: !game.messages?.get?.(id)
+            }))
+        : [],
     contagions: Object.values(state.contagions).map(entry => {
       const plan = contagionSavePlan(entry);
       return {
