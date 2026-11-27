@@ -1,5 +1,5 @@
 /** Attacks and damage. */
-import { targetRoleCriticalRules, threatAgainstRole } from "../../rules/npc-qualities.mjs";
+import { targetRoleCriticalRules, threatAgainstRole, targetRoleNote } from "../../rules/npc-qualities.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { laserWeapon } from "../../rules/damage-types.mjs";
 import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
@@ -46,6 +46,19 @@ import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
 import { spendWeaponShots, weaponAmmunition } from "../../apps/ammunition-use.mjs";
 import { loc } from "../../i18n.mjs";
 import { breakdownRows, weaponAttackBreakdown } from "../../rules/bonus-breakdown.mjs";
+
+/** Tell the GC alone what the target's villain role does to this attack. */
+async function whisperTargetRole(role, threat) {
+  try {
+    await ChatMessage.create({
+      speaker: { alias: loc`Game Control` },
+      whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id),
+      content: `<p>${foundry.utils.escapeHTML(targetRoleNote(role, threat))}</p>`
+    });
+  } catch {
+    /* the note is a courtesy; the attack card already carries the rules */
+  }
+}
 
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
@@ -347,7 +360,7 @@ export const ActorAttackRolls = Base =>
             { label: loc`Situational modifier`, value: situational }
           ]),
           featReminders: options.featReminders,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}${threatAgainstRole(atk.threat, targetRole) > 20 ? loc` This attack cannot threaten.` : ""}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,
@@ -406,6 +419,8 @@ export const ActorAttackRolls = Base =>
             combatStance: combatStanceProof(this.system, { ranged: atk.ranged }),
             targetActorUuid: declaredTargetUuid,
             targetRole,
+            // The threat number before any villain role, so Resolve can re-read the role of the actual target.
+            baseThreat: atk.threat,
             missTrickSources: atk.missTrickSources,
             cheapShot: atk.cheapShot?.active ? atk.cheapShot : null,
             quirky,
@@ -469,6 +484,8 @@ export const ActorAttackRolls = Base =>
           improvised: !!item.system.improvised
         }
       );
+      // A villain role is the GC's knowledge: the note goes to the GC alone (pp.447–448).
+      if (message && targetRole) await whisperTargetRole(targetRole, atk.threat);
       if (message && shotsFired) await spendWeaponShots(item, shotsFired);
       return message;
     }

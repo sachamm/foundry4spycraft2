@@ -35,6 +35,7 @@ import {
 } from "../rules/damage-application.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
 import { gladiatorsDefense } from "../rules/campaign-rules.mjs";
+import { resolvedTargetRole } from "../rules/npc-qualities.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
@@ -244,6 +245,19 @@ export async function resolveAttack(message, options = {}) {
     });
   } catch (error) {
     return refuse(error.message);
+  }
+  // A villain role belongs to the target actually hit, not the one declared (pp.447–448): its threat range and
+  // critical cost are read again for the target chosen here.
+  if (target) {
+    const roleChange = resolvedTargetRole(check, target.system);
+    if (roleChange) {
+      await message.update({
+        "flags.spycraft2.threat": roleChange.threat,
+        "flags.spycraft2.attackContext.targetRole": roleChange.role
+      });
+      check.threat = roleChange.threat;
+      check.attackContext = { ...check.attackContext, targetRole: roleChange.role };
+    }
   }
   const before = check.attackResolution ?? null;
   const resolution = {

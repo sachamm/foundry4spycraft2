@@ -182,3 +182,34 @@ test("Clobber rides the Grapple check; Joint Lock hampers escape; Berserker Supr
   assert.equal(frenzySaveBonus({ activeFeatNames: ["Berserker Supremacy"] }, { resistFrenzy: true }), 4);
   assert.equal(frenzySaveBonus({ activeFeatNames: [] }, { resistFrenzy: true }), 0);
 });
+
+test("Grapple Size limits, the bigger side's +4, the second-opponent and Mute penalties (pp.357–358)", () => {
+  const sys = {
+    activeFeatNames: [],
+    abilities: { str: { mod: 2 } },
+    unarmed: { die: 4, extraDice: 0, damageBonus: 2 }
+  };
+  const check = { ...GRAPPLE_CHECK };
+  assert.match(grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: 2 }).blockedReason, /at most 1 Size/);
+  const smaller = grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: "-2" });
+  assert.deepEqual(
+    smaller.bonuses.map(b => b.value),
+    [8]
+  );
+  const bigger = grappleCheckPlan(sys, "athletics", check, { grappleSizeDifference: 1 });
+  assert.ok(bigger.notes.some(note => note.includes("gains +4")));
+  const both = grappleCheckPlan(sys, "athletics", check, { grappleSecondOpponent: true, grappleMute: true });
+  assert.deepEqual(
+    both.bonuses.map(b => b.value),
+    [-4, -2]
+  );
+  assert.ok(
+    both.notes.some(
+      note =>
+        note ===
+        "Benefits that deal damage: Injure 1d4+2 (or a 1-handed weapon's); Throw 1d4+4, and the opponent is sprawled and free; Sprawl 1d4+2 subdual, and you become prone."
+    )
+  );
+  const escape = grappleCheckPlan(sys, "athletics", { id: "restraint-escape" }, { grappleSizeDifference: 2 });
+  assert.equal(escape.blockedReason, "");
+});

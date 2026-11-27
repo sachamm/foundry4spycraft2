@@ -26,11 +26,27 @@ export function grappleSkillChecks(key, checks = []) {
   return key === "athletics" ? [...checks.filter(c => c.id !== "grapple"), { ...GRAPPLE_CHECK }] : checks;
 }
 
+/** The damage of the grapple benefits that deal it (pp.357–358), worked out for this character. */
+export function grappleDamageNote(system) {
+  const str = Number(system?.abilities?.str?.mod) || 0,
+    unarmed = system?.unarmed ?? { die: 3, extraDice: 0, damageBonus: str },
+    dice = `${1 + (unarmed.extraDice ?? 0)}d${unarmed.die ?? 3}`,
+    signedValue = n => (n < 0 ? `−${-n}` : `+${n}`);
+  return loc`Benefits that deal damage: Injure ${dice}${signedValue(unarmed.damageBonus ?? str)} (or a 1-handed weapon's); Throw ${dice}${signedValue((unarmed.damageBonus ?? str) + Math.max(1, str))}, and the opponent is sprawled and free; Sprawl 1d4${signedValue(str)} subdual, and you become prone.`;
+}
+
 export function grappleCheckPlan(
   system,
   key,
   check,
-  { grappleAdvantageConfirmed = false, grappleGarrote = false, grappleJointLock = false } = {}
+  {
+    grappleAdvantageConfirmed = false,
+    grappleGarrote = false,
+    grappleJointLock = false,
+    grappleSizeDifference = 0,
+    grappleSecondOpponent = false,
+    grappleMute = false
+  } = {}
 ) {
   const empty = { evidence: null, bonuses: [], blockedReason: "", notes: [], threatIncrease: 0 };
   if (key !== "athletics" || !["grapple", "restraint-escape"].includes(check?.id)) return empty;
@@ -40,10 +56,24 @@ export function grappleCheckPlan(
     garrote = feats.includes("Garrote Basics") && grappleGarrote === true,
     // Joint Lock (Submission Moves, p.188): the grappler's trick gives −4 to this character's escape checks.
     jointLock = check.id === "restraint-escape" && grappleJointLock === true;
+  // Size (p.357): an opponent at most 1 category bigger; the bigger side gains +4 per category of difference.
+  const sizeDifference = Math.trunc(Number(grappleSizeDifference) || 0);
+  if (check.id === "grapple" && sizeDifference > 1)
+    return {
+      ...empty,
+      blockedReason: loc`A Grapple can target an opponent at most 1 Size category bigger than you (p.357).`
+    };
+  const sizeBonus = check.id === "grapple" && sizeDifference < 0 ? 4 * -sizeDifference : 0,
+    // Grapple Second Opponent and Mute (pp.357–358): −4 while taking on or holding two, −2 with a hand over a mouth.
+    secondOpponent = grappleSecondOpponent === true,
+    mute = grappleMute === true;
   const bonuses = [
       ...(proneStance ? [{ source: "Prone Stance (Grapple)", value: 1 }] : []),
       ...(horde ? [{ source: "Horde Mastery (Grapple)", type: "morale", value: 1 }] : []),
-      ...(jointLock ? [{ source: "Joint Lock", value: -4 }] : [])
+      ...(jointLock ? [{ source: "Joint Lock", value: -4 }] : []),
+      ...(sizeBonus ? [{ source: loc`Bigger than the opponent`, value: sizeBonus }] : []),
+      ...(secondOpponent ? [{ source: loc`Second grapple opponent`, value: -4 }] : []),
+      ...(mute ? [{ source: loc`Hand over the opponent's mouth`, value: -2 }] : [])
     ],
     notes = [
       ...(proneStance ? [loc`Prone Stance: +1 on this Grapple check (p.188).`] : []),
@@ -51,12 +81,31 @@ export function grappleCheckPlan(
       ...(garrote
         ? [loc`Garrote Basics: threat range +2 with the readied garrote; an opponent you hold becomes mute (p.178).`]
         : []),
-      ...(jointLock ? [loc`Joint Lock: −4 on this escape check (p.188).`] : [])
+      ...(jointLock ? [loc`Joint Lock: −4 on this escape check (p.188).`] : []),
+      ...(sizeBonus ? [loc`Size: +${sizeBonus} for being ${-sizeDifference} category(ies) bigger (p.357).`] : []),
+      ...(check.id === "grapple" && sizeDifference === 1
+        ? [loc`Size: the opponent is a category bigger and gains +4 on its check (p.357).`]
+        : []),
+      ...(secondOpponent ? [loc`Second opponent: −4 while grappling or holding two (p.357).`] : []),
+      ...(mute ? [loc`Mute: −2 on Athletics checks while the hand stays over the mouth (p.358).`] : []),
+      ...(check.id === "grapple" ? [grappleDamageNote(system)] : [])
     ];
   return {
     ...empty,
     evidence:
-      bonuses.length || garrote ? { version: 1, proneStance, horde, garrote, jointLock, checkId: check.id } : null,
+      bonuses.length || garrote
+        ? {
+            version: 1,
+            proneStance,
+            horde,
+            garrote,
+            jointLock,
+            sizeDifference,
+            secondOpponent,
+            mute,
+            checkId: check.id
+          }
+        : null,
     bonuses,
     notes,
     threatIncrease: garrote ? 2 : 0
@@ -79,7 +128,7 @@ rollPipeline.register({
     return [
       {
         at: 207,
-        html: `<details><summary>${loc`Grapple feats`}</summary><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
+        html: `<details><summary>${loc`Grapple`}</summary><label>${loc`Opponent's Size compared with mine`} <select name="grappleSizeDifference"><option value="0">${loc`The same`}</option><option value="-1">${loc`1 smaller`}</option><option value="-2">${loc`2 smaller`}</option><option value="-3">${loc`3 smaller`}</option><option value="1">${loc`1 bigger`}</option><option value="2">${loc`2 or more bigger (no Grapple)`}</option></select></label><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`I am grappling or holding a second opponent (−4)`}</label><label><input name="grappleMute" type="checkbox" /> ${loc`My hand is over an opponent's mouth (−2)`}</label><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
       }
     ];
   }

@@ -378,6 +378,28 @@ export function targetRoleCriticalRules(system) {
   };
 }
 
+/** The GC's note on what a target's role does to an attack with this threat number. */
+export function targetRoleNote(role, threat) {
+  const line = loc`Target is a ${role.label}: threat range ${role.threatRangeReduction} narrower, a critical costs ${role.extraDiceToActivate} more.`;
+  return threatAgainstRole(threat, role) > 20 ? `${line} ${loc`This attack cannot threaten.`}` : line;
+}
+
 /** A threat number with the target's role applied: the range shrinks from its low end, and can vanish. */
 export const threatAgainstRole = (threat, role) =>
   threat > 0 && role?.threatRangeReduction > 0 ? threat + role.threatRangeReduction : threat;
+
+/**
+ * The threat number and role for the target an attack is resolved against, or null when nothing changes. The
+ * threat before any role is the one recorded at the roll (or worked back from the declared target's role).
+ */
+export function resolvedTargetRole(check, targetSystem) {
+  const declared = check.attackContext?.targetRole ?? null,
+    role = targetRoleCriticalRules(targetSystem);
+  if ((declared?.id ?? null) === (role?.id ?? null)) return null;
+  const base = Number.isSafeInteger(check.attackContext?.baseThreat)
+    ? check.attackContext.baseThreat
+    : declared?.threatRangeReduction > 0 && check.threat > 0
+      ? check.threat - declared.threatRangeReduction
+      : check.threat;
+  return { threat: threatAgainstRole(base, role), role };
+}
