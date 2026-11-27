@@ -452,3 +452,15 @@ responses. All **4,030** Node tests, native schemas and the added 720px dialog
 check pass. An actual native skill-sheet button/dialog records two skills and
 changes taking-10 time from 2× to 1×, with no page errors or transaction diagnostics.
 The review scores remain unchanged while the larger documented gaps are addressed.
+
+The remaining standard-NPC health conversion audit is complete. The actor captures
+actual vitality/wound maximum changes in both native Active Effect phases, combines
+them with feat bonuses for the p.452 Damage save conversion, and retains the effect's
+native duration and suppression behavior. Standard NPCs retain no temporary health
+pools. Regression tests cover negative changes, repeated preparation, disabled and
+removed sources, and legacy adjustment review. Native Foundry confirms a +4 base
+save becomes +5 with the feat and +9 with both phases, then +7 and +5 as effects are
+disabled and removed; repeated preparation stays +9 and both pools remain zero.
+All **4,032** tests, the 13 rebuilt-pack tests, focused lint, formatting, bundling
+and the text-copy check pass. B-185 is closed. Broader specialist and campaign
+coverage remains open, so no 9.9 claim is warranted yet.

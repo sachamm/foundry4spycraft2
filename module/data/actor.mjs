@@ -261,7 +261,7 @@ export class NpcData extends BaseActorData {
   reviewCreationRules() {
     if (this.featEffects?.damageSaveHealth?.needsReview)
       this.warnings.push(
-        loc`Review the manual Damage save adjustment: choose whether it already includes feat vitality and wound bonuses.`
+        loc`Review the manual Damage save adjustment: choose whether it already includes vitality and wound bonuses.`
       );
     if (this.creationPolicyStatus.needsReview)
       this.warnings.push(

@@ -16,6 +16,8 @@ import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
 import { creationPolicyRecord, creationRole } from "../rules/creation-policy.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
+import { npcHealthSaveAdjustment } from "../rules/npc-feat-effects.mjs";
+import { loc } from "../i18n.mjs";
 
 export class SpycraftActor extends ActorRolls(
   ActorSkillRolls(
@@ -26,12 +28,48 @@ export class SpycraftActor extends ActorRolls(
 ) {
   /** @override */
   prepareData() {
+    this._npcHealthEffects = { vitality: 0, wounds: 0 };
     super.prepareData();
+    if (this.type === "npc" && Number.isFinite(this.system.damageSave)) {
+      const system = this.system,
+        effects = system.featEffects;
+      if (effects) {
+        effects.damageSaveHealth = npcHealthSaveAdjustment(
+          {
+            vitality: effects.vitality + this._npcHealthEffects.vitality,
+            wounds: effects.wounds + this._npcHealthEffects.wounds
+          },
+          system
+        );
+        for (const [pool, value] of Object.entries(this._npcHealthEffects)) {
+          if (value)
+            effects.rows.push({
+              name: loc`Active Effects`,
+              label: pool === "vitality" ? loc`Vitality` : loc`Wounds`,
+              value
+            });
+          // Standard characters use a Damage save, not temporary health pools.
+          system[pool].max = system.npcProfile?.enabled ? 0 : this._source.system[pool].max;
+        }
+        if (effects.damageSaveHealth.needsReview) {
+          const warning = loc`Review the manual Damage save adjustment: choose whether it already includes vitality and wound bonuses.`;
+          if (!system.warnings.includes(warning)) system.warnings.push(warning);
+        }
+      }
+    }
     // Current vitality, wounds and action dice follow their maximums, and any preparation can move one (an item, an
     // effect, a combat round, a teammate). module/apps/pool-max.mjs listens, checks after this preparation and
     // writes only on a change.
     if ((this.type === "agent" || this.type === "npc") && globalThis.game?.ready)
       Hooks.callAll("spycraft2.agentPrepared", this);
+  }
+
+  /** Capture actual numeric health changes in every native effect phase, including formula and override modes. */
+  applyActiveEffects(phase) {
+    const before = this.type === "npc" ? { vitality: this.system.vitality.max, wounds: this.system.wounds.max } : null;
+    super.applyActiveEffects(phase);
+    if (before && this._npcHealthEffects)
+      for (const pool of ["vitality", "wounds"]) this._npcHealthEffects[pool] += this.system[pool].max - before[pool];
   }
 
   /** @override */

@@ -176,8 +176,8 @@ function npcFeatPlay(effects) {
     rows: effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
     health: effects.damageSaveHealth
       ? effects.damageSaveHealth.needsReview
-        ? loc`Feat health bonuses would adjust the Damage save by ${signed(effects.damageSaveHealth.automatic)}. Review the existing manual adjustment before adding them.`
-        : loc`Feat health bonuses add ${signed(effects.damageSaveHealth.applied)} to the Damage save; the manual adjustment is separate.`
+        ? loc`Health bonuses would adjust the Damage save by ${signed(effects.damageSaveHealth.automatic)}. Review the existing manual adjustment before adding them.`
+        : loc`Health bonuses add ${signed(effects.damageSaveHealth.applied)} to the Damage save; the manual adjustment is separate.`
       : healthLeft
         ? loc`Vitality ${signed(effects.vitality)} and wounds ${signed(effects.wounds)} are not added to typed-in maximums: include them in the numbers above.`
         : "",
@@ -1932,7 +1932,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       featPlay: npcFeatPlay(sys.featEffects),
       damageSaveHealthModes: {
         review: loc`Review existing adjustment`,
-        automatic: loc`Add feat health bonuses`,
+        automatic: loc`Add feat and effect health bonuses`,
         manual: loc`Health bonuses already included manually`
       },
       hazards: hazardsView(this.actor),
