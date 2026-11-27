@@ -10946,7 +10946,10 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": 2,
    "summary": "Player and special characters get +4 morale on Blend/Stealth and Sneak/Hide checks that decide surprise rounds. All characters take -4 morale on skill checks to shift disposition or persuade a target into an action.",
-   "effects": {}
+   "effects": {
+    "surpriseStealthMorale": 4,
+    "socialCheckMorale": -4
+   }
   },
   {
    "id": "rare-spectacle",

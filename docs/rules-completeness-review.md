@@ -894,3 +894,29 @@ All **4,168** Node tests, **988** independent fixture assertions and **240**
 layout checks pass. Lint, formatting, bundling and copy checks pass with existing
 warnings. Scores remain **PC creation 9.4/10 and combat 9.5/10** pending the
 broader source audit and remaining play gaps. The next pass continues that work.
+
+### Continuing pass: Paranoid skill checks and morale penalties
+
+Paranoid now grants its surprise bonus only to player/special characters making
+the named Blend/Stealth or Sneak/Hide check for surprise. It applies the social
+penalty to the named disposition/persuasion uses and to other checks explicitly
+declared to shift disposition or persuade an action. The NPC dialog supports
+those declarations, including its role restriction on the surprise bonus.
+
+Negative morale entries and Shaken now share one strongest-penalty calculation.
+They stay separate from the skill bonus changed by Baffled or Incompetent.
+Positive morale uses normal stacking. PC and NPC rolls retain campaign evidence
+and reject applicable campaign or Shaken changes before posting. PC guards also
+detect a quality newly introduced after planning an otherwise ordinary check.
+
+Native checks covered a real PC, standard NPC and special NPC. PC persuasion
+received one −4 penalty with Shaken present. The actual special-NPC dialog
+produced `1d20 + 10` for the surprise check; the Shaken/social roll produced
+`1d20 + 2`, rather than applying both −4 penalties. Standard NPCs received no
+surprise bonus. Saved cards retained evidence; browser errors and diagnostics
+were empty. Existing campaign-skill tests were preserved alongside the new suite.
+
+All **4,174** Node tests, **988** independent fixture assertions, **241** layout
+checks and **13** pack checks pass. Lint, formatting, bundling and copy checks
+pass with existing warnings. Scores remain **PC creation 9.4/10 and combat
+9.5/10**. Disposition effects and the other documented gaps remain under review.

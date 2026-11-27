@@ -47,6 +47,8 @@ import { possessedActionDice } from "./bonus-pools.mjs";
 import { attributeActionBlock, conditionAbilityPenalty, conditionRollPenalties } from "./attributes.mjs";
 import { underwaterCheckPlan } from "./environment.mjs";
 import { qualitySkillChecks } from "./quality-checks.mjs";
+import { campaignSkillChecks, moraleSkillPenalty, isMoralePenalty } from "./campaign-skills.mjs";
+import { shakenSkillPenalty } from "./shaken.mjs";
 import { medicalSkillPlan } from "./medical.mjs";
 import { littleDetailsSkillPlan } from "./little-details.mjs";
 import { skillTagPlan } from "./skill-tags.mjs";
@@ -137,6 +139,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     complexTaskNearby = false,
     dramaticConflictNearby = false,
     shiftingDisposition = false,
+    persuadingAction = false,
     seductionConflict = false,
     purelyMentalConfirmed = false,
     blinded = false,
@@ -464,6 +467,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     method
   });
   const qualityChecks = qualitySkillChecks(system, key, check, { shiftingDisposition, seductionConflict, terrain });
+  const campaignChecks = campaignSkillChecks(system, key, check, { surprise, shiftingDisposition, persuadingAction });
   classEffects.timeChoices.push(...ambush.timeChoices);
   // Bonuses to this named check: the class abilities' own, the check's circumstances, and each registered term's.
   classEffects.bonuses = terms.merge("bonuses", [
@@ -471,6 +475,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [100, pursuit.bonuses],
     [110, appearancePlan.bonuses],
     [150, qualityChecks.bonuses],
+    [155, campaignChecks.bonuses],
     [
       160,
       [
@@ -791,8 +796,12 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   }
   // pp.87,92,101: distinguish the substituted skill bonus from modifiers on this named check.
   const baseSkillEntries = skillConditionEntries(system, skill.bonusEntries ?? []),
-    skillBonusEntries = [...baseSkillEntries, ...misc],
-    checkBonusEntries = [...classEffects.bonuses, ...synergyValues];
+    allSkillEntries = [...baseSkillEntries, ...misc],
+    allCheckEntries = [...classEffects.bonuses, ...synergyValues],
+    skillBonusEntries = allSkillEntries.filter(e => !isMoralePenalty(e)),
+    checkBonusEntries = allCheckEntries.filter(e => !isMoralePenalty(e)),
+    shakenPenalty = shakenSkillPenalty(conditionSystem, selected),
+    moralePenalty = moraleSkillPenalty([...allSkillEntries, ...allCheckEntries], shakenPenalty);
   const normalSkillBonus = total + rankAdjustment + stacked(skillBonusEntries) - stacked(baseSkillEntries),
     skillBonus = skillBonusCondition(system, normalSkillBonus).total;
   const nonSynergy = checkBonusEntries.filter(e => e.type !== "synergy"),
@@ -802,6 +811,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     condition = skillBonusCondition(system, normalSkillBonus + skillExtra);
   const checkAdjustment =
     skillConditionCheckPenalty(conditionSystem, selected) +
+    moralePenalty -
+    shakenPenalty +
     (isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0) +
     (hasForte ? 1 : 0) +
     armor +
@@ -968,6 +979,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [450, `${hardCorePlan.notes.join(" ")} `],
     [460, `${underwaterContext.notes.join(" ")} `],
     [470, `${qualityChecks.notes.join(" ")} `],
+    [471, `${campaignChecks.notes.join(" ")} `],
     [480, `${medical.notes.join(" ")} `],
     [490, `${details.notes.join(" ")} `],
     [500, `${skillTags.notes.join(" ")} `],
@@ -1158,6 +1170,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     sensoryConditions,
     underwaterContext,
     qualityChecks,
+    campaignSkillChecks: campaignChecks.evidence,
     medical: medical.applicable ? medical : null,
     littleDetails: details.active ? details : null,
     skillTags,

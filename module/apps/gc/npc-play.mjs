@@ -17,6 +17,8 @@ import {
 } from "../../rules/gc/disposition.mjs";
 import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
 import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
+import { campaignSkillChecks, moraleSkillPenalty } from "../../rules/campaign-skills.mjs";
+import { shakenSkillPenalty } from "../../rules/shaken.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
@@ -125,6 +127,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
       <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" value="1" /></label>
       ${qualityCheckContent(actor.system.qualityEffects)}
+      ${actor.system.campaignEffects?.socialCheckMorale ? `<label><input type="checkbox" name="surprise" /> ${loc`Paranoid: Blend/Stealth or Sneak/Hide to determine surprise`}</label><label><input type="checkbox" name="shiftingDisposition" /> ${loc`Paranoid: this check shifts a target's disposition`}</label><label><input type="checkbox" name="persuadingAction" /> ${loc`Paranoid: this check persuades a target to take an action`}</label>` : ""}
       <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`,
       loc`Roll`
     );
@@ -159,12 +162,31 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
   // Feat items on the NPC that add a plain number to this skill.
   const featBonus = Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0);
   if (featBonus) quality.rows.push({ label: loc`Feats`, value: featBonus });
+  if (input.surprise === true && !["blend", "sneak"].includes(skill.key))
+    throw Error(loc`Choose Blend/Stealth or Sneak/Hide for the confirmed surprise check.`);
+  const checkId = context.combatPersuasion
+      ? "persuasion"
+      : input.surprise === true
+        ? skill.key === "blend"
+          ? "stealth"
+          : "hide"
+        : (input.qualityCheck ?? ""),
+    campaignChecks = campaignSkillChecks(actor.system, skill.key, { id: checkId }, input),
+    shakenPenalty = shakenSkillPenalty(actor.system, ability),
+    campaignModifier = campaignChecks.bonuses.filter(row => row.value > 0).reduce((n, row) => n + row.value, 0),
+    moralePenalty = moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty);
+  quality.rows.push(
+    ...campaignChecks.bonuses.filter(row => row.value > 0).map(row => ({ label: row.source, value: row.value }))
+  );
+  if (moralePenalty) quality.rows.push({ label: loc`Morale penalty (strongest applies)`, value: moralePenalty });
   const total =
     plan.bonus +
     (actor.system.abilities[ability]?.mod ?? 0) +
     (Number(input.modifier) || 0) +
     quality.modifier +
-    featBonus;
+    featBonus +
+    campaignModifier +
+    moralePenalty;
   return actor.rollCheck(
     "1d20 + @total",
     { total },
@@ -191,6 +213,18 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       cap: plan.cap,
       error: Math.max(0, Number(input.error) || 0) + quality.errorIncrease,
       npcSkill: skill.key,
+      checkKind: "skill",
+      skillKey: skill.key,
+      ...(checkId ? { checkId } : {}),
+      campaignSkillChecks: campaignChecks.evidence,
+      validateSkillContext: () => {
+        const live = campaignSkillChecks(actor.system, skill.key, { id: checkId }, input);
+        if (
+          JSON.stringify(live.evidence) !== JSON.stringify(campaignChecks.evidence) ||
+          shakenSkillPenalty(actor.system, ability) !== shakenPenalty
+        )
+          throw Error(loc`The campaign modifiers or Shaken changed before posting this NPC skill check.`);
+      },
       ...(context.combatPersuasion
         ? {
             checkKind: "skill",

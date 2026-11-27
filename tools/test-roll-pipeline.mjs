@@ -653,6 +653,7 @@ const EXPECTED_ORDER = [
   "allOrNothingContent:skill",
   "allOrNothingContent:knowledge",
   "skillConditionsRecord",
+  "campaignSkillChecksRecord",
   "skillFeatTermsRecord",
   "fireActionControl",
   "opportunistDamageControl",

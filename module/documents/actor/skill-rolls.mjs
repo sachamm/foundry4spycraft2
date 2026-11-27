@@ -33,6 +33,7 @@ import { knowledgeCheckBreakdown, skillCheckBreakdown } from "../../rules/bonus-
 
 /** Plan fields a skill check records as the rules returned them. */
 const SKILL_PLAN_FIELDS = [
+  "campaignSkillChecks",
   "campaignSkillDCPolicy",
   "stalkingStance",
   "feint",
@@ -106,6 +107,7 @@ const SKILL_PLAN_FIELDS = [
 
 /** Plan fields whose sources have to be the same when the check is posted as when it was planned. */
 const GUARDED_SKILL_FIELDS = [
+  "campaignSkillChecks",
   "stalkingStance",
   "feint",
   "meleeSkillFeats",
@@ -148,7 +150,10 @@ const GUARDED_SKILL_FIELDS = [
 ];
 const guardedFacts = plan =>
   JSON.stringify([...GUARDED_SKILL_FIELDS.map(field => plan[field]), plan.skillGear?.toolShedKit]);
-const hasGuardedFacts = plan => GUARDED_SKILL_FIELDS.some(field => plan[field]) || !!plan.skillGear?.toolShedKit;
+const hasGuardedFacts = plan =>
+  Object.hasOwn(plan, "campaignSkillChecks") ||
+  GUARDED_SKILL_FIELDS.some(field => plan[field]) ||
+  !!plan.skillGear?.toolShedKit;
 
 export const ActorSkillRolls = Base =>
   class ActorSkillRolls extends Base {

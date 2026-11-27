@@ -18,7 +18,7 @@ import {
   reviewFavoredGearSession,
   recordFavoredGearLevelChoices
 } from "../../module/apps/favored-gear-session.mjs";
-import { npcDamageSave } from "../../module/apps/gc/npc-play.mjs";
+import { npcDamageSave, rollNpcSkill } from "../../module/apps/gc/npc-play.mjs";
 import {
   reviewCrossroadsMissionXP,
   reviewCrossroadsSession,
@@ -223,6 +223,35 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+test("Paranoid NPC skill circumstances and roll confirmation remain reachable at720px", async ({ page }) => {
+  const prior = content,
+    oldGame = game;
+  try {
+    globalThis.game = { ...oldGame, user: { id: "gc", isGM: true }, i18n: { localize: String } };
+    await rollNpcSkill({
+      name: "QA special NPC",
+      isOwner: true,
+      system: {
+        npcType: "special",
+        npcProfile: { enabled: false },
+        campaignEffects: { surpriseStealthMorale: 4, socialCheckMorale: -4 }
+      }
+    });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.locator('select[name="key"]').selectOption("blend");
+    await page.locator('[name="surprise"]').check();
+    await page.locator('[name="persuadingAction"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 for (const mode of ["eligibility", "session", "award", "settlement"])
   test(`Crossroads XP ${mode} keeps actual source fields and confirmation reachable at720px`, async ({ page }) => {
     const prior = content,

@@ -312,7 +312,14 @@ const parts = [
     570,
     ({ actor }) =>
       (actor.system.originEffects ?? []).some(effect => effect.qualityKey === "seductive")
-        ? `<label><input type="checkbox" name="shiftingDisposition" /> ${loc`Seductive: this check actually shifts disposition`}</label><label><input type="checkbox" name="seductionConflict" /> ${loc`Seductive: this check is part of a seduction Dramatic Conflict`}</label>`
+        ? `${actor.system.campaignEffects?.socialCheckMorale ? "" : `<label><input type="checkbox" name="shiftingDisposition" /> ${loc`Seductive: this check actually shifts disposition`}</label>`}<label><input type="checkbox" name="seductionConflict" /> ${loc`Seductive: this check is part of a seduction Dramatic Conflict`}</label>`
+        : ""
+  ],
+  [
+    575,
+    ({ actor }) =>
+      actor.system.campaignEffects?.socialCheckMorale
+        ? `<label><input type="checkbox" name="shiftingDisposition" /> ${loc`Paranoid: this check shifts a target's disposition`}</label><label><input type="checkbox" name="persuadingAction" /> ${loc`Paranoid: this check persuades a target to take an action`}</label>`
         : ""
   ],
   [
