@@ -148,6 +148,7 @@ import { loc } from "../i18n.mjs";
 import { featActions } from "./feat-actions.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
+import { abilityIncreaseLevels } from "../rules/campaign-rules.mjs";
 import { contactPeopleRows, editContactPeople, summonContactPerson } from "../apps/contact-people.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -902,7 +903,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ...sys.abilities[key],
       tip: abilityTip(sys, key, game.i18n.localize(label))
     }));
-    context.increaseLevels = cfg.abilityIncreaseLevels.map(l => ({
+    context.increaseLevels = abilityIncreaseLevels().map(l => ({
       level: l,
       key: `l${l}`,
       value: sys.abilityIncreases[`l${l}`],

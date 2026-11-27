@@ -9,20 +9,28 @@ import { loc } from "../i18n.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 
 let source = () => ({});
+// A character's data is prepared in one synchronous pass that asks for the rules many times; the answer is kept
+// until that pass ends, so a quality changed between passes is always seen.
+let cached = null;
 
 /** Register the function that returns the merged effects of the qualities in force (`campaignEffects().effects`). */
 export function setCampaignRulesSource(fn) {
   source = typeof fn === "function" ? fn : () => ({});
+  cached = null;
 }
 
 /** The merged effects of the qualities in force, or {} when none are or the world is not ready. */
 export function campaignRules() {
+  if (cached) return cached;
+  let effects;
   try {
-    const effects = source();
-    return effects && typeof effects === "object" ? effects : {};
+    effects = source();
   } catch {
-    return {};
+    effects = null;
   }
+  cached = effects && typeof effects === "object" ? effects : {};
+  queueMicrotask(() => (cached = null));
+  return cached;
 }
 
 const number = (value, fallback) => (Number.isFinite(value) ? value : fallback);
@@ -143,6 +151,29 @@ export function paranoidModifier({ surpriseCheck = false, dispositionCheck = fal
 /** One line per quality effect that this module applies, for the GC Console. */
 export function campaignRuleLines(effects = campaignRules()) {
   const lines = [];
+  const gear = Math.trunc(number(effects.gearCaliberShift, 0));
+  if (gear)
+    lines.push(
+      gear > 0
+        ? loc`Gear picks: +${gear} Caliber over the mission's (past V, an extra Caliber I item of that type).`
+        : loc`Gear picks: ${gear} Caliber under the mission's (below I, the pick is lost).`
+    );
+  if (campaignWealthBonus(effects)) lines.push(loc`Starting Wealth +${campaignWealthBonus(effects)}.`);
+  const growth = campaignGrowth(effects);
+  if (growth.xpFraction !== 1) lines.push(loc`XP for each level ×${growth.xpFraction}.`);
+  if (growth.attributeInterval !== 4)
+    lines.push(loc`An attribute increase every ${growth.attributeInterval} career levels.`);
+  if (growth.featInterval !== 3) lines.push(loc`A feat every ${growth.featInterval} career levels.`);
+  if (growth.interestInterval !== 4) lines.push(loc`An Interest every ${growth.interestInterval} career levels.`);
+  if (growth.proficiencyInterval !== 2)
+    lines.push(
+      growth.proficiencyInterval === 1
+        ? loc`A proficiency every career level.`
+        : loc`A proficiency every ${growth.proficiencyInterval} career levels.`
+    );
+  if (effects.pointBuy) lines.push(loc`Starting attributes: ${effects.pointBuy} points, none above 18.`);
+  if (effects.fixedVitality) lines.push(loc`Vitality after Level 1: 2, 3 or 4 a level by vitality die.`);
+  if (effects.allClassSkills) lines.push(loc`Every skill is a class skill.`);
   const attack = campaignAttackTerms(effects);
   if (attack.threat) lines.push(loc`Every attack: threat range +${attack.threat}.`);
   if (attack.modifier)
@@ -255,3 +286,97 @@ rollPipeline.register({
     };
   }
 });
+
+/* -------------------------------------------- */
+/*  Season qualities that change how characters are built and grow (pp.405–408)  */
+/* -------------------------------------------- */
+
+const interval = (value, fallback) => (Number.isSafeInteger(value) && value > 0 ? value : fallback);
+
+/**
+ * The growth schedule under the qualities in force: Fast and Slow Attributes, Feats, Interests and Proficiencies
+ * change how often each comes; Fast and Slow Growth change the XP for each level.
+ */
+export function campaignGrowth(effects = campaignRules()) {
+  return {
+    attributeInterval: interval(effects.attributeInterval, 4),
+    featInterval: interval(effects.featInterval, 3),
+    interestInterval: interval(effects.interestInterval, 4),
+    proficiencyInterval: interval(effects.proficiencyInterval, 2),
+    xpFraction: number(effects.xpToLevelFraction, 1)
+  };
+}
+
+/** The career levels that bring an attribute increase: every 4th, or every 3rd or 5th. */
+export function abilityIncreaseLevels(effects = campaignRules()) {
+  const every = campaignGrowth(effects).attributeInterval,
+    levels = [];
+  for (let level = every; level <= 20; level += every) levels.push(level);
+  return levels;
+}
+
+/**
+ * Table 1.3's row for a level, with the counts the growth qualities change. With no such quality the printed row is
+ * returned as it is. Feats: 1 at Level 1 and one more every 3 levels; proficiencies: one every 2 levels from Level 3;
+ * interests: one every 4 levels from Level 2; attribute increases: one every 4 levels.
+ */
+export function campaignLevelRow(row, effects = campaignRules()) {
+  if (!row) return row;
+  const growth = campaignGrowth(effects),
+    level = row.level;
+  const standard =
+    growth.attributeInterval === 4 &&
+    growth.featInterval === 3 &&
+    growth.interestInterval === 4 &&
+    growth.proficiencyInterval === 2 &&
+    growth.xpFraction === 1;
+  if (standard) return row;
+  const interests = level >= 2 && (level - 2) % growth.interestInterval === 0 ? 1 : 0;
+  return {
+    ...row,
+    xp: level > 1 ? Math.floor(row.xp * growth.xpFraction) : row.xp,
+    feats: level >= 1 ? 1 + Math.floor(level / growth.featInterval) : 0,
+    abilityIncreases: Math.floor(level / growth.attributeInterval),
+    proficiencies: level >= 1 ? Math.floor((level - 1) / growth.proficiencyInterval) : 0,
+    interests
+  };
+}
+
+/** Interests known at a level: 2, and one more at Level 2 and every 4 levels after (every 3rd or 5th under the
+ * Interests qualities). `printed` is Table 1.3's figure, kept when no such quality is in force. */
+export function campaignInterestBase(level, printed, effects = campaignRules()) {
+  const every = campaignGrowth(effects).interestInterval;
+  if (every === 4) return printed;
+  return 2 + (level >= 2 ? 1 + Math.floor((level - 2) / every) : 0);
+}
+
+/** Starting attribute points: 36, or 32 under Small Screen (p.408). */
+export const campaignPointBuy = (standard = 36, effects = campaignRules()) =>
+  Number.isSafeInteger(effects.pointBuy) ? effects.pointBuy : standard;
+
+/** Fragile (p.406): the fixed vitality a level after the first gives, by vitality die; null when not in force. */
+export function fragileVitality(die, effects = campaignRules()) {
+  if (!effects.fixedVitality) return null;
+  return { 8: 2, 10: 3, 12: 4 }[die] ?? null;
+}
+
+/** Jack-of-All-Trades (p.407): every skill is a class skill for every class. */
+export const allClassSkills = (effects = campaignRules()) => effects.allClassSkills === true;
+
+/** Extra starting Wealth (Big Budget +4, p.405). */
+export const campaignWealthBonus = (effects = campaignRules()) => Math.trunc(number(effects.wealthBonus, 0));
+
+/** The feat trees a season quality opens: a feat from one may be taken in place of any other feat choice. */
+export const campaignFeatTrees = (effects = campaignRules()) =>
+  Array.isArray(effects.bonusFeatTrees) ? effects.bonusFeatTrees : [];
+
+/**
+ * Big Budget and Shoe-String Budget (pp.405, 408): every gear pick is 1 Caliber higher or lower than the mission
+ * allows. Returns the Caliber a pick may reach, and whether the shift ran past V (an extra Caliber I item of the type)
+ * or below I (the pick is lost).
+ */
+export function campaignGearCaliber(caliber, effects = campaignRules()) {
+  const shift = Math.trunc(number(effects.gearCaliberShift, 0)),
+    raw = caliber + shift;
+  return { caliber: Math.max(1, Math.min(5, raw)), shift, pastV: raw > 5, lost: raw < 1 };
+}

@@ -3,6 +3,7 @@ import { shakenActionDieCost } from "./shaken.mjs";
 import { priorityRequestBonus, localHeroRequestBonus, requestBenefitContext } from "./requests.mjs";
 import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
+import { campaignGearCaliber } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
@@ -284,7 +285,7 @@ export function gearAcquisitionPlan(
     !Number.isSafeInteger(caliber) ||
     caliber < 1 ||
     caliber > maxCaliber ||
-    (!benefit?.ignoreMissionCaliber && caliber > record.caliber + (useProcure ? 1 : 0))
+    (!benefit?.ignoreMissionCaliber && caliber > campaignGearCaliber(record.caliber).caliber + (useProcure ? 1 : 0))
   )
     throw new Error(
       maxCaliber === 5

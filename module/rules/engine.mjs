@@ -1,4 +1,16 @@
-import { campaignActionDice, campaignRules } from "./campaign-rules.mjs";
+import {
+  abilityIncreaseLevels,
+  allClassSkills,
+  campaignActionDice,
+  campaignLevelRow,
+  campaignPointBuy,
+  campaignRules,
+  campaignFeatTrees,
+  campaignGearCaliber,
+  campaignInterestBase,
+  campaignWealthBonus,
+  fragileVitality
+} from "./campaign-rules.mjs";
 import { periodMoney } from "./period-money.mjs";
 import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
@@ -264,7 +276,8 @@ function startPass(state) {
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   const todo = [];
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
-  const levelRow = l => T.levels[clamp(l, 0, 20)];
+  // Table 1.3, with the growth season qualities applied (p.407).
+  const levelRow = l => campaignLevelRow(T.levels[clamp(l, 0, 20)]);
   Object.assign(state, { allItems, items, shaken, T, warnings, legalFeatIds, activeFeatIds, todo, plural, levelRow });
 }
 
@@ -676,9 +689,12 @@ function collectBonusSources(state) {
     t1: stepLookup(T.talentBonus.t1, level),
     t2: stepLookup(T.talentBonus.t2, level),
     t3: stepLookup(T.talentBonus.t3, level),
-    interestBase: stepLookup(
-      T.interests.map(r => [r[0], r[1]]),
-      level
+    interestBase: campaignInterestBase(
+      level,
+      stepLookup(
+        T.interests.map(r => [r[0], r[1]]),
+        level
+      )
     ),
     interestTalent: stepLookup(
       T.interests.map(r => [r[0], r[2]]),
@@ -766,7 +782,7 @@ function deriveAttributes(state) {
   let pointCost = 0;
   for (const k of ABILITIES) {
     const a = sys.abilities[k];
-    a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
+    a.increase = abilityIncreaseLevels().filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
     // Where that bonus comes from, for the sheet's breakdown tooltip.
     a.bonusSources = abilityBonus.sources.get(k) ?? [];
@@ -788,11 +804,16 @@ function deriveAttributes(state) {
       sys.abilities[k].base + sys.abilities[k].increase + (sys.abilities[k].misc ?? 0) + nonCandidateBonus.get(k)
     ])
   );
-  const increasesDue = cfg.abilityIncreaseLevels.filter(l => l <= level);
+  const increasesDue = abilityIncreaseLevels().filter(l => l <= level);
   const increasesMissing = increasesDue.filter(l => !increaseAt(l)).length;
   if (increasesMissing)
     todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
-  sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
+  // Small Screen (p.408) lowers the standard budget; a budget set to something else (a lieutenant's 32) stays.
+  const budget =
+    sys.pointBuyBudget === undefined || sys.pointBuyBudget === null || sys.pointBuyBudget === cfg.pointBuy
+      ? campaignPointBuy(cfg.pointBuy)
+      : sys.pointBuyBudget;
+  sys.pointBuy = { budget, spent: pointCost };
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
   if (sys.pointBuy.remaining < 0) {
     warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
@@ -839,9 +860,12 @@ function deriveAttributes(state) {
       t1: stepLookup(T.talentBonus.t1, career),
       t2: stepLookup(T.talentBonus.t2, career),
       t3: stepLookup(T.talentBonus.t3, career),
-      interestBase: stepLookup(
-        T.interests.map(r => [r[0], r[1]]),
-        career
+      interestBase: campaignInterestBase(
+        career,
+        stepLookup(
+          T.interests.map(r => [r[0], r[1]]),
+          career
+        )
       ),
       interestTalent: stepLookup(
         T.interests.map(r => [r[0], r[2]]),
@@ -872,7 +896,7 @@ function deriveAttributes(state) {
     const abilities = Object.fromEntries(
       ABILITIES.map(k => {
         const a = sys.abilities[k];
-        const inc = cfg.abilityIncreaseLevels.filter(x => x <= career && increaseAt(x) === k).length;
+        const inc = abilityIncreaseLevels().filter(x => x <= career && increaseAt(x) === k).length;
         const value = a.base + inc + (a.misc ?? 0) + (sys.aging.modifiers[k] ?? 0) + bonusAt(`abilities.${k}`);
         return [k, { value, mod: mod(value) }];
       })
@@ -885,6 +909,7 @@ function deriveAttributes(state) {
     const override = sys.skills?.[key];
     return (
       item.system.classSkills?.includes(key) ||
+      allClassSkills() ||
       (item.system.identifier === "schemer" && (stageAt(career).classLevels.schemer ?? 0) >= 6) ||
       stageAt(career).bonus(`skills.${key}.classSkill`) > 0 ||
       (override?.classSkill && career >= (override.classSkillAt ?? 1))
@@ -990,7 +1015,7 @@ function deriveSkillRanks(state) {
   };
   const isClassSkillAt = (key, idx) => manualClassSkillAt(key, idx) || ruleClassSkillAt(key, idx);
   const ruleClassSkillAt = (key, idx) => {
-    if (stageAt(idx + 1).bonus(`skills.${key}.classSkill`)) return true;
+    if (allClassSkills() || stageAt(idx + 1).bonus(`skills.${key}.classSkill`)) return true;
     const ci = classAtLevel[idx];
     return (
       !!ci?.system.classSkills?.includes(key) ||
@@ -1692,8 +1717,10 @@ function deriveFinalTotals(state) {
   progression.forEach((entry, idx) => {
     const ci = classAtLevel[idx];
     const die = ci?.system.vitalityDie ?? 0;
-    const roll = idx === 0 ? die : Number(entry.vitality) || 0;
-    if (idx > 0 && !entry.vitality) vitMissing.push(idx + 1);
+    // Fragile (p.406): after Level 1 each level gives a fixed amount instead of a roll.
+    const fixed = idx > 0 ? fragileVitality(die) : null;
+    const roll = idx === 0 ? die : (fixed ?? (Number(entry.vitality) || 0));
+    if (idx > 0 && fixed === null && !entry.vitality) vitMissing.push(idx + 1);
     vitalityBreakdown.dice += roll;
     vitalityBreakdown.constitution += abil.con.mod;
     vitalityBreakdown.minimumAdjustment += Math.max(0, 1 - roll - abil.con.mod);
@@ -1786,7 +1813,7 @@ function deriveSkillTotals(state) {
   const anyClass = new Set(
     classItems.filter(c => classLevels[c.system.identifier || c.name]).flatMap(c => c.system.classSkills ?? [])
   );
-  if ((classLevels.schemer ?? 0) >= 6) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
+  if ((classLevels.schemer ?? 0) >= 6 || allClassSkills()) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
   const derivedSkills = {};
   for (const sd of skillDefs) {
     const stored = sys.skills?.[sd.key] ?? {};
@@ -1972,11 +1999,28 @@ function deriveFeatSlots(state) {
     overflow += Math.max(0, s - slots[t]);
   }
   for (const [t, s] of Object.entries(spent)) if (!(t in cfg.featTrees)) overflow += s;
+  // The tree season qualities (pp.405–408): a feat from that tree may fill a choice meant for another tree.
+  const openTrees = campaignFeatTrees()
+    .map(label => Object.keys(cfg.featTrees).find(key => cfg.featTrees[key] === label))
+    .filter(Boolean);
+  for (const open of openTrees) {
+    let extra = Math.max(0, trees[open].spent - trees[open].slots);
+    for (const [t, v] of Object.entries(trees)) {
+      if (!extra || t === open) continue;
+      const spare = Math.max(0, v.slots - v.spent - (v.lent ?? 0));
+      const used = Math.min(spare, extra);
+      if (!used) continue;
+      v.lent = (v.lent ?? 0) + used;
+      trees[open].borrowed = (trees[open].borrowed ?? 0) + used;
+      extra -= used;
+      overflow -= used;
+    }
+  }
   sys.feats = { any: { slots: slots.any, spent: overflow, remaining: slots.any - overflow }, trees, replacementGrants };
   if (overflow > slots.any) warnings.push(loc`${overflow - slots.any} more feat(s) taken than available.`);
   const unusedTree = Object.entries(trees)
-    .filter(([, v]) => v.slots > v.spent)
-    .map(([t, v]) => `${v.slots - v.spent} ${cfg.featTrees[t]}`);
+    .filter(([, v]) => v.slots > v.spent + (v.lent ?? 0))
+    .map(([t, v]) => `${v.slots - v.spent - (v.lent ?? 0)} ${cfg.featTrees[t]}`);
   sys.feats.unusedTreeSlots = unusedTree;
   if (sys.feats.any.remaining > 0)
     todo.push({
@@ -2130,7 +2174,8 @@ function deriveProficiencies(state) {
 /** Step 12: wealth and mission gear. */
 function deriveWealthAndGear(state) {
   const { sys, allItems, items, T, warnings, todo, plural, base, gearBase, abil, B, misc } = state;
-  const wealthTotal = base.wealth + B.get("wealth") + Math.max(0, abil.cha.mod) + (misc.wealth ?? 0);
+  const wealthTotal =
+    base.wealth + B.get("wealth") + Math.max(0, abil.cha.mod) + (misc.wealth ?? 0) + campaignWealthBonus();
   const alloc = sys.wealthAllocation ?? {};
   const allocated = (alloc.lifestyle ?? 0) + (alloc.possessions ?? 0) + (alloc.spendingCash ?? 0);
   const lifestyleRaw = 1 + B.get("lifestyle") + (alloc.lifestyle ?? 0);
@@ -2233,7 +2278,11 @@ function deriveWealthAndGear(state) {
   for (const item of items.filter(item => ["weapon", "armor", "gear"].includes(item.type) && item.system.pick)) {
     const category = equipmentCategory(item),
       pick = item.system.pick;
-    if (activeReserves && !managedAcquisition(sys, item) && item.system.caliber > activeReserves.caliber) {
+    if (
+      activeReserves &&
+      !managedAcquisition(sys, item) &&
+      item.system.caliber > campaignGearCaliber(activeReserves.caliber).caliber
+    ) {
       const exception =
         bigStickMatches(sys, item) &&
         sys.bigStickMissionPick.missionCaliber === activeReserves.caliber &&
@@ -2294,10 +2343,10 @@ function deriveWealthAndGear(state) {
 /** Step 13: experience. */
 function deriveExperience(state) {
   const { sys, T, warnings, level } = state;
-  sys.xpNext = level < 20 ? (T.levels[level + 1]?.xp ?? null) : null;
+  sys.xpNext = level < 20 ? (campaignLevelRow(T.levels[level + 1])?.xp ?? null) : null;
   // Career levels follow XP thresholds (Table 1.3, p.27). A first-level character may start below its threshold,
   // so only later levels are checked; this is a reminder, as the GC may grant levels directly.
-  const xpForLevel = T.levels[level]?.xp;
+  const xpForLevel = campaignLevelRow(T.levels[level])?.xp;
   if (level > 1 && Number.isFinite(xpForLevel) && (Number(sys.xp) || 0) < xpForLevel)
     warnings.push(loc`Career Level ${level} needs ${xpForLevel} XP; this character has ${Number(sys.xp) || 0}.`);
 

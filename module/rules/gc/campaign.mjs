@@ -68,7 +68,8 @@ const MERGE = {
   surpriseHideBonus: (a, b) => a + b,
   favorableDispositionBonus: (a, b) => a + b,
   actionDieStep: (a, b) => a + b,
-  lowestAttributeErrorIncrease: (a, b) => a + b
+  lowestAttributeErrorIncrease: (a, b) => a + b,
+  wealthBonus: (a, b) => a + b
 };
 
 /**

@@ -11200,7 +11200,8 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "Every gear pick for any character, NPCs included, rises 1 Caliber; a pick pushed past Caliber V also yields 1 extra Caliber I item of that type. Player and special characters start with +4 Wealth.",
    "effects": {
-    "gearCaliberShift": 1
+    "gearCaliberShift": 1,
+    "wealthBonus": 4
    }
   },
   {
@@ -11482,7 +11483,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "After Level 1, player and special characters gain fixed vitality per career level: 2 with a d8 vitality die, 3 with a d10, 4 with a d12.",
-   "effects": {}
+   "effects": {
+    "fixedVitality": true
+   }
   },
   {
    "id": "freelance",
@@ -11593,7 +11596,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Every skill counts as a class skill for every class. Skill points gained do not change.",
-   "effects": {}
+   "effects": {
+    "allClassSkills": true
+   }
   },
   {
    "id": "the-market",
@@ -11779,7 +11784,9 @@ export const GC_DATA = {
    "xp": 25,
    "gcDice": null,
    "summary": "Player characters get 32 points for starting attributes instead of 36, and no starting attribute may exceed 18, Origin benefits included.",
-   "effects": {}
+   "effects": {
+    "pointBuy": 32
+   }
   },
   {
    "id": "soap",
