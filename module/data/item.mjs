@@ -350,6 +350,8 @@ export class ArmorData extends GearData {
       /** Legacy storage name: DR against other attacks, not subdual damage. */
       damageReductionSubdual: int(0, { min: 0 }),
       resistances: str(),
+      contagionSaveBonus: int(0, { min: 0 }),
+      radiationSaveBonus: int(0, { min: 0 }),
       defensePenalty: int(0),
       armorCheck: int(0),
       speedPenalty: int(0),

@@ -149,6 +149,12 @@ export function armorTotals(
       visionCheck: trained.filter(i => i.system.visionPenalty).reduce((n, i) => n + (i.system.armorCheck || 0), 0),
       speed: sum("speedPenalty"),
       resistances,
+      ...(selected.some(i => i.system.contagionSaveBonus > 0)
+        ? { contagionSaveBonus: Math.max(0, ...selected.map(i => Number(i.system.contagionSaveBonus) || 0)) }
+        : {}),
+      ...(selected.some(i => i.system.radiationSaveBonus > 0)
+        ? { radiationSaveBonus: Math.max(0, ...selected.map(i => Number(i.system.radiationSaveBonus) || 0)) }
+        : {}),
       training,
       adjustments: selected.map((item, n) => ({
         id: item.id,

@@ -7,6 +7,7 @@ import {
   FIRE_AP,
   FIRE_REDUCTIONS,
   SCAR_SAVE_DC,
+  SEALED_SUIT_BONUS,
   attributeLoss,
   burningRoundPlan,
   contagionDue,
@@ -320,7 +321,12 @@ export async function rollContagionSave(actor, id, options = {}) {
   const entry = hazardState(actor.system).contagions[id];
   if (!entry) return refuse(loc`This contagion is no longer being tracked.`);
   let sealedSuit = options.sealedSuit === true;
-  if (options.sealedSuit === undefined && entry.phase === "primary" && /radiation/i.test(entry.name)) {
+  if (
+    options.sealedSuit === undefined &&
+    !(actor.system.armor?.radiationSaveBonus >= SEALED_SUIT_BONUS) &&
+    entry.phase === "primary" &&
+    /radiation/i.test(entry.name)
+  ) {
     const input = await systemDialog.input({
       window: { title: entry.label },
       rejectClose: false,
@@ -329,7 +335,7 @@ export async function rollContagionSave(actor, id, options = {}) {
     if (!input) return null;
     sealedSuit = input.sealedSuit === true;
   }
-  const plan = contagionSavePlan(entry, { sealedSuit });
+  const plan = contagionSavePlan(entry, { sealedSuit, armor: actor.system.armor ?? {} });
   return actor.rollSave("fort", { askContext: true, hazardSave: { kind: "contagion", ...plan } });
 }
 

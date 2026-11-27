@@ -1,0 +1,197 @@
+{
+  "source": "Spycraft 2.0 second printing, pp.232–233, Tables 4.13–4.14",
+  "fields": [
+    "caliber",
+    "dr",
+    "resist",
+    "defensePenalty",
+    "acp",
+    "speed",
+    "notice",
+    "weight",
+    "armorType",
+    "sealed",
+    "visionPenalty",
+    "armorSlot",
+    "year"
+  ],
+  "width": 12,
+  "armor": {
+    "Corrections vest": [
+      232,
+      "de7d1b721a1e0ae38aae1700bda050585a00cf3bae39dd691bad6b8cf9715feceb66ffc86b51d431df5d32209ccbf8a8148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Duty vest, Class IIA": [
+      232,
+      "5d7f49449ab20d7f0e336166bda050585a005feceb66ffc85feceb66ffc85feceb66ffc8b17ef6d19c7a8a199b120cf4148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8e092c759a6d8e"
+    ],
+    "Duty vest, Class II": [
+      232,
+      "f5557d4fcf72f70b94aeb67dbda050585a001bad6b8cf9711bad6b8cf9715feceb66ffc8e629fa6598d74b227777d4dd148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8e092c759a6d8e"
+    ],
+    "Duty vest, Class IIIA": [
+      233,
+      "0ab3068230350b9db2ecfb8dbda050585a00cf3bae39dd691bad6b8cf9715feceb66ffc88527a891e224ef2d127de37b148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Flotation vest": [
+      232,
+      "de7d1b721a1e1d800ad9f4e94d2ee500d5d9cf3bae39dd69cf3bae39dd695feceb66ffc88c371634a4acd4735e3a265e148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8ed9447b08414d"
+    ],
+    "K-9 vest": [
+      232,
+      "de7d1b721a1e6d27ca189b30bda050585a005feceb66ffc85feceb66ffc85feceb66ffc881dcf73d9805e7f6c011776e148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8ef9543514b2d0"
+    ],
+    "Low-profile armor (poor)": [
+      232,
+      "f5557d4fcf720b9db2ecfb8dbda050585a005feceb66ffc85feceb66ffc85feceb66ffc84c4a5ee20a937902699be42c148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Low-profile armor (trendy)": [
+      233,
+      "0ab306823035f70b94aeb67dbda050585a005feceb66ffc85feceb66ffc85feceb66ffc84c4a5ee20a93e7f6c011776e148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8ef9543514b2d0"
+    ],
+    "Motorcycle jacket": [
+      232,
+      "de7d1b721a1e98ce94b2b196ba4996e24c281bad6b8cf9711bad6b8cf9715feceb66ffc88c371634a4ace7f6c011776e148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8ea40d6a5eb981"
+    ],
+    "Plastron": [
+      232,
+      "de7d1b721a1e98ce94b2b196e5eab6f8698f1bad6b8cf9715feceb66ffc85feceb66ffc8f5ca38f748a1ef2d127de37b148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8ea0aea7dfb98f"
+    ],
+    "Raid jacket": [
+      232,
+      "5d7f49449ab2401133a5a312bda050585a005feceb66ffc85feceb66ffc85feceb66ffc8d719b905c34e7902699be42c148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Tactical vest": [
+      232,
+      "5d7f49449ab2401133a5a312e5eab6f8698f615bdd17c255cf3bae39dd695feceb66ffc84a44dc153642e7f6c011776e148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Tuxedo liner": [
+      232,
+      "5d7f49449ab2d939926f0544bda050585a001bad6b8cf9715feceb66ffc85feceb66ffc8f5ca38f748a14e07408562be148de9c5a7a4fcbcf165908dfcbcf165908d230d8358dc8ef9543514b2d0"
+    ],
+    "Corrections suit": [
+      232,
+      "5d7f49449ab25bdb15b49f6cba4996e24c28e5e0093f285a615bdd17c25537aa1ccf80e44a44dc1536427902699be42c62c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Flak jacket": [
+      232,
+      "5d7f49449ab20b9db2ecfb8de5eab6f8698f37aa1ccf80e4cf3bae39dd695feceb66ffc88527a891e22419581e27de7c62c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8e3a7944692034"
+    ],
+    "Hobbyist's armor": [
+      232,
+      "de7d1b721a1eda090f9d2150bda050585a00e5e0093f285a615bdd17c255c171d4ec282b4a44dc1536428527a891e22462c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "Military flight suit": [
+      232,
+      "5d7f49449ab218d6e1cac2a8d0c8fa57c82ecf3bae39dd69cf3bae39dd6937aa1ccf80e48c371634a4ac2c624232cdd262c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8e775afff8c937"
+    ],
+    "Modular tactical armor vest": [
+      232,
+      "5d7f49449ab2401133a5a312bda050585a00615bdd17c2551bad6b8cf9715feceb66ffc88527a891e2247902699be42c62c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8ef9543514b2d0"
+    ],
+    "Modular tactical armor vest+guard": [
+      232,
+      "f5557d4fcf721265c5694e90ba4996e24c28615bdd17c255cf3bae39dd6937aa1ccf80e46b51d431df5d2c624232cdd262c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8ef9543514b2d0"
+    ],
+    "Motorcycle suit": [
+      232,
+      "5d7f49449ab2da090f9d21502b781ed5b2f7615bdd17c255cf3bae39dd6937aa1ccf80e48c371634a4ac6b51d431df5d62c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8ea40d6a5eb981"
+    ],
+    "Red man suit": [
+      232,
+      "de7d1b721a1e575671dc5db4ba4996e24c28cf3bae39dd69cf3bae39dd69c171d4ec282b81dcf73d9805e629fa6598d762c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "Tactical jacket": [
+      232,
+      "f5557d4fcf72d016d339874fe5eab6f8698fe5e0093f285acf3bae39dd695feceb66ffc84a44dc15364219581e27de7c62c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "Turnout gear": [
+      232,
+      "f5557d4fcf72b8db3faf75723197ba824f0ae5e0093f285a615bdd17c25537aa1ccf80e481dcf73d9805811786ad1ae762c66a7a5dd7fcbcf165908dfcbcf165908d230d8358dc8eb3b0561583c5"
+    ],
+    "Crash rescue suit (sealed)": [
+      233,
+      "0ab30682303558c0e7476a0deec43ecb698203b269448909e5e0093f285a5e37b37c842d81dcf73d980548449a14a4ff252f10c83610b5bea41b6c62fcbcf165908d230d8358dc8e775afff8c937"
+    ],
+    "Diving hardsuit (sealed)": [
+      233,
+      "4c94485e0c21e57831a7be36a7125993858be91592205d38c171d4ec282b5feceb66ffc881dcf73d9805bc10b57514d7252f10c83610b5bea41b6c62fcbcf165908d230d8358dc8e092c759a6d8e"
+    ],
+    "EOD suit": [
+      233,
+      "4c94485e0c215dbc6b15dd3c74425564f843a770d3270c9d03b2694489095e37b37c842d81dcf73d9805d59eced1ded0252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e775afff8c937"
+    ],
+    "Hobbyist's plate harness": [
+      232,
+      "5d7f49449ab2d42a258c590bbda050585a00e5e0093f285ae5e0093f285ac171d4ec282b81dcf73d9805ff5a1ae012af252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "Riot gear": [
+      233,
+      "0ab306823035bac89235c814aeb62c058f5703b26944890937aa1ccf80e4c171d4ec282b81dcf73d9805b17ef6d19c7a252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e775afff8c937"
+    ],
+    "Space suit (sealed)": [
+      233,
+      "4c94485e0c21ff060f43ada258d2dca13d1ee91592205d3803b2694489094cbaf3fbc9b681dcf73d9805226f76b55acb252f10c83610b5bea41b6c62fcbcf165908d230d8358dc8e775afff8c937"
+    ],
+    "Wetsuit": [
+      232,
+      "de7d1b721a1e253d950f11eb352443f36a7ccf3bae39dd691bad6b8cf9715feceb66ffc8b17ef6d19c7ae7f6c011776e252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "Athletic helmet": [
+      233,
+      "74234e98afe7253d950f11ebd8f72fdbec265feceb66ffc81bad6b8cf9715feceb66ffc881dcf73d98054e07408562bebda050585a00fcbcf165908db5bea41b6c62115584860cd5775afff8c937"
+    ],
+    "Ballistic helmet, early": [
+      233,
+      "74234e98afe7253d950f11ebbda050585a005feceb66ffc8cf3bae39dd695feceb66ffc881dcf73d98054e07408562bebda050585a00fcbcf165908db5bea41b6c62115584860cd5d80cf5ea021c"
+    ],
+    "Ballistic helmet, modern": [
+      233,
+      "74234e98afe7d939926f0544bda050585a005feceb66ffc81bad6b8cf9715feceb66ffc881dcf73d9805b8736b999909bda050585a00fcbcf165908db5bea41b6c62115584860cd5aa05ccc345c0"
+    ],
+    "Fire helmet": [
+      233,
+      "74234e98afe7253d950f11ebfd8d36a6fcb35feceb66ffc8cf3bae39dd695feceb66ffc881dcf73d98054b227777d4ddbda050585a00fcbcf165908db5bea41b6c62115584860cd5b3b0561583c5"
+    ],
+    "Flight helmet": [
+      233,
+      "74234e98afe7253d950f11eb2f111a9992ee5feceb66ffc8cf3bae39dd695feceb66ffc881dcf73d9805d4735e3a265ebda050585a00fcbcf165908db5bea41b6c62115584860cd5775afff8c937"
+    ],
+    "Hobbyist's helmet": [
+      233,
+      "74234e98afe7253d950f11ebbda050585a005feceb66ffc8e5e0093f285a5feceb66ffc881dcf73d98054a44dc153642bda050585a00fcbcf165908db5bea41b6c62115584860cd529422839d0b8"
+    ],
+    "Racing helmet": [
+      233,
+      "74234e98afe7253d950f11eb2ee07bf3b10f5feceb66ffc8615bdd17c2555feceb66ffc881dcf73d9805d4735e3a265ebda050585a00fcbcf165908db5bea41b6c62115584860cd529422839d0b8"
+    ],
+    "NBC gear, Level 1": [
+      232,
+      "de7d1b721a1ebda050585a007922b7227ccdcf3bae39dd691bad6b8cf9715feceb66ffc86b51d431df5de7f6c011776e252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "Radiation suit (sealed)": [
+      232,
+      "de7d1b721a1e18d6e1cac2a878b188dbe69937aa1ccf80e4615bdd17c255c171d4ec282b81dcf73d98054a44dc153642252f10c83610b5bea41b6c62fcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "Shield, tactical": [
+      232,
+      "de7d1b721a1ee86574df7434bda050585a004e07408562be37aa1ccf80e4c171d4ec282b81dcf73d9805c2356069e9d1bda050585a00fcbcf165908dfcbcf165908d072a626ed2d629422839d0b8"
+    ],
+    "Biohazard suit (sealed)": [
+      232,
+      "5d7f49449ab218d6e1cac2a8b6ab5e0be77537aa1ccf80e4615bdd17c255c171d4ec282b81dcf73d98056b51d431df5d252f10c83610b5bea41b6c62fcbcf165908d230d8358dc8eaa05ccc345c0"
+    ],
+    "NBC gear, Level 2": [
+      232,
+      "5d7f49449ab2bda050585a001ca23f38018dcf3bae39dd691bad6b8cf97137aa1ccf80e44a44dc153642a22eea496bce252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "NBC gear, Level 3": [
+      232,
+      "f5557d4fcf72bda050585a001fa4c0ece0a0615bdd17c255cf3bae39dd6937aa1ccf80e481dcf73d9805cc6f2aa507f6252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ],
+    "NBC gear, Level 4": [
+      233,
+      "0ab306823035bda050585a004ccd32c6a38ee5e0093f285a615bdd17c25537aa1ccf80e481dcf73d980519581e27de7c252f10c83610fcbcf165908dfcbcf165908d230d8358dc8e29422839d0b8"
+    ]
+  }
+}

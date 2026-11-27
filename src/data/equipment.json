@@ -8670,7 +8670,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Corrections vest",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 3,
@@ -8689,7 +8690,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Duty vest, Class IIA",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1970s"
   },
   {
    "num": 4,
@@ -8708,7 +8710,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Duty vest, Class II",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1970s"
   },
   {
    "num": 5,
@@ -8727,7 +8730,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "Duty vest, Class IIIA",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 6,
@@ -8746,7 +8750,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Flotation vest",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1880s"
   },
   {
    "num": 7,
@@ -8765,7 +8770,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "K-9 vest",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1990s"
   },
   {
    "num": 8,
@@ -8784,7 +8790,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Low-profile armor (poor or average)",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 9,
@@ -8803,7 +8810,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "Low-profile armor (trendy)",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1990s"
   },
   {
    "num": 10,
@@ -8822,7 +8830,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Motorcycle jacket",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1920s"
   },
   {
    "num": 11,
@@ -8841,7 +8850,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Plastron",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1800s"
   },
   {
    "num": 12,
@@ -8860,7 +8870,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Raid jacket",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 13,
@@ -8879,7 +8890,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Tactical vest",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 14,
@@ -8898,7 +8910,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Tuxedo liner",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1990s"
   },
   {
    "num": 15,
@@ -8917,7 +8930,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Corrections suit",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 16,
@@ -8936,7 +8950,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Flak jacket",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1940s"
   },
   {
    "num": 17,
@@ -8955,7 +8970,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Hobbyist’s armor",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1960s"
   },
   {
    "num": 18,
@@ -8974,7 +8990,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Military flight suit",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1950s"
   },
   {
    "num": 19,
@@ -8993,7 +9010,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Modular tactical armor, vest only",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1990s"
   },
   {
    "num": 20,
@@ -9012,7 +9030,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Modular tactical armor, vest + guards",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1990s"
   },
   {
    "num": 21,
@@ -9031,7 +9050,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Motorcycle suit",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1920s"
   },
   {
    "num": 22,
@@ -9050,7 +9070,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Red man suit",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1960s"
   },
   {
    "num": 23,
@@ -9069,7 +9090,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Tactical jacket",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1980s"
   },
   {
    "num": 24,
@@ -9088,7 +9110,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Turnout gear",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1900s"
   },
   {
    "num": 25,
@@ -9107,7 +9130,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "Crash rescue suit (sealed)",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1950s"
   },
   {
    "num": 26,
@@ -9126,7 +9150,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "Diving hardsuit (sealed) ",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1970s"
   },
   {
    "num": 27,
@@ -9145,7 +9170,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "EOD suit",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1950s"
   },
   {
    "num": 28,
@@ -9164,7 +9190,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Hobbyist’s plate harness",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1960s"
   },
   {
    "num": 29,
@@ -9183,7 +9210,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "Riot gear",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1950s"
   },
   {
    "num": 30,
@@ -9202,7 +9230,9 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear continued (descriptions: See page 284)",
    "sourceName": "Space suit (sealed) ",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "radiationSaveBonus": 10,
+   "year": "1950s"
   },
   {
    "num": 31,
@@ -9221,7 +9251,8 @@
    "sourcePage": 232,
    "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear (descriptions: See page 283)",
    "sourceName": "Wetsuit",
-   "armorSlot": "body"
+   "armorSlot": "body",
+   "year": "1960s"
   },
   {
    "num": 32,
@@ -9240,7 +9271,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, athletic",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1950s"
   },
   {
    "num": 33,
@@ -9259,7 +9291,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, ballistic (early)",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1930s"
   },
   {
    "num": 34,
@@ -9278,7 +9311,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, ballistic (modern)",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1980s"
   },
   {
    "num": 35,
@@ -9297,7 +9331,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, fire",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1900s"
   },
   {
    "num": 36,
@@ -9316,7 +9351,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, flight",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1950s"
   },
   {
    "num": 37,
@@ -9335,7 +9371,8 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, hobbyist’s",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1960s"
   },
   {
    "num": 38,
@@ -9354,7 +9391,159 @@
    "sourcePage": 233,
    "sourceTable": "Table 4.14: Armor and Protective Gear Upgrades (descriptions: See page 285)",
    "sourceName": "Helmet, racing",
-   "armorSlot": "helmet"
+   "armorSlot": "helmet",
+   "year": "1960s"
+  },
+  {
+   "num": 39,
+   "name": "NBC gear, Level 1",
+   "caliber": "I",
+   "dr": "—",
+   "resist": "AC4",
+   "defensePenalty": -2.0,
+   "acp": -1.0,
+   "speed": 0,
+   "notice": "12",
+   "weight": 6.0,
+   "armorType": "F",
+   "sealed": false,
+   "visionPenalty": false,
+   "armorSlot": "body",
+   "sourcePage": 232,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "NBC gear, Level 1",
+   "contagionSaveBonus": 1,
+   "rulesNote": "Primary contagion save bonus only. Levels 3 and 4 include a gas mask; review its separate protection with the GC.",
+   "year": "1960s"
+  },
+  {
+   "num": 40,
+   "name": "Radiation suit (sealed)",
+   "caliber": "I",
+   "dr": "1/0",
+   "resist": "EL8, FL4",
+   "defensePenalty": -5.0,
+   "acp": -3.0,
+   "speed": -10.0,
+   "notice": "obvious",
+   "weight": 10.0,
+   "armorType": "F",
+   "sealed": true,
+   "visionPenalty": false,
+   "armorSlot": "body",
+   "sourcePage": 232,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "Radiation suit (sealed)",
+   "radiationSaveBonus": 10,
+   "rulesNote": "Primary radiation save +10. Sealed; two-hour air supply and gas mask.",
+   "year": "1960s"
+  },
+  {
+   "num": 41,
+   "name": "Shield, tactical",
+   "caliber": "I",
+   "dr": "3/3",
+   "resist": "—",
+   "defensePenalty": 3.0,
+   "acp": -5.0,
+   "speed": -10.0,
+   "notice": "obvious",
+   "weight": 24.0,
+   "armorType": "—",
+   "sealed": false,
+   "visionPenalty": false,
+   "armorSlot": "shield",
+   "sourcePage": 232,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "Shield, tactical",
+   "year": "1960s"
+  },
+  {
+   "num": 42,
+   "name": "Biohazard suit (sealed)",
+   "caliber": "II",
+   "dr": "1/0",
+   "resist": "AC15, CN (all), VC4",
+   "defensePenalty": -5.0,
+   "acp": -3.0,
+   "speed": -10.0,
+   "notice": "obvious",
+   "weight": 12.0,
+   "armorType": "F",
+   "sealed": true,
+   "visionPenalty": false,
+   "armorSlot": "body",
+   "sourcePage": 232,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "Biohazard suit (sealed)",
+   "rulesNote": "Sealed; two-hour air supply.",
+   "year": "1980s"
+  },
+  {
+   "num": 43,
+   "name": "NBC gear, Level 2",
+   "caliber": "II",
+   "dr": "—",
+   "resist": "AC4, CD4, EL4",
+   "defensePenalty": -2.0,
+   "acp": -1.0,
+   "speed": -5.0,
+   "notice": "10",
+   "weight": 6.5,
+   "armorType": "F",
+   "sealed": false,
+   "visionPenalty": false,
+   "armorSlot": "body",
+   "sourcePage": 232,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "NBC gear, Level 2",
+   "contagionSaveBonus": 3,
+   "rulesNote": "Primary contagion save bonus only. Levels 3 and 4 include a gas mask; review its separate protection with the GC.",
+   "year": "1960s"
+  },
+  {
+   "num": 44,
+   "name": "NBC gear, Level 3",
+   "caliber": "III",
+   "dr": "—",
+   "resist": "AC4, CD4, CN4, EL4",
+   "defensePenalty": -3.0,
+   "acp": -2.0,
+   "speed": -5.0,
+   "notice": "obvious",
+   "weight": 8.5,
+   "armorType": "F",
+   "sealed": false,
+   "visionPenalty": false,
+   "armorSlot": "body",
+   "sourcePage": 232,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "NBC gear, Level 3",
+   "contagionSaveBonus": 6,
+   "rulesNote": "Primary contagion save bonus only. Levels 3 and 4 include a gas mask; review its separate protection with the GC.",
+   "year": "1960s"
+  },
+  {
+   "num": 45,
+   "name": "NBC gear, Level 4",
+   "caliber": "IV",
+   "dr": "—",
+   "resist": "AC4, CD4, CN8, EL4",
+   "defensePenalty": -4.0,
+   "acp": -3.0,
+   "speed": -5.0,
+   "notice": "obvious",
+   "weight": 9.0,
+   "armorType": "F",
+   "sealed": false,
+   "visionPenalty": false,
+   "armorSlot": "body",
+   "sourcePage": 233,
+   "sourceTable": "Table 4.13: Security picks: Armor and Protective Gear",
+   "sourceName": "NBC Gear, Level 4",
+   "contagionSaveBonus": 10,
+   "rulesNote": "Primary contagion save bonus only. Levels 3 and 4 include a gas mask; review its separate protection with the GC.",
+   "year": "1960s"
   }
  ]
 }

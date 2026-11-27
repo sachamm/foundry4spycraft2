@@ -26,7 +26,7 @@ test("every catalog item and GC table has an explicit, defined compressed icon",
       for (const result of doc.embedded?.results ?? []) assert.equal(result.img, doc.img);
     }
   }
-  assert.equal(items, 1941);
+  assert.equal(items, 1948);
   assert.equal(tables, 36);
 });
 

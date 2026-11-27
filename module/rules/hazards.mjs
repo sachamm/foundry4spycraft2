@@ -163,10 +163,15 @@ export function contagionDue(entry, worldTime) {
 }
 
 /** The Fortitude save a contagion calls for now. */
-export function contagionSavePlan(entry, { sealedSuit = false } = {}) {
+export function contagionSavePlan(entry, { sealedSuit = false, armor = {} } = {}) {
   const phase = entry.phase === "primary" ? entry.primary : entry.secondary;
-  // A sealed suit helps only against a radiation contagion's first save (p.287).
-  const suit = sealedSuit && entry.phase === "primary" && /radiation/i.test(entry.name) ? SEALED_SUIT_BONUS : 0;
+  const radiation = /radiation/i.test(entry.name);
+  const bonuses = [armor.contagionSaveBonus ?? 0, radiation ? (armor.radiationSaveBonus ?? 0) : 0];
+  if (bonuses.some(value => !Number.isSafeInteger(value) || value < 0))
+    throw Error(loc`Review the protective gear's primary contagion save bonuses before rolling.`);
+  // NBC gear and radiation/space suits protect the Primary Phase only (pp.284,287).
+  // A declared suit and the same equipped suit must never supply its bonus twice.
+  const suit = entry.phase === "primary" ? Math.max(...bonuses, sealedSuit && radiation ? SEALED_SUIT_BONUS : 0) : 0;
   return {
     id: entry.id,
     label: entry.label,
@@ -343,7 +348,7 @@ rollPipeline.register({
       rowAt: 110,
       rows: [
         [loc`Extra doses`, save.dosePenalty ?? 0],
-        [loc`Sealed suit`, save.suitBonus ?? 0],
+        [loc`Protective gear`, save.suitBonus ?? 0],
         // A hazard's own situational modifier (movement before an explosion, half actions given up to acid, armor
         // against heat), labelled by the rule that set it.
         ...(Number(save.bonus) ? [[String(save.bonusLabel ?? loc`Hazard modifier`), Number(save.bonus)]] : [])

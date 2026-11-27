@@ -1613,7 +1613,7 @@
       },
       {
         "id": "khCHFGrQaGkb6uUZ",
-        "name": "This\u2026 is my Boomstick",
+        "name": "This… is my Boomstick",
         "icon": "shotgun"
       },
       {
@@ -4675,7 +4675,7 @@
       },
       {
         "id": "gcAlv74YKo9Ngrct",
-        "name": "Enfield L86A1 LSW 5.56\u00d745mm NATO",
+        "name": "Enfield L86A1 LSW 5.56×45mm NATO",
         "icon": "assault-rifle"
       },
       {
@@ -4685,47 +4685,47 @@
       },
       {
         "id": "ldTdQSt3vE1rXQ7f",
-        "name": "FN Minimi 5.56\u00d745mm NATO",
+        "name": "FN Minimi 5.56×45mm NATO",
         "icon": "assault-rifle"
       },
       {
         "id": "LOLiR1rnhZP2CXKI",
-        "name": "FN Minimi Para 5.56\u00d745mm NATO",
+        "name": "FN Minimi Para 5.56×45mm NATO",
         "icon": "assault-rifle"
       },
       {
         "id": "QNYmE8vrodTeMSCU",
-        "name": "NORINCO QJY-88 5.8\u00d742mm",
+        "name": "NORINCO QJY-88 5.8×42mm",
         "icon": "assault-rifle"
       },
       {
         "id": "2kMyS71oj2KpUDFV",
-        "name": "RSA RPK 7.62\u00d739mm Russian",
+        "name": "RSA RPK 7.62×39mm Russian",
         "icon": "assault-rifle"
       },
       {
         "id": "sUx3c0OZKfsingun",
-        "name": "RSA RPK-74 5.45\u00d739mm Russian",
+        "name": "RSA RPK-74 5.45×39mm Russian",
         "icon": "assault-rifle"
       },
       {
         "id": "FekYi6KxDfUnpe3l",
-        "name": "Steyr AUG Hbar 5.56\u00d745mm NATO",
+        "name": "Steyr AUG Hbar 5.56×45mm NATO",
         "icon": "assault-rifle"
       },
       {
         "id": "NPCochh2y3knyomB",
-        "name": "Saco M60 7.62\u00d751mm NATO",
+        "name": "Saco M60 7.62×51mm NATO",
         "icon": "assault-rifle"
       },
       {
         "id": "hH9tFl1txgLHt2OU",
-        "name": "FN MAG 7.62\u00d751mm NATO",
+        "name": "FN MAG 7.62×51mm NATO",
         "icon": "assault-rifle"
       },
       {
         "id": "WlG12TK33AeqF1T7",
-        "name": "German State Arsenal MG-42 7.62\u00d751mm NATO",
+        "name": "German State Arsenal MG-42 7.62×51mm NATO",
         "icon": "assault-rifle"
       },
       {
@@ -4735,7 +4735,7 @@
       },
       {
         "id": "pI5TuZurxCK4M2pk",
-        "name": "RSA PK 7.62\u00d754mm Russian",
+        "name": "RSA PK 7.62×54mm Russian",
         "icon": "assault-rifle"
       },
       {
@@ -4745,12 +4745,12 @@
       },
       {
         "id": "4Jz04RJTvce6wpiW",
-        "name": "General Electric M134 7.62\u00d751mm NATO",
+        "name": "General Electric M134 7.62×51mm NATO",
         "icon": "assault-rifle"
       },
       {
         "id": "BICTwQQcq3nKjEpc",
-        "name": "RSA DShK 12.7\u00d7109mm Russian",
+        "name": "RSA DShK 12.7×109mm Russian",
         "icon": "assault-rifle"
       },
       {
@@ -5184,6 +5184,41 @@
         "id": "Ys7A4aFdJ2wKyZo4",
         "name": "Racing helmet",
         "icon": "helmet"
+      },
+      {
+        "id": "7hrGyXt5rXmvRgem",
+        "name": "NBC gear, Level 1",
+        "icon": "protective-suit"
+      },
+      {
+        "id": "ZMu7j9iLKW3gTCoO",
+        "name": "Radiation suit (sealed)",
+        "icon": "protective-suit"
+      },
+      {
+        "id": "QIclwkQkrTZocJxC",
+        "name": "Shield, tactical",
+        "icon": "shield"
+      },
+      {
+        "id": "YqSO8928C71OnVGr",
+        "name": "Biohazard suit (sealed)",
+        "icon": "protective-suit"
+      },
+      {
+        "id": "pRUjOtxm46pkNduq",
+        "name": "NBC gear, Level 2",
+        "icon": "protective-suit"
+      },
+      {
+        "id": "g8FP2OUJoU4UljFK",
+        "name": "NBC gear, Level 3",
+        "icon": "protective-suit"
+      },
+      {
+        "id": "EpchIjyigLhtg0qk",
+        "name": "NBC gear, Level 4",
+        "icon": "protective-suit"
       }
     ],
     "kits": [
@@ -5204,17 +5239,17 @@
       },
       {
         "id": "M8oYuh3BHXG5roxo",
-        "name": "Architect\u2019s Kit I",
+        "name": "Architect’s Kit I",
         "icon": "blueprint"
       },
       {
         "id": "zcjVC5GO322EX7K1",
-        "name": "Architect\u2019s Kit II",
+        "name": "Architect’s Kit II",
         "icon": "blueprint"
       },
       {
         "id": "j3kdtfEUvwltNusO",
-        "name": "Architect\u2019s Kit III",
+        "name": "Architect’s Kit III",
         "icon": "blueprint"
       },
       {
@@ -8630,7 +8665,7 @@
       },
       {
         "id": "xiPdk6gEpIUo6Fsk",
-        "name": "\u201cTechnical\u201d conversion, kit",
+        "name": "“Technical” conversion, kit",
         "icon": "assault-rifle"
       },
       {
@@ -9432,7 +9467,7 @@
       },
       {
         "id": "t4QyTRQdXOOAuKa3",
-        "name": "Helmet, hobbyist\u2019s",
+        "name": "Helmet, hobbyist’s",
         "icon": "helmet"
       },
       {
@@ -9472,7 +9507,7 @@
       },
       {
         "id": "XEqbiizEPuZMi7zB",
-        "name": "Shield, hobbyist\u2019s",
+        "name": "Shield, hobbyist’s",
         "icon": "shield"
       },
       {
@@ -9787,17 +9822,17 @@
       },
       {
         "id": "XA7k0cgLJvdsuGtB",
-        "name": "Sight, day/night (1.5\u00d7\u20134\u00d7)",
+        "name": "Sight, day/night (1.5×–4×)",
         "icon": "scope"
       },
       {
         "id": "Gh5OeZeRdh7qmQHS",
-        "name": "Sight, day/night (4.1\u00d7\u20138\u00d7)",
+        "name": "Sight, day/night (4.1×–8×)",
         "icon": "scope"
       },
       {
         "id": "Cdi71nQYISp7O44t",
-        "name": "Sight, day/night (8.1\u00d7\u201316\u00d7)",
+        "name": "Sight, day/night (8.1×–16×)",
         "icon": "scope"
       },
       {
@@ -9807,17 +9842,17 @@
       },
       {
         "id": "eXoMDRwyy8BFwWEo",
-        "name": "Sight, night vision (1.5\u00d7\u20134\u00d7)",
+        "name": "Sight, night vision (1.5×–4×)",
         "icon": "scope"
       },
       {
         "id": "ZjoepMIFVFHNCeI7",
-        "name": "Sight, night vision (4.1\u00d7\u20138\u00d7)",
+        "name": "Sight, night vision (4.1×–8×)",
         "icon": "scope"
       },
       {
         "id": "9HlDLO7SHRqnQX2V",
-        "name": "Sight, night vision (8.1\u00d7\u201316\u00d7)",
+        "name": "Sight, night vision (8.1×–16×)",
         "icon": "scope"
       },
       {
@@ -9827,22 +9862,22 @@
       },
       {
         "id": "p0BQV0Ce33KpAUGI",
-        "name": "Sight, telescopic (1.5\u00d7\u20134\u00d7)",
+        "name": "Sight, telescopic (1.5×–4×)",
         "icon": "scope"
       },
       {
         "id": "y8Lrv0PDVGEk8yoJ",
-        "name": "Sight, telescopic (4.1\u00d7\u20138\u00d7)",
+        "name": "Sight, telescopic (4.1×–8×)",
         "icon": "scope"
       },
       {
         "id": "LmbKEkYb72x7rGxr",
-        "name": "Sight, telescopic (8.1\u00d7\u201316\u00d7)",
+        "name": "Sight, telescopic (8.1×–16×)",
         "icon": "scope"
       },
       {
         "id": "A7ht0YMCoxDhPK3g",
-        "name": "Sight, telescopic (16.1+\u00d7)",
+        "name": "Sight, telescopic (16.1+×)",
         "icon": "scope"
       },
       {
@@ -9852,7 +9887,7 @@
       },
       {
         "id": "PMStc2Og07vmwFZU",
-        "name": "Sight, thermal (1.5\u00d7\u20134\u00d7)",
+        "name": "Sight, thermal (1.5×–4×)",
         "icon": "scope"
       },
       {
@@ -10511,27 +10546,27 @@
       },
       {
         "id": "lXpbdPTHQ64q2bOa",
-        "name": "Deviation Distance: 1\u20132 Range Increments",
+        "name": "Deviation Distance: 1–2 Range Increments",
         "icon": "arrow"
       },
       {
         "id": "xUquT3rEjEMk4Lv3",
-        "name": "Deviation Distance: 3\u20134 Range Increments",
+        "name": "Deviation Distance: 3–4 Range Increments",
         "icon": "arrow"
       },
       {
         "id": "Snsn0YKB6a1izzAO",
-        "name": "Deviation Distance: 5\u20136 Range Increments",
+        "name": "Deviation Distance: 5–6 Range Increments",
         "icon": "arrow"
       },
       {
         "id": "4I5RYuigNkkm1bVN",
-        "name": "Deviation Distance: 7\u20138 Range Increments",
+        "name": "Deviation Distance: 7–8 Range Increments",
         "icon": "arrow"
       },
       {
         "id": "JHzpQwjTIVMVBcCx",
-        "name": "Deviation Distance: 9\u201310 Range Increments",
+        "name": "Deviation Distance: 9–10 Range Increments",
         "icon": "arrow"
       },
       {

@@ -65,7 +65,7 @@ const armor = (id, patch = {}) => ({
 
 test("RAW pp.232–276: the original 394 weapons and 37 armor records retain their independent source statistics", () => {
   assert.equal(equipment.weapons.length, 458);
-  assert.equal(equipment.armor.length, 37);
+  assert.equal(equipment.armor.length, 44);
   for (const weapon of equipment.weapons.filter(w => !/^Table 4\.5[0-9]:/.test(w.sourceTable))) {
     const row = reference.weapons[weapon.legacyName ?? weapon.name];
     assert.ok(row, weapon.name);
@@ -83,7 +83,7 @@ test("RAW pp.232–276: the original 394 weapons and 37 armor records retain the
     assert.equal(weapon.weight, number(row.cells[8]), weapon.name);
     assert.equal(weapon.range, number(row.cells[5]), weapon.name);
   }
-  for (const item of equipment.armor) {
+  for (const item of equipment.armor.filter(item => Object.hasOwn(reference.armor, item.name))) {
     const row = reference.armor[item.name];
     assert.ok(row, item.name);
     assert.equal(item.dr, row.cells[2].replace("**", ""), item.name);

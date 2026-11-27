@@ -260,7 +260,7 @@ test("a save against a hazard carries the hazard's DC, dose penalty and suit bon
   const term = terms.list.find(t => t.id === "hazardSaveTerm");
   assert.deepEqual(term.rows, [
     ["Extra doses", -2],
-    ["Sealed suit", 10]
+    ["Protective gear", 10]
   ]);
   assert.equal(term.flavor, " — E coli DC 12");
   assert.equal(

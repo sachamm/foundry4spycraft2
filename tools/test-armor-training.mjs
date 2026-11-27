@@ -278,10 +278,10 @@ test("dropping active feats or unwearing armor removes its protections without m
   assert.equal(b.system.choice, "P");
   assert.equal(m.system.choice, "M");
 });
-test("all 37 source armor entries retain base statistics while every typed body armor gets the correct training branch", () => {
+test("all 44 source armor entries retain base statistics while every typed body armor gets the correct training branch", () => {
   const catalog = JSON.parse(readFileSync(new URL("../src/data/equipment.json", import.meta.url))).armor,
     rules = training([supremacy()]);
-  assert.equal(catalog.length, 37);
+  assert.equal(catalog.length, 44);
   for (const source of catalog) {
     const item = armor(source.armorType, {
         armorSlot: source.armorSlot,

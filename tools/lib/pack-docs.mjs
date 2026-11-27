@@ -430,7 +430,7 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
         "armor",
         "icons/svg/shield.svg",
         {
-          description: "",
+          description: p(a.rulesNote),
           source: `Spycraft 2.0 p.${a.sourcePage}`,
           quantity: 1,
           equipped: false,
@@ -439,6 +439,8 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
           armorType: a.armorType,
           armorSlot: a.armorSlot,
           sealed: a.sealed,
+          ...(a.contagionSaveBonus ? { contagionSaveBonus: a.contagionSaveBonus } : {}),
+          ...(a.radiationSaveBonus ? { radiationSaveBonus: a.radiationSaveBonus } : {}),
           visionPenalty: a.visionPenalty,
           gearCategory: "S",
           caliber: ROMAN[a.caliber] ?? 0,

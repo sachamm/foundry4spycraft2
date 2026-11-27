@@ -14,6 +14,8 @@
     <label>{{localize "SPYCRAFT.Speed"}} <input type="number" name="system.speedPenalty" value="{{system.speedPenalty}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.ArmorField.Notice"}} <input type="text" name="system.notice" value="{{system.notice}}" class="w-4" /></label>
     <label class="wide">{{localize "SPYCRAFT.ArmorField.Resistances"}} <input type="text" name="system.resistances" value="{{system.resistances}}" placeholder="{{localize 'SPYCRAFT.Template.ItemItemArmor.AD4CD4CNAll'}}" /></label>
+    <label>{{localize "SPYCRAFT.ArmorField.PrimaryContagion"}} <input type="number" name="system.contagionSaveBonus" value="{{system.contagionSaveBonus}}" min="0" step="1" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.ArmorField.PrimaryRadiation"}} <input type="number" name="system.radiationSaveBonus" value="{{system.radiationSaveBonus}}" min="0" step="1" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
     <label>{{localize "SPYCRAFT.Weight"}} <input type="number" step="any" name="system.weight" value="{{system.weight}}" class="w-2" /></label>

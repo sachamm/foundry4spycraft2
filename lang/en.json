@@ -352,6 +352,8 @@
    "UntrainedPenalty": "Untrained penalty"
   },
   "ArmorField": {
+   "PrimaryContagion": "Primary contagion save bonus",
+   "PrimaryRadiation": "Primary radiation save bonus",
    "Defense": "Defense",
    "Check": "Armor check",
    "Notice": "Notice DC",

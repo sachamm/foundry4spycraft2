@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 27 November 2026:** PC creation **9.7/10**;
+**Continuing review, 27 November 2026:** PC creation **9.8/10**;
 combat play **9.8/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -2015,3 +2015,38 @@ final GC-release guard; its additional regression and the affected workflows
 then passed in a **64-test** run. Schema, lint, formatting, bundle and copy checks
 also pass. Continue the newly identified missing protective-gear records, typed
 lethal bruising, fire totals and the remaining documented creation/combat gaps.
+
+## Pass 68: Complete protective-gear profiles and source availability
+
+PC creation rises to **9.8/10**; combat remains **9.8/10**. All 44 armor profiles
+now retain thirteen independently checked table fields (**572 comparisons**).
+The original 37 combat profiles matched. Seven omitted entries were added:
+radiation and biohazard suits, four NBC levels, and the tactical shield. A further
+29 availability dates disagreed with the printed tables. Source dates now live
+on every armor entry; the obsolete estimated armor-date map was removed.
+Existing compendium identities were retained and the new entries use existing
+icons. The source fingerprints cover the entire expanded armor catalog.
+
+NBC gear's +1/+3/+6/+10 bonuses now reach Primary Phase contagion saves. Radiation
+and space suits supply +10 against primary radiation saves without requiring the
+wearer to declare the same protection again. Secondary Phase saves receive
+neither benefit; a declared suit cannot double its equipped bonus. Reserve and
+unavailable armor do not supply protection. The actual armor sheet exposes both
+bonuses for GC corrections. Included gas masks and air supplies have concise
+reference summaries; their separate management still belongs to the GC.
+
+Native Foundry equipped all eight relevant profiles on a Scientist clone and
+rolled six actual contagion saves. The four NBC grades supplied 1/3/6/10 and both
+radiation/space suits supplied 10, with the rebuilt dates and resistance values.
+The NBC IV item sheet displayed its editable bonus at 1280×720, entirely within
+the viewport. This is equipment evidence, not another complete PC build.
+A separate attempted grade-built NPC gear test exposed that owned armor does not
+yet feed its shared armor aggregate; address this before claiming NPC equipment
+protection. Existing NPC quality-built defenses remain separately covered.
+
+All **4,378** Node tests, **988** engine checks, **13** packed-data tests and
+**267** layout cases pass, as do schema, lint, formatting, bundle and copy checks.
+Only the armor column changed in 28 sample-engine fingerprints, reflecting the
+corrected dates and declared equipment properties; other derived columns were
+verified unchanged. Continue NPC equipment preparation, typed lethal bruising,
+fire totals, injury/recovery timing and broader creation choices toward 9.9.
