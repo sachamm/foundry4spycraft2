@@ -11212,7 +11212,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Every character and NPC is labelled Good or Evil. At GC discretion, actions or attacks meant to harm or hinder the opposite side gain +2, and an exemplary act fitting one's nature earns 1 action die.",
-   "effects": {}
+   "effects": {
+    "goodAndEvil": true
+   }
   },
   {
    "id": "bleak",
@@ -11303,7 +11305,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "1/session, on rolling a threat (attack or skill), a player/special character may deliver a signature line as a free action. Effect: morale bonus on Defense and Resist checks = 2x Charisma bonus (at least +1), lasting half his career level in rounds (round up).",
-   "effects": {}
+   "effects": {
+    "catchPhrase": true
+   }
   },
   {
    "id": "the-circuit",
@@ -11696,7 +11700,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "A PC killed in a standard scene, body still whole, can return when the next mission begins for 200 Reputation or $10,000,000.",
-   "effects": {}
+   "effects": {
+    "revolvingDoor": true
+   }
   },
   {
    "id": "routine",

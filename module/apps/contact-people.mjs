@@ -8,6 +8,7 @@ import {
   newContactPerson,
   personNpcGrade,
   reviewContactPeople,
+  sharedContactPeople,
   specialistLevels,
   summonPlan
 } from "../rules/contact-people.mjs";
@@ -18,6 +19,11 @@ import { loc } from "../i18n.mjs";
 const GRADES = ["Acquaintance", "Associate", "Confederate", "Partner"];
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 const contactsOf = actor => (actor.system.contacts ?? []).map(row => ({ ...row, people: [...(row.people ?? [])] }));
+/** The same contact on other agents' sheets, for shared contacts (p.459). */
+const otherContacts = actor =>
+  [...(globalThis.game?.actors ?? [])]
+    .filter(other => other.type === "agent" && other.id !== actor.id)
+    .flatMap(other => (other.system.contacts ?? []).map(contact => ({ owner: other.name, contact })));
 const personLabel = person =>
   person.kind === "specialist"
     ? loc`${GRADES[person.grade - 1]} specialist: ${person.ability || loc`ability not chosen`}`
@@ -29,6 +35,13 @@ export async function editContactPeople(actor, index) {
   const contacts = contactsOf(actor),
     contact = contacts[index];
   if (!contact) return refuse(loc`That contact is no longer listed. Close the dialog and try again.`);
+  const shared = sharedContactPeople(contact, otherContacts(actor));
+  // Offer the introducer's people while this sheet lacks some within reach or differs from them; once they match,
+  // either character may introduce the next one as the relationship grows.
+  const key = person => `${person.kind}|${person.grade}|${person.skill}|${person.ability}`,
+    mine = new Set(contact.people.map(key));
+  if (shared && (shared.problems.length || shared.reachable.some(person => !mine.has(key(person)))))
+    return shareContactPeople(actor, contacts, index, shared);
   const { room } = reviewContactPeople(contact);
   const existing = contact.people
     .map(
@@ -60,6 +73,36 @@ export async function editContactPeople(actor, index) {
       return refuse(loc`Name the specialist's class ability, then save again.`);
     contact.people.push(person);
   }
+  contacts[index] = contact;
+  return actor.update({ "system.contacts": contacts });
+}
+
+/** A shared contact's people come from whoever introduced them first; this copies the ones within reach. */
+async function shareContactPeople(actor, contacts, index, shared) {
+  const contact = contacts[index];
+  const list = shared.people
+    .map(
+      person =>
+        `<li>${esc(personLabel(person))}${shared.reachable.some(r => r.grade === person.grade && r.kind === person.kind && r.skill === person.skill && r.ability === person.ability) ? "" : esc(loc` (above this relationship's grade)`)}</li>`
+    )
+    .join("");
+  const ok = await formDialog({
+    title: loc`${contact.name || loc`Contact`}: consultants and specialists`,
+    intro: loc`${shared.owner} introduced this contact's people first, so they are fixed (p.459). This character can call the ones at or below their own grade with the contact.`,
+    fields: [raw(`<ul>${list}</ul>`)],
+    ok: loc`Use the shared people`
+  });
+  if (!ok) return null;
+  const kept = new Map(
+    (contact.people ?? []).map(person => [
+      `${person.kind}|${person.grade}|${person.skill}|${person.ability}`,
+      person.summoned
+    ])
+  );
+  contact.people = shared.reachable.map(person => ({
+    ...person,
+    summoned: kept.get(`${person.kind}|${person.grade}|${person.skill}|${person.ability}`) ?? ""
+  }));
   contacts[index] = contact;
   return actor.update({ "system.contacts": contacts });
 }

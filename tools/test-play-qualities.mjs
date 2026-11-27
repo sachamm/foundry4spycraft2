@@ -113,3 +113,13 @@ test("Gladiators adds 1 Defense against ranged attacks per Melee or Unarmed Comb
     assert.equal(incomingDefensePlan(defender, { ranged: false }).total, plain);
   });
 });
+
+test("Catch Phrase reminds the table on a threat, and the reminder qualities list their rulings", async () => {
+  const { checkFlavor } = await import("../module/rules/outcomes.mjs");
+  const { campaignRuleLines } = await import("../module/rules/campaign-rules.mjs");
+  const check = { checkKind: "skill", threatConfirmed: true, successConfirmed: true, rawTotal: 25, naturalDie: 20 };
+  assert.doesNotMatch(checkFlavor(check), /Catch Phrase/);
+  withRules({ catchPhrase: true }, () => assert.match(checkFlavor(check), /Catch Phrase: once per session/));
+  const lines = campaignRuleLines({ catchPhrase: true, goodAndEvil: true, revolvingDoor: true });
+  assert.equal(lines.length, 3);
+});

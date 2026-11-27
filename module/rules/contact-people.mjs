@@ -96,3 +96,34 @@ export function summonPlan(contact, index, { mission, threatLevel, checkSucceede
     formula: `1d20 + ${consultantBonus(g, threatLevel)}`
   };
 }
+
+const sameContact = (a, b) =>
+  String(a ?? "")
+    .trim()
+    .toLowerCase() ===
+    String(b ?? "")
+      .trim()
+      .toLowerCase() && String(a ?? "").trim() !== "";
+
+/**
+ * Shared contacts (p.459): when two characters have the same contact, the first to introduce its consultants and
+ * specialists sets them for good. `others` lists [{ owner, contact }] from the other characters' sheets; the first
+ * with people for a contact of the same name is the one who introduced them. A character reaches only the people
+ * at or below the grade of their own relationship.
+ * @returns {null|{owner: string, people: object[], reachable: object[], problems: string[]}}
+ */
+export function sharedContactPeople(contact, others = []) {
+  const source = others.find(other => sameContact(other.contact?.name, contact?.name) && other.contact?.people?.length);
+  if (!source) return null;
+  const rank = grade(contact?.rank),
+    people = source.contact.people,
+    reachable = people.filter(person => grade(person.grade) <= rank).map(person => ({ ...person, summoned: "" })),
+    key = person => `${person.kind}|${grade(person.grade)}|${person.skill ?? ""}|${person.ability ?? ""}`,
+    theirs = new Set(people.map(key)),
+    problems = [];
+  if ((contact?.people ?? []).some(person => !theirs.has(key(person))))
+    problems.push(
+      loc`${contact.name} is shared with ${source.owner}, who introduced its consultants and specialists first. Use theirs (p.459).`
+    );
+  return { owner: source.owner, people, reachable, problems };
+}

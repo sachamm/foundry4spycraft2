@@ -57,3 +57,28 @@ test("summoning: once per mission, at the Threat Level", () => {
     /Threat Level/
   );
 });
+
+test("a shared contact's people come from whoever introduced them, within the relationship's grade", async () => {
+  const { sharedContactPeople } = await import("../module/rules/contact-people.mjs");
+  const first = {
+    name: "Backstage",
+    rank: 2,
+    people: [
+      { kind: "consultant", grade: 2, skill: "Analysis", ability: "", summoned: "m1" },
+      { kind: "specialist", grade: 1, skill: "", ability: "Behind the Scenes I", summoned: "" }
+    ]
+  };
+  assert.equal(sharedContactPeople({ name: "Other", rank: 1 }, [{ owner: "Ana", contact: first }]), null);
+  const shared = sharedContactPeople({ name: " backstage ", rank: 1, people: [] }, [{ owner: "Ana", contact: first }]);
+  assert.equal(shared.owner, "Ana");
+  assert.deepEqual(
+    shared.reachable.map(person => person.kind),
+    ["specialist"]
+  );
+  assert.equal(shared.reachable[0].summoned, "");
+  const differing = sharedContactPeople(
+    { name: "Backstage", rank: 1, people: [{ kind: "consultant", grade: 1, skill: "Drive", ability: "" }] },
+    [{ owner: "Ana", contact: first }]
+  );
+  assert.equal(differing.problems.length, 1);
+});

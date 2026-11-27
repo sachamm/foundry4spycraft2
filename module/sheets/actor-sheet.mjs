@@ -127,6 +127,7 @@ import { brightIdeaPoolStatus } from "../rules/bright-idea.mjs";
 import { queueResources, isResourceLock } from "../services/transactions.mjs";
 import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
 import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
+import { organizationChoices } from "../rules/npc-organization.mjs";
 import { reviewActorRules } from "../apps/rules-refresh.mjs";
 import { classSkillSelections, orderedClassChoices } from "../rules/class-skills.mjs";
 import { armorSlot } from "../rules/gear.mjs";
@@ -1974,6 +1975,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         ])
       ),
       caliberOptions: Object.fromEntries(NPC_RULES.grades.slice(0, 5).map((g, i) => [i + 1, g])),
+      // Tools (p.394): the organization this NPC serves caps its gear Calibers.
+      organizationOptions: organizationChoices().length
+        ? { "": loc`None recorded`, ...Object.fromEntries(organizationChoices()) }
+        : null,
+      organizationCapsNote: result.organizationCaps
+        ? loc`${result.organizationCaps.name}'s Tools: weapons up to Caliber ${NPC_RULES.grades[result.organizationCaps.weapons - 1]}, gear up to ${NPC_RULES.grades[result.organizationCaps.gear - 1]}, vehicles up to ${NPC_RULES.grades[result.organizationCaps.vehicles - 1]}.`
+        : "",
       skillOptions,
       grades: Object.entries(NPC_STATS)
         .filter(([key]) => !(result.type === "animal" && ["competence", "wealth"].includes(key)))

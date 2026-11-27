@@ -214,6 +214,18 @@ export function campaignRuleLines(effects = campaignRules()) {
   if (effects.meleeFeatRangedDefense)
     lines.push(loc`Each Melee or Unarmed Combat feat gives +1 Defense against ranged attacks, NPCs included.`);
   if (effects.closedStandOffs) lines.push(loc`Nobody may interrupt or join a Stand Off.`);
+  if (effects.catchPhrase)
+    lines.push(
+      loc`Catch Phrase: once per session, on a threat, a line said as a free action gives Defense and Resist morale.`
+    );
+  if (effects.goodAndEvil)
+    lines.push(
+      loc`Every character is Good or Evil: +2 against the other side at your call, and 1 action die for a fitting act.`
+    );
+  if (effects.revolvingDoor)
+    lines.push(
+      loc`An agent killed in a standard scene with the body whole may return next mission for 200 Reputation or $10,000,000.`
+    );
   return lines;
 }
 

@@ -105,3 +105,24 @@ test("rating pools and conflict ratings", () => {
   assert.equal(conflictRatings(sample())["Organization Image Rating"], 3);
   assert.match(ratingDetails(sample(), "tools"), /E–III/);
 });
+
+test("an NPC's organization caps its gear Calibers by Tools", async () => {
+  const { setOrganizationToolsSource, organizationNpcCaps, organizationChoices } =
+    await import("../module/rules/npc-organization.mjs");
+  const { npcEquipmentCost } = await import("../module/rules/npcs.mjs");
+  setOrganizationToolsSource(() => ({
+    org1: { name: "Test Bureau", calibers: toolsCalibers({ E: 2, W: 1 }) }
+  }));
+  try {
+    assert.deepEqual(organizationChoices(), [["org1", "Test Bureau"]]);
+    assert.deepEqual(organizationNpcCaps("org1"), { name: "Test Bureau", weapons: 3, vehicles: 2, gear: 4 });
+    assert.equal(organizationNpcCaps("missing"), null);
+    const profile = { organization: "org1", equipment: { weapons: [4], gear: [4], vehicles: [1] }, extraAmmoPairs: 0 };
+    const result = npcEquipmentCost(profile, "standard");
+    assert.ok(result.warnings.some(line => line.startsWith("weapons: Test Bureau's Tools reach Caliber III")));
+    assert.ok(!result.warnings.some(line => line.startsWith("gear:")));
+    assert.equal(npcEquipmentCost({ ...profile, organization: "" }, "standard").caps, null);
+  } finally {
+    setOrganizationToolsSource(null);
+  }
+});

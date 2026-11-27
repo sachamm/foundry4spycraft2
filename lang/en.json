@@ -1252,7 +1252,8 @@
     "Page": "Page",
     "TierITL4IITL": "Tier I: TL−4 · II: TL−2 · III: TL · IV: TL+2 · V: TL+4. Clamp effective TL to 1–20; Tier III is the default. Tiers do not add an invented grade or XP surcharge.",
     "ManualModePreservesExistingNPCStat": "Manual mode preserves existing NPC stat blocks. Enable graded creation to resolve the core tables and calculate XP.",
-    "Skills": "Skills"
+    "Skills": "Skills",
+    "Organization": "Organization (its Tools cap this NPC's gear Calibers)"
    },
    "ActorNpcSheet": {
     "QualitiesInPlay": "Qualities in play",

@@ -3,6 +3,8 @@ import { renderOpenSheet } from "../../services/refresh.mjs";
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
 import { setCampaignRulesSource } from "../../rules/campaign-rules.mjs";
+import { setOrganizationToolsSource } from "../../rules/npc-organization.mjs";
+import { toolsCalibers } from "../../rules/gc/organization.mjs";
 import { missionCatalog } from "./mission-defaults.mjs";
 import { loc, locKey } from "../../i18n.mjs";
 
@@ -138,6 +140,14 @@ export const qualitiesInForce = () =>
 export const currentCampaignEffects = () => campaignEffects(qualitiesInForce());
 // The rules read the qualities in force through this source (module/rules/campaign-rules.mjs).
 setCampaignRulesSource(() => currentCampaignEffects().effects);
+setOrganizationToolsSource(() =>
+  Object.fromEntries(
+    Object.entries(getOrganizations()).map(([id, org]) => [
+      id,
+      { name: org?.name ?? "", calibers: toolsCalibers(org?.tools) }
+    ])
+  )
+);
 
 /** Mission XP including season-long campaign qualities (which modify every mission of the season, p.435). */
 export function missionXP({ planned = false } = {}) {
