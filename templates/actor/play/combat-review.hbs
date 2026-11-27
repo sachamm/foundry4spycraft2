@@ -8,6 +8,9 @@
   {{#unless combatReviewNeeded}}<p class="sc2-empty muted">{{localize "SPYCRAFT.Review.Nothing"}}</p>{{/unless}}
   <details class="review-more" data-key="combat-review-more"><summary>{{localize "SPYCRAFT.Review.Interrupted"}}</summary>
   <div class="tool-actions">
+    {{#if isGM}}{{#if actor.flags.spycraft2.triggeredAttacks}}
+    <button type="button" class="sc2-action" data-action="reviewTriggeredAttacks">{{localize "SPYCRAFT.Review.ExtraAttackClaims"}}</button>
+    {{/if}}{{/if}}
     <button type="button" class="sc2-action" data-action="reviewCounterTrip">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewInterruptedCounterTrip"}}</button>
     <button type="button" class="sc2-action" data-action="reviewTripFinalAttack">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewInterruptedTripFinalAttack"}}</button>
     <button type="button" class="sc2-action" data-action="reviewFeintBonuses">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewInterruptedFeintBenefit"}}</button>

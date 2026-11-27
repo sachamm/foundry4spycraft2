@@ -1,10 +1,12 @@
 /** The Cleave Basics and Snap Shot controls on the Main tab (see module/rules/drop-follow-up.mjs). */
 import { finalAttackOptions, finalWeaponReady, limitedFinalAttack } from "./final-attack.mjs";
+export { reviewTriggeredAttacks } from "./final-attack.mjs";
 import { DROP_FOLLOW_UPS, dropTriggerEligible, dropFollowUpPlan, triggerUsed } from "../rules/drop-follow-up.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { loc } from "../i18n.mjs";
+import { triggerClaimUsed } from "../rules/triggered-attacks.mjs";
 
 const triggerChoices = (actor, combat, ranged) => {
   // The record of every posted card is needed only once a trigger qualifies, and then the same list serves them all.
@@ -15,7 +17,14 @@ const triggerChoices = (actor, combat, ranged) => {
       m.isContentVisible !== false &&
       (!m.blind || game.user.isGM) &&
       dropTriggerEligible(m.flags?.spycraft2, { actorUuid: actor.uuid, combat, ranged }) &&
-      !triggerUsed(m.uuid, (records ??= posted()))
+      !triggerUsed(m.uuid, (records ??= posted())) &&
+      !triggerClaimUsed(
+        actor.flags?.spycraft2?.triggeredAttacks,
+        ranged ? "snapShot" : "cleaveBasics",
+        m.uuid,
+        null,
+        actor.uuid
+      )
   );
 };
 const posted = () => [...(game.messages ?? [])].map(m => m.flags?.spycraft2).filter(Boolean);
@@ -49,6 +58,7 @@ export async function takeDropFollowUp(actor, key, options = {}) {
     if (!input) return null;
   }
   const opts = finalAttackOptions(input);
+  let reservationId = null;
   const event = () => {
     const message = game.messages.get(input.messageId),
       now = expertiseCombatContext(actor);
@@ -65,7 +75,11 @@ export async function takeDropFollowUp(actor, key, options = {}) {
       actorUuid: actor.uuid,
       targetUuid: opts.targetActorUuid ?? ""
     });
-    if (triggerUsed(message.uuid, posted())) throw new Error(loc`That hit already earned its extra attack.`);
+    if (
+      triggerUsed(message.uuid, posted()) ||
+      triggerClaimUsed(actor.flags?.spycraft2?.triggeredAttacks, key, message.uuid, reservationId, actor.uuid)
+    )
+      throw new Error(loc`That hit already earned its extra attack.`);
     return { message, plan };
   };
   if (JSON.stringify(expertiseCombatContext(actor)) !== clock)
@@ -85,6 +99,7 @@ export async function takeDropFollowUp(actor, key, options = {}) {
       triggerMessageUuid: original.message.uuid ?? original.message.id,
       triggerEvidence: evidence
     };
+  reservationId = receipt.id;
   return limitedFinalAttack(actor, key, {
     weaponId: item.id,
     options: opts,

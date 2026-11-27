@@ -45,7 +45,9 @@ export function finalAttackActor(feats = []) {
           const keys = path.split(".");
           let o = this;
           for (const key of keys.slice(0, -1)) o = o[key] ??= {};
-          o[keys.at(-1)] = structuredClone(value);
+          const key = keys.at(-1);
+          if (key.startsWith("-=")) delete o[key.slice(2)];
+          else o[key] = structuredClone(value);
         }
       }
     };

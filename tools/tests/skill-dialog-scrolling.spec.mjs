@@ -7,6 +7,7 @@ import { SPYCRAFT as cfg } from "../../module/config.mjs";
 import { ActorProgression } from "../../module/documents/actor/progression.mjs";
 import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
 import { settleGrapple } from "../../module/apps/combat-actions.mjs";
+import { reviewTriggeredAttacks } from "../../module/apps/final-attack.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -140,6 +141,40 @@ const recoveryContent = content;
 content = ordinaryContent;
 
 const css = readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8");
+test("extra-attack claim recovery shows readable choices and keeps its GC confirmation reachable at 720px", async ({
+  page
+}) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { isGM: true } };
+    await reviewTriggeredAttacks({
+      isOwner: true,
+      flags: {
+        spycraft2: {
+          triggeredAttacks: {
+            claim: { source: "cleaveBasics", round: 3, state: "reserved" }
+          }
+        }
+      }
+    });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await expect(page.getByRole("combobox", { name: "Extra attack", exact: true })).toContainText(
+      "Cleave — round 3 (Needs review)"
+    );
+    await page.getByRole("combobox", { name: "Resolution", exact: true }).selectOption("unused");
+    await page.getByLabel("Review note", { exact: true }).fill("No attack rolled; checked with the player");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
 test("the actual Grapple settlement exposes opening Size context and keeps confirmation reachable at 720px", async ({
   page
 }) => {

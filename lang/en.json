@@ -85,6 +85,7 @@
    "Thresholds": "(broken at {broken}, destroyed at {destroyed})"
   },
   "Review": {
+   "ExtraAttackClaims": "Review extra-attack claims",
    "Nothing": "Nothing needs review.",
    "Interrupted": "Review an interrupted action",
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"

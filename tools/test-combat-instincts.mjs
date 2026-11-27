@@ -196,9 +196,15 @@ test("the next round never reuses an old miss; a new actual miss gets only that 
   a.usagePeriods.round = "combat:3";
   await assert.rejects(take(a, input()));
   game.messages.get("miss").flags.spycraft2.rollCombat.round = 3;
-  await take(a, input());
+  await assert.rejects(take(a, input()), /trigger already supplied/);
+  const nextMiss = structuredClone(game.messages.get("miss"));
+  nextMiss.id = "next-miss";
+  nextMiss.uuid = "ChatMessage.next-miss";
+  nextMiss.flags.spycraft2.rollCombat.round = 3;
+  game.messages.push(nextMiss);
+  await take(a, { ...input(), messageId: nextMiss.id });
   assert.deepEqual(a.system.resourceUses.combatInstincts, { epoch: "combat:3", used: 1 });
-  assert.equal(game.messages.length, 3);
+  assert.equal(game.messages.length, 4);
 });
 test("hidden, blind, self, removed-opponent and unresolved incoming events cannot fund a reaction; a player cannot supply a GC timing override", async () => {
   for (const change of [

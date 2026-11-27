@@ -111,6 +111,12 @@ export async function fixture(kind = "success") {
     const update = x.update;
     x.update = async patch => {
       for (const [path, v] of Object.entries(patch)) {
+        if (path.startsWith("flags.")) {
+          const keys = path.split(".");
+          let target = x;
+          for (const key of keys.slice(0, -1)) target = target[key] ??= {};
+          target[keys.at(-1)] = structuredClone(v);
+        }
         if (path.startsWith("system.resourceUses.")) {
           const key = path.slice("system.resourceUses.".length);
           x.raw.resourceUses ??= {};

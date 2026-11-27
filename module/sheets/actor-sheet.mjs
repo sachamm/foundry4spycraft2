@@ -86,7 +86,7 @@ import {
 import { takeMobileOffense } from "../apps/mobile-offense.mjs";
 import { takeContempt } from "../apps/contempt.mjs";
 import { takeCombatInstincts } from "../apps/combat-instincts.mjs";
-import { takeDropFollowUp } from "../apps/drop-follow-up.mjs";
+import { takeDropFollowUp, reviewTriggeredAttacks } from "../apps/drop-follow-up.mjs";
 import { takeOpportunist } from "../apps/opportunist.mjs";
 import { grantFortunate } from "../apps/fortunate.mjs";
 import { applyBlackCat } from "../apps/black-cat.mjs";
@@ -348,6 +348,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         reviewFeintBonuses: reviewFeintBenefits,
         takeCounterTrip,
         reviewCounterTrip,
+        reviewTriggeredAttacks,
         takeTripFinalAttack,
         reviewTripFinalAttack,
         manageTripOutcomes,
@@ -1235,7 +1236,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       context.usagePeriodReview.needsReview ||
       actor.flags.spycraft2?.missionXPReview?.needsReview ||
       actor.flags.spycraft2?.actionDieAwardReview?.needsReview ||
-      sys.actionDiceSettlementReview?.needsReview
+      sys.actionDiceSettlementReview?.needsReview ||
+      Object.values(actor.flags.spycraft2?.triggeredAttacks ?? {}).some(r => r?.state === "reserved")
     );
     const brightStatus = brightIdeaPoolStatus(sys, this.actor.usagePeriods);
     context.brightIdeaLegacy = brightStatus.needsReview;

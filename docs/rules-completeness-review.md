@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **8.8/10**;
-combat play **8.9/10**. Implementation continues toward the requested **9.9/10**
+**Continuing review, 26 November 2026:** PC creation **8.9/10**;
+combat play **9.0/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -308,8 +308,8 @@ later increases do not make a legal original score illegal. Both manual and
 graded NPCs use that review. New blank agents record their original creation-only
 campaign policy. Existing history can be reviewed by the GC, and recorded rules
 survive later season changes without changing current attributes or health.
-This uses the stated creation-only interpretation while the history ruling is
-pending. The full Node run passes **3,994** tests; native schema preparation,
+The user confirmed that creation-only rules remain with the character and the
+GC reviews unknown history. The full Node run passes **3,994** tests; native schema preparation,
 formatting, lint and the copied-text check pass.
 
 Modular now has a guarded creation trade: each additional feat costs two
@@ -333,6 +333,26 @@ difference. Deleted or self targets are rejected. Grapple crowd limits, benefit
 damage and penalties remain open. All **4,001** Node tests and **222** browser
 layout checks pass; lint and copied-text checks also pass. This closes only the
 opening Size path, so the combat score remains **8.9/10** pending broader work.
+
+The shared final-attack posting path now retains actor-level claims for recorded
+triggers, including Cleave/Snap Shot, Combat Instincts, miss tricks and Trip.
+Deleting a result or resetting a round counter cannot reopen an already claimed
+event. Claims reserve before rolling, void an unposted failed attempt, recognize
+committed updates with lost responses, and retain consumption after a posted
+attack whose final bookkeeping fails. GC review can close an interrupted claim
+without changing health or saved round uses, and cannot release an existing
+posted result as unused. Copied actors do not inherit another actor's claims.
+The full Node suite passes **4,007** tests; lint, formatting, bundle and copied-text
+checks pass. The new actual recovery dialog passes the 720px browser check,
+following the prior full **222**-test layout run.
+
+This pass raises creation to **8.9/10** for the verified starting-score, original
+policy and Modular/gear accounting paths, and combat to **9.0/10** for durable
+trigger consumption. The remaining class/origin history and data audit,
+between-mission level limits, falling stress, NPC damage and conditions,
+Grapple benefits, broader action cooperation and environmental rules still
+prevent the requested 9.9 rating. Native multiplayer session evidence remains
+outstanding. Work continues through those gaps.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,
