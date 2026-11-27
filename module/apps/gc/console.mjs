@@ -332,7 +332,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       live.setAttribute("aria-live", "polite");
       this.element.append(live);
     }
-    const acting = context.combat?.started ? context.combat.acting : null;
+    // With the console both in the sidebar and in its own window, only the window speaks.
+    const speaks = this.isPopout || !this.popout?.rendered;
+    const acting = speaks && context.combat?.started ? context.combat.acting : null;
     const text = acting ? loc`Round ${context.combat.round}: ${acting.name}'s turn.` : "";
     if (live.textContent !== text) live.textContent = text;
   }
@@ -371,7 +373,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       if (actor?.type !== "npc") return refuse(loc`Only an NPC can be dropped on the GC Console.`);
       const section = event.target?.closest?.("details[data-section]")?.dataset.section;
       try {
-        if (section === "antagonists") await mission.addAntagonist({ uuid: actor.pack ? "" : actor.uuid });
+        if (section === "antagonists") await mission.addAntagonist({ uuid: actor.uuid, dropped: actor });
         else await addNpcToScene({ uuid: actor.uuid });
       } catch (error) {
         ui.notifications.warn(error.message);
@@ -390,7 +392,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 function withWeaponKeys(acting) {
   if (!acting?.weapons) return acting;
   acting.weapons = acting.weapons.map((weapon, index) => {
-    const key = index < 2 ? shortcutLabel(`actingWeapon${index + 1}`) : "",
+    const key = acting.npc && index < 2 ? shortcutLabel(`actingWeapon${index + 1}`) : "",
       hint = game.i18n.localize("SPYCRAFT.Console.AttackHint");
     return { ...weapon, key, tip: key ? `${hint} (${key})` : hint };
   });
@@ -576,8 +578,9 @@ export function consoleContext() {
       nextTurn: withKey(loc`Ends this turn and moves to the next combatant`, "nextTurn"),
       previousTurn: withKey(loc`Steps the fight back one turn`, "previousTurn"),
       spendDice: withKey(loc`Opens Spend dice with the acting NPC chosen`, "spendDice"),
+      spendDiceAny: withKey(loc`Opens Spend dice: choose what the GC action dice buy and for whom`, "spendDice"),
       cardNextStep: withKey(
-        loc`Presses the main button (Roll damage, Apply) on the newest chat card about this combatant, and says which`,
+        loc`Presses the main button (Roll damage, Apply) on this combatant's newest chat card, and says which. The key also presses your own newest card when this combatant has none waiting`,
         "cardPrimary"
       )
     },
@@ -615,7 +618,7 @@ export function consoleContext() {
           : loc`Standard`,
       // Awards can take the pool past its starting number; "left of" would then read oddly.
       dice: !dice.current
-        ? loc`not set up`
+        ? loc`none until Begin session`
         : dice.value > starting
           ? loc`${dice.value} left`
           : loc`${dice.value} left of ${starting}`,
@@ -651,7 +654,7 @@ export function consoleContext() {
       threatLevel: tl,
       threatNote: m.threatOverride
         ? loc`set by hand`
-        : `${live.adjust ? loc`team ${live.base}, ${signed(live.adjust)} adjustment` : loc`from the team's levels`}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
+        : `${live.adjust ? loc`base ${live.base} from the team, ${signed(live.adjust)} adjustment` : loc`from the team's levels`}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
       bonusDice: threatBonusActionDice(tl, levels),
       team: team.map(actor => {
         const status = standingStatus(actor.system);

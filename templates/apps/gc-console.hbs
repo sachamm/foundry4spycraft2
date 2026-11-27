@@ -6,7 +6,7 @@
       class="sc2-value">{{status.mission}}</b><span class="gc-note">{{status.missionState}}</span></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.ScenePeriod"}}</span><b class="sc2-value">{{status.scene}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.GCActionDice"}}</span><b
-      class="sc2-value">{{status.dice}}</b><span class="gc-note">{{localize "SPYCRAFT.Console.Session"}} {{status.session}}</span></div>
+      class="sc2-value">{{status.dice}}</b>{{#if session.begun}}<span class="gc-note">{{localize "SPYCRAFT.Console.Session"}} {{status.session}}</span>{{/if}}</div>
   </div>
   <div class="gc-views" role="group" aria-label="{{localize 'SPYCRAFT.Console.Views'}}">{{#each views}}
     <button type="button" data-action="consoleView" data-view="{{id}}" aria-pressed="{{active}}" data-tooltip="{{hint}}">{{label}}</button>{{/each}}{{#unless windowed}}
@@ -58,7 +58,7 @@
     </div>
     <p class="controls">
       <button type="button" class="{{#if (eq @root.primary "spendDice")}} gc-primary{{/if}}" data-action="spendDice"
-        data-tooltip="{{@root.shortcuts.spendDice}}">{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>
+        data-tooltip="{{@root.tips.spendDiceAny}}"{{#if @root.shortcuts.spendDice}} aria-keyshortcuts="{{@root.shortcuts.spendDice}}"{{/if}}>{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>
       <button type="button" data-action="gcDice" data-tooltip="{{localize 'SPYCRAFT.Console.AdjustPoolHint'}}">{{#if dice.current}}{{localize "SPYCRAFT.Console.AdjustPool"}}{{else}}{{localize "SPYCRAFT.Console.SetUpPool"}}{{/if}}</button>
     {{#if scene.dramatic}}<button type="button" data-action="dramaticOff">{{localize "SPYCRAFT.Template.AppsGcConsole.ReturnToAStandardScene"}}</button>
       <button type="button" data-action="doubleInitiative">{{localize "SPYCRAFT.Template.AppsGcConsole.DoubleOpponentsInitiative"}}</button>{{else}}
@@ -94,8 +94,8 @@
           data-tooltip="{{localize 'SPYCRAFT.Console.PlanNextHint'}}">{{localize "SPYCRAFT.Console.PlanNext"}}</button>
         <button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>
       {{else}}
-        <button type="button" class="{{#if (eq @root.primary "startMission")}} gc-primary{{/if}}" data-action="startMission"
-          data-tooltip="{{localize 'SPYCRAFT.Console.StartMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.StartMission"}}</button>
+        {{#unless checklist.startIsNext}}<button type="button" class="{{#if (eq @root.primary "startMission")}} gc-primary{{/if}}" data-action="startMission"
+          data-tooltip="{{localize 'SPYCRAFT.Console.StartMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.StartMission"}}</button>{{/unless}}
         <button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>{{/if}}
     </p>
     <div class="gc-facts">
@@ -131,7 +131,8 @@
       <li class="gc-row"><span class="gc-row-text">{{#if complete}}✔{{else}}○{{/if}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Grade"}} {{grade}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{#if critical}} · <b>{{localize "SPYCRAFT.Template.AppsGcConsole.Critical"}}</b>{{/if}}</span>
     <span class="gc-row-actions">
       <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}"
-        data-change="complete" aria-pressed="{{#if complete}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Console.DoneNamed' name=name}}">{{localize "SPYCRAFT.Console.DoneToggle"}}</button>
+        data-change="complete" aria-pressed="{{#if complete}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Console.DoneNamed' name=name}}"
+        data-tooltip="{{localize 'SPYCRAFT.Console.DoneHint'}}">{{localize "SPYCRAFT.Console.DoneToggle"}}</button>
       {{#if @root.shown.prep}}
       <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}"
         data-change="critical" aria-pressed="{{#if critical}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Console.CriticalNamed' name=name}}">{{localize "SPYCRAFT.Console.CriticalToggle"}}</button>

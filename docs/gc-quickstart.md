@@ -42,20 +42,24 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
 
 ## The first combat
 
-1. Add the tokens to Foundry's combat tracker and have the players roll Initiative from their sheets.
-2. In the console's Combat section, press **Roll NPC Initiative by type**, then **Begin combat**. Until everyone has
-   rolled, the button says how many have not.
+1. Select the tokens on the map and press **Start a fight with the selected tokens** in the console's Combat
+   section (**Add selected tokens** brings in late arrivals). Players roll Initiative from their sheets.
+2. Press **Roll NPC Initiative by type**, then **Begin combat**. Until everyone has rolled, the button says how many
+   have not.
 3. The **turn bar** at the top of the fight holds **Next turn** (Alt+N), **Previous turn** (Alt+P) and **Spend GC
    dice** with the acting NPC already chosen (Alt+D).
 4. On an NPC's turn, the acting block under it has an **Attack** button for each weapon, with its bonus and damage
-   (Shift-click with one target goes straight to hit or miss; Alt+1 and Alt+2 attack with the first two), then **Next step on this combatant's card**, which presses the main button of the
-   newest card about that combatant and says which one. Spend, Delay, Ready and the Damage save are under **Turn
-   actions**. A player's turn is rolled from their own sheet; the card's top line names its state and its main button
-   is the next step. During a fight Alt+Enter presses the acting combatant's newest card, or the newest card when that
-   combatant has none, and marks the card it pressed.
+   (Shift-click with one target goes straight to hit or miss; Alt+1 and Alt+2 attack with the first two), then
+   **Card: next step**, which presses the main button of that combatant's newest card and says which one, and
+   **Delay** and **Ready**. Spending actions and the Damage save are under **Turn actions**. A player's turn is rolled
+   from their own sheet; the card's top line names its state and its main button is the next step. During a fight
+   Alt+Enter presses the acting combatant's newest card, or your own newest card when that combatant has none waiting,
+   and marks the card it pressed.
 5. For an NPC's result, **GC boost** on its card spends a GC action die. Alt+B does the same: the first press marks
    the card it would boost, a second press within three seconds spends the die.
 6. Click a name in the order to select its token and centre the map on it; double-click to open its sheet.
+
+When the fight is over, **End combat…** under the order closes it; Foundry asks first.
 
 ## After the session (Wrap-up)
 

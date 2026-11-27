@@ -6,8 +6,8 @@ import { loc, locKey } from "../i18n.mjs";
 import { stepBackTurn } from "./gc/combat.mjs";
 
 /** The newest chat card on screen that holds a button matching the selector, and that button. */
-export function newestCardButton(root, selector) {
-  const cards = [...(root?.querySelectorAll?.("[data-message-id]") ?? [])];
+export function newestCardButton(root, selector, keep = () => true) {
+  const cards = [...(root?.querySelectorAll?.("[data-message-id]") ?? [])].filter(keep);
   for (const card of cards.reverse()) {
     const button = [...card.querySelectorAll(selector)].find(candidate => !candidate.disabled);
     if (button) return button;
@@ -32,9 +32,13 @@ function describePress(button) {
  * Press the matching button on the newest chat card that has one, and say which card it was.
  * Returns whether a button was pressed.
  */
-export function pressNewestCard(selector, { notify = false } = {}) {
+export function pressNewestCard(selector, { notify = false, mineOnly = false } = {}) {
+  const mine = card => {
+    const author = globalThis.game?.messages?.get?.(card.dataset?.messageId)?.author;
+    return (author?.id ?? author) === game.user?.id;
+  };
   const buttons = chatRoots()
-    .map(root => newestCardButton(root, selector))
+    .map(root => newestCardButton(root, selector, mineOnly ? mine : undefined))
     .filter(Boolean);
   const button = buttons.at(-1) ?? null;
   if (!button) {
@@ -60,13 +64,14 @@ function showPressed(button) {
 }
 
 /**
- * Alt+Enter: during a fight, the acting combatant's newest card with a next step; otherwise, or when that combatant
- * has none, the newest card in the log. The console's "Next step on this combatant's card" uses the first half alone.
+ * Alt+Enter: during a fight, the acting combatant's newest card when it has a next step, else this user's own newest
+ * card that has one; outside a fight, the newest card in the log. The console's "Next step on this combatant's card" uses the first half alone.
  */
 export function pressNextStep(selector) {
   const acting = globalThis.game?.combat?.started ? game.combat.combatant : null;
   if (acting && pressActorCard(acting, selector, { quiet: true })) return true;
-  return pressNewestCard(selector, { notify: true });
+  // During a fight a player's card is never pressed in place of the acting combatant's: only one this user posted.
+  return pressNewestCard(selector, { notify: true, mineOnly: !!acting });
 }
 
 /**
@@ -83,7 +88,9 @@ export function pressActorCard(combatant, selector, { quiet = false } = {}) {
     return (tokenId && speaker.token === tokenId) || (!speaker.token && actorId && speaker.actor === actorId);
   };
   for (const root of chatRoots()) {
-    const cards = [...(root.querySelectorAll?.("[data-message-id]") ?? [])].filter(about).reverse();
+    // Only the newest card about this combatant: an older card's step, still live after its damage card was
+    // settled, is never pressed a second time from here.
+    const cards = [...(root.querySelectorAll?.("[data-message-id]") ?? [])].filter(about).reverse().slice(0, 1);
     for (const card of cards) {
       const button = [...card.querySelectorAll(selector)].find(candidate => !candidate.disabled);
       if (!button) continue;
@@ -180,7 +187,17 @@ function actingWeapon(index) {
   const combatant = game.combat?.started ? game.combat.combatant : null,
     actor = combatant?.actor;
   if (!actor) return false;
-  const weapon = [...(actor.items ?? [])].filter(item => item.type === "weapon")[index];
+  // The keys stand for the console's attack buttons, which only a standing NPC has: an agent attacks from its sheet.
+  if (actor.type !== "npc" || combatant.isDefeated) {
+    ui.notifications.info(
+      loc`${combatant.name} is not a standing NPC: Alt+${index + 1} attacks only on an NPC's turn.`
+    );
+    return true;
+  }
+  // The same order as the console's buttons, which list the sheet's weapons as the sheet does.
+  const weapon = [...(actor.items ?? [])]
+    .filter(item => item.type === "weapon")
+    .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))[index];
   if (!weapon) {
     ui.notifications.info(loc`${combatant.name} has no weapon ${index + 1} on its sheet.`);
     return true;
@@ -260,7 +277,7 @@ const bindings = ({ openConsole }) => [
   [
     "cardPrimary",
     locKey`Press the next step on the newest card`,
-    locKey`Presses the main button of the acting combatant's newest card during a fight, else of the newest card that has one.`,
+    locKey`During a fight, presses the main button of the acting combatant's newest card, else of your own newest card; outside a fight, of the newest card that has one.`,
     [{ key: "Enter", modifiers: ["Alt"] }],
     false,
     () => (pressNextStep("button.sc2-primary-action[data-roll-control]"), true)

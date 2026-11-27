@@ -58,6 +58,34 @@ export const ACTING_OUTCOMES = Object.freeze([
   ["cancelReady", "CancelAReadiedAction", combatOptions]
 ]);
 
+/** One line each on what an outcome button settles, shown as its tooltip. */
+const OUTCOME_HINTS = {
+  get manageTripOutcomes() {
+    return loc`Settle what follows a trip this combatant made or suffered`;
+  },
+  get manageFeintOutcomes() {
+    return loc`Settle what follows a feint this combatant made`;
+  },
+  get settleGrapple() {
+    return loc`Settle the grapple check this combatant is part of`;
+  },
+  get recordAnticipate() {
+    return loc`Record the result of an Anticipate Action check (p.354)`;
+  },
+  get standOff() {
+    return loc`Start a Stand Off, its round's stress, or a surrender (p.359)`;
+  },
+  get tireResult() {
+    return loc`Settle a Tire action once both Resolve checks are rolled (p.361)`;
+  },
+  get coupDeGraceSave() {
+    return loc`Roll the Fortitude save after surviving a Coup de Grace (p.355)`;
+  },
+  get cancelReady() {
+    return loc`Drop this combatant's readied action`;
+  }
+};
+
 /** Settle one of the combat outcomes for the acting combatant's actor. */
 export async function actingOutcome(actor, step) {
   const row = ACTING_OUTCOMES.find(([name]) => name === step);
@@ -90,8 +118,13 @@ export function actingBlock(combat) {
         : loc`${left} half actions left`,
     weapons: [...(defeated ? [] : (actor.items ?? []))]
       .filter(item => item.type === "weapon")
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
       .map(item => weaponButton(actor, item)),
-    outcomes: ACTING_OUTCOMES.map(([step, label]) => ({ step, label: `${OUTCOME_KEY}${label}` }))
+    outcomes: ACTING_OUTCOMES.map(([step, label]) => ({
+      step,
+      label: `${OUTCOME_KEY}${label}`,
+      hint: OUTCOME_HINTS[step]
+    }))
   };
 }
 

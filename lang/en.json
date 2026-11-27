@@ -148,7 +148,7 @@
    "Delay": "Delay…",
    "Ready": "Ready an action",
    "DamageSave": "Damage save…",
-   "CardNextStep": "Next step on this combatant's card",
+   "CardNextStep": "Card: next step",
    "CardNextStepHint": "Presses the main button (Roll damage, Apply) on the newest chat card about this combatant, and says which",
    "ActingOutcomes": "Settle a trip, feint, grapple or stand-off",
    "Unrolled": "Combatants with no Initiative Count yet: {count}.",
@@ -247,8 +247,11 @@
    "AddSelectedHint": "Adds the tokens selected on the map to this fight; tokens already in it are skipped",
    "EndFight": "End combat…",
    "EndFightHint": "Ends this fight after Foundry asks to confirm",
-   "DropRecord": "Drop to record this NPC for XP",
-   "DropPlace": "Drop to place this NPC on the scene"
+   "DropRecord": "Drop an NPC here to record it for XP",
+   "DropPlace": "Drop an NPC here to place it on the scene",
+   "NoFightNote": "none",
+   "DoneHint": "Marks the objective met, or clears the mark",
+   "FightTools": "Fight tools"
   },
   "Ability": {
    "str": "Strength",
@@ -1933,6 +1936,7 @@
    "CountAmmunition_16vo7br": "Count ammunition",
    "DefaultPlayerAccessToNewCharacters_0fqrj0e": "Default player access to new characters",
    "DialogsOpenWithEveryTheGC_1dbtchy": "Dialogs open with every \"the GC confirms\" box already ticked, so declarations stand unless someone unticks them. Leave off to confirm each one.",
+   "DuringAFightPressesTheMain_0247vgo": "During a fight, presses the main button of the acting combatant's newest card, else of your own newest card; outside a fight, of the newest card that has one.",
    "EnableTheOptionalSeparateLanguageRule_0ib5a2p": "Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.",
    "EndsTheCurrentTurnInThe_0biw384": "Ends the current turn in the active combat.",
    "FluidInitiative_1d7s9kb": "Fluid initiative",
@@ -1955,7 +1959,6 @@
    "PlayersSeeATargetSDefense_183tbn8": "Players see a target's Defense when resolving an attack and can resolve against a recorded target in one click. Turn off to keep NPC Defense hidden; players then pick the target in the resolve dialog and the result still says hit or miss.",
    "PostACardWithItsButton_1xy6doc": "Post a card with its button when a burning character's turn begins and, at the end of each round, for every dying character in the fight.",
    "PressTheNextStepOnThe_0arnwu4": "Press the next step on the newest card",
-   "PressesTheMainButtonOfThe_1p4bmgl": "Presses the main button of the acting combatant's newest card during a fight, else of the newest card that has one.",
    "PreviousTurn_1p7ekqf": "Previous turn",
    "RecordFluidInitiativeFromDamage_1etx06v": "Record fluid initiative from damage",
    "ResolveQuickNPCAttacksAtOnce_0yqj5ew": "Resolve quick NPC attacks at once",

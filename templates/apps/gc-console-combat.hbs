@@ -1,5 +1,6 @@
   <details class="gc-section" data-section="combat" data-view-hidden="{{hiddenSections.combat}}" data-state="{{sections.combat.state}}" {{#if sections.combat.open}}open{{/if}}>
-    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Combat"}}</span>{{#if combat}}<span
+    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Combat"}}</span>{{#unless combat}}<span
+      class="gc-note">{{localize "SPYCRAFT.Console.NoFightNote"}}</span>{{/unless}}{{#if combat}}<span
       class="gc-note">{{#if combat.started}}{{localize "SPYCRAFT.Template.AppsGcConsole.Round"}} {{combat.round}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}{{/if}}</span>{{/if}}</summary>
     {{#if combat}}
     {{#if combat.elsewhere}}<p class="bad">{{localize "SPYCRAFT.Console.Elsewhere" scene=combat.scene}}</p>{{/if}}
@@ -27,19 +28,19 @@
         <button type="button" data-action="actingAttack" data-id="{{id}}" data-combatant="{{../id}}" data-tooltip="{{tip}}"{{#if key}} aria-keyshortcuts="{{key}}"{{/if}}>{{localize "SPYCRAFT.Console.AttackWith" weapon=name}}{{#if facts}} <span class="gc-note">{{facts}}</span>{{/if}}</button>{{/each}}
         </p>{{/if}}
       <p class="controls">{{#each @root.combat.mobs}}<button type="button" data-action="mobAttack" data-key="{{key}}"
-        data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}} aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button></p>
+        data-tooltip="{{localize 'SPYCRAFT.Console.MobAttackHint'}}">{{label}}</button>{{/each}}<button type="button" data-action="cardNextStep" data-combatant="{{id}}" data-tooltip="{{@root.tips.cardNextStep}}"{{#if @root.shortcuts.cardPrimary}} aria-keyshortcuts="{{@root.shortcuts.cardPrimary}}"{{/if}}>{{localize "SPYCRAFT.Console.CardNextStep"}}</button>{{#unless defeated}}
+        <button type="button" data-action="actingDelay" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DelayHint'}}">{{localize "SPYCRAFT.Console.Delay"}}</button>
+        <button type="button" data-action="actingReady" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.ReadyHint'}}">{{localize "SPYCRAFT.Console.Ready"}}</button>{{/unless}}</p>
       {{#unless defeated}}<details class="gc-more">
         <summary>{{localize "SPYCRAFT.Console.TurnActions"}}</summary>
         <p class="controls"><button type="button" data-action="actingSpend" data-kind="half" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.SpendHalfHint'}}">{{localize "SPYCRAFT.Console.SpendHalf"}}</button>
           <button type="button" data-action="actingSpend" data-kind="full" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.SpendFullHint'}}">{{localize "SPYCRAFT.Console.SpendFull"}}</button>
-          <button type="button" data-action="actingSpend" data-kind="reset" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.GiveBackHint'}}">{{localize "SPYCRAFT.Console.GiveBack"}}</button>
-          <button type="button" data-action="actingDelay" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DelayHint'}}">{{localize "SPYCRAFT.Console.Delay"}}</button>
-          <button type="button" data-action="actingReady" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.ReadyHint'}}">{{localize "SPYCRAFT.Console.Ready"}}</button>{{#if standard}}
+          <button type="button" data-action="actingSpend" data-kind="reset" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.GiveBackHint'}}">{{localize "SPYCRAFT.Console.GiveBack"}}</button>{{#if standard}}
           <button type="button" data-action="actingDamageSave" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DamageSaveHint'}}">{{localize "SPYCRAFT.Console.DamageSave"}}</button>{{/if}}</p>
       </details>
       <details class="gc-more">
         <summary>{{localize "SPYCRAFT.Console.ActingOutcomes"}}</summary>
-        <p class="controls">{{#each outcomes}}<button type="button" data-action="actingOutcome" data-step="{{step}}" data-combatant="{{../id}}">{{localize label}}</button>{{/each}}</p>
+        <p class="controls">{{#each outcomes}}<button type="button" data-action="actingOutcome" data-step="{{step}}" data-combatant="{{../id}}" data-tooltip="{{hint}}">{{localize label}}</button>{{/each}}</p>
       </details>{{/unless}}
     </section>
     {{/with}}
@@ -67,16 +68,21 @@
         <button type="button" data-action="surprise">{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound2"}}</button>
         <button type="button" data-action="fluidEvent">{{localize "SPYCRAFT.Template.AppsGcConsole.FluidInitiativeEvent"}}</button>
         <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button>
-        <button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.AddSelectedHint'}}">{{localize "SPYCRAFT.Console.AddSelected"}}</button>
-        <button type="button" class="gc-danger" data-action="fightEnd" data-tooltip="{{localize 'SPYCRAFT.Console.EndFightHint'}}">{{localize "SPYCRAFT.Console.EndFight"}}</button></p>
+        <button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.AddSelectedHint'}}">{{localize "SPYCRAFT.Console.AddSelected"}}</button></p>
     </details>
+    <p class="controls gc-fight-end"><button type="button" class="gc-danger" data-action="fightEnd"
+      data-tooltip="{{localize 'SPYCRAFT.Console.EndFightHint'}}">{{localize "SPYCRAFT.Console.EndFight"}}</button></p>
     {{else}}
     <p class="controls gc-turn-controls">
       <button type="button" class="{{#if (eq @root.primary "nextTurn")}}gc-primary{{/if}}" data-action="nextTurn"
         data-tooltip="{{localize 'SPYCRAFT.Console.BeginCombatHint'}}">{{#if combat.unrolled}}{{localize "SPYCRAFT.Console.BeginCombatWaiting" count=combat.unrolled}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.BeginCombat"}}{{/if}}</button>
-      <button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.AddSelectedHint'}}">{{localize "SPYCRAFT.Console.AddSelected"}}</button>
-      <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button>
-      <button type="button" class="gc-danger" data-action="fightEnd" data-tooltip="{{localize 'SPYCRAFT.Console.EndFightHint'}}">{{localize "SPYCRAFT.Console.EndFight"}}</button></p>
+      </p>
+    <p class="controls"><button type="button" data-action="fightAddSelected" data-tooltip="{{localize 'SPYCRAFT.Console.AddSelectedHint'}}">{{localize "SPYCRAFT.Console.AddSelected"}}</button>
+      <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button></p>
+    <details class="gc-more">
+      <summary>{{localize "SPYCRAFT.Console.FightTools"}}</summary>
+      <p class="controls"><button type="button" class="gc-danger" data-action="fightEnd" data-tooltip="{{localize 'SPYCRAFT.Console.EndFightHint'}}">{{localize "SPYCRAFT.Console.EndFight"}}</button></p>
+    </details>
     {{/if}}
     {{else}}
     <p class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoActiveCombat"}}</p>

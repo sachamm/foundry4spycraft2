@@ -409,7 +409,10 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
     blocked: point => point.x === 300 && point.y === 200
   });
   assert.equal(bounded.length, 6);
-  assert.ok(bounded.every(c => c.x >= 200 && c.y >= 200 && c.x + 100 <= 500 && c.y + 100 <= 500), "inside the scene");
+  assert.ok(
+    bounded.every(c => c.x >= 200 && c.y >= 200 && c.x + 100 <= 500 && c.y + 100 <= 500),
+    "inside the scene"
+  );
   assert.ok(!bounded.some(c => c.x === 300 && c.y === 200), "not behind the wall");
 
   assert.deepEqual(numberedNames("Guard", 1), ["Guard"]);

@@ -123,7 +123,7 @@
   overflow-wrap: anywhere;
   padding: 0 0.6rem 0.75rem;
   /* The sticky turn bar never covers the control that keyboard focus moves to. */
-  scroll-padding-top: 56px;
+  scroll-padding-top: 104px;
 }
 .gc-console-body .controls button {
   max-width: 100%;
@@ -297,11 +297,19 @@
 }
 /* Caption, value and note on one line; a long mission name wraps under its caption instead of growing a tile. */
 .gc-console-body .gc-now .sc2-field {
-  display: grid;
-  grid-template-columns: 7em minmax(0, 1fr);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  min-height: 0;
   column-gap: 6px;
   align-items: baseline;
-  padding: 2px 8px;
+  padding: 1px 8px;
+}
+.gc-console-body .gc-now .sc2-caption {
+  flex: 0 0 auto;
+  min-width: 7.5em;
+  white-space: nowrap;
 }
 .gc-console-body .gc-now .sc2-value {
   font-size: var(--sc2-text-m);
@@ -389,13 +397,14 @@
 /* Prep, Play and Wrap-up: one console, three views. A search looks through every section whatever the view. */
 .gc-console-body .gc-views {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 32px;
   gap: 4px;
   margin: 0.4rem 0;
 }
 .gc-console-body .gc-views button {
   width: 100%;
   min-height: 32px;
+  white-space: nowrap;
 }
 .gc-console-body .gc-views button[aria-pressed="true"] {
   color: var(--sc2-on-bar);
@@ -405,9 +414,12 @@
 .gc-console-body details.gc-section[data-view-hidden="true"]:not([data-tool-search-active="true"]) {
   display: none;
 }
+/* The note follows its value on the same line: "Cold Open · active". */
 .gc-console-body .gc-now .gc-note {
-  grid-column: 2;
   font-size: var(--sc2-text-s);
+}
+.gc-console-body .gc-now .gc-note::before {
+  content: "· ";
 }
 /* The first-session steps, the wrap-up steps and the acting combatant are raised panels above the sections. */
 .gc-console-body :is(.gc-checklist, .gc-wrap, .gc-acting) {
@@ -611,8 +623,8 @@
   background: var(--sc2-danger-tint);
 }
 .gc-console-body .gc-views .gc-window-link {
-  width: auto;
-  min-width: 32px;
+  min-width: 0;
+  padding: 0;
 }
 
 /* A dialog's refusal stays inside the dialog, beside the button, and what was typed is kept. */

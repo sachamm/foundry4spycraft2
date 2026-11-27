@@ -52,7 +52,7 @@ function withState(context, { view, active, ended, combat = null, firstSession =
     context.checklist = firstSessionChecklist({ mission: context.mission, ...firstSession });
     if (!firstSession.diceCurrent) {
       context.session = { begun: false, at: "", note: "" };
-      context.status.dice = "not set up";
+      context.status.dice = "none until Begin session";
       context.status.session = "not begun";
       context.dice.current = false;
     }

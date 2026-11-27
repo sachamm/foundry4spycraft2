@@ -209,12 +209,17 @@ export async function startMission() {
       (before.scenesPlayed ?? 0) > 0 ||
       Object.keys(before.standingPaid ?? {}).length > 0);
   if (hadResults) {
-    const ok = await confirmStep(loc`Start the mission again`, [
-      loc`This record holds the results of an earlier run. Starting it again begins a new run of the same mission.`,
-      loc`Completed objectives, antagonists faced, infractions, scenes played and the standing payout are cleared.`,
-      loc`A new mission period begins: per-mission uses come back and promoted NPCs return to standard.`,
-      loc`To carry on the run that was ended, cancel and use Resume mission.`
-    ]);
+    const ok = await confirmStep(
+      loc`Start the mission again`,
+      [
+        loc`This record holds the results of an earlier run. Starting it again begins a new run of the same mission.`,
+        loc`Completed objectives, antagonists faced, infractions, scenes played and the standing payout are cleared.`,
+        loc`A new mission period begins: per-mission uses come back and promoted NPCs return to standard.`,
+        loc`To carry on the run that was ended, cancel and use Resume mission.`
+      ],
+      loc`Start the mission again`,
+      { warning: loc`This clears the last run's results and cannot be undone.` }
+    );
     if (!ok) return null;
   }
   // The mission record and the mission's usage period begin together: mission uses come back.
@@ -523,9 +528,11 @@ export async function addObjective({ another = false } = {}) {
   return addObjective({ another: true });
 }
 
-export async function addAntagonist({ uuid = "", another = false } = {}) {
+export async function addAntagonist({ uuid = "", another = false, dropped = null } = {}) {
   requireGC();
   const npcs = [...game.actors].filter(actor => actor.type === "npc");
+  // A compendium NPC dropped on the console is listed and chosen, though it is not in the world.
+  if (dropped?.type === "npc" && !npcs.some(actor => actor.uuid === dropped.uuid)) npcs.unshift(dropped);
   const input = await ask(
     loc`Add an antagonist (p.452)`,
     `

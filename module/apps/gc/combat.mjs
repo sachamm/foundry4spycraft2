@@ -40,7 +40,7 @@ import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 import { markAntagonistsFaced } from "./mission.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -273,7 +273,17 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
     <label data-when="id=unproficient">${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
     <label data-when="id=ready">${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`,
-    loc`Record event`
+    loc`Record event`,
+    // Refused inside the dialog, so the combatant and event chosen stay chosen.
+    values => {
+      if (values.id === "diversion" && !(Number(values.amount) >= 1))
+        return loc`Enter the rolled Count loss for Diversion.`;
+      const timed = !/^(press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup)$/.test(
+        values.id
+      );
+      if (timed && !(Number(values.times) >= 1)) return loc`Times it applies must be 1 or more.`;
+      return "";
+    }
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
@@ -951,7 +961,9 @@ export async function addSelectedToFight() {
     tokens = [...(globalThis.canvas?.tokens?.controlled ?? [])].map(token => token.document).filter(Boolean);
   if (!scene) return refuse(loc`Open a scene first.`);
   if (!tokens.length) return refuse(loc`Select the tokens to add on the map first (click, or drag a box round them).`);
-  let fight = [...(game.combats ?? [])].find(entry => entry.scene?.id === scene.id && entry.active) ?? null;
+  // The fight the GC is viewing comes first, linked to a scene or not; only with none is one looked for or made here.
+  let fight =
+    game.combat ?? [...(game.combats ?? [])].find(entry => entry.scene?.id === scene.id && entry.active) ?? null;
   fight ??= await CONFIG.Combat.documentClass.create({ scene: scene.id, active: true });
   if (!fight) return null;
   const present = new Set([...(fight.combatants ?? [])].map(combatant => combatant.tokenId));

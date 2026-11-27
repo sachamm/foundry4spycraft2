@@ -418,6 +418,11 @@ test("the console's next step presses only the acting combatant's newest card an
   globalThis.ui = { notifications: { info: message => notes.push(message) }, chat: {} };
   try {
     const guard = { name: "Guard (Rook)", tokenId: "t1", actor: { id: "guard" } };
+    // Its newest card has no step left, so an older card's step is not pressed a second time.
+    assert.equal(pressActorCard(guard, "button"), false);
+    assert.deepEqual(pressed, []);
+    notes.length = 0;
+    cards.pop();
     assert.equal(pressActorCard(guard, "button"), true);
     assert.deepEqual(pressed, ["Roll damage"], "the agent's newer card is passed over");
     assert.deepEqual(notes, ["Roll damage: Guard (Rook)."]);

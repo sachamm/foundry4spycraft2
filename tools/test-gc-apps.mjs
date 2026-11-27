@@ -1095,7 +1095,7 @@ test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's 
   assert.equal(context.view, "play");
   assert.equal(context.hiddenSections.combat, false);
   assert.equal(context.hiddenSections.campaign, true);
-  assert.match(context.status.dice, /left of 10|not set up/);
+  assert.match(context.status.dice, /left of 10|none until Begin session/);
   assert.equal(context.status.missionState, "active");
 
   const blank = firstSessionChecklist({ mission: { objectives: [] }, diceCurrent: false, npcActors: 0 });
@@ -1226,7 +1226,8 @@ test("console sections open for the state in play and keep the GC's choice until
   // Closing Combat during a fight sticks for that fight, but the next combat opens it again.
   const closed = { combat: { state: "running", open: false }, clock: { state: "always", open: true } };
   assert.equal(consoleSections({ missionActive: true, combat: true }, closed).combat.open, false);
-  assert.equal(consoleSections({ missionActive: true, combat: false }, closed).combat.open, false);
+  // Between fights Combat opens again, so Start a fight is in sight.
+  assert.equal(consoleSections({ missionActive: true, combat: false }, closed).combat.open, true);
   assert.equal(
     consoleSections({ missionActive: true, combat: true }, { combat: { state: "idle", open: false } }).combat.open,
     true

@@ -64,7 +64,7 @@ export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatS
     },
     {
       id: "combat",
-      label: loc`First combat: add tokens to the tracker, roll Initiative`,
+      label: loc`First combat: select the tokens, start a fight here, roll Initiative`,
       done: !!combatSeen,
       action: "consoleView",
       button: loc`Go to Play`,
@@ -76,7 +76,9 @@ export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatS
     steps: steps.map(step => ({ ...step, next: step === next })),
     done: steps.filter(step => step.done).length,
     total: steps.length,
-    complete: !next
+    complete: !next,
+    // The Mission section's own Start mission button steps aside while the list offers it.
+    startIsNext: next?.id === "start"
   };
 }
 
@@ -105,8 +107,10 @@ export function consoleSections({ missionActive, combat, conflictsRunning }, sto
     objectives: missionActive && !combat,
     antagonists: false,
     complications: false,
-    dice: missionActive,
-    combat: !!combat,
+    // During a fight the turn bar holds Spend GC dice, so the dice section closes; between fights Combat stays open,
+    // so Start a fight is one press away.
+    dice: missionActive && !combat,
+    combat: !!combat || missionActive,
     conflicts: conflictsRunning,
     organizations: false,
     campaign: false,
