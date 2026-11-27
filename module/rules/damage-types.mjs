@@ -21,6 +21,7 @@
  * This module is pure: it plans and never rolls dice or touches documents.
  */
 import { loc } from "../i18n.mjs";
+import { campaignSkillDC } from "./campaign-rules.mjs";
 
 /** Fortitude save against a lasting injury from heavy damage of one type (pp.333–340). */
 export const INJURY_SAVE_DC = 15;
@@ -174,6 +175,9 @@ export function fallingPlan({ feet, surface = "solid", soft = false } = {}) {
   };
 }
 
+/** The Acrobatics/Falling DC (20) after Cakewalk or Comedy of Errors (p.406). */
+export const fallingDC = () => campaignSkillDC(20);
+
 /**
  * The damage a fall deals once rolled (pp.106, 336). A made Acrobatics/Falling check (DC 20) lands the character on
  * their feet and takes a quarter of its result off the damage, never below 1 per die; otherwise they land sprawled.
@@ -184,7 +188,7 @@ export function fallingPlan({ feet, surface = "solid", soft = false } = {}) {
  */
 export function fallingOutcome(plan, { rolled, checkResult = null, dr = 0, halve = false } = {}) {
   const total = whole(rolled, loc`Falling damage`),
-    landed = Number.isFinite(checkResult) && checkResult >= 20;
+    landed = Number.isFinite(checkResult) && checkResult >= fallingDC();
   let damage = landed ? Math.max(plan.dice, total - Math.floor(checkResult / 4)) : total;
   if (halve) damage = Math.floor(damage / 2);
   const reduction = Math.max(0, whole(dr, loc`Damage reduction`) - plan.armorPiercing),

@@ -26,7 +26,8 @@ import {
   qualitiesInForce,
   currentCampaignEffects,
   getCampaign,
-  setCampaign
+  setCampaign,
+  missionEpoch
 } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { withUndo } from "../undo.mjs";
@@ -798,7 +799,8 @@ export async function awardStanding() {
           paidAmount = amount;
         }
       },
-      () => ({ standingPaid: paidBefore })
+      // The mission period goes with the marks: Undo leaves a later mission's payout alone.
+      () => ({ standingPaid: { period: missionEpoch(), marks: paidBefore } })
     );
   } finally {
     payingStanding = false;

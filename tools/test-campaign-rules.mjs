@@ -268,3 +268,18 @@ test("Bulletproof and Gritty move Medicine error ranges and DCs (pp.406–407)",
     assert.equal(campaignSkillPlan({}, "medicine", { attributes: ["int"] }, {}, effects).errorIncrease, -2);
   });
 });
+
+test("Cakewalk and Comedy of Errors move the Falling and forward-observer DCs (p.406)", async () => {
+  const { indirectFirePlan } = await import("../module/rules/indirect-fire.mjs");
+  const plan = fallingPlan({ feet: 45 });
+  withQualities(["cakewalk"], () => {
+    assert.equal(fallingOutcome(plan, { rolled: 14, checkResult: 17 }).landed, true);
+    assert.equal(indirectFirePlan({}, { observerResult: 12 }).blocked, false);
+  });
+  withQualities(["comedy-of-errors"], () => {
+    assert.equal(fallingOutcome(plan, { rolled: 14, checkResult: 22 }).landed, false);
+    const relay = indirectFirePlan({}, { observerResult: 17 });
+    assert.equal(relay.blocked, true);
+    assert.match(relay.reason, /DC 20/);
+  });
+});

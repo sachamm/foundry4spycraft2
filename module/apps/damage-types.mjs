@@ -27,6 +27,7 @@ import {
   explosiveSavePlan,
   explosiveStunRounds,
   exposureInterval,
+  fallingDC,
   fallingOutcome,
   fallingPlan,
   flashOutcome,
@@ -392,7 +393,7 @@ export async function sufferFall(actor, preset = {}) {
           ["fluid", loc`Water or another fluid (subdual)`]
         ])}</select></label>
         <label><input type="checkbox" name="soft" /> ${loc`Soft or yielding landing: counts as 10 ft. shorter`}</label>
-        <label>${loc`Acrobatics/Falling result, if the check succeeded (DC 20)`} <input type="number" name="checkResult" step="1" /></label>
+        <label>${loc`Acrobatics/Falling result, if the check succeeded (DC ${fallingDC()})`} <input type="number" name="checkResult" step="1" /></label>
         <label>${loc`Armor damage reduction`} <input type="number" name="dr" min="0" step="1" value="${Math.max(0, Math.trunc(Number(actor.system?.armor?.dr) || 0))}" /></label>
         ${wireFu && special ? `<p class="hint">${loc`Wire Fu: the damage is halved, rounded down (p.408).`}</p>` : ""}
         <p class="hint">${loc`Use the distance after Equilibrium Basics; the Falling skill dialog works it out. Action dice cannot boost falling damage (p.336).`}</p>

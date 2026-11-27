@@ -30,7 +30,8 @@ export function adjudicateCheck(check, succeeded) {
     threat: check.threat ?? 0,
     actionDieBonus: check.boostTotal ?? 0,
     succeeded,
-    triumphAt: triumphAt(check)
+    triumphAt: triumphAt(check),
+    ceiling: check.resultCeiling ?? null
   });
   const candidates = checkCandidates({ ...check, effectiveTotal: result.total });
   return {

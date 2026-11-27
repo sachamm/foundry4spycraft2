@@ -33,6 +33,7 @@ import { setCondition, woundConditions } from "./wound-conditions.mjs";
 import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignStress } from "../rules/campaign-rules.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -143,7 +144,10 @@ export async function sufferStress(actor, amount, source, damageMode = "stressBe
   if (doubled) amount *= 2;
   const prefix = doubled ? `${loc`An animal takes double stress from ${source} (p.445).`} ` : "";
   if (actor.type !== "agent") {
-    // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
+    // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save. The agent
+    // ledger applies Tense or Mellow itself, so only this branch scales the stress here.
+    const scaled = campaignStress(amount);
+    amount = scaled.amount;
     if (!(Number(actor.system.vitality?.max) > 0))
       return prefix + loc`${amount} stress damage: roll the Damage save for it.`;
     const totals = actor.flags?.spycraft2?.nonLethal ?? {},

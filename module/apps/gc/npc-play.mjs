@@ -230,7 +230,9 @@ export async function rollNpcSkill(actor, input = null) {
     surprise: input.surprise === true,
     paranoidPersuasion: input.paranoidPersuasion === true
   });
-  const rows = [...situation.rows, ...quality.rows],
+  // Omni-Competent halves every penalty, the NPC qualities' too; npcSkillCheckRows has halved its own rows.
+  const halve = omniPenalty();
+  const rows = [...situation.rows, ...quality.rows.map(row => ({ ...row, value: halve(row.value) }))],
     errorIncrease = quality.errorIncrease + situation.errorIncrease;
   const total =
     plan.bonus + (actor.system.abilities[ability]?.mod ?? 0) + rows.reduce((sum, row) => sum + row.value, 0);

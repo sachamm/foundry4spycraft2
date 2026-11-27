@@ -73,6 +73,14 @@ export async function gcActivateThreat(message, actor) {
     });
     return true;
   }
+  // Laser damage (p.338): a threat costs 1 action die less to activate, so an NPC's laser critical is free.
+  if (check.checkKind === "attack" && check.attackContext?.laser === true) {
+    await message.update({
+      "flags.spycraft2.criticalSuccess": true,
+      "flags.spycraft2.criticalActivation": { cost: 0, payer: "gc", source: loc`Laser damage –1` }
+    });
+    return true;
+  }
   const result = await spendGCDice({
     id: "activateThreat",
     actor,

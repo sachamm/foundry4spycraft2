@@ -21,13 +21,9 @@ const CHECK_SECTIONS = {
   tauntOpponentUuid: ["taunt", "resist-taunt"],
   diversionOpponentUuid: ["diversion", "resist-diversion"],
   skillTrick: ["trip", "bull-rush", "feint", "grapple"],
-  grappleAdvantageConfirmed: ["grapple", "restraint-escape"],
-  grappleJointLock: ["restraint-escape"],
-  grappleSizeDifference: ["grapple"],
-  grappleOthers: ["grapple"],
-  grappleSecondOpponent: ["grapple", "restraint-escape"],
-  grappleMute: ["grapple", "restraint-escape"],
-  grappleGarrote: ["grapple", "restraint-escape"],
+  // The Grapple section holds every grapple control, so it is shown for both checks; the rules ignore the ones that
+  // do not apply to the chosen check.
+  grappleSizeDifference: ["grapple", "restraint-escape"],
   trackingSurface: ["tracking"],
   nest: ["hide"],
   hideMovement: ["hide"],

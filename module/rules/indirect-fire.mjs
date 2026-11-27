@@ -8,6 +8,7 @@
  */
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignSkillDC } from "./campaign-rules.mjs";
 
 export const OBSERVER_DC = 15;
 
@@ -56,10 +57,11 @@ export function indirectFirePlan(system, { observerResult = null, adjustments = 
   const result = observed ? Number(observerResult) : null;
   if (observed && !Number.isSafeInteger(result))
     return { blocked: true, reason: loc`Enter the forward observer's Tactics result as a whole number.` };
-  if (observed && result < OBSERVER_DC)
+  const observerDC = campaignSkillDC(OBSERVER_DC);
+  if (observed && result < observerDC)
     return {
       blocked: true,
-      reason: loc`The forward observer's Tactics check (${result}) missed DC ${OBSERVER_DC}, so the coordinates did not get through. The observer may try again with another half action.`
+      reason: loc`The forward observer's Tactics check (${result}) missed DC ${observerDC}, so the coordinates did not get through. The observer may try again with another half action.`
     };
   const relays = Number(adjustments) || 0;
   if (!Number.isSafeInteger(relays) || relays < 0)

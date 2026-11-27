@@ -329,6 +329,9 @@ test("the standing award pays each agent once per mission; a correction pays aga
   answer({ currency: "reputation", again: true });
   await mission.awardStanding();
   assert.equal(actors.get("a2").system.reputation, 26, "the correction pays everyone");
+  const paidNote = messages.findLast(message => message.flags?.spycraft2?.undo?.standingPaid)?.flags.spycraft2.undo;
+  assert.equal(paidNote.standingPaid.period, state.missionEpoch(), "Undo is tied to the mission that paid");
+  assert.ok(paidNote.standingPaid.marks.a2, "the earlier marks are kept for Undo");
   for (const id of ["a2", "a3", "a4"]) await actors.get(id).update({ "system.reputation": 14 });
 });
 

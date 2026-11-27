@@ -407,3 +407,21 @@ test("ranges print as die faces and attacks hit or miss where other checks succe
   assert.match(checkFlavor(attack), /Error range 1–2; threat range 19–20\./);
   assert.doesNotMatch(checkFlavor({ ...attack, criticalSuccess: true }), /Critical success/);
 });
+
+test("confirming an attack keeps the forward observer's result ceiling (p.300)", () => {
+  const attack = {
+    checkKind: "attack",
+    checkMethod: "roll",
+    rawTotal: 80,
+    effectiveTotal: 22,
+    resultCeiling: 22,
+    naturalDie: 12,
+    error: 1,
+    threat: 20,
+    boostTotal: 0,
+    boostSpent: 0
+  };
+  const outcome = adjudicateCheck(attack, true);
+  assert.equal(outcome.effectiveTotal, 22);
+  assert.equal(outcome.triumphed, false);
+});

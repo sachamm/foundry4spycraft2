@@ -302,16 +302,23 @@ async function undoRecord(message, record) {
       })).catch(error => ui.notifications.warn(loc`The antagonist list was not put back: ${error.message}`));
   }
   // A standing payout's paid marks go back to what they were, so those agents can be paid again.
-  if (record.standingPaid && Object.keys(record.standingPaid).length && game.user.isGM) {
-    const { updateMission } = await import("./gc/state.mjs");
-    await updateMission(now => {
-      const paid = { ...(now.standingPaid ?? {}) };
-      for (const [id, was] of Object.entries(record.standingPaid)) {
-        if (was) paid[id] = was;
-        else delete paid[id];
-      }
-      return { standingPaid: paid };
-    }).catch(error => ui.notifications.warn(loc`The standing paid marks were not put back: ${error.message}`));
+  // Only within the mission that paid: once a later mission has begun, its own marks are left as they are.
+  const standing = record.standingPaid;
+  if (standing?.marks && Object.keys(standing.marks).length && game.user.isGM) {
+    const { updateMission, missionEpoch } = await import("./gc/state.mjs");
+    if (standing.period !== missionEpoch())
+      ui.notifications.warn(
+        loc`The standing was given back, but a later mission has begun, so its paid marks were left as they are.`
+      );
+    else
+      await updateMission(now => {
+        const paid = { ...(now.standingPaid ?? {}) };
+        for (const [id, was] of Object.entries(standing.marks)) {
+          if (was) paid[id] = was;
+          else delete paid[id];
+        }
+        return { standingPaid: paid };
+      }).catch(error => ui.notifications.warn(loc`The standing paid marks were not put back: ${error.message}`));
   }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {
