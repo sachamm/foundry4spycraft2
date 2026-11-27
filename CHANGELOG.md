@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The recorded-save damage tool now accepts Fortitude and Will as well as Reflex saves, and applies
+  Blockbuster when the GC confirms that the source normally allows a save for half. Evasion retains its
+  own Reflex eligibility and failed-save reduction.
+
 - Blockbuster now prevents acid, explosion and first-round vacuum damage after a successful saving throw,
   including secondary effects. Pending hazard saves retain the campaign policy recorded when they began.
 

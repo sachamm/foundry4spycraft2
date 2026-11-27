@@ -165,6 +165,57 @@ function actor(level = 19) {
   });
   return a;
 }
+
+test("actual saving throws retain Blockbuster policy independently of later campaign changes", async () => {
+  const settings = game.settings;
+  game.settings = { get: (_id, key) => (key === "campaign" ? { qualities: ["blockbuster"] } : {}) };
+  try {
+    const a = actor();
+    const m = await a.rollSave("fort");
+    assert.deepEqual(m.flags.spycraft2.campaignSaveContext, { version: 1, ignoreSuccessfulHalfSave: true });
+    game.settings = settings;
+    assert.equal(m.flags.spycraft2.campaignSaveContext.ignoreSuccessfulHalfSave, true);
+    assert.equal((await a.rollSave("will")).flags.spycraft2.campaignSaveContext.ignoreSuccessfulHalfSave, false);
+  } finally {
+    game.settings = settings;
+  }
+});
+
+test("the sheet's recorded-save tool accepts a Fortitude save and reports Blockbuster without health writes", async () => {
+  const { checkReflexDamage } = await import("../module/apps/reflex-damage.mjs");
+  const a = actor();
+  a.update = async () => {
+    throw Error("Damage review must not write health");
+  };
+  const m = {
+    id: "fort-save",
+    flags: {
+      spycraft2: {
+        actorUuid: a.uuid,
+        checkKind: "save",
+        checkId: "fort",
+        effectiveTotal: 20,
+        successConfirmed: true,
+        campaignSaveContext: { version: 1, ignoreSuccessfulHalfSave: true }
+      }
+    }
+  };
+  const messages = [m];
+  messages.get = id => messages.find(row => row.id === id);
+  game.messages = messages;
+  input = {
+    messageId: m.id,
+    damage: "21",
+    normalSuccessDamage: "10",
+    succeeded: "true",
+    successHalves: true,
+    confirmed: true
+  };
+  const result = await checkReflexDamage(a);
+  assert.equal(result.blockbuster, true);
+  assert.equal(result.total, 0);
+  delete game.messages;
+});
 test("Evasion III takes 10 on any real Reflex save with no d20, natural result, threat, action-die boost or random reroll", async () => {
   const a = actor(),
     m = await a.rollSave("ref", { checkMethod: "take10", reflexReducesDamage: true, flatFooted: true }),

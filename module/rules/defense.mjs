@@ -339,6 +339,47 @@ export function reflexDamagePlan(
   return { damage, normalSuccessDamage, succeeded, ordinary, total, evaded, halved, eligible, context: { ...context } };
 }
 
+/** A recorded save's damage adjustment; the GC identifies sources that normally allow a save for half. */
+export function savingThrowDamagePlan(check, options = {}) {
+  const { damage, normalSuccessDamage, succeeded = check.successConfirmed, confirmed, successHalves = false } = options;
+  if (check.checkKind !== "save" || !["ref", "fort", "will"].includes(check.checkId) || check.superseded)
+    throw new Error(loc`Choose an original saving throw.`);
+  if (confirmed !== true || typeof succeeded !== "boolean" || typeof successHalves !== "boolean")
+    throw new Error(loc`The GC must confirm the source damage, ordinary successful-save damage and outcome.`);
+  if (typeof check.successConfirmed === "boolean" && succeeded !== check.successConfirmed)
+    throw new Error(loc`The save outcome changed; use its currently confirmed outcome.`);
+  if (
+    ![damage, normalSuccessDamage].every(Number.isSafeInteger) ||
+    damage < 0 ||
+    normalSuccessDamage < 0 ||
+    normalSuccessDamage > damage
+  )
+    throw new Error(
+      loc`Enter whole source damage and ordinary successful-save damage between zero and the source damage.`
+    );
+  if (successHalves && ![Math.floor(damage / 2), Math.ceil(damage / 2)].includes(normalSuccessDamage))
+    throw new Error(loc`A save for half must use the source rule's half-damage amount.`);
+  const recorded = check.campaignSaveContext;
+  if (recorded && (recorded.version !== 1 || typeof recorded.ignoreSuccessfulHalfSave !== "boolean"))
+    throw new Error(loc`Review the saving throw's recorded campaign policy.`);
+  const ordinary = succeeded ? normalSuccessDamage : damage;
+  const evasion =
+    check.checkId === "ref" && check.evasionContext
+      ? reflexDamagePlan(check, { ...options, succeeded })
+      : {
+          damage,
+          normalSuccessDamage,
+          succeeded,
+          ordinary,
+          total: ordinary,
+          evaded: false,
+          halved: false,
+          context: null
+        };
+  const blockbuster = succeeded && successHalves && recorded?.ignoreSuccessfulHalfSave === true;
+  return { ...evasion, total: blockbuster ? 0 : evasion.total, blockbuster };
+}
+
 // Uncanny Dodge against a security device as part of a Reflex save plan.
 rollPipeline.register({
   id: "securityDeviceSaveTerm",
@@ -357,4 +398,4 @@ rollPipeline.register({
 });
 
 // Recorded on the posted check as the roll was given them.
-rollPipeline.register({ id: "defenseRecord", order: 9655, record: ["evasionContext"] });
+rollPipeline.register({ id: "defenseRecord", order: 9655, record: ["evasionContext", "campaignSaveContext"] });

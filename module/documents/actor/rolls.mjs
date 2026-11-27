@@ -19,6 +19,8 @@ import { surchargeFundingInput, unrolledPaymentFundingInput } from "../../apps/a
 import { shakenRules } from "../../rules/shaken.mjs";
 import { restraintActionBlock } from "../../rules/restraints.mjs";
 import { evasionPlan, evasionSaveContext } from "../../rules/defense.mjs";
+import { ignoresSuccessfulHalfSave } from "../../rules/campaign-combat.mjs";
+import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { sleepingSourceSnapshot } from "../../rules/sleeping.mjs";
 import {
   attributeCollapsePlan,
@@ -610,6 +612,10 @@ export const ActorRolls = Base =>
           ...Object.assign({}, ...terms.all("options")),
           checkMethod,
           evasionContext,
+          campaignSaveContext: {
+            version: 1,
+            ignoreSuccessfulHalfSave: ignoresSuccessfulHalfSave(this, currentCampaignRules().effects)
+          },
           validateSaveContext: terms.list.some(term => term.guarded)
             ? () => {
                 if (guards.some((term, index) => term.facts() !== planned[index]))
