@@ -101,6 +101,17 @@ test("an open check offers boosting and resolution, in one row under the card", 
   ]);
 });
 
+test("a closed acquisition retains its completion control while delivery or the actor receipt is incomplete", () => {
+  actor = makeActor({ system: { missionReserves: { epoch: "mission", attempts: { a: {} } } } });
+  const receipt = { id: "receipt", epoch: "mission", attemptId: "a", stage: "rolling" };
+  const msg = message({ resolved: true, gearAttempt: { id: "a", settlement: receipt } });
+  assert.deepEqual(labels(msg), ["content:Complete acquisition record"]);
+  receipt.stage = "complete";
+  assert.deepEqual(labels(msg), ["content:Complete acquisition record"]);
+  actor.system.missionReserves.attempts.a.settlementId = "receipt";
+  assert.deepEqual(labels(msg), []);
+});
+
 test("confirmation, critical activation and a required bonus die appear in their fixed positions", () => {
   actor = makeActor();
   const got = labels(message({ naturalDie: 20, threat: 20, threatConfirmed: true, requiredBonusPoolId: "pool" }));

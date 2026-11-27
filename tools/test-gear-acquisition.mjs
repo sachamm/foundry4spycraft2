@@ -227,7 +227,14 @@ globalThis.foundry = { utils: { randomID: () => String(++serial), escapeHTML: s 
 globalThis.ChatMessage = { getSpeaker: () => ({}) };
 globalThis.Roll = class {
   constructor(formula) {
-    this.total = formula.includes("1d20") ? rollTotal : 7;
+    this.formula = formula;
+    this.total = /^\d+$/.test(formula)
+      ? Number(formula)
+      : formula.includes("1d20")
+        ? rollTotal
+        : formula === "1d6"
+          ? 6
+          : 7;
     this.dice = [{ total: 1 }];
   }
   async evaluate() {
@@ -237,6 +244,7 @@ globalThis.Roll = class {
     if (postFails) throw Error("post failed");
     return {
       ...data,
+      rolls: [this],
       uuid: "ChatMessage." + serial,
       async update(patch) {
         update(this, patch);
@@ -260,6 +268,10 @@ test("actual document workflow defers success until boosts are finished, rolls d
   assert.equal(result.delivery.total, 7);
   assert.equal(result.delivery.unit, "hours");
   assert.equal(msg.flags.spycraft2.resolved, true);
+  assert.equal(msg.rolls.length, 2);
+  assert.equal(msg.rolls[0].total, 20);
+  assert.equal(msg.rolls[1].formula, "2d6");
+  assert.equal(msg.flags.spycraft2.gearAttempt.settlement.deliveryEvidence.rawTotal, 7);
   const itemData = { name: request.name, type: "gear", system: { gearCategory: "R", caliber: 2 } };
   await assert.rejects(
     actor.claimGearAcquisition({ attemptId: id, itemData, delivered: false, gcConfirmed: true }),
@@ -1232,6 +1244,111 @@ test("acquisition settlement reconciles rejected/committed chat writes without r
     assert.equal(result.delivery.total, 7);
     assert.equal(a.system.actionDice.value, 3);
     assert.equal(a.system.missionReserves.spent.R, 1);
+  }
+});
+
+test("delivery writes freeze the check before RNG and retry the same raw roll without duplicate attachments", async () => {
+  for (const failure of ["before", "after"]) {
+    const a = new SpycraftActor();
+    await a.allocateMissionReserves(initialize);
+    const m = await a.rollGearAcquisition(request),
+      original = m.update.bind(m),
+      evaluate = Roll.prototype.evaluate;
+    let deliveries = 0,
+      failed = false;
+    Roll.prototype.evaluate = async function () {
+      if (this.formula === "2d6") deliveries++;
+      return evaluate.call(this);
+    };
+    m.update = async patch => {
+      if (!failed && patch["flags.spycraft2.gearAttempt"]?.settlement?.stage === "complete") {
+        failed = true;
+        if (failure === "before") throw Error("delivery write rejected");
+        await original(patch);
+        throw Error("delivery response lost");
+      }
+      return original(patch);
+    };
+    try {
+      if (failure === "before") {
+        await assert.rejects(a.finishCheck(m), /delivery write rejected/);
+        assert.equal(m.flags.spycraft2.resolved, true);
+        assert.equal(m.flags.spycraft2.gearAttempt.settlement.stage, "rolling");
+        assert.equal(m.rolls.length, 1);
+        assert.equal(await a.boostCheck(m, { count: 1 }), null);
+      } else await a.finishCheck(m);
+      const settled = await a.finishCheck(m);
+      assert.equal(settled.delivery.total, 7);
+      assert.equal(deliveries, 1);
+      assert.equal(m.rolls.length, 2);
+      assert.equal(m.rolls[1].total, 7);
+      assert.equal(a.system.actionDice.value, 3);
+      assert.equal(a.system.missionReserves.spent.R, 1);
+    } finally {
+      Roll.prototype.evaluate = evaluate;
+    }
+  }
+});
+
+test("after client state is lost, an interrupted delivery needs GC review of its actual result and cannot reroll", async () => {
+  const a = new SpycraftActor();
+  await a.allocateMissionReserves(initialize);
+  const m = await a.rollGearAcquisition(request),
+    original = m.update.bind(m);
+  let failed = false;
+  m.update = async patch => {
+    if (!failed && patch["flags.spycraft2.gearAttempt"]?.settlement?.stage === "complete") {
+      failed = true;
+      throw Error("delivery write rejected");
+    }
+    return original(patch);
+  };
+  await assert.rejects(a.finishCheck(m), /delivery write rejected/);
+  const reloaded = await import(`../module/apps/gear-acquisition.mjs?delivery-client-${++serial}`);
+  const priorUser = game.user,
+    evaluate = Roll.prototype.evaluate;
+  let dice = 0;
+  Roll.prototype.evaluate = async function () {
+    if (/d/.test(this.formula)) dice++;
+    return evaluate.call(this);
+  };
+  try {
+    game.user = { ...priorUser, id: "gc", isGM: false };
+    await assert.rejects(reloaded.finishGearAcquisition(a, m), /GC review/);
+    game.user.isGM = true;
+    await assert.rejects(
+      reloaded.finishGearAcquisition(a, m, { deliveryTotal: 1, confirmed: true, note: "Checked" }),
+      /actual delivery total/
+    );
+    const result = await reloaded.finishGearAcquisition(a, m, {
+      deliveryTotal: 7,
+      confirmed: true,
+      note: "Actual original delivery total checked"
+    });
+    assert.equal(result.delivery.total, 7);
+    assert.equal(dice, 0);
+    assert.equal(m.rolls.length, 2);
+    assert.equal(m.rolls[1].formula, "7");
+    const evidence = m.flags.spycraft2.gearAttempt.settlement.deliveryEvidence;
+    assert.equal(evidence.origin, "reviewed");
+    assert.equal(evidence.reviewerId, "gc");
+    assert.equal((await a.finishCheck(m)).delivery.total, 7);
+  } finally {
+    game.user = priorUser;
+    Roll.prototype.evaluate = evaluate;
+  }
+});
+
+test("delivery receipts reject changed attached rolls instead of silently accepting their stored total", async () => {
+  for (const change of ["total", "formula", "base"]) {
+    const a = new SpycraftActor();
+    await a.allocateMissionReserves(initialize);
+    const m = await a.rollGearAcquisition(request);
+    await a.finishCheck(m);
+    if (change === "total") m.rolls[1].total++;
+    if (change === "formula") m.rolls[1].formula = "3d6";
+    if (change === "base") m.rolls[0].total++;
+    await assert.rejects(a.finishCheck(m), /delivery|original dice/);
   }
 });
 test("actor settlement errors preserve the final chat result and one frozen delivery; retry completes only the same record", async () => {

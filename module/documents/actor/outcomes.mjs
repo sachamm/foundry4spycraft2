@@ -1045,7 +1045,7 @@ export const ActorOutcomes = Base =>
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
       if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const check = message.flags.spycraft2;
-      if (check.gearAttempt) return finishGearAcquisition(this, message);
+      if (check.gearAttempt) return finishGearAcquisition(this, message, options);
       if (
         check.requiredBonusPoolId &&
         bonusPoolForCheck(this.system, check.requiredBonusPoolId, message, { periods: this.usagePeriods }).available

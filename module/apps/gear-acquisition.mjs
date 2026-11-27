@@ -28,7 +28,8 @@ import {
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
 import { loc } from "../i18n.mjs";
-import { same } from "../rules/equal.mjs";
+import { sameValues as same } from "../rules/equal.mjs";
+import { systemDialog } from "./dialog-theme.mjs";
 import { postedReceipt } from "../services/message-lookup.mjs";
 const queued = (actor, work, options) => queueResources([actor], work, options);
 const crossQueued = (actor, actors, work) => queueResources([actor, ...actors], work);
@@ -470,11 +471,14 @@ async function refreshAcquisitionChat(message) {
   }
 }
 const acquisitionEvidence = check => rollEvidence({ ...check, resolved: false, successConfirmed: undefined });
-function validateSettlement(actor, message, record, attempt, receipt) {
+const pendingDeliveries = new Map();
+const deliveryKey = (actor, message, receipt) => `${actor.uuid}|${message.uuid ?? message.id}|${receipt.id}`;
+const rollSummaries = message => [...(message.rolls ?? [])].map(r => ({ formula: r.formula, total: r.total }));
+function validateAcquisitionReceipt(actor, message, record, receipt) {
   const check = message.flags.spycraft2,
     id = check.gearAttempt.id;
   if (
-    receipt?.version !== 1 ||
+    ![1, 2].includes(receipt?.version) ||
     receipt.actorUuid !== actor.uuid ||
     receipt.messageUuid !== (message.uuid ?? message.id) ||
     receipt.epoch !== record.epoch ||
@@ -488,6 +492,52 @@ function validateSettlement(actor, message, record, attempt, receipt) {
     check.superseded
   )
     throw new Error(loc`The recorded acquisition result changed or has an invalid receipt. Ask the GC to review it.`);
+  if (receipt.finalTotal !== check.effectiveTotal)
+    throw new Error(loc`The final acquisition result changed. Ask the GC to review it.`);
+}
+function deliveryBounds(spec) {
+  const match = spec.formula.match(/^(\d+)d(\d+)$/);
+  if (!match) throw Error(loc`Review the delivery dice formula.`);
+  return { minimum: Number(match[1]), maximum: Number(match[1]) * Number(match[2]) };
+}
+function validateDeliveryAttachment(message, receipt, spec) {
+  const evidence = receipt.deliveryEvidence;
+  if (
+    !Array.isArray(receipt.baseRolls) ||
+    !same(rollSummaries(message).slice(0, receipt.baseRolls.length), receipt.baseRolls)
+  )
+    throw Error(loc`The acquisition's original dice changed. The GC must review the delivery evidence.`);
+  if (!spec) {
+    if (evidence !== null) throw Error(loc`This acquisition must not have delivery dice.`);
+    return;
+  }
+  const bounds = deliveryBounds(spec),
+    roll = message.rolls?.[evidence?.index];
+  if (
+    !evidence ||
+    evidence.index !== receipt.baseRolls.length ||
+    !["rolled", "reviewed"].includes(evidence.origin) ||
+    evidence.formula !== spec.formula ||
+    !Number.isSafeInteger(evidence.rawTotal) ||
+    evidence.rawTotal < bounds.minimum ||
+    evidence.rawTotal > bounds.maximum ||
+    roll?.total !== evidence.rawTotal ||
+    roll.formula !== (evidence.origin === "rolled" ? spec.formula : String(evidence.rawTotal)) ||
+    (evidence.origin === "reviewed" &&
+      (typeof evidence.note !== "string" ||
+        !evidence.note.trim() ||
+        typeof evidence.reviewerId !== "string" ||
+        !evidence.reviewerId)) ||
+    receipt.next.delivery.total !== Math.ceil(evidence.rawTotal * (receipt.before.deliveryMultiplier ?? 1))
+  )
+    throw Error(loc`The delivery dice or reviewed result do not match the recorded delivery time.`);
+}
+function validateSettlement(actor, message, record, attempt, receipt) {
+  validateAcquisitionReceipt(actor, message, record, receipt);
+  const check = message.flags.spycraft2,
+    id = check.gearAttempt.id;
+  if (receipt.version === 2 && receipt.stage !== "complete")
+    throw Error(loc`Complete the interrupted delivery before claiming this acquisition.`);
   const result = acquisitionOutcome(receipt.before, receipt.finalTotal),
     next = receipt.next;
   if (
@@ -512,8 +562,7 @@ function validateSettlement(actor, message, record, attempt, receipt) {
       : next.delivery !== null
   )
     throw new Error(loc`The recorded delivery needs GC review.`);
-  if (receipt.finalTotal !== check.effectiveTotal)
-    throw new Error(loc`The final acquisition result changed. Ask the GC to review it.`);
+  if (receipt.version === 2) validateDeliveryAttachment(message, receipt, spec);
   if (attempt.settlementId === receipt.id) {
     if (!same({ ...attempt, claimedItemId: next.claimedItemId }, next))
       throw new Error(loc`The actor acquisition outcome changed after settlement.`);
@@ -523,7 +572,119 @@ function validateSettlement(actor, message, record, attempt, receipt) {
     throw new Error(loc`The acquisition record changed before settlement. Preserve it for GC review.`);
   return false;
 }
-export function finishGearAcquisition(actor, message) {
+async function completeDelivery(actor, message, record, attempt, receipt, { fresh, options }) {
+  validateAcquisitionReceipt(actor, message, record, receipt);
+  const result = acquisitionOutcome(receipt.before, receipt.finalTotal);
+  if (!same(attempt, receipt.before))
+    throw Error(loc`The acquisition record changed before settlement. Preserve it for GC review.`);
+  if (
+    receipt.version !== 2 ||
+    receipt.stage !== "rolling" ||
+    !same(rollSummaries(message), receipt.baseRolls) ||
+    message.flags.spycraft2.successConfirmed !== result.success ||
+    message.flags.spycraft2.gearAttempt.success !== result.success
+  )
+    throw Error(loc`The interrupted acquisition no longer matches its frozen result. Ask the GC to review it.`);
+  const spec = result.success && attempt.kind === "request" ? DELIVERY[attempt.location] : null,
+    key = deliveryKey(actor, message, receipt);
+  let pending = pendingDeliveries.get(key);
+  if (spec && options.deliveryTotal !== undefined) {
+    if (
+      !game.user?.isGM ||
+      typeof game.user.id !== "string" ||
+      options.confirmed !== true ||
+      typeof options.note !== "string" ||
+      !options.note.trim() ||
+      options.note.length > 500
+    )
+      throw Error(loc`The GC must confirm the actual delivery result and add a review note.`);
+    const value = Number(options.deliveryTotal),
+      bounds = deliveryBounds(spec);
+    if (!Number.isSafeInteger(value) || value < bounds.minimum || value > bounds.maximum)
+      throw Error(loc`Record an actual delivery total from ${bounds.minimum} to ${bounds.maximum}.`);
+    pending = {
+      roll: await new Roll(String(value)).evaluate(),
+      origin: "reviewed",
+      note: options.note.trim(),
+      reviewerId: game.user.id
+    };
+    pendingDeliveries.set(key, pending);
+  } else if (spec && !pending) {
+    if (!fresh) {
+      if (!game.user?.isGM) throw Error(loc`The interrupted delivery roll needs GC review; do not roll it again.`);
+      const bounds = deliveryBounds(spec);
+      const input = await systemDialog.input({
+        window: { title: loc`Review interrupted delivery` },
+        rejectClose: false,
+        ok: { label: loc`Record delivery result` },
+        content: `<div class="spycraft2-roll-options"><p>${loc`The acquisition result is closed. Record the actual delivery roll total (${spec.formula}), before its time multiplier. Do not reroll a result that already occurred; adjudicate an unknown result separately.`}</p><label>${loc`Actual delivery roll total`} <input name="deliveryTotal" type="number" min="${bounds.minimum}" max="${bounds.maximum}" step="1" required /></label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC reviewed this actual delivery result`}</label></div>`
+      });
+      if (!input) return null;
+      return completeDelivery(actor, message, record, attempt, receipt, { fresh: false, options: input });
+    }
+    pending = { roll: await new Roll(spec.formula).evaluate(), origin: "rolled" };
+    pendingDeliveries.set(key, pending);
+  }
+  validateAcquisitionReceipt(actor, message, record, receipt);
+  const latest = currentReserves(actor.system);
+  if (!latest || latest.epoch !== receipt.epoch || !same(latest.attempts?.[receipt.attemptId], receipt.before))
+    throw Error(loc`The acquisition record changed before settlement. Preserve it for GC review.`);
+  if (spec) {
+    const bounds = deliveryBounds(spec),
+      value = pending.roll.total,
+      multiplier = attempt.deliveryMultiplier ?? 1;
+    if (
+      !Number.isSafeInteger(value) ||
+      value < bounds.minimum ||
+      value > bounds.maximum ||
+      !Number.isFinite(multiplier) ||
+      multiplier <= 0 ||
+      pending.roll.formula !== (pending.origin === "rolled" ? spec.formula : String(value))
+    )
+      throw Error(
+        loc`Review the actual delivery dice and positive time multiplier before completing this acquisition.`
+      );
+  }
+  const delivery = spec
+    ? {
+        formula: spec.formula,
+        total: Math.ceil(pending.roll.total * (attempt.deliveryMultiplier ?? 1)),
+        unit: spec.unit
+      }
+    : null;
+  const next = { ...attempt, ...result, delivery, settlementId: receipt.id };
+  const completed = {
+    ...receipt,
+    stage: "complete",
+    next,
+    deliveryEvidence: spec
+      ? {
+          index: receipt.baseRolls.length,
+          formula: spec.formula,
+          rawTotal: pending.roll.total,
+          origin: pending.origin,
+          ...(pending.origin === "reviewed" ? { note: pending.note, reviewerId: pending.reviewerId } : {})
+        }
+      : null
+  };
+  const gearAttempt = { ...message.flags.spycraft2.gearAttempt, ...result, delivery, settlement: completed };
+  const notes = result.success
+    ? loc`Succeeded.${delivery ? loc` Available after ${delivery.total} ${delivery.unit}.` : loc` The Common Item was already brought along.`} Claim it on the Gear tab.`
+    : loc`Failed. The consumed reserve and action dice are not refunded.`;
+  try {
+    await message.update({
+      "flags.spycraft2.gearAttempt": gearAttempt,
+      ...(spec ? { rolls: [...(message.rolls ?? []), pending.roll] } : {}),
+      flavor: `${message.flags.spycraft2.baseFlavor ?? loc`Acquisition`}<br><strong>${loc`Final result ${receipt.finalTotal}: ${notes}`}</strong>`
+    });
+  } catch (error) {
+    if (!same(message.flags?.spycraft2?.gearAttempt, gearAttempt)) throw error;
+  }
+  validateSettlement(actor, message, record, attempt, completed);
+  pendingDeliveries.delete(key);
+  return completed;
+}
+export function finishGearAcquisition(actor, message, options = {}) {
   if (!owned(actor) || message.flags?.spycraft2?.actorUuid !== actor.uuid) return null;
   return queued(
     actor,
@@ -539,24 +700,16 @@ export function finishGearAcquisition(actor, message) {
       if (!attempt || attempt.epoch !== record.epoch || check.gearAttempt.epoch !== record.epoch)
         throw new Error(loc`This acquisition belongs to an earlier mission or has no reserve transaction.`);
       if (check.superseded) throw new Error(loc`Resolve the replacement acquisition check instead.`);
-      let receipt = check.gearAttempt.settlement;
+      let receipt = check.gearAttempt.settlement,
+        fresh = false;
       if (!receipt) {
         if (check.resolved || attempt.status !== "pending")
           return refuseStep(loc`This acquisition has already been resolved.`);
         const result = acquisitionOutcome(attempt, check.effectiveTotal),
-          spec = result.success && attempt.kind === "request" ? DELIVERY[attempt.location] : null;
-        const roll = spec ? await new Roll(spec.formula).evaluate() : null,
-          delivery = spec
-            ? {
-                formula: spec.formula,
-                total: Math.ceil(roll.total * (attempt.deliveryMultiplier ?? 1)),
-                unit: spec.unit
-              }
-            : null,
           settlementId = foundry.utils.randomID();
-        const next = { ...attempt, ...result, delivery, settlementId };
         receipt = {
-          version: 1,
+          version: 2,
+          stage: "rolling",
           id: settlementId,
           actorUuid: actor.uuid,
           messageUuid: message.uuid ?? message.id,
@@ -565,18 +718,15 @@ export function finishGearAcquisition(actor, message) {
           evidence: acquisitionEvidence(check),
           finalTotal: check.effectiveTotal,
           before: structuredClone(attempt),
-          next
+          baseRolls: rollSummaries(message)
         };
-        const notes = result.success
-          ? loc`Succeeded.${delivery ? loc` Available after ${delivery.total} ${delivery.unit}.` : loc` The Common Item was already brought along.`} Claim it on the Gear tab.`
-          : loc`Failed. The consumed reserve and action dice are not refunded.`;
-        const gearAttempt = { ...check.gearAttempt, ...result, delivery, settlement: receipt };
+        const gearAttempt = { ...check.gearAttempt, ...result, delivery: null, settlement: receipt };
         try {
           await message.update({
             "flags.spycraft2.resolved": true,
             "flags.spycraft2.successConfirmed": result.success,
             "flags.spycraft2.gearAttempt": gearAttempt,
-            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${loc`Final result ${check.effectiveTotal}: ${notes}`}</strong>`
+            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${loc`Final result ${check.effectiveTotal} recorded; delivery settlement follows.`}</strong>`
           });
         } catch (error) {
           const current = message.flags?.spycraft2;
@@ -587,9 +737,15 @@ export function finishGearAcquisition(actor, message) {
           )
             throw error;
         }
+        fresh = true;
+      }
+      if (receipt.version === 2 && receipt.stage === "rolling") {
+        receipt = await completeDelivery(actor, message, record, attempt, receipt, { fresh, options });
+        if (!receipt) return null;
       }
       // The message commits first: its resolved state prevents further boosts or replacement rolls.
       // Actor failures leave that exact final result/delivery available for a bounded retry.
+      pendingDeliveries.delete(deliveryKey(actor, message, receipt));
       if (validateSettlement(actor, message, record, attempt, receipt)) {
         await refreshAcquisitionChat(message);
         return attempt;

@@ -558,3 +558,16 @@ GC-only visibility. Existing test doubles now model native preparation without
 posting, so resource rollback and lost-response tests still exercise the actual
 posting boundary. All **4,051** tests, focused lint, formatting and bundling pass.
 Delivery-roll attachment and write-failure replay remain the next B-192 work.
+
+The remaining B-192 work now preserves delivery results through interrupted
+settlement. A successful Request closes its check and reserves the delivery
+before drawing dice. The complete receipt and actual delivery Roll are saved
+together. A rejected write reuses the retained Roll; after lost client state the
+GC records the actual total and a review note, without drawing new dice. Receipt
+validation binds the original check, historical time multiplier, delivery dice
+and actor settlement. Native Foundry confirms both ordinary delivery and recovery
+through the existing acquisition completion control after a page reload, with
+no duplicate payment, page errors or transaction diagnostics. The recovery dialog
+also passes keyboard and 720px layout checks. All **4,055** tests pass. B-192 is
+closed; the scores remain **9.1/10** for creation and **9.2/10** for combat while
+the remaining source audit and play workflows are implemented.

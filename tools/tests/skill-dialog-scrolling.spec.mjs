@@ -11,6 +11,7 @@ import { reviewTriggeredAttacks } from "../../module/apps/final-attack.mjs";
 import { selectCakewalkSkills } from "../../module/apps/cakewalk.mjs";
 import { resolveFallingDamage, recordUncontrolledFall } from "../../module/apps/falling-damage.mjs";
 import { rollEvidence } from "../../module/rules/outcomes.mjs";
+import { finishGearAcquisition } from "../../module/apps/gear-acquisition.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -228,6 +229,69 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     content = prior;
   }
 });
+test("interrupted delivery recovery keeps the actual total and GC review reachable at 720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { isGM: true, id: "gc" }, settings: { get: () => ({}) } };
+    const attempt = {
+      id: "delivery",
+      epoch: "mission",
+      kind: "request",
+      status: "pending",
+      success: null,
+      dc: 20,
+      location: "nearCity"
+    };
+    const actor = {
+      uuid: "Actor.layout-delivery",
+      type: "agent",
+      isOwner: true,
+      system: {
+        usagePeriods: { mission: "mission" },
+        missionReserves: { epoch: "mission", attempts: { delivery: attempt } }
+      }
+    };
+    const check = {
+      actorUuid: actor.uuid,
+      rawTotal: 30,
+      effectiveTotal: 30,
+      resolved: true,
+      successConfirmed: true,
+      gearAttempt: { id: "delivery", epoch: "mission", success: true }
+    };
+    const message = { uuid: "ChatMessage.layout-delivery", flags: { spycraft2: check }, rolls: [] };
+    check.gearAttempt.settlement = {
+      version: 2,
+      stage: "rolling",
+      id: "reservation",
+      actorUuid: actor.uuid,
+      messageUuid: message.uuid,
+      epoch: "mission",
+      attemptId: "delivery",
+      before: structuredClone(attempt),
+      finalTotal: 30,
+      baseRolls: [],
+      evidence: rollEvidence({ ...check, resolved: false, successConfirmed: undefined })
+    };
+    await finishGearAcquisition(actor, message);
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByLabel("Actual delivery roll total", { exact: true }).fill("7");
+    await page.getByLabel("GC review note", { exact: true }).fill("Original dice checked");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    await page.locator("#confirm").click();
+    await expect(page.locator("#confirm")).toBeFocused();
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("a fall without a check keeps distance, surface and confirmation reachable at 720px", async ({ page }) => {
   const prior = content;
   try {
