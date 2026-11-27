@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { responseOwnSize } from "./trip.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
@@ -119,7 +120,7 @@ export function validateBullRushDefenseProof(
     attributeSubstitution?.source === "All According to Plan" &&
     attributeSubstitution.originalAbility === "str" &&
     attributeSubstitution.ability === "int" &&
-    (system.classLevels?.schemer ?? 0) >= 4;
+    (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "str"))
     throw Error(loc`The Bull Rush response attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))

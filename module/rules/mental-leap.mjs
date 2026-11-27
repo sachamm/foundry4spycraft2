@@ -1,9 +1,10 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Schemer pp.78–79, round durations p.346, exhaustion/unconsciousness pp.341–342. */
 const time = n => Number.isFinite(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER;
 export function mentalLeapSource(system) {
-  const level = system.classLevels?.schemer ?? 0;
+  const level = classFeatureLevels(system)?.schemer ?? 0;
   return Number.isSafeInteger(level) && level >= 1 && level <= 10
     ? { level, limit: 1 + (level >= 5 ? 1 : 0) + (level >= 9 ? 1 : 0) }
     : null;

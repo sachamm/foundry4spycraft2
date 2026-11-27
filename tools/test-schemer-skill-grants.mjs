@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { mentalLeapRecord } from "../module/rules/mental-leap.mjs";
 const defs = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))),

@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 const classes = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))),
   feats = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url)));

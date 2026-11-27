@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { skillBonusCondition } from "../module/rules/skill-conditions.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
 import { substituteSkillBonus, nestPlan } from "../module/rules/breakthrough.mjs";
@@ -113,7 +113,7 @@ test("Sickened, Drunk, Entangled, armor and discretionary check penalties are no
   const acp = check.tags.includes("Armor Check Penalty") ? -2 : 0;
   assert.equal(r.total, Math.ceil(n.skillBonusCondition.normal / 2) - 2 - 2 - 4 + acp + 3);
   assert.equal(r.checkAdjustment, -2 - 2 - 4 + acp + 3);
-  b.classLevels.schemer = 4;
+  b.classLevels.schemer = b.activeClassLevels.schemer = 4;
   const changed = resolveSkillCheck(b, "acrobatics", check, { ...options, ability: "dex", allAccordingToPlan: true });
   const base = n.normalSkillBonus + b.abilities.int.mod - b.abilities.dex.mod;
   assert.equal(changed.total, Math.ceil(base / 2) - 2 + acp);
@@ -170,7 +170,7 @@ test("skill-bonus replacement reuses the original bonus and reduces the combined
     assert.equal(r.skillBonusCondition.normal, 22);
   }
   const s = compute({ baffled: true });
-  s.classLevels.sniper = 4;
+  s.classLevels.sniper = s.activeClassLevels.sniper = 4;
   s.classOptionSelections.push({ classId: "sniper", name: "Nest" });
   s.skillTotals.tactics.bonusEntries = [{ type: "gear", value: 2 }];
   for (const t of s.skillTotals.tactics.totals) {

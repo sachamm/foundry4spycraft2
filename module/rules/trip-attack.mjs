@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
@@ -166,7 +167,7 @@ export function validateTripAttackProof(
       attributeSubstitution?.source === "All According to Plan" &&
       attributeSubstitution.originalAbility === "dex" &&
       attributeSubstitution.ability === "int" &&
-      (system.classLevels?.schemer ?? 0) >= 4;
+      (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "dex"))
     throw Error(loc`The Trip attacker attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))

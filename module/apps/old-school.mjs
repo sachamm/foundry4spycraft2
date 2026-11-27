@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "../rules/class-features.mjs";
 import { oldSchoolEligible, oldSchoolPlan } from "../rules/old-school.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
@@ -29,7 +30,7 @@ export async function oldSchoolContext(actor, context, options = {}) {
     plan &&
     plan.sharedClassAbility &&
     input.classSource !== undefined &&
-    input.classSource !== JSON.stringify(actor.system.classLevels ?? {})
+    input.classSource !== JSON.stringify(classFeatureLevels(actor.system) ?? {})
   )
     throw new Error(loc`Old School’s shared class source changed; confirm its target qualification again.`);
   if (plan && input.mission !== undefined && input.mission !== mission)
@@ -40,7 +41,7 @@ export async function oldSchoolContext(actor, context, options = {}) {
       ? {
           ...plan,
           mission,
-          ...(plan.sharedClassAbility ? { classSource: JSON.stringify(actor.system.classLevels ?? {}) } : {})
+          ...(plan.sharedClassAbility ? { classSource: JSON.stringify(classFeatureLevels(actor.system) ?? {}) } : {})
         }
       : null
   };
@@ -51,7 +52,7 @@ export function validateOldSchool(actor, context, evidence) {
     JSON.stringify({
       ...oldSchoolPlan(actor.system, context, evidence),
       mission: String(actor.usagePeriods.mission ?? "initial"),
-      ...(evidence.sharedClassAbility ? { classSource: JSON.stringify(actor.system.classLevels ?? {}) } : {})
+      ...(evidence.sharedClassAbility ? { classSource: JSON.stringify(classFeatureLevels(actor.system) ?? {}) } : {})
     }) !== JSON.stringify(evidence)
   )
     throw new Error(loc`Old School’s target facts or source changed before posting the check.`);

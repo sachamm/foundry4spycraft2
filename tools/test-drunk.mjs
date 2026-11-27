@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { conditionAbilityPenalty } from "../module/rules/attributes.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
 import { weaponAttack, weaponDamage } from "../module/rules/gear.mjs";

@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { ruleName } from "./rule-name.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
@@ -205,7 +206,7 @@ export function validateTripDefenseProof(
     attributeSubstitution?.source === "All According to Plan" &&
     attributeSubstitution.originalAbility === "dex" &&
     attributeSubstitution.ability === "int" &&
-    (system.classLevels?.schemer ?? 0) >= 4;
+    (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "dex"))
     throw Error(loc`The Trip response key attribute or actual substitution source changed before posting.`);
   const candidate = proof.version === 1 && p.evidence ? { ...p.evidence, version: 1 } : p.evidence;

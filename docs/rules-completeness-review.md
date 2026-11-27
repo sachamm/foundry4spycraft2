@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
-**Continuing review, 27 November 2026:** PC creation **9.4/10**;
-combat play **9.5/10**. Implementation continues toward the requested **9.9/10**
+**Continuing review, 27 November 2026:** PC creation **9.6/10**;
+combat play **9.6/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -1411,3 +1411,39 @@ existing Delay behavior remains while that ruling is pending. Malformed and
 older Count histories, remaining once-per-trigger paths, broader action
 timing, finalized-Defense correction and the other documented source and
 combat gaps remain under review. The 9.9 target is still open.
+
+## Pass 47: expert-class qualification and complete multiclass creation
+
+PC creation is **9.6/10**; combat remains **9.6/10**. The class-table source
+cross-check covered all 30 classes, 420 level rows and 6,300 numeric fields,
+with no differences. This checks progression values, not every ability's behavior.
+
+Expert entry cannot occur before Career Level 5. Recorded original entry and
+current requirements now have separate checks. Losing a requirement suspends
+class abilities, including the original expert core, conditional combat effects
+and new limited-use activations. It retains owned levels, base progression,
+health, purchased skill history and acquired feats. Restoring the requirement
+restores abilities without replenishing resources. Unknown original entry is
+explicitly provisional; malformed or failed entry evidence blocks abilities.
+An owning GC can record and restore entry decisions with source notes and
+concurrent-history checks, without rewinding later advancement.
+
+Advancing a complete first-level PC now captures its original attribute scores
+before later increases. Origin attribute choices participate in the history
+signature, while unrelated later skill choices do not invalidate it.
+
+A third complete native PC, Soldier 4/Brawler 1, entered the expert class through
+the actual advancement workflow and reloaded in Play with no creation tasks.
+Removing and restoring Improved Weapon Proficiency exercised actual damage
+boosts: the core produced two dice while qualified and one while suspended.
+Base totals, health, purchased ranks and remaining resources were retained.
+Actual GC entry review and restore also passed, followed by a clean reload.
+There were no browser errors or diagnostic failures.
+
+All **4,299** Node tests, **988** fixture assertions and **263** layouts pass;
+schemas, lint, formatting, bundling and copy checks pass with existing warnings.
+Partial class-ability unit fixtures explicitly assume qualification; separate
+integration tests use real prerequisites and do not use that assumption.
+The origins/feats/equipment audit, broader native choices and combat gaps in
+the backlog still prevent a 9.9 rating. Treatment of already-running timed
+abilities after losing requirements awaits the requested ruling.

@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { classAbilityUseSpecs } from "./class-ability-uses.mjs";
 import { jinxUseSpec } from "./jinx.mjs";
 import { markSource } from "./mark.mjs";
@@ -49,7 +50,7 @@ const key = value => encodeURIComponent(value).replaceAll(".", "%2E");
 export function skillFeatRules(system, items, cfg) {
   const active = new Set(items.filter(i => i.type === "feat" && system.featStatus?.[i.id]?.ok).map(i => i.id));
   const virtuoso = items.find(
-    i => i.type === "class" && i.system.identifier === "virtuoso" && system.classLevels?.virtuoso
+    i => i.type === "class" && i.system.identifier === "virtuoso" && classFeatureLevels(system)?.virtuoso
   );
   const rules = [];
   for (const feat of items.filter(i => active.has(i.id))) {
@@ -387,7 +388,7 @@ export function limitedUseAbilities(system, items, cfg) {
       hidden: true
     });
   }
-  if ((system.classLevels?.schemer ?? 0) >= 8)
+  if ((classFeatureLevels(system)?.schemer ?? 0) >= 8)
     add({
       id: "masterPlan",
       name: loc`Master Plan (free action; scene bonus d4s)`,
@@ -395,12 +396,12 @@ export function limitedUseAbilities(system, items, cfg) {
       limit: 1,
       workflow: "masterPlan"
     });
-  if ((system.classLevels?.schemer ?? 0) >= 2)
+  if ((classFeatureLevels(system)?.schemer ?? 0) >= 2)
     add({
       id: "cunningPlan",
       name: loc`Cunning Plan (free action, reduce error range)`,
       period: "scene",
-      limit: system.classLevels.schemer >= 7 ? 2 : 1,
+      limit: classFeatureLevels(system).schemer >= 7 ? 2 : 1,
       workflow: "cunningPlan"
     });
   const genius = everydayGeniusSource(system);
@@ -449,22 +450,22 @@ export function limitedUseAbilities(system, items, cfg) {
       limit: anyTime.limit,
       workflow: "selfTerrainFeat"
     });
-  if ((system.classLevels?.schemer ?? 0) >= 3)
+  if ((classFeatureLevels(system)?.schemer ?? 0) >= 3)
     add({
       id: "renaissanceMan",
       name: loc`Renaissance Man (temporary Basic Skill feat; free action)`,
       period: "mission",
-      limit: system.classLevels.schemer >= 7 ? 2 : 1,
+      limit: classFeatureLevels(system).schemer >= 7 ? 2 : 1,
       workflow: "selfTemporaryFeat"
     });
-  if ((system.classLevels?.schemer ?? 0) >= 4)
+  if ((classFeatureLevels(system)?.schemer ?? 0) >= 4)
     add({
       id: "allAccordingToPlan",
       name: loc`All According to Plan (substitute INT)`,
       limit: system.actionDice?.max ?? 0,
       workflow: "attributeSubstitution"
     });
-  if ((system.classLevels?.sniper ?? 0) >= 10)
+  if ((classFeatureLevels(system)?.sniper ?? 0) >= 10)
     add({
       id: "millionDollarSkill",
       name: loc`Million Dollar Skill (vulnerable opponent; eligible weapon)`,
@@ -484,7 +485,7 @@ export function limitedUseAbilities(system, items, cfg) {
   const adjustment = manualAdjustmentSource(system);
   if (adjustment) out.push(adjustment);
   out.push(...classAbilityUseSpecs(system));
-  if ((system.classLevels?.stuntman ?? 0) >= 8)
+  if ((classFeatureLevels(system)?.stuntman ?? 0) >= 8)
     add({
       id: "iKnowWhatDoing",
       name: loc`…I Know What I’m Doing. (STR/DEX skill, DC > Career Level +20)`,
@@ -507,7 +508,7 @@ export function limitedUseAbilities(system, items, cfg) {
       limit: system.actionDice?.max ?? 0,
       workflow: "improvisation"
     });
-  if ((system.classLevels?.virtuoso ?? 0) >= 10)
+  if ((classFeatureLevels(system)?.virtuoso ?? 0) >= 10)
     add({
       id: "breakthrough",
       name: loc`Breakthrough (INT/WIS skill or Knowledge)`,
@@ -515,14 +516,14 @@ export function limitedUseAbilities(system, items, cfg) {
       limit: 1,
       workflow: "breakthrough"
     });
-  if ((system.classLevels?.scientist ?? 0) >= 14)
+  if ((classFeatureLevels(system)?.scientist ?? 0) >= 14)
     add({
       id: "tenSecondSolution",
       name: loc`10-Second Solution (standalone INT skill or Knowledge)`,
       limit: 1,
       workflow: "tenSecondSolution"
     });
-  if ((system.classLevels?.soldier ?? 0) >= 14)
+  if ((classFeatureLevels(system)?.soldier ?? 0) >= 14)
     add({ id: "oneInAMillion", name: loc`One in a Million`, limit: 1, workflow: "oneInAMillion" });
   out.push(...brightIdeaSources(system));
   if (system.coreClassIds?.includes("virtuoso")) {
@@ -574,7 +575,7 @@ export function limitedUseAbilities(system, items, cfg) {
         workflow: "intelTemporaryFeat"
       });
   }
-  if ((system.classLevels?.stuntman ?? 0) >= 7)
+  if ((classFeatureLevels(system)?.stuntman ?? 0) >= 7)
     add({ id: "noFear", name: loc`No Fear II (temporary stress resistance)`, limit: 1, workflow: "noFear" });
   if (system.legacyAbilities?.fortunesOfWar?.grade > 0)
     add({

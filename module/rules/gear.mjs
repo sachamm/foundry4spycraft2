@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
 import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
@@ -673,13 +674,13 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
 }
 /** Whatever's Handy (Brawler 1st, 5th, 9th): the improvised weapon bonus at the character's Brawler level. */
 export function whateversHandyBonus(system) {
-  const level = system?.classLevels?.brawler ?? 0;
+  const level = classFeatureLevels(system)?.brawler ?? 0;
   return level >= 9 ? 3 : level >= 5 ? 2 : level >= 1 ? 1 : 0;
 }
 
 /** Dead to Rights (Grunt 2nd, 7th): extra d4s of damage with tactical weapons. */
 export function deadToRightsDice(system, weapon) {
-  const level = system?.classLevels?.grunt ?? 0;
+  const level = classFeatureLevels(system)?.grunt ?? 0;
   if (weapon?.proficiency !== "tactical") return 0;
   return level >= 7 ? 2 : level >= 2 ? 1 : 0;
 }

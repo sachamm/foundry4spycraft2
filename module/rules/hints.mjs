@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { actionDiceGain } from "./action-dice.mjs";
 import { loc } from "../i18n.mjs";
 /** Free hints: origins pp.21,23,25; Snoop Intuition p.47. */
@@ -21,7 +22,7 @@ export function hintSources(system, items = []) {
         workflow: "hintResponse"
       });
   }
-  const level = system.classLevels?.snoop ?? 0,
+  const level = classFeatureLevels(system)?.snoop ?? 0,
     native = level >= 19 ? 3 : level >= 11 ? 2 : level >= 2 ? 1 : 0;
   const inherited =
     level >= 2 ? 0 : (system.inheritedClassChoices ?? []).filter(entry => entry.name === "Snoop: Intuition I").length;

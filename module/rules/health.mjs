@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeCollapsePlan, attributeActionBlock } from "./attributes.mjs";
@@ -246,7 +247,7 @@ export function fortunesOfWarPlan(system, combat) {
 
 /** No Fear II, p.81: once per session; duration measured from own initiative (p.346). */
 export function noFearSource(system) {
-  const level = system.classLevels?.stuntman ?? 0;
+  const level = classFeatureLevels(system)?.stuntman ?? 0;
   return Number.isSafeInteger(level) && level >= 7 && level <= 10
     ? { resistance: level, rounds: Math.max(1, (system.abilities?.wis?.mod ?? 0) + 1) }
     : null;

@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 
@@ -30,7 +31,7 @@ export function classCheckEffects(
     notes: []
   };
   if (["analysis", "investigation", "search"].includes(skill)) {
-    const level = system.classLevels?.fieldAnalyst ?? 0;
+    const level = classFeatureLevels(system)?.fieldAnalyst ?? 0;
     if (level >= 3)
       result.timeChoices.push({
         id: "questionsI",
@@ -108,7 +109,7 @@ export function oneInAMillionEligible(
   { checkKind, checkId = "", ability = "", checkMethod = "roll", chooseTwice = false } = {}
 ) {
   return (
-    (system.classLevels?.soldier ?? 0) >= 14 &&
+    (classFeatureLevels(system)?.soldier ?? 0) >= 14 &&
     checkMethod === "roll" &&
     !chooseTwice &&
     (checkKind === "attack" ||
@@ -193,7 +194,7 @@ export const AUTOMATIC_SKILL_SOURCES = [
   }
 ];
 function automaticSkillLevel(system, source) {
-  const native = system.classLevels?.[source.classId] ?? 0;
+  const native = classFeatureLevels(system)?.[source.classId] ?? 0;
   if (native > 0) return native;
   const classes = new Map();
   for (const entry of system.inheritedClassChoices ?? [])
@@ -254,7 +255,7 @@ export function flawlessSearchPlan(system, check, options = {}) {
 
 /** Wheelman pp.50–51; the retry/physical half action is confirmed at the table. */
 export function manualAdjustmentSource(system) {
-  const native = system.classLevels?.wheelman ?? 0;
+  const native = classFeatureLevels(system)?.wheelman ?? 0;
   const owners = new Map();
   for (const entry of system.inheritedClassChoices ?? [])
     if (entry.name === "Wheelman: Manual adjustment I") {
@@ -326,7 +327,7 @@ export function tenSecondSolutionEligible(
   } = {}
 ) {
   return (
-    (system.classLevels?.scientist ?? 0) >= 14 &&
+    (classFeatureLevels(system)?.scientist ?? 0) >= 14 &&
     ["skill", "knowledge"].includes(checkKind) &&
     ability === "int" &&
     checkMethod === "roll" &&
@@ -340,7 +341,7 @@ export function tenSecondSolutionEligible(
 /** Schemer 2/7, p.79; the prose's scene limits govern its conflicting table. */
 export function cunningPlanEffect(system, error) {
   const reduction = system.abilities?.int?.mod;
-  if ((system.classLevels?.schemer ?? 0) < 2 || !Number.isSafeInteger(reduction) || reduction <= 0)
+  if ((classFeatureLevels(system)?.schemer ?? 0) < 2 || !Number.isSafeInteger(reduction) || reduction <= 0)
     throw new Error(loc`Cunning Plan requires Schemer 2 and a positive Intelligence modifier.`);
   if (!Number.isSafeInteger(error) || error <= 0)
     throw new Error(loc`This check has no positive error range to reduce.`);

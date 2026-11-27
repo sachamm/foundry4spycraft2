@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { ruleName } from "./rule-name.mjs";
 import { armorTypeChoice } from "./armor-training.mjs";
 import { loc } from "../i18n.mjs";
@@ -63,7 +64,7 @@ export function temporarySharePlan(
 
 /** Schemer 3/7, p.79: one temporary Basic Skill feat per use, ending with the mission. */
 export function renaissanceManPlan(system, items, feat, { epoch = "initial", sourceActorUuid = "" } = {}) {
-  if ((system.classLevels?.schemer ?? 0) < 3) throw new Error(loc`Renaissance Man requires Schemer 3.`);
+  if ((classFeatureLevels(system)?.schemer ?? 0) < 3) throw new Error(loc`Renaissance Man requires Schemer 3.`);
   if (!feat || feat.type !== "feat" || feat.system.tree !== "basicSkill")
     throw new Error(loc`Choose a Basic Skill feat from the system compendium.`);
   const same = items.some(
@@ -108,7 +109,7 @@ export const INTEL_FEAT_ABILITIES = {
 };
 export function intelTemporaryFeatSource(system, ability) {
   const d = Object.hasOwn(INTEL_FEAT_ABILITIES, ability) ? INTEL_FEAT_ABILITIES[ability] : null,
-    level = d ? (system.classLevels?.[d.classId] ?? 0) : 0;
+    level = d ? (classFeatureLevels(system)?.[d.classId] ?? 0) : 0;
   return d && Number.isSafeInteger(level) && level >= d.minimum && level <= d.maximum
     ? { ...d, ability, count: d.doubleAt && level >= d.doubleAt ? 2 : 1, level }
     : null;
@@ -186,7 +187,7 @@ export function intelTemporaryFeatPlan(
 
 /** Guide p.73: one free-action mission use earned at each of levels four and eight. */
 export function anyTimeAnyPlaceSource(system) {
-  const level = system.classLevels?.guide ?? 0;
+  const level = classFeatureLevels(system)?.guide ?? 0;
   return Number.isSafeInteger(level) && level >= 4 && level <= 10 ? { limit: level >= 8 ? 2 : 1 } : null;
 }
 export function anyTimeAnyPlacePlan(system, items, feat, { epoch = "initial", sourceActorUuid = "" } = {}) {
@@ -256,7 +257,7 @@ export function selfGrantedTemporaryFeat(system, feat) {
 
 /** Scientist p.42: two Advanced Skill feats per free-action claim; another mission use at twenty. */
 export function knowItAllSource(system) {
-  const level = system.classLevels?.scientist ?? 0;
+  const level = classFeatureLevels(system)?.scientist ?? 0;
   return Number.isSafeInteger(level) && level >= 10 && level <= 20 ? { limit: level === 20 ? 2 : 1, count: 2 } : null;
 }
 export function knowItAllChoiceOptions(system, feat, cfg) {

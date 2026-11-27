@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { ownCountDurationActive } from "./own-count-duration.mjs";
 import { loc } from "../i18n.mjs";
@@ -38,7 +39,7 @@ export function twoWeaponStyleState(system) {
   if (!valid)
     return { ...empty(), needsReview: true, reason: loc`The GC must review the saved two-weapon declaration.` };
   if (!ownCountDurationActive(r, system.twoWeaponCombatContext)) return empty();
-  const capstone = system.classLevels?.triggerman === 10,
+  const capstone = classFeatureLevels(system)?.triggerman === 10,
     handguns = r.weaponProficiencies.filter(p => p === "handgun").length,
     mixedPending = capstone && handguns === 1;
   const handgunSkillWaiver = capstone && handguns === 2,
@@ -59,7 +60,7 @@ export function twoWeaponStyleState(system) {
 /** Only the accepted two-weapon attack penalty is waived; unrelated conditions/recoil remain separate. */
 export function twoWeaponHandgunWaiver(system, weapon) {
   const s = twoWeaponStyleState(system);
-  return s.active && !s.needsReview && system.classLevels?.triggerman === 10 && weapon.proficiency === "handgun"
+  return s.active && !s.needsReview && classFeatureLevels(system)?.triggerman === 10 && weapon.proficiency === "handgun"
     ? s.penalty
     : 0;
 }

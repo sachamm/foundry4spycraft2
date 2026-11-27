@@ -7,7 +7,7 @@ import {
   shakenRules,
   shakenSkillPenalty
 } from "../module/rules/shaken.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
@@ -132,7 +132,7 @@ test("every named check uses its selected attribute; Shaken penalties remain ful
 test("specific INT attribute substitution removes the original CHA/WIS Shaken check penalty without changing either score", () => {
   const s = compute(1),
     check = cfg.skills.notice.checks[0];
-  s.classLevels.schemer = 4;
+  s.classLevels.schemer = s.activeClassLevels.schemer = 4;
   const normal = resolveSkillCheck(s, "notice", check, { ability: "wis" }),
     replaced = resolveSkillCheck(s, "notice", check, { ability: "wis", allAccordingToPlan: true });
   assert.equal(normal.ability, "wis");
@@ -143,7 +143,7 @@ test("specific INT attribute substitution removes the original CHA/WIS Shaken ch
 });
 test("Shaken blocks taking 10/20 for skills and Knowledge even with normal-time or other taking options", () => {
   const s = compute(1);
-  s.classLevels.schemer = 10;
+  s.classLevels.schemer = s.activeClassLevels.schemer = 10;
   s.activeFeatNames.push("Photographic Memory");
   const check = cfg.skills.athletics.checks.find(c => c.id === "escape");
   for (const method of ["take10", "take20"]) {
@@ -194,7 +194,7 @@ test("the actual save entry forbids fixed Evasion results while Shaken and retai
   a.isOwner = true;
   a.statuses = new Set();
   a.system = compute(3);
-  a.system.classLevels.intruder = 12;
+  a.system.classLevels.intruder = a.system.activeClassLevels.intruder = 12;
   a.rollCheck = async (formula, data, options) => ({ formula, data, options });
   assert.equal(await a.rollSave("ref", { checkMethod: "take10" }), false);
   const normal = await a.rollSave("ref", {});

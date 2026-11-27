@@ -1,10 +1,11 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { actionDiceGain } from "./action-dice.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 export const hasStrut = system =>
-  (system.classLevels?.brawler ?? 0) >= 3 &&
+  (classFeatureLevels(system)?.brawler ?? 0) >= 3 &&
   (system.classOptionSelections ?? []).some(s => s.classId === "brawler" && s.name === "Strut");
 /** Brawler Ploy, p.66. The GC confirms the next half action, not an arbitrary later action. */
 export function strutGainPlan(

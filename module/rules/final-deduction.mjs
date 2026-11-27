@@ -1,6 +1,7 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 /** Sleuth Final Deduction, p.46. Tracks study; all information is supplied by the GC. */
-export const hasFinalDeduction = system => (system.classLevels?.sleuth ?? 0) >= 14;
+export const hasFinalDeduction = system => (classFeatureLevels(system)?.sleuth ?? 0) >= 14;
 export function finalDeductionStudy(stored, epoch) {
   if (stored == null) return null;
   if (typeof stored !== "object" || Array.isArray(stored) || typeof stored.epoch !== "string" || !stored.epoch)

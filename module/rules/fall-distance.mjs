@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { stable } from "./equal.mjs";
@@ -31,7 +32,7 @@ export function fallDistancePlan(
   // Spider Mastery, p.196: each die of falling damage is 1 lower, never below 1.
   const spider = names.includes("Spider Mastery");
   // Fall Guy (Stuntman 4th): each die of falling damage is 2 lower.
-  const fallGuy = (system?.classLevels?.stuntman ?? 0) >= 4,
+  const fallGuy = (classFeatureLevels(system)?.stuntman ?? 0) >= 4,
     perDieReduction = (spider ? 1 : 0) + (fallGuy ? 2 : 0);
   return {
     version: 1,

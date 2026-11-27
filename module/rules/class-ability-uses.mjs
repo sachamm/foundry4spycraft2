@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 /**
  * Counted class abilities.
  *
@@ -213,7 +214,7 @@ const INHERITED_USES = [
 export function classAbilityUseSpecs(system, table = CLASS_ABILITY_USES) {
   const out = [];
   for (const [classKey, name, period, steps] of table) {
-    const level = Number(system?.classLevels?.[classKey]) || 0;
+    const level = Number(classFeatureLevels(system)?.[classKey]) || 0;
     let limit = 0;
     for (const [at, uses] of steps) if (level >= at) limit = uses;
     if (!limit) continue;
@@ -235,7 +236,7 @@ export function classAbilityUseSpecs(system, table = CLASS_ABILITY_USES) {
     if (
       entry.emulatedClass !== classKey ||
       entry.assumedLevel !== assumedLevel ||
-      (system.classLevels?.[classKey] ?? 0) >= assumedLevel
+      (classFeatureLevels(system)?.[classKey] ?? 0) >= assumedLevel
     )
       continue;
     const id = idOf(classKey, name);

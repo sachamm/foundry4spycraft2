@@ -1,9 +1,10 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { stable } from "./equal.mjs";
 /** Brawler Ploy: Still Standing, p.66. Actual derived class selection, not a feat name. */
 export function stillStandingSource(system) {
-  const level = system?.classLevels?.brawler ?? 0;
+  const level = classFeatureLevels(system)?.brawler ?? 0;
   if (!Number.isSafeInteger(level) || level < 0 || level > 10)
     throw Error(loc`Review the actual Brawler class level before applying Still Standing.`);
   if (level < 3) return null;

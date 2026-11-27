@@ -1,4 +1,5 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
+import { classFeatureLevels, expertClassQualification } from "./class-features.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
 import { subplotPlan } from "./subplots.mjs";
 import { crossroadsSessionPolicy } from "./crossroads-session.mjs";
@@ -370,6 +371,10 @@ function deriveCareerLevels(state) {
     classLevels[entry.classId] = (classLevels[entry.classId] ?? 0) + 1;
   }
   sys.classLevels = classLevels;
+  const inactiveExpertClasses = new Set(state.options.inactiveExpertClasses ?? []);
+  sys.activeClassLevels = Object.fromEntries(
+    Object.entries(classLevels).map(([id, levels]) => [id, inactiveExpertClasses.has(id) ? 0 : levels])
+  );
   delete sys.crossroadsSession;
   if (sys.crossroadsTitle) {
     try {
@@ -392,10 +397,10 @@ function deriveCareerLevels(state) {
   const coreItems = [
     classAtLevel.find(item => item && !item.system.expert),
     classAtLevel.find(item => item?.system.expert)
-  ].filter(Boolean);
+  ].filter(item => item && !inactiveExpertClasses.has(item.system.identifier || item.name));
   sys.coreClassIds = [...new Set(coreItems.map(item => item.system.identifier || item.name))];
   const inherited = inheritedClassFeatures(items, progression, cfg);
-  sys.inheritedClassChoices = inherited.entries;
+  sys.inheritedClassChoices = inherited.entries.filter(entry => !inactiveExpertClasses.has(entry.ownerClass));
   sys.inheritedFeatureGrants = inherited.grants;
   warnings.push(...inherited.warnings);
   for (const text of inherited.pending) todo.push({ order: 21, tab: "classes", text });
@@ -529,7 +534,7 @@ function collectBonusSources(state) {
       rank: 1,
       bonuses: [{ target: "defense", value: "2", bonusType: "dodge" }]
     });
-  if ((classLevels.triggerman ?? 0) >= 8)
+  if ((classFeatureLevels(sys).triggerman ?? 0) >= 8)
     sources.push({
       name: loc`Eye of the Storm (all attackers)`,
       rank: 1,
@@ -704,10 +709,10 @@ function collectBonusSources(state) {
   if (sys.actionDieDefense)
     sources.push({ name: loc`Action die Defense boost`, rank: 1, bonuses: [{ target: "defense", value: "2" }] });
   sources.push(...inherited.sources);
-  const inheritedArmor = inherited.entries.filter(entry => entry.name === "Soldier: Armor use I").length;
-  const inheritedWar = inherited.entries.filter(entry => entry.name === "Soldier: Fortunes of war I").length;
+  const inheritedArmor = sys.inheritedClassChoices.filter(entry => entry.name === "Soldier: Armor use I").length;
+  const inheritedWar = sys.inheritedClassChoices.filter(entry => entry.name === "Soldier: Fortunes of war I").length;
   const soldierLevel = classLevels.soldier ?? 0,
-    counterLevel = classLevels.counterterrorist ?? 0;
+    counterLevel = classFeatureLevels(sys).counterterrorist ?? 0;
   const armorGrade = Math.min(
     Math.floor(soldierLevel / 4) + Math.floor(counterLevel / 4) + inheritedArmor,
     Math.max(soldierLevel ? 5 : 0, counterLevel ? 2 : 0, inheritedArmor ? 1 : 0)
@@ -781,7 +786,15 @@ function collectBonusSources(state) {
     )
   };
   const lr = levelRow(level);
-  Object.assign(state, { sources, linkedSkillPairs, tb, lr });
+  const historicalSources = sources.map(source => ({ ...source, bonuses: [...source.bonuses] }));
+  const currentSources = sources.map(source =>
+    source.classId && !classFeatureLevels(sys)[source.classId]
+      ? { ...source, bonuses: source.bonuses.filter(bonus => bonus.target?.startsWith("featSlots.")) }
+      : source
+  );
+  sys.earnedClassOptionSelections = sys.classOptionSelections;
+  sys.classOptionSelections = sys.classOptionSelections.filter(selection => classFeatureLevels(sys)[selection.classId]);
+  Object.assign(state, { sources: currentSources, historicalSources, linkedSkillPairs, tb, lr });
 }
 
 /** Step 4 (phase A): attributes, which later bonuses may depend on. */
@@ -803,6 +816,7 @@ function deriveAttributes(state) {
     base,
     classesData,
     sources,
+    historicalSources,
     tb
   } = state;
   const abilityBonus = new Bonuses(),
@@ -952,9 +966,9 @@ function deriveAttributes(state) {
       )
     };
     const snapshot = { level: career, tb: historicalTb, classes: historicalClasses, base: historicalBase };
-    const bonusAt = (target, extra = {}) => {
+    const bonusAt = (target, extra = {}, activeOnly = false) => {
       let value = 0;
-      for (const source of sources) {
+      for (const source of activeOnly ? sources : historicalSources) {
         const taken = source.classId
           ? (counts[source.classId] ?? 0) >= source.requiredClassLevel
           : (source.acquiredAtLevel ?? 1) <= career;
@@ -1029,7 +1043,10 @@ function deriveAttributes(state) {
     );
   });
   targeted.rules.push(...inherited.skillRules);
-  sys.classSkillRules = targeted.rules;
+  sys.classSkillRules = targeted.rules.filter(rule => {
+    const owner = rule.sourceClassId ?? rule.classId;
+    return !owner || classFeatureLevels(sys)[owner];
+  });
   warnings.push(...targeted.warnings);
   for (const task of targeted.pendingTasks ?? targeted.pending.map(text => ({ text })))
     todo.push({ order: 21, tab: "classes", ...task });
@@ -1071,7 +1088,7 @@ function deriveAttributes(state) {
         if (!item.system.classSkills?.includes(item.system[field])) return [];
         let count = 0;
         const index = progression.findIndex(entry => entry.classId === key && ++count === milestone);
-        return index < 0 ? [] : [{ skill: item.system[field], career: index + 1 }];
+        return index < 0 ? [] : [{ skill: item.system[field], career: index + 1, sourceClassId: key }];
       });
     })
     .concat(
@@ -1080,14 +1097,19 @@ function deriveAttributes(state) {
           entry =>
             entry.name === "Scientist: Ph.D. (1 skill)" && cfg.classFeatures.scientist.classSkills.includes(entry.skill)
         )
-        .map(entry => ({ skill: entry.skill, career: entry.career }))
+        .map(entry => ({ skill: entry.skill, career: entry.career, sourceClassId: entry.ownerClass }))
     );
-  const maximumRanksAt = (key, career) => {
+  const maximumRanksAt = (key, career, activeOnly = false) => {
     const locks = [
       ...unlocked.filter(lock => lock.skill === key && lock.career <= career).map(() => 3),
-      ...phdLocks.filter(lock => lock.skill === key && lock.career <= career).map(() => 5)
+      ...phdLocks
+        .filter(
+          lock =>
+            lock.skill === key && lock.career <= career && (!activeOnly || classFeatureLevels(sys)[lock.sourceClassId])
+        )
+        .map(() => 5)
     ];
-    const bonus = locks.length ? Math.min(...locks) : stageAt(career).bonus(`skills.${key}.maxRanks`);
+    const bonus = locks.length ? Math.min(...locks) : stageAt(career).bonus(`skills.${key}.maxRanks`, {}, activeOnly);
     return (T.levels[clamp(career, 0, 20)]?.maxRanks ?? 0) + bonus;
   };
   Object.assign(state, { preData, abil, stageAt, targeted, unlocked, maximumRanksAt });
@@ -1516,9 +1538,7 @@ function deriveFinalTotals(state) {
     classItems,
     progression,
     level,
-    classLevels,
     classAtLevel,
-    inherited,
     base,
     lr,
     abil,
@@ -1744,7 +1764,7 @@ function deriveFinalTotals(state) {
     ...new Set([
       ...classItems.flatMap(item => {
         const key = item.system.identifier || item.name,
-          lvl = classLevels[key] ?? 0;
+          lvl = classFeatureLevels(sys)[key] ?? 0;
         const fields =
           key === "scientist"
             ? [
@@ -1759,7 +1779,7 @@ function deriveFinalTotals(state) {
           .filter(([at, field]) => lvl >= at && item.system.classSkills?.includes(item.system[field]))
           .map(([, field]) => item.system[field]);
       }),
-      ...inherited.entries
+      ...sys.inheritedClassChoices
         .filter(
           entry =>
             entry.name === "Scientist: Ph.D. (1 skill)" && cfg.classFeatures.scientist.classSkills.includes(entry.skill)
@@ -1955,7 +1975,6 @@ function deriveSkillTotals(state) {
     lr,
     abil,
     stageAt,
-    targeted,
     maximumRanksAt,
     skillDefs,
     talentClassSkill,
@@ -1971,7 +1990,7 @@ function deriveSkillTotals(state) {
   const anyClass = new Set(
     classItems.filter(c => classLevels[c.system.identifier || c.name]).flatMap(c => c.system.classSkills ?? [])
   );
-  if ((classLevels.schemer ?? 0) >= 6) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
+  if ((classFeatureLevels(sys).schemer ?? 0) >= 6) for (const key of Object.keys(cfg.skills)) anyClass.add(key);
   if (sys.campaignEffects?.allSkillsClass === 1 && !sys.companionOf?.ownerUuid)
     for (const key of Object.keys(cfg.skills)) anyClass.add(key);
   const derivedSkills = {};
@@ -2000,7 +2019,11 @@ function deriveSkillTotals(state) {
         ? totals.find(t => t.ability === stored.ability)
         : totals.reduce((a, b) => (b.total > a.total ? b : a));
     const capRow = stepLookup(T.skillCap, ranks);
-    const skillMaxRanks = maximumRanksAt(sd.key, level);
+    const rankPurchaseMax = maximumRanksAt(sd.key, level, true);
+    const suspendedClass = Object.entries(classLevels).some(
+      ([id, owned]) => owned > (classFeatureLevels(sys)[id] ?? 0)
+    );
+    const skillMaxRanks = suspendedClass ? Math.max(rankPurchaseMax, purchasedRanks[sd.key] ?? 0) : rankPurchaseMax;
     derivedSkills[sd.key] = {
       ...stored,
       key: sd.key,
@@ -2020,13 +2043,13 @@ function deriveSkillTotals(state) {
         anyClass.has(sd.key) ||
         talentClassSkill.has(sd.key) ||
         !!stored.classSkill ||
-        targeted.rules.some(rule => rule.grantsClassSkill && rule.skill === sd.key),
+        sys.classSkillRules.some(rule => rule.grantsClassSkill && rule.skill === sd.key),
       classOverride: !!stored.classSkill,
       threat:
         Math.min(20, ...(B.entries.get(`skills.${sd.key}.baseThreat`) ?? []).map(e => e.value)) -
         B.get(`skills.${sd.key}.threat`),
       errorFloor: Math.max(0, ...(B.entries.get(`skills.${sd.key}.errorFloor`) ?? []).map(e => e.value)),
-      take10TimeMultiplier: targeted.rules.some(rule => rule.skill === sd.key && rule.take10Normal) ? 1 : 2,
+      take10TimeMultiplier: sys.classSkillRules.some(rule => rule.skill === sd.key && rule.take10Normal) ? 1 : 2,
       errorReductionZero: B.get(`skills.${sd.key}.errorReductionZero`),
       errorReduction: B.get(`skills.${sd.key}.errorReduction`),
       cap:
@@ -2036,6 +2059,7 @@ function deriveSkillTotals(state) {
             B.get(`skills.${sd.key}.cap`) +
             (ranks === 0 ? B.get("untrainedSkillCap") : 0),
       maxRanks: skillMaxRanks,
+      rankPurchaseMax,
       overMax: ranks > skillMaxRanks
     };
     if (ranks > skillMaxRanks) {
@@ -2683,7 +2707,9 @@ function settlePrerequisites(state) {
   const classQualificationRanks = Object.fromEntries(
     Object.entries(classQualificationSystem.skillTotals ?? {}).map(([key, skill]) => [key, skill.ranks])
   );
-  // Expert classes: must qualify when first taken.
+  // Keep entry evidence separate from present qualification: later losses suspend abilities, not owned progression.
+  const expertStatuses = {},
+    inactiveExpertClasses = [];
   for (const [cid, lvl] of Object.entries(classLevels)) {
     const ci = classById.get(cid);
     if (!ci?.system.expert || !ci.system.requirements) continue;
@@ -2701,12 +2727,20 @@ function settlePrerequisites(state) {
       permanentTrees,
       classQualificationRanks
     );
-    const res = firstEntry?.expertEntry ?? checkPrerequisites(ci.system.requirements, classContext);
-    if (!res.ok)
+    const status = expertClassQualification(ci.system, firstEntry, classContext, {
+      entryCareer: progression.findIndex(entry => entry.classId === cid) + 1
+    });
+    expertStatuses[cid] = status;
+    if (!status.active) inactiveExpertClasses.push(cid);
+    const res = status.entry?.ok === false ? status.entry : status.current;
+    if (!status.active)
       warnings.push(
-        loc`${ci.name}: expert class requirements not met at ${firstEntry?.expertEntry ? "entry" : loc`current level (entry unknown)`} (${res.unmet.join("; ")}).`
+        loc`${ci.name}: expert-class abilities are inactive (${status.earlyEntry ? loc`entered before Career Level 5` : status.malformedEntry ? loc`entry history needs review` : res.unmet.join("; ")}). Owned class levels, base totals, skills and acquired feats are retained.`
       );
+    if (status.entryNeedsReview)
+      warnings.push(loc`${ci.name}: original expert-class entry is unknown; the GC must review its history.`);
   }
+  sys.expertClassStatus = expertStatuses;
 
   // Re-evaluate to a fixed point, since enabling a qualified feat can unlock
   // other feats. Failed feats stay owned (and consume slots), but are inactive.
@@ -2721,10 +2755,21 @@ function settlePrerequisites(state) {
       .map(f => f.id)
   );
   const stable = eligible.size === activeFeatIds.size && [...eligible].every(id => activeFeatIds.has(id));
-  if (!stable && (options.pass ?? 0) < featItems.length + 2) {
-    return computeAgent(sys, allItems, cfg, { activeFeatIds: eligible, pass: (options.pass ?? 0) + 1 });
+  const previousInactive = new Set(options.inactiveExpertClasses ?? []);
+  const classStable =
+    inactiveExpertClasses.length === previousInactive.size &&
+    inactiveExpertClasses.every(id => previousInactive.has(id));
+  if ((!stable || !classStable) && (options.pass ?? 0) < featItems.length + Object.keys(classLevels).length + 4) {
+    return computeAgent(sys, allItems, cfg, {
+      ...options,
+      activeFeatIds: eligible,
+      inactiveExpertClasses,
+      pass: (options.pass ?? 0) + 1
+    });
   }
   if (!stable) warnings.push(loc`Feat prerequisites did not converge; verify cyclic dependencies.`);
+  if (!classStable)
+    warnings.push(loc`Expert-class qualification did not converge; review dependent abilities and prerequisites.`);
   warnings.push(...sys.weaponSpecialist.warnings);
   for (const text of sys.weaponSpecialist.pending) todo.push({ order: 21, tab: "classes", text });
   sys.skillFeatRules = skillFeatRules(sys, items, cfg);

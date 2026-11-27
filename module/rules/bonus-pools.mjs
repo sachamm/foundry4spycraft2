@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { underminedSpendBlock } from "./taunt.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { actionDiceGain, actionDieBoostPlan } from "./action-dice.mjs";
@@ -9,7 +10,7 @@ const epoch = (periods, key) => String(periods?.[key] ?? "initial");
 export const UNRESTRICTED_POOL_SOURCES = Object.freeze(["masterPlan", "strut", "adrenalineJunkie", "fortunate"]);
 /** Stuntman 8, p.81: one compulsory d10, confined to its STR/DEX check, once per scene. */
 export function difficultSkillBonusPlan(system, result, { dc } = {}) {
-  if ((system.classLevels?.stuntman ?? 0) < 8) throw new Error(loc`This bonus requires Stuntman level 8.`);
+  if ((classFeatureLevels(system)?.stuntman ?? 0) < 8) throw new Error(loc`This bonus requires Stuntman level 8.`);
   if (result?.method !== "roll" || !["str", "dex"].includes(result.ability))
     throw new Error(loc`This bonus requires a rolled Strength- or Dexterity-based skill check.`);
   const target = Number(dc);
@@ -122,7 +123,7 @@ export function hardKnocksGainPlan(system, check, { kind, careerDie = 4 } = {}) 
   if (
     kind !== "failure" ||
     !check?.errorConfirmed ||
-    (system.classLevels?.stuntman ?? 0) < 8 ||
+    (classFeatureLevels(system)?.stuntman ?? 0) < 8 ||
     check.schoolOfHardKnocks ||
     check.criticalFailure ||
     check.resolved ||
@@ -151,7 +152,7 @@ export function transferableCheckBonusPool(system, message, periods = system.usa
 
 /** Schemer 8, p.79: fixed d4 bonus dice, one mission use, lost at scene end. */
 export function masterPlanGainPlan(system) {
-  if ((system.classLevels?.schemer ?? 0) < 8) throw new Error(loc`Master Plan requires Schemer level 8.`);
+  if ((classFeatureLevels(system)?.schemer ?? 0) < 8) throw new Error(loc`Master Plan requires Schemer level 8.`);
   const modifier = system.abilities?.int?.mod;
   if (!Number.isSafeInteger(modifier) || modifier < 1)
     throw new Error(loc`Master Plan requires a positive current Intelligence modifier to grant bonus dice.`);

@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { sniperWeapon } from "./sniper.mjs";
 import { loc } from "../i18n.mjs";
@@ -18,7 +19,7 @@ export function sneakAttackSources(
     add = (source, dice) => {
       if (dice > 0) sources.push({ source, dice });
     };
-  const scout = Math.floor(Math.min(20, system.classLevels?.scout ?? 0) / 4),
+  const scout = Math.floor(Math.min(20, classFeatureLevels(system)?.scout ?? 0) / 4),
     borrowed = (system.inheritedClassChoices ?? []).some(s => s.name === "Scout: Sneak attack (1 die)");
   add("Scout Sneak Attack", Math.max(scout, borrowed ? 1 : 0));
   if (sideStanceDie === true) add("Side Stance", 1);
@@ -38,7 +39,7 @@ export function sneakAttackSources(
     for (const name of ["Dirty Fighting Supremacy", "Vital Points Supremacy"]) if (has(system, name)) add(name, 1);
   if (targetFlanked === true)
     for (const name of ["Wolfpack Mastery", "Wolfpack Supremacy"]) if (has(system, name)) add(name, 1);
-  const sniper = system.classLevels?.sniper ?? 0;
+  const sniper = classFeatureLevels(system)?.sniper ?? 0;
   if (sniper >= 4 && sniperWeapon(weapon) && braced === true) add("Sniper Ranged Sneak Attack", sniper >= 8 ? 3 : 1);
   return sources;
 }
@@ -110,7 +111,7 @@ export function sneakAttackDamagePlan(
   if (!melee(weapon)) {
     const distance = typeof distanceFeet === "number" ? distanceFeet : Number(distanceFeet),
       increment = Number(weapon.range),
-      sniper = system.classLevels?.sniper ?? 0;
+      sniper = classFeatureLevels(system)?.sniper ?? 0;
     if (
       !["number", "string"].includes(typeof distanceFeet) ||
       distanceFeet === "" ||

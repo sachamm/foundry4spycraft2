@@ -1174,6 +1174,54 @@ async function render(page, height, markup = content) {
     })
   );
 }
+test("expert entry review remains reachable at720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { id: "gc", isGM: true }, settings: { get: () => false } };
+    const actor = new (ActorProgression(class {}))();
+    Object.assign(actor, {
+      type: "agent",
+      isOwner: true,
+      uuid: "Actor.entry-layout",
+      items: [
+        {
+          id: "brawler",
+          name: "Brawler",
+          type: "class",
+          system: {
+            identifier: "brawler",
+            expert: true,
+            requirements: { type: "feat", name: "Improvised Weapon Basics" }
+          }
+        }
+      ],
+      system: {
+        progression: Array.from({ length: 5 }, (_, i) => ({
+          classId: i === 4 ? "brawler" : "soldier",
+          careerEntryId: `career${i}`,
+          skills: {}
+        }))
+      }
+    });
+    await actor.reviewExpertEntry();
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page
+      .getByLabel("Original source or ruling", { exact: true })
+      .fill("Original career record reviewed before the first expert level");
+    await page.locator('[name="metAtEntry"]').check();
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("Count history review remains reachable at720px", async ({ page }) => {
   const prior = content,
     oldGame = globalThis.game;

@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { validateDamageLedger, accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
@@ -101,7 +102,7 @@ export function damageSaveSourceSnapshot(actor, key) {
   return JSON.stringify({
     save: actor.system.saves?.[key],
     abilities: actor.system.abilities,
-    classLevels: actor.system.classLevels,
+    classLevels: classFeatureLevels(actor.system),
     feats: actor.system.activeFeatNames,
     conditions: actor.system.conditionContext,
     shaken: actor.system.shakenState,

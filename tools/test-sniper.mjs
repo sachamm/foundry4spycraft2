@@ -234,7 +234,8 @@ test("a failed modifier restore retains the spent resources and warns for review
 });
 
 const { sniperAttackEffects, sniperMagicTouchBonus } = await import("../module/rules/sniper.mjs");
-const { computeAgent, prerequisiteContext } = await import("../module/rules/engine.mjs");
+const { prerequisiteContext } = await import("../module/rules/engine.mjs");
+const { isolatedClassAbilityCalculation: computeAgent } = await import("./lib/class-ability-fixture.mjs");
 const { checkPrerequisites } = await import("../module/rules/prerequisites.mjs");
 const { captureFeatAcquisition, featAcquisitionSignature } = await import("../module/rules/feat-acquisition.mjs");
 const { readFile } = await import("node:fs/promises");

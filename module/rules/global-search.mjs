@@ -1,7 +1,8 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 /** Sleuth Global Search, p.46. The GC supplies the target's location; this computes the legal search effort. */
 export function globalSearchSource(system) {
-  const level = system.classLevels?.sleuth ?? 0;
+  const level = classFeatureLevels(system)?.sleuth ?? 0;
   return level >= 10 ? { level, limit: level >= 20 ? 2 : 1, hoursPerLevel: level >= 20 ? 4 : 8 } : null;
 }
 export function globalSearchPlan(

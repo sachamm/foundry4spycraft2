@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { stable } from "./equal.mjs";
@@ -94,7 +95,7 @@ export function validateHideCircumstanceProof(
     attributeSubstitution?.source === "All According to Plan" &&
     attributeSubstitution.originalAbility === proof.baseAbility &&
     attributeSubstitution.ability === "int" &&
-    (system.classLevels?.schemer ?? 0) >= 4;
+    (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : proof.baseAbility))
     throw Error(loc`The Hide key attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))

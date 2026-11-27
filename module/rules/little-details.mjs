@@ -1,7 +1,8 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 /** Sleuth p.45: one shared session allowance, no more than once per round. */
 export function littleDetailsSource(system) {
-  const native = system.classLevels?.sleuth ?? 0,
+  const native = classFeatureLevels(system)?.sleuth ?? 0,
     borrowed = (system.inheritedClassChoices ?? []).some(e => e.name === "Sleuth: Little details (1/session)"),
     level = Math.max(native, borrowed ? 3 : 0);
   return level >= 3 ? { level, limit: 1 + Math.floor((level - 3) / 4) } : null;

@@ -330,6 +330,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         "reviewCreationPolicy",
         "configureModularCreation",
         "reviewAdvancement",
+        "reviewExpertEntry",
         "awardActionDice",
         "rollKnowledge",
         "configureFortuneTeammates",
@@ -1064,6 +1065,9 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
 
     // Classes & progression
     const classItems = byType("class");
+    context.hasExpertClasses = classItems.some(
+      item => item.system.expert && sys.classLevels?.[item.system.identifier || item.name]
+    );
     const classById = Object.fromEntries(classItems.map(c => [c.system.identifier || c.name, c]));
     context.finalAttackRound = uses.find(s => s.id === "finalAttackRound");
     context.dartingFinalAttack = uses.find(s => s.id === "dartingFinalAttack");
@@ -1135,6 +1139,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
             : [],
         item: ci,
         levels: lvl,
+        qualificationNote: sys.expertClassStatus?.[ident]
+          ? !sys.expertClassStatus[ident].active
+            ? loc`Expert-class abilities are inactive. Review current requirements and original entry history.`
+            : sys.expertClassStatus[ident].entryNeedsReview
+              ? loc`Original expert-class entry needs GC review.`
+              : ""
+          : "",
         isVirtuoso: ident === "virtuoso",
         skillOptions: Object.fromEntries(Object.values(cfg.skills).map(s => [s.key, s.name])),
         abilities: (ci.system.abilities ?? [])

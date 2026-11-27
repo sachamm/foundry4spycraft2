@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { hasAquaticQuality } from "./environment.mjs";
 import { activeNoFear } from "./health.mjs";
 import { RESISTANCE_TYPES, qualityResistances } from "./resistances.mjs";
@@ -259,7 +260,7 @@ export function characterSurvivalStats(system) {
     resistances = { ...(system.armor?.resistances ?? {}) },
     resistanceSources = [],
     quality = qualityResistances(system);
-  const coolHeaded = (system.classLevels?.grunt ?? 0) >= 4 ? Math.max(0, system.abilities?.con?.mod ?? 0) : 0;
+  const coolHeaded = (classFeatureLevels(system)?.grunt ?? 0) >= 4 ? Math.max(0, system.abilities?.con?.mod ?? 0) : 0;
   if (coolHeaded)
     for (const key of ["stress", "subdual"]) {
       resistanceSources.push({ source: "Grunt Cool-Headed", key, value: coolHeaded });

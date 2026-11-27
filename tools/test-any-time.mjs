@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { anyTimeAnyPlaceSource, anyTimeAnyPlacePlan, temporaryFeatActive } from "../module/rules/temporary-feats.mjs";
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 const definitions = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url))),

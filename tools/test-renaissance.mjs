@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { renaissanceManPlan } from "../module/rules/temporary-feats.mjs";
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 const feats = JSON.parse(await readFile(new URL("../src/data/feats.json", import.meta.url), "utf8"))
   .filter(f => f.tree === "Basic Skill")

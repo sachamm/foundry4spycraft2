@@ -31,7 +31,10 @@ export function startingAttributeSignature(system, items = []) {
         i.system.originType ?? "",
         i.system.bonuses ?? [],
         i.system.choices ?? {},
-        i.system.choice ?? ""
+        i.system.choice ?? "",
+        ...(i.system.originChoices?.up || i.system.originChoices?.down
+          ? [{ up: i.system.originChoices.up ?? "", down: i.system.originChoices.down ?? "" }]
+          : [])
       ]),
     feats: items
       .filter(
@@ -108,4 +111,20 @@ export function startingAttributeRecord(
     at,
     signature: startingAttributeSignature(system, items)
   };
+}
+
+/** Save still-known first-level scores before advancement makes later changes part of the live score. */
+export function captureFirstLevelAttributes(system, items, record, { reviewedBy = "owner", at = 0 } = {}) {
+  const cap = system.startingAttributeReview?.cap;
+  if (system.level !== 1 || system.progression?.length !== 1 || !Number.isSafeInteger(cap) || cap < 1) return null;
+  const review = startingAttributeReview(system, items, record, cap);
+  if (review.recorded || review.needsReview || review.violations.length) return null;
+  return startingAttributeRecord(system, items, {
+    scores: review.scores,
+    cap,
+    confirmed: true,
+    note: loc`Known first-level starting scores captured before later advancement.`,
+    reviewedBy,
+    at
+  });
 }

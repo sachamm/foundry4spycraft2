@@ -1,10 +1,11 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { actionDiceGain } from "./action-dice.mjs";
 import { loc } from "../i18n.mjs";
 export function adrenalineSource(system) {
   return system.coreClassIds?.includes("stuntman") &&
-    Number.isSafeInteger(system.classLevels?.stuntman) &&
-    system.classLevels.stuntman >= 1 &&
-    system.classLevels.stuntman <= 10
+    Number.isSafeInteger(classFeatureLevels(system)?.stuntman) &&
+    classFeatureLevels(system).stuntman >= 1 &&
+    classFeatureLevels(system).stuntman <= 10
     ? {
         id: "adrenalineJunkie",
         name: loc`Adrenaline Junkie (confirmed wound-loss events)`,

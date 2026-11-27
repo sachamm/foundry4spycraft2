@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { computeAgent } from "../module/rules/engine.mjs";
-import { startingAttributeRecord, startingAttributeReview } from "../module/rules/starting-attributes.mjs";
+import {
+  startingAttributeRecord,
+  startingAttributeReview,
+  captureFirstLevelAttributes,
+  startingAttributeSignature
+} from "../module/rules/starting-attributes.mjs";
 import { ActorProgression } from "../module/documents/actor/progression.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 
@@ -30,6 +35,32 @@ const origin = bonus => ({
 const scores = strength =>
   Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, k === "str" ? strength : 12]));
 const review = { confirmed: true, cap: 18, note: "GC checked the original character record" };
+
+test("starting history binds Origin attribute choices without treating later skill choices as a new starting score", () => {
+  const item = origin(0),
+    system = source(1);
+  item.system.originChoices = { up: "str", down: "dex", maxRank0: "athletics" };
+  const signature = startingAttributeSignature(system, [item, ...classes]);
+  item.system.originChoices.maxRank1 = "notice";
+  assert.equal(startingAttributeSignature(system, [item, ...classes]), signature);
+  item.system.originChoices.up = "int";
+  assert.notEqual(startingAttributeSignature(system, [item, ...classes]), signature);
+});
+
+test("known first-level starting scores are captured before advancement, without guessing later or damaged history", () => {
+  const system = computeAgent(source(1), classes, cfg, { campaignEffects: effects });
+  const record = captureFirstLevelAttributes(system, classes, null, { reviewedBy: "owner", at: 12 });
+  assert.equal(record.scores.str, 12);
+  assert.equal(record.historical, false);
+  assert.equal(captureFirstLevelAttributes(system, classes, record), null);
+  system.progression.push({ classId: "test", vitality: 4, skills: {} });
+  system.level = 2;
+  system.abilities.str.value = 16;
+  assert.equal(captureFirstLevelAttributes(system, classes, null), null);
+  assert.equal(startingAttributeReview(system, classes, record, 18).scores.str, 12);
+  const invalid = computeAgent(source(1), [origin(8), ...classes], cfg, { campaignEffects: effects });
+  assert.equal(captureFirstLevelAttributes(invalid, [origin(8), ...classes], null), null);
+});
 
 test("Small Screen uses 32 points without overwriting the saved budget and checks Origin-adjusted creation scores", () => {
   const s = source(0);

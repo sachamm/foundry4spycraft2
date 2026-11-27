@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { checkFocus, isHideCheck } from "./check-identity.mjs";
 import { campaignSkillDCPolicy } from "./campaign-skill-dc.mjs";
 import { cakewalkSkillSelected } from "./cakewalk.mjs";
@@ -319,7 +320,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     bound === true ? { ...system, conditionContext: { ...system.conditionContext, bound: true } } : system;
   const originalAbility =
     hideCircumstance.baseAbility ?? (check.attributes.includes(ability) ? ability : check.attributes[0]);
-  const accordingEligible = (system.classLevels?.schemer ?? 0) >= 4;
+  const accordingEligible = (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   const substituted = !!allAccordingToPlan && accordingEligible,
     selected = substituted ? "int" : originalAbility;
   const originalRow = skill.totals.find(t => t.ability === originalAbility),
@@ -737,7 +738,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
         tracking.take10Normal ||
         hasForte ||
         skill.take10TimeMultiplier === 1 ||
-        ((system.classLevels?.schemer ?? 0) >= 10 && selected === "int"),
+        ((classFeatureLevels(system)?.schemer ?? 0) >= 10 && selected === "int"),
       falseStart: hasFeat("False Start"),
       professional,
       classEffect: classEffects,
@@ -1025,7 +1026,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [630, substituted ? loc`All According to Plan: Intelligence replaces the check’s key attribute (p.79). ` : ""],
     [
       640,
-      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" && method === "take10"
+      (classFeatureLevels(system)?.schemer ?? 0) >= 10 && selected === "int" && method === "take10"
         ? loc`Hyperconscious: take 10 without doubling time. `
         : ""
     ],
@@ -1252,7 +1253,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     blocked: blockedReasons.length > 0,
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
-      cakewalk || ((system.classLevels?.schemer ?? 0) >= 10 && selected === "int")
+      cakewalk || ((classFeatureLevels(system)?.schemer ?? 0) >= 10 && selected === "int")
         ? 1
         : skill.take10TimeMultiplier === 1
           ? 1

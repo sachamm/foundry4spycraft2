@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { combatStanceState } from "./combat-stance.mjs";
 import { stanceMovementState } from "./stance-movement.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
@@ -16,7 +17,7 @@ export const strikingActorStats = s => ({
   ),
   conditions: s.conditionContext ?? {},
   feats: s.activeFeatNames ?? [],
-  classes: s.classLevels ?? {}
+  classes: classFeatureLevels(s) ?? {}
 });
 export function strikingTriggerPlan(
   system,

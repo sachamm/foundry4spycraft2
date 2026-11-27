@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { weaponGrip, possessionUnavailable } from "./gear.mjs";
@@ -55,7 +56,7 @@ export function twoWeaponDeclarationPlan(
       );
   }
   const proficiencies = pair.map(i => i.system.proficiency);
-  if (system.classLevels?.triggerman === 10 && proficiencies.filter(p => p === "handgun").length === 1)
+  if (classFeatureLevels(system)?.triggerman === 10 && proficiencies.filter(p => p === "handgun").length === 1)
     throw new Error(loc`Both Guns Blazing with a mixed weapon pair requires the pending scope ruling.`);
   return {
     combatId: combat.id,

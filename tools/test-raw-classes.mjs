@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 const classes = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url)));
 const reference = JSON.parse(readFileSync(new URL("./fixtures/raw/classes-reference.json", import.meta.url)));
 const item = cls => ({

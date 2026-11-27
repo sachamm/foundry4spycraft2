@@ -342,7 +342,7 @@ test("current Strength changes and unrelated Count loss survive stance exit with
 });
 test("actual protected incoming Shaken loss remains minus two through Power removal, then clears independently", async () => {
   const { a, c } = fixture({ active: true, count: 34 });
-  a.system.classLevels = { intruder: 16 };
+  a.system.classLevels = a.system.activeClassLevels = { intruder: 16 };
   setShaken(a);
   await reconcileShakenInitiative(a);
   assert.equal(c.initiative, 32);
@@ -358,7 +358,7 @@ test("actual protected incoming Shaken loss remains minus two through Power remo
 });
 test("a fresh final Initiative check retains the full Shaken check penalty alongside Power rather than reclassifying it as a protected loss", async () => {
   const { a, c } = fixture({ active: true, count: 34 });
-  a.system.classLevels = { intruder: 16 };
+  a.system.classLevels = a.system.activeClassLevels = { intruder: 16 };
   setShaken(a);
   await c.update({ initiative: 30 });
   assert.equal(c.flags.spycraft2.shakenInitiative.includedPenalty, -4);

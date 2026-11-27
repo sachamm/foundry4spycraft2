@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 /** Sniper p.80: firearm and hurled categories are narrower than the shared heavy-weapon firing workflow. */
@@ -68,13 +69,13 @@ export function eagleEyeState(system) {
 }
 
 export function sniperMagicTouchBonus(system) {
-  const level = system.classLevels?.sniper ?? 0;
+  const level = classFeatureLevels(system)?.sniper ?? 0;
   return level >= 9 ? 2 : level >= 5 ? 1 : 0;
 }
 /** Native attack effects, p.80. Target condition is declared for this particular attack. */
 export function sniperAttackEffects(system, weapon, { targetFlatFooted = false } = {}) {
   const eligible = sniperWeapon(weapon),
-    level = system.classLevels?.sniper ?? 0;
+    level = classFeatureLevels(system)?.sniper ?? 0;
   const attackBonus = eligible ? sniperMagicTouchBonus(system) : 0;
   const threatIncrease = eligible && targetFlatFooted === true ? (level >= 7 ? 2 : level >= 2 ? 1 : 0) : 0;
   const errorReduction =
@@ -97,7 +98,7 @@ export function sniperAttackEffects(system, weapon, { targetFlatFooted = false }
 
 /** Sniper 10, p.80: choose either of two attack rolls against a vulnerable target, once/round. */
 export function millionDollarSkillPlan(system, weapon, { targetVulnerable = false } = {}) {
-  if ((system.classLevels?.sniper ?? 0) < 10)
+  if ((classFeatureLevels(system)?.sniper ?? 0) < 10)
     return { blocked: true, reason: loc`Million Dollar Skill requires Sniper 10.` };
   if (!sniperWeapon(weapon))
     return { blocked: true, reason: loc`Million Dollar Skill requires a two-handed firearm or hurled weapon.` };

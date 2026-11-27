@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { skillConditionEntries, substituteConditionedBonus } from "./skill-conditions.mjs";
 import { stackedBonuses } from "./knowledge.mjs";
@@ -28,7 +29,7 @@ export function breakthroughPlan(
   { checkKind = "skill", sourceAbility = "", modifier = 0 } = {}
 ) {
   if (
-    (system.classLevels?.virtuoso ?? 0) < 10 ||
+    (classFeatureLevels(system)?.virtuoso ?? 0) < 10 ||
     !["skill", "knowledge"].includes(checkKind) ||
     (checkKind === "skill" && !["int", "wis"].includes(result?.ability))
   )
@@ -85,7 +86,7 @@ export function nestPlan(
   { skillKey = "", checkId = "", halfCoverConfirmed = false, sourceAbility = "", breakthrough = false } = {}
 ) {
   if (
-    (system.classLevels?.sniper ?? 0) < 4 ||
+    (classFeatureLevels(system)?.sniper ?? 0) < 4 ||
     !(system.classOptionSelections ?? []).some(s => s.classId === "sniper" && s.name === "Nest")
   )
     throw new Error(loc`Nest requires the earned Sniper Perfect Killer choice.`);

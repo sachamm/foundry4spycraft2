@@ -206,7 +206,8 @@ test("Knuckles attacks count as unarmed for conditional sneak attack dice withou
 });
 
 const { sneakAttackCapacity } = await import("../module/rules/sneak-attack.mjs"),
-  { prerequisiteContext, computeAgent } = await import("../module/rules/engine.mjs"),
+  { prerequisiteContext } = await import("../module/rules/engine.mjs"),
+  { isolatedClassAbilityCalculation: computeAgent } = await import("./lib/class-ability-fixture.mjs"),
   { checkPrerequisites, describe } = await import("../module/rules/prerequisites.mjs"),
   { readFile } = await import("node:fs/promises"),
   { captureFeatAcquisition, featAcquisitionSignature } = await import("../module/rules/feat-acquisition.mjs");

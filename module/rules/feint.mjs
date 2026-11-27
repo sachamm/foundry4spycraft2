@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { combatStanceProof } from "./combat-stance.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { fencingDisarmPlan as readiedFencingPlan } from "./fencing-disarm.mjs";
@@ -163,7 +164,7 @@ export function validateFeintProof(
       attributeSubstitution?.source === "All According to Plan" &&
       attributeSubstitution.originalAbility === base &&
       attributeSubstitution.ability === "int" &&
-      (actor.system.classLevels?.schemer ?? 0) >= 4;
+      (classFeatureLevels(actor.system)?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : base))
     throw Error(loc`The Feint key attribute or actual substitution source changed before posting.`);
   const candidate = p.evidence ? structuredClone(p.evidence) : null;

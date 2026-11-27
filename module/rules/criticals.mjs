@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { cleaveCriticalPlan } from "./cleave.mjs";
 import { finesseCriticalEligible } from "./finesse.mjs";
@@ -159,7 +160,10 @@ export function criticalPlan(
       adjustment--;
       sources.push("Most Deadly –1");
     }
-    if ((system.classLevels?.grunt ?? 0) >= 8 && ["tactical", "indirectFire"].includes(check.weaponProficiency)) {
+    if (
+      (classFeatureLevels(system)?.grunt ?? 0) >= 8 &&
+      ["tactical", "indirectFire"].includes(check.weaponProficiency)
+    ) {
       adjustment--;
       sources.push("Overkill –1");
     }

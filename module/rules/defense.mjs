@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
@@ -17,7 +18,7 @@ import { specialistDefense, specialistDRIncrement } from "./weapon-specialist.mj
 export function uncannyDodgePlan(system) {
   const sources = [];
   for (const classId of ["explorer", "intruder", "triggerman"]) {
-    const level = system.classLevels?.[classId] ?? 0,
+    const level = classFeatureLevels(system)?.[classId] ?? 0,
       maxGrade = classId === "triggerman" ? 2 : 5;
     if (Number.isSafeInteger(level) && level > 0)
       sources.push({ classId, grade: Math.min(maxGrade, Math.floor(level / 4)), maxGrade });
@@ -106,7 +107,7 @@ export function incomingDefensePlan(system, options = {}) {
   const ignoreDodge = vulnerable || options.damageType === "laser";
   const dodgeLost = ignoreDodge ? (system.defense.dodgeBonuses ?? 0) : 0;
   const securityBonus = securityDevice ? uncanny.securityBonus : 0;
-  const triggerman = system.classLevels?.triggerman ?? 0,
+  const triggerman = classFeatureLevels(system)?.triggerman ?? 0,
     eyeOfStorm = adjacent && triggerman >= 4 ? 3 : 0;
   const foibles = specialistDefense(system, options.weaponProficiency);
   const specialistDodge = ignoreDodge ? 0 : foibles.dodge;
@@ -268,8 +269,8 @@ export function incomingDefensePlan(system, options = {}) {
 /** pp.29,37,83: Evasion's separate legacy progression. */
 export function evasionPlan(system) {
   const sources = [],
-    intruder = system.classLevels?.intruder ?? 0,
-    transporter = system.classLevels?.transporter ?? 0;
+    intruder = classFeatureLevels(system)?.intruder ?? 0,
+    transporter = classFeatureLevels(system)?.transporter ?? 0;
   if (Number.isSafeInteger(intruder) && intruder > 0)
     sources.push({
       classId: "intruder",

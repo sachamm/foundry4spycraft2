@@ -9,7 +9,7 @@ import {
   sameFeatSelection
 } from "../module/rules/temporary-feats.mjs";
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 const definitions = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url))),
   classes = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url)));

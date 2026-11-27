@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { equipmentCategory, bigStickMatches, bigStickStatus, armorGrantStatus } from "./gear.mjs";
 import { currentReserves, missionEpoch, reserveAllocations } from "./gear-acquisition.mjs";
 import { loc } from "../i18n.mjs";
@@ -48,7 +49,7 @@ export function missionCaliberSourceActive(system, key) {
     ? (system.classOptionSelections ?? []).some(
         entry => entry.classId === source.classId && entry.name === source.option
       )
-    : (system.classLevels?.[source.classId] ?? 0) >= source.level;
+    : (classFeatureLevels(system)?.[source.classId] ?? 0) >= source.level;
   return (
     native ||
     (!!source.inherited && (system.inheritedClassChoices ?? []).some(entry => entry.name === source.inherited))
@@ -58,7 +59,7 @@ const recordItemIds = record =>
   record?.itemId ? [record.itemId, ...(Array.isArray(record.additionalItemIds) ? record.additionalItemIds : [])] : [];
 export function missionCaliberLimit(system, key) {
   const source = MISSION_CALIBER_SOURCES[key];
-  return source?.extraAt && (system.classLevels?.[source.classId] ?? 0) >= source.extraAt ? 2 : 1;
+  return source?.extraAt && (classFeatureLevels(system)?.[source.classId] ?? 0) >= source.extraAt ? 2 : 1;
 }
 function eligibleItem(system, item, source) {
   const gear = item?.system;

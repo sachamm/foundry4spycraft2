@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "../rules/class-features.mjs";
 import { refuse } from "../error-notices.mjs";
 import {
   whirlingDefenseContent,
@@ -22,7 +23,7 @@ const rangedSourceFacts = ({ attacker, weapon }) =>
   JSON.stringify({
     feats: attacker.system.activeFeatNames ?? [],
     cqbRange: attacker.system.cqbRange ?? 30,
-    classes: attacker.system.classLevels ?? {},
+    classes: classFeatureLevels(attacker.system) ?? {},
     weapon: weapon.system
   });
 const canReadSource = actor =>

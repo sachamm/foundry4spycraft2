@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "../../rules/class-features.mjs";
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
 import { checkFocus } from "../../rules/check-identity.mjs";
 import { formatRange } from "../../rules/outcome-labels.mjs";
@@ -339,7 +340,7 @@ export const ActorSkillRolls = Base =>
         if (result.rollMode === "blindroll" && !game.user?.isGM)
           throw new Error(loc`The GC resolves this bonus for a secret or passive check.`);
       }
-      if (input.brightIdea && key === "search" && (this.system.classLevels?.fieldAnalyst ?? 0) >= 8)
+      if (input.brightIdea && key === "search" && (classFeatureLevels(this.system)?.fieldAnalyst ?? 0) >= 8)
         return refuse(loc`Eye for Detail already rolls Search twice. Clear Bright Idea to preserve its limited use.`);
       if (input.brightIdea && (result.method !== "roll" || !["int", "wis"].includes(result.ability)))
         return refuse(loc`Bright Idea requires a rolled Intelligence- or Wisdom-based skill check.`);
@@ -389,7 +390,7 @@ export const ActorSkillRolls = Base =>
           throw new Error(
             fresh?.blockedReason || loc`This check’s requirements changed. Review it before rolling again.`
           );
-        if (input.brightIdea && key === "search" && (this.system.classLevels?.fieldAnalyst ?? 0) >= 8)
+        if (input.brightIdea && key === "search" && (classFeatureLevels(this.system)?.fieldAnalyst ?? 0) >= 8)
           throw new Error(
             loc`Eye for Detail now covers this Search check; preserve Bright Idea and roll again without it.`
           );

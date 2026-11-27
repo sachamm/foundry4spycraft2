@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { dartingStyleState as state } from "../module/rules/darting-state.mjs";
 import { dartingDeclarationPlan as plan, dartingFinalAttackPlan as finalPlan } from "../module/rules/darting.mjs";
 import { declareDarting, reviewDarting, takeDartingFinalAttack } from "../module/apps/darting.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { weaponAttack, weaponDamage } from "../module/rules/gear.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
@@ -329,7 +329,7 @@ test("malformed saved tradeoffs hold actual attack/skill/Knowledge checks before
 test("Darting penalties stack with independent tradeoffs; Both Guns Blazing waives only its own two-weapon penalty", () => {
   const s = calculate(2),
     b = calculate();
-  s.classLevels.triggerman = 10;
+  s.classLevels.triggerman = s.activeClassLevels.triggerman = 10;
   s.twoWeaponCombatContext = clock();
   s.twoWeaponStyle = {
     id: "two",

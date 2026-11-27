@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
@@ -227,7 +228,7 @@ export function validateConveyanceBullRushProof(
       attributeSubstitution?.source === "All According to Plan" &&
       attributeSubstitution.originalAbility === base &&
       attributeSubstitution.ability === "int" &&
-      (system.classLevels?.schemer ?? 0) >= 4;
+      (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : base))
     throw Error(loc`The conveyance Bull Rush attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))

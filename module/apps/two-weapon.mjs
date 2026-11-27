@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "../rules/class-features.mjs";
 import { completeCharacterTarget } from "./character-target.mjs";
 import { standardAttackContextContent, standardAttackContextInput } from "./standard-attack-context.mjs";
 import { twoWeaponDeclarationPlan, twoWeaponFinalAttackPlan } from "../rules/two-weapon.mjs";
@@ -124,7 +125,7 @@ export async function reviewTwoWeapon(actor, options = {}) {
       JSON.stringify({
         record: actor.system.twoWeaponStyle,
         combat: expertiseCombatContext(actor),
-        triggerman: actor.system.classLevels?.triggerman,
+        triggerman: classFeatureLevels(actor.system)?.triggerman,
         declarations: actor.flags?.spycraft2?.twoWeaponDeclarations,
         reviews: actor.flags?.spycraft2?.twoWeaponReviews
       }),

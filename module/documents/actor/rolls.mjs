@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "../../rules/class-features.mjs";
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
 import { refuse } from "../../error-notices.mjs";
 import { messageModeOption } from "../../rolls/message-mode.mjs";
@@ -118,7 +119,7 @@ export const ActorRolls = Base =>
         checkKind === "skill" &&
         skillKey === "search" &&
         checkMethod === "roll" &&
-        (this.system.classLevels?.fieldAnalyst ?? 0) >= 8
+        (classFeatureLevels(this.system)?.fieldAnalyst ?? 0) >= 8
       ) {
         if (rollMode === "blindroll" && !game.user?.isGM)
           throw new Error(loc`The GC resolves Eye for Detail for a secret or passive Search check.`);

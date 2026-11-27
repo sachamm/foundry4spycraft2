@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 const epoch = periods => String(periods?.session ?? "initial");
 const safeKey = value => encodeURIComponent(value).replaceAll(".", "%2E");
@@ -6,8 +7,8 @@ export function brightIdeaSources(system) {
   const out = [],
     add = (id, label, limit) =>
       out.push({ id, name: loc`Bright Idea (${label})`, limit, cost: 0, period: "session", workflow: "brightIdea" });
-  const scientist = system.classLevels?.scientist ?? 0,
-    analyst = system.classLevels?.fieldAnalyst ?? 0;
+  const scientist = classFeatureLevels(system)?.scientist ?? 0,
+    analyst = classFeatureLevels(system)?.fieldAnalyst ?? 0;
   if (scientist >= 3) add("brightIdeaScientist", "Scientist", 2 + 2 * Math.floor((Math.min(scientist, 20) - 3) / 4));
   if (analyst >= 4) add("brightIdeaFieldAnalyst", "Field Analyst", analyst >= 8 ? 4 : 2);
   if (scientist < 3) {

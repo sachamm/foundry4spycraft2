@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Request-check exceptions: Veteran p.21, Geek p.23, Executive Decision p.77, Sources p.45. */
@@ -13,7 +14,7 @@ export function requestSources(system, items = []) {
       cost: 0,
       workflow: "requestBenefit"
     });
-  const sleuth = system.classLevels?.sleuth ?? 0,
+  const sleuth = classFeatureLevels(system)?.sleuth ?? 0,
     sourcesGrade =
       sleuth >= 19
         ? 3
@@ -43,7 +44,7 @@ export function requestSources(system, items = []) {
       cost: 0,
       workflow: "requestBenefit"
     });
-  const advocate = system.classLevels?.advocate ?? 0,
+  const advocate = classFeatureLevels(system)?.advocate ?? 0,
     native = advocate >= 19 ? 3 : advocate >= 11 ? 2 : advocate >= 2 ? 1 : 0;
   const inherited =
     advocate >= 2
@@ -97,7 +98,7 @@ export function requestSources(system, items = []) {
         cost: 0,
         workflow: "requestBenefit"
       });
-  if ((system.classLevels?.politico ?? 0) >= 10)
+  if ((classFeatureLevels(system)?.politico ?? 0) >= 10)
     sources.push({
       id: "requestExecutiveDecision",
       name: loc`Executive Decision: automatic Request without action-die cost`,
@@ -119,7 +120,7 @@ export function priorityRequestBonus(system, category) {
     ["cleaner", ["V", "W"], ["G", "T"], "Cleaner"],
     ["fieldAnalyst", ["E", "R"], ["T", "V"], "Field Analyst"]
   ]) {
-    const level = system.classLevels?.[classId] ?? 0;
+    const level = classFeatureLevels(system)?.[classId] ?? 0;
     if ((level >= 2 && early.includes(category)) || (level >= 7 && late.includes(category)))
       sources.push({ name: `${name}: Priority Request`, value: level });
   }

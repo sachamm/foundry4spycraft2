@@ -22,7 +22,8 @@ import { retainedVitality, removedVitalityKey, removedVitalityRecord } from "../
 import {
   CREATION_ABILITIES,
   startingAttributeSignature,
-  startingAttributeRecord
+  startingAttributeRecord,
+  captureFirstLevelAttributes
 } from "../../rules/starting-attributes.mjs";
 import {
   CREATION_QUALITIES,
@@ -242,6 +243,97 @@ export const ActorProgression = Base =>
       });
     }
 
+    async reviewExpertEntry(options = {}) {
+      if (this.type !== "agent" || !this.isOwner || !game.user?.isGM)
+        throw Error(loc`The owning GC reviews expert-class entry history.`);
+      const progressionOf = () => this.system.toObject?.()?.progression ?? structuredClone(this.system.progression);
+      const rows = [...this.items]
+        .filter(item => item.type === "class" && item.system.expert)
+        .flatMap(item => {
+          const key = item.system.identifier || item.name,
+            index = this.system.progression.findIndex(entry => entry.classId === key);
+          return index < 0
+            ? []
+            : [
+                {
+                  item,
+                  key,
+                  index,
+                  before: structuredClone(this.system.progression[index].expertEntry ?? null),
+                  entryId: this.system.progression[index].careerEntryId ?? "",
+                  prefix: progressionOf().slice(0, index + 1),
+                  requirements: structuredClone(item.system.requirements ?? null)
+                }
+              ];
+        });
+      if (!rows.length) throw Error(loc`This character has no owned expert-class level to review.`);
+      let input = options;
+      if (!input.classId) {
+        input = await systemDialog.input({
+          window: { title: loc`Review expert-class entry` },
+          position: { width: 560 },
+          rejectClose: false,
+          content: `<div class="spycraft2-roll-options"><p>${loc`Review the original attributes, base bonuses, ranks and feats before the first expert level. Do not use that class's later benefits to qualify its entry. Current requirements are checked separately; this review cannot waive them.`}</p><label>${loc`Expert class`} <select name="classId">${rows.map(row => `<option value="${esc(row.key)}">${esc(row.item.name)} — ${loc`first taken at Career Level ${row.index + 1}`}</option>`).join("")}</select></label><label>${loc`Decision`} <select name="decision"><option value="review">${loc`Record the original entry review`}</option><option value="restore">${loc`Restore the previous entry record`}</option></select></label><label><input name="metAtEntry" type="checkbox" /> ${loc`The original entry requirements were met`}</label><label>${loc`Original source or ruling`} <textarea name="note"></textarea></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this entry-history decision`}</label></div>`,
+          ok: { label: loc`Record entry history` }
+        });
+        if (!input) return null;
+      }
+      input = { ...input, decision: input.decision ?? "review" };
+      if (!["review", "restore"].includes(input.decision))
+        throw Error(loc`Choose an entry-history review or restore the previous record.`);
+      const selected = rows.find(row => row.key === input.classId);
+      if (!selected || input.confirmed !== true)
+        throw Error(loc`Choose the original expert class and confirm the GC's decision.`);
+      if (input.decision === "restore" && !Object.hasOwn(selected.before?.review ?? {}, "before"))
+        throw Error(loc`This entry has no previous review record to restore.`);
+      if (
+        input.decision !== "restore" &&
+        (typeof input.metAtEntry !== "boolean" || typeof input.note !== "string" || !input.note.trim())
+      )
+        throw Error(loc`Record whether the original requirements were met and identify the reviewed source.`);
+      if (input.decision !== "restore" && input.metAtEntry && selected.index < 4)
+        throw Error(
+          loc`Expert classes cannot begin before Career Level 5. Repair the career history before confirming a valid entry.`
+        );
+      return queueResources([this], async () => {
+        if (!this.isOwner || !game.user?.isGM) throw Error(loc`The owning GC reviews expert-class entry history.`);
+        const item = [...this.items].find(item => item.id === selected.item.id),
+          progression = progressionOf();
+        const first = progression.findIndex(entry => entry.classId === selected.key),
+          row = progression[first];
+        if (
+          first !== selected.index ||
+          !item?.system.expert ||
+          (item.system.identifier || item.name) !== selected.key ||
+          (row?.careerEntryId ?? "") !== selected.entryId ||
+          !same(progression.slice(0, first + 1), selected.prefix) ||
+          !same(row?.expertEntry ?? null, selected.before) ||
+          !same(item?.system.requirements ?? null, selected.requirements)
+        )
+          throw Error(loc`The class, first career level or entry history changed. Review the current record again.`);
+        row.expertEntry =
+          input.decision === "restore"
+            ? structuredClone(selected.before.review.before)
+            : {
+                ok: input.metAtEntry,
+                unmet: input.metAtEntry
+                  ? []
+                  : [loc`The GC confirmed that the original entry requirements were not met.`],
+                review: {
+                  version: 1,
+                  before: selected.before,
+                  note: input.note.trim(),
+                  reviewedBy: game.user.id,
+                  at: Date.now(),
+                  career: first + 1,
+                  classId: selected.key
+                }
+              };
+        await this.update({ "system.progression": progression });
+        return row.expertEntry;
+      });
+    }
+
     async reviewStartingAttributes(options = {}) {
       if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       if (!game.user?.isGM) throw new Error(loc`The GC reviews original starting attribute scores.`);
@@ -424,6 +516,20 @@ export const ActorProgression = Base =>
         ident,
         definition.vitalityDie
       );
+      const startingScores = captureFirstLevelAttributes(
+        this.system,
+        [...this.items],
+        this.flags?.spycraft2?.creationAttributes,
+        { reviewedBy: game.user?.id ?? "owner", at: Date.now() }
+      );
+      if (startingScores)
+        await this.update(
+          recordReplacementPatch(
+            "flags.spycraft2.creationAttributes",
+            startingScores,
+            this.flags?.spycraft2?.creationAttributes
+          )
+        );
       if (!cls) {
         const data = classData.toObject?.() ?? foundry.utils.deepClone(classData);
         delete data._id;

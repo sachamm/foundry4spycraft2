@@ -10,7 +10,7 @@ import {
   activeFortunesOfWar,
   fortunesOfWarPlan
 } from "../module/rules/health.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 const system = () => ({
   size: "Medium",

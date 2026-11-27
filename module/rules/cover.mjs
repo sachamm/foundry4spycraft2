@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { terrainCoverPlan } from "./terrain-cover.mjs";
 import { cqbRangedWeapon } from "./cqb.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
@@ -5,7 +6,7 @@ import { loc } from "../i18n.mjs";
 export const COVER_GRADES = ["None", "One-quarter (1/4)", "One-half (1/2)", "Three-quarters (3/4)", "Total"];
 /** Counter-Terrorist p.69: second grade replaces the first; no weapon or range restriction. */
 export function precisionTakedownGrade(system) {
-  const level = system?.classLevels?.counterterrorist ?? 0;
+  const level = classFeatureLevels(system)?.counterterrorist ?? 0;
   if (!Number.isSafeInteger(level) || level < 0 || level > 10)
     throw new Error(loc`Review the actual Counter-Terrorist class level before reducing cover.`);
   return level >= 7 ? 2 : level >= 2 ? 1 : 0;
@@ -75,7 +76,7 @@ export function coverPlan({
         : 0,
     grade = baseGrade - precisionReduction - supremacyReduction - sharpshooterReduction;
   const listedDefenseBonus = 2 * grade,
-    safeAttack = (precisionAttackerSystem ?? attackerSystem)?.classLevels?.counterterrorist >= 4;
+    safeAttack = classFeatureLevels(precisionAttackerSystem ?? attackerSystem)?.counterterrorist >= 4;
   if (
     !Number.isSafeInteger(humanShieldDefense) ||
     humanShieldDefense < 0 ||

@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 /**
  * Feat reminders: the "declare and remind" tier of feat automation.
  *
@@ -77,7 +78,7 @@ export function featReminders(items, roll) {
  */
 export function classAbilityReminders(system, roll, table = CLASS_ABILITY_REMINDERS) {
   const list = [];
-  for (const [classKey, level] of Object.entries(system?.classLevels ?? {})) {
+  for (const [classKey, level] of Object.entries(classFeatureLevels(system) ?? {})) {
     for (const ability of table?.[classKey] ?? []) {
       if (!(Number(level) >= ability.level)) continue;
       if (!reminderApplies(reminderTokens(ability.rolls), roll)) continue;

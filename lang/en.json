@@ -86,6 +86,7 @@
   },
   "Review": {
    "Advancement": "Review level advancement",
+   "ExpertEntry": "Review expert-class entry",
    "ExtraAttackClaims": "Review extra-attack claims",
    "Nothing": "Nothing needs review.",
    "Interrupted": "Review an interrupted action",

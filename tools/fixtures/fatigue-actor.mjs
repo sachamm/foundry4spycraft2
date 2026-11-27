@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { computeAgent } from "../../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "../lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../../module/config.mjs";
 let sequence = 0;
 globalThis.Actor = class {};

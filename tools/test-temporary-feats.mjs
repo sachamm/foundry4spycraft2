@@ -358,7 +358,7 @@ test("legacy expert-entry review excludes temporary and explicit virtual numeric
     const result = computeAgent(input, [cls, expert, grant], cfg);
     assert.equal(result.abilities.str.value, 14);
     assert.ok(
-      result.warnings.some(w => w.includes("Test Expert: expert class requirements not met")),
+      result.expertClassStatus.expert.active === false && result.expertClassStatus.expert.current.ok === false,
       featKind
     );
   }

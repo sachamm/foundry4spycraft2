@@ -1,3 +1,4 @@
+import { classFeatureLevels } from "./class-features.mjs";
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { armorTrainingDRForAttack } from "./armor-training.mjs";
@@ -5,7 +6,7 @@ import { armorTrainingDRForAttack } from "./armor-training.mjs";
 export function weaponSpecialist(system, items, cfg) {
   const result = { fields: [], proficiencies: [], abilities: [], pending: [], warnings: [] };
   const soldier = items.find(item => item.type === "class" && (item.system.identifier || item.name) === "soldier");
-  const level = system.classLevels?.soldier ?? 0;
+  const level = classFeatureLevels(system)?.soldier ?? 0;
   if (!soldier || level < 6) return result;
   const list = soldier.system.choiceLists?.find(list => list.key === "weaponSpecialist");
   const selected = new Set(),

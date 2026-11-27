@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import {
   restraintState,
@@ -155,7 +155,7 @@ test("passive Knowledge remains available but active Knowledge/taking require ac
   for (const condition of ["held", "pinned"]) {
     const s = compute({ [condition]: true });
     s.activeFeatNames.push("Photographic Memory");
-    s.classLevels.schemer = 2;
+    s.classLevels.schemer = s.activeClassLevels.schemer = 2;
     assert.doesNotMatch(resolveKnowledgeCheck(s, { skill: "search" }).blockedReason, /Held:|Pinned:/);
     for (const options of [
       { active: true },
@@ -169,7 +169,7 @@ test("passive Knowledge remains available but active Knowledge/taking require ac
 });
 test("specific attribute replacement still applies to an eligible full-action escape, while stronger paralysis/incapacity and separate Pinned free actions remain blocked", () => {
   const s = compute({ pinned: true });
-  s.classLevels.schemer = 4;
+  s.classLevels.schemer = s.activeClassLevels.schemer = 4;
   const according = resolveSkillCheck(s, "athletics", escape, { ability: "str", allAccordingToPlan: true });
   assert.equal(according.blocked, false, according.blockedReason);
   assert.equal(according.ability, "int");
@@ -216,8 +216,8 @@ test("Grapple requires reviewed proficiency and Size context; the larger partici
 });
 test("untrained Grapple doubles its action time and raises error by two; no time-reducing ability can shorten it", () => {
   const s = compute({ held: true });
-  s.classLevels.scientist = 14;
-  s.classLevels.schemer = 4;
+  s.classLevels.scientist = s.activeClassLevels.scientist = 14;
+  s.classLevels.schemer = s.activeClassLevels.schemer = 4;
   const trained = resolveSkillCheck(s, "athletics", escape, { ability: "str" }),
     untrained = resolveSkillCheck(s, "athletics", escape, { ability: "str", grappleProficient: false }),
     solution = resolveSkillCheck(s, "athletics", escape, {
