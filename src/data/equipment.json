@@ -270,6 +270,7 @@
    "sourcePage": 250,
    "sourceName": "Stun gun, melee",
    "sourceTable": "Table 4.30: blunt melee weapon Picks (descriptions: See page 302)",
+   "year": "1970s",
    "rulesNote": ""
   },
   {
@@ -288,6 +289,7 @@
    "sourcePage": 250,
    "sourceName": "Stun gun, ranged",
    "sourceTable": "Table 4.30: blunt melee weapon Picks (descriptions: See page 302)",
+   "year": "1970s",
    "rulesNote": ""
   },
   {
@@ -1412,6 +1414,7 @@
    "sourcePage": 252,
    "sourceName": "Bow, compound",
    "sourceTable": "Table 4.35: exotic hurled weapon Picks (descriptions: See page 305)",
+   "year": "1940s",
    "rulesNote": "",
    "maxRangeIncrements": 2
   },
@@ -1450,6 +1453,7 @@
    "sourcePage": 252,
    "sourceName": "Crossbow, light",
    "sourceTable": "Table 4.35: exotic hurled weapon Picks (descriptions: See page 305)",
+   "year": "1920s",
    "rulesNote": "",
    "maxRangeIncrements": 2
   },
@@ -1594,6 +1598,7 @@
    "sourcePage": 254,
    "sourceName": "Beretta 92 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "1976",
    "rulesNote": ""
   },
   {
@@ -1612,6 +1617,7 @@
    "sourcePage": 254,
    "sourceName": "Beretta 93R 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "1977",
    "rulesNote": ""
   },
   {
@@ -1630,6 +1636,7 @@
    "sourcePage": 254,
    "sourceName": "Beretta 950 Jetfire .22 LR",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1953",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -1649,6 +1656,7 @@
    "sourcePage": 254,
    "sourceName": "Beretta 950 Jetfire .25 ACP",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1953",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -1668,6 +1676,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Detective Special .38 Special",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1927",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -1687,6 +1696,7 @@
    "sourcePage": 255,
    "sourceName": "Colt M1911A1 .45 ACP",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1911",
    "rulesNote": ""
   },
   {
@@ -1705,6 +1715,7 @@
    "sourcePage": 254,
    "sourceName": "Colt Model 1908 Vest Pocket .25 ACP",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1908",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -1724,6 +1735,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Police Positive .22 LR",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1908",
    "rulesNote": ""
   },
   {
@@ -1742,6 +1754,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Police Positive .32 S&W",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1908",
    "rulesNote": ""
   },
   {
@@ -1760,6 +1773,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Police Positive .38 Special",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1908",
    "rulesNote": ""
   },
   {
@@ -1778,6 +1792,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Python .357 Magnum",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1955",
    "rulesNote": ""
   },
   {
@@ -1796,6 +1811,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Single Action Army .22 LR",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1893",
    "rulesNote": ""
   },
   {
@@ -1814,6 +1830,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Single Action Army .357 Magnum",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1976",
    "rulesNote": ""
   },
   {
@@ -1832,6 +1849,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Single Action Army .44-40",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1873",
    "rulesNote": ""
   },
   {
@@ -1850,6 +1868,7 @@
    "sourcePage": 256,
    "sourceName": "Colt Single Action Army .45 Long Colt",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1873",
    "rulesNote": ""
   },
   {
@@ -1868,6 +1887,7 @@
    "sourcePage": 254,
    "sourceName": "COP, Inc. COP .357 Magnum",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1980",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -1887,6 +1907,7 @@
    "sourcePage": 254,
    "sourceName": "Distinject Model 35 13mm dart",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -1905,6 +1926,7 @@
    "sourcePage": 255,
    "sourceName": "FN Browning High-Power .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -1923,6 +1945,7 @@
    "sourcePage": 255,
    "sourceName": "FN Browning High-Power 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1935",
    "rulesNote": ""
   },
   {
@@ -1941,6 +1964,7 @@
    "sourcePage": 255,
    "sourceName": "FN Five-seveN 5.7×28mm",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1996",
    "rulesNote": ""
   },
   {
@@ -1959,6 +1983,7 @@
    "sourcePage": 254,
    "sourceName": "General Motors Liberator .45 ACP (×2)",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1942",
    "rulesNote": "",
    "untrainedPenalty": -6,
    "bundleSize": 2
@@ -1979,6 +2004,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 17 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1982",
    "rulesNote": ""
   },
   {
@@ -1997,6 +2023,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 17L 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1988",
    "rulesNote": ""
   },
   {
@@ -2015,6 +2042,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 18 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1988",
    "rulesNote": ""
   },
   {
@@ -2033,6 +2061,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 20 10mm ACP",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -2051,6 +2080,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 21 .45 ACP",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -2069,6 +2099,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 22 .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -2087,6 +2118,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 24 .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1994",
    "rulesNote": ""
   },
   {
@@ -2105,6 +2137,7 @@
    "sourcePage": 253,
    "sourceName": "Glock 26 9mm P",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2124,6 +2157,7 @@
    "sourcePage": 253,
    "sourceName": "Glock 27 .40 S&W",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2143,6 +2177,7 @@
    "sourcePage": 253,
    "sourceName": "Glock 28 .380 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2162,6 +2197,7 @@
    "sourcePage": 253,
    "sourceName": "Glock 29 10mm ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1997",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2181,6 +2217,7 @@
    "sourcePage": 253,
    "sourceName": "Glock 30 .45 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1997",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2200,6 +2237,7 @@
    "sourcePage": 255,
    "sourceName": "Glock 31 .357 SiG",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -2218,6 +2256,7 @@
    "sourcePage": 253,
    "sourceName": "Glock 33 .357 SiG",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1997",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2237,6 +2276,7 @@
    "sourcePage": 255,
    "sourceName": "H&K Mk. 23 .45 ACP",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1996",
    "rulesNote": ""
   },
   {
@@ -2255,6 +2295,7 @@
    "sourcePage": 253,
    "sourceName": "H&K P7 40 S&W",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1991",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2274,6 +2315,7 @@
    "sourcePage": 253,
    "sourceName": "H&K P7 9mm P",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1982",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2293,6 +2335,7 @@
    "sourcePage": 255,
    "sourceName": "H&K USP .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -2311,6 +2354,7 @@
    "sourcePage": 255,
    "sourceName": "H&K USP .45 ACP",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1995",
    "rulesNote": ""
   },
   {
@@ -2329,6 +2373,7 @@
    "sourcePage": 255,
    "sourceName": "H&K USP 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -2347,6 +2392,7 @@
    "sourcePage": 254,
    "sourceName": "Kel-Tec P3AT .380 ACP",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "2003",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2366,6 +2412,7 @@
    "sourcePage": 253,
    "sourceName": "Kimber Ultra Carry .40 S&W",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1996",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2385,6 +2432,7 @@
    "sourcePage": 253,
    "sourceName": "Kimber Ultra Carry .45 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1996",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2404,6 +2452,7 @@
    "sourcePage": 254,
    "sourceName": "Luger P08 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "1898",
    "rulesNote": ""
   },
   {
@@ -2422,6 +2471,7 @@
    "sourcePage": 255,
    "sourceName": "Magnum Research Desert Eagle .357 Magnum",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1981",
    "rulesNote": ""
   },
   {
@@ -2440,6 +2490,7 @@
    "sourcePage": 255,
    "sourceName": "Magnum Research Desert Eagle .41 Magnum",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1987",
    "rulesNote": ""
   },
   {
@@ -2458,6 +2509,7 @@
    "sourcePage": 255,
    "sourceName": "Magnum Research Desert Eagle .44 Magnum",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1986",
    "rulesNote": ""
   },
   {
@@ -2476,6 +2528,7 @@
    "sourcePage": 255,
    "sourceName": "Magnum Research Desert Eagle .50 Action Express",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1991",
    "rulesNote": ""
   },
   {
@@ -2494,6 +2547,7 @@
    "sourcePage": 253,
    "sourceName": "Makarov PB 9×18mm Makarov",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1990",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2513,6 +2567,7 @@
    "sourcePage": 253,
    "sourceName": "Makarov PM 9x18mm Makarov",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1951",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2532,6 +2587,7 @@
    "sourcePage": 256,
    "sourceName": "Manurhin MR-73 .357 Magnum",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1973",
    "rulesNote": ""
   },
   {
@@ -2550,6 +2606,7 @@
    "sourcePage": 256,
    "sourceName": "Manurhin MR-73 9mm P",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1973",
    "rulesNote": ""
   },
   {
@@ -2568,6 +2625,7 @@
    "sourcePage": 256,
    "sourceName": "NAA Mini-Revolver .17 HMR",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "2003",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2587,6 +2645,7 @@
    "sourcePage": 256,
    "sourceName": "NAA Mini-Revolver .22 LR",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1985",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2606,6 +2665,7 @@
    "sourcePage": 256,
    "sourceName": "NAA Mini-Revolver .22 Magnum",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1985",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2625,6 +2685,7 @@
    "sourcePage": 254,
    "sourceName": "RSA Ots-21 9×18mm Makarov",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2644,6 +2705,7 @@
    "sourcePage": 254,
    "sourceName": "Ruger Mark III .22 LR",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "2003",
    "rulesNote": "",
    "legacyName": "Ruger Mark II .22 LR"
   },
@@ -2663,6 +2725,7 @@
    "sourcePage": 257,
    "sourceName": "Ruger Super Redhawk .44 Magnum",
    "sourceTable": "Table 4.41: hunting revolver Picks (descriptions: See page 307)",
+   "year": "1987",
    "rulesNote": ""
   },
   {
@@ -2681,6 +2744,7 @@
    "sourcePage": 257,
    "sourceName": "Ruger Super Redhawk .454 Casull",
    "sourceTable": "Table 4.41: hunting revolver Picks (descriptions: See page 307)",
+   "year": "1999",
    "rulesNote": ""
   },
   {
@@ -2699,6 +2763,7 @@
    "sourcePage": 254,
    "sourceName": "Sharps Model 1A .22 LR",
    "sourceTable": "Table 4.37: holdout pistol Picks (descriptions: See page 306)",
+   "year": "1859",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2718,6 +2783,7 @@
    "sourcePage": 255,
    "sourceName": "SiG P210 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1947",
    "rulesNote": ""
   },
   {
@@ -2736,6 +2802,7 @@
    "sourcePage": 254,
    "sourceName": "SiG-Sauer P220 .32 ACP",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "1975",
    "rulesNote": ""
   },
   {
@@ -2754,6 +2821,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P220 .38 Super",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1975",
    "rulesNote": ""
   },
   {
@@ -2772,6 +2840,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P220 .45 ACP",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1975",
    "rulesNote": ""
   },
   {
@@ -2790,6 +2859,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P220 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1975",
    "rulesNote": ""
   },
   {
@@ -2808,6 +2878,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P226 .357 SiG",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -2826,6 +2897,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P226 .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1991",
    "rulesNote": "",
    "legacyName": "SiG Sauer P226 .45 ACP"
   },
@@ -2845,6 +2917,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P226 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1983",
    "rulesNote": ""
   },
   {
@@ -2863,6 +2936,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P229 .357 SiG",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -2881,6 +2955,7 @@
    "sourcePage": 255,
    "sourceName": "SiG-Sauer P229 .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1991",
    "rulesNote": "",
    "legacyName": "SiG Sauer P229 .45 ACP"
   },
@@ -2900,6 +2975,7 @@
    "sourcePage": 254,
    "sourceName": "SiG-Sauer P229 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks (descriptions: See page 306)",
+   "year": "1989",
    "rulesNote": ""
   },
   {
@@ -2918,6 +2994,7 @@
    "sourcePage": 253,
    "sourceName": "SiG-Sauer P239 .357 SiG",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1997",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2937,6 +3014,7 @@
    "sourcePage": 253,
    "sourceName": "SiG-Sauer P239 .40 S&W",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1998",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2956,6 +3034,7 @@
    "sourcePage": 253,
    "sourceName": "SiG-Sauer P239 9mm P",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1990",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2975,6 +3054,7 @@
    "sourcePage": 256,
    "sourceName": "Smith & Wesson Bodyguard .357 Magnum",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1957",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -2994,6 +3074,7 @@
    "sourcePage": 256,
    "sourceName": "Smith & Wesson Bodyguard .38 Special",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1957",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3013,6 +3094,7 @@
    "sourcePage": 257,
    "sourceName": "Smith & Wesson Chief’s Special .38 Special",
    "sourceTable": "Table 4.42: Backup Revolvers",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -3031,6 +3113,7 @@
    "sourcePage": 256,
    "sourceName": "Smith & Wesson Ladysmith .22 LR",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1989",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3050,6 +3133,7 @@
    "sourcePage": 256,
    "sourceName": "Smith & Wesson Ladysmith .357 Magnum",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1989",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3069,6 +3153,7 @@
    "sourcePage": 256,
    "sourceName": "Smith & Wesson Ladysmith .38 Special",
    "sourceTable": "Table 4.40: backup revolver Picks (descriptions: See page 307)",
+   "year": "1989",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3088,6 +3173,7 @@
    "sourcePage": 257,
    "sourceName": "Smith & Wesson Model 500 .500 Magnum",
    "sourceTable": "Table 4.41: hunting revolver Picks (descriptions: See page 307)",
+   "year": "2003",
    "rulesNote": ""
   },
   {
@@ -3106,6 +3192,7 @@
    "sourcePage": 257,
    "sourceName": "Smith & Wesson Model 629 .44 Magnum",
    "sourceTable": "Table 4.41: hunting revolver Picks (descriptions: See page 307)",
+   "year": "1956",
    "rulesNote": ""
   },
   {
@@ -3124,6 +3211,7 @@
    "sourcePage": 256,
    "sourceName": "Taurus Model 608 .357 Magnum",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -3142,6 +3230,7 @@
    "sourcePage": 255,
    "sourceName": "Walther P99/Smith & Wesson SW99 .40 S&W",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1996",
    "rulesNote": ""
   },
   {
@@ -3160,6 +3249,7 @@
    "sourcePage": 255,
    "sourceName": "Walther P99/Smith & Wesson SW99 9mm P",
    "sourceTable": "Table 4.38: service pistol Picks continued (descriptions: See page 306)",
+   "year": "1996",
    "rulesNote": ""
   },
   {
@@ -3178,6 +3268,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PP .22 LR",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1929",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3197,6 +3288,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PP .32 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1929",
    "rulesNote": "",
    "untrainedPenalty": -6,
    "legacyName": "Walther PP .23 ACP"
@@ -3217,6 +3309,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PP .25 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1929",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3236,6 +3329,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PP .380 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1929",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3255,6 +3349,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PPK .22 LR",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1931",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3274,6 +3369,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PPK .32 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1931",
    "rulesNote": "",
    "untrainedPenalty": -6,
    "legacyName": "Walther PPK .23 ACP"
@@ -3294,6 +3390,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PPK .25 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1931",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3313,6 +3410,7 @@
    "sourcePage": 253,
    "sourceName": "Walther PPK .380 ACP",
    "sourceTable": "Table 4.36: backup pistol Picks (descriptions: See page 305)",
+   "year": "1931",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3332,6 +3430,7 @@
    "sourcePage": 256,
    "sourceName": "Webley Mk. 6 .455 British Service",
    "sourceTable": "Table 4.39: service revolver Picks (descriptions: See page 307)",
+   "year": "1915",
    "rulesNote": ""
   },
   {
@@ -3369,6 +3468,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, concussive (×3)",
    "sourceTable": "Table 4.35: Hurled Explosives",
+   "year": "1950s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 3
@@ -3409,6 +3509,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, flash/bang (×3)",
    "sourceTable": "Table 4.35: Hurled Explosives",
+   "year": "1980s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 3
@@ -3429,6 +3530,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, fragmentation (×3)",
    "sourceTable": "Table 4.35: Hurled Explosives",
+   "year": "1920s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 3
@@ -3488,6 +3590,7 @@
    "sourcePage": 252,
    "sourceName": "Molotov cocktail (×2)",
    "sourceTable": "Table 4.34: hurled weapon Picks (descriptions: See page 304)",
+   "year": "1800s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 2
@@ -3508,6 +3611,7 @@
    "sourcePage": 252,
    "sourceName": "Bomb, pipe (×4)",
    "sourceTable": "Table 4.34: hurled weapon Picks (descriptions: See page 304)",
+   "year": "1880s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 4
@@ -3528,6 +3632,7 @@
    "sourcePage": 252,
    "sourceName": "Bomb, propane",
    "sourceTable": "Table 4.34: hurled weapon Picks (descriptions: See page 304)",
+   "year": "1960s",
    "rulesNote": "",
    "maxRangeIncrements": 4
   },
@@ -3605,6 +3710,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, smoke (×5)",
    "sourceTable": "Table 4.34: hurled weapon Picks (descriptions: See page 304)",
+   "year": "1930s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 5
@@ -3625,6 +3731,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, tear gas (×3)",
    "sourceTable": "Table 4.34: hurled weapon Picks (descriptions: See page 304)",
+   "year": "1950s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 3
@@ -3645,6 +3752,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, thermite (×2)",
    "sourceTable": "Table 4.35: Hurled Explosives",
+   "year": "1970s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 2
@@ -3665,6 +3773,7 @@
    "sourcePage": 252,
    "sourceName": "Grenade, white phosphorus (×2)",
    "sourceTable": "Table 4.35: Hurled Explosives",
+   "year": "1950s",
    "rulesNote": "",
    "maxRangeIncrements": 4,
    "bundleSize": 2
@@ -3685,6 +3794,7 @@
    "sourcePage": 262,
    "sourceName": "AI AW 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1982",
    "rulesNote": ""
   },
   {
@@ -3703,6 +3813,7 @@
    "sourcePage": 262,
    "sourceName": "AI AW Covert",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -3721,6 +3832,7 @@
    "sourcePage": 262,
    "sourceName": "AI AW-50",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1989",
    "rulesNote": ""
   },
   {
@@ -3739,6 +3851,7 @@
    "sourcePage": 262,
    "sourceName": "AI AWM .300 Winchester",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1991",
    "rulesNote": ""
   },
   {
@@ -3757,6 +3870,7 @@
    "sourcePage": 262,
    "sourceName": "AI AWM .338 Laupa",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -3775,6 +3889,7 @@
    "sourcePage": 262,
    "sourceName": "AI AWM 7mm Remington",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -3793,6 +3908,7 @@
    "sourcePage": 262,
    "sourceName": "AMP DSR-1 .300 Winchester",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -3811,6 +3927,7 @@
    "sourcePage": 262,
    "sourceName": "AMP DSR-1 .338 Laupa",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -3829,6 +3946,7 @@
    "sourcePage": 262,
    "sourceName": "AMP DSR-1 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -3847,6 +3965,7 @@
    "sourcePage": 262,
    "sourceName": "AMP DSR-1 7.62×51mm NATO,",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -3865,6 +3984,7 @@
    "sourcePage": 259,
    "sourceName": "Barrett M82A1",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1982",
    "rulesNote": ""
   },
   {
@@ -3883,6 +4003,7 @@
    "sourcePage": 260,
    "sourceName": "C.G. Haenel StG.44",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1943",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3902,6 +4023,7 @@
    "sourcePage": 260,
    "sourceName": "Colt Commando",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1984",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3921,6 +4043,7 @@
    "sourcePage": 260,
    "sourceName": "Colt M16",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1963",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3940,6 +4063,7 @@
    "sourcePage": 260,
    "sourceName": "Colt M16A1",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1967",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3959,6 +4083,7 @@
    "sourcePage": 260,
    "sourceName": "Colt M16A2/M16A4",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1982",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3978,6 +4103,7 @@
    "sourcePage": 260,
    "sourceName": "Colt M16A3",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1994",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -3997,6 +4123,7 @@
    "sourcePage": 260,
    "sourceName": "Colt M4",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1994",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4016,6 +4143,7 @@
    "sourcePage": 261,
    "sourceName": "Colt M4 SOPMOD",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1999",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4035,6 +4163,7 @@
    "sourcePage": 260,
    "sourceName": "Colt M4A1",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1994",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4054,6 +4183,7 @@
    "sourcePage": 262,
    "sourceName": "Dan-Inject IM 13mm dart",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -4072,6 +4202,7 @@
    "sourcePage": 260,
    "sourceName": "Enfield L85A1",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1984",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4091,6 +4222,7 @@
    "sourcePage": 260,
    "sourceName": "Enfield L85A2",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1997",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4110,6 +4242,7 @@
    "sourcePage": 261,
    "sourceName": "FN FAL “Para”",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1953",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4129,6 +4262,7 @@
    "sourcePage": 261,
    "sourceName": "FN FAL",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1953",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4148,6 +4282,7 @@
    "sourcePage": 263,
    "sourceName": "FN Hecate II .50 BMG",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -4166,6 +4301,7 @@
    "sourcePage": 263,
    "sourceName": "FN Hecate II .50 BMG Subsonic",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -4184,6 +4320,7 @@
    "sourcePage": 263,
    "sourceName": "Mini-Hecate .338 Laupa",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -4202,6 +4339,7 @@
    "sourcePage": 262,
    "sourceName": "FN Ultra-Ratio Commando II 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1991",
    "rulesNote": ""
   },
   {
@@ -4220,6 +4358,7 @@
    "sourcePage": 260,
    "sourceName": "GIAT FAMAS F1",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1978",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4239,6 +4378,7 @@
    "sourcePage": 260,
    "sourceName": "GIAT FAMAS G2",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1994",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4258,6 +4398,7 @@
    "sourcePage": 261,
    "sourceName": "H&K G3 SG/1",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1971",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4277,6 +4418,7 @@
    "sourcePage": 260,
    "sourceName": "H&K G36",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4296,6 +4438,7 @@
    "sourcePage": 260,
    "sourceName": "H&K G36C",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "2001",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4315,6 +4458,7 @@
    "sourcePage": 260,
    "sourceName": "H&K G36K",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4334,6 +4478,7 @@
    "sourcePage": 261,
    "sourceName": "H&K G3A3",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1959",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4353,6 +4498,7 @@
    "sourcePage": 261,
    "sourceName": "H&K G3A4",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1959",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4372,6 +4518,7 @@
    "sourcePage": 260,
    "sourceName": "H&K HK33A2",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1968",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4391,6 +4538,7 @@
    "sourcePage": 260,
    "sourceName": "H&K HK33A3",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1968",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4410,6 +4558,7 @@
    "sourcePage": 260,
    "sourceName": "H&K HK33SG1",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1971",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4429,6 +4578,7 @@
    "sourcePage": 260,
    "sourceName": "H&K HK53A2",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1970",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4448,6 +4598,7 @@
    "sourcePage": 260,
    "sourceName": "H&K HK53A3",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1970",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4467,6 +4618,7 @@
    "sourcePage": 259,
    "sourceName": "H&K MSG-90 7.62×51mm NATO",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1987",
    "rulesNote": ""
   },
   {
@@ -4485,6 +4637,7 @@
    "sourcePage": 259,
    "sourceName": "H&K PSG-1",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1982",
    "rulesNote": ""
   },
   {
@@ -4503,6 +4656,7 @@
    "sourcePage": 259,
    "sourceName": "KAC SR25",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1995",
    "rulesNote": ""
   },
   {
@@ -4521,6 +4675,7 @@
    "sourcePage": 262,
    "sourceName": "Lee-Enfield DeLisle Carbine .45 ACP",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1942",
    "rulesNote": ""
   },
   {
@@ -4539,6 +4694,7 @@
    "sourcePage": 262,
    "sourceName": "Lee-Enfield No. 1 Mk. 3 .303 British",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1907",
    "rulesNote": ""
   },
   {
@@ -4557,6 +4713,7 @@
    "sourcePage": 262,
    "sourceName": "Lee-Enfield No. 2 .22 LR",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1926",
    "rulesNote": ""
   },
   {
@@ -4575,6 +4732,7 @@
    "sourcePage": 262,
    "sourceName": "Lee-Enfield No. 4 Mk. 1 .303 British",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1941",
    "rulesNote": ""
   },
   {
@@ -4593,6 +4751,7 @@
    "sourcePage": 263,
    "sourceName": "Lee-Enfield No. 5 .303 British",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1944",
    "rulesNote": ""
   },
   {
@@ -4611,6 +4770,7 @@
    "sourcePage": 263,
    "sourceName": "Mauser Model 1898 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1970",
    "rulesNote": "",
    "legacyName": "Mauser Model 1908 7.62mm NATO"
   },
@@ -4630,6 +4790,7 @@
    "sourcePage": 263,
    "sourceName": "Mauser Model 1898 8mm Mauser",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1898",
    "rulesNote": "",
    "legacyName": "Mauser Model 1908 8mm Mauser"
   },
@@ -4649,6 +4810,7 @@
    "sourcePage": 263,
    "sourceName": "Mosin-Nagant M1891 7.62×54mm Russian",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1891",
    "rulesNote": ""
   },
   {
@@ -4667,6 +4829,7 @@
    "sourcePage": 263,
    "sourceName": "Mosin-Nagant M1891 Sniper 7.62×54mm Russian",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1891",
    "rulesNote": ""
   },
   {
@@ -4685,6 +4848,7 @@
    "sourcePage": 259,
    "sourceName": "NORINCO KBU-88",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1995",
    "rulesNote": ""
   },
   {
@@ -4703,6 +4867,7 @@
    "sourcePage": 260,
    "sourceName": "NORINCO QBZ-95",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4722,6 +4887,7 @@
    "sourcePage": 260,
    "sourceName": "NORINCO QBZ-97",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1995",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4741,6 +4907,7 @@
    "sourcePage": 263,
    "sourceName": "Remington M24 SWS .300 Winchester",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -4759,6 +4926,7 @@
    "sourcePage": 263,
    "sourceName": "Remington M24 SWS 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1988",
    "rulesNote": ""
   },
   {
@@ -4777,6 +4945,7 @@
    "sourcePage": 263,
    "sourceName": "Remington Model 700 .300 Winchester",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -4795,6 +4964,7 @@
    "sourcePage": 263,
    "sourceName": "Remington Model 700 .30-06",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -4813,6 +4983,7 @@
    "sourcePage": 263,
    "sourceName": "Remington Model 700 .375 H&H Magnum",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -4831,6 +5002,7 @@
    "sourcePage": 263,
    "sourceName": "Remington Model 700 5.56×45mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -4849,6 +5021,7 @@
    "sourcePage": 263,
    "sourceName": "Remington Model 700 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -4867,6 +5040,7 @@
    "sourcePage": 263,
    "sourceName": "Remington Model 700 7mm Remington",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -4885,6 +5059,7 @@
    "sourcePage": 261,
    "sourceName": "RSA AK-101",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "2001",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4904,6 +5079,7 @@
    "sourcePage": 260,
    "sourceName": "RSA AK-47",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1949",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4923,6 +5099,7 @@
    "sourcePage": 260,
    "sourceName": "RSA AK-74",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1974",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4942,6 +5119,7 @@
    "sourcePage": 261,
    "sourceName": "RSA AKS",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1949",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4961,6 +5139,7 @@
    "sourcePage": 261,
    "sourceName": "RSA AKS-74",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1974",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4980,6 +5159,7 @@
    "sourcePage": 261,
    "sourceName": "RSA AKS-74U",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1984",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -4999,6 +5179,7 @@
    "sourcePage": 261,
    "sourceName": "RSA AKS-74U-UBN",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1984",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -5018,6 +5199,7 @@
    "sourcePage": 259,
    "sourceName": "RSA Dragunov SVD",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -5036,6 +5218,7 @@
    "sourcePage": 259,
    "sourceName": "RSA SVU",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1996",
    "rulesNote": ""
   },
   {
@@ -5054,6 +5237,7 @@
    "sourcePage": 259,
    "sourceName": "Ruger 10/22 .22 LR",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1964",
    "rulesNote": ""
   },
   {
@@ -5072,6 +5256,7 @@
    "sourcePage": 259,
    "sourceName": "Ruger Mini-14 5.56×45mm NATO",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1974",
    "rulesNote": ""
   },
   {
@@ -5090,6 +5275,7 @@
    "sourcePage": 259,
    "sourceName": "Ruger Mini-30 7.6×39mm Russian",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1986",
    "rulesNote": ""
   },
   {
@@ -5108,6 +5294,7 @@
    "sourcePage": 263,
    "sourceName": "Simonov PTRD 14.5mm Russian",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1941",
    "rulesNote": ""
   },
   {
@@ -5126,6 +5313,7 @@
    "sourcePage": 259,
    "sourceName": "Simonov SKS 7.62×39mm Russian",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1949",
    "rulesNote": ""
   },
   {
@@ -5144,6 +5332,7 @@
    "sourcePage": 259,
    "sourceName": "Springfield Armory M1 Garand .30-06",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1936",
    "rulesNote": ""
   },
   {
@@ -5162,6 +5351,7 @@
    "sourcePage": 261,
    "sourceName": "Springfield Armory M14",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1957",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -5181,6 +5371,7 @@
    "sourcePage": 263,
    "sourceName": "Springfield Armory M1903 .30-06",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1906",
    "rulesNote": ""
   },
   {
@@ -5199,6 +5390,7 @@
    "sourcePage": 263,
    "sourceName": "Spingfield Armory M1903A4 .30-06",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1942",
    "rulesNote": ""
   },
   {
@@ -5217,6 +5409,7 @@
    "sourcePage": 259,
    "sourceName": "Springfield Armory M21",
    "sourceTable": "Table 4.44: semi-automatic rifle Picks (descriptions: See page 309)",
+   "year": "1969",
    "rulesNote": ""
   },
   {
@@ -5235,6 +5428,7 @@
    "sourcePage": 261,
    "sourceName": "Steyr AUG",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1977",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -5254,6 +5448,7 @@
    "sourcePage": 261,
    "sourceName": "Steyr AUG Carbine",
    "sourceTable": "Table 4.45: assault rifle Picks continued (descriptions: See page 307)",
+   "year": "1977",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -5273,6 +5468,7 @@
    "sourcePage": 260,
    "sourceName": "Steyr AUG Para",
    "sourceTable": "Table 4.45: assault rifle Picks (descriptions: See page 307)",
+   "year": "1977",
    "rulesNote": "",
    "untrainedPenalty": -6
   },
@@ -5292,6 +5488,7 @@
    "sourcePage": 263,
    "sourceName": "Weatherby Mk. V .30-06",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1956",
    "rulesNote": ""
   },
   {
@@ -5310,6 +5507,7 @@
    "sourcePage": 263,
    "sourceName": "Weatherby Mk. V .460 Weatherby",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1956",
    "rulesNote": ""
   },
   {
@@ -5328,6 +5526,7 @@
    "sourcePage": 262,
    "sourceName": "Weatherby Mk. V 5.56×45mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks (descriptions: See page 308)",
+   "year": "1956",
    "rulesNote": ""
   },
   {
@@ -5346,6 +5545,7 @@
    "sourcePage": 263,
    "sourceName": "Weatherby Mk. V 7.62×51mm NATO",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1956",
    "rulesNote": ""
   },
   {
@@ -5364,6 +5564,7 @@
    "sourcePage": 263,
    "sourceName": "Weatherby Mk. V 7mm Remington",
    "sourceTable": "Table 4.46: Bolt-Action rifle Picks continued (descriptions: See page 308)",
+   "year": "1956",
    "rulesNote": ""
   },
   {
@@ -5382,6 +5583,7 @@
    "sourcePage": 266,
    "sourceName": "Benelli M1 Practical 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1998",
    "rulesNote": ""
   },
   {
@@ -5400,6 +5602,7 @@
    "sourcePage": 266,
    "sourceName": "Benelli M1 Practical 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1998",
    "rulesNote": ""
   },
   {
@@ -5418,6 +5621,7 @@
    "sourcePage": 266,
    "sourceName": "Benelli M1 Tactical 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -5436,6 +5640,7 @@
    "sourcePage": 266,
    "sourceName": "Benelli M1 Tactical 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -5454,6 +5659,7 @@
    "sourcePage": 266,
    "sourceName": "Benelli M4 Super 90 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1999",
    "rulesNote": ""
   },
   {
@@ -5472,6 +5678,7 @@
    "sourcePage": 266,
    "sourceName": "Benelli M4 Super 90 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1999",
    "rulesNote": ""
   },
   {
@@ -5490,6 +5697,7 @@
    "sourcePage": 266,
    "sourceName": "Browning Auto-5 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1903",
    "rulesNote": ""
   },
   {
@@ -5508,6 +5716,7 @@
    "sourcePage": 266,
    "sourceName": "Browning Auto-5 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1903",
    "rulesNote": ""
   },
   {
@@ -5526,6 +5735,7 @@
    "sourcePage": 266,
    "sourceName": "Browning Auto-5 16 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1903",
    "rulesNote": ""
   },
   {
@@ -5544,6 +5754,7 @@
    "sourcePage": 266,
    "sourceName": "Browning Auto-5 16 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1903",
    "rulesNote": ""
   },
   {
@@ -5562,6 +5773,7 @@
    "sourcePage": 266,
    "sourceName": "Browning Auto-5 20 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1903",
    "rulesNote": ""
   },
   {
@@ -5580,6 +5792,7 @@
    "sourcePage": 266,
    "sourceName": "Browning Auto-5 20 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1903",
    "rulesNote": ""
   },
   {
@@ -5598,6 +5811,7 @@
    "sourcePage": 265,
    "sourceName": "Browning BPS Stalker 10 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -5616,6 +5830,7 @@
    "sourcePage": 265,
    "sourceName": "Browning BPS Stalker 10 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1990",
    "rulesNote": ""
   },
   {
@@ -5634,6 +5849,7 @@
    "sourcePage": 265,
    "sourceName": "Browning BPS Stalker 12 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5652,6 +5868,7 @@
    "sourcePage": 265,
    "sourceName": "Browning BPS Stalker 12 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5670,6 +5887,7 @@
    "sourcePage": 264,
    "sourceName": "Browning Superposed .410 (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -5688,6 +5906,7 @@
    "sourcePage": 264,
    "sourceName": "Browning Superposed .410 (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1963",
    "rulesNote": ""
   },
   {
@@ -5706,6 +5925,7 @@
    "sourcePage": 264,
    "sourceName": "Browning Superposed 12 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1931",
    "rulesNote": ""
   },
   {
@@ -5724,6 +5944,7 @@
    "sourcePage": 264,
    "sourceName": "Browning Superposed 12 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1931",
    "rulesNote": ""
   },
   {
@@ -5742,6 +5963,7 @@
    "sourcePage": 264,
    "sourceName": "Browning Superposed 20 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1949",
    "rulesNote": ""
   },
   {
@@ -5760,6 +5982,7 @@
    "sourcePage": 264,
    "sourceName": "Browning Superposed 20 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1949",
    "rulesNote": ""
   },
   {
@@ -5778,6 +6001,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter .410 (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5796,6 +6020,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter .410 (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5814,6 +6039,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 10 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5832,6 +6058,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 10 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5850,6 +6077,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 12 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5868,6 +6096,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 12 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5886,6 +6115,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 16 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5904,6 +6134,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 16 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5922,6 +6153,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 20 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5940,6 +6172,7 @@
    "sourcePage": 264,
    "sourceName": "Charles Daly Field II Hunter 20 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1997",
    "rulesNote": ""
   },
   {
@@ -5958,6 +6191,7 @@
    "sourcePage": 266,
    "sourceName": "Daewoo USAS-12 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1987",
    "rulesNote": ""
   },
   {
@@ -5976,6 +6210,7 @@
    "sourcePage": 266,
    "sourceName": "Daewoo USAS-12 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1987",
    "rulesNote": ""
   },
   {
@@ -5994,6 +6229,7 @@
    "sourcePage": 266,
    "sourceName": "Franchi SPAS-12 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1979",
    "rulesNote": ""
   },
   {
@@ -6012,6 +6248,7 @@
    "sourcePage": 266,
    "sourceName": "Franchi SPAS-12 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1979",
    "rulesNote": ""
   },
   {
@@ -6030,6 +6267,7 @@
    "sourcePage": 266,
    "sourceName": "Franchi SPAS-15 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1989",
    "rulesNote": ""
   },
   {
@@ -6048,6 +6286,7 @@
    "sourcePage": 266,
    "sourceName": "Franchi SPAS-15 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1989",
    "rulesNote": ""
   },
   {
@@ -6066,6 +6305,7 @@
    "sourcePage": 265,
    "sourceName": "KAC Masterkey 12 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1985",
    "rulesNote": ""
   },
   {
@@ -6084,6 +6324,7 @@
    "sourcePage": 265,
    "sourceName": "KAC Masterkey 12 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1985",
    "rulesNote": ""
   },
   {
@@ -6102,6 +6343,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870 12 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6120,6 +6362,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870 12 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6138,6 +6381,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870 16 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6156,6 +6400,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870 16 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6174,6 +6419,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870 20 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6192,6 +6438,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870 20 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6210,6 +6457,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870P 12 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6228,6 +6476,7 @@
    "sourcePage": 265,
    "sourceName": "Remington Model 870P 12 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1950",
    "rulesNote": ""
   },
   {
@@ -6246,6 +6495,7 @@
    "sourcePage": 266,
    "sourceName": "Reutech Striker 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1983",
    "rulesNote": ""
   },
   {
@@ -6264,6 +6514,7 @@
    "sourcePage": 266,
    "sourceName": "Reutech Striker 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1983",
    "rulesNote": ""
   },
   {
@@ -6282,6 +6533,7 @@
    "sourcePage": 266,
    "sourceName": "Saiga 12K .410 (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6300,6 +6552,7 @@
    "sourcePage": 266,
    "sourceName": "Saiga 12K .410 (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6318,6 +6571,7 @@
    "sourcePage": 266,
    "sourceName": "Saiga 12K 12 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6336,6 +6590,7 @@
    "sourcePage": 266,
    "sourceName": "Saiga 12K 12 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6354,6 +6609,7 @@
    "sourcePage": 266,
    "sourceName": "Saiga 12K 20 gauge (shot)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6372,6 +6628,7 @@
    "sourcePage": 266,
    "sourceName": "Saiga 12K 20 gauge (slug)",
    "sourceTable": "Table 4.49: semi-automatic shotgun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6390,6 +6647,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Rifle Barrel) .17 HMR",
    "sourceTable": "Table 4.48: Break-Action Shotguns",
+   "year": "2002",
    "rulesNote": "Source renders E/T as 1 (20); interpreted as 1/20. Rifle barrel shares the weight of the combo gun; do not count both barrel entries."
   },
   {
@@ -6408,6 +6666,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Rifle Barrel) .22 LR",
    "sourceTable": "Table 4.48: Break-Action Shotguns",
+   "year": "1938",
    "rulesNote": "Source renders E/T as 1 (20); interpreted as 1/20. Rifle barrel shares the weight of the combo gun; do not count both barrel entries."
   },
   {
@@ -6426,6 +6685,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Rifle Barrel) .22 Magnum",
    "sourceTable": "Table 4.48: Break-Action Shotguns",
+   "year": "1959",
    "rulesNote": "Source renders E/T as 1 (20); interpreted as 1/20. Rifle barrel shares the weight of the combo gun; do not count both barrel entries."
   },
   {
@@ -6444,6 +6704,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Rifle Barrel) 5.56×45mm NATO",
    "sourceTable": "Table 4.48: Break-Action Shotguns",
+   "year": "1938",
    "rulesNote": "Source renders E/T as 1 (20); interpreted as 1/20. Rifle barrel shares the weight of the combo gun; do not count both barrel entries."
   },
   {
@@ -6462,6 +6723,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Shotgun Barrel) .410 (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1938",
    "rulesNote": ""
   },
   {
@@ -6480,6 +6742,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Shotgun Barrel) .410 (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1938",
    "rulesNote": ""
   },
   {
@@ -6498,6 +6761,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Shotgun Barrel) 12 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1938",
    "rulesNote": ""
   },
   {
@@ -6516,6 +6780,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Shotgun Barrel) 12 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1938",
    "rulesNote": ""
   },
   {
@@ -6534,6 +6799,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Shotgun Barrel) 20 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1938",
    "rulesNote": ""
   },
   {
@@ -6552,6 +6818,7 @@
    "sourcePage": 264,
    "sourceName": "Savage Arms Model 24 (Shotgun Barrel) 20 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1938",
    "rulesNote": ""
   },
   {
@@ -6570,6 +6837,7 @@
    "sourcePage": 265,
    "sourceName": "Truvelo Neostead 12 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -6588,6 +6856,7 @@
    "sourcePage": 265,
    "sourceName": "Truvelo Neostead 12 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -6606,6 +6875,7 @@
    "sourcePage": 265,
    "sourceName": "Winchester Model 1897 12 gauge (shot)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1897",
    "rulesNote": ""
   },
   {
@@ -6624,6 +6894,7 @@
    "sourcePage": 265,
    "sourceName": "Winchester Model 1897 12 gauge (slug)",
    "sourceTable": "Table 4.48: pump-action shotgun Picks (descriptions: See page 310)",
+   "year": "1897",
    "rulesNote": ""
   },
   {
@@ -6642,6 +6913,7 @@
    "sourcePage": 264,
    "sourceName": "Winchester Model 21 12 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1930",
    "rulesNote": ""
   },
   {
@@ -6660,6 +6932,7 @@
    "sourcePage": 264,
    "sourceName": "Winchester Model 21 12 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1930",
    "rulesNote": ""
   },
   {
@@ -6678,6 +6951,7 @@
    "sourcePage": 264,
    "sourceName": "Winchester Model 21 16 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1930",
    "rulesNote": ""
   },
   {
@@ -6696,6 +6970,7 @@
    "sourcePage": 264,
    "sourceName": "Winchester Model 21 16 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1930",
    "rulesNote": ""
   },
   {
@@ -6714,6 +6989,7 @@
    "sourcePage": 264,
    "sourceName": "Winchester Model 21 20 gauge (shot)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1930",
    "rulesNote": ""
   },
   {
@@ -6732,6 +7008,7 @@
    "sourcePage": 264,
    "sourceName": "Winchester Model 21 20 gauge (slug)",
    "sourceTable": "Table 4.47: break-action shotgun Picks (descriptions: See page 309)",
+   "year": "1930",
    "rulesNote": ""
   },
   {
@@ -6750,6 +7027,7 @@
    "sourcePage": 257,
    "sourceName": "CZ Skorpion .32 ACP",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1984",
    "rulesNote": ""
   },
   {
@@ -6768,6 +7046,7 @@
    "sourcePage": 257,
    "sourceName": "CZ Skorpion .380 ACP",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1984",
    "rulesNote": ""
   },
   {
@@ -6786,6 +7065,7 @@
    "sourcePage": 257,
    "sourceName": "CZ Skorpion 9×18mm Makarov",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1984",
    "rulesNote": ""
   },
   {
@@ -6804,6 +7084,7 @@
    "sourcePage": 258,
    "sourceName": "FN P90 5.7×28mm",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1991",
    "rulesNote": ""
   },
   {
@@ -6822,6 +7103,7 @@
    "sourcePage": 258,
    "sourceName": "German State Arsenal MP-40 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1940",
    "rulesNote": ""
   },
   {
@@ -6840,6 +7122,7 @@
    "sourcePage": 258,
    "sourceName": "H&K MP5/10 10mm ACP",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6858,6 +7141,7 @@
    "sourcePage": 258,
    "sourceName": "H&K MP5/40 .40 S&W",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1992",
    "rulesNote": ""
   },
   {
@@ -6876,6 +7160,7 @@
    "sourcePage": 258,
    "sourceName": "H&K MP5A4 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1966",
    "rulesNote": ""
   },
   {
@@ -6894,6 +7179,7 @@
    "sourcePage": 258,
    "sourceName": "H&K MP5A5 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1966",
    "rulesNote": ""
   },
   {
@@ -6912,6 +7198,7 @@
    "sourcePage": 257,
    "sourceName": "H&K MP5K 9mm P",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1976",
    "rulesNote": ""
   },
   {
@@ -6930,6 +7217,7 @@
    "sourcePage": 257,
    "sourceName": "H&K MP5K, briefcase 9mm P",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1976",
    "rulesNote": ""
   },
   {
@@ -6948,6 +7236,7 @@
    "sourcePage": 258,
    "sourceName": "H&K MP5SD5 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1974",
    "rulesNote": ""
   },
   {
@@ -6966,6 +7255,7 @@
    "sourcePage": 258,
    "sourceName": "H&K MP5SD6 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1974",
    "rulesNote": ""
   },
   {
@@ -6984,6 +7274,7 @@
    "sourcePage": 257,
    "sourceName": "H&K MP7A1 4.6×30mm",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "2001",
    "rulesNote": ""
   },
   {
@@ -7002,6 +7293,7 @@
    "sourcePage": 258,
    "sourceName": "H&K UMP .40 S&W",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1999",
    "rulesNote": ""
   },
   {
@@ -7020,6 +7312,7 @@
    "sourcePage": 258,
    "sourceName": "H&K UMP .45 ACP",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1999",
    "rulesNote": ""
   },
   {
@@ -7038,6 +7331,7 @@
    "sourcePage": 258,
    "sourceName": "H&K UMP 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1999",
    "rulesNote": ""
   },
   {
@@ -7056,6 +7350,7 @@
    "sourcePage": 257,
    "sourceName": "IMI Micro-Uzi 9mm P",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1982",
    "rulesNote": ""
   },
   {
@@ -7074,6 +7369,7 @@
    "sourcePage": 258,
    "sourceName": "IMI Mini-Uzi 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1981",
    "rulesNote": ""
   },
   {
@@ -7092,6 +7388,7 @@
    "sourcePage": 258,
    "sourceName": "IMI Uzi 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1953",
    "rulesNote": ""
   },
   {
@@ -7110,6 +7407,7 @@
    "sourcePage": 257,
    "sourceName": "MAC M10 .45 ACP",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1983",
    "rulesNote": ""
   },
   {
@@ -7128,6 +7426,7 @@
    "sourcePage": 257,
    "sourceName": "MAC M10 9mm P",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1983",
    "rulesNote": ""
   },
   {
@@ -7146,6 +7445,7 @@
    "sourcePage": 257,
    "sourceName": "MAC M11 .380 ACP",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1983",
    "rulesNote": ""
   },
   {
@@ -7164,6 +7464,7 @@
    "sourcePage": 258,
    "sourceName": "RSA Bizon-2 9×18mm Improved",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -7182,6 +7483,7 @@
    "sourcePage": 258,
    "sourceName": "Sten Mk. II 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1941",
    "rulesNote": ""
   },
   {
@@ -7200,6 +7502,7 @@
    "sourcePage": 258,
    "sourceName": "Sten Mk. II(S) 9mm P",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1943",
    "rulesNote": ""
   },
   {
@@ -7218,6 +7521,7 @@
    "sourcePage": 257,
    "sourceName": "Steyr TMP 9mm P",
    "sourceTable": "Table 4.42: light submachine gun Picks (descriptions: See page 310)",
+   "year": "1993",
    "rulesNote": ""
   },
   {
@@ -7236,6 +7540,7 @@
    "sourcePage": 258,
    "sourceName": "Thompson M1928 .45 ACP",
    "sourceTable": "Table 4.43: heavy submachine gun Picks (descriptions: See page 310)",
+   "year": "1921",
    "rulesNote": "Table 4.43 footnote (p.258): choose 20M6, 30M4, 50D3 or 100D1 as the supplied stockpile configuration.",
    "ammoCodeOptions": [
     "20M6",
@@ -7261,6 +7566,7 @@
    "sourcePage": 267,
    "sourceName": "Enfield L86A1 LSW 5.56×45mm NATO",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1986",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 0. Complexity: 27/+1. First year: 1986. Street value: R$4,800. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7281,6 +7587,7 @@
    "sourcePage": 267,
    "sourceName": "Browning M1918 BAR .30-06",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1917",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 0. Complexity: 22/+1. First year: 1917. Street value: R$8,800. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7301,6 +7608,7 @@
    "sourcePage": 267,
    "sourceName": "FN Minimi 5.56×45mm NATO",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1982",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 3. Complexity: 25/+1. First year: 1982. Street value: R$4,100. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7321,6 +7629,7 @@
    "sourcePage": 267,
    "sourceName": "FN Minimi Para 5.56×45mm NATO",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1996",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 3. Complexity: 25/+1. First year: 1996. Street value: R$6,400. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7341,6 +7650,7 @@
    "sourcePage": 267,
    "sourceName": "NORINCO QJY-88 5.8×42mm",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1995",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 1. Complexity: 27/+1. First year: 1995. Street value: R$6,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7361,6 +7671,7 @@
    "sourcePage": 267,
    "sourceName": "RSA RPK 7.62×39mm Russian",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1949",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 3. Complexity: 22/+1. First year: 1949. Street value: R$3,200. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7381,6 +7692,7 @@
    "sourcePage": 267,
    "sourceName": "RSA RPK-74 5.45×39mm Russian",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1974",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 2. Complexity: 25/+1. First year: 1974. Street value: R$3,500. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7401,6 +7713,7 @@
    "sourcePage": 267,
    "sourceName": "Steyr AUG Hbar 5.56×45mm NATO",
    "sourceTable": "Table 4.50: Squad automatic weapon (SAW) picks (descriptions: See page 311)",
+   "year": "1977",
    "rulesNote": "Printed table 4.50, p.267. Additional upgrades: 3. Complexity: 27/+1. First year: 1977. Street value: R$3,900. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Rifle proficiency, untrained attack penalty -6, weapon Damage save +10.",
    "untrainedPenalty": -6
   },
@@ -7421,6 +7734,7 @@
    "sourcePage": 267,
    "sourceName": "Saco M60 7.62×51mm NATO",
    "sourceTable": "Table 4.51: General purpose machine gun (GPMG) picks (descriptions: See page 311)",
+   "year": "1950",
    "rulesNote": "Printed table 4.51, p.267. Additional upgrades: 0. Complexity: 25/+1. First year: 1950. Street value: R$4,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7441,6 +7755,7 @@
    "sourcePage": 267,
    "sourceName": "FN MAG 7.62×51mm NATO",
    "sourceTable": "Table 4.51: General purpose machine gun (GPMG) picks (descriptions: See page 311)",
+   "year": "1958",
    "rulesNote": "Printed table 4.51, p.267. Additional upgrades: 0. Complexity: 25/+1. First year: 1958. Street value: R$6,600. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7461,6 +7776,7 @@
    "sourcePage": 267,
    "sourceName": "German State Arsenal MG-42 7.62×51mm NATO",
    "sourceTable": "Table 4.51: General purpose machine gun (GPMG) picks (descriptions: See page 311)",
+   "year": "1950",
    "rulesNote": "Printed table 4.51, p.267. Additional upgrades: 3. Complexity: 25/+1. First year: 1950. Street value: R$1,500. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7481,6 +7797,7 @@
    "sourcePage": 267,
    "sourceName": "German State Arsenal MG-42 8mm Mauser",
    "sourceTable": "Table 4.51: General purpose machine gun (GPMG) picks (descriptions: See page 311)",
+   "year": "1942",
    "rulesNote": "Printed table 4.51, p.267. Additional upgrades: 2. Complexity: 22/+1. First year: 1942. Street value: R$1,500. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7501,6 +7818,7 @@
    "sourcePage": 267,
    "sourceName": "RSA PK 7.62×54mm Russian",
    "sourceTable": "Table 4.51: General purpose machine gun (GPMG) picks (descriptions: See page 311)",
+   "year": "1969",
    "rulesNote": "Printed table 4.51, p.267. Additional upgrades: 1. Complexity: 22/+1. First year: 1969. Street value: R$1,900. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7521,6 +7839,7 @@
    "sourcePage": 268,
    "sourceName": "Browning M2hB .50 BMG",
    "sourceTable": "Table 4.52: Heavy machine gun (HMG) picks (descriptions: See page 311)",
+   "year": "1921",
    "rulesNote": "Printed table 4.52, p.268. Additional upgrades: 0. Complexity: 22/+1. First year: 1921. Street value: R$14,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7541,6 +7860,7 @@
    "sourcePage": 268,
    "sourceName": "General Electric M134 7.62×51mm NATO",
    "sourceTable": "Table 4.52: Heavy machine gun (HMG) picks (descriptions: See page 311)",
+   "year": "1961",
    "rulesNote": "Printed table 4.52, p.268. Additional upgrades: 0. Complexity: 27/+1. First year: 1961. Street value: R$20,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7561,6 +7881,7 @@
    "sourcePage": 268,
    "sourceName": "RSA DShK 12.7×109mm Russian",
    "sourceTable": "Table 4.52: Heavy machine gun (HMG) picks (descriptions: See page 311)",
+   "year": "1930",
    "rulesNote": "Printed table 4.52, p.268. Additional upgrades: 0. Complexity: 22/+1. First year: 1930. Street value: R$11,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7581,6 +7902,7 @@
    "sourcePage": 268,
    "sourceName": "RSA KPV 14.5mm Russian",
    "sourceTable": "Table 4.52: Heavy machine gun (HMG) picks (descriptions: See page 311)",
+   "year": "1944",
    "rulesNote": "Printed table 4.52, p.268. Additional upgrades: 0. Complexity: 22/+1. First year: 1944. Street value: R$17,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +10.",
    "untrainedPenalty": -8
   },
@@ -7601,6 +7923,7 @@
    "sourcePage": 268,
    "sourceName": "Hydroar LC T1 M1",
    "sourceTable": "Table 4.53: Flamethrower picks (descriptions: See page 313)",
+   "year": "1976",
    "rulesNote": "Printed table 4.53, p.268. Additional upgrades: 0. Complexity: 17/+0. First year: 1976. Street value: R$7,500. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +5.",
    "untrainedPenalty": -8
   },
@@ -7621,6 +7944,7 @@
    "sourcePage": 268,
    "sourceName": "RSA LPO-50",
    "sourceTable": "Table 4.53: Flamethrower picks (descriptions: See page 313)",
+   "year": "1968",
    "rulesNote": "Printed table 4.53, p.268. Additional upgrades: 0. Complexity: 17/+0. First year: 1968. Street value: R$6,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +5.",
    "untrainedPenalty": -8
   },
@@ -7641,6 +7965,7 @@
    "sourcePage": 268,
    "sourceName": "U.S. Arsenal M2A1",
    "sourceTable": "Table 4.53: Flamethrower picks (descriptions: See page 313)",
+   "year": "1942",
    "rulesNote": "Printed table 4.53, p.268. Additional upgrades: 0. Complexity: 17/+0. First year: 1942. Street value: R$4,500. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +5.",
    "untrainedPenalty": -8
   },
@@ -7661,6 +7986,7 @@
    "sourcePage": 268,
    "sourceName": "U.S. Arsenal M9A1",
    "sourceTable": "Table 4.53: Flamethrower picks (descriptions: See page 313)",
+   "year": "1956",
    "rulesNote": "Printed table 4.53, p.268. Additional upgrades: 0. Complexity: 17/+0. First year: 1956. Street value: R$5,000. Built-in upgrades remain listed in weapon qualities. Weapon Basics (Table 4.77, p.299): Tactical proficiency, untrained attack penalty -8, weapon Damage save +5.",
    "untrainedPenalty": -8
   },
@@ -7684,6 +8010,7 @@
    "sourcePage": 268,
    "sourceName": "Charge, breaching",
    "sourceTable": "Table 4.54: Explosive charge and mine picks (descriptions: See page 312)",
+   "year": "1980",
    "rulesNote": "Printed table 4.54, p.268. One weapon pick supplies 1 unit(s); listed weight and damage are per unit. Additional upgrades: 0. Complexity: 22/+1. First year: 1980. Street value: R$75. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7706,6 +8033,7 @@
    "sourcePage": 268,
    "sourceName": "Mine, anti-personnel (×2)",
    "sourceTable": "Table 4.54: Explosive charge and mine picks (descriptions: See page 312)",
+   "year": "1930",
    "rulesNote": "Printed table 4.54, p.268. One weapon pick supplies 2 unit(s); listed weight and damage are per unit. Additional upgrades: 0. Complexity: 20/+1. First year: 1930. Street value: R$10. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7728,6 +8056,7 @@
    "sourcePage": 268,
    "sourceName": "Mine, anti-tank",
    "sourceTable": "Table 4.54: Explosive charge and mine picks (descriptions: See page 312)",
+   "year": "1930",
    "rulesNote": "Printed table 4.54, p.268. One weapon pick supplies 1 unit(s); listed weight and damage are per unit. Additional upgrades: 0. Complexity: 25/+1. First year: 1930. Street value: R$400. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7750,6 +8079,7 @@
    "sourcePage": 268,
    "sourceName": "Mine, Bouncing Betty",
    "sourceTable": "Table 4.54: Explosive charge and mine picks (descriptions: See page 312)",
+   "year": "1940",
    "rulesNote": "Printed table 4.54, p.268. One weapon pick supplies 1 unit(s); listed weight and damage are per unit. Additional upgrades: 0. Complexity: 22/+1. First year: 1940. Street value: R$120. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7772,6 +8102,7 @@
    "sourcePage": 268,
    "sourceName": "Mine, directional",
    "sourceTable": "Table 4.54: Explosive charge and mine picks (descriptions: See page 312)",
+   "year": "1940",
    "rulesNote": "Printed table 4.54, p.268. One weapon pick supplies 1 unit(s); listed weight and damage are per unit. Additional upgrades: 0. Complexity: 20/+1. First year: 1940. Street value: R$120. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7794,6 +8125,7 @@
    "sourcePage": 268,
    "sourceName": "Charge, satchel",
    "sourceTable": "Table 4.54: Explosive charge and mine picks (descriptions: See page 312)",
+   "year": "1930",
    "rulesNote": "Printed table 4.54, p.268. One weapon pick supplies 1 unit(s); listed weight and damage are per unit. Additional upgrades: 0. Complexity: 15/+0. First year: 1930. Street value: R$850. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7816,6 +8148,7 @@
    "sourcePage": 269,
    "sourceName": "ANFO, 50 lbs. (×2)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1950",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 2 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 17/+0. First year: 1950. Street value: $30. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7838,6 +8171,7 @@
    "sourcePage": 269,
    "sourceName": "Black powder, 1 lb. (×3)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "900",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 3 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 12/+0. First year: 900. Street value: $20. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7860,6 +8194,7 @@
    "sourcePage": 269,
    "sourceName": "Dynamite, 1 stick (×4)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1867",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 4 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 15/+0. First year: 1867. Street value: $2. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7882,6 +8217,7 @@
    "sourcePage": 269,
    "sourceName": "Dynamite (expired), 1 stick (×4)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1868",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 4 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: —. First year: 1868. Street value: —. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7904,6 +8240,7 @@
    "sourcePage": 269,
    "sourceName": "Nitroglycerine, 1/4 lb. (×3)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1846",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 3 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 12/+0. First year: 1846. Street value: R$50. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7926,6 +8263,7 @@
    "sourcePage": 269,
    "sourceName": "Plastic explosive, 1/4 lb. (×2)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1930",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 2 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 20/+1. First year: 1930. Street value: R$10. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7948,6 +8286,7 @@
    "sourcePage": 269,
    "sourceName": "Plastic explosive, 1-ft. strip (×2)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1940",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 2 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 20/+1. First year: 1940. Street value: R$1,000. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7970,6 +8309,7 @@
    "sourcePage": 269,
    "sourceName": "Thermite, 1 lb. (×4)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1920",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 4 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 17/+0. First year: 1920. Street value: R$240. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -7992,6 +8332,7 @@
    "sourcePage": 269,
    "sourceName": "TNT, 1/4 lb. (×2)",
    "sourceTable": "Table 4.55: Raw explosive picks (descriptions: See page 312)",
+   "year": "1860",
    "rulesNote": "Printed table 4.55, p.269. One weapon pick supplies 2 unit(s); listed weight and damage are per unit. Additional upgrades: 1. Complexity: 17/+0. First year: 1860. Street value: $10. Damage marked * is explosive (p.336). Thermite’s AP 24 belongs to damage, not its error range. Weapon Basics (p.299): Explosives proficiency, INT attack attribute, untrained penalty −8, weapon Damage save +2. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8014,6 +8355,7 @@
    "sourcePage": 269,
    "sourceName": "Watervliet Arsenal M224 60mm",
    "sourceTable": "Table 4.56: Mortar picks (descriptions: See page 315)",
+   "year": "1980",
    "rulesNote": "Printed table 4.56, p.269. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 2. Complexity: 12/+0. First year: 1980. Street value: R$11,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Single-Shot only; no ability or effect can increase its fire modes (p.299). Assembly/disassembly each requires 6 half actions; cannot fire while disassembled (p.315).",
    "ammoChamber": "60mm",
    "assemblyHalfActions": 6
@@ -8038,6 +8380,7 @@
    "sourcePage": 269,
    "sourceName": "Royal Ordnance L-16A2 81mm",
    "sourceTable": "Table 4.56: Mortar picks (descriptions: See page 315)",
+   "year": "1984",
    "rulesNote": "Printed table 4.56, p.269. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 2. Complexity: 12/+0. First year: 1984. Street value: R$25,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Single-Shot only; no ability or effect can increase its fire modes (p.299). Assembly/disassembly each requires 10 half actions; cannot fire while disassembled (p.315).",
    "ammoChamber": "81mm",
    "assemblyHalfActions": 10
@@ -8062,6 +8405,7 @@
    "sourcePage": 269,
    "sourceName": "Soltam Commando 60mm",
    "sourceTable": "Table 4.56: Mortar picks (descriptions: See page 315)",
+   "year": "1990",
    "rulesNote": "Printed table 4.56, p.269. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 2. Complexity: 15/+0. First year: 1990. Street value: R$18,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Single-Shot only; no ability or effect can increase its fire modes (p.299).",
    "ammoChamber": "60mm"
   },
@@ -8085,6 +8429,7 @@
    "sourcePage": 270,
    "sourceName": "CTS TL-1 37mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "2000",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 2. Complexity: 22/+1. First year: 2000. Street value: R$475. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "",
    "ammoChamber": "37mm"
@@ -8109,6 +8454,7 @@
    "sourcePage": 270,
    "sourceName": "CTS TL-8 37mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "2000",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 25/+1. First year: 2000. Street value: R$1,600. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "",
    "ammoChamber": "37mm"
@@ -8133,6 +8479,7 @@
    "sourcePage": 270,
    "sourceName": "RSA BS-1",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1979",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 22/+1. First year: 1979. Street value: R$400. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). May fire only when attached to a rifle underbarrel location. Attached rifle recoil decreases by launcher weight rounded up. Each additional grenade weighs 0.4 lbs. and costs one upgrade or R$80. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "underbarrel",
    "ammoChamber": "BS-1"
@@ -8157,6 +8504,7 @@
    "sourcePage": 270,
    "sourceName": "RSA GP-25 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1986",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 27/+1. First year: 1986. Street value: R$3,500. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). May fire only when attached to a rifle underbarrel location. Attached rifle recoil decreases by launcher weight rounded up. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "underbarrel",
    "ammoChamber": "40mm"
@@ -8181,6 +8529,7 @@
    "sourcePage": 270,
    "sourceName": "Colt M203 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1968",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 22/+1. First year: 1968. Street value: R$600. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). May fire only when attached to a rifle underbarrel location. Attached rifle recoil decreases by launcher weight rounded up. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "underbarrel",
    "ammoChamber": "40mm"
@@ -8205,6 +8554,7 @@
    "sourcePage": 270,
    "sourceName": "Colt M203PI 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1984",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 25/+1. First year: 1984. Street value: R$900. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Standalone and underbarrel versions exist; the underbarrel version requires attachment to a rifle and reduces rifle recoil by launcher weight rounded up. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "optionalUnderbarrel",
    "ammoChamber": "40mm"
@@ -8229,6 +8579,7 @@
    "sourcePage": 270,
    "sourceName": "Colt M79 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1961",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 22/+1. First year: 1961. Street value: R$400. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "",
    "ammoChamber": "40mm"
@@ -8253,6 +8604,7 @@
    "sourcePage": 270,
    "sourceName": "H&K AG36 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1995",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 25/+1. First year: 1995. Street value: R$2,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Standalone and underbarrel versions exist; the underbarrel version requires attachment to a rifle and reduces rifle recoil by launcher weight rounded up. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "optionalUnderbarrel",
    "ammoChamber": "40mm"
@@ -8277,6 +8629,7 @@
    "sourcePage": 270,
    "sourceName": "Hawk MM-1 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1979",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 27/+1. First year: 1979. Street value: R$4,500. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "",
    "ammoChamber": "40mm"
@@ -8301,6 +8654,7 @@
    "sourcePage": 270,
    "sourceName": "Milkor MGL Mk. 1 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1983",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 27/+1. First year: 1983. Street value: R$4,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "mountRequirement": "",
    "ammoChamber": "40mm"
@@ -8325,6 +8679,7 @@
    "sourcePage": 270,
    "sourceName": "RSA AGS-17 30mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1975",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 27/+1. First year: 1975. Street value: R$10,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Requires its integral tripod or attachment to a vehicle. Single-Shot/Burst/Full Auto permitted; Autofire/Strafe volleys use one shot each instead of three. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "fireModes": [
     "single",
@@ -8354,6 +8709,7 @@
    "sourcePage": 270,
    "sourceName": "Saco Mk. 19 40mm",
    "sourceTable": "Table 4.57: Grenade launcher picks (descriptions: See page 314)",
+   "year": "1983",
    "rulesNote": "Printed table 4.57, p.270. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 27/+1. First year: 1983. Street value: R$14,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Weapon Basics p.299: direct fire uses Tactical/DEX (untrained −6); out-of-sight indirect fire uses Indirect/INT (untrained −10). Requires its integral tripod or attachment to a vehicle. Single-Shot/Burst/Full Auto permitted; Autofire/Strafe volleys use one shot each instead of three. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "fireModes": [
     "single",
@@ -8383,6 +8739,7 @@
    "sourcePage": 271,
    "sourceName": "Euromissile Milan",
    "sourceTable": "Table 4.58: Missile launcher picks (descriptions: See page 314)",
+   "year": "1972",
    "rulesNote": "Printed table 4.58, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 0. Complexity: 25/+1. First year: 1972. Street value: R$90,000. Listed weight is the launcher; each missile weighs 14.8 lbs. Additional missile stockpiles cost two upgrades. Guided weapons target only vehicles/structures (p.299). Single-Shot only; no ability or effect can increase its fire modes (p.299). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8405,6 +8762,7 @@
    "sourcePage": 271,
    "sourceName": "Raytheon FIM-92",
    "sourceTable": "Table 4.58: Missile launcher picks (descriptions: See page 314)",
+   "year": "1982",
    "rulesNote": "Printed table 4.58, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 0. Complexity: 25/+1. First year: 1982. Street value: R$38,000. Listed weight is the launcher; each missile weighs 23 lbs. Additional missile stockpiles cost two upgrades. Guided weapons target only vehicles/structures (p.299). Single-Shot only; no ability or effect can increase its fire modes (p.299). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8427,6 +8785,7 @@
    "sourcePage": 271,
    "sourceName": "Raytheon Javelin",
    "sourceTable": "Table 4.58: Missile launcher picks (descriptions: See page 314)",
+   "year": "1992",
    "rulesNote": "Printed table 4.58, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 0. Complexity: 25/+1. First year: 1992. Street value: R$100,000. Listed weight is the launcher; each missile weighs 25.1 lbs. Additional missile stockpiles cost two upgrades. Guided weapons target only vehicles/structures (p.299). Single-Shot only; no ability or effect can increase its fire modes (p.299). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8449,6 +8808,7 @@
    "sourcePage": 271,
    "sourceName": "RSA SA-7",
    "sourceTable": "Table 4.58: Missile launcher picks (descriptions: See page 314)",
+   "year": "1972",
    "rulesNote": "Printed table 4.58, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 0. Complexity: 25/+1. First year: 1972. Street value: R$25,000. Listed weight is the launcher; each missile weighs 22 lbs. Additional missile stockpiles cost two upgrades. Guided weapons target only vehicles/structures (p.299). Single-Shot only; no ability or effect can increase its fire modes (p.299). Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8471,6 +8831,7 @@
    "sourcePage": 271,
    "sourceName": "Blacker PIAT",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1943",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 17/+0. First year: 1943. Street value: R$5,000. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8493,6 +8854,7 @@
    "sourcePage": 271,
    "sourceName": "Talley M72 LAW",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1963",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 2 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 12/+0. First year: 1963. Street value: R$1,500. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8515,6 +8877,7 @@
    "sourcePage": 271,
    "sourceName": "Bofors AT4 HE",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1988",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 2 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 20/+1. First year: 1988. Street value: R$1,500. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8537,6 +8900,7 @@
    "sourcePage": 271,
    "sourceName": "Bofors AT4 HEAT",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1988",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 2 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 20/+1. First year: 1988. Street value: R$1,500. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8559,6 +8923,7 @@
    "sourcePage": 271,
    "sourceName": "Bofors AT4 CS HE",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "2001",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 2 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 22/+1. First year: 2001. Street value: R$3,500. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8581,6 +8946,7 @@
    "sourcePage": 271,
    "sourceName": "Bofors AT4 CS HEAT",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "2001",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 2 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 22/+1. First year: 2001. Street value: R$3,500. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   },
   {
@@ -8603,6 +8969,7 @@
    "sourcePage": 271,
    "sourceName": "Bofors Carl Gustav",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1964",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 2. Complexity: 20/+1. First year: 1964. Street value: R$5,000. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "ammoChamber": "Carl Gustav"
   },
@@ -8626,6 +8993,7 @@
    "sourcePage": 271,
    "sourceName": "RSA RPG-7",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1962",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 12/+0. First year: 1962. Street value: R$750. Damage and threat range depend on selected ammunition (Table 4.62, p.274); no default damage is assigned. Includes one stockpile of a first-stockpile ammunition type (∆, Table 4.62). Additional stockpiles cost the listed upgrades; initial conversion costs desired upgrades minus one. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions.",
    "ammoChamber": "RPG-7"
   },
@@ -8649,6 +9017,7 @@
    "sourcePage": 271,
    "sourceName": "U.S. Arsenal M9A1 rocket launcher",
    "sourceTable": "Table 4.59: Rocket launcher picks (descriptions: See page 315)",
+   "year": "1943",
    "rulesNote": "Printed table 4.59, p.271. One weapon pick supplies 1 unit(s); listed weapon weight is per unit. Additional upgrades: 1. Complexity: 15/+0. First year: 1943. Street value: R$5,000. Single-Shot only; no ability or effect can increase its fire modes (p.299). Footnoted reusable launchers list launcher-only weight; each separate rocket weighs 3 lbs. Ordinary weapon upgrades do not apply to this category (p.315); use its specific ammunition/detonator rules and any explicit exceptions."
   }
  ],
