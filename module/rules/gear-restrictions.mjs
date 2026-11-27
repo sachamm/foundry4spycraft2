@@ -86,7 +86,7 @@ export function applyGearRestrictions(picks, losses = {}, items = [], restrictio
         ? restriction.chooser === "gc"
           ? loc`Gear Restriction: the GC removes ${required} mission gear pick(s); ${assigned} assigned so far (p.437).`
           : loc`Gear Restriction: remove ${required} mission gear pick(s) of your choice; ${assigned} assigned so far (p.437).`
-        : loc`No Gear Restriction is in force; clear the ${assigned} restricted pick(s) recorded on this sheet.`
+        : loc`No Gear Restriction is in force; clear the ${assigned} restricted pick(s) entered on this sheet.`
     );
   if (required)
     for (const key of keys) {

@@ -71,7 +71,7 @@ export async function allocateMissionReserves(actor, options = {}) {
    <label>${loc`Reserve Common Items`} <input type="number" name="common" min="0" value="0" /></label>
    ${
      missionCaliber
-       ? `<p>${loc`Mission Caliber: ${CONFIG.SPYCRAFT.calibers[missionCaliber]}, from the GC’s mission record.`}</p><input type="hidden" name="caliber" value="${missionCaliber}" />`
+       ? `<p>${loc`Mission Caliber: ${CONFIG.SPYCRAFT.calibers[missionCaliber]}, as the GC set it for this mission.`}</p><input type="hidden" name="caliber" value="${missionCaliber}" />`
        : `<label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>`
    }
    <label><input type="checkbox" name="procureAtIntel" /> ${loc`Procure: Intel takes place in a city of 10,000+ people with quick contact; hold two additional reserves`}</label>

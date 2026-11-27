@@ -2381,7 +2381,7 @@ function deriveWealthAndGear(state) {
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
           era.gadget
-            ? loc`${item.name}: not yet introduced in the campaign year, so it is a Caliber ${caliber} gadget (Historical, p.407), above this mission’s allowance.`
+            ? loc`${item.name}: not yet introduced in the campaign year, so it is a Caliber ${["I", "II", "III", "IV", "V"][caliber - 1]} gadget (Historical, p.407), above this mission’s allowance.`
             : loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
         );
     }

@@ -149,7 +149,7 @@ test("the sheet checks a mission pick at its gadget Caliber, and flags one past 
     return s.warnings.filter(w => w.startsWith(item.name));
   };
   inYear(1962, () => {
-    assert.match(warningsFor(2, car(2, "1970s")).join(" "), /Caliber 3 gadget \(Historical, p\.407\)/);
+    assert.match(warningsFor(2, car(2, "1970s")).join(" "), /Caliber III gadget \(Historical, p\.407\)/);
     assert.deepEqual(warningsFor(3, car(2, "1970s")), []);
     assert.deepEqual(warningsFor(2, car(2, "1950s")), []);
     assert.match(warningsFor(5, car(5, "1980s")).join(" "), /cannot be had under Historical/);

@@ -146,7 +146,7 @@ export function reserveInitialization(
   // The GC sets the mission's Caliber (p.398); reserves take it from the mission record when there is one.
   if (Number.isSafeInteger(missionCaliber) && caliber !== missionCaliber)
     throw new Error(
-      loc`This mission is Caliber ${ROMAN[missionCaliber - 1]} in the GC’s mission record, so reserves use that Caliber.`
+      loc`The GC set this mission at Caliber ${ROMAN[missionCaliber - 1]}, so reserves use that Caliber.`
     );
   if (items.some(i => ["weapon", "armor", "gear"].includes(i.type) && i.system.reserve))
     throw new Error(loc`Review legacy reserved-item checkboxes before allocating unassigned reserves.`);

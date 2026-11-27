@@ -2353,7 +2353,7 @@ test("reserves take the mission record's Caliber, and a GC increase raises them 
   const sys = system();
   assert.throws(
     () => reserveInitialization(sys, [], { ...initialize, caliber: 3, missionCaliber: 2 }),
-    /Caliber II in the GC’s mission record/
+    /GC set this mission at Caliber II/
   );
   sys.missionReserves = reserveInitialization(sys, [], { ...initialize, missionCaliber: 2 });
   assert.equal(sys.missionReserves.caliber, 2);
