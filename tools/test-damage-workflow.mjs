@@ -735,6 +735,65 @@ test("standard NPC bang and flash hits call for Fortitude saves instead of letha
   }
 });
 
+test("flash/bang delivers separate full-DC saves for agents and both NPC health models", async () => {
+  for (const npcType of [null, "standard", "special"]) {
+    reset();
+    const actor = character(`Compound-${npcType}`, {
+      npcType,
+      vitality: { value: 40, max: npcType === "standard" ? 0 : 40 },
+      wounds: { value: 12, max: 12 },
+      survivalStats: { resistances: { FL: 4, BN: 2 }, resistanceSources: [] }
+    });
+    if (npcType) actor.type = "npc";
+    const asked = [];
+    actor.rollSave = async (key, options) => {
+      asked.push([key, options.hazardSave]);
+      return { uuid: `ChatMessage.${options.hazardSave.kind}`, flags: {} };
+    };
+    const damage = card(`compound-${npcType}`, {
+      checkKind: "damage",
+      effectiveTotal: 18,
+      damageProfile: { kind: "lethal", type: "flashBang", armorPiercing: 0, blast: true }
+    });
+    assert.ok(await applyDamage(damage, { targetUuid: actor.uuid, damage: 18 }));
+    assert.deepEqual(
+      asked.map(([key, save]) => [key, save.kind, save.dc]),
+      [
+        ["fort", "flash", 14],
+        ["fort", "bang", 16]
+      ]
+    );
+    const row = Object.values(actor.flags.spycraft2.damageApplications)[0];
+    assert.equal(row.state, "complete");
+    assert.deepEqual(row.components, {
+      flash: { state: "posted", messageUuid: "ChatMessage.flash" },
+      bang: { state: "posted", messageUuid: "ChatMessage.bang" }
+    });
+    assert.equal(actor.system.vitality.value, 40);
+    await assert.rejects(applyDamage(damage, { targetUuid: actor.uuid, damage: 18 }), /already reached/);
+    assert.equal(asked.length, 2, "a second Apply cannot roll either component again");
+  }
+});
+
+test("an interrupted second sensory save preserves first delivery and blocks replacement dice", async () => {
+  reset();
+  const actor = character("Interrupted-compound", { vitality: { value: 40, max: 40 } });
+  let rolls = 0;
+  actor.rollSave = async () => (++rolls === 1 ? { uuid: "ChatMessage.first" } : null);
+  const damage = card("interrupted-compound", {
+    checkKind: "damage",
+    effectiveTotal: 18,
+    damageProfile: { kind: "lethal", type: "flashBang", armorPiercing: 0, blast: true }
+  });
+  assert.equal(await applyDamage(damage, { targetUuid: actor.uuid, damage: 18 }), null);
+  const row = Object.values(actor.flags.spycraft2.damageApplications)[0];
+  assert.equal(row.state, "needsReview");
+  assert.equal(row.components.flash.messageUuid, "ChatMessage.first");
+  assert.equal(row.components.bang.state, "started");
+  await assert.rejects(applyDamage(damage, { targetUuid: actor.uuid, damage: 18 }), /pending damage/);
+  assert.equal(rolls, 2);
+});
+
 test("standard NPC hazard stress rolls its actual Damage save with campaign factors once", async () => {
   reset();
   const actor = character("Standard-stress", {

@@ -46,7 +46,9 @@ export function attackOutcome({ total, defense, fireAction = null, feats = [] } 
 export function damageProfile(damageText = "", qualities = "") {
   const text = String(damageText ?? ""),
     tags = String(qualities ?? "");
-  const type = [...Object.keys(DAMAGE_TYPES), "fire"].find(word => new RegExp(`\\b${word}\\b`, "i").test(text));
+  const type = /\b(?:flash\s*(?:&|and)\s*bang|bang\s*(?:&|and)\s*flash)\b/i.test(text)
+    ? "flashBang"
+    : [...Object.keys(DAMAGE_TYPES), "fire"].find(word => new RegExp(`\\b${word}\\b`, "i").test(text));
   const piercing = text.match(/AP\s*\(?\s*(\d+)/i) ?? tags.match(/\bAP\s*\(?\s*(\d+)/);
   return {
     kind:

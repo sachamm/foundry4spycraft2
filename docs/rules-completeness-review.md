@@ -1992,3 +1992,26 @@ All **4,373** Node tests, **988** engine reference assertions and **13** built-p
 checks pass. Schema, lint, formatting, bundle and copy checks also pass. Continue
 the armor audit, broader feat/origin choices, compound damage types, initial fire
 totals and the remaining injury/recovery rules before either 9.9 score.
+
+## Pass 67: Both flash/bang components reach actual saves
+
+PC creation remains **9.7/10**; combat remains **9.8/10**. A shared flash/bang
+roll now delivers separate flash and bang Fortitude saves at the full rolled DC,
+with each type's own resistance and immunity. The application saves each
+component's delivery before moving on. Cancelling the second save leaves an
+interrupted application for GC review; another Apply cannot replace either roll.
+GC review displays component delivery and cannot release a hit with a delivered
+component. This closes the catalog's sole shared-roll compound damage entry;
+other separately rolled combinations still require separate applications.
+
+Native Foundry used the actual packed grenade and actual saves against a complete
+Scientist clone, a standard NPC and a special NPC. Rolled DCs 14, 12 and 8 each
+reached both saves unchanged; all three failed flash and passed bang, leaving
+Blinded without bang's conditions. Delivery evidence retained both original save
+UUIDs. No browser errors or diagnostics were reported.
+
+All **4,375** full-suite tests and **988** engine comparisons passed before the
+final GC-release guard; its additional regression and the affected workflows
+then passed in a **64-test** run. Schema, lint, formatting, bundle and copy checks
+also pass. Continue the newly identified missing protective-gear records, typed
+lethal bruising, fire totals and the remaining documented creation/combat gaps.

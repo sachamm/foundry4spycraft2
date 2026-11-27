@@ -74,6 +74,7 @@ import {
 import {
   beginDamageApplication,
   finishDamageApplication,
+  recordDamageComponent,
   damageApplicationUndo,
   damageApplications,
   reviewDamageApplication
@@ -580,8 +581,9 @@ export async function reviewDamageHitDialog(actor, message) {
 
 const isSpecial = target => target.type === "agent" || (target.type === "npc" && npcIsSpecial(target));
 /** Damage types with rules of their own that an agent's hazards track; fire is kept with the other hazards. */
-const TYPED = [...Object.keys(DAMAGE_TYPES), "fire"];
-const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
+const TYPED = [...Object.keys(DAMAGE_TYPES), "fire", "flashBang"];
+const typeLabel = type =>
+  type === "flashBang" ? loc`Flash and bang` : type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type);
 
 /** Take a lethal hit off a special character's vitality and wounds and set the conditions that follow. */
 async function lethalOnSpecial(target, hit, source) {
@@ -919,39 +921,64 @@ export async function applyDamage(message, options = {}) {
           fire: type === "fire" || profile.type === "fire"
         });
       } else if (type && ["agent", "npc"].includes(target.type)) {
-        // Typed damage shares its hazard state and saves across agents and special NPCs.
-        const typedAP = DAMAGE_TYPES[type]?.armorPiercing;
-        const hitContext = {
-          critical,
-          criticalDice,
-          blast: input.blast === true || profile.blast === true,
-          attackKind,
-          weaponProficiency
-        };
-        const reduction =
-          armorPiercingAll || typedAP === "all"
-            ? 0
-            : Math.max(0, hit.dr - Math.max(armorPiercing, typedAP === "damage" ? damage : 0));
-        result =
-          type === "fire"
-            ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true, hitContext })
-            : await sufferTypedDamage(target, {
-                type,
-                amount: damage,
-                reduction,
-                ...(type === "acid"
-                  ? {
-                      armor: { P: "partial", M: "moderate", F: "full" }[target.system.armor?.armorType] ?? "none",
-                      unarmoredReduction: armorPiercingAll
-                        ? 0
-                        : Math.max(0, drWithoutWornArmor(target.system, attackKind, weaponProficiency) - armorPiercing)
-                    }
-                  : {}),
-                source: weapon?.name ?? "",
-                review: input.reviewType === true,
-                hitContext
-              });
-        if (!result) return null;
+        if (type === "flashBang") {
+          // The shared roll is each sensory type's DC, never divided between them (p.333).
+          for (const component of ["flash", "bang"]) {
+            await recordDamageComponent(application, component);
+            const saved = await sufferTypedDamage(target, {
+              type: component,
+              amount: damage,
+              source: weapon?.name ?? "",
+              hitContext: {
+                critical,
+                criticalDice,
+                blast: input.blast === true || profile.blast === true,
+                attackKind,
+                weaponProficiency
+              }
+            });
+            if (!saved) return null;
+            await recordDamageComponent(application, component, saved);
+          }
+          result = true;
+        } else {
+          // Typed damage shares its hazard state and saves across agents and special NPCs.
+          const typedAP = DAMAGE_TYPES[type]?.armorPiercing;
+          const hitContext = {
+            critical,
+            criticalDice,
+            blast: input.blast === true || profile.blast === true,
+            attackKind,
+            weaponProficiency
+          };
+          const reduction =
+            armorPiercingAll || typedAP === "all"
+              ? 0
+              : Math.max(0, hit.dr - Math.max(armorPiercing, typedAP === "damage" ? damage : 0));
+          result =
+            type === "fire"
+              ? await exposeToFire(target, { damage, ap: armorPiercing, reduction, save: true, hitContext })
+              : await sufferTypedDamage(target, {
+                  type,
+                  amount: damage,
+                  reduction,
+                  ...(type === "acid"
+                    ? {
+                        armor: { P: "partial", M: "moderate", F: "full" }[target.system.armor?.armorType] ?? "none",
+                        unarmoredReduction: armorPiercingAll
+                          ? 0
+                          : Math.max(
+                              0,
+                              drWithoutWornArmor(target.system, attackKind, weaponProficiency) - armorPiercing
+                            )
+                      }
+                    : {}),
+                  source: weapon?.name ?? "",
+                  review: input.reviewType === true,
+                  hitContext
+                });
+          if (!result) return null;
+        }
       } else if (!isSpecial(target)) {
         // Standard NPCs and animals: damage reduction, then a Damage save on what is left.
         const reduced = standardReduction(kind, hit);
@@ -1418,11 +1445,19 @@ export async function reviewTargetDamageDialog(message) {
     key = damageApplicationKey(check, message.id);
   const actors = targetChoices().actors.filter(actor => actor.isOwner && damageApplications(actor)[key]);
   if (!actors.length) return refuse(loc`This damage has no target application receipt to review.`);
+  const components = actors
+    .flatMap(actor =>
+      Object.entries(damageApplications(actor)[key].components ?? {}).map(
+        ([type, component]) =>
+          `<li>${esc(actor.name)}: ${esc(typeLabel(type))} — ${esc(component.state === "posted" ? loc`Save or immunity report delivered; check its outcome.` : loc`Delivery interrupted; check whether a save was rolled.`)}${component.messageUuid ? ` @UUID[${esc(component.messageUuid)}]` : ""}</li>`
+      )
+    )
+    .join("");
   const input = await systemDialog.input({
     window: { title: loc`Review target damage` },
     position: { width: 560 },
     rejectClose: false,
-    content: `<p>${loc`Check the target's actual health, saves, conditions and reports first. Keep actual effects without replaying dice. Release only after verifying that no effects or dice occurred. Saved Undo evidence can be restored for a completed application.`}</p><label>${loc`Target`} <select name="targetUuid">${actors.map(actor => `<option value="${esc(actor.uuid)}">${esc(actor.name)} (${esc(damageApplications(actor)[key].state)})</option>`).join("")}</select></label><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects; restore saved Undo note`}</option><option value="release">${loc`Verified no effects or dice; allow same result again`}</option></select></label><label><input type="checkbox" name="confirmedNoEffects" /> ${loc`I verified that no effects or dice occurred`}</label><label>${loc`What actually happened`} <textarea name="note" required></textarea></label>`,
+    content: `<p>${loc`Check the target's actual health, saves, conditions and reports first. Keep actual effects without replaying dice. Release only after verifying that no effects or dice occurred. Saved Undo evidence can be restored for a completed application.`}</p>${components ? `<ul>${components}</ul>` : ""}<label>${loc`Target`} <select name="targetUuid">${actors.map(actor => `<option value="${esc(actor.uuid)}">${esc(actor.name)} (${esc(damageApplications(actor)[key].state)})</option>`).join("")}</select></label><label>${loc`Decision`} <select name="decision"><option value="keep">${loc`Keep actual effects; restore saved Undo note`}</option><option value="release">${loc`Verified no effects or dice; allow same result again`}</option></select></label><label><input type="checkbox" name="confirmedNoEffects" /> ${loc`I verified that no effects or dice occurred`}</label><label>${loc`What actually happened`} <textarea name="note" required></textarea></label>`,
     ok: { label: loc`Record review` }
   });
   if (!input) return null;

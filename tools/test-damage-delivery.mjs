@@ -11,6 +11,7 @@ import {
 import {
   beginDamageApplication,
   finishDamageApplication,
+  recordDamageComponent,
   damageApplicationUndo,
   setDamageUndo,
   reviewDamageApplication
@@ -243,6 +244,29 @@ test("damage application freezes its result but permits another target", async (
   await beginDamageApplication(actor, damageCheck(), "card1", input());
   const other = { ...actor, uuid: "Actor.otherTarget", flags: {}, _actionDieQueue: undefined };
   await beginDamageApplication(other, damageCheck(), "card1", { ...input(), targetUuid: other.uuid });
+});
+
+test("GC review cannot release a compound hit with an already delivered component", async () => {
+  setup();
+  const lease = await beginDamageApplication(actor, damageCheck(), "card1", input());
+  await recordDamageComponent(lease, "flash");
+  await recordDamageComponent(lease, "flash", { uuid: "ChatMessage.originalFlash" });
+  await recordDamageComponent(lease, "bang");
+  await finishDamageApplication(lease, false);
+  const { key } = damageApplicationUndo(lease);
+  await assert.rejects(
+    reviewDamageApplication(actor, key, {
+      decision: "release",
+      note: "The second save was cancelled",
+      confirmedNoEffects: true
+    }),
+    /Only a verified/
+  );
+  await reviewDamageApplication(actor, key, {
+    decision: "keep",
+    note: "First save kept; remaining effect resolved manually"
+  });
+  assert.equal(actor.flags.spycraft2.damageApplications[key].components.flash.messageUuid, "ChatMessage.originalFlash");
 });
 
 test("GC review requires a note and cannot release positive health or Undo evidence", async () => {

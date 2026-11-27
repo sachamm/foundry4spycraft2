@@ -98,6 +98,9 @@ test("a printed damage entry gives its kind, special type, armor-piercing and bl
     assert.equal(profile.kind, ["cold", "heat", "electrical"].includes(type) ? "subdual" : "lethal");
   }
   assert.equal(damageProfile("2d6 flashpoint").type, "", "only whole type names identify damage");
+  assert.equal(damageProfile("4d8 (flash & bang)").type, "flashBang");
+  assert.equal(damageProfile("4d8 (bang and flash)").type, "flashBang");
+  assert.equal(damageProfile("4d8 (flash or bang)").type, "bang", "alternatives are not simultaneous damage");
 });
 
 test("damage reduction comes off first, and armor-piercing lowers it", () => {

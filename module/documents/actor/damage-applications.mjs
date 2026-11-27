@@ -33,6 +33,20 @@ export async function beginDamageApplication(actor, check, messageId, input) {
   return lease;
 }
 
+/** Keep each simultaneous component's delivery visible if a later save is cancelled or interrupted. */
+export async function recordDamageComponent(lease, type, result = null) {
+  const data = leases.get(lease);
+  if (!data) throw Error(loc`The original damage application receipt is missing.`);
+  await queueResources([data.actor], async () => {
+    const row = damageApplications(data.actor)[data.key];
+    if (row?.attempt !== data.attempt || row.signature !== data.signature || row.state !== "applying")
+      throw Error(loc`The damage application changed. Ask the GC to review its actual effects.`);
+    const components = { ...row.components };
+    components[type] = result ? { state: "posted", messageUuid: result.uuid ?? null } : { state: "started" };
+    await data.actor.update({ [`flags.spycraft2.damageApplications.${data.key}.components`]: components });
+  });
+}
+
 export async function finishDamageApplication(lease, completed, evidence = {}) {
   const data = leases.get(lease);
   if (!data) throw Error(loc`The original damage application receipt is missing.`);
@@ -57,7 +71,14 @@ export async function reviewDamageApplication(actor, key, { decision, note, conf
     const row = damageApplications(actor)[key];
     if (!row || !["applying", "needsReview", "undoing", "complete"].includes(row.state))
       throw Error(loc`Choose this target's original pending damage receipt.`);
-    if (decision !== "keep" && (decision !== "release" || !confirmedNoEffects || row.lethalPlan || row.undoEntry))
+    if (
+      decision !== "keep" &&
+      (decision !== "release" ||
+        !confirmedNoEffects ||
+        row.lethalPlan ||
+        row.undoEntry ||
+        Object.values(row.components ?? {}).some(c => c.state === "posted"))
+    )
       throw Error(
         loc`Only a verified application with no effects or dice may be released. Keep actual effects and review their correction.`
       );
