@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
 import { damageSaveAdjustment } from "../rules/gc/npc-damage.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
@@ -186,6 +187,15 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
   }
 }
 
+const hasNpcQuality = (profile, id) => (profile?.qualities ?? []).some(entry => entry?.id === id);
+
+/** A Commander's statistics: the members' build at a Threat Level 2 higher (p.447). */
+function commanderBlock(profile, type, threatLevel, abilities) {
+  const level = Math.min(20, (Number(threatLevel) || 1) + 2),
+    build = computeNpcProfile(profile, type, level, abilities);
+  return { threatLevel: level, effectiveLevel: build.effectiveLevel, stats: build.stats, health: build.health };
+}
+
 /** The combat an Undermine record is timed in, as the rule reads it. */
 function underminedCombatContext(system) {
   const id = system.undermined?.combatId,
@@ -219,6 +229,10 @@ export class NpcData extends BaseActorData {
       this.effectiveThreatLevel = partnerThreatLevel(partnerOwner.system?.level);
       this.usesMissionThreatLevel = false;
     }
+    // Commander (p.447): the squad's leader is built as if the Threat Level were 2 higher.
+    const commanderQuality = !!this.npcProfile?.enabled && hasNpcQuality(this.npcProfile, "commander");
+    this.isCommander = commanderQuality && this.commander === true;
+    if (this.isCommander) this.effectiveThreatLevel = Math.min(20, this.effectiveThreatLevel + 2);
     // p.398: a promoted standard NPC is special until the mission ends.
     this.promoted = !!this.promotion && this.promotion.mission === String(this.usagePeriods?.mission ?? "initial");
     // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
@@ -238,6 +252,19 @@ export class NpcData extends BaseActorData {
       this.conditionContext
     );
     this.npcBuild = result;
+    // The squad's Commander, worked out beside the members' block so the GC can see both (p.447).
+    this.commanderBuild =
+      commanderQuality && !this.isCommander
+        ? commanderBlock(this.npcProfile, this.npcType, this.effectiveThreatLevel, this.abilities)
+        : null;
+    const commanderNote = this.qualityEffects?.notes?.find(note => note.id === "commander");
+    if (commanderNote && this.isCommander)
+      commanderNote.text = loc`This token leads the squad, built at Threat Level ${this.effectiveThreatLevel}.`;
+    else if (commanderNote && this.commanderBuild) {
+      const { threatLevel, stats } = this.commanderBuild,
+        sign = value => (value >= 0 ? `+${value}` : `${value}`);
+      commanderNote.text = loc`One squad member leads, built at Threat Level ${threatLevel}: attack ${sign(stats.attack)}, Defense ${sign(stats.defense)}, Initiative ${sign(stats.initiative)}, saves ${sign(stats.resilience)} before attributes.`;
+    }
     // Table values are base bonuses. Attribute modifiers are applied once by the base model.
     this.bab = result.stats?.attack ?? 0;
     this.defense.bonus = result.stats?.defense ?? 0;
@@ -317,6 +344,8 @@ export class NpcData extends BaseActorData {
       damageTrack: record("damageTrack", { nullable: true, initial: null }),
       disposition: record("disposition", { initial: () => ({ base: "neutral", toward: {} }) }),
       manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),
+      // This token is the Commander of its Minion squad (p.447).
+      commander: new BooleanField({ initial: false }),
       npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain", "animal"] }),
       npcProfile: record("npcProfile", { initial: () => defaultNpcProfile() })
     };

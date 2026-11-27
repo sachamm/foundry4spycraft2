@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { npcQualityEffects, npcSkillOptionsFor, npcSkillQualityPlan } from "../module/rules/npc-qualities.mjs";
+import {
+  minionSquad,
+  npcQualityEffects,
+  npcSkillOptionsFor,
+  npcSkillQualityPlan
+} from "../module/rules/npc-qualities.mjs";
 import { unnervingGrade } from "../module/rules/unnerving.mjs";
 import { improvedVisionRangePlan } from "../module/rules/senses.mjs";
 
@@ -171,6 +176,14 @@ test("villain roles set the GC's die and what it costs to hurt them; Story-Criti
     attack: true
   });
   assert.equal(effects(["treacherous"], { type: "special" }).canCriticalWithoutDice.attack, false);
+});
+
+test("a Minion squad is the team's size, doubled by Horde, with a Commander when it has one (pp.447–448)", () => {
+  assert.equal(minionSquad([{ id: "henchman" }], 4), null);
+  assert.deepEqual(minionSquad([{ id: "minion" }], 4), { size: 4, commander: false });
+  assert.deepEqual(minionSquad([{ id: "minion" }, { id: "horde" }], 3), { size: 6, commander: false });
+  assert.deepEqual(minionSquad([{ id: "minion" }, { id: "commander" }], 5), { size: 5, commander: true });
+  assert.deepEqual(minionSquad([{ id: "minion" }, { id: "commander" }], 0), { size: 1, commander: false });
 });
 
 test("an animal counts its trained qualities for Morale; other NPCs do not (p.445)", () => {

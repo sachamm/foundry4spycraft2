@@ -433,6 +433,22 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
   );
   assert.deepEqual([kept[0].actorLink, kept[0].disposition], [true, 1]);
   assert.equal("appendNumber" in kept[0], false, "a name left alone keeps the token's own setting");
+  // A Minion squad's Commander is marked on its own token (p.447), and its name still counts for numbering.
+  const squad = placementData(
+    { name: "Guard", actorLink: false, disposition: -1 },
+    {
+      corners: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 }
+      ],
+      names: ["Guard 1", "Guard 2"],
+      commanderIndex: 0
+    }
+  );
+  assert.equal(squad[0].name, "Guard 1 (Commander)");
+  assert.deepEqual(squad[0].delta, { system: { commander: true } });
+  assert.equal("delta" in squad[1], false);
+  assert.deepEqual(numberedNames("Guard", 1, ["Guard 1 (Commander)", "Guard 2"]), ["Guard 3"]);
 
   const created = [];
   const fight = {

@@ -172,6 +172,30 @@ test("an NPC's statuses reach its Defense, attacks, saves and initiative as an a
   m.abilities.dex.value = 6;
   assert.equal(prepare(["flat-footed"]).defense, prepare([]).defense);
 });
+test("a Minion squad's Commander is built at Threat Level +2, and the members' sheet shows its numbers (p.447)", () => {
+  const member = model(),
+    leader = model();
+  for (const m of [member, leader]) {
+    m.parent.statuses = new Set();
+    m.npcProfile.qualities = [{ id: "minion" }, { id: "commander" }];
+    m.npcProfile.grades = { ...m.npcProfile.grades, attack: 5, defense: 5 };
+    m.threatLevel = 6;
+  }
+  leader.commander = true;
+  member.prepareDerivedData();
+  leader.prepareDerivedData();
+  assert.equal(member.isCommander, false);
+  assert.equal(leader.isCommander, true);
+  assert.equal(member.npcBuild.effectiveLevel, 6);
+  assert.equal(leader.npcBuild.effectiveLevel, 8);
+  assert.deepEqual(member.commanderBuild.stats, leader.npcBuild.stats);
+  assert.equal(leader.commanderBuild, null);
+  assert.match(member.qualityEffects.notes.find(n => n.id === "commander").text, /Threat Level 8/);
+  // Without the quality the mark does nothing.
+  leader.npcProfile.qualities = [{ id: "minion" }];
+  leader.prepareDerivedData();
+  assert.equal(leader.npcBuild.effectiveLevel, 6);
+});
 test("Hulking and Undersized give an NPC the Size table's Defense, attack, Hide, wounds and death point (pp.349, 448, 452)", () => {
   const m = model();
   m.parent.statuses = new Set();
