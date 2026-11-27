@@ -730,7 +730,9 @@
     "ReviewInvalidWellFundedCashGrant": "Review invalid Well-Funded cash grant records.",
     "ToolShedFindAGradeIII": "Tool Shed: find a Grade III kit",
     "GCReviewToolShedUses": "GC review Tool Shed uses",
-    "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)"
+    "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)",
+    "GearRestrictionPicks": "Gear Restriction: {count} mission gear pick(s) lost this mission (p.437)",
+    "GearRestrictionGCChooses": "The GC chooses which picks this mission's Gear Restriction takes."
    },
    "ActorAgentHeader": {
     "DoneEditingReturnToPlay": "Done editing · Return to play",

@@ -17,6 +17,7 @@ import {
 } from "./campaign-rules.mjs";
 import { periodMoney } from "./period-money.mjs";
 import { historicalCaliber } from "./gear-era.mjs";
+import { applyGearRestrictions, gearRestrictionsInForce } from "./gear-restrictions.mjs";
 import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
@@ -2283,6 +2284,18 @@ function deriveWealthAndGear(state) {
     picks[key].remaining = picks[key].available - picks[key].spent;
     if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
   }
+  // Gear Restrictions (Table 7.8, p.437): the mission's lost picks, in the categories chosen at Intel, and any list of
+  // allowed weapons or Mechanisms the GC keeps with the mission.
+  const restriction = gearRestrictionsInForce(),
+    restrictionLosses = sys.gearRestrictionLosses ?? {};
+  warnings.push(...applyGearRestrictions(picks, restrictionLosses, items, restriction));
+  sys.gearRestriction = {
+    picks: restriction?.picks ?? 0,
+    chooser: restriction?.chooser ?? "player",
+    lists: restriction?.lists ?? [],
+    // Shown while picks are lost, or while an earlier mission's losses are left to clear.
+    show: (restriction?.picks ?? 0) > 0 || Object.values(restrictionLosses).some(value => Number(value) > 0)
+  };
   sys.ammunitionConfigurations = {};
   for (const item of items.filter(i => i.type === "weapon")) {
     const configuration = ammunitionConfiguration(item.system);

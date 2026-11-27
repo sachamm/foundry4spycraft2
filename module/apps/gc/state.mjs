@@ -3,6 +3,8 @@ import { renderOpenSheet } from "../../services/refresh.mjs";
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
 import { setCampaignRulesSource } from "../../rules/campaign-rules.mjs";
+import { setGearRestrictionSource, missionGearRestrictions } from "../../rules/gear-restrictions.mjs";
+import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { setOrganizationToolsSource } from "../../rules/npc-organization.mjs";
 import { toolsCalibers } from "../../rules/gc/organization.mjs";
 import { missionCatalog } from "./mission-defaults.mjs";
@@ -141,6 +143,8 @@ export const qualitiesInForce = () =>
 export const currentCampaignEffects = () => campaignEffects(qualitiesInForce());
 // The rules read the qualities in force through this source (module/rules/campaign-rules.mjs).
 setCampaignRulesSource(() => currentCampaignEffects().effects);
+// Gear Restrictions scripted into the mission under way take picks from every agent (Table 7.8, p.437).
+setGearRestrictionSource(() => missionGearRestrictions(getMission(), GC_DATA.tables.gearRestrictions));
 setOrganizationToolsSource(() =>
   Object.fromEntries(
     Object.entries(getOrganizations()).map(([id, org]) => [

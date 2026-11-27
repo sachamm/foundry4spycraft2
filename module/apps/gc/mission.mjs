@@ -14,6 +14,7 @@ import {
 import { qualityAddition, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
+import { gearRestrictionNames } from "../../rules/gear-restrictions.mjs";
 import {
   requireGC,
   getMission,
@@ -442,6 +443,7 @@ export async function addComplication() {
     <label data-when="kind=security">${loc`Device Power Rating`} <input type="number" name="pr" min="1" value="${Math.max(1, mission.threatLevel ?? 1)}" /></label>
     <label data-when="kind=security">${loc`Device XP if the table gives no plain formula`} <input type="number" name="deviceXP" min="0" /></label>
     <label data-when="kind=gear">${loc`Gear restriction`} <select name="gear">${options(T.gearRestrictions.map(entry => [entry.id, `${entry.name} (${signed(entry.xp)} XP)`]))}</select></label>
+    <label data-when="kind=gear">${loc`Allowed weapons or Mechanisms, one per line (list restrictions only, up to 12)`} <textarea name="allowedNames" rows="4"></textarea></label>
     <label data-when="kind=exposure">${loc`Exposure objective`} <select name="exposure">${options(T.exposure.map(entry => [entry.id, `${entry.objective} (${entry.xpPrinted ?? signed(entry.xp)} XP)`]))}</select></label>
     <label data-when="kind=bundle|other">${loc`Bundle pick or other complication name`} <input name="name" /></label>
     <label data-when="kind=bundle">${loc`Bundle pick Caliber (−10 XP per Caliber)`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
@@ -476,10 +478,16 @@ export async function addComplication() {
           ]
         }));
       }
-      case "gear":
+      case "gear": {
+        const row = T.gearRestrictions.find(entry => entry.id === input.gear);
+        const names = row?.data?.allowed ? gearRestrictionNames(input.allowedNames, row.data.allowed) : [];
         return updateMission(m => ({
-          gearRestrictions: [...m.gearRestrictions, { key: id, id: input.gear, count: 1 }]
+          gearRestrictions: [
+            ...m.gearRestrictions,
+            { key: id, id: input.gear, count: 1, ...(row?.data?.allowed ? { names } : {}) }
+          ]
         }));
+      }
       case "exposure":
         return updateMission(m => ({
           exposure: [...m.exposure.filter(entry => entry.id !== input.exposure), { key: id, id: input.exposure }]
