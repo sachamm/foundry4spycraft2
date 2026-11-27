@@ -8,6 +8,7 @@ import { withGCPeriodLock } from "./gc-dice.mjs";
 import { actionDiceGain } from "../rules/action-dice.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "../rules/equal.mjs";
+import { missionLevelSnapshot } from "../rules/advancement.mjs";
 const clone = structuredClone;
 const periodState = () => game.settings.get("spycraft2", "usagePeriods") ?? {};
 export function getUsagePeriodReview() {
@@ -107,6 +108,7 @@ export async function startUsagePeriod(period) {
       const beforePeriods = clone(periodState()),
         id = foundry.utils.randomID(),
         afterPeriods = { ...beforePeriods, [period]: id };
+      if (period === "mission") afterPeriods.missionCareerLevels = missionLevelSnapshot(actors, id);
       if (period === "scene") {
         const n = afterPeriods.sceneSequence ?? 0;
         if (!Number.isSafeInteger(n) || n < 0 || !Number.isSafeInteger(n + 1))

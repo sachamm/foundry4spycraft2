@@ -15,6 +15,7 @@ import { campaignVitalityDie, campaignCharacterEffects } from "../../rules/campa
 import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
 import { same } from "../../rules/equal.mjs";
 import { modularCreationPlan } from "../../rules/modular-creation.mjs";
+import { advancementPlan } from "../../rules/advancement.mjs";
 import {
   CREATION_ABILITIES,
   startingAttributeSignature,
@@ -30,6 +31,67 @@ import {
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
+    async reviewAdvancement(options = {}) {
+      if (this.type !== "agent" || !this.isOwner || !game.user?.isGM)
+        throw new Error(loc`The owning GC reviews level advancement history and grants.`);
+      const current = () => this.flags?.spycraft2?.advancementReview ?? null;
+      const previous = structuredClone(current());
+      const level = this.system.progression.length;
+      const mission = String(game.settings?.get("spycraft2", "usagePeriods")?.mission ?? "initial");
+      let input = options;
+      if (!input.mode) {
+        input = await systemDialog.input({
+          window: { title: loc`Review level advancement` },
+          rejectClose: false,
+          ok: { label: loc`Record level review` },
+          content: `<div class="spycraft2-roll-options"><p>${loc`Review the level this character had when the last mission began, or explicitly approve a starting level or special level grant. This records permission for this mission period and changes no levels or XP.`}</p><label>${loc`Review type`} <select name="mode"><option value="history">${loc`Original level at the last mission's start`}</option><option value="grant">${loc`Starting level or GC level grant`}</option></select></label><label>${loc`Original career level`} <input name="baseline" type="number" min="0" max="${level}" value="${level}" step="1" /></label><label>${loc`Approved career level ceiling`} <input name="ceiling" type="number" min="${level}" max="20" value="${Math.min(20, level + 1)}" step="1" /></label><label>${loc`Source or ruling note`} <input name="note" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the history or this explicit level grant`}</label></div>`
+        });
+        if (!input) return null;
+        for (const field of ["baseline", "ceiling"])
+          input[field] = String(input[field] ?? "").trim() ? Number(input[field]) : NaN;
+      }
+      return queueResources([this], async () => {
+        if (
+          !this.isOwner ||
+          !game.user?.isGM ||
+          !same(current(), previous) ||
+          this.system.progression.length !== level ||
+          String(game.settings?.get("spycraft2", "usagePeriods")?.mission ?? "initial") !== mission
+        )
+          throw new Error(
+            loc`The character's levels, mission period or prior review changed. Review the current history again.`
+          );
+        const value = input.mode === "history" ? input.baseline : input.ceiling;
+        if (
+          !["history", "grant"].includes(input.mode) ||
+          input.confirmed !== true ||
+          typeof input.note !== "string" ||
+          !input.note.trim() ||
+          !Number.isSafeInteger(value) ||
+          value < 0 ||
+          value > 20 ||
+          (input.mode === "history" ? value > level : value < level)
+        )
+          throw new Error(loc`Confirm a valid original level or approved ceiling and record the source or ruling.`);
+        const record = {
+          version: 1,
+          mission,
+          mode: input.mode,
+          ...(input.mode === "history" ? { baseline: value } : { ceiling: value }),
+          confirmed: true,
+          note: input.note.trim(),
+          at: Date.now(),
+          reviewedBy: game.user.id ?? "GC"
+        };
+        try {
+          await this.update({ "flags.spycraft2.advancementReview": record });
+        } catch (error) {
+          if (!same(current(), record)) throw error;
+        }
+        return record;
+      });
+    }
+
     async configureModularCreation(options = {}) {
       if (this.type !== "agent" || !this.isOwner || this.system.companionOf?.ownerUuid) return null;
       const context = () => ({
@@ -306,6 +368,15 @@ export const ActorProgression = Base =>
           loc`Spend all deferred skill points before gaining another level (I Can Swim, p.200): ${deferred.join("; ")}.`
         );
       if (sys.progression.length >= 20) return refuseStep(game.i18n.localize("SPYCRAFT.Class.MaxLevel"));
+      const advancementContext = () => ({
+        actorUuid: this.uuid,
+        periods: game.settings?.get("spycraft2", "usagePeriods") ?? {},
+        missionActive: game.settings?.get("spycraft2", "mission")?.active === true,
+        effects: currentCampaignRules().effects,
+        review: this.flags?.spycraft2?.advancementReview
+      });
+      const advancement = advancementPlan(sys, CONFIG.SPYCRAFT, advancementContext());
+      if (!advancement.allowed) return refuseStep(advancement.reason);
       const ident = classData.system?.identifier || classData.name;
       let cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === ident);
       const definition = cls?.system ?? classData.system;
@@ -353,6 +424,9 @@ export const ActorProgression = Base =>
           10) /
           2
       );
+      const freshAdvancement = advancementPlan(this.system, CONFIG.SPYCRAFT, advancementContext());
+      if (!same(advancement, freshAdvancement))
+        return refuseStep(loc`The mission, XP or advancement permission changed. Review the level again.`);
       await this.update({ "system.progression": progression });
       await this.syncGrantedFeats();
       for (const feat of this.items.filter(

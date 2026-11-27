@@ -141,6 +141,37 @@ const recoveryContent = content;
 content = ordinaryContent;
 
 const css = readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8");
+test("the actual advancement review separates original history from a GC grant and remains usable at 720px", async ({
+  page
+}) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { isGM: true }, settings: { get: () => ({ mission: "review-mission" }) } };
+    const C = ActorProgression(class {});
+    const a = Object.assign(new C(), {
+      type: "agent",
+      uuid: "Actor.advancement-layout",
+      isOwner: true,
+      flags: {},
+      system: { progression: Array(5).fill({}) }
+    });
+    await a.reviewAdvancement();
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByRole("combobox", { name: "Review type", exact: true }).selectOption("grant");
+    await page.getByLabel("Approved career level ceiling", { exact: true }).fill("7");
+    await page.getByLabel("Source or ruling note", { exact: true }).fill("GC-approved starting level");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
 test("extra-attack claim recovery shows readable choices and keeps its GC confirmation reachable at 720px", async ({
   page
 }) => {

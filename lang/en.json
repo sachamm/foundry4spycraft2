@@ -85,6 +85,7 @@
    "Thresholds": "(broken at {broken}, destroyed at {destroyed})"
   },
   "Review": {
+   "Advancement": "Review level advancement",
    "ExtraAttackClaims": "Review extra-attack claims",
    "Nothing": "Nothing needs review.",
    "Interrupted": "Review an interrupted action",

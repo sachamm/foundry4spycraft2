@@ -133,6 +133,8 @@ test("scene starts advance a safe duration sequence without changing other perio
   assert.equal(periods.sceneSequence, 2);
   await startUsagePeriod("mission");
   assert.equal(periods.sceneSequence, 2);
+  assert.equal(periods.missionCareerLevels.mission, periods.mission);
+  assert.deepEqual(periods.missionCareerLevels.levels, { "Actor.a": 1, "Actor.b": 1 });
   assert.deepEqual(
     game.actors.map(a => a.system.actionDice.value),
     [9, 0, 8]

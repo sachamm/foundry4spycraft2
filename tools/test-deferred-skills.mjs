@@ -290,6 +290,16 @@ test("a period change during posting restores the purchase and a final purchase 
   assert.equal(left, 0);
   await a.update({ "system.progression": [{ classId: "scientist", vitality: 6, skills: alloc }] });
   a.syncGrantedFeats = async () => {};
+  a.flags ??= {};
+  a.flags.spycraft2 ??= {};
+  a.flags.spycraft2.advancementReview = {
+    version: 1,
+    mission,
+    mode: "grant",
+    ceiling: 2,
+    confirmed: true,
+    note: "GC granted the next level for this queue test"
+  };
   let release, started;
   const entered = new Promise(r => (started = r)),
     held = new Promise(r => (release = r));

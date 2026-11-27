@@ -353,6 +353,17 @@ between-mission level limits, falling stress, NPC damage and conditions,
 Grapple benefits, broader action cooperation and environmental rules still
 prevent the requested 9.9 rating. Native multiplayer session evidence remains
 outstanding. Work continues through those gaps.
+
+Mission starts now retain each PC's career level alongside the new mission
+period. Ordinary advancement checks the source's one-level limit, Fast Growth's
+two-level limit, the active-mission restriction and the Growth-adjusted XP
+threshold. Excess XP is retained. New characters can still be built before the
+first mission; unknown later history and explicit GC starting-level or level
+grants have an audited review. Concurrent requests cannot exceed the ceiling,
+and resuming a mission does not refresh it. The full suite passes **4,012** Node
+tests and **224** browser checks; native schemas, lint, formatting, bundle and
+copied-text checks also pass. Scores remain **8.9/10** and **9.0/10** while the
+remaining creation data/history and combat gaps are worked through.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,
