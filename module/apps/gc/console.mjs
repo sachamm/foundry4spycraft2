@@ -8,7 +8,7 @@ import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
 import { antagonistReward, threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
-import { campaignYear, periodMoneyModifier } from "../../rules/period-money.mjs";
+import { campaignYear, periodMoney, periodMoneyModifier } from "../../rules/period-money.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
@@ -533,7 +533,7 @@ export function consoleContext() {
       .filter(quality => quality.source === "season")
       .map(quality => ({ name: quality.name, xp: signed(quality.xp), summary: quality.summary })),
     ruleLines: [
-      ...campaignRuleLines(effects),
+      ...campaignRuleLines(effects, { money: amount => periodMoney(amount, { effects }) }),
       ...(effects.historicalMoney
         ? [
             campaignYear() === null

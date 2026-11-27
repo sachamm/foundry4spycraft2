@@ -149,7 +149,7 @@ export function paranoidModifier({ surpriseCheck = false, dispositionCheck = fal
 }
 
 /** One line per quality effect that this module applies, for the GC Console. */
-export function campaignRuleLines(effects = campaignRules()) {
+export function campaignRuleLines(effects = campaignRules(), { money = amount => amount } = {}) {
   const lines = [];
   const gear = Math.trunc(number(effects.gearCaliberShift, 0));
   if (gear)
@@ -233,7 +233,8 @@ export function campaignRuleLines(effects = campaignRules()) {
     );
   if (effects.revolvingDoor)
     lines.push(
-      loc`An agent killed in a standard scene with the body whole may return next mission for 200 Reputation or $10,000,000.`
+      // The price is a money value, so Historical scales it by Table 7.4 (p.407): `money` does that.
+      loc`An agent killed in a standard scene with the body whole may return next mission for 200 Reputation or $${money(10000000).toLocaleString("en-US")}.`
     );
   return lines;
 }

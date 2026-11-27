@@ -50,3 +50,29 @@ test("an exposure penalty's Net Worth follows the year; Reputation does not", t 
   setCampaignYearSource(() => 1955);
   assert.deepEqual(exposurePenalty({ reputation: -10, netWorth: -100000 }), { reputation: -10, netWorth: -10000 });
 });
+
+test("a small loss under Table 7.4 stays a loss of at least $1, never −0", () => {
+  const options = { effects: { historicalMoney: true }, year: 1955 };
+  assert.equal(periodMoney(-3, options), -1);
+  assert.equal(periodMoney(3, options), 1);
+  assert.ok(Object.is(periodMoney(0, options), 0));
+  assert.equal(periodMoney(-100000, options), -10000);
+});
+
+test("a companion's death and the Revolving Door price follow Table 7.4 under Historical (pp.201, 204, 408)", async t => {
+  const { companionLoss } = await import("../module/rules/companions.mjs");
+  const { campaignRuleLines } = await import("../module/rules/campaign-rules.mjs");
+  assert.deepEqual(companionLoss({ level: 5 }, { effects: { historicalMoney: true }, year: 1965 }), {
+    reputation: 5,
+    netWorth: 50000
+  });
+  assert.equal(companionLoss({ level: 5 }, { effects: {}, year: 1965 }).netWorth, 250000);
+  t.after(() => setCampaignYearSource(null));
+  setCampaignYearSource(() => 1965);
+  const door = effects =>
+    campaignRuleLines(effects, { money: amount => periodMoney(amount, { effects }) }).find(line =>
+      line.includes("200 Reputation")
+    );
+  assert.match(door({ revolvingDoor: true, historicalMoney: true }), /\$2,000,000\./);
+  assert.match(door({ revolvingDoor: true }), /\$10,000,000\./);
+});
