@@ -1,6 +1,7 @@
 /** Limited-use class and feat abilities, analysis tasks, temporary feats and assistants. */
 import { refuse, refuseStep } from "../../error-notices.mjs";
 import { ruleName } from "../../rules/rule-name.mjs";
+import { shareFeats, restoreShareCard, recoverShare, withdrawShare } from "./shared-feats.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { useMark, discloseMark, correctMark } from "../../apps/mark.mjs";
 import { improvisedMasterySpec } from "../../rules/improvised-weapons.mjs";
@@ -57,7 +58,6 @@ import { queueResources, isResourceLock } from "../../services/transactions.mjs"
 import { rollEvidence } from "../../rules/outcomes.mjs";
 import {
   SHARE_ABILITIES,
-  temporarySharePlan,
   renaissanceManPlan,
   intelTemporaryFeatSource,
   intelTemporaryFeatPlan,
@@ -2046,6 +2046,14 @@ export const ActorAbilities = Base =>
       let input = options;
       const definition = SHARE_ABILITIES[ability];
       if (!definition) throw new Error(loc`Unknown sharing ability.`);
+      const prior = this.system.temporaryShares?.[ability];
+      if (
+        !input.featIds &&
+        prior?.id &&
+        (prior.epoch === String(this.usagePeriods.session ?? "initial") ||
+          ["pending", "needsReview"].includes(prior.state))
+      )
+        return restoreShareCard(this, ability);
       if (!input.featIds) {
         const esc = foundry.utils.escapeHTML;
         const eligible = this.items.filter(
@@ -2071,38 +2079,14 @@ export const ActorAbilities = Base =>
         input.featIds = eligible.filter(item => input[`feat_${item.id}`]).map(item => item.id);
         input.recipients = recipients.filter(actor => input[`recipient_${actor.id}`]);
       }
-      const work = async () => {
-        const epoch = String(this.usagePeriods.session ?? "initial");
-        const data = temporarySharePlan(this.system, this.items, ability, input.featIds, {
-          epoch,
-          atSessionStart: !!input.atSessionStart,
-          sourceActorUuid: this.uuid
-        });
-        const recipients = [...new Set(input.recipients ?? [])];
-        if (!recipients.length || recipients.some(actor => actor === this || actor.type !== "agent" || !actor.isOwner))
-          throw new Error(loc`Choose teammates you can update; ask the GC to apply sharing for other players.`);
-        const created = [];
-        try {
-          for (const actor of recipients) {
-            const recipientData = structuredClone(data);
-            for (const feat of recipientData) feat.system.acquiredAtLevel = Math.max(1, actor.system?.level ?? 1);
-            const docs = await actor.createEmbeddedDocuments("Item", recipientData);
-            created.push({ actor, ids: docs.map(doc => doc.id) });
-          }
-          if (String(this.usagePeriods.session ?? "initial") !== epoch)
-            throw new Error(loc`The session changed during sharing; repeat the selection.`);
-          await this.update({
-            "system.temporaryShares": {
-              ...this.system.temporaryShares,
-              [ability]: { epoch, featIds: [...input.featIds], recipients: recipients.map(actor => actor.uuid) }
-            }
-          });
-          return created;
-        } catch (error) {
-          for (const entry of created.reverse()) await entry.actor.deleteEmbeddedDocuments("Item", entry.ids);
-          throw error;
-        }
-      };
-      return queueResources([this], work);
+      return shareFeats(this, ability, input);
+    }
+
+    async reviewTemporaryShare(ability, options = {}) {
+      return recoverShare(this, ability, options, input => systemDialog.input(input));
+    }
+
+    async withdrawTemporaryShare(ability, options = {}) {
+      return withdrawShare(this, ability, options, input => systemDialog.input(input));
     }
   };

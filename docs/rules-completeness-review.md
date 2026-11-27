@@ -1283,3 +1283,45 @@ lint, formatting, bundling and copy checks. Existing lint warnings remain.
 
 Scores remain **PC creation 9.4/10 and combat 9.6/10** while the remaining
 backlog and source audits are addressed.
+
+## Review 44 — Scientist creation and durable shared feats
+
+The creation audit checked the PDF layout for the Brainy and Origin tables
+(pp.18–19); the older plain-text table shifts row labels, while the actual
+Brainy mechanics agree with the data. Researcher and Scientist creation rules
+were checked against pp.25 and 41–42. A second complete native character,
+Brainy/Researcher Scientist 1, now has **36/36** attribute points, **52/52**
+skill points and no setup tasks. False Start is acquired at level 1 through
+the explicitly assigned Intense Study source and its two-level allowance.
+Scholar and Depth of Study use the other feat choices; the additional Science
+focus and contact allocation remain valid. Editing the contact, entering
+Play and reopening after reload preserve the completed character. The 1280px
+test emits Foundry's known minimum-resolution warning, with no browser errors.
+
+Professor/Trailblazer sharing previously locked only the source and attempted
+to roll back recipients after a failure. It now locks the source and actual
+recipients, records the session selection before delivery and journals each
+positive grant. Stable source/selection/feat identities reconcile a lost
+creation response. A removed feat or deleted card cannot free that selection.
+Already possessed selections are retained without adding duplicates. The GC
+can complete confirmed undelivered grants or retain consumption when history
+is uncertain. Private source cards expose recovery and Undo; restoring a
+deleted card does not repeat delivery. Undo removes only that selection's
+temporary items and preserves the session choice. Partial withdrawal retries
+the remaining grants, and an old card cannot remove the next session's grants.
+
+Native Foundry injected a response loss after the second recipient's actual
+item was created. Recovery retained one Scholar per recipient, applied each
+Science bonus from **0 to 2** once and undid them back to **0**. A separate
+player client delivered the owned character's grant and received a private
+receipt; player withdrawal was blocked, while GC Undo synchronized back to
+the player. These sharing runs had no browser errors or diagnostics. All
+**4,257** Node tests, **988** fixture assertions and **258** layouts pass.
+Native schemas, lint, formatting, bundling and copy checks also pass with
+existing warnings.
+
+PC creation advances to **9.5/10**: origins/classes **1.90/2** and
+feats/training **1.80/2**, with the other dimensions unchanged. Combat stays
+**9.6/10**. The broad class/origin/feat and equipment source audits, additional
+expert/multiclass creation cases and remaining combat/campaign gaps are still
+open; these two complete creation cases do not establish universal coverage.

@@ -31,6 +31,7 @@ import { boostNpcDefense, recoverNpcDefense } from "../../module/apps/gc/npc-def
 import { reviewNpcHitDefense } from "../../module/apps/gc/post-hit-defense.mjs";
 import { declareSkillDC, recoverDeclaredDC, reviewDeclaredDCClaim } from "../../module/apps/gc/declared-skill-dc.mjs";
 import { reviewLegacyGCRefund } from "../../module/apps/undo.mjs";
+import { recoverShare, withdrawShare } from "../../module/documents/actor/shared-feats.mjs";
 import {
   beginNpcHitDefense,
   addNpcHitDefenseDie,
@@ -287,6 +288,70 @@ for (const stage of ["boost", "rolling", "reserved", "postHit"])
     } finally {
       content = prior;
       globalThis.game = oldGame;
+    }
+  });
+
+for (const stage of ["review", "undo"])
+  test(`shared-feat ${stage} controls remain reachable at720px`, async ({ page }) => {
+    const prior = content,
+      oldGame = globalThis.game,
+      oldFromUuid = globalThis.fromUuid;
+    try {
+      const uuid = "Actor.shared-source",
+        claim = {
+          version: 1,
+          id: "grant",
+          ability: "professor",
+          sourceActorUuid: uuid,
+          epoch: "session",
+          state: "needsReview",
+          featIds: ["feat"],
+          recipients: ["Actor.shared-target"],
+          delivered: [],
+          grants: [
+            {
+              name: "Scholar",
+              type: "feat",
+              system: {
+                featKind: "temporary",
+                granted: true,
+                temporaryGrant: {
+                  grantId: "grant",
+                  sourceActorUuid: uuid,
+                  sourceFeatId: "feat",
+                  epoch: "session",
+                  ability: "professor"
+                }
+              }
+            }
+          ]
+        },
+        actor = {
+          uuid,
+          isOwner: true,
+          usagePeriods: { session: "session" },
+          system: { temporaryShares: { professor: claim } }
+        };
+      globalThis.game = { user: { id: "gc", isGM: true } };
+      globalThis.fromUuid = async () => ({ uuid: "Actor.shared-target", type: "agent", isOwner: true });
+      const ask = options => foundry.applications.api.DialogV2.input(options);
+      if (stage === "review") await recoverShare(actor, "professor", {}, ask);
+      else await withdrawShare(actor, "professor", {}, ask);
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      if (stage === "review") {
+        await page.getByRole("combobox", { name: "Recovery", exact: true }).selectOption("finish");
+        await page.getByLabel("GC review note", { exact: true }).fill("Actual recipient grants reviewed");
+      }
+      await page.locator('[name="confirmed"]').check();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+      globalThis.fromUuid = oldFromUuid;
     }
   });
 

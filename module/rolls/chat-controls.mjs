@@ -19,6 +19,36 @@ import { shakenRules } from "../rules/shaken.mjs";
 import { actionDieBoostPlan } from "../rules/action-dice.mjs";
 import { loc } from "../i18n.mjs";
 import { renderCheckGuidance } from "./chat-guidance.mjs";
+
+rollPipeline.register({
+  id: "temporaryShareControls",
+  order: 9998.8,
+  kinds: ["temporaryShare"],
+  chatControls({ actor, check, message, user }) {
+    const card = check.temporaryShare;
+    if (!user?.isGM || !actor?.isOwner || !card?.id) return null;
+    const live = actor.system.temporaryShares?.[card.ability],
+      state = live?.id === card.id ? live.state : card.state;
+    if (state === "withdrawn") return null;
+    return [
+      ...(["pending", "needsReview"].includes(state) && live?.id === card.id
+        ? [
+            {
+              label: loc`Review shared-feat grants`,
+              placement: "card",
+              emphasis: "primary",
+              run: () => actor.reviewTemporaryShare(card.ability, { grantId: card.id })
+            }
+          ]
+        : []),
+      {
+        label: loc`Undo recipient grants`,
+        placement: "card",
+        run: () => actor.withdrawTemporaryShare(card.ability, { messageUuid: message.uuid })
+      }
+    ];
+  }
+});
 import { runChatAction } from "../apps/chat-action-feedback.mjs";
 import { targetResponseControls } from "../apps/target-response.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
