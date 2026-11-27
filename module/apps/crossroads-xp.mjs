@@ -4,6 +4,7 @@ import {
   crossroadsMissionXPReviewPlan,
   crossroadsTitleChoices
 } from "../rules/crossroads-xp.mjs";
+import { crossroadsSessionPolicy, crossroadsSessionReviewPlan } from "../rules/crossroads-session.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { withUndo } from "./undo.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
@@ -16,49 +17,67 @@ export const crossroadsXPContext = actor => ({
   worldTime: globalThis.game?.time?.worldTime ?? actor.system.worldTime,
   actorUuid: actor.uuid,
   usagePeriods: actor.usagePeriods ?? actor.system.usagePeriods,
+  sessionDiceReset: actor.flags?.spycraft2?.sessionDiceReset ?? actor.system.sessionDiceReset,
+  crossroadsSessionReviews:
+    actor.flags?.spycraft2?.crossroadsSessionReviews ?? actor.system.crossroadsSessionReviews ?? {},
   crossroadsMissionReviews:
     actor.flags?.spycraft2?.crossroadsMissionReviews ?? actor.system.crossroadsMissionReviews ?? {}
 });
 
-export async function reviewCrossroadsMissionXP(actor, options = {}) {
+export const reviewCrossroadsMissionXP = (actor, options = {}) => reviewCrossroads(actor, options, false);
+export const reviewCrossroadsSession = (actor, options = {}) => reviewCrossroads(actor, options, true);
+
+async function reviewCrossroads(actor, options, sessionMode) {
   if (actor?.type !== "agent" || !actor.isOwner || !game.user?.isGM)
-    throw Error(loc`The owning GC reviews Crossroads XP eligibility.`);
+    throw Error(loc`The owning GC reviews Crossroads eligibility.`);
   const context = crossroadsXPContext(actor),
-    mission = String(context.usagePeriods?.mission ?? "initial"),
+    period = sessionMode ? "session" : "mission",
+    reviewsField = sessionMode ? "crossroadsSessionReviews" : "crossroadsMissionReviews",
+    historyField = sessionMode ? "crossroadsSessionReviewHistory" : "crossroadsMissionReviewHistory",
+    mission = String(context.usagePeriods?.[period] ?? "initial"),
     key = crossroadsMissionKey(mission),
     availableTitles = crossroadsTitleChoices(context);
   let policy;
   try {
-    policy = crossroadsMissionXPPolicy(context);
+    policy = sessionMode ? crossroadsSessionPolicy(context) : crossroadsMissionXPPolicy(context);
   } catch {
     policy = { eligibleTitle: null };
   }
   const fingerprint = () => {
     const current = crossroadsXPContext(actor);
     return structuredClone({
-      mission: current.usagePeriods?.mission ?? "initial",
+      mission: current.usagePeriods?.[period] ?? "initial",
       owned: current.crossroadsTitle,
       level: current.level,
-      snapshot: current.usagePeriods?.missionCareerLevels,
-      review: current.crossroadsMissionReviews?.[key] ?? null
+      classLevels: current.classLevels,
+      snapshot: sessionMode ? current.sessionDiceReset : current.usagePeriods?.missionCareerLevels,
+      review: current[reviewsField]?.[key] ?? null
     });
   };
   const before = fingerprint();
   let input = options;
   if (input.confirmed !== true) {
     input = await systemDialog.input({
-      window: { title: loc`Review mission Crossroads XP eligibility` },
+      window: {
+        title: sessionMode
+          ? loc`Review session Crossroads dice eligibility`
+          : loc`Review mission Crossroads XP eligibility`
+      },
       position: { width: 620 },
       rejectClose: false,
       ok: { label: loc`Record eligibility` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Record the title whose XP benefit was already eligible when this mission began. A title earned during this mission starts its XP benefit next mission. This records eligibility only; it does not change the held title, award XP or replay an earlier settlement.`}</p><label>${loc`Title eligible for this mission`} <select name="eligibleTitle" required><option value="choose">${loc`Choose the actual mission-start eligibility`}</option><option value="none"${policy.eligibleTitle === "" ? " selected" : ""}>${loc`No Crossroads XP benefit yet`}</option>${availableTitles
+      content: `<div class="spycraft2-roll-options"><p>${
+        sessionMode
+          ? loc`Record the title benefit eligible when this session began. A title earned during this session changes starting dice next session. This review preserves the current dice balance and held title.`
+          : loc`Record the title whose XP benefit was already eligible when this mission began. A title earned during this mission starts its XP benefit next mission. This records eligibility only; it does not change the held title, award XP or replay an earlier settlement.`
+      }</p><label>${sessionMode ? loc`Title eligible for this session` : loc`Title eligible for this mission`} <select name="eligibleTitle" required><option value="choose">${loc`Choose the actual starting eligibility`}</option><option value="none"${policy.eligibleTitle === "" ? " selected" : ""}>${loc`No Crossroads benefit yet`}</option>${availableTitles
         .map(
           row =>
-            `<option value="${row.value}"${policy.eligibleTitle === row.value ? " selected" : ""}>${esc(row.label)} — ${row.percent}%</option>`
+            `<option value="${row.value}"${policy.eligibleTitle === row.value ? " selected" : ""}>${esc(row.label)}${sessionMode ? "" : ` — ${row.percent}%`}</option>`
         )
         .join(
           ""
-        )}</select></label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`I checked when the title was earned and which title benefit this mission may use`}</label></div>`
+        )}</select></label><label>${loc`GC review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${sessionMode ? loc`I checked which title benefit this session may use` : loc`I checked when the title was earned and which title benefit this mission may use`}</label></div>`
     });
     if (!input) return null;
   }
@@ -66,7 +85,7 @@ export async function reviewCrossroadsMissionXP(actor, options = {}) {
     if (!actor.isOwner || !game.user?.isGM || !sameValues(before, fingerprint()))
       throw Error(loc`The mission, held title or eligibility history changed during review.`);
     const id = foundry.utils.randomID(),
-      record = crossroadsMissionXPReviewPlan(crossroadsXPContext(actor), {
+      record = (sessionMode ? crossroadsSessionReviewPlan : crossroadsMissionXPReviewPlan)(crossroadsXPContext(actor), {
         ...input,
         eligibleTitle: input.eligibleTitle === "none" ? "" : input.eligibleTitle,
         id,
@@ -74,23 +93,29 @@ export async function reviewCrossroadsMissionXP(actor, options = {}) {
         actorUuid: actor.uuid,
         reviewerId: game.user.id
       });
-    const path = `flags.spycraft2.crossroadsMissionReviews.${key}`,
+    const path = `flags.spycraft2.${reviewsField}.${key}`,
       history = { before: before.review, record };
     const patch = {
       ...recordReplacementPatch(path, record, before.review),
-      [`flags.spycraft2.crossroadsMissionReviewHistory.${id}`]: history
+      [`flags.spycraft2.${historyField}.${id}`]: history
     };
-    await withUndo([actor], loc`${actor.name}: review Crossroads XP eligibility for this mission`, async () => {
-      try {
-        await actor.update(patch);
-      } catch (error) {
-        if (
-          !sameValues(actor.flags?.spycraft2?.crossroadsMissionReviews?.[key], record) ||
-          !sameValues(actor.flags?.spycraft2?.crossroadsMissionReviewHistory?.[id], history)
-        )
-          throw error;
+    await withUndo(
+      [actor],
+      sessionMode
+        ? loc`${actor.name}: review Crossroads dice eligibility for this session`
+        : loc`${actor.name}: review Crossroads XP eligibility for this mission`,
+      async () => {
+        try {
+          await actor.update(patch);
+        } catch (error) {
+          if (
+            !sameValues(actor.flags?.spycraft2?.[reviewsField]?.[key], record) ||
+            !sameValues(actor.flags?.spycraft2?.[historyField]?.[id], history)
+          )
+            throw error;
+        }
       }
-    });
+    );
     return record;
   });
 }

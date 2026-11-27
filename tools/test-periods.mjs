@@ -53,6 +53,56 @@ test("session reset reserves the Favored Gear review before new-session item use
   assert.equal(game.actors[0].flags.spycraft2.sessionDiceReset.session, periods.session);
   assert.equal(game.actors[1].flags.spycraft2.sessionDiceReset.favoredGearPending, undefined);
 });
+
+test("a newly earned title resets to next-session dice despite preparation changing during writes, and rollback restores the old title snapshot", async () => {
+  for (const failure of [false, true]) {
+    reset();
+    const a = game.actors[0],
+      update = a.update.bind(a);
+    a.system.level = 16;
+    a.system.crossroadsTitle = "hardened";
+    a.flags.spycraft2 = {
+      sessionDiceReset: { session: "old", actorUuid: a.uuid, crossroadsTitle: "seasoned", level: 16 }
+    };
+    const prepare = () => {
+      const current =
+        a.flags.spycraft2.sessionDiceReset?.session === periods.session
+          ? a.flags.spycraft2.sessionDiceReset.crossroadsTitle === "seasoned"
+            ? 1
+            : 2
+          : 2;
+      a.system.actionDice.max = 6 + current;
+      a.system.actionDice.crossroadsCalculation = {
+        ownedTitle: "hardened",
+        currentBonus: current,
+        nextBonus: 2,
+        multiplier: 1,
+        fixed: false
+      };
+    };
+    a.update = async patch => {
+      await update(patch);
+      prepare();
+    };
+    a.reset = prepare;
+    prepare();
+    assert.equal(a.system.actionDice.max, 7);
+    failActor = failure ? "b" : "";
+    if (failure) {
+      await assert.rejects(startUsagePeriod("session"), /write failed/);
+      assert.equal(periods.session, "old");
+      assert.equal(a.system.actionDice.max, 7);
+      assert.equal(a.system.actionDice.value, 9);
+      assert.equal(a.flags.spycraft2.sessionDiceReset.crossroadsTitle, "seasoned");
+    } else {
+      await startUsagePeriod("session");
+      assert.equal(a.system.actionDice.value, 8);
+      assert.equal(a.flags.spycraft2.sessionDiceReset.crossroadsTitle, "hardened");
+      refreshUsagePeriodActors();
+      assert.equal(a.system.actionDice.max, 8);
+    }
+  }
+});
 function actor(id, value, max, type = "agent") {
   return {
     id,

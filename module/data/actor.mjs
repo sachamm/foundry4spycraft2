@@ -552,6 +552,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     const participatingCombat = () =>
       foundCombat === undefined ? (foundCombat = this.parent.participatingCombat ?? null) : foundCombat;
     this.actorUuid = this.parent.uuid;
+    this.sessionDiceReset = this.parent.flags?.spycraft2?.sessionDiceReset ?? null;
+    this.crossroadsSessionReviews = this.parent.flags?.spycraft2?.crossroadsSessionReviews ?? {};
     this.favoredGearSessions = this.parent.flags?.spycraft2?.favoredGearSessions ?? {};
     this.favoredGearForfeits = this.parent.flags?.spycraft2?.favoredGearForfeits ?? {};
     this.favoredGearPendingSession = this.parent.flags?.spycraft2?.sessionDiceReset?.favoredGearPending

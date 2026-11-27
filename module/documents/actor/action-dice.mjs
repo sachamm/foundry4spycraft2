@@ -5,6 +5,7 @@ import { systemDialog } from "../../apps/dialog-theme.mjs";
 import {
   missionSettlementDefaults,
   reviewCrossroadsMissionXP,
+  reviewCrossroadsSession,
   crossroadsXPContext
 } from "../../apps/gc/mission-defaults.mjs";
 import { crossroadsMissionXPPolicy } from "../../rules/crossroads-xp.mjs";
@@ -63,6 +64,9 @@ export const ActorActionDice = Base =>
   class ActorActionDice extends Base {
     reviewCrossroadsMissionXP(options = {}) {
       return reviewCrossroadsMissionXP(this, options);
+    }
+    reviewCrossroadsSession(options = {}) {
+      return reviewCrossroadsSession(this, options);
     }
     get actionDiceFundingSystem() {
       return {

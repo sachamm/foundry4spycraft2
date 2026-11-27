@@ -8,6 +8,7 @@ import { withGCPeriodLock } from "./gc-dice.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "../rules/equal.mjs";
 import { missionLevelSnapshot } from "../rules/advancement.mjs";
+import { nextSessionStartingDice } from "../rules/crossroads-session.mjs";
 const clone = structuredClone;
 const periodState = () => game.settings.get("spycraft2", "usagePeriods") ?? {};
 export function getUsagePeriodReview() {
@@ -56,8 +57,13 @@ export function sessionDicePlan(actors) {
   return actors
     .filter(actor => actor.type === "agent")
     .map(actor => {
-      const starting = actor.system.actionDice?.max,
-        before = actor.system.actionDice?.value;
+      let starting;
+      try {
+        starting = nextSessionStartingDice(actor.system);
+      } catch (error) {
+        throw new Error(loc`${actor.name}: review starting dice before starting a session. ${error.message}`);
+      }
+      const before = actor.system.actionDice?.value;
       if (!Number.isSafeInteger(starting) || starting < 0 || !Number.isSafeInteger(before) || before < 0)
         throw new Error(loc`${actor.name}: review the starting/current action-die count before starting a session.`);
       return {
@@ -66,6 +72,7 @@ export function sessionDicePlan(actors) {
         // Fortune Favors the Bold (p.189) improves the dice gained at the start of each session.
         value: sessionGain(actor.system, starting).units,
         starting,
+        crossroadsTitle: actor.system.crossroadsTitle ?? "",
         // Characters used to wait for a "Begin play" entry before their first session; none do now. A review saved
         // by an older version can still hold such an entry, so the review below keeps reading it.
         deferred: false,
@@ -129,6 +136,7 @@ export async function startUsagePeriod(period) {
               previousSession: String(beforePeriods.session ?? "initial"),
               die: p.starting > 0 && p.die ? sessionGain(p.actor.system, p.starting).die : p.die,
               level: p.level ?? null,
+              crossroadsTitle: p.crossroadsTitle,
               ...([...(p.actor.items ?? [])].some(i => i.system?.possessionSource === "favoredGear")
                 ? { favoredGearPending: true }
                 : {}),
@@ -156,7 +164,8 @@ export async function startUsagePeriod(period) {
         for (const p of plans) {
           if (
             p.actor.system.actionDice.value !== p.before ||
-            p.actor.system.actionDice.max !== p.starting ||
+            nextSessionStartingDice(p.actor.system) !== p.starting ||
+            (p.actor.system.crossroadsTitle ?? "") !== p.crossroadsTitle ||
             p.actor.system.level !== p.level ||
             !same(snapshot(p.actor, p.field), p.beforeRecord)
           )
@@ -177,7 +186,12 @@ export async function startUsagePeriod(period) {
         }
         if (
           !same(periodState(), beforePeriods) ||
-          plans.some(p => p.actor.system.actionDice.max !== p.starting || p.actor.system.level !== p.level)
+          plans.some(
+            p =>
+              nextSessionStartingDice(p.actor.system) !== p.starting ||
+              (p.actor.system.crossroadsTitle ?? "") !== p.crossroadsTitle ||
+              p.actor.system.level !== p.level
+          )
         )
           throw new Error(loc`Starting counts or counters changed during the start.`);
         try {

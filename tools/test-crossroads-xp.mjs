@@ -8,7 +8,12 @@ import {
 import { missionLevelSnapshot } from "../module/rules/advancement.mjs";
 import { missionXPPlan } from "../module/rules/action-dice.mjs";
 import { characterMissionXP } from "../module/rules/gc/mission.mjs";
-import { reviewCrossroadsMissionXP, crossroadsXPContext } from "../module/apps/crossroads-xp.mjs";
+import {
+  reviewCrossroadsMissionXP,
+  reviewCrossroadsSession,
+  crossroadsXPContext
+} from "../module/apps/crossroads-xp.mjs";
+import { crossroadsSessionPolicy } from "../module/rules/crossroads-session.mjs";
 const system = (crossroadsTitle = "weathered", level = 7) => ({
   actorUuid: "Actor.a",
   level,
@@ -199,6 +204,44 @@ const input = {
   note: "Confirmed title was already eligible for this mission",
   confirmed: true
 };
+test("session eligibility controller preserves dice and XP and records an undoable correction after a lost response", async () => {
+  const { a, posts } = controller();
+  a.system.actionDice = { value: 3, max: 5 };
+  a.flags.spycraft2 = { crossroadsSessionReviews: { s: { version: 0, obsolete: true } } };
+  const update = a.update.bind(a);
+  a.update = async patch => {
+    await update(patch);
+    throw Error("response lost");
+  };
+  const r = await reviewCrossroadsSession(a, { ...input, eligibleTitle: "none" });
+  assert.equal(r.session, "s");
+  assert.equal(r.eligibleTitle, "");
+  assert.equal(crossroadsSessionPolicy(crossroadsXPContext(a)).bonus, 0);
+  assert.equal(a.system.actionDice.value, 3);
+  assert.equal(a.system.xp, 1000);
+  assert.equal(a.flags.spycraft2.crossroadsSessionReviews.s.obsolete, undefined);
+  assert.deepEqual(a.flags.spycraft2.crossroadsSessionReviewHistory[r.id].before, { version: 0, obsolete: true });
+  assert.ok(posts[0].flags.spycraft2.undo);
+});
+test("an actual session eligibility dialog refuses a changed session or held title before writing", async () => {
+  for (const change of [
+    a => {
+      a.usagePeriods.session = "next";
+    },
+    a => {
+      a.system.crossroadsTitle = "seasoned";
+    }
+  ]) {
+    const { a } = controller();
+    foundry.applications.api.DialogV2.input = async () => {
+      change(a);
+      return { ...input, eligibleTitle: "none" };
+    };
+    await assert.rejects(reviewCrossroadsSession(a), /changed during review/);
+    assert.equal(a.flags.spycraft2?.crossroadsSessionReviews, undefined);
+    assert.equal(a.system.xp, 1000);
+  }
+});
 test("the actual eligibility controller records source history and Undo without changing XP, even after a lost successful response", async () => {
   for (const lost of [false, true]) {
     const { a, posts } = controller(),

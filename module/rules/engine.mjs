@@ -1,6 +1,7 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
 import { subplotPlan } from "./subplots.mjs";
+import { crossroadsSessionPolicy } from "./crossroads-session.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 import { purchasedFeatSources } from "./feat-purchase.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
@@ -368,6 +369,14 @@ function deriveCareerLevels(state) {
     classLevels[entry.classId] = (classLevels[entry.classId] ?? 0) + 1;
   }
   sys.classLevels = classLevels;
+  delete sys.crossroadsSession;
+  if (sys.crossroadsTitle) {
+    try {
+      sys.crossroadsSession = crossroadsSessionPolicy(sys);
+    } catch (error) {
+      sys.crossroadsSession = { bonus: 0, nextBonus: 0, needsReview: true, problem: error.message };
+    }
+  }
   for (const ci of new Set(classAtLevel.filter(Boolean))) {
     const book = cfg.classFeatures?.[ci.system.identifier]?.classSkills;
     const own = ci.system.classSkills ?? [];
@@ -1344,11 +1353,7 @@ function deriveOtherBonuses(state) {
   const fortuneBold = items.some(
     i => i.type === "feat" && ruleName(i) === "Fortune Favors the Bold" && activeFeatIds.has(i.id)
   );
-  rd.actionDice.max +=
-    miscActionDice(sys) +
-    (cfg.tables.crossroads?.[sys.crossroadsTitle]?.level <= level
-      ? cfg.tables.crossroads[sys.crossroadsTitle].actionDice
-      : 0);
+  rd.actionDice.max += miscActionDice(sys) + (sys.crossroadsSession?.bonus ?? 0);
   for (const source of sources)
     for (const b of source.bonuses)
       if (b.target === "actionDice.count") rd.actionDice.max += evaluate(b.value, { ...rd, rank: source.rank });
@@ -1878,7 +1883,23 @@ function deriveFinalTotals(state) {
     todo.push({ order: 54, tab: "training", always: true, error: true, text });
   }
   sys.actionDice.max =
-    (lr?.actionDice ?? 0) + B.get("actionDice.count") + (misc.actionDice ?? 0) + (earnedTitle?.actionDice ?? 0);
+    (lr?.actionDice ?? 0) + B.get("actionDice.count") + (misc.actionDice ?? 0) + (sys.crossroadsSession?.bonus ?? 0);
+  delete sys.actionDice.crossroadsCalculation;
+  if (earnedTitle && !sys.crossroadsSession?.problem)
+    sys.actionDice.crossroadsCalculation = {
+      ownedTitle: sys.crossroadsTitle,
+      currentBonus: sys.crossroadsSession.bonus,
+      nextBonus: sys.crossroadsSession.nextBonus,
+      multiplier: fortuneBold && (lr?.actionDie ?? 4) === 12 ? 2 : 1,
+      fixed: sys.companionOf?.feat === PERSONAL_LIEUTENANT
+    };
+  if (sys.crossroadsSession?.needsReview) {
+    const text =
+      sys.crossroadsSession.problem ??
+      loc`Crossroads: the GC must review which title benefit was eligible when this session began. Existing dice are preserved.`;
+    warnings.push(text);
+    todo.push({ order: 54, tab: "training", always: true, error: true, text });
+  }
   sys.actionDice.die = lr?.actionDie ?? 4;
   if (fortuneBold) {
     if (sys.actionDice.die === 12) {
@@ -2552,6 +2573,9 @@ function settlePrerequisites(state) {
     ? computeAgent(
         Object.assign(sys.toObject?.() ?? structuredClone(sys), {
           usagePeriods: sys.usagePeriods,
+          actorUuid: sys.actorUuid,
+          sessionDiceReset: sys.sessionDiceReset,
+          crossroadsSessionReviews: sys.crossroadsSessionReviews,
           worldTime: sys.worldTime,
           mentalLeapCombats: sys.mentalLeapCombats,
           conditionContext: sys.conditionContext
@@ -2620,6 +2644,9 @@ function settlePrerequisites(state) {
     ? computeAgent(
         Object.assign(sys.toObject?.() ?? structuredClone(sys), {
           usagePeriods: sys.usagePeriods,
+          actorUuid: sys.actorUuid,
+          sessionDiceReset: sys.sessionDiceReset,
+          crossroadsSessionReviews: sys.crossroadsSessionReviews,
           worldTime: sys.worldTime,
           mentalLeapCombats: sys.mentalLeapCombats,
           conditionContext: sys.conditionContext

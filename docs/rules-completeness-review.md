@@ -838,3 +838,32 @@ checks and **13** pack checks pass. Lint, formatting, bundling and the text-copy
 check pass with the existing warnings. Scores remain **PC creation 9.4/10 and
 combat 9.5/10**. Next-session starting-die eligibility and the title-award workflow
 remain open, along with the broader source and play gaps in the backlog.
+
+### Continuing pass: Crossroads title dice at the next session
+
+Session resets now capture the held title, including an empty selection. The
+engine uses that session's eligible title in starting counts and formulas that
+depend on them. A newly earned title first changes dice at the next session.
+Reset planning uses the upcoming count, with guards that remain valid while
+Foundry prepares the character between the actor write and counter update.
+Rollback restores the prior title snapshot along with the dice balance.
+
+Unknown legacy history remains an explicit GC review and preserves existing
+counts until reviewed. Session eligibility corrections archive their earlier
+record, provide Undo, reject stale dialogs and leave current dice and XP alone.
+The owning GC can reach both session and mission title reviews in Play mode.
+Invalid saved title values stay visible for correction.
+
+The actual Foundry flow used Bold Soldier 16 with Hardened newly held and
+Seasoned eligible at session start: prepared count 7, die d12, saved balance 3.
+A session eligibility review and Undo preserved the balance. The actual reset
+plan and actor receipt produced 8d12 at the next counter, then remained 8 on
+repreparation. Native diagnostics and browser errors were empty. Tests also
+cover original-d12 Fortune doubling and Personal Lieutenant's fixed count.
+
+All **4,163** Node tests, **988** independent fixture assertions and **239**
+layout checks pass. Lint, formatting, bundling and the copy check pass with the
+existing warnings.
+
+Scores remain **PC creation 9.4/10 and combat 9.5/10**. Title awards and the
+broader B-193 audit remain open; no credit is claimed for unreviewed mechanics.

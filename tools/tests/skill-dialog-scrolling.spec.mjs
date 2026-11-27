@@ -19,7 +19,7 @@ import {
   recordFavoredGearLevelChoices
 } from "../../module/apps/favored-gear-session.mjs";
 import { npcDamageSave } from "../../module/apps/gc/npc-play.mjs";
-import { reviewCrossroadsMissionXP } from "../../module/apps/crossroads-xp.mjs";
+import { reviewCrossroadsMissionXP, reviewCrossroadsSession } from "../../module/apps/crossroads-xp.mjs";
 import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
@@ -219,7 +219,7 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
-for (const mode of ["eligibility", "settlement"])
+for (const mode of ["eligibility", "session", "settlement"])
   test(`Crossroads XP ${mode} keeps actual source fields and confirmation reachable at720px`, async ({ page }) => {
     const prior = content,
       oldGame = game;
@@ -251,11 +251,16 @@ for (const mode of ["eligibility", "settlement"])
         flags: {}
       };
       if (mode === "eligibility") await reviewCrossroadsMissionXP(actor);
+      else if (mode === "session") await reviewCrossroadsSession(actor);
       else await ActorActionDice(class {}).prototype.settleMissionXP.call(actor);
       await render(page, 720);
       await page.setViewportSize({ width: 1280, height: 720 });
-      if (mode === "eligibility") {
-        await page.getByRole("combobox", { name: "Title eligible for this mission" }).selectOption("weathered");
+      if (mode !== "settlement") {
+        await page
+          .getByRole("combobox", {
+            name: mode === "session" ? "Title eligible for this session" : "Title eligible for this mission"
+          })
+          .selectOption("weathered");
         await page.locator('[name="note"]').fill("Actual title eligibility checked");
         await page.locator('[name="confirmed"]').check();
       } else {
