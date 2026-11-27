@@ -5,6 +5,7 @@ import { campaignLevelRow, campaignRules, featPurchasePlan } from "../rules/camp
 import { TABLES } from "../rules/tables.mjs";
 import { loc } from "../i18n.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
+import { withUndo } from "./undo.mjs";
 
 const levelRow = level => {
   const row = TABLES.levels.find(entry => entry.level === level);
@@ -43,10 +44,13 @@ export async function buyFeatWithXP(actor) {
   const spent = await queueRuleState(actor, async () => {
     const now = featPurchasePlan(actor.system, levelRow(actor.system.level));
     if (!now.allowed || now.cost !== plan.cost) return null;
-    await actor.update({
-      "system.xp": now.xp,
-      "system.featTrades.purchased": (actor.system.featTrades?.purchased ?? 0) + 1
-    });
+    // An Undo note puts both the XP and the purchase count back.
+    await withUndo([actor], loc`Feat bought with XP: ${actor.name}`, () =>
+      actor.update({
+        "system.xp": now.xp,
+        "system.featTrades.purchased": (actor.system.featTrades?.purchased ?? 0) + 1
+      })
+    );
     return now;
   });
   if (!spent) return refuse(loc`The XP or level changed while the dialog was open. Open Buy a feat again.`);

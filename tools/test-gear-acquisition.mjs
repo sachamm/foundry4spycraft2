@@ -2336,3 +2336,14 @@ test("an Agency Site adds +4 and halves delivery for the Requests it serves (p.3
     /serves Skill training requests/
   );
 });
+test("Shoe-String Budget on a Caliber I mission loses the Reserve picks (p.408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const sys = system();
+  sys.missionReserves = reserveInitialization(sys, [], { ...initialize, caliber: 1 });
+  setCampaignRulesSource(() => ({ gearCaliberShift: -1 }));
+  try {
+    assert.throws(() => gearAcquisitionPlan(sys, { ...request, caliber: 1 }), /Shoe-String/);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+});

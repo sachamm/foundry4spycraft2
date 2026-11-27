@@ -203,6 +203,8 @@ export function campaignRuleLines(effects = campaignRules()) {
     );
   if (effects.bottomlessClip) lines.push(loc`Weapons that hold 5 or more shots never run out.`);
   if (effects.halveSkillPenalties) lines.push(loc`Skill check penalties are halved, rounding down, to −1 at least.`);
+  if (effects.allChecksActive)
+    lines.push(loc`Every check is active: none is rolled in secret or barred from action dice.`);
   if (campaignErrorActivationCap(effects))
     lines.push(loc`A skill error costs at most ${campaignErrorActivationCap(effects)} action dice to activate.`);
   if (campaignTake10Time(2, effects) > 2)

@@ -279,6 +279,11 @@ export function gearAcquisitionPlan(
     throw new Error(
       loc`Procure requires the earned Intruder option, a city of at least 10,000 people and quick communication (pp.30,38).`
     );
+  // Shoe-String Budget (p.408): picks pushed below Caliber I are lost, so an ordinary Request has nothing to draw on.
+  if (!benefit?.ignoreMissionCaliber && !useProcure && campaignGearCaliber(record.caliber).lost)
+    throw new Error(
+      loc`Shoe-String Budget takes this mission's Reserve picks below Caliber I, so they are lost (p.408).`
+    );
   // Total Control (p.209): Requests may be for Caliber V gear.
   const maxCaliber = system.activeFeatNames?.includes("Total Control") ? 5 : 4;
   if (

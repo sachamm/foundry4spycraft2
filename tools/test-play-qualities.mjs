@@ -141,3 +141,17 @@ test("under Gritty a Table of Ouch injury at 0 vitality can be activated for 0 d
     assert.equal(plan.cost, 0);
   });
 });
+
+test("Tense doubles stress on NPCs too", async () => {
+  const { standardReduction } = await import("../module/apps/damage-application.mjs").catch(() => ({}));
+  const { nonLethalHitPlan } = await import("../module/rules/damage-application.mjs");
+  withRules({ stressMultiplier: 2 }, () => {
+    const plan = nonLethalHitPlan(
+      { abilities: { wis: { value: 12 }, con: { value: 10 } } },
+      { stress: 0, subdual: 0 },
+      { kind: "stress", damage: 10 }
+    );
+    assert.equal(plan.net, 20);
+    if (standardReduction) assert.equal(standardReduction("stress", { damage: 10 }).net, 20);
+  });
+});

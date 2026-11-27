@@ -5,7 +5,7 @@
  * armor-piercing value, and what a hit does to a special character's vitality and wounds. The Foundry side is in
  * module/apps/damage-application.mjs.
  */
-import { criticalInjuryBand } from "./campaign-rules.mjs";
+import { campaignStress, criticalInjuryBand } from "./campaign-rules.mjs";
 import { specialistDefense } from "./weapon-specialist.mjs";
 import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
@@ -346,7 +346,8 @@ export function nonLethalHitPlan(system, totals = {}, hit = {}) {
           dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, int(hit.dr) - int(hit.armorPiercing)),
           armorPiercing: 0
         })
-      : reducedDamage({ damage: hit.damage });
+      : // Tense doubles stress and Mellow halves it, for NPCs as for agents (pp.407–408).
+        reducedDamage({ damage: campaignStress(hit.damage).amount });
   const current = Math.max(0, int(totals[kind]));
   const plan = accumulatedDamagePlan(system, {
     kind,

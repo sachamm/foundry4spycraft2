@@ -84,7 +84,8 @@ export const ActorRolls = Base =>
         requiredBonusPoolId = null
       } = options;
       // Campaign qualities (pp.406–408): Omni-Competent lifts skill result caps; Tense forbids taking 10.
-      if (["skill", "knowledge"].includes(checkKind)) {
+      // An NPC skill roll from the GC tools is marked with npcSkill rather than its own check kind.
+      if (["skill", "knowledge"].includes(checkKind) || options.npcSkill) {
         if (skillCapsLifted()) cap = null;
         const refusal = takeTenRefusal(checkMethod);
         if (refusal) throw new Error(refusal);

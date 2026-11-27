@@ -11668,7 +11668,8 @@ export const GC_DATA = {
    "summary": "No result caps on skill checks; every check is treated as active; skill penalties are cut in half (round down, never better than -1).",
    "effects": {
     "noSkillResultCaps": true,
-    "halveSkillPenalties": true
+    "halveSkillPenalties": true,
+    "allChecksActive": true
    }
   },
   {

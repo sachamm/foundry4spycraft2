@@ -1,4 +1,4 @@
-import { campaignTake10Time, omniPenalty } from "./campaign-rules.mjs";
+import { campaignRules, campaignTake10Time, omniPenalty } from "./campaign-rules.mjs";
 import { checkFocus, isHideCheck } from "./check-identity.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
@@ -514,7 +514,12 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const originallySecret = check.mode === "Secret" || (!!secret && check.mode.includes("Secret"));
   const crossCheckAvailable =
     ambush.crossCheckGranted || check.tags.includes("Cross-Check") || (!!attention && originallySecret);
-  const forceActive = activeCore || hailMaryActive || (crossCheckActive && crossCheckAvailable);
+  // Omni-Competent (p.408) makes every check active.
+  const forceActive =
+    activeCore ||
+    hailMaryActive ||
+    (crossCheckActive && crossCheckAvailable) ||
+    campaignRules().allChecksActive === true;
   const mode = forceActive ? "Active" : check.mode;
   const synergy = skillSynergy(
     system,

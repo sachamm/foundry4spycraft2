@@ -34,7 +34,7 @@ import {
   woundState
 } from "../rules/damage-application.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
-import { gladiatorsDefense } from "../rules/campaign-rules.mjs";
+import { campaignStress, gladiatorsDefense } from "../rules/campaign-rules.mjs";
 import { resolvedTargetRole } from "../rules/npc-qualities.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
@@ -706,7 +706,8 @@ export function standardReduction(kind, hit) {
       dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, hit.dr - hit.armorPiercing),
       armorPiercing: 0
     });
-  return reducedDamage({ damage: hit.damage });
+  // Stress ignores DR; Tense and Mellow scale it (pp.407–408).
+  return reducedDamage({ damage: campaignStress(hit.damage).amount });
 }
 
 /**
