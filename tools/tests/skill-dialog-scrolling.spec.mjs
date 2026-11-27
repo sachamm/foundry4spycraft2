@@ -27,6 +27,7 @@ import {
 import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
 import { manageSceneDisposition } from "../../module/apps/scene-disposition.mjs";
 import { reviewSkillPurchasePolicy } from "../../module/apps/skill-purchase-policy.mjs";
+import { boostNpcDefense, recoverNpcDefense } from "../../module/apps/gc/npc-defense.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -225,6 +226,48 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+for (const stage of ["boost", "rolling", "reserved"])
+  test(`NPC Defense ${stage} controls remain reachable at720px`, async ({ page }) => {
+    const prior = content,
+      oldGame = globalThis.game;
+    try {
+      const actor = {
+        uuid: "Actor.npc-defense-layout",
+        name: "NPC Defense",
+        type: "npc",
+        isOwner: true,
+        system: { defenseBoost: null }
+      };
+      globalThis.game = {
+        user: { id: "gc", isGM: true },
+        combats: [{ id: "combat", name: "Combat", started: true, round: 1, combatants: [{ actor }] }]
+      };
+      if (stage === "boost") await boostNpcDefense(actor);
+      else
+        await recoverNpcDefense(actor, {
+          flags: { spycraft2: { gcDefenseDelivery: { state: stage, actorUuid: actor.uuid, rolls: [4] } } }
+        });
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      if (stage === "boost") {
+        await page.getByRole("combobox", { name: "Combat", exact: true }).selectOption("combat");
+        await page.locator('[name="atStartOfRound"]').check();
+      } else {
+        if (stage === "rolling")
+          await page.getByLabel("Actual die results (comma separated)", { exact: true }).fill("4, 2");
+        await page.getByLabel("GC review note", { exact: true }).fill("Actual source reviewed");
+        await page.locator('[name="confirmed"]').check();
+      }
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+    }
+  });
+
 test("purchase-time skill policy review keeps the historical choice and final controls reachable at720px", async ({
   page
 }) => {

@@ -1116,3 +1116,43 @@ focused **21**-test regression run and native verification. Lint, formatting,
 bundling and copy checks pass with existing warnings. Omni-Competent's
 per-penalty reduction remains open, including the pending GC rounding ruling.
 Scores remain **PC creation 9.4/10 and combat 9.5/10**; work continues.
+
+### Shared NPC Defense boost review — 27 November 2026
+
+The normal GC Defense spend now applies its actual effect. It checks the NPC's
+participation, start-of-round declaration and action eligibility, pays one GC
+die, uses the NPC's role die and the recorded dramatic-scene explosion policy,
+and grants +2 live Defense for the actual rolled duration. The current round
+counts toward that duration. Another combat cannot inherit it. An explicit
+replacement pays for a new duration without stacking; Undo restores the prior
+paid state. The GC's public/private spend choice is preserved.
+
+A source card is reserved before payment/RNG. Each natural result is saved
+before another explosion rolls. Known failures before RNG cancel and refund
+only their reserved payment. Unknown results or effect-write failures hold the
+GC payment and block another delivery for that NPC. GC recovery preserves all
+saved natural results, rolls nothing, pays nothing again and keeps the original
+round. An unrolled reservation can release only its own held payment. Lost
+effect-write responses are recognized; completed deliveries cannot replay after
+Undo. Source and payment state changes are guarded before rolling and applying.
+
+New GC Undo notes identify their original session, preventing an old receipt
+from crediting a new pool. Legacy unscoped notes still need review. NPCs now
+show the shared Defense state through the round-effect display, while numeric
+expiry refreshes on combat changes even with that display disabled. The
+contributor registers through the existing NPC card module, preserving the
+repository's layer limits.
+
+Native Foundry used the real GC dialog, recorded actual dice, changed live
+Defense from **10 to 12**, expired it at the recorded round, removed its mirror,
+and restored the original state and one die with Undo. An injected effect-write
+failure held the saved die/payment; recovery applied the boost without another
+charge. Browser errors and diagnostics were empty. The full **4,218**-test run,
+**988** fixture assertions, **248** layout checks and native schema checks pass.
+The final guards and dramatic-role explosion case also pass **41** focused
+tests. Lint, formatting, bundling and copy checks pass with existing warnings.
+
+The dramatic post-hit spend must still integrate before damage/on-hit
+settlements; DC boosts still need an actual declared-DC workflow. Neither is
+credited as complete. Omni-Competent penalty rounding is also still awaiting
+the requested GC ruling. Scores remain **PC creation 9.4/10 and combat 9.5/10**.

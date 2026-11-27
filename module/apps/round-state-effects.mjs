@@ -16,6 +16,7 @@ import { superiorCoverState } from "../rules/superior-cover.mjs";
 import { totalDefenseState } from "../rules/total-defense.mjs";
 import { twoWeaponStyleState } from "../rules/two-weapon-state.mjs";
 import { loc } from "../i18n.mjs";
+import { renderOpenSheet } from "../services/refresh.mjs";
 
 const ICON = "icons/svg/aura.svg";
 
@@ -140,6 +141,7 @@ export function syncRoundStateEffects(actor, options = {}) {
 
 /** Bring one character's mirror effects in line with its states. Returns what was changed. */
 async function applyRoundStateEffects(actor, { states = ROUND_STATES } = {}) {
+  if (actor.type === "npc") states = states.filter(state => state.key === "defenseBoost");
   const plan = planRoundStateEffects(mirrorEffects(actor), activeRoundStates(actor.system, states));
   if (plan.remove.length) await actor.deleteEmbeddedDocuments("ActiveEffect", plan.remove, { render: false });
   if (plan.rename.length)
@@ -166,7 +168,7 @@ async function applyRoundStateEffects(actor, { states = ROUND_STATES } = {}) {
 const enabled = () => {
   return readSetting("roundStateEffects", false) !== false;
 };
-const mine = actor => enabled() && actor?.type === "agent" && game.users?.activeGM?.isSelf === true;
+const mine = actor => enabled() && ["agent", "npc"].includes(actor?.type) && game.users?.activeGM?.isSelf === true;
 const report = error => console.error(loc`Field Agent's Handbook | Could not update round-state effects`, error);
 
 /** Register the setting and the hooks. Call during `init`. */
@@ -184,16 +186,26 @@ export function installRoundStateEffects() {
     syncRoundStateEffects(actor).catch(report);
   });
   // Round-long states end on the combat clock, without the character's data changing.
-  const sweep = () => {
+  const sweep = combat => {
+    const actors = new Set([
+      ...(game.actors ?? []),
+      ...[...(combat?.combatants ?? [])].map(c => c.actor).filter(Boolean)
+    ]);
+    for (const actor of actors)
+      if (actor.type === "npc" && actor.system.defenseBoost) {
+        actor.reset?.();
+        renderOpenSheet(actor);
+      }
     if (!game.users?.activeGM?.isSelf || !enabled()) return;
-    for (const actor of game.actors ?? []) {
-      if (actor.type !== "agent") continue;
+    for (const actor of actors) {
+      if (!["agent", "npc"].includes(actor.type)) continue;
       if (mirrorEffects(actor).length || activeRoundStates(actor.system).length)
         syncRoundStateEffects(actor).catch(report);
     }
   };
   Hooks.on("updateCombat", (combat, changed) => {
-    if (Object.hasOwn(changed, "round") || Object.hasOwn(changed, "turn") || Object.hasOwn(changed, "active")) sweep();
+    if (Object.hasOwn(changed, "round") || Object.hasOwn(changed, "turn") || Object.hasOwn(changed, "active"))
+      sweep(combat);
   });
   Hooks.on("deleteCombat", sweep);
 }

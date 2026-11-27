@@ -28,6 +28,7 @@ import { campaignCQBRange, campaignNpcHealthReview } from "../rules/campaign-com
 import { characterCampaignPolicy } from "../rules/creation-policy.mjs";
 import { startingAttributeReview } from "../rules/starting-attributes.mjs";
 import { loc } from "../i18n.mjs";
+import { activeDefenseBoost } from "../rules/health.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
 import {
@@ -104,6 +105,7 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
       vitality: resource(0),
       wounds: resource(0),
       defense: new SchemaField({ bonus: int(0) }),
+      defenseBoost: record("defenseBoost", { nullable: true, initial: null }),
       initiative: new SchemaField({ bonus: int(0) }),
       bab: int(0),
       saves: new SchemaField({
@@ -135,7 +137,14 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
       save.total =
         save.base + this.abilities[ability].mod + (["ref", "will"].includes(key) ? shaken.reflexWillPenalty : 0);
     }
-    this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod;
+    const boostCombat = this.defenseBoost?.combatId
+      ? globalThis.game?.combats?.get?.(this.defenseBoost.combatId)
+      : null;
+    this.combatContext = boostCombat
+      ? { id: boostCombat.id, started: boostCombat.started, round: boostCombat.round }
+      : null;
+    this.actionDieDefense = activeDefenseBoost(this);
+    this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod + (this.actionDieDefense?.bonus ?? 0);
     this.underminedCombatContext = underminedCombatContext(this);
     this.underminedState = underminedState(this);
     this.initiative.total =

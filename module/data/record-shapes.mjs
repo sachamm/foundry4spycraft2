@@ -430,6 +430,7 @@ export const RECORD_SHAPES = {
   },
   defenseBoost: {
     $also: "null",
+    gcFunded: "boolean",
     actionDiceReceiptId: "string",
     combatId: "string",
     custom: {

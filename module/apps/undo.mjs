@@ -6,6 +6,7 @@
 import { loc } from "../i18n.mjs";
 import { esc } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { readSetting } from "../settings.mjs";
 
 // An empty record is a value too: without it, a record the step created could not be told from one it filled.
 const leaf = value => value === null || typeof value !== "object" || Array.isArray(value) || !Object.keys(value).length;
@@ -206,13 +207,27 @@ export async function withUndo(actors, label, work, extra = {}) {
 }
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
-export function postUndo(label, entries, { gcDice = 0, damageCard = null } = {}) {
+export function postUndo(label, entries, { gcDice = 0, damageCard = null, gcDiceSession, gcDefenseDeliveryUuid } = {}) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
     // The GC sees every note, so a step a player took can be undone by the GC too.
     whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
-    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, done: false } } }
+    flags: {
+      spycraft2: {
+        undo: {
+          label,
+          entries,
+          gcDice,
+          damageCard,
+          done: false,
+          ...(gcDice > 0
+            ? { gcDiceSession: gcDiceSession ?? String(readSetting("usagePeriods", {})?.session ?? "initial") }
+            : {}),
+          ...(gcDefenseDeliveryUuid ? { gcDefenseDeliveryUuid } : {})
+        }
+      }
+    }
   });
 }
 
@@ -276,7 +291,16 @@ async function undoRecord(message, record) {
       await combatant.update(change);
     }
   }
-  if (record.gcDice > 0 && game.user.isGM) {
+  if (
+    record.gcDice > 0 &&
+    game.user.isGM &&
+    record.gcDiceSession !== undefined &&
+    record.gcDiceSession !== String(readSetting("usagePeriods", {})?.session ?? "initial")
+  ) {
+    ui.notifications.warn(
+      loc`The character was restored. Its GC dice belong to another session, so the current pool was not credited.`
+    );
+  } else if (record.gcDice > 0 && game.user.isGM) {
     const { adjustGCDice } = await import("../services/gc-dice.mjs");
     // A new session has its own pool: the characters are still put back, and the GC is told about the dice.
     await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>

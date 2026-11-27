@@ -14,10 +14,12 @@ import { spendProfile } from "./npc-play.mjs";
 import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
+import { npcDefenseDeliveryControls } from "./npc-defense.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
   ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind) || !!check.npcSkill;
+rollPipeline.register({ id: "npcDefenseDeliveryControl", order: 9998.5, chatControls: npcDefenseDeliveryControls });
 /** An activated critical failure can no longer be boosted (the same rule as an agent's boost). */
 export const gcBoostable = check =>
   Number.isFinite(check?.rawTotal) && !check.resolved && !check.superseded && !check.criticalFailure;
