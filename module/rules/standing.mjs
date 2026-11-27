@@ -1,9 +1,11 @@
 import { loc } from "../i18n.mjs";
+import { periodMoney } from "./period-money.mjs";
 /**
  * Reputation and Net Worth costs of standing-only gear picks. Pure functions: no Foundry access.
  *
  * Gear tables print the cost as "Reputation/$Net Worth" (for example "15/$750,000"). Vehicle tables print only the
- * Reputation cost; their Net Worth cost is the Reputation cost × $50,000 (Tables 4.22–4.27 footnote).
+ * Reputation cost; their Net Worth cost is the Reputation cost × $50,000 (Tables 4.22–4.27 footnote). Under the
+ * Historical quality the Net Worth cost follows Table 7.4 for the campaign year (module/rules/period-money.mjs).
  */
 export const VEHICLE_NET_WORTH_PER_REPUTATION = 50000;
 
@@ -11,11 +13,11 @@ export const VEHICLE_NET_WORTH_PER_REPUTATION = 50000;
 export function parseStandingCost(label) {
   const text = String(label ?? "").trim();
   const both = /^(\d+)\s*\/\s*\$([\d,]+)$/.exec(text);
-  if (both) return { reputation: Number(both[1]), netWorth: Number(both[2].replaceAll(",", "")) };
+  if (both) return { reputation: Number(both[1]), netWorth: periodMoney(Number(both[2].replaceAll(",", ""))) };
   const repOnly = /^(\d+)\s+Reputation$/i.exec(text);
   if (repOnly) {
     const reputation = Number(repOnly[1]);
-    return { reputation, netWorth: reputation * VEHICLE_NET_WORTH_PER_REPUTATION };
+    return { reputation, netWorth: periodMoney(reputation * VEHICLE_NET_WORTH_PER_REPUTATION) };
   }
   return null;
 }

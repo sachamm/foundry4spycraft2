@@ -8,6 +8,7 @@ import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
 import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
+import { campaignYear, periodMoneyModifier } from "../../rules/period-money.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
@@ -526,7 +527,16 @@ export function consoleContext() {
     season: qualities
       .filter(quality => quality.source === "season")
       .map(quality => ({ name: quality.name, xp: signed(quality.xp), summary: quality.summary })),
-    ruleLines: campaignRuleLines(effects),
+    ruleLines: [
+      ...campaignRuleLines(effects),
+      ...(effects.historicalMoney
+        ? [
+            campaignYear() === null
+              ? loc`Historical: set the clock's date so money follows Table 7.4.`
+              : loc`Money values and costs ×${periodMoneyModifier({ effects })} for ${campaignYear()} (Table 7.4).`
+          ]
+        : [])
+    ],
     effectConflicts,
     combat: combatNow
       ? {

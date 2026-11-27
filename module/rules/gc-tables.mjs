@@ -5806,6 +5806,61 @@ export const GC_DATA = {
      "label": "Access codes for every enemy installation within 100 miles"
     }
    ]
+  },
+  "historicalMoney": {
+   "page": 407,
+   "rows": [
+    {
+     "from": 1875,
+     "to": 1900,
+     "modifier": 0.01
+    },
+    {
+     "from": 1901,
+     "to": 1909,
+     "modifier": 0.025
+    },
+    {
+     "from": 1910,
+     "to": 1919,
+     "modifier": 0.03
+    },
+    {
+     "from": 1920,
+     "to": 1929,
+     "modifier": 0.05
+    },
+    {
+     "from": 1930,
+     "to": 1949,
+     "modifier": 0.06
+    },
+    {
+     "from": 1950,
+     "to": 1959,
+     "modifier": 0.1
+    },
+    {
+     "from": 1960,
+     "to": 1969,
+     "modifier": 0.2
+    },
+    {
+     "from": 1970,
+     "to": 1979,
+     "modifier": 0.3
+    },
+    {
+     "from": 1980,
+     "to": 1989,
+     "modifier": 0.6
+    },
+    {
+     "from": 1990,
+     "to": null,
+     "modifier": 1
+    }
+   ]
   }
  },
  "conflicts": {
@@ -11514,7 +11569,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Pick a year for the season. Gear that did not exist yet is available only as a gadget (Housing or effect), at +1 Caliber (cap V). Table 7.4 scales monetary values and actual costs by era: x0.01 for 1875-1900 rising to x1 from 1990.",
-   "effects": {}
+   "effects": {
+    "historicalMoney": true
+   }
   },
   {
    "id": "hybrid",

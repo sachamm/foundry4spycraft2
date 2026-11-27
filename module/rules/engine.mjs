@@ -1,4 +1,5 @@
 import { campaignActionDice, campaignRules } from "./campaign-rules.mjs";
+import { periodMoney } from "./period-money.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
@@ -2154,7 +2155,8 @@ function deriveWealthAndGear(state) {
       appearanceFeatBonus: B.get("appearance")
     },
     possessions: { rank: possessions, picks: posRow?.picks },
-    spendingCash: { rank: cash, amount: 100 * cash * cash }
+    // Table 7.4 under the Historical quality (p.407).
+    spendingCash: { rank: cash, amount: periodMoney(100 * cash * cash) }
   };
   sys.wealth.possessions.budget = possessionBudget(items, posRow?.picks, sys);
   warnings.push(...sys.wealth.possessions.budget.warnings);

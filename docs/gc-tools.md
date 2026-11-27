@@ -144,7 +144,7 @@ All seven types are supported with their printed Strategies, requirements, modif
 
 All 60 qualities are listed with XP modifier and action die cost. Season qualities apply to every mission; mission qualities are scripted (XP applies) or bought with action dice (no XP).
 
-The qualities in force change the rolls themselves: threat and attack modifiers (Violent, Subtle), Triumph thresholds (the Spectacle qualities), range and blast increments (Gunmen), critical injury bands and costs (Bloodbath and its kin), stress (Tense, Mellow), falling damage (Wire-Fu), the skill caps (Omni-Competent), surprise and persuasion modifiers (Paranoid), error ranges (Comedy of Errors), action dice (Spirited), Lead Advantage and challenge counts (Speed-Frame, Thriller) and the honor exposure penalty (Virtuous, Corrupt). The Campaign qualities section lists each change in force.
+The qualities in force change the rolls themselves: threat and attack modifiers (Violent, Subtle), Triumph thresholds (the Spectacle qualities), range and blast increments (Gunmen), critical injury bands and costs (Bloodbath and its kin), stress (Tense, Mellow), falling damage (Wire-Fu), the skill caps (Omni-Competent), surprise and persuasion modifiers (Paranoid), error ranges (Comedy of Errors), action dice (Spirited), Lead Advantage and challenge counts (Speed-Frame, Thriller) and the honor exposure penalty (Virtuous, Corrupt). Under Historical, money follows Table 7.4 for the year the game clock shows (×0.1 in the 1950s up to ×0.6 in the 1980s): Net Worth awards, Net Worth request costs and Spending Cash. The Campaign qualities section lists each change in force.
 
 ## Organizations (pp.389–395)
 

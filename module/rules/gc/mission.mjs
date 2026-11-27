@@ -4,6 +4,7 @@
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
+import { periodMoney } from "../period-money.mjs";
 
 const M = GC_DATA.core.mission;
 const whole = (value, min, max) => Number.isSafeInteger(value) && value >= min && value <= max;
@@ -91,7 +92,8 @@ export function missionStanding(mission) {
       : 0;
   return {
     reputation: row.reputation + adjust * M.threatLevel.reputationPerStep,
-    netWorth: row.netWorth + adjust * M.threatLevel.netWorthPerStep
+    // Table 7.4 under the Historical quality (p.407).
+    netWorth: periodMoney(row.netWorth + adjust * M.threatLevel.netWorthPerStep)
   };
 }
 

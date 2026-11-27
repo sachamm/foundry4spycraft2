@@ -377,7 +377,9 @@
     "xp": 0,
     "gcDice": null,
     "summary": "Pick a year for the season. Gear that did not exist yet is available only as a gadget (Housing or effect), at +1 Caliber (cap V). Table 7.4 scales monetary values and actual costs by era: x0.01 for 1875-1900 rising to x1 from 1990.",
-    "effects": {}
+    "effects": {
+      "historicalMoney": true
+    }
   },
   {
     "id": "hybrid",

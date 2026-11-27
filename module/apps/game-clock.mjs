@@ -38,6 +38,7 @@ import {
 } from "../rules/timers.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc, locKey } from "../i18n.mjs";
+import { setCampaignYearSource } from "../rules/period-money.mjs";
 
 const pad = n => String(n).padStart(2, "0");
 const now = () => Math.max(0, Math.floor(Number(game.time?.worldTime) || 0));
@@ -65,6 +66,9 @@ export function clockYear(time = now()) {
 }
 
 /** Players see the clock unless the GC hides it; their timers show time left either way. */
+// Money under the Historical quality follows the year the clock shows (Table 7.4).
+setCampaignYearSource(() => clockYear());
+
 export const clockVisible = () => game.user?.isGM === true || setting("clockVisibleToPlayers") !== false;
 
 /** A world time as the table reads it: a date when the GC has set one, a day count otherwise. */
