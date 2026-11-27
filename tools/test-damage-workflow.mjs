@@ -852,3 +852,51 @@ test("rest, a dying roll, Stabilize, a hazard save's result and a grapple each l
   assert.deepEqual(grapple.entries.map(entry => entry.name).sort(), ["Held", "Holder"]);
   game.messages = keptMessages;
 });
+
+test("a grapple is settled from the two check cards, with the Size bonus read once from inside the total (U7)", async () => {
+  reset();
+  const keptMessages = game.messages;
+  const big = character("Big", { activeFeatNames: [] }),
+    small = character("Small", {});
+  // Big is a category larger: its card's 21 already holds the +4 (p.357).
+  const mine = card("g1", {
+      actorUuid: big.uuid,
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "grapple",
+      rawTotal: 21,
+      effectiveTotal: 21,
+      grappleFeats: { version: 1, sizeDifference: -1, checkId: "grapple" }
+    }),
+    theirs = card("g2", {
+      actorUuid: small.uuid,
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "grapple",
+      rawTotal: 19,
+      effectiveTotal: 19,
+      criticalSuccess: true
+    });
+  mine.speaker = { alias: "Big" };
+  theirs.speaker = { alias: "Small" };
+  game.messages = [mine, theirs];
+  const { grappleInputFromCards } = await import("../module/apps/combat-actions.mjs");
+  const { recentResults } = await import("../module/apps/opposed-checks.mjs");
+  const filled = grappleInputFromCards({ cardUuid: mine.uuid, opponentCardUuid: theirs.uuid }, recentResults());
+  assert.deepEqual(
+    [filled.total, filled.opponentTotal, filled.opponentCritical, filled.opponentUuid, filled.cardSizeBonus],
+    [21, 19, true, small.uuid, 4]
+  );
+  const outcome = await settleGrapple(big, {
+    cardUuid: mine.uuid,
+    opponentCardUuid: theirs.uuid,
+    opening: false,
+    benefits: []
+  });
+  assert.equal(outcome.winner, "actor", "21 against 19: the Size bonus is not counted twice");
+  assert.match(posted.find(data => /Grapple: 21 against 19/.test(data.content)).content, /includes \+4/);
+  // A side with no card is typed.
+  const typed = grappleInputFromCards({ cardUuid: "", opponentCardUuid: theirs.uuid, total: "15" }, recentResults());
+  assert.deepEqual([typed.total, typed.opponentTotal, typed.critical], [15, 19, false]);
+  game.messages = keptMessages;
+});

@@ -578,6 +578,7 @@ const EXPECTED_ORDER = [
   "containmentSkillTerm",
   "skillTrickSkillTerm",
   "grappleSkillTerm",
+  "grappleRecord",
   "revolverIntimidateSkillTerm",
   "stoneColdIntimidateTerm",
   "conveyanceBullRushSkillTerm",

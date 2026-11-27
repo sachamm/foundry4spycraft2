@@ -244,3 +244,25 @@ test("Omni-Competent halves the grapple penalties too (p.408)", async () => {
     setCampaignRulesSource(() => ({}));
   }
 });
+
+test("a Grapple check records its Size on the card, and the card's facts give the bonus already in the total (U7)", async () => {
+  const { grappleCardFacts } = await import("../module/rules/grapple-check.mjs");
+  const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+  const bigger = roll(state([]), { grappleSizeDifference: -2 });
+  assert.equal(bigger.grappleFeats.sizeDifference, -2);
+  assert.deepEqual(
+    rollPipeline.flags({ options: { grappleFeats: bigger.grappleFeats } }).grappleFeats,
+    bigger.grappleFeats
+  );
+  assert.deepEqual(
+    grappleCardFacts({
+      effectiveTotal: 25,
+      checkId: "grapple",
+      grappleFeats: bigger.grappleFeats,
+      criticalSuccess: true
+    }),
+    { total: 25, critical: true, criticalFailure: false, grapple: true, sizeBonus: 8 }
+  );
+  assert.equal(grappleCardFacts({ effectiveTotal: 14, checkId: "grapple" }).sizeBonus, 0);
+  assert.equal(grappleCardFacts({ checkId: "grapple" }), null);
+});
