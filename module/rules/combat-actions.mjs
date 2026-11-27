@@ -300,6 +300,30 @@ export function grappleAllowed(difference) {
   return Math.trunc(Number(difference) || 0) >= -1;
 }
 
+/** Recorded Size takes precedence over a manual difference; unknown history requires an explicit declaration. */
+export function grappleOpeningContext(
+  system,
+  opponentSystem,
+  { sizeDifference: declared, grappleContextConfirmed = false } = {}
+) {
+  const knownSize = source => {
+    const value = source?.size ?? source?.qualityEffects?.size;
+    const base = typeof value === "string" ? value.replace(/\s*\(.*\)$/, "") : "";
+    return SIZES.includes(base) ? base : null;
+  };
+  const size = knownSize(system),
+    otherSize = knownSize(opponentSystem);
+  const recorded = !!(size && otherSize);
+  const difference = recorded ? sizeDifference(size, otherSize) : declared;
+  if (grappleContextConfirmed !== true)
+    throw new Error(loc`Confirm adjacency and the current participants' Sizes before starting a grapple.`);
+  if (!Number.isSafeInteger(difference) || Math.abs(difference) >= SIZES.length)
+    throw new Error(loc`Record a valid Size difference for the grapple participants.`);
+  if (!grappleAllowed(difference))
+    throw new Error(loc`The target is more than one Size category larger; this opening grapple is not allowed.`);
+  return { difference, size, otherSize, recorded };
+}
+
 /** The most characters who may grapple one target, by the target's Size relative to theirs (p.357). */
 export function grapplerLimit(targetDifference) {
   const d = Math.trunc(Number(targetDifference) || 0);

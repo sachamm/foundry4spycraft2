@@ -325,6 +325,14 @@ lint and copied-text checks pass. The actual trade dialog also passes the
 Remaining creation work includes the Growth limit on level gains between
 missions and the source-data audit. These source-verified gaps keep the
 scores below the requested threshold; the scores remain **8.8/10** and **8.9/10**.
+
+The opening Grapple settlement now enforces the Size limit before applying
+conditions. Recorded PC or NPC Size takes precedence over a manual difference;
+the GC confirms adjacency, and unrecorded Sizes require a valid explicit
+difference. Deleted or self targets are rejected. Grapple crowd limits, benefit
+damage and penalties remain open. All **4,001** Node tests and **222** browser
+layout checks pass; lint and copied-text checks also pass. This closes only the
+opening Size path, so the combat score remains **8.9/10** pending broader work.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,

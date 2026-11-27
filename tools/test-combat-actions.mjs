@@ -16,12 +16,34 @@ import {
   grappleAllowed,
   grappleBenefitText,
   grappleOutcome,
+  grappleOpeningContext,
   grappleSizeBonus,
   grapplerLimit,
   pummelPlan,
   sizeDifference,
   strafeHits
 } from "../module/rules/combat-actions.mjs";
+
+test("opening grapples use recorded PC and NPC Sizes, including large origin labels, and require confirmed adjacency", () => {
+  const confirmed = { grappleContextConfirmed: true, sizeDifference: 0 };
+  assert.throws(
+    () => grappleOpeningContext({ size: "Small" }, { size: "Large (1×1)" }, confirmed),
+    /more than one Size/
+  );
+  assert.throws(
+    () => grappleOpeningContext({ size: "Medium" }, { qualityEffects: { size: "Huge" } }, confirmed),
+    /more than one Size/
+  );
+  assert.equal(grappleOpeningContext({ size: "Large (1×1)" }, { size: "Medium" }, confirmed).difference, 1);
+  assert.equal(grappleOpeningContext({ size: "Small" }, { size: "Medium" }, confirmed).difference, -1);
+  assert.throws(() => grappleOpeningContext({ size: "Medium" }, { size: "Medium" }), /Confirm adjacency/);
+  for (const difference of [undefined, NaN, -1.5, "0", 10])
+    assert.throws(
+      () => grappleOpeningContext({}, {}, { ...confirmed, sizeDifference: difference }),
+      /valid Size difference/
+    );
+  assert.equal(grappleOpeningContext({}, {}, confirmed).recorded, false);
+});
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { weaponAttack } from "../module/rules/gear.mjs";
 import { coverFireTargetLabel, fireActionInput } from "../module/apps/combat-actions.mjs";

@@ -6,6 +6,7 @@ import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 import { SPYCRAFT as cfg } from "../../module/config.mjs";
 import { ActorProgression } from "../../module/documents/actor/progression.mjs";
 import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
+import { settleGrapple } from "../../module/apps/combat-actions.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -139,6 +140,25 @@ const recoveryContent = content;
 content = ordinaryContent;
 
 const css = readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8");
+test("the actual Grapple settlement exposes opening Size context and keeps confirmation reachable at 720px", async ({
+  page
+}) => {
+  const prior = content;
+  try {
+    await settleGrapple({ isOwner: true, uuid: "Actor.grapple-layout", system: {} });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.locator('[name="sizeDifference"]').fill("-1");
+    await page.locator('[name="grappleContextConfirmed"]').check();
+    await expect(page.locator("body")).toContainText("recorded character Sizes take precedence");
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+  }
+});
 test("Modular's actual creation trade keeps every tree, review note and confirmation reachable at 720px", async ({
   page
 }) => {

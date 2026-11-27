@@ -284,7 +284,7 @@ own line on the card, and checked against the page first.
 | B-183 | Falling stress not applied. (p.336) | R-04 | S |
 | B-184 | No control for persuading an NPC to join a fight. | R-05 | S |
 | B-185 | Standard NPC Damage save is not adjusted automatically for vitality or wound changes; a manual field exists. *GC to confirm.* (p.452) | R-06 | S |
-| B-186 | Grapple Size limits not enforced; grapple benefit damage (Injure, Throw, Sprawl) is rolled from the weapon card and applied separately; the −4 penalties are by hand. (p.357) | R-07, RW-210, RW-346 | M |
+| B-186 | Opening Grapple Size limits now execute with recorded PC/NPC Sizes and confirmed adjacency; multiple-grappler crowd limits still need accounting. Grapple benefit damage (Injure, Throw, Sprawl) is rolled from the weapon card and applied separately; the −4 penalties are by hand. (p.357) | R-07, RW-210, RW-346 | M |
 | B-187 | "Once per trigger" guards hold only while the chat card exists. Put receipts on the actor. | R-08, JS-08 | M |
 | B-188 | Dramatic-scene Defense and DC boosts are reported for the GC to apply. | RW (gc-tools) | S |
 | B-189 | NPC feats and class abilities beyond plain numbers (threat ranges, abilities) stay reminders; a failed stress save on a special NPC leaves Shaken to a button; stress thresholds from a hazard; special damage types other than bang, flash and explosive are applied as ordinary damage. | RW-223, RW-344, RW-345, RW-411 | M |

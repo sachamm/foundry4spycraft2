@@ -649,7 +649,15 @@ test("grapple benefits the winner takes change conditions on both sides", async 
   const foe = character("Foe", {});
   const remove = who => async () => who.statuses.clear();
   foe.deleteEmbeddedDocuments = remove(foe);
-  await settleGrapple(kevin, { opening: true, total: 20, opponentTotal: 12, opponentUuid: foe.uuid, benefits: [] });
+  await settleGrapple(kevin, {
+    opening: true,
+    total: 20,
+    opponentTotal: 12,
+    opponentUuid: foe.uuid,
+    benefits: [],
+    sizeDifference: 0,
+    grappleContextConfirmed: true
+  });
   assert.equal(foe.statuses.has("held"), true);
   await settleGrapple(kevin, {
     opening: false,
@@ -669,6 +677,35 @@ test("grapple benefits the winner takes change conditions on both sides", async 
   });
   assert.deepEqual([foe.statuses.has("sprawled"), kevin.statuses.has("prone")], [true, true]);
   assert.match(posted.at(-1).content, /1d4 \+ Strength subdual/);
+});
+
+test("actual opening grapple settlement rejects oversized, missing, self or unconfirmed participants before writing conditions or chat", async () => {
+  reset();
+  const grappler = character("Small grappler", { size: "Small" });
+  const foe = character("Large foe", { size: "Large (1×1)" });
+  const input = {
+    opening: true,
+    total: 30,
+    opponentTotal: 1,
+    opponentUuid: foe.uuid,
+    benefits: [],
+    sizeDifference: 0,
+    grappleContextConfirmed: true
+  };
+  for (const patch of [
+    {},
+    { opponentUuid: grappler.uuid },
+    { opponentUuid: "Actor.deleted" },
+    { grappleContextConfirmed: false }
+  ]) {
+    assert.equal(await settleGrapple(grappler, { ...input, ...patch }), false);
+    assert.equal(foe.statuses.size, 0);
+    assert.equal(grappler.statuses.size, 0);
+    assert.equal(posted.length, 0);
+  }
+  grappler.system.size = "Medium";
+  assert.equal((await settleGrapple(grappler, input)).winner, "actor");
+  assert.equal(foe.statuses.has("held"), true);
 });
 
 test("rest wears off a special NPC's stress and subdual damage", async () => {

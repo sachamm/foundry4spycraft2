@@ -16,6 +16,7 @@ import {
   grappleBenefitChanges,
   grappleBenefitText,
   grappleOutcome,
+  grappleOpeningContext,
   grappleSizeBonus,
   strafeHits
 } from "../rules/combat-actions.mjs";
@@ -403,6 +404,7 @@ async function grappleBenefitsChosen(actor, input, outcome) {
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */
 export async function settleGrapple(actor, options = {}) {
+  if (!actor?.isOwner) return null;
   let input = options;
   if (input.total === undefined) {
     input = await systemDialog.input({
@@ -417,18 +419,28 @@ export async function settleGrapple(actor, options = {}) {
         )
         .join(
           ""
-        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size categories you are bigger by (negative when smaller), for reference`} <input type="number" name="sizeDifference" value="0" step="1" /></label></div>`
+        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size difference when a participant has no recorded Size (negative when smaller)`} <input type="number" name="sizeDifference" value="0" min="-9" max="9" step="1" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`For an opening grapple, the GC confirms adjacency and current Sizes; recorded character Sizes take precedence over the manual difference`}</label></div>`
     });
     if (!input) return null;
     input = {
       ...input,
       total: Number(input.total),
       opponentTotal: Number(input.opponentTotal),
-      sizeDifference: Number(input.sizeDifference) || 0
+      sizeDifference: Number(input.sizeDifference)
     };
   }
-  let outcome;
+  let outcome, openingContext;
   try {
+    if (input.opening) {
+      const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+      if (
+        input.opponentUuid &&
+        (!opponent || opponent.uuid === actor.uuid || !["agent", "npc"].includes(opponent.type))
+      )
+        throw new Error(loc`Choose the other current grapple participant.`);
+      openingContext = grappleOpeningContext(actor.system, opponent?.system, input);
+      input = { ...input, sizeDifference: openingContext.difference };
+    }
     outcome = grappleOutcome(input);
   } catch (error) {
     return refuse(error.message);
@@ -447,6 +459,11 @@ export async function settleGrapple(actor, options = {}) {
     benefits.push(loc`Your grapple tricks:`, `<ul>${tricks.map(line => `<li>${esc(line)}</li>`).join("")}</ul>`);
   await post(actor, [
     loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
+    openingContext
+      ? openingContext.recorded
+        ? loc`Opening Sizes: ${openingContext.size} against ${openingContext.otherSize}; adjacency confirmed.`
+        : loc`Opening Size difference: ${openingContext.difference}; the GC confirmed unrecorded Sizes and adjacency.`
+      : "",
     ...outcome.effects.map(esc),
     sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
     ...benefits,
