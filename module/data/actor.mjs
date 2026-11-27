@@ -25,6 +25,7 @@ const missionThreatLevelSetting = () => {
 import { computeAgent } from "../rules/engine.mjs";
 import { characterSurvivalStats } from "../rules/terrain.mjs";
 import { qualityResistanceReview } from "../rules/resistances.mjs";
+import { npcArmorPlan } from "../rules/npc-equipment.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { campaignCQBRange, campaignNpcHealthReview } from "../rules/campaign-combat.mjs";
 import { characterCampaignPolicy } from "../rules/creation-policy.mjs";
@@ -254,6 +255,7 @@ export class NpcData extends BaseActorData {
       this.warnings.push(
         ...partnerWarnings,
         ...this.resistanceReview,
+        ...this.armorWarnings,
         ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : [])
       );
       this.warnings.push(
@@ -311,6 +313,7 @@ export class NpcData extends BaseActorData {
     this.warnings = [
       ...(result.warnings ?? []),
       ...this.resistanceReview,
+      ...this.armorWarnings,
       ...partnerWarnings,
       ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : []),
       ...campaignNpcHealthReview({
@@ -376,6 +379,14 @@ export class NpcData extends BaseActorData {
       this.wounds.max += effects.wounds;
     }
     this.featEffects = effects;
+    const equipment = npcArmorPlan(this, [...(this.parent?.items ?? [])]);
+    Object.assign(this, equipment.fields);
+    this.armorWarnings = equipment.warnings;
+    this.defense.total += equipment.defense;
+    this.saves.ref.total += equipment.reflex;
+    if (Number.isFinite(this.qualityEffects?.speed))
+      this.qualityEffects.speed = Math.max(5, this.qualityEffects.speed + equipment.speed);
+    this.speed = this.qualityEffects?.speed ?? 30;
     this.survivalStats = characterSurvivalStats(this);
     this.resistanceReview = qualityResistanceReview(this);
   }

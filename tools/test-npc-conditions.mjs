@@ -137,3 +137,100 @@ test("manual NPCs expose actual skill-condition/save context without replacing t
   assert.equal(m.bab, 7);
   assert.equal(m.conditionContext.baffled, true);
 });
+
+test("NPC armor prepares protection and penalties once across health types and manual/profile preparation", () => {
+  for (const enabled of [true, false])
+    for (const npcType of ["standard", "special", "animal"]) {
+      const m = model();
+      m.npcType = npcType;
+      m.npcProfile.enabled = enabled;
+      m.npcProfile.qualities = [{ id: "damage-reduction", units: 3 }];
+      m.parent.items = [];
+      m.prepareDerivedData();
+      const defense = m.defense.total,
+        reflex = m.saves.ref.total;
+      const item = {
+        id: "armor",
+        name: "QA radiation suit",
+        type: "armor",
+        system: {
+          equipped: true,
+          carried: true,
+          quantity: 1,
+          armorSlot: "body",
+          armorType: "F",
+          sealed: true,
+          damageReduction: 1,
+          damageReductionSubdual: 0,
+          defensePenalty: -5,
+          armorCheck: -3,
+          speedPenalty: -10,
+          resistances: "EL8, FL4",
+          radiationSaveBonus: 10
+        }
+      };
+      m.parent.items = [item];
+      for (let n = 0; n < 3; n++) {
+        m.prepareDerivedData();
+        assert.equal(m.defense.total, defense - 5);
+        assert.equal(m.saves.ref.total, reflex - 3);
+        assert.equal(m.speed, 20);
+        assert.equal(m.armor.radiationSaveBonus, 10);
+        assert.equal(m.survivalStats.resistances.EL, 8);
+        assert.equal(m.armorDRByAttack.meleeWeapon, enabled ? 3 : 1, "quality and armor DR take their maximum");
+      }
+      item.system.equipped = false;
+      m.prepareDerivedData();
+      assert.equal(m.armor, null);
+      assert.equal(m.defense.total, defense);
+      assert.equal(m.saves.ref.total, reflex);
+      assert.equal(m.speed, 30);
+      assert.equal(m.survivalStats.resistances.EL, undefined);
+    }
+});
+
+test("NPC armor training uses the selected type and disappears with its source", () => {
+  const m = model();
+  const body = {
+    id: "vest",
+    name: "Moderate vest",
+    type: "armor",
+    system: {
+      equipped: true,
+      quantity: 1,
+      armorSlot: "body",
+      armorType: "M",
+      damageReduction: 4,
+      damageReductionSubdual: 2,
+      defensePenalty: -3,
+      armorCheck: -3,
+      speedPenalty: -10
+    }
+  };
+  // Native Documents expose these through accessors rather than enumerable object fields.
+  const feat = Object.create(null, {
+    id: { value: "basics" },
+    name: { value: "Armor Basics" },
+    type: { value: "feat" },
+    system: { value: { choice: "M", bonuses: [] } }
+  });
+  m.parent.items = [body, feat];
+  m.prepareDerivedData();
+  assert.equal(m.armor.check, -1);
+  assert.equal(m.speed, 25);
+  assert.equal(m.armorDRByAttack.rangedWeapon, 3);
+  assert.equal(m.armorDRByAttack.meleeWeapon, 4);
+  feat.system.choice = "P";
+  m.prepareDerivedData();
+  assert.equal(m.armor.check, -3);
+  assert.equal(m.speed, 20);
+  assert.equal(m.armorDRByAttack.rangedWeapon, 2);
+  m.parent.items = [body];
+  m.prepareDerivedData();
+  assert.equal(m.armorTraining.basics, false);
+  assert.equal(m.armor.check, -3);
+  body.system.reserve = true;
+  m.prepareDerivedData();
+  assert.equal(m.armor, null);
+  assert.ok(m.warnings.some(w => /reserve armor/.test(w)));
+});

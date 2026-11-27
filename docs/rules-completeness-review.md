@@ -2050,3 +2050,30 @@ Only the armor column changed in 28 sample-engine fingerprints, reflecting the
 corrected dates and declared equipment properties; other derived columns were
 verified unchanged. Continue NPC equipment preparation, typed lethal bruising,
 fire totals, injury/recovery timing and broader creation choices toward 9.9.
+
+## Pass 69: NPC equipment reaches shared protection and penalties
+
+Both areas remain **9.8/10**. Equipped NPC armor now prepares the same slots,
+availability, training, defenses, resistances and Primary Phase bonuses used by
+agents. Its Defense, Reflex and Speed penalties apply after grade/manual base
+statistics, and skill checks can read the shared armor aggregate. Non-armor
+quality DR takes its maximum against armor rather than being added twice; acid
+can still read the protected character's separate non-armor DR. Training feats
+are read through native document accessors and retain their selected armor type.
+Removing a feat, choosing another type or unequipping/reserving armor removes the
+corresponding benefits on the next preparation. Repeated preparation does not
+accumulate adjustments. Slot and availability warnings reach the NPC sheet.
+
+The model regression covers manual and grade-built standard/special/animal
+characters, repeat preparation and removal. Native Foundry equipped all eight
+protective profiles on a special NPC and verified six actual contagion-save
+bonuses. Two further actual shotgun hits exercised standard and special health.
+With quality DR 3 and Armor Basics (partial), the native vest gave melee DR 5,
+ranged DR 3 and non-armor DR 3. Rolled hits 14 and 15 became 11 and 12 after
+protection; the special NPC's vitality fell from 75 to 63. Unequipping the vest
+restored quality-only DR. Both native runs reported no browser errors.
+
+All **4,380** Node tests and **988** engine assertions pass. Schema, lint,
+formatting and bundle checks pass; the previous **13** pack and **267** layout
+checks remain applicable. Continue typed lethal bruising, initial fire totals,
+injury/recovery timing, Drained and broader creation-choice evidence.
