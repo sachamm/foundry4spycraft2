@@ -1185,6 +1185,16 @@ test("End mission can record exposure for a critical objective left undone (pp.4
     dialogAnswers.push({ countFinalScene: false, recordCritical: true });
     await mission.endMission();
     assert.equal(actors.get("a1").system.reputation, before - 2, "charged again after Undo");
+    // An objective ticked complete while the End dialog is open is not charged.
+    for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
+    await state.setMission({ ...state.getMission(), active: true, ended: false, infractions: [] });
+    dialogAnswers.push(async () => {
+      await state.updateMission(m => ({ objectives: m.objectives.map(o => ({ ...o, complete: true })) }));
+      return { countFinalScene: false, recordCritical: true };
+    });
+    await mission.endMission();
+    assert.equal(actors.get("a1").system.reputation, before, "completed while the dialog was open");
+    assert.deepEqual(state.getMission().infractions, []);
   } finally {
     for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
     await state.setMission(saved);

@@ -485,13 +485,15 @@ async function grappleBenefitHit(winner, loser, id) {
   return [rolled, loc`No GC is here: apply it to ${esc(loser.name)} by hand.`];
 }
 
-/** Settle one opposed grapple check and list the benefits the winner may choose from. */
+const GRAPPLE_CARD_CHECKS = ["grapple", "restraint-escape"];
+
 /** Recent check cards a grapple can be settled from: this character's Grapple checks, and everyone else's results. */
 function grappleCards(actor) {
   const rows = recentResults().filter(row => row.check),
     grappleFirst = (a, b) => Number(b.check.checkId === "grapple") - Number(a.check.checkId === "grapple");
   return {
-    mine: rows.filter(row => row.check.actorUuid === actor.uuid && row.check.skillKey === "athletics"),
+    // Only this character's Grapple or escape checks, so a later Climb or Jump is never the default.
+    mine: rows.filter(row => row.check.actorUuid === actor.uuid && GRAPPLE_CARD_CHECKS.includes(row.check.checkId)),
     theirs: rows.filter(row => row.check.actorUuid !== actor.uuid).sort(grappleFirst)
   };
 }
@@ -505,7 +507,9 @@ const cardOption = row =>
  */
 export function grappleInputFromCards(input, rows) {
   const card = uuid => (uuid ? rows.find(row => row.uuid === uuid) : null),
-    mine = card(input.cardUuid),
+    // The character's own card must be a Grapple or escape check; any other result is left for the typed total.
+    found = card(input.cardUuid),
+    mine = GRAPPLE_CARD_CHECKS.includes(found?.check?.checkId) ? found : null,
     theirs = card(input.opponentCardUuid),
     own = grappleCardFacts(mine?.check),
     other = grappleCardFacts(theirs?.check);

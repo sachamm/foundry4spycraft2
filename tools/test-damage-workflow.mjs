@@ -917,6 +917,22 @@ test("a grapple is settled from the two check cards, with the Size bonus read on
   // A side with no card is typed.
   const typed = grappleInputFromCards({ cardUuid: "", opponentCardUuid: theirs.uuid, total: "15" }, recentResults());
   assert.deepEqual([typed.total, typed.opponentTotal, typed.critical], [15, 19, false]);
+  // A Climb card is not a Grapple check: it is not taken as the character's own result.
+  const climb = card("g3", {
+    actorUuid: big.uuid,
+    checkKind: "skill",
+    skillKey: "athletics",
+    checkId: "climb",
+    rawTotal: 30,
+    effectiveTotal: 30
+  });
+  climb.speaker = { alias: "Big" };
+  game.messages = [mine, theirs, climb];
+  const wrong = grappleInputFromCards(
+    { cardUuid: climb.uuid, opponentCardUuid: theirs.uuid, total: "" },
+    recentResults()
+  );
+  assert.ok(Number.isNaN(wrong.total));
   game.messages = keptMessages;
 });
 

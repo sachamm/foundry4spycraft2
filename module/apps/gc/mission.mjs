@@ -281,6 +281,28 @@ export async function rollLiquidations(team) {
   });
 }
 
+/**
+ * The critical objectives a mission record leaves undone, each with its exposure row (pp.435–436), and which of them
+ * are still due from an agent: one already charged to that agent (an earlier End before Resume) is not charged again.
+ */
+function criticalExposure(mission) {
+  const criticalRow = T.exposure.find(row => row.id === "complete-critical-objective-complication");
+  const failedCritical = (mission.objectives ?? [])
+    .filter(objective => objective.critical && !objective.complete)
+    .map(objective => ({ objective, infraction: criticalRow?.infractions?.[Number(objective.grade) - 1] }))
+    .filter(entry => entry.infraction);
+  const charged = actorId =>
+    new Set(
+      (mission.infractions ?? [])
+        .filter(entry => entry.actor === actorId)
+        .flatMap(entry => entry.criticalObjectives ?? [])
+    );
+  return {
+    failedCritical,
+    dueFor: actor => failedCritical.filter(({ objective }) => !charged(actor.id).has(objective.id))
+  };
+}
+
 /** End the mission after asking: the record stays for the XP report, settlement and the standing payout. */
 export async function endMission({ clear = false } = {}) {
   requireGC();
@@ -288,19 +310,7 @@ export async function endMission({ clear = false } = {}) {
   if (clear) return setMission(defaultMission());
   const open = (mission.objectives ?? []).filter(objective => !objective.complete).length;
   // A critical objective left undone is exposure for every agent, by its grade (pp.435–436).
-  const criticalRow = T.exposure.find(row => row.id === "complete-critical-objective-complication");
-  const failedCritical = (mission.objectives ?? [])
-    .filter(objective => objective.critical && !objective.complete)
-    .map(objective => ({ objective, infraction: criticalRow?.infractions?.[Number(objective.grade) - 1] }))
-    .filter(entry => entry.infraction);
-  // An objective already charged to an agent (an earlier End before Resume) is not charged to that agent again.
-  const charged = actorId =>
-    new Set(
-      (mission.infractions ?? [])
-        .filter(entry => entry.actor === actorId)
-        .flatMap(entry => entry.criticalObjectives ?? [])
-    );
-  const dueFor = actor => failedCritical.filter(({ objective }) => !charged(actor.id).has(objective.id));
+  const { failedCritical, dueFor } = criticalExposure(mission);
   const pendingCritical = teamActors(mission).some(actor => dueFor(actor).length);
   const lines = [
     loc`The mission stops being active: NPCs that follow the mission's Threat Level go back to their own.`,
@@ -343,8 +353,11 @@ export async function endMission({ clear = false } = {}) {
     ...(input.countFinalScene === true ? { scenesPlayed: (now.scenesPlayed ?? 0) + 1 } : {})
   }));
   if (input.recordCritical === true && pendingCritical) {
-    // Each agent pays in their own affiliation's currency; the Undo note gives the standing back.
-    const team = teamActors(getMission()),
+    // Each agent pays in their own affiliation's currency; the Undo note gives the standing back. What is due is
+    // worked out again from the record as it is now, so an objective ticked while the dialog was open is not charged.
+    const current = getMission(),
+      { dueFor: dueNow } = criticalExposure(current),
+      team = teamActors(current),
       recorded = [];
     await withUndo(
       team,
@@ -352,7 +365,7 @@ export async function endMission({ clear = false } = {}) {
       async () => {
         for (const actor of team) {
           const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation",
-            due = dueFor(actor);
+            due = dueNow(actor);
           if (!due.length) continue;
           let total = 0;
           for (const { infraction } of due) total += exposurePenalty(infraction)[currency];
