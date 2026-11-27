@@ -739,6 +739,83 @@ test("standard NPC hazard stress rolls its actual Damage save with campaign fact
   assert.equal(actor.system.damageTrack.state, "unconscious");
 });
 
+test("standard NPC cold, heat and electrical hits use subdual Damage saves and their own armor piercing", async () => {
+  for (const type of ["cold", "heat", "electrical"]) {
+    reset();
+    const actor = character(`Standard-kind-${type}`, {
+      npcType: "standard",
+      damageSave: 30,
+      vitality: { value: 0, max: 0 },
+      dr: { other: type === "electrical" ? 10 : 50 }
+    });
+    actor.type = "npc";
+    const damage = card(`kind-${type}`, { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+    await applyDamage(damage, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type });
+    const reports = posted.filter(m => m.flags?.spycraft2?.npcDamageSave).map(m => m.flags.spycraft2.npcDamageSave);
+    assert.equal(reports[0].kind, "subdual");
+    assert.equal(reports[0].damage, 14);
+    assert.equal(reports.length, type === "electrical" ? 2 : 1);
+    if (type === "electrical") {
+      assert.equal(reports[1].kind, "stress");
+      assert.equal(reports[1].damage, 3);
+    }
+  }
+});
+
+test("standard NPC laser and collision stress uses damage after actual armor piercing and DR", async () => {
+  for (const [type, dr, ap, net, stress] of [
+    ["laser", 20, 0, 8, 2],
+    ["collision", 4, 3, 13, 3]
+  ]) {
+    reset();
+    const actor = character(`Standard-secondary-${type}`, {
+      npcType: "standard",
+      damageSave: 30,
+      vitality: { value: 0, max: 0 },
+      dr: { other: dr }
+    });
+    actor.type = "npc";
+    const damage = card(`secondary-${type}`, { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+    await applyDamage(damage, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type, armorPiercing: ap });
+    const reports = posted.filter(m => m.flags?.spycraft2?.npcDamageSave).map(m => m.flags.spycraft2.npcDamageSave);
+    assert.deepEqual(
+      reports.map(r => [r.kind, r.damage]),
+      [
+        ["lethal", net],
+        ["stress", stress]
+      ]
+    );
+    assert.equal(actor.system.damageTrack.accumulated, net + stress);
+  }
+});
+
+test("standard NPC stress does not reroll an NPC already eliminated by its primary damage", async () => {
+  reset();
+  const actor = character("Standard-eliminated", {
+    npcType: "standard",
+    damageSave: 0,
+    vitality: { value: 0, max: 0 }
+  });
+  actor.type = "npc";
+  const damage = card("eliminated-electrical", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+  await applyDamage(damage, { targetUuid: actor.uuid, damage: 14, kind: "lethal", type: "electrical" });
+  assert.equal(actor.system.damageTrack.state, "unconscious");
+  assert.equal(posted.filter(m => m.flags?.spycraft2?.npcDamageSave).length, 1);
+});
+
+test("acid and laser conversion is refused before source or target mutation", async () => {
+  for (const type of ["acid", "laser"]) {
+    reset();
+    const actor = character(`Cannot-convert-${type}`, { npcType: "standard", damageSave: 30 });
+    actor.type = "npc";
+    const damage = card(`convert-${type}`, { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+    assert.equal(await applyDamage(damage, { targetUuid: actor.uuid, damage: 14, kind: "subdual", type }), false);
+    assert.match(warnings[0], /cannot be converted/);
+    assert.equal(actor.system.damageTrack, undefined);
+    assert.equal(damage.flags.spycraft2.damageApplicationStarted, undefined);
+  }
+});
+
 test("grapple benefits the winner takes change conditions on both sides", async () => {
   reset();
   const kevin = character("Grappler", { activeFeatNames: [] });

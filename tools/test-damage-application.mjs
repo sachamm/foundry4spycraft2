@@ -75,11 +75,29 @@ test("a printed damage entry gives its kind, special type, armor-piercing and bl
   assert.deepEqual(damageProfile("1d10+1", "—"), { kind: "lethal", type: "", armorPiercing: 0, blast: false });
   assert.equal(damageProfile("1d6 subdual").kind, "subdual");
   assert.equal(damageProfile("2d4 sub").kind, "subdual");
+  assert.equal(damageProfile("1d6 stress").kind, "stress");
   assert.equal(damageProfile("4d4+2 (AP 4)").armorPiercing, 4);
   assert.equal(damageProfile("2d6", "AP (2), TKD").armorPiercing, 2);
   assert.equal(damageProfile("3d6 explosive", "BLS (10 ft.)").type, "explosive");
   assert.equal(damageProfile("3d6 explosive", "BLS (10 ft.)").blast, true);
   assert.equal(damageProfile("2d6 fire (AP 5)").type, "fire");
+  for (const type of [
+    "acid",
+    "cold",
+    "heat",
+    "collision",
+    "electrical",
+    "explosive",
+    "flash",
+    "bang",
+    "laser",
+    "vacuum"
+  ]) {
+    const profile = damageProfile(`2d6 ${type}`);
+    assert.equal(profile.type, type);
+    assert.equal(profile.kind, ["cold", "heat", "electrical"].includes(type) ? "subdual" : "lethal");
+  }
+  assert.equal(damageProfile("2d6 flashpoint").type, "", "only whole type names identify damage");
 });
 
 test("damage reduction comes off first, and armor-piercing lowers it", () => {

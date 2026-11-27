@@ -34,7 +34,7 @@ import {
   woundState
 } from "../rules/damage-application.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
-import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
+import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS, typedStress } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
@@ -43,7 +43,7 @@ import { nonLethalDamage } from "./nonlethal-damage.mjs";
 export { accumulatedDamageLines, nonLethalTotals } from "./nonlethal-damage.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
 import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
-import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
+import { exposeToFire, hazardSaveResolvers, sufferStress } from "./hazards.mjs";
 import { sufferTypedDamage } from "./damage-types.mjs";
 import { rollCriticalInjury } from "./critical-injuries.mjs";
 import { blastCaught } from "./map.mjs";
@@ -784,7 +784,7 @@ const option = (value, label, chosen) =>
   `<option value="${value}"${value === chosen ? " selected" : ""}>${esc(label)}</option>`;
 /** The fields every way of applying damage shares: kind, special type, DR column and armor-piercing. */
 const sharedFields = (profile, attackKind) =>
-  `<label>${loc`Kind`} <select name="kind">${option("lethal", loc`Lethal`, profile.kind)}${option("subdual", loc`Subdual`, profile.kind)}${option("stress", loc`Stress`, profile.kind)}</select></label><label>${loc`Special damage type (an agent's own saves and effects)`} <select name="type">${option("", loc`None`, profile.type)}${TYPED.map(
+  `<label>${loc`Kind`} <select name="kind">${option("lethal", loc`Lethal`, profile.kind)}${option("subdual", loc`Subdual`, profile.kind)}${option("stress", loc`Stress`, profile.kind)}</select></label><label>${loc`Special damage type`} <select name="type">${option("", loc`None`, profile.type)}${TYPED.map(
     type => option(type, typeLabel(type), profile.type)
   ).join("")}</select></label><label>${loc`Damage reduction against`} <select name="attackKind">${Object.entries(
     SUBDUAL_ATTACK_KINDS
@@ -792,7 +792,7 @@ const sharedFields = (profile, attackKind) =>
     .map(([id, label]) => option(id, label, attackKind))
     .join(
       ""
-    )}</select></label><label>${loc`Armor-piercing`} <input type="number" name="armorPiercing" min="0" step="1" value="${profile.armorPiercing}" /></label><label><input type="checkbox" name="armorPiercingAll" /> ${loc`Armor-piercing (all): ignore damage reduction`}</label>`;
+    )}</select></label><label>${loc`Armor-piercing`} <input type="number" name="armorPiercing" min="0" step="1" value="${profile.armorPiercing}" /></label><label><input type="checkbox" name="armorPiercingAll" /> ${loc`Armor-piercing (all): ignore damage reduction`}</label><p class="hint">${loc`Cold, heat and electrical are subdual. Damage-type armor piercing applies automatically; acid and laser cannot be converted.`}</p>`;
 
 /** Damage reduction for a standard character: as listed against lethal, doubled against subdual, none against stress. */
 export function standardReduction(kind, hit) {
@@ -854,11 +854,17 @@ export async function applyDamage(message, options = {}) {
     }
   }
   const damage = Number(input.damage),
-    kind = input.kind ?? "lethal",
-    type = TYPED.includes(input.type) ? input.type : "",
+    type = TYPED.includes(input.type ?? profile.type) ? (input.type ?? profile.type) : "",
+    kind = DAMAGE_TYPES[type]?.damage === "subdual" ? "subdual" : (input.kind ?? profile.kind ?? "lethal"),
     attackKind = Object.hasOwn(SUBDUAL_ATTACK_KINDS, input.attackKind) ? input.attackKind : kindOfAttack,
-    armorPiercing = Math.max(0, Math.trunc(Number(input.armorPiercing) || 0)),
-    armorPiercingAll = input.armorPiercingAll === true,
+    armorPiercing = Math.max(
+      0,
+      Math.trunc(Number(input.armorPiercing) || 0),
+      DAMAGE_TYPES[type]?.armorPiercing === "damage" ? damage : 0
+    ),
+    armorPiercingAll =
+      input.armorPiercingAll === true ||
+      (["agent", "npc"].includes(target.type) && DAMAGE_TYPES[type]?.armorPiercing === "all"),
     critical = check.sourceAttack?.claimId ? crit.critical : input.critical === true,
     criticalDice = critical
       ? check.sourceAttack?.claimId
@@ -867,6 +873,8 @@ export async function applyDamage(message, options = {}) {
       : 0;
   if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
   if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
+  if (DAMAGE_TYPES[type]?.convertible === false && kind !== "lethal")
+    return refuse(loc`Acid and laser damage cannot be converted to subdual or stress damage.`);
   if (!(await markCard(message, "damageApplicationStarted", { targetUuid: target.uuid }, { quiet: true })))
     return refuse(loc`Record the damage card's application before changing the target. Ask the GC to finish it.`);
   const source = loc`${weapon?.name ?? loc`Damage`} (${message.id ?? "roll"})`;
@@ -950,6 +958,10 @@ export async function applyDamage(message, options = {}) {
             campaignStressAdjusted: hit.campaignStressAdjusted
           });
           if (!result) return null;
+          if (["collision", "electrical", "laser"].includes(type)) {
+            const stress = typedStress(type, reduced.net);
+            if (stress.points) lines.push(await sufferStress(target, stress.points, typeLabel(type)));
+          }
         }
       } else if (kind === "lethal") {
         // Juggernaut: the brawler may take up to half of the hit as subdual damage instead.

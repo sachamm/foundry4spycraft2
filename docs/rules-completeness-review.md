@@ -1686,5 +1686,31 @@ resolution notice. All **4,333** Node tests, **988** fixture assertions and **26
 layouts pass. Schemas, lint, formatting, bundling and copy checks pass. Remaining
 standard-NPC damage types, typed secondary-effect timing, Drained, grapple and
 the other documented combat gaps still need implementation and review.
+
+## Pass 57: standard NPC damage kind, AP and secondary stress
+
+Both areas remain **9.6/10**. Damage profiles now recognize every supported type
+as a whole name, select subdual for cold/heat/electrical and recognize explicit
+stress damage. Application uses the saved profile when no type/kind override
+was supplied. Cold/heat/electrical always use their subdual rules; automatic
+type AP applies to character DR, including standard NPCs. Acid and laser
+conversion is refused before either source or target mutation. The shared form
+explains these rules.
+
+Standard NPC collision, electrical and laser Damage saves now add the source's
+secondary stress from damage after DR/AP, with the actual separate Damage save.
+An NPC already eliminated by the first save makes no additional stress roll.
+Both dice and effects remain under the original target-held hit receipt.
+
+Native checks used real DR 8 NPC quality records and an explicit +30 save
+adjustment to isolate reduction arithmetic from elimination. Actual d20 saves
+ran after the hit reservation. Cold/heat took 14 subdual, electrical 14 subdual
+plus 3 stress, laser 14 lethal plus 3 stress, and collision with AP 3 took 9
+lethal plus 2 stress. These are controlled workflow fixtures, not assertions
+that a +30 adjustment is a printed NPC table value. No browser errors or
+diagnostics occurred. All **4,337** Node tests, **988** fixture assertions and
+**267** layouts pass; schema, lint, formatting, bundling and copy checks pass.
+Standard NPC acid/explosive/vacuum/fire paths, typed critical/secondary timing,
+Drained and the wider combat audit remain open.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.

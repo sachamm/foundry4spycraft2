@@ -11,6 +11,7 @@ import { loc } from "../i18n.mjs";
 import { specialistDRIncrement } from "./weapon-specialist.mjs";
 import { injuryThresholds } from "./gc/campaign.mjs";
 import { campaignStressDamage, campaignStressPolicy } from "./campaign-combat.mjs";
+import { DAMAGE_TYPES } from "./damage-types.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 const int = value => Math.trunc(Number(value) || 0);
@@ -43,10 +44,15 @@ export function attackOutcome({ total, defense, fireAction = null, feats = [] } 
 export function damageProfile(damageText = "", qualities = "") {
   const text = String(damageText ?? ""),
     tags = String(qualities ?? "");
-  const type = ["explosive", "electrical", "flash", "bang", "fire"].find(word => new RegExp(word, "i").test(text));
+  const type = [...Object.keys(DAMAGE_TYPES), "fire"].find(word => new RegExp(`\\b${word}\\b`, "i").test(text));
   const piercing = text.match(/AP\s*\(?\s*(\d+)/i) ?? tags.match(/\bAP\s*\(?\s*(\d+)/);
   return {
-    kind: /\bsub(dual)?\b/i.test(text) ? "subdual" : "lethal",
+    kind:
+      DAMAGE_TYPES[type]?.damage === "subdual" || /\bsub(dual)?\b/i.test(text)
+        ? "subdual"
+        : /\bstress\b/i.test(text)
+          ? "stress"
+          : "lethal",
     type: type ?? "",
     armorPiercing: piercing ? Number(piercing[1]) : 0,
     blast: /\bBLS\b/.test(tags)

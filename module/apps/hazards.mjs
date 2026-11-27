@@ -31,7 +31,7 @@ import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { postNonLethalDamage } from "./nonlethal-damage.mjs";
-import { npcDamageSave } from "./gc/npc-damage-save.mjs";
+import { damageSaveState, npcDamageSave } from "./gc/npc-damage-save.mjs";
 import {
   beginHazardResolution,
   finishHazardResolution,
@@ -153,7 +153,12 @@ export async function sufferStress(actor, amount, source, damageMode = "stressBe
     ).adjustedDamage;
     // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
     if (!(Number(actor.system.vitality?.max) > 0)) {
-      if (amount > 0) await npcDamageSave(actor, { damage: amount, kind: "stress", campaignStressAdjusted: true });
+      if (damageSaveState(actor).track.state !== "active")
+        return loc`${amount} stress damage after campaign modifiers; no further Damage save while the standard character is already out of the fight.`;
+      if (amount > 0 && !(await npcDamageSave(actor, { damage: amount, kind: "stress", campaignStressAdjusted: true })))
+        throw Error(
+          loc`The standard character's stress Damage save was not recorded. Review its actual damage before retrying.`
+        );
       return loc`${amount} stress damage after campaign modifiers; the standard character's Damage save is recorded separately.`;
     }
     await postNonLethalDamage(actor, "stress", amount, source, { campaignStressAdjusted: true });
