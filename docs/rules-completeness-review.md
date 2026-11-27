@@ -1611,10 +1611,10 @@ rating is refused. Custom Resource records receive the already declared rating.
 All **4,324** Node tests, **988** fixture assertions and **267** layouts pass,
 including paid automatic settlement, wrong-option/rating refusal, exhausted
 funding, a zero-cost Clout request and no random dice for immediate delivery.
-Schemas, lint, formatting, bundling and copy checks pass. A live form experiment
-using a qualified Advocate stalled during its Freelance setup before the form
-opened; it is not counted as successful native evidence. This verification gap
-remains in B-193 alongside the wider character/source audit.
+Schemas, lint, formatting, bundling and copy checks pass. The live experiment's
+initial stall diagnosis was incorrect: later saved-record inspection proved
+that its form had completed. The test was waiting for item specifications during
+claim. Pass 55 records the completed claim and the experiment's actual limits.
 
 ## Pass 54: special NPC typed damage and hazard threshold reports
 
@@ -1641,5 +1641,21 @@ Node tests, **988** fixture assertions and **267** layouts pass; schema, lint,
 formatting, bundling and copy checks pass. Standard-NPC typed damage, hazard
 secondary-effect timing, Drained, broader resistance/ability coverage and the
 remaining combat gaps still prevent the requested score.
+
+## Pass 55: completing the native Political claim
+
+Both areas remain **9.6/10**. Saved native records proved the actual Political
+Clout form selected invitation, used its mission allowance once, reserved one
+Security category Charisma pick, waived the base dice cost and created no Roll
+or delivery delay. The follow-up supplied the GC-approved specifications that
+the earlier test had left unanswered, then claimed the original acquisition.
+The item retained its typed invitation receipt; neither the benefit nor Reserve
+pick was spent again. The completed run had no browser errors or diagnostics.
+
+This clone is not another complete PC build: resetting its creation-policy flags
+and reallocating Networking left attribute/contact setup tasks. Those fixture
+limitations do not establish a Freelance creation defect. The four previously
+completed distinct builds remain the native completeness evidence. B-193 retains
+the broader source audit and additional legal character choices.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.
