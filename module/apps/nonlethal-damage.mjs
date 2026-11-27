@@ -103,7 +103,7 @@ export async function nonLethalDamage(target, kind, amount, facts) {
   if (plan.net) await target.update({ "flags.spycraft2.nonLethal": plan.totals });
   const lines = [
     plan.stopped
-      ? loc`${esc(target.name)}: damage reduction stops all ${amount} ${kind} damage (it counts twice against subdual damage).`
+      ? loc`${esc(target.name)}: damage reduction and resistance prevent the ${kind} damage.`
       : loc`${esc(target.name)} takes ${plan.net} ${kind} damage: ${plan.total} in all, against a threshold of ${plan.threshold}.`
   ];
   if (!plan.saveRequired) return { lines, pendingSave: null, net: plan.net };

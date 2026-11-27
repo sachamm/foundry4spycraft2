@@ -109,11 +109,12 @@ async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = 
       throw Error(
         loc`The standard character's subdual Damage save was not recorded. Review its actual damage before retrying.`
       );
+    const applied = result?.damage ?? net;
     return {
-      line: net
-        ? loc`${net} subdual damage after defenses; the standard character's Damage save is recorded separately.`
-        : loc`Damage reduction prevents the subdual damage; no Damage save is required.`,
-      net
+      line: applied
+        ? loc`${applied} subdual damage after defenses; the standard character's Damage save is recorded separately.`
+        : loc`Damage reduction and resistance prevent the subdual damage; no Damage save is required.`,
+      net: applied
     };
   }
   if (actor.type === "npc" && Number(actor.system.vitality?.max) > 0) {
@@ -460,6 +461,7 @@ async function applyVacuum(actor, damage, source, rolls = [], hitContext = {}, r
 
 async function sufferSurroundings(actor, type, { amount, source, temperature, medium, armor, hitContext }) {
   const applied = await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS[type], { armorPiercingAll: true }, hitContext);
+  if (!applied.net) return post(actor, [applied.line]);
   const lines = [applied.line];
   let interval = null;
   if (temperature !== undefined && temperature !== null && String(temperature).trim() !== "") {
@@ -496,6 +498,7 @@ async function sufferElectrical(actor, { amount, source, hitContext }) {
     { armorPiercing: amount },
     hitContext
   );
+  if (!applied.net) return post(actor, [applied.line]);
   const lines = [
     applied.line,
     loc`If that Fortitude save fails, use "Failed save" on the sheet: nauseated for 1d6 rounds and Initiative Count −${Math.floor(applied.net / 2)}.`

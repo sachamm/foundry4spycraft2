@@ -1193,6 +1193,93 @@ test("ongoing acid and fire use current resistance and count only damage that ge
   assert.equal(actor.system.vitality.value, 94);
 });
 
+test("NPC stress and subdual resistance reaches ordinary hits without dice or totals for fully resisted damage", async () => {
+  for (const role of ["standard", "special"])
+    for (const kind of ["stress", "subdual"]) {
+      reset();
+      const actor = character(`Generic-resistance-${role}-${kind}`, {
+        npcType: role,
+        damageSave: 30,
+        stressThreshold: 10,
+        subdualThreshold: 10,
+        vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+        wounds: { value: 20, max: 20 },
+        survivalStats: { resistances: { [kind]: 8 }, resistanceSources: [] }
+      });
+      actor.type = "npc";
+      const hit = card(`generic-resistance-${role}-${kind}`, {
+        actorUuid: "Actor.Kevin",
+        checkKind: "damage",
+        effectiveTotal: 6
+      });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 6, kind });
+      assert.equal(actor.system.damageTrack, undefined);
+      assert.equal(actor.flags.spycraft2?.nonLethal?.[kind] ?? 0, 0);
+      assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0);
+      assert.equal(actor.system.vitality.value, 100);
+    }
+});
+
+test("NPC partial resistance follows DR for subdual and bypasses DR for stress", async () => {
+  for (const role of ["standard", "special"])
+    for (const kind of ["stress", "subdual"]) {
+      reset();
+      const actor = character(`Partial-resistance-${role}-${kind}`, {
+        npcType: role,
+        damageSave: 30,
+        stressThreshold: 100,
+        subdualThreshold: 100,
+        dr: { other: 3 },
+        vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+        wounds: { value: 20, max: 20 },
+        survivalStats: { resistances: { [kind]: 4 }, resistanceSources: [] }
+      });
+      actor.type = "npc";
+      const hit = card(`partial-resistance-${role}-${kind}`, {
+        actorUuid: "Actor.Kevin",
+        checkKind: "damage",
+        effectiveTotal: 14
+      });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 14, kind });
+      const expected = kind === "subdual" ? 4 : 10;
+      if (role === "standard")
+        assert.equal(
+          posted.find(m => m.flags?.spycraft2?.npcDamageSave)?.flags.spycraft2.npcDamageSave.damage,
+          expected
+        );
+      else assert.equal(actor.flags.spycraft2.nonLethal[kind], expected);
+    }
+});
+
+test("generic NPC subdual resistance prevents cold, heat and electrical exposure without a follow-up save", async () => {
+  for (const role of ["standard", "special"])
+    for (const type of ["cold", "heat", "electrical"]) {
+      reset();
+      const actor = character(`Subdual-resistance-${role}-${type}`, {
+        npcType: role,
+        damageSave: 30,
+        stressThreshold: 10,
+        subdualThreshold: 10,
+        vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+        wounds: { value: 20, max: 20 },
+        survivalStats: { resistances: { subdual: 8 }, resistanceSources: [] }
+      });
+      actor.type = "npc";
+      actor.rollSave = async () => {
+        throw Error("Fully resisted damage must not ask for a save");
+      };
+      const hit = card(`subdual-resistance-${role}-${type}`, {
+        actorUuid: "Actor.Kevin",
+        checkKind: "damage",
+        effectiveTotal: 6
+      });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 6, kind: "lethal", type });
+      assert.equal(actor.system.hazards?.exposure ?? null, null);
+      assert.equal(actor.system.damageTrack, undefined);
+      assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0);
+    }
+});
+
 test("typed electrical subdual retains its original melee DR column and tracks only net exposure", async () => {
   for (const special of [false, true]) {
     reset();

@@ -213,6 +213,7 @@ const npcSystem = (overrides = {}) => ({
   damageSave: 6,
   damageSaveAdjust: 0,
   damageTrack: null,
+  survivalStats: { resistances: {}, resistanceSources: [] },
   usagePeriods: {},
   disposition: { base: "neutral", toward: {} },
   abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { mod: k === "wis" ? 2 : 0 }])),
@@ -539,6 +540,52 @@ test("standard NPC Damage saves accumulate, kill and reset; special NPCs are ref
   assert.ok(!guard.statuses.has("dead"));
   await npc.npcDamageSave(boss, { damage: 5, kind: "lethal" });
   assert.match(warnings.at(-1), /Special NPCs/);
+});
+
+test("standard NPC damage validates before dice and fully resisted critical subdual/stress rolls no save", async () => {
+  const target = makeActor(
+    "resistant-guard",
+    "npc",
+    npcSystem({ survivalStats: { resistances: { stress: 8, subdual: 8 }, resistanceSources: [] } })
+  );
+  const before = diceQueue.length;
+  for (const patch of [
+    { damage: 0 },
+    { damage: 1.5 },
+    { kind: "unknown" },
+    { bonus: 0.5 },
+    { criticalDice: -1 },
+    { blast: "yes" }
+  ])
+    assert.equal(await npc.npcDamageSave(target, { damage: 6, kind: "lethal", ...patch }), false);
+  for (const kind of ["stress", "subdual"]) {
+    const result = await npc.npcDamageSave(target, { damage: 6, kind, criticalDice: 2 });
+    assert.equal(result.damage, 0);
+    assert.equal(result.prevented, true);
+    assert.equal(target.system.damageTrack, null);
+  }
+  assert.equal(diceQueue.length, before);
+});
+
+test("standard NPC stress applies campaign adjustment once and resistance afterward", async () => {
+  for (const already of [false, true]) {
+    const target = makeActor(
+      `campaign-resistant-${already}`,
+      "npc",
+      npcSystem({
+        campaignEffects: { stressDamageMultipliers: [0.5], stressDamageMinimum: 1 },
+        survivalStats: { resistances: { stress: 2 }, resistanceSources: [] }
+      })
+    );
+    dice(12);
+    const result = await npc.npcDamageSave(target, {
+      damage: already ? 3 : 7,
+      kind: "stress",
+      campaignStressAdjusted: already
+    });
+    assert.equal(result.damage, 1);
+    assert.equal(target.system.damageTrack.accumulated, 1);
+  }
 });
 
 test("GC action dice: die type, cost, dramatic scene, promotion and healing", async () => {

@@ -6,6 +6,7 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
+import { damageResistancePlan } from "../../rules/resistances.mjs";
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
@@ -48,7 +49,7 @@ export async function npcDamageSave(actor, input = null) {
     input = await ask(
       loc`${actor.name}: Damage save`,
       `
-      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.`}</p>
+      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction; prepared stress/subdual resistance is applied here.`}</p>
       <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
       <label>${loc`Type`} <select name="kind">${options(
         [
@@ -65,6 +66,23 @@ export async function npcDamageSave(actor, input = null) {
     );
     if (!input) return null;
   }
+  input = { ...input, kind: input.kind ?? "lethal" };
+  const damage = Number(input.damage),
+    saveBonus = Number(input.bonus ?? state.bonus),
+    criticalDice = Number(input.criticalDice ?? 0);
+  if (
+    !Number.isSafeInteger(damage) ||
+    damage < 1 ||
+    !["lethal", "subdual", "stress"].includes(input.kind) ||
+    !Number.isSafeInteger(saveBonus) ||
+    !Number.isSafeInteger(criticalDice) ||
+    criticalDice < 0 ||
+    (input.blast !== undefined && typeof input.blast !== "boolean") ||
+    (input.campaignStressAdjusted !== undefined && typeof input.campaignStressAdjusted !== "boolean")
+  )
+    return refuse(
+      loc`Enter positive whole damage, a whole save bonus and nonnegative whole critical size before rolling.`
+    );
   // The card's large number is the save's total, the one compared with the DC; the die is in the formula beside it.
   const stressPolicy = campaignStressPolicy(actor.system.campaignEffects);
   const campaignDamage =
@@ -72,7 +90,19 @@ export async function npcDamageSave(actor, input = null) {
       ? campaignStressDamage(Number(input.damage), stressPolicy)
       : null;
   if (campaignDamage) input = { ...input, damage: campaignDamage.adjustedDamage };
-  const saveBonus = Number(input.bonus ?? state.bonus) || 0;
+  let resistance = null;
+  if (["stress", "subdual"].includes(input.kind)) {
+    resistance = damageResistancePlan(actor.system, input.kind, Number(input.damage));
+    input = { ...input, damage: resistance.net };
+    if (!resistance.net) {
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor }),
+        content: `<div class="spycraft2 chat-note"><p>${loc`${esc(actor.name)}: no ${input.kind} damage remains after campaign modifiers and resistance; no Damage save is needed.`}</p></div>`,
+        flags: { spycraft2: { actorUuid: actor.uuid, checkKind: "note", npcDamagePrevented: resistance } }
+      });
+      return { damage: 0, prevented: true, state: state.track.state, track: state.track, resistance };
+    }
+  }
   const roll = await new Roll(`1d20 ${saveBonus < 0 ? "-" : "+"} ${Math.abs(saveBonus)}`).evaluate(),
     natural = roll.dice?.[0]?.total ?? roll.total - saveBonus;
   if (
@@ -113,7 +143,8 @@ export async function npcDamageSave(actor, input = null) {
           kind: input.kind,
           damage: Number(input.damage),
           campaignStress: campaignDamage,
-          campaignStressAdjusted: input.campaignStressAdjusted === true
+          campaignStressAdjusted: input.campaignStressAdjusted === true,
+          ...(resistance ? { resistance } : {})
         }
       }
     },
@@ -132,5 +163,5 @@ export async function npcDamageSave(actor, input = null) {
       for (const combatant of combat.combatants)
         if (combatant.actor === actor && !combatant.defeated) await combatant.update({ defeated: true });
   }
-  return result;
+  return { ...result, damage: Number(input.damage), ...(resistance ? { resistance } : {}) };
 }

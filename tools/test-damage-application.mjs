@@ -325,7 +325,10 @@ test("firing spends shots and Reload refills from the reserve", () => {
 });
 
 test("stress and subdual damage on a character without a ledger add up against its thresholds", () => {
-  const system = { abilities: { wis: { value: 12 }, con: { value: 10 } } };
+  const system = {
+    abilities: { wis: { value: 12 }, con: { value: 10 } },
+    survivalStats: { resistances: {}, resistanceSources: [] }
+  };
   const light = nonLethalHitPlan(system, { stress: 0, subdual: 0 }, { kind: "subdual", damage: 8 });
   assert.deepEqual([light.net, light.total, light.saveRequired, light.totals.subdual], [8, 8, false, 8]);
   const heavy = nonLethalHitPlan(system, { stress: 0, subdual: 8 }, { kind: "subdual", damage: 10 });
@@ -333,7 +336,17 @@ test("stress and subdual damage on a character without a ledger add up against i
   // Damage reduction counts twice against subdual damage; armor-piercing lowers it first.
   assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 10, dr: 3 }).net, 4);
   assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 10, dr: 3, armorPiercing: 2 }).net, 8);
-  assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 5, dr: 3 }).stopped, true);
+  assert.equal(
+    nonLethalHitPlan(system, {}, { kind: "subdual", damage: 5, dr: 3 }).net,
+    1,
+    "DR leaves one bruising point before resistance"
+  );
+  assert.throws(
+    () => nonLethalHitPlan(system, {}, { kind: "subdual", damage: 5, dr: 3, critical: true }),
+    /GC must review/
+  );
+  system.survivalStats.resistances.subdual = 1;
+  assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 5, dr: 3, critical: true }).net, 0);
   // Stress ignores damage reduction; a critical hit forces a save below every threshold.
   const stress = nonLethalHitPlan(system, { stress: 20 }, { kind: "stress", damage: 8, dr: 5 });
   assert.deepEqual(

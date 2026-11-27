@@ -1887,3 +1887,35 @@ lint, formatting, bundling and copy checks. Cold/heat/electrical and ordinary NP
 stress/subdual resistance still need delivery; initial fire totals, broader
 recovery timing and the remaining source/build audits remain open. Neither area
 meets 9.9 yet.
+
+## Pass 64: NPC stress/subdual resistance and pre-roll validation
+
+PC creation remains **9.6/10** and combat **9.7/10**. Standard NPC Damage saves
+now apply prepared stress/subdual resistance after campaign adjustment and DR
+already applied by the incoming hit. Full protection creates a no-save report,
+including critical hits, without changing the Damage-save track or rolling dice.
+The returned net amount drives typed exposure and electrical consequences.
+Special NPC running totals use the same resistance ordering; their subdual DR
+leaves one bruising point before resistance, with unresolved critical bruising
+requiring GC review. Fully resisted cold/heat/electrical subdual does not create
+new exposure or follow-up saves. Their type-specific resistance is still open.
+
+The standard Damage-save controller validates damage, bonus, critical size and
+boolean circumstances before RNG. The manual form now states that prepared
+stress/subdual resistance is applied here. Campaign adjustments apply once and
+precede resistance, including caller-supplied already-adjusted stress.
+
+Native Foundry verified eight combinations of standard/special, stress/subdual
+and full/partial resistance. Full six-point critical hits against resistance 8
+rolled no dice; partial fourteen-point standard hits rolled exactly one actual
+Damage save. Stress ignored DR and became ten after resistance 4; subdual used
+DR 3 twice, then resistance 4, leaving four. Special totals matched those values
+without losing vitality or wounds. Standard saves used an explicit QA-only +30
+save adjustment. The run reported no browser errors or diagnostics.
+All **4,366** Node tests and **988** reference assertions pass, with schema,
+lint, formatting, bundle and copy checks.
+
+Continue type-specific cold/heat/electrical resistance and standard-character
+bruising when DR stops a hit; the latter remains inconsistent with the corrected
+special-character path. Other documented recovery/timing and source/build audits
+still prevent the requested 9.9 scores.

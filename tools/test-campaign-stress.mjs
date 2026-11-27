@@ -44,7 +44,12 @@ test("Firefighter Training and campaign modifiers combine before prepared resist
 });
 test("special NPC stress totals use the same campaign multipliers, preserve subdual, and accept already-adjusted falling stress once", () => {
   for (const ids of [["mellow"], ["tense"], ["mellow", "tense"]]) {
-    const s = { campaignEffects: effects(ids), stressThreshold: 100, subdualThreshold: 100 };
+    const s = {
+      campaignEffects: effects(ids),
+      stressThreshold: 100,
+      subdualThreshold: 100,
+      survivalStats: { resistances: {}, resistanceSources: [] }
+    };
     const adjusted = campaignStressDamage(7, policy(ids)).adjustedDamage;
     const p = nonLethalHitPlan(s, { stress: 3 }, { kind: "stress", damage: 7, dr: 100 });
     assert.equal(p.net, adjusted);

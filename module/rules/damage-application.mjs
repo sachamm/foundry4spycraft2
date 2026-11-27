@@ -13,6 +13,7 @@ import { armorTrainingDRForAttack } from "./armor-training.mjs";
 import { injuryThresholds } from "./gc/campaign.mjs";
 import { campaignStressDamage, campaignStressPolicy } from "./campaign-combat.mjs";
 import { DAMAGE_TYPES } from "./damage-types.mjs";
+import { damageResistancePlan } from "./resistances.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 const int = value => Math.trunc(Number(value) || 0);
@@ -384,15 +385,28 @@ export function nonLethalHitPlan(system, totals = {}, hit = {}) {
             ? hit.damage
             : campaignStressDamage(hit.damage, campaignStressPolicy(system.campaignEffects)).adjustedDamage
         });
-  const current = Math.max(0, int(totals[kind]));
+  const bruising = kind === "subdual" && reduced.stopped ? 1 : 0,
+    resistance = damageResistancePlan(system, kind, reduced.net + bruising),
+    current = Math.max(0, int(totals[kind]));
+  if (hit.critical === true && bruising && resistance.net)
+    throw new Error(loc`The GC must review this critical hit's bruising before applying its subdual save.`);
   const plan = accumulatedDamagePlan(system, {
     kind,
     currentDamage: current,
-    newDamage: reduced.net,
+    newDamage: resistance.net,
     criticalHit: hit.critical === true,
     confirmed: true
   });
-  return { ...plan, ...reduced, damage: hit.damage, totals: { ...totals, [kind]: plan.total } };
+  return {
+    ...plan,
+    ...reduced,
+    bruising,
+    resistance,
+    net: resistance.net,
+    stopped: resistance.net === 0,
+    damage: hit.damage,
+    totals: { ...totals, [kind]: plan.total }
+  };
 }
 
 const KNOCKOUT_UNITS = ["round", "minute", "hour", "day", "week"];
