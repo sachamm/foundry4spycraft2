@@ -21,13 +21,17 @@ import {
   rollGearAcquisition,
   claimGearAcquisition,
   settleFavoredGearSession,
-  reviewFavoredGearSession
+  reviewFavoredGearSession,
+  recordFavoredGearLevelChoices
 } from "../../apps/gear-acquisition.mjs";
 import { armorGrantPlan, bigStickPlan } from "../../rules/gear.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorGear = Base =>
   class ActorGear extends Base {
+    recordFavoredGearLevelChoices(options = {}) {
+      return recordFavoredGearLevelChoices(this, options);
+    }
     settleFavoredGearSession(options = {}) {
       return settleFavoredGearSession(this, options);
     }

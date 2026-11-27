@@ -134,7 +134,165 @@ export function favoredGearSessionPlan(system, items, { id, actorUuid, missionCa
   };
 }
 
+/** p.197: finalize all favored items once for the benefits of a new career level, without another session award. */
+export function favoredGearLevelChoicePlan(
+  system,
+  items,
+  { id, actorUuid, missionCaliber, careerDie, note, confirmed = false, emptyStartConfirmed = false, userId } = {}
+) {
+  const level = system.level,
+    saved = current(system),
+    reset = system.sessionDiceReset;
+  if (
+    !Number.isSafeInteger(level) ||
+    level < 1 ||
+    level > 20 ||
+    !Number.isFinite(system.worldTime) ||
+    typeof actorUuid !== "string" ||
+    !actorUuid ||
+    typeof id !== "string" ||
+    !/^[A-Za-z0-9_-]{1,60}$/.test(id)
+  )
+    throw Error(loc`Review the character, current career level and level-choice reference.`);
+  if (
+    confirmed !== true ||
+    typeof note !== "string" ||
+    !note.trim() ||
+    note.trim().length > 500 ||
+    typeof userId !== "string" ||
+    !userId
+  )
+    throw Error(loc`The GC must confirm the complete new-level selection and record its source.`);
+  if (system.actionDieAwardReview?.needsReview || system.actionDiceSettlementReview?.needsReview)
+    throw Error(loc`Review interrupted action-die records before recording favored-item replacements.`);
+  if (
+    saved &&
+    (saved.version !== 1 ||
+      saved.state !== "complete" ||
+      saved.actorUuid !== actorUuid ||
+      saved.session !== epoch(system, "session") ||
+      !Array.isArray(saved.items))
+  )
+    throw Error(loc`Settle or review the existing favored-item session record first.`);
+  const priorLevel = saved?.lastSelectionLevel ?? saved?.sessionStartLevel ?? saved?.level ?? reset?.level;
+  const rows = favoredGearSessionItems(system, items, missionCaliber);
+  const sources = (system.activeFeatSelections ?? []).filter(f => f.name === "Favored Gear");
+  if (!sources.length || rows.length !== sources.length)
+    throw Error(loc`Choose one approved favored item for each active Favored Gear feat before finalizing this level.`);
+  if (saved && !Array.isArray(saved.levelChoices ?? []))
+    throw Error(loc`Review the favored-item level-choice history.`);
+  if (saved?.lastSelectionLevel === level) {
+    const sameItems =
+      rows.length === saved.items.length &&
+      rows.every(row => saved.items.some(e => e.itemUuid === row.itemUuid && e.caliber === row.caliber));
+    if (sameItems) return { duplicate: true, receipt: saved, retiredPools: [] };
+    throw Error(loc`This career level's favored items were already chosen. The GC must review a correction.`);
+  }
+  if (!Number.isSafeInteger(priorLevel) || priorLevel < 1 || priorLevel >= level)
+    throw Error(
+      loc`A favored-item replacement requires a recorded earlier career level and the benefits of a new level.`
+    );
+  if (
+    !saved &&
+    (reset?.session !== epoch(system, "session") ||
+      reset?.actorUuid !== actorUuid ||
+      reset.favoredGearPending === true ||
+      emptyStartConfirmed !== true)
+  )
+    throw Error(loc`The GC must verify the session-start record and confirm that no favored items were held then.`);
+  if (
+    ![4, 6, 8, 10, 12].includes(careerDie) ||
+    !Number.isSafeInteger(system.actionDice?.value) ||
+    system.actionDice.value < 0
+  )
+    throw Error(loc`Review the actual action-die balance and career die.`);
+  const before = saved?.items ?? [],
+    retiredPools = [];
+  const entries = rows.map(row => {
+    const old = before.find(e => e.itemUuid === row.itemUuid && e.caliber === row.caliber);
+    if (old) return structuredClone(old);
+    return {
+      ...row,
+      status: row.unavailable ? "unavailable" : "levelChoice",
+      cost: 0,
+      selectionLevel: level,
+      selectionMission: epoch(system, "mission"),
+      selectionMissionCaliber: missionCaliber
+    };
+  });
+  for (const old of before)
+    if (!entries.some(e => e.itemUuid === old.itemUuid && e.caliber === old.caliber) && old.poolId) {
+      const pool = system.bonusActionDice?.[old.poolId];
+      if (
+        !pool ||
+        pool.source !== "favoredGear" ||
+        pool.receiptId !== saved.id ||
+        pool.itemUuid !== old.itemUuid ||
+        !Number.isSafeInteger(pool.remaining) ||
+        pool.remaining < 0
+      )
+        throw Error(loc`Review the original item's remaining bonus dice before replacing it.`);
+      retiredPools.push({ id: old.poolId, remaining: pool.remaining });
+    }
+  const receipt = saved
+    ? structuredClone(saved)
+    : {
+        version: 1,
+        state: "complete",
+        id,
+        actorUuid,
+        session: epoch(system, "session"),
+        mission: epoch(system, "mission"),
+        missionCaliber,
+        careerDie,
+        level: priorLevel,
+        at: system.worldTime,
+        beforeBalance: system.actionDice.value,
+        afterBalance: system.actionDice.value,
+        discarded: 0,
+        items: [],
+        emptyStartReview: { userId, note: note.trim(), reset: structuredClone(reset) }
+      };
+  receipt.lastSelectionLevel = level;
+  receipt.items = entries;
+  receipt.levelChoices = [
+    ...(receipt.levelChoices ?? []),
+    {
+      id,
+      level,
+      previousLevel: priorLevel,
+      at: system.worldTime,
+      userId,
+      note: note.trim(),
+      mission: epoch(system, "mission"),
+      featSources: structuredClone(sources),
+      beforeItems: structuredClone(before),
+      items: structuredClone(entries),
+      retiredPools
+    }
+  ];
+  return { duplicate: false, receipt, retiredPools };
+}
+
 /** GC reconstruction records actual balances without replaying a historical gain or discard. */
+export function favoredGearReviewItems(system, items, missionCaliber) {
+  const saved = current(system);
+  return favoredGearSessionItems({ ...system, favoredGearForfeits: {} }, items, missionCaliber).map(row => {
+    const prior = saved?.items?.find(
+      e => e.itemUuid === row.itemUuid && e.caliber === row.caliber && Number.isSafeInteger(e.selectionLevel)
+    );
+    const known =
+      prior &&
+      Array.isArray(saved.levelChoices) &&
+      saved.levelChoices.some(
+        choice =>
+          choice.level === prior.selectionLevel &&
+          choice.items?.some(e => e.itemUuid === row.itemUuid && e.caliber === row.caliber)
+      );
+    return known ? { ...row, levelChoice: structuredClone(prior) } : row;
+  });
+}
+
 export function favoredGearReviewPlan(
   system,
   items,
@@ -151,7 +309,8 @@ export function favoredGearReviewPlan(
     !Array.isArray(rows)
   )
     throw Error(loc`The GC must record actual ordinary dice, each item's history and a review note.`);
-  const favored = favoredGearSessionItems({ ...system, favoredGearForfeits: {} }, items, missionCaliber);
+  const favored = favoredGearReviewItems(system, items, missionCaliber);
+  const saved = current(system);
   if (
     rows.length !== favored.length ||
     new Set(rows.map(r => r.itemUuid)).size !== favored.length ||
@@ -168,7 +327,7 @@ export function favoredGearReviewPlan(
   let maximumCost = 0;
   for (const item of favored) {
     const row = rows.find(r => r.itemUuid === item.itemUuid);
-    if (!(item.difference < 0 ? ["pay", "forfeit"] : ["available", "forfeit"]).includes(row.mode))
+    if (!(item.difference < 0 && !item.levelChoice ? ["pay", "forfeit"] : ["available", "forfeit"]).includes(row.mode))
       throw Error(loc`Record ${item.name}'s actual paid, available or forfeited status.`);
     delete forfeits[favoredPeriodKey(item.itemUuid)];
     if (row.mode === "forfeit")
@@ -177,7 +336,7 @@ export function favoredGearReviewPlan(
         mission,
         receiptId: id
       };
-    else if (item.difference < 0) {
+    else if (item.difference < 0 && !item.levelChoice) {
       choices[item.itemUuid] = "pay";
       maximumCost -= item.difference;
     }
@@ -189,7 +348,7 @@ export function favoredGearReviewPlan(
       favoredGearForfeits: forfeits,
       actionDice: { ...system.actionDice, value: Math.max(system.actionDice?.value ?? 0, maximumCost) }
     },
-    items,
+    items.filter(item => !favored.some(row => row.itemUuid === item.uuid && row.levelChoice)),
     { id, actorUuid, missionCaliber, careerDie, choices }
   );
   for (const pool of Object.values(plan.pools)) {
@@ -204,6 +363,19 @@ export function favoredGearReviewPlan(
   }
   return {
     ...plan,
+    items: [
+      ...plan.items,
+      ...favored
+        .filter(item => item.levelChoice)
+        .map(item => ({
+          ...item.levelChoice,
+          status: rows.find(row => row.itemUuid === item.itemUuid).mode === "forfeit" ? "unavailable" : "levelChoice",
+          cost: 0
+        }))
+    ],
+    ...(saved?.levelChoices
+      ? { levelChoices: structuredClone(saved.levelChoices), lastSelectionLevel: saved.lastSelectionLevel }
+      : {}),
     forfeits: { ...plan.forfeits, ...reviewForfeits },
     beforeBalance: system.actionDice.value,
     afterBalance: ordinaryBalance,

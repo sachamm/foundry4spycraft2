@@ -2,9 +2,8 @@
  * Favored Gear, Signature Gear and Trademark Gear, p.197.
  *
  * - Favored Gear: one extra Possession, the item with `possessionSource: "favoredGear"`. It is not charged to the
- *   Wealth allowance, and its Caliber may not exceed one third of career level (rounded up). The per-session action
- *   dice it gains or costs against the mission Caliber are left to the GC: they need a die pool restricted to one
- *   item, which the system does not have.
+ *   Wealth allowance, and its Caliber may not exceed one third of career level (rounded up). Session receipts
+ *   track its actual dice, item restrictions, mission access and confirmed new-level replacements.
  * - Signature Gear (repeatable): a favored item marked `signatureGear: 1` gives +1 morale to skill checks and damage
  *   rolls made with it. Critical failures never destroy it; the system only destroys improvised weapons that way.
  * - Trademark Gear: a signature item marked `signatureGear: 2` gives +2 morale in all, and each action die spent to

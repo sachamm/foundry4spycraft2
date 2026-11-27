@@ -4,11 +4,16 @@ import {
   favoredGearSessionPlan,
   favoredGearSessionItems,
   favoredGearReviewPlan,
+  favoredGearLevelChoicePlan,
   favoredGearPoolStatus,
   favoredGearAccess,
   favoredPeriodKey
 } from "../module/rules/favored-gear-session.mjs";
-import { settleFavoredGearSession, reviewFavoredGearSession } from "../module/apps/favored-gear-session.mjs";
+import {
+  settleFavoredGearSession,
+  reviewFavoredGearSession,
+  recordFavoredGearLevelChoices
+} from "../module/apps/favored-gear-session.mjs";
 import { bonusPoolForCheck, actionDiceFundingContext, possessedActionDice } from "../module/rules/bonus-pools.mjs";
 import { actionDieBenefitQuote } from "../module/rules/benefit-payments.mjs";
 import { multipartActionDicePlan } from "../module/rules/action-die-payments.mjs";
@@ -56,6 +61,112 @@ const check = (item, patch = {}) => ({
   gearUuid: item.uuid,
   resolved: false,
   ...patch
+});
+
+const levelInput = {
+  id: "levelChoice",
+  actorUuid: "Actor.a",
+  missionCaliber: 2,
+  careerDie: 6,
+  note: "All actual new-level benefits and favored choices checked",
+  confirmed: true,
+  userId: "gc"
+};
+function replaceFirst(f, caliber = 4) {
+  f.system.level = 10;
+  f.items[0].system.possessionSource = "";
+  const item = {
+    id: "replacement",
+    uuid: "Actor.a.Item.replacement",
+    name: "Replacement",
+    type: "weapon",
+    system: { caliber, possessionSource: "favoredGear", possessionApproved: true }
+  };
+  f.items.push(item);
+  return item;
+}
+test("new-level favored replacements retire only removed item dice, preserve mission forfeits, and charge or grant no session dice", () => {
+  const f = fixture();
+  f.settle({ choices: { [f.items[1].uuid]: "forfeit" } });
+  const balance = f.system.actionDice.value,
+    forfeits = structuredClone(f.system.favoredGearForfeits),
+    replacement = replaceFirst(f);
+  const p = favoredGearLevelChoicePlan(f.system, f.items, levelInput);
+  assert.deepEqual(p.retiredPools, [{ id: "receipt_0", remaining: 1 }]);
+  assert.equal(p.receipt.items.find(e => e.itemUuid === replacement.uuid).status, "levelChoice");
+  assert.equal(p.receipt.items.find(e => e.itemUuid === replacement.uuid).cost, 0);
+  assert.equal(p.receipt.lastSelectionLevel, 10);
+  assert.equal(p.receipt.level, 9);
+  assert.equal(p.receipt.levelChoices[0].featSources.length, 2);
+  assert.equal(f.system.actionDice.value, balance);
+  assert.deepEqual(f.system.favoredGearForfeits, forfeits);
+  f.system.favoredGearSessions.s1 = p.receipt;
+  assert.equal(favoredGearAccess(f.system, replacement.uuid, replacement.system), "");
+  assert.match(favoredGearAccess(f.system, f.items[1].uuid, f.items[1].system), /forfeited/);
+  assert.equal(favoredGearPoolStatus(f.system, "receipt_0").available, 0);
+});
+test("unchanged favored items retain actual historical wallets and complete new-level choices are idempotent", () => {
+  const f = fixture();
+  f.settle();
+  f.system.level = 10;
+  const p = favoredGearLevelChoicePlan(f.system, f.items, levelInput);
+  assert.deepEqual(p.retiredPools, []);
+  f.system.favoredGearSessions.s1 = p.receipt;
+  assert.equal(favoredGearPoolStatus(f.system, "receipt_0", { check: check(f.items[0]) }).available, 1);
+  assert.equal(favoredGearLevelChoicePlan(f.system, f.items, levelInput).duplicate, true);
+  replaceFirst(f);
+  assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, levelInput), /already chosen/);
+});
+test("a first Favored Gear feat acquired after session start needs a verified reset and GC confirmation of the empty starting selection", () => {
+  const f = fixture([1]);
+  f.system.level = 10;
+  f.system.sessionDiceReset = { session: "s1", actorUuid: "Actor.a", level: 9 };
+  assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, levelInput), /no favored items/);
+  const p = favoredGearLevelChoicePlan(f.system, f.items, { ...levelInput, emptyStartConfirmed: true });
+  assert.equal(p.receipt.items[0].status, "levelChoice");
+  assert.equal(p.receipt.emptyStartReview.userId, "gc");
+  assert.equal(p.receipt.discarded, 0);
+  assert.deepEqual(p.retiredPools, []);
+  f.system.sessionDiceReset.favoredGearPending = true;
+  assert.throws(
+    () => favoredGearLevelChoicePlan(f.system, f.items, { ...levelInput, emptyStartConfirmed: true }),
+    /session-start/
+  );
+});
+test("level replacements require a new level, complete approved selections and bounded confirmed history", () => {
+  const f = fixture();
+  f.settle();
+  assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, levelInput), /new level/);
+  f.system.level = 10;
+  for (const patch of [{ confirmed: false }, { note: "" }, { userId: "" }, { note: "x".repeat(501) }])
+    assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, { ...levelInput, ...patch }));
+  f.items[0].system.possessionSource = "";
+  assert.throws(() => favoredGearLevelChoicePlan(f.system, f.items, levelInput), /each active/);
+});
+test("GC balance reviews preserve new-level selections without generating fees or replacement-item wallets", () => {
+  for (const caliber of [1, 4]) {
+    const f = fixture();
+    f.settle();
+    const item = replaceFirst(f, caliber);
+    const p = favoredGearLevelChoicePlan(f.system, f.items, levelInput);
+    f.system.favoredGearSessions.s1 = p.receipt;
+    const review = favoredGearReviewPlan(f.system, f.items, {
+      ...levelInput,
+      id: "review",
+      ordinaryBalance: f.system.actionDice.value,
+      reviewerId: "gc",
+      rows: [
+        { itemUuid: f.items[1].uuid, mode: "pay" },
+        { itemUuid: item.uuid, mode: "available" }
+      ]
+    });
+    assert.equal(review.items.find(e => e.itemUuid === item.uuid).status, "levelChoice");
+    assert.equal(review.lastSelectionLevel, 10);
+    assert.equal(Object.values(review.pools).filter(pool => pool.itemUuid === item.uuid).length, 0);
+    assert.equal(review.reviewedDiscarded, 1);
+    assert.equal(review.afterBalance, f.system.actionDice.value);
+    assert.equal(review.levelChoices[0].id, p.receipt.levelChoices[0].id);
+  }
 });
 test("ordinary catalog and reference items without UUIDs need no Favored Gear record", () => {
   assert.equal(favoredGearAccess({}, undefined, { caliber: 1 }), "");
@@ -410,6 +521,96 @@ const reviewInput = f => ({
   ],
   note: "Actual balances and prior item fees reviewed",
   confirmed: true
+});
+
+test("the actual level-choice controller commits retired wallets once and reconciles a lost update response", async () => {
+  for (const lost of [false, true]) {
+    const f = controllerFixture();
+    await settleFavoredGearSession(f.a, f.options);
+    CONFIG.SPYCRAFT.tables.levels[10] = { actionDie: 6 };
+    const item = replaceFirst(f),
+      originalBalance = f.a.system.actionDice.value;
+    const update = f.a.update.bind(f.a);
+    if (lost)
+      f.a.update = async patch => {
+        await update(patch);
+        throw Error("response lost");
+      };
+    const options = { missionCaliber: 2, note: "Actual complete level10 selection", confirmed: true };
+    const r = await recordFavoredGearLevelChoices(f.a, options);
+    assert.equal(r.lastSelectionLevel, 10);
+    assert.equal(f.a.system.bonusActionDice.id1_0.remaining, 0);
+    assert.equal(f.a.system.actionDice.value, originalBalance);
+    assert.equal(r.items.find(e => e.itemUuid === item.uuid).cost, 0);
+    const writes = f.writes();
+    assert.deepEqual(await recordFavoredGearLevelChoices(f.a, options), r);
+    assert.equal(f.writes(), writes);
+  }
+});
+
+test("changed resources while the level-choice dialog is open cannot overwrite the current wallet", async () => {
+  const f = controllerFixture();
+  await settleFavoredGearSession(f.a, f.options);
+  replaceFirst(f);
+  CONFIG.SPYCRAFT.tables.levels[10] = { actionDie: 6 };
+  const input = foundry.applications.api.DialogV2.input;
+  foundry.applications.api.DialogV2.input = async () => {
+    f.a.system.actionDice.value--;
+    return { confirmed: true, note: "Actual complete level10 selection" };
+  };
+  try {
+    await assert.rejects(recordFavoredGearLevelChoices(f.a, { missionCaliber: 2 }), /resources changed/);
+  } finally {
+    foundry.applications.api.DialogV2.input = input;
+  }
+  assert.equal(f.record().lastSelectionLevel, undefined);
+  assert.equal(f.a.system.bonusActionDice.id1_0.remaining, 1);
+});
+
+test("a replacement acquires only its normal new-session dice or fee when the next session actually begins", () => {
+  const f = fixture();
+  f.settle();
+  replaceFirst(f, 1);
+  const p = favoredGearLevelChoicePlan(f.system, f.items, levelInput);
+  f.system.favoredGearSessions.s1 = p.receipt;
+  f.system.bonusActionDice.receipt_0.remaining = 0;
+  f.system.usagePeriods.session = "s2";
+  const next = favoredGearSessionPlan(f.system, f.items, {
+    id: "next",
+    actorUuid: "Actor.a",
+    missionCaliber: 2,
+    careerDie: 6,
+    choices: { [f.items[1].uuid]: "pay" }
+  });
+  assert.equal(next.items.find(e => e.itemId === "replacement").status, "bonus");
+  assert.equal(next.pools.next_1.remaining, 1);
+  assert.equal(next.discarded, 1);
+});
+
+test("a new Favored Gear selection gained with a level adds access without altering existing item wallets", () => {
+  const f = fixture([1]);
+  f.settle();
+  f.system.level = 10;
+  f.system.activeFeatSelections.push({ name: "Favored Gear", id: "newFeat" });
+  f.items.push({
+    id: "newGear",
+    uuid: "Actor.a.Item.newGear",
+    name: "New feat item",
+    type: "gear",
+    system: { caliber: 4, possessionSource: "favoredGear", possessionApproved: true }
+  });
+  const p = favoredGearLevelChoicePlan(f.system, f.items, levelInput);
+  assert.equal(p.receipt.items[0].poolId, "receipt_0");
+  assert.equal(p.receipt.items[1].status, "levelChoice");
+  assert.deepEqual(p.retiredPools, []);
+});
+
+test("session settlement does not replay session-start awards for a first feat gained after a recorded level increase", async () => {
+  const f = controllerFixture();
+  f.system.level = 10;
+  f.a.flags.spycraft2 = { sessionDiceReset: { session: "s1", actorUuid: f.a.uuid, level: 9 } };
+  await assert.rejects(settleFavoredGearSession(f.a, f.options), /new-level favored/);
+  assert.equal(f.writes(), 0);
 });
 test("GC review separates actual wallets, preserves earlier evidence and does not reapply historical discards", async () => {
   const f = controllerFixture(),

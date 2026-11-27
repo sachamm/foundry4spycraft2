@@ -76,7 +76,7 @@
     {{else}}<tr><td colspan="8" class="inventory-empty">{{localize "SPYCRAFT.Template.ActorAgentGear.NoVehiclesRecordedUseBrowseVehicles"}}</td></tr>{{/each}}</tbody>
   </table></div>
   <details class="reference-panel" data-key="gearPlanning"><summary>{{localize "SPYCRAFT.Template.ActorAgentGear.WealthMissionPlanningAndAcquisitions"}}</summary>
-  {{#if favoredGearSessionControl}}<p>{{#if canSettleFavoredGear}}<button type="button" class="sc2-action" data-action="settleFavoredGearSession">{{favoredGearSessionLabel}}</button>{{/if}} <button type="button" class="sc2-action" data-action="reviewFavoredGearSession">{{favoredGearReviewLabel}}</button></p>{{/if}}
+  {{#if favoredGearSessionControl}}<p>{{#if canSettleFavoredGear}}<button type="button" class="sc2-action" data-action="settleFavoredGearSession">{{favoredGearSessionLabel}}</button>{{/if}} {{#if canRecordFavoredLevelChoices}}<button type="button" class="sc2-action" data-action="recordFavoredGearLevelChoices">{{favoredGearLevelLabel}}</button>{{/if}} <button type="button" class="sc2-action" data-action="reviewFavoredGearSession">{{favoredGearReviewLabel}}</button></p>{{/if}}
   <h3>{{localize "SPYCRAFT.Wealth"}} <span class="points {{#if (sc2lt system.wealth.remaining 0)}}bad{{/if}}">{{system.wealth.allocated}} / {{system.wealth.total}}</span></h3>
   <table class="wealth">
     <thead><tr><th></th><th>{{localize "SPYCRAFT.Spent"}}</th><th>{{localize "SPYCRAFT.Rank"}}</th><th></th></tr></thead>

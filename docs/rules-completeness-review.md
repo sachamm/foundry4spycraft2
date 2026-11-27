@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **9.3/10**;
+**Continuing review, 26 November 2026:** PC creation **9.4/10**;
 combat play **9.5/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -722,3 +722,34 @@ credits these executable global campaign rules and their native evidence.
 B-180 still covers disposition and other campaign details; B-183 and B-186–191
 retain the movement, grappling, source-history, environment and advanced combat
 gaps. Neither area has met 9.9/10; implementation continues.
+
+### Continuing pass: favored items chosen with a new career level
+
+The Gear tab now records the complete favored-item selection once when a PC
+applies a new career level. Unchanged items retain their actual historical
+wallets. Replaced items retire their old restricted dice; the new items receive
+neither a session bonus nor a session fee until the next session starts.
+Mission forfeits remain recorded against their original items. The history binds
+actual active feats, items, Calibers, level, session, reviewer and source note.
+
+A first Favored Gear selection after session start requires the earlier reset
+record and GC confirmation that the starting selection was empty. The ordinary
+session settlement cannot replay its awards in that known advancement case.
+GC balance review preserves recorded level replacements, including a higher
+Caliber item that legitimately owes no fee this session. Unknown histories still
+require explicit GC review. Complete selections, source freshness, rejected or
+lost writes and repeated submissions have focused coverage.
+
+A native PC advanced from level 16 to 17, selected a new Caliber V favored item
+through the actual Gear-tab button, retained six ordinary dice and retired its
+old two-die wallet. Undo restored the prior receipt and wallet; reapplication and
+a later GC review preserved the new selection with no extra cost or award.
+There were no browser errors. The full suite passes **4,132** Node tests and
+**988** reference assertions; **234** layout checks pass. Lint, formatting,
+bundling and the text-copy check pass with the existing warnings.
+
+Review: **PC creation 9.4/10; combat 9.5/10**. Creation's gear/finalization dimension
+rises to 1.90; attributes/health 1.95, origins/classes 1.85, skill purchases 1.95 and
+feats/training 1.75 remain. B-193 continues the wider source audit and other
+class/origin/feat/contact history cases. Both areas remain below 9.9/10, so the
+implementation/review cycle continues.

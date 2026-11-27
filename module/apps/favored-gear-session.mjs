@@ -2,6 +2,8 @@ import {
   favoredGearSessionItems,
   favoredGearSessionPlan,
   favoredGearReviewPlan,
+  favoredGearLevelChoicePlan,
+  favoredGearReviewItems,
   favoredPeriodKey
 } from "../rules/favored-gear-session.mjs";
 import { recordReplacementPatch } from "../rules/record-patch.mjs";
@@ -21,8 +23,72 @@ const source = actor => ({
   ...actor.actionDiceFundingSystem,
   usagePeriods: actor.usagePeriods ?? actor.system.usagePeriods,
   favoredGearSessions: actor.flags?.spycraft2?.favoredGearSessions ?? {},
-  favoredGearForfeits: actor.flags?.spycraft2?.favoredGearForfeits ?? {}
+  favoredGearForfeits: actor.flags?.spycraft2?.favoredGearForfeits ?? {},
+  sessionDiceReset: actor.flags?.spycraft2?.sessionDiceReset ?? null
 });
+
+export async function recordFavoredGearLevelChoices(actor, options = {}) {
+  if (actor?.type !== "agent" || !actor.isOwner || !game.user?.isGM)
+    throw Error(loc`The owning GC records favored-item choices after applying a new career level.`);
+  const initial = source(actor),
+    missionCaliber = options.missionCaliber ?? getMission().caliber;
+  const rows = favoredGearSessionItems(initial, [...actor.items], missionCaliber);
+  const fingerprint = system =>
+    structuredClone({
+      level: system.level,
+      periods: system.usagePeriods,
+      feats: system.activeFeatSelections,
+      sessions: system.favoredGearSessions,
+      forfeits: system.favoredGearForfeits,
+      pools: system.bonusActionDice,
+      reset: system.sessionDiceReset,
+      balance: system.actionDice?.value
+    });
+  const before = fingerprint(initial);
+  let input = options;
+  if (options.confirmed !== true) {
+    input = await systemDialog.input({
+      window: { title: loc`Favored items for a new career level` },
+      position: { width: 620 },
+      rejectClose: false,
+      ok: { label: loc`Record level choices` },
+      content: `<div class="spycraft2-roll-options"><p>${loc`Career Level ${actor.system.level}: first mark one approved favored Possession for every active Favored Gear feat. This records the complete new-level selection once. Replacement items gain no session dice and cost no session dice now. Old item dice stay with unchanged items; dice for replaced items are retired. Mission forfeits remain.`}</p><ul>${rows.map(row => `<li>${esc(row.name)} — ${loc`Caliber ${row.caliber}`}</li>`).join("")}</ul>${!record(actor) ? `<label><input name="emptyStartConfirmed" type="checkbox" /> ${loc`The GC checked the session-start record: no favored items were held at that time`}</label>` : ""}<label>${loc`GC review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`All benefits of this new level are applied; these are the complete favored-item choices for that level`}</label></div>`
+    });
+    if (!input) return null;
+  }
+  return queueResources([actor], async () => {
+    if (
+      !actor.isOwner ||
+      !game.user?.isGM ||
+      !sameValues(before, fingerprint(source(actor))) ||
+      !sameValues(rows, favoredGearSessionItems(source(actor), [...actor.items], missionCaliber))
+    )
+      throw Error(loc`The level, favored items or session resources changed. Review the current level choices again.`);
+    const plan = favoredGearLevelChoicePlan(source(actor), [...actor.items], {
+      ...input,
+      missionCaliber,
+      id: foundry.utils.randomID(),
+      actorUuid: actor.uuid,
+      careerDie: CONFIG.SPYCRAFT.tables.levels[initial.level]?.actionDie,
+      userId: game.user.id
+    });
+    if (plan.duplicate) return plan.receipt;
+    const changes = { [`flags.spycraft2.favoredGearSessions.${favoredPeriodKey(plan.receipt.session)}`]: plan.receipt };
+    for (const pool of plan.retiredPools) changes[`system.bonusActionDice.${pool.id}.remaining`] = 0;
+    await withUndo([actor], loc`${actor.name}: record favored items for Career Level ${initial.level}`, async () => {
+      try {
+        await actor.update(changes);
+      } catch (error) {
+        if (
+          !sameValues(record(actor), plan.receipt) ||
+          plan.retiredPools.some(p => actor.system.bonusActionDice?.[p.id]?.remaining !== 0)
+        )
+          throw error;
+      }
+    });
+    return plan.receipt;
+  });
+}
 function retained(actor) {
   const saved = record(actor);
   if (!saved) return null;
@@ -63,7 +129,7 @@ export async function reviewFavoredGearSession(actor, options = {}) {
     throw Error(loc`The session changed while its history was being selected. Review the current session.`);
   const initial = source(actor),
     missionCaliber = options.missionCaliber ?? record(actor)?.missionCaliber ?? getMission().caliber;
-  const items = favoredGearSessionItems({ ...initial, favoredGearForfeits: {} }, [...actor.items], missionCaliber);
+  const items = favoredGearReviewItems(initial, [...actor.items], missionCaliber);
   if (!items.length) return null;
   const snapshot = structuredClone({
     session: session(actor),
@@ -80,7 +146,7 @@ export async function reviewFavoredGearSession(actor, options = {}) {
       window: { title: loc`${actor.name}: review favored item history` },
       rejectClose: false,
       ok: { label: loc`Record actual favored item balances` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Record actual remaining dice after any earlier Favored Gear adjustments. Separate item-restricted dice from ordinary dice.`}</p><label>${loc`Career level at session start`} <input name="careerLevel" type="number" min="1" max="20" step="1" value="${options.careerLevel ?? actor.flags?.spycraft2?.sessionDiceReset?.level ?? actor.system.level}" required /></label><label>${loc`Actual ordinary dice remaining`} <input name="ordinaryBalance" type="number" min="0" step="1" value="${actor.system.actionDice.value}" required /></label>${items.map((item, i) => `<fieldset><legend>${esc(item.name)} — ${loc`Caliber ${item.caliber}`}</legend><label>${loc`Actual item access`} <select name="access_${i}" required><option value="">${loc`Choose actual history`}</option><option value="${item.difference < 0 ? "pay" : "available"}">${item.difference < 0 ? loc`The required ${-item.difference} dice were already discarded` : loc`Available this mission`}</option><option value="forfeit">${loc`Access lost for this mission`}</option></select></label>${item.difference > 0 ? `<div data-when="access_${i}=available"><label>${loc`Actual item-restricted die`} <select name="die_${i}">${[4, 6, 8, 10, 12].map(d => `<option value="${d}">d${d}</option>`).join("")}</select></label><label>${loc`Actual item-restricted dice remaining`} <input name="remaining_${i}" type="number" min="0" step="1" required /></label></div>` : ""}</fieldset>`).join("")}<label>${loc`GC review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms these actual balances and each item's access history`}</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Record actual remaining dice after any earlier Favored Gear adjustments. Separate item-restricted dice from ordinary dice.`}</p><label>${loc`Career level at session start`} <input name="careerLevel" type="number" min="1" max="20" step="1" value="${options.careerLevel ?? actor.flags?.spycraft2?.sessionDiceReset?.level ?? actor.system.level}" required /></label><label>${loc`Actual ordinary dice remaining`} <input name="ordinaryBalance" type="number" min="0" step="1" value="${actor.system.actionDice.value}" required /></label>${items.map((item, i) => `<fieldset><legend>${esc(item.name)} — ${loc`Caliber ${item.caliber}`}</legend><label>${loc`Actual item access`} <select name="access_${i}" required><option value="">${loc`Choose actual history`}</option><option value="${item.difference < 0 && !item.levelChoice ? "pay" : "available"}">${item.difference < 0 && !item.levelChoice ? loc`The required ${-item.difference} dice were already discarded` : loc`Available this mission`}</option><option value="forfeit">${loc`Access lost for this mission`}</option></select></label>${item.difference > 0 && !item.levelChoice ? `<div data-when="access_${i}=available"><label>${loc`Actual item-restricted die`} <select name="die_${i}">${[4, 6, 8, 10, 12].map(d => `<option value="${d}">d${d}</option>`).join("")}</select></label><label>${loc`Actual item-restricted dice remaining`} <input name="remaining_${i}" type="number" min="0" step="1" required /></label></div>` : ""}</fieldset>`).join("")}<label>${loc`GC review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms these actual balances and each item's access history`}</label></div>`
     });
     if (!input) return null;
     input.rows = items.map((item, i) => ({
@@ -108,7 +174,7 @@ export async function reviewFavoredGearSession(actor, options = {}) {
       };
     if (
       !sameValues(currentSnapshot, snapshot) ||
-      !sameValues(favoredGearSessionItems({ ...now, favoredGearForfeits: {} }, [...actor.items], missionCaliber), items)
+      !sameValues(favoredGearReviewItems(now, [...actor.items], missionCaliber), items)
     )
       throw Error(loc`The actual balances, session or favored items changed during review. Review them again.`);
     const id = foundry.utils.randomID(),
@@ -172,6 +238,17 @@ export async function settleFavoredGearSession(actor, options = {}) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
   if (retained(actor)) return retained(actor);
   if (!game.user?.isGM) throw Error(loc`The GC settles Favored Gear at session start or reviews unknown history.`);
+  const reset = actor.flags?.spycraft2?.sessionDiceReset;
+  if (
+    reset?.session === session(actor) &&
+    reset.actorUuid === actor.uuid &&
+    Number.isSafeInteger(reset.level) &&
+    reset.level < actor.system.level &&
+    reset.favoredGearPending !== true
+  )
+    throw Error(
+      loc`Record the new-level favored items instead of replaying session-start dice for a feat acquired after the session began.`
+    );
   const missionCaliber = options.missionCaliber ?? getMission().caliber;
   const rows = favoredGearSessionItems(source(actor), [...actor.items], missionCaliber);
   if (!rows.length) return null;

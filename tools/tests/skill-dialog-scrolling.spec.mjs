@@ -13,7 +13,11 @@ import { resolveFallingDamage, recordUncontrolledFall } from "../../module/apps/
 import { rollEvidence } from "../../module/rules/outcomes.mjs";
 import { finishGearAcquisition } from "../../module/apps/gear-acquisition.mjs";
 import { manageCombatPersuasion } from "../../module/apps/gc/combat-persuasion.mjs";
-import { settleFavoredGearSession, reviewFavoredGearSession } from "../../module/apps/favored-gear-session.mjs";
+import {
+  settleFavoredGearSession,
+  reviewFavoredGearSession,
+  recordFavoredGearLevelChoices
+} from "../../module/apps/favored-gear-session.mjs";
 import { npcDamageSave } from "../../module/apps/gc/npc-play.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
@@ -213,6 +217,45 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+test("new-level favored items keep the full selection and confirmation reachable at 720px", async ({ page }) => {
+  const prior = content,
+    oldGame = game;
+  try {
+    globalThis.game = { ...game, user: { id: "gc", isGM: true } };
+    const items = Array.from({ length: 12 }, (_, i) => ({
+      id: `gear${i}`,
+      uuid: `Actor.level.Item.gear${i}`,
+      name: `Favored item ${i}`,
+      type: "gear",
+      system: { possessionSource: "favoredGear", possessionApproved: true, caliber: 3 }
+    }));
+    const system = {
+      level: 10,
+      actionDice: { value: 3 },
+      usagePeriods: { session: "s1", mission: "m1" },
+      activeFeatSelections: items.map(() => ({ name: "Favored Gear" })),
+      worldTime: 10
+    };
+    await recordFavoredGearLevelChoices(
+      { uuid: "Actor.level", type: "agent", isOwner: true, system, items, flags: {}, actionDiceFundingSystem: system },
+      { missionCaliber: 2 }
+    );
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await expect(page.locator("body")).toContainText("Favored item 11");
+    await page.locator('[name="emptyStartConfirmed"]').check();
+    await page.locator('[name="note"]').fill("Actual complete selection reviewed");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("the actual NPC Damage save keeps the campaign stress choice and roll control reachable at 720px", async ({
   page
 }) => {

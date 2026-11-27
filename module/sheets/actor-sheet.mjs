@@ -314,6 +314,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         "allocateMissionReserves",
         "settleFavoredGearSession",
         "reviewFavoredGearSession",
+        "recordFavoredGearLevelChoices",
         "findImprovisedWeapon",
         "claimGearAcquisition",
         "recoverResourceTransaction",
@@ -1276,6 +1277,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         r.actorUuid === this.actor.uuid
     );
     context.favoredGearReviewLabel = loc`Review favored item history`;
+    const favoredReceipt = Object.values(this.actor.flags?.spycraft2?.favoredGearSessions ?? {}).find(
+      r => r?.session === String(this.actor.usagePeriods?.session ?? "initial") && r.actorUuid === this.actor.uuid
+    );
+    const favoredPriorLevel =
+      favoredReceipt?.lastSelectionLevel ??
+      favoredReceipt?.sessionStartLevel ??
+      favoredReceipt?.level ??
+      this.actor.flags?.spycraft2?.sessionDiceReset?.level;
+    context.canRecordFavoredLevelChoices =
+      context.favoredGearSessionControl && Number.isSafeInteger(favoredPriorLevel) && favoredPriorLevel < sys.level;
+    context.favoredGearLevelLabel = loc`Record new-level favored items`;
+    if (context.canRecordFavoredLevelChoices && !favoredReceipt) context.canSettleFavoredGear = false;
     context.hazards = hazardsView(this.actor);
     context.professor = sys.coreClassIds?.includes("scientist");
     context.trailblazer = sys.coreClassIds?.includes("scout");
