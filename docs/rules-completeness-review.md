@@ -679,3 +679,19 @@ bundling and the text-copy check also pass. Combat rises to **9.4/10**: damage/
 recovery is now 1.95 and conditional options/environments 1.80, with the other
 dimensions unchanged. Creation remains **9.3/10**. Multi-round descent and
 Wire Fu movement still require work; these checks establish the damage rule.
+
+### Continuing pass: Subtle and Violent attack checks
+
+Subtle now reduces actual attack checks and prepared PC/NPC attack figures by
+one. Violent widens attack threat ranges by two through the shared weapon
+planner, including unarmed and final attacks. These combine with existing feat,
+weapon and target-role changes, preserve attacks that cannot threaten, and leave
+error ranges and damage unchanged. Chat results retain the declared campaign
+policy; a changed policy during an attack invalidates its context.
+
+Actual Foundry PC and NPC attacks verified both changes, the sheet figures and
+historical chat results after the qualities ended. All **4,114** Node tests,
+**988** independent fixture assertions and **13** pack checks pass. Lint retains
+its existing warnings with no errors; formatting, bundling and the text-copy
+check pass. Scores remain **PC creation 9.3/10, combat 9.4/10**. Campaign stress,
+disposition, movement and action-die details remain open in B-180/B-183.

@@ -141,9 +141,24 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
     this.initiative.total =
       this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty - this.underminedState.penalty;
     this.attack = {
-      melee: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
-      unarmed: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
-      ranged: cheapShotPenalty(this, "dex") + this.bab + this.abilities.dex.mod + shaken.attackPenalty
+      melee:
+        cheapShotPenalty(this, "str") +
+        this.bab +
+        this.abilities.str.mod +
+        shaken.attackPenalty +
+        (this.campaignEffects?.attackModifier ?? 0),
+      unarmed:
+        cheapShotPenalty(this, "str") +
+        this.bab +
+        this.abilities.str.mod +
+        shaken.attackPenalty +
+        (this.campaignEffects?.attackModifier ?? 0),
+      ranged:
+        cheapShotPenalty(this, "dex") +
+        this.bab +
+        this.abilities.dex.mod +
+        shaken.attackPenalty +
+        (this.campaignEffects?.attackModifier ?? 0)
     };
     this.skillTotals = {};
     this.warnings = [];

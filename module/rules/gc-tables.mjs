@@ -11126,7 +11126,9 @@ export const GC_DATA = {
    "xp": -50,
    "gcDice": 2,
    "summary": "Every attack check by any character, NPCs included, takes a -1 penalty.",
-   "effects": {}
+   "effects": {
+    "attackModifier": -1
+   }
   },
   {
    "id": "tense",
@@ -11156,7 +11158,9 @@ export const GC_DATA = {
    "xp": 50,
    "gcDice": 2,
    "summary": "Threat ranges of all attack checks by any character, NPCs included, widen by 2.",
-   "effects": {}
+   "effects": {
+    "attackThreatIncrease": 2
+   }
   },
   {
    "id": "virtuous",

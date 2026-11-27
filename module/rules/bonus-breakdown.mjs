@@ -125,6 +125,7 @@ export function attackBreakdown(system, kind) {
       { label: loc`Base attack bonus`, value: system.bab, keep: true },
       attribute(system, ability),
       { label: loc`Size`, value: system.sizeModifier },
+      { label: loc`Subtle campaign quality`, value: system.campaignEffects?.attackModifier },
       ...(kind === "unarmed" ? recorded(system, "unarmedAttack") : [])
     ],
     system.attack?.[kind],

@@ -259,6 +259,10 @@ export const ActorAttackRolls = Base =>
         const current = item.id && this.items?.get ? this.items.get(item.id) : item;
         if (!current) throw new Error(loc`The attack weapon no longer exists.`);
         const preview = this.weaponAttack(current, feintContext());
+        if (JSON.stringify(preview.campaignAttackPolicy) !== JSON.stringify(atk.campaignAttackPolicy))
+          throw new Error(
+            loc`The campaign attack modifiers changed during this attack. Review the active qualities and roll again.`
+          );
         if (meleeSnapshot && JSON.stringify(preview.meleeFire) !== meleeSnapshot)
           throw new Error(loc`The ranged melee-fire circumstances or CQB waiver source changed during the attack.`);
         if (
@@ -373,6 +377,7 @@ export const ActorAttackRolls = Base =>
           cleanAndPolished: cleanAndPolishedApplies(this.system, w),
           gearUuid: item.uuid,
           attackContext: {
+            campaignAttackPolicy: atk.campaignAttackPolicy,
             ...(/\blaser\b/i.test(w.damage ?? "") ? { damageType: "laser" } : {}),
             ...(options.underwater === true ? { underwater: true } : {}),
             reach: atk.reach,

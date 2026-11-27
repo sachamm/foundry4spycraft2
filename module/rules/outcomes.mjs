@@ -272,6 +272,9 @@ export function rollEvidence(check) {
         ]
       : []),
     ...(check.attackContext?.damageType ? [{ weaponDamageType: check.attackContext.damageType }] : []),
+    ...(check.attackContext?.campaignAttackPolicy
+      ? [{ campaignAttackPolicy: check.attackContext.campaignAttackPolicy }]
+      : []),
     ...(check.meleeArmorPiercing
       ? [{ meleeArmorPiercing: check.meleeArmorPiercing, weaponQualities: check.weaponQualities }]
       : []),

@@ -1675,21 +1675,24 @@ function deriveFinalTotals(state) {
       sys.sizeModifier +
       B.get("unarmedAttack") +
       sys.conditionPenalties.attack +
-      sys.conditionPenalties.meleeAttack,
+      sys.conditionPenalties.meleeAttack +
+      (sys.campaignEffects?.attackModifier ?? 0),
     melee:
       cheapShotPenalty(sys, "str") +
       sys.bab +
       abil.str.mod +
       sys.sizeModifier +
       sys.conditionPenalties.attack +
-      sys.conditionPenalties.meleeAttack,
+      sys.conditionPenalties.meleeAttack +
+      (sys.campaignEffects?.attackModifier ?? 0),
     ranged:
       cheapShotPenalty(sys, "dex") +
       sys.bab +
       abil.dex.mod +
       sys.sizeModifier +
       sys.conditionPenalties.attack +
-      conditionAbilityPenalty(sys, "dex")
+      conditionAbilityPenalty(sys, "dex") +
+      (sys.campaignEffects?.attackModifier ?? 0)
   };
   const martialArtsFeat = featItems.find(feat => ruleName(feat) === "Martial Arts" && activeFeatIds.has(feat.id));
   const mastersArt = featItems.some(feat => ruleName(feat) === "Master's Art" && activeFeatIds.has(feat.id));

@@ -483,6 +483,12 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     ],
     [180, massive.notes],
     [
+      185,
+      system.campaignEffects?.attackThreatIncrease
+        ? loc`Violent campaign quality: attack threat range +${system.campaignEffects.attackThreatIncrease} (p.408).`
+        : ""
+    ],
+    [
       190,
       finesseBasic.granted
         ? loc`Finesse Basics: optional FIN quality granted; trained use may choose Dexterity damage (p.178).`
@@ -588,6 +594,10 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     mortarOperation,
     launcherOperation,
     proficiency: weapon.proficiency,
+    campaignAttackPolicy: {
+      attackModifier: system.campaignEffects?.attackModifier ?? 0,
+      attackThreatIncrease: system.campaignEffects?.attackThreatIncrease ?? 0
+    },
     ability,
     trained,
     forte,
@@ -630,6 +640,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
         [150, [loc`Condition ability penalty`, conditionAbilityPenalty(system, ability)]],
         [160, [loc`Base attack bonus`, system.bab ?? 0]],
         [170, [loc`Attribute`, system.abilities[ability]?.mod ?? 0]],
+        [175, [loc`Subtle campaign quality`, system.campaignEffects?.attackModifier ?? 0]],
         [180, [loc`Forte`, forte]],
         [190, [loc`Size`, system.sizeModifier ?? 0]],
         [200, [loc`Quirky weapon`, quirky?.attackPenalty ?? 0]],
@@ -651,6 +662,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
             (superiorAccuracy?.threatIncrease ?? 0) -
             (accurized?.threatIncrease ?? 0) -
             stance.threatIncrease -
+            (system.campaignEffects?.attackThreatIncrease ?? 0) -
             terms.sum("threat")
         )
       : 0,
