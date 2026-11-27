@@ -5,6 +5,7 @@ import {
   campaignCqbRange,
   campaignFeatTrades,
   campaignLevelRow,
+  campaignStartingAttributeCap,
   campaignSubplotBonus,
   crossroadsAllowed,
   campaignPointBuy,
@@ -735,7 +736,8 @@ function deriveAttributes(state) {
     tb
   } = state;
   const abilityBonus = new Bonuses(),
-    nonCandidateBonus = new Bonuses();
+    nonCandidateBonus = new Bonuses(),
+    originAbility = new Map();
   sys.unrestrictedBonusPools = unrestrictedBonusPools(sys);
   for (const pool of sys.unrestrictedBonusPools) if (pool.needsReview) warnings.push(pool.reason);
   sys.drunkRepositionState = drunkRepositionHistory(sys);
@@ -774,6 +776,7 @@ function deriveAttributes(state) {
           key = b.target.slice(10);
         abilityBonus.add(key, amount, s.name, b.bonusType);
         if (!s.candidate) nonCandidateBonus.add(key, amount, s.name, b.bonusType);
+        if (s.origin) originAbility.set(key, (originAbility.get(key) ?? 0) + (Number(amount) || 0));
       }
     }
   // Berserker rage, pp.183–184: Strength and Constitution rise while it runs.
@@ -801,6 +804,12 @@ function deriveAttributes(state) {
       warnings.push(loc`${k.toUpperCase()} ${a.base} is outside the creation point-buy range (8–18).`);
     }
     pointCost += a.cost;
+    // Small Screen (p.408): no starting attribute above 18, Origin benefits included.
+    const startingCap = campaignStartingAttributeCap();
+    if (startingCap && a.base + (originAbility.get(k) ?? 0) > startingCap)
+      warnings.push(
+        loc`Small Screen: starting ${k.toUpperCase()} ${a.base + (originAbility.get(k) ?? 0)} with its Origin is above ${startingCap}.`
+      );
   }
   sys.candidateScores = Object.fromEntries(
     ABILITIES.map(k => [

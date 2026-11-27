@@ -40,8 +40,9 @@ function agent(levels = 1, className = "Soldier", extra = {}) {
     actionDice: { value: 0 },
     xp: 0
   };
-  Object.assign(sys, extra);
-  computeAgent(sys, [{ id: "c", name: doc.name, type: doc.type, system: structuredClone(doc.system) }], cfg);
+  const { items = [], ...fields } = extra;
+  Object.assign(sys, fields);
+  computeAgent(sys, [{ id: "c", name: doc.name, type: doc.type, system: structuredClone(doc.system) }, ...items], cfg);
   return sys;
 }
 
@@ -149,4 +150,24 @@ test("Routine leaves a Crossroads Title without benefits", t => {
   assert.equal(routine.crossroads.actionDice, 0);
   assert.equal(routine.actionDice.max, titled.actionDice.max - 1);
   assert.ok(routine.warnings.some(line => line.startsWith("Routine is in force")));
+});
+
+test("Small Screen flags a starting attribute above 18 with its Origin", t => {
+  t.after(() => setCampaignRulesSource(null));
+  setCampaignRulesSource(() => ({ pointBuy: 32 }));
+  const origin = {
+    id: "o",
+    name: "Test talent",
+    type: "origin",
+    system: { originType: "talent", bonuses: [{ target: "abilities.str", value: "2" }] }
+  };
+  const fine = agent(1, "Soldier", { items: [origin] });
+  assert.ok(!fine.warnings.some(line => line.startsWith("Small Screen")));
+  const high = agent(1, "Soldier", {
+    items: [origin],
+    abilities: Object.fromEntries(
+      ["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: k === "str" ? 18 : 10, misc: 0 }])
+    )
+  });
+  assert.ok(high.warnings.some(line => line.startsWith("Small Screen: starting STR 20")));
 });

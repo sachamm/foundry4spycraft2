@@ -461,7 +461,7 @@ export function accumulatedDamageLines(name, kind, amount, record, system = {}) 
  * @returns {{lines: string[], pendingSave: object|null}}
  */
 async function nonLethalDamage(target, kind, amount, facts) {
-  const { source, attackKind, armorPiercing = 0, armorPiercingAll = false, critical = false } = facts;
+  const { source, attackKind, armorPiercing = 0, armorPiercingAll = false, critical = false, proficiency = "" } = facts;
   if (target.type === "agent") {
     try {
       const record = await applyAccumulatedDamage(target, {
@@ -471,7 +471,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
         criticalHit: critical === true,
         confirmed: true,
         ...(kind === "subdual"
-          ? { damageMode: "subdualBeforeDefenses", attackKind, armorPiercing, armorPiercingAll }
+          ? { damageMode: "subdualBeforeDefenses", attackKind, armorPiercing, armorPiercingAll, proficiency }
           : { damageMode: "stressBeforeResistance" })
       });
       return {

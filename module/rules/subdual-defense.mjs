@@ -1,6 +1,7 @@
 import { preparedResistanceSource } from "./resistances.mjs";
 import { armorTrainingDRForAttack } from "./armor-training.mjs";
 import { loc } from "../i18n.mjs";
+import { specialistDefense } from "./weapon-specialist.mjs";
 /** DR categories of an incoming attack. The labels are read when asked for, in the reader's language. */
 export const SUBDUAL_ATTACK_KINDS = {
   get unarmed() {
@@ -38,7 +39,7 @@ export const subdualDefenseSourceSnapshot = (system, kind) => JSON.stringify(sub
 /** pp.332–333,339: AP reduces DR, each remaining point absorbs two subdual, then resistance applies. */
 export function subdualDefensePlan(
   system,
-  { rawDamage, attackKind, armorPiercing = 0, armorPiercingAll = false, criticalHit = false } = {}
+  { rawDamage, attackKind, armorPiercing = 0, armorPiercingAll = false, criticalHit = false, proficiency = "" } = {}
 ) {
   if (
     !Number.isSafeInteger(rawDamage) ||
@@ -49,8 +50,10 @@ export function subdualDefensePlan(
     typeof criticalHit !== "boolean"
   )
     throw new Error(loc`Confirm whole subdual damage/AP and the actual AP(all)/critical checkboxes.`);
+  // Weapon Specialist Foibles (p.50): DR 1/— more against the attacking weapon's chosen proficiencies.
+  const foibles = proficiency ? specialistDefense(system, proficiency).damageReduction : 0;
   const source = subdualDefenseSource(system, attackKind),
-    temporaryDR = armorPiercingAll ? 0 : Math.max(0, source.listedDR - armorPiercing),
+    temporaryDR = armorPiercingAll ? 0 : Math.max(0, source.listedDR + foibles - armorPiercing),
     effectiveDR = temporaryDR * 2;
   if (!Number.isSafeInteger(effectiveDR)) throw new Error(loc`The doubled subdual DR cannot be represented safely.`);
   const afterDR = Math.max(0, rawDamage - effectiveDR),
@@ -65,6 +68,7 @@ export function subdualDefensePlan(
     ...source,
     armorPiercing: armorPiercingAll ? 0 : armorPiercing,
     armorPiercingAll,
+    foibles,
     temporaryDR,
     effectiveDR,
     afterDR,

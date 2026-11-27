@@ -500,3 +500,6 @@ export const campaignSubplotBonus = (effects = campaignRules()) =>
 
 /** Routine (p.408): no Crossroads Subplots, so no Crossroads Titles. */
 export const crossroadsAllowed = (effects = campaignRules()) => !effects.noCrossroads;
+
+/** Small Screen (p.408): the highest a starting attribute may be with its Origin, or null with no such limit. */
+export const campaignStartingAttributeCap = (effects = campaignRules()) => (effects.pointBuy ? 18 : null);
