@@ -67,16 +67,22 @@ export async function editContactPeople(actor, index) {
     ok: loc`Save the contact`
   });
   if (!input) return null;
-  contact.people = contact.people.filter((_, i) => input[`remove-${i}`] !== true);
+  const removed = new Set(contact.people.filter((_, i) => input[`remove-${i}`] === true).map(personKey));
+  let added = null;
   if (room && input.kind) {
-    const person = { ...newContactPerson(contact, input.kind), skill: input.kind === "consultant" ? input.skill : "" };
-    person.ability = input.kind === "specialist" ? String(input.ability ?? "").trim() : "";
-    if (person.kind === "specialist" && !person.ability)
+    added = { ...newContactPerson(contact, input.kind), skill: input.kind === "consultant" ? input.skill : "" };
+    added.ability = input.kind === "specialist" ? String(input.ability ?? "").trim() : "";
+    if (added.kind === "specialist" && !added.ability)
       return refuse(loc`Name the specialist's class ability, then save again.`);
-    contact.people.push(person);
   }
-  contacts[index] = contact;
-  return actor.update({ "system.contacts": contacts });
+  try {
+    return await saveContactPeople(actor, index, contact.name, current => [
+      ...current.people.filter(person => !removed.has(personKey(person))),
+      ...(added && !current.people.some(person => personKey(person) === personKey(added)) ? [added] : [])
+    ]);
+  } catch (error) {
+    return refuse(error.message);
+  }
 }
 
 /** A shared contact's people come from whoever introduced them first; this copies the ones within reach. */
@@ -95,22 +101,15 @@ async function shareContactPeople(actor, contacts, index, shared) {
     ok: loc`Use the shared people`
   });
   if (!ok) return null;
-  const kept = new Map(
-    (contact.people ?? []).map(person => [
-      `${person.kind}|${person.grade}|${person.skill}|${person.ability}`,
-      person.summoned
-    ])
-  );
   // People only this sheet introduced are kept, unless they clash with the earlier introductions.
-  contact.people = [
-    ...shared.reachable.map(person => ({
-      ...person,
-      summoned: kept.get(`${person.kind}|${person.grade}|${person.skill}|${person.ability}`) ?? ""
-    })),
-    ...(shared.problems.length ? [] : shared.extras)
-  ];
-  contacts[index] = contact;
-  return actor.update({ "system.contacts": contacts });
+  try {
+    return await saveContactPeople(actor, index, contact.name, () => [
+      ...shared.reachable,
+      ...(shared.problems.length ? [] : shared.extras)
+    ]);
+  } catch (error) {
+    return refuse(error.message);
+  }
 }
 
 /** Summon a consultant or specialist after a successful Contact check: once per mission, at the Threat Level. */
