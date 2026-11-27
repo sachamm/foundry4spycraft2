@@ -509,7 +509,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       featTrades: new SchemaField({
         purchased: int(0, { min: 0 }),
         modular: int(0, { min: -20, max: 20 }),
-        // The mission period of the last Feat Purchase: one feat may be bought at the end of each mission (p.406).
+        // The mission period of the last Feat Purchase: one feat may be bought at the end of each mission (p.407).
         purchaseMission: str()
       }),
       relinquishedInterests: int(0, { min: 0 }),

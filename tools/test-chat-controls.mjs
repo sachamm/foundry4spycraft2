@@ -278,7 +278,7 @@ test("the GC spends the session pool from an NPC's card; the NPC's own threat is
   const gc = { isGM: true };
   assert.deepEqual(labels(message({ checkKind: "attack" }), gc).slice(0, 1), ["card:GC boost (+1d4)"]);
   const threat = labels(message({ checkKind: "attack", threatConfirmed: true }), gc);
-  assert.deepEqual(threat.slice(0, 2), ["card:GC: activate threat", "card:GC boost (+1d4)"]);
+  assert.deepEqual(threat.slice(0, 2), ["card:Activate threat (GC dice)", "card:GC boost (+1d4)"]);
   assert.equal(
     threat.some(label => label.startsWith("card:Activate critical")),
     false

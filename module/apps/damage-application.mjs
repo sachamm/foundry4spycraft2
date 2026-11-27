@@ -68,7 +68,7 @@ export const tokenInView = actor => {
 const canSee = actor =>
   actor?.isOwner === true || game.user?.isGM === true || actor?.visible === true || tokenInView(actor);
 /** Post a report. `pendingSave` makes it a card with a button that rolls the save it calls for. */
-const post = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
+export const postDamageReport = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
     content: `<div class="spycraft2 chat-note">${lines
@@ -516,7 +516,9 @@ rollPipeline.register({
 /** A hit of 25 or more (p.331): a failed save means a critical injury, and –9 wounds for a hit of 50 or more. */
 hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded) => {
   if (succeeded)
-    return post(actor, [loc`${esc(actor.name)} makes the save against massive damage: no critical injury.`]);
+    return postDamageReport(actor, [
+      loc`${esc(actor.name)} makes the save against massive damage: no critical injury.`
+    ]);
   const lines = [loc`${esc(actor.name)} fails the save against massive damage.`],
     rolls = [];
   const reference = `massive-${message?.id ?? foundry.utils.randomID(8)}`,
@@ -543,20 +545,20 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
       ...(await woundConditions(actor, woundState(wounds, actor.system.deathThreshold)))
     );
   }
-  return post(actor, lines, { rolls });
+  return postDamageReport(actor, lines, { rolls });
 });
 
 /** A stress or subdual threshold on a character without a ledger (pp.339–340). */
 hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded, check) => {
-  if (succeeded) return post(actor, [loc`${esc(actor.name)} makes the save: no further effect.`]);
+  if (succeeded) return postDamageReport(actor, [loc`${esc(actor.name)} makes the save: no further effect.`]);
   if (save.damageKind === "stress")
-    return post(actor, [
+    return postDamageReport(actor, [
       save.failureOutcome
         ? loc`${esc(actor.name)} fails the save: ${esc(save.failureOutcome)}. Use "Apply Shaken" on the sheet to record it.`
         : loc`${esc(actor.name)} fails the save from a critical hit below every threshold: the GC decides the effect.`
     ]);
   const time = knockoutDuration(save.knockoutBase, save.dc, Number(check?.effectiveTotal));
-  return post(actor, [
+  return postDamageReport(actor, [
     time
       ? loc`${esc(actor.name)} fails the save and is unconscious for ${time.count} ${time.unit}(s). The game clock ends it.`
       : loc`${esc(actor.name)} fails the save and is unconscious; the GC sets how long.`,
@@ -791,7 +793,7 @@ export async function applyDamage(message, options = {}) {
         : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
     );
   }
-  if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
+  if (lines.filter(Boolean).length) await postDamageReport(target, lines, { pendingSave, rolls });
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
   if (failed) return null;
   // When the card cannot be marked the report above is the record.

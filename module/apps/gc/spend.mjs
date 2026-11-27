@@ -292,8 +292,13 @@ export function dramaticOpponent(combatant) {
 }
 
 /** Dramatic scene: double each opponent's current Initiative Count, to at most 50 (p.424). Each combatant is doubled once per combat. */
-export async function doubleOpponentInitiative(combat = game.combat, { quiet = false } = {}) {
+export function doubleOpponentInitiative(combat = game.combat, options = {}) {
   requireGC();
+  // On the Initiative queue, so a doubling never lands in the middle of the end-of-round pass (p.424).
+  return queueInitiative(() => doubleNow(combat, options));
+}
+
+async function doubleNow(combat, { quiet = false } = {}) {
   if (!combat) return quiet ? [] : refuse(loc`There is no active combat.`);
   if (!isDramaticScene()) return quiet ? [] : refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
@@ -323,7 +328,7 @@ export function installDramaticInitiative() {
     if (game.users?.activeGM?.id !== game.user.id || !Object.hasOwn(changed, "initiative")) return;
     if (!Number.isFinite(changed.initiative) || combatant.flags?.spycraft2?.dramaticDoubled) return;
     if (!isDramaticScene() || !dramaticOpponent(combatant)) return;
-    queueInitiative(() => doubleOpponentInitiative(combatant.combat, { quiet: true })).catch(error =>
+    doubleOpponentInitiative(combatant.combat, { quiet: true }).catch(error =>
       console.warn("Field Agent's Handbook | A dramatic Initiative Count was not doubled.", error)
     );
   });

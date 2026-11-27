@@ -404,9 +404,20 @@ export function periodResourceActors() {
   for (const scene of globalThis.game?.scenes ?? [])
     for (const token of scene.tokens ?? []) {
       const actor = token.actor;
-      // NPC tokens read the period from the world setting and are reset by the refresh, so they need no lock.
+      // NPC tokens read the period from the world setting and are reset by periodRefreshActors, so need no lock.
       if (actor?.type === "agent" && actor.isToken) actors.push(actor);
     }
+  return [...new Map(actors.map(actor => [actor.uuid, actor])).values()];
+}
+
+/**
+ * Every actor whose derived numbers read the usage periods: world actors and every unlinked token's actor, NPCs
+ * included. A period change refreshes them all, though only the agents above are locked for it.
+ */
+export function periodRefreshActors() {
+  const actors = [...(globalThis.game?.actors ?? [])];
+  for (const scene of globalThis.game?.scenes ?? [])
+    for (const token of scene.tokens ?? []) if (token.actor?.isToken) actors.push(token.actor);
   return [...new Map(actors.map(actor => [actor.uuid, actor])).values()];
 }
 

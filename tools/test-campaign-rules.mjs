@@ -309,3 +309,42 @@ test("round-2 council: campaign DCs reach helpers, Surgery and bleeding; promoti
     true
   );
 });
+
+test("round-3 council: NPC critical prices, Feat Purchase mid-mission, the whole helper DC shifts, villains are special", async () => {
+  const { npcCriticalPrice } = await import("../module/rules/critical-effects.mjs");
+  const { featPurchasePlan } = await import("../module/rules/campaign-rules.mjs");
+  const { helperDC } = await import("../module/rules/cooperative.mjs");
+  const { characterTargetPlan } = await import("../module/rules/character-target.mjs");
+  const attack = { checkKind: "attack" };
+  // Gritty brings the Ouch-at-0 critical to 0: nothing is spent.
+  withQualities(["gritty"], () => {
+    const free = criticalHitChoices(attack).find(choice => choice.id === "hit.ouchAtZero");
+    assert.equal(npcCriticalPrice(attack, free.cost).cost, 0);
+  });
+  assert.deepEqual(npcCriticalPrice(attack, 1, { laser: true }), {
+    cost: 0,
+    baseCost: 1,
+    sources: ["Laser damage –1"]
+  });
+  const toughLuck = npcCriticalPrice({ ...attack, blackCat: { toughLuck: true } }, 1);
+  assert.equal(toughLuck.cost, 2);
+  assert.match(toughLuck.sources[0], /Tough Luck/);
+  assert.equal(npcCriticalPrice({ checkKind: "skill", blackCat: { toughLuck: true } }, 1).cost, 2, "skill too");
+  const role = { ...attack, attackContext: { targetRole: { label: "Mastermind", extraDiceToActivate: 2 } } };
+  assert.equal(npcCriticalPrice(role, 1).cost, 3);
+  assert.equal(npcCriticalPrice(role, 2, { bloodbath: true }).cost, 0);
+  assert.equal(npcCriticalPrice({ checkKind: "skill" }, 1, { bloodbath: true, laser: true }).cost, 1, "attacks only");
+
+  const system = { level: 3, xp: 20000, usagePeriods: { mission: "m2" } };
+  const during = featPurchasePlan(system, { xp: 3000 }, { featPurchase: true }, { missionActive: true });
+  assert.equal(during.allowed, false);
+  assert.match(during.reason, /mission is under way/);
+  assert.equal(featPurchasePlan(system, { xp: 3000 }, { featPurchase: true }, { missionActive: false }).allowed, true);
+
+  withQualities(["comedy-of-errors"], () => assert.equal(helperDC({ leaderResult: 40 }), 35));
+  withQualities(["cakewalk"], () => assert.equal(helperDC({ leaderResult: 40 }), 25));
+
+  const villain = characterTargetPlan({ uuid: "Actor.v", type: "npc", npcType: "villain" });
+  assert.equal(villain.characterType, "special");
+  assert.equal(villain.standard, false);
+});

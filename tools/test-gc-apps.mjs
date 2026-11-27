@@ -1243,3 +1243,32 @@ test("a mission's start rolls liquidation for each targeted agent and keeps the 
     a4.flags = before.flags4;
   }
 });
+
+test("round-3 council: an NPC card's critical is priced like an agent's, a free one spends nothing, and the card text is rebuilt", async () => {
+  const { gcActivateThreat } = await import("../module/apps/gc/npc-card-dice.mjs");
+  const card = check => ({
+    flags: { spycraft2: { checkKind: "attack", threatConfirmed: true, rawTotal: 20, effectiveTotal: 20, ...check } },
+    async update(patch) {
+      this.patch = patch;
+      for (const [path, value] of Object.entries(patch))
+        if (path.startsWith("flags.spycraft2.")) this.flags.spycraft2[path.slice(16)] = value;
+    }
+  });
+  const before = gcDiceStatus().value;
+  // Laser damage takes the 1-die wounds critical to 0: recorded without a spend.
+  const laser = card({ attackContext: { laser: true } });
+  assert.equal(await gcActivateThreat(laser, boss, { preset: "hit.wounds" }), true);
+  assert.equal(laser.flags.spycraft2.criticalActivation.cost, 0);
+  assert.deepEqual(laser.flags.spycraft2.criticalActivation.sources, ["Laser damage –1"]);
+  assert.equal(typeof laser.patch.flavor, "string", "the card's text is rebuilt");
+  assert.equal(gcDiceStatus().value, before);
+  // Tough Luck adds a die to what the GC pays.
+  const marked = card({ blackCat: { toughLuck: true } });
+  assert.equal(await gcActivateThreat(marked, boss, { preset: "hit.wounds" }), true);
+  assert.equal(marked.flags.spycraft2.criticalActivation.cost, 2);
+  assert.equal(gcDiceStatus().value, before - 2);
+  // A standard NPC without treacherous gets no laser discount and no critical.
+  const plain = card({ attackContext: { laser: true } });
+  assert.equal(await gcActivateThreat(plain, guard, { preset: "hit.wounds" }), null);
+  assert.equal(plain.flags.spycraft2.criticalSuccess, undefined);
+});

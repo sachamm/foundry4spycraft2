@@ -30,11 +30,14 @@ export function helperLimit(check, { charismaMod = 0 } = {}) {
   return { allowed: max === null || max > 0, max, special: false, smallItem: rule.smallItem === true };
 }
 
-/** The DC each helper rolls against. */
+/**
+ * The DC each helper rolls against: 10, or the leader's result less 10 when that is higher (p.91). Cakewalk and
+ * Comedy of Errors shift the whole DC, whichever it is.
+ */
 export function helperDC({ setDC = false, leaderResult = null } = {}) {
   if (setDC) return helperBaseDC();
   if (!Number.isFinite(leaderResult)) throw new Error(loc`The leader's result is needed to set the helpers' DC.`);
-  return Math.max(helperBaseDC(), leaderResult - 10);
+  return campaignSkillDC(Math.max(HELPER_BASE_DC, leaderResult - 10));
 }
 
 /**

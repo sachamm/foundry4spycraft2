@@ -325,8 +325,12 @@ async function startVacuum(actor, { amount, firstRound, source }) {
   return applyVacuum(actor, rolled, source, rolls);
 }
 
-async function applyVacuum(actor, damage, source, rolls = []) {
-  const result = await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum);
+async function applyVacuum(actor, damage, source, rolls = [], { resisted = false } = {}) {
+  // Blockbuster's full resistance takes no damage this round, but the exposure still starts and the character still
+  // suffocates.
+  const result = resisted
+    ? { lines: [RESISTED()], lost: 0, rolls: [] }
+    : await sufferTypedLethal(actor, "vacuum", damage, DAMAGE_TYPE_LABELS.vacuum);
   result.lines.push(loc`A character in vacuum is also suffocating (p.349).`);
   const tracked = addExposure(hazardState(actor.system), {
     type: "vacuum",
@@ -669,9 +673,9 @@ const resolvers = {
     return post(actor, [rounds ? await condition(actor, "stun", rounds, loc`Stunned`) : loc`Explosive: no stun.`]);
   },
   async vacuum(actor, message, save, succeeded) {
-    if (resistsFully(actor, succeeded)) return post(actor, [RESISTED()]);
-    const damage = vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
-    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum);
+    const resisted = resistsFully(actor, succeeded),
+      damage = resisted ? 0 : vacuumDamage(save.damage, { firstRound: true, saved: succeeded });
+    return applyVacuum(actor, damage, save.source ?? DAMAGE_TYPE_LABELS.vacuum, [], { resisted });
   },
   async typedInjury(actor, message, save, succeeded) {
     const state = hazardState(actor.system);

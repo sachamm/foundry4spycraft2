@@ -31,10 +31,16 @@ export function characterTargetPlan(target, { targetCharacterType = "", targetNa
     typeof target.uuid !== "string" ||
     !target.uuid ||
     !["agent", "npc"].includes(target.type) ||
-    (target.type === "npc" && !["standard", "special", "animal"].includes(target.npcType))
+    (target.type === "npc" && !["standard", "special", "villain", "animal"].includes(target.npcType))
   )
     throw new Error(loc`Review the actual target’s character type.`);
-  const known = target.type === "agent" ? "special" : target.npcType === "animal" ? null : target.npcType;
+  // A villain (the legacy special type) is a special character.
+  const known =
+    target.type === "agent" || target.npcType === "villain"
+      ? "special"
+      : target.npcType === "animal"
+        ? null
+        : target.npcType;
   if (known && targetCharacterType && targetCharacterType !== "object" && known !== targetCharacterType)
     throw new Error(
       loc`The declared target type conflicts with its actual character sheet. Correct the source before attacking.`

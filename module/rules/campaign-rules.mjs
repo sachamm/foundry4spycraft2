@@ -522,9 +522,28 @@ export function campaignFeatTrades(trades = {}, effects = campaignRules()) {
   return { feats, points, purchased, modular, problems };
 }
 
-/** Feat Purchase (p.406): the XP a feat costs at a career level, and whether the character can pay it. */
-export function featPurchasePlan(system, levelRow, effects = campaignRules()) {
+/** Whether the mission setting says a mission is under way (false before the settings are registered). */
+export function missionUnderWay() {
+  try {
+    return globalThis.game?.settings?.get("spycraft2", "mission")?.active === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Feat Purchase (p.407): the XP a feat costs at a career level, and whether the character can pay it. The trade is
+ * made at the end of a mission, so it is refused while one is under way.
+ */
+export function featPurchasePlan(
+  system,
+  levelRow,
+  effects = campaignRules(),
+  { missionActive = missionUnderWay() } = {}
+) {
   if (!effects.featPurchase) return { allowed: false, reason: loc`Feat Purchase is not in force this season.` };
+  if (missionActive)
+    return { allowed: false, reason: loc`A mission is under way. A feat is bought with XP when the mission ends.` };
   const level = Number(system?.level) || 0;
   if (level < 1) return { allowed: false, reason: loc`Finish Level 1 before buying a feat.` };
   const mission = String(system?.usagePeriods?.mission ?? "initial");

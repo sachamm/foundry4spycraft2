@@ -612,12 +612,16 @@ export function installFluidInitiativeHooks() {
     settling.add(combat.id);
     try {
       const changedCounts = await applyEndOfRound(combat, previous);
-      await rollTiebreaks(combat);
-      // The new round starts from the top of the revised order, not from whoever led the last one.
-      if (changedCounts.length) {
-        combat.setupTurns?.();
-        if (combat.turn !== 0) await combat.update({ turn: 0 });
-      }
+      // Tiebreaks and the turn reset wait their place on the Initiative queue, behind any dramatic doubling the
+      // pass set off, so the new order already holds the doubled Counts.
+      await queueInitiative(async () => {
+        await rollTiebreaks(combat);
+        // The new round starts from the top of the revised order, not from whoever led the last one.
+        if (changedCounts.length) {
+          combat.setupTurns?.();
+          if (combat.turn !== 0) await combat.update({ turn: 0 });
+        }
+      });
       ui.combat?.render();
     } catch (error) {
       ui.notifications.warn(loc`Fluid initiative needs review: ${error.message}`);

@@ -4,7 +4,7 @@
  * NPCs have no action dice of their own; the GC spends from the session pool (pp.397–399, 452). On an NPC's open
  * attack, skill or save card the GC gets two buttons:
  *  - "GC boost (+1dN)" pays one die, rolls the NPC's die type and adds it to the card's total;
- *  - "GC: activate threat" pays for a confirmed threat and marks the card as a critical success, so the damage roll
+ *  - "Activate threat (GC dice)" pays for a confirmed threat and marks the card as a critical success, so the damage roll
  *    and its application carry the critical hit on.
  * Both go through spendGCDice, which checks the pool, the NPC's qualities and posts the spend to the GC.
  */
@@ -18,7 +18,8 @@ import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
 import { esc } from "../../html.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
-import { criticalHitChoices } from "../../rules/critical-effects.mjs";
+import { criticalHitChoices, npcCriticalPrice } from "../../rules/critical-effects.mjs";
+import { checkFlavor } from "../../rules/outcomes.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
@@ -60,12 +61,20 @@ export async function gcBoostCard(message, actor) {
     "flags.spycraft2.boostTotal": boostTotal,
     "flags.spycraft2.capped": resolved.limited,
     "flags.spycraft2.potentialTriumph": ["skill", "knowledge", "attack"].includes(check.checkKind) && resolved.triumph,
-    "flags.spycraft2.gcBoosts": [...(check.gcBoosts ?? []), result.die.total]
+    "flags.spycraft2.gcBoosts": [...(check.gcBoosts ?? []), result.die.total],
+    flavor: checkFlavor({
+      ...check,
+      effectiveTotal: resolved.total,
+      boostTotal,
+      capped: resolved.limited,
+      gcBoosts: [...(check.gcBoosts ?? []), result.die.total]
+    })
   });
   return resolved.total;
 }
 
-const laserCriticalAllowed = actor => {
+/** Whether this NPC may have its attack criticals activated at all (special, or treacherous; p.452). */
+const attackCriticalAllowed = actor => {
   try {
     const profile = spendProfile(actor);
     return profile.type === "special" || profile.treacherous === true;
@@ -74,68 +83,86 @@ const laserCriticalAllowed = actor => {
   }
 };
 
-/** Ask which critical hit an NPC's attack buys (p.329), with its price; null when the GC backs out. */
-async function chooseNpcCritical(check, preset) {
-  const choices = criticalHitChoices(check);
+/** The price of each critical hit on the p.329 list for this NPC's attack, after its discounts and surcharges. */
+const pricedChoices = (check, terms) =>
+  criticalHitChoices(check).map(choice => ({ ...choice, price: npcCriticalPrice(check, choice.cost, terms) }));
+
+/** Ask which critical hit an NPC's attack buys (p.329), at what the GC pays for it; null when the GC backs out. */
+async function chooseNpcCritical(check, terms, preset) {
+  const choices = pricedChoices(check, terms);
   if (!choices.length) return null;
   if (preset) return choices.find(choice => choice.id === preset) ?? null;
+  const dice = n => (n === 1 ? loc`1 die` : loc`${n} dice`);
   const picked = await systemDialog.input({
-    window: { title: loc`Activate the critical hit` },
+    window: { title: loc`Activate the NPC's critical hit` },
     rejectClose: false,
-    ok: { label: loc`Activate` },
+    ok: { label: loc`Activate critical hit` },
     content: `<div class="spycraft2-roll-options"><label>${loc`Effect`} <select name="preset">${choices
       .map(
-        choice => `<option value="${esc(choice.id)}">${esc(loc`${choice.cost} die/dice — ${choice.label}`)}</option>`
+        choice =>
+          `<option value="${esc(choice.id)}">${esc(`${choice.price.cost ? dice(choice.price.cost) : loc`Free`} — ${choice.label}`)}</option>`
       )
-      .join(
-        ""
-      )}</select></label><p class="hint">${loc`Choose by the target: a special character with vitality left, one at 0 vitality, or a standard character (p.329).`}</p></div>`
+      .join("")}</select></label>${
+      choices[0].price.sources.length
+        ? `<p class="hint">${esc(loc`Price changes: ${choices[0].price.sources.join("; ")}.`)}</p>`
+        : ""
+    }<p class="hint">${loc`Choose by the target: a special character with vitality left, one at 0 vitality, or a standard character (p.329).`}</p></div>`
   });
   return picked ? (choices.find(choice => choice.id === picked.preset) ?? null) : null;
 }
 
 /**
  * Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. An attack's critical is
- * chosen from the p.329 list at its own price; a skill check's costs 1 die.
+ * chosen from the p.329 list at its own price; a skill check's costs 1 die. Laser damage, Tough Luck, a Henchman or
+ * Mastermind target and Bloodbath change the price (npcCriticalPrice); a price of 0 is recorded without a spend.
  */
 export async function gcActivateThreat(message, actor, { preset = null } = {}) {
   const check = message.flags.spycraft2,
-    attack = check.checkKind === "attack";
-  const choice = attack ? await chooseNpcCritical(check, preset) : null;
+    attack = check.checkKind === "attack",
+    allowed = attack ? attackCriticalAllowed(actor) : true,
+    terms = {
+      // Laser damage (p.338) only helps an NPC that may activate attack criticals at all.
+      laser: attack && check.attackContext?.laser === true && allowed,
+      // Bloodbath (p.406): a special character's attack threat becomes a critical hit without paying a die.
+      bloodbath: attack && threatsAutoActivate() && !!actor && npcIsSpecial(actor)
+    };
+  const choice = attack ? await chooseNpcCritical(check, terms, preset) : null;
   if (attack && !choice) return null;
-  const record = (cost, extra = {}) =>
-    message.update({
-      "flags.spycraft2.criticalSuccess": true,
-      "flags.spycraft2.criticalActivation": {
+  const price = choice?.price ?? npcCriticalPrice(check, 1, terms);
+  const record = async cost => {
+    const criticalActivation = {
         cost,
         payer: "gc",
         ...(choice ? { kind: "success", effect: choice.label, preset: choice.id, baseCost: choice.cost } : {}),
-        ...extra
-      }
+        ...(price.sources.length ? { sources: price.sources } : {})
+      },
+      next = { ...check, criticalSuccess: true, criticalActivation };
+    await message.update({
+      "flags.spycraft2.criticalSuccess": true,
+      "flags.spycraft2.criticalActivation": criticalActivation,
+      flavor: checkFlavor(next)
     });
-  // Bloodbath (p.406): a special character's attack threat becomes a critical hit without paying a die.
-  if (attack && threatsAutoActivate() && actor && npcIsSpecial(actor)) {
-    await record(0, { source: "Bloodbath" });
     return true;
-  }
-  // Laser damage (p.338): a threat costs 1 action die less to activate. Only an NPC that may activate attack
-  // criticals at all (special, or treacherous) gets it; any other goes on to the usual spend, which refuses it.
-  const laser = attack && check.attackContext?.laser === true && laserCriticalAllowed(actor);
-  const cost = Math.max(0, (choice?.cost ?? 1) - (laser ? 1 : 0));
-  if (laser && cost === 0) {
-    await record(0, { source: loc`Laser damage –1` });
-    return true;
+  };
+  if (price.cost === 0) {
+    // A free critical still needs an NPC that may score one (p.452); Bloodbath is its own permission.
+    if (!terms.bloodbath && !allowed) {
+      ui.notifications.warn(
+        loc`A standard NPC needs the treacherous quality before the GC may activate its critical hits (p.452).`
+      );
+      return null;
+    }
+    return record(0);
   }
   const result = await spendGCDice({
     id: "activateThreat",
     actor,
     onCard: true,
-    dice: Math.max(1, cost),
+    dice: price.cost,
     checkKind: attack ? "attack" : "skill"
   });
   if (!result?.plan) return null;
-  await record(result.plan.cost, laser ? { source: loc`Laser damage –1` } : {});
-  return true;
+  return record(result.plan.cost);
 }
 
 rollPipeline.register({
@@ -162,7 +189,7 @@ rollPipeline.register({
       : [];
     if (check.threatConfirmed && !check.criticalSuccess && !check.criticalFailure)
       controls.unshift({
-        label: loc`GC: activate threat`,
+        label: loc`Activate threat (GC dice)`,
         placement: "card",
         run: () => gcActivateThreat(message, actor)
       });

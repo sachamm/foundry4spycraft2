@@ -133,3 +133,30 @@ export function applyCriticalChoice(check, input = {}) {
   const extra = String(input.effect ?? "").trim();
   return { ...input, baseCost: choice.cost, effect: extra ? `${choice.label} — ${extra}` : choice.label };
 }
+
+/**
+ * What the GC pays to activate an NPC's critical: the effect's table cost (1 for a skill check), less 1 for laser
+ * damage (p.338, only for an NPC allowed to activate attack criticals), plus 1 against a Black Cat's Tough Luck and
+ * the extra dice for a Henchman or Mastermind target (pp.447–448), never below 0. Under Bloodbath (p.406) a special
+ * character's attack critical is free. `sources` names each change, as on an agent's activation.
+ */
+export function npcCriticalPrice(check, baseCost = 1, { laser = false, bloodbath = false } = {}) {
+  const attack = check?.checkKind === "attack";
+  if (attack && bloodbath) return { cost: 0, baseCost, sources: [loc`Bloodbath: a critical hit at no cost (p.406)`] };
+  const sources = [];
+  let adjustment = 0;
+  if (attack && laser) {
+    adjustment--;
+    sources.push(loc`Laser damage –1`);
+  }
+  if (check?.blackCat?.toughLuck === true) {
+    adjustment++;
+    sources.push(loc`Tough Luck (Black Cat target) +1`);
+  }
+  const role = check?.attackContext?.targetRole;
+  if (attack && Number.isSafeInteger(role?.extraDiceToActivate) && role.extraDiceToActivate > 0) {
+    adjustment += role.extraDiceToActivate;
+    sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
+  }
+  return { cost: Math.max(0, baseCost + adjustment), baseCost, sources };
+}

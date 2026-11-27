@@ -637,7 +637,7 @@ What stays in this section is what a contributor needs while working: what alrea
 - The `?` captions on vitality, wounds and action dice (`agent-rail.hbs`).
 - The attack dialog's quick/advanced split with a "N set" counter, `briefOption`, and remembered choices with Reset.
 - One-click Resolve with a hit/miss preview; NPC quick resolve against the T-target; the cover selector in Resolve (`damage-application.mjs:208`).
-- GC boost and GC activate threat on NPC cards, paid from the GC dice.
+- GC boost and Activate threat (GC dice) on NPC cards, paid from the GC dice.
 - Reach: block the player, ask the GC — the model for 8.3.
 - "Begin combat" warning with "Roll for NPCs and remind players" as the default (`module/apps/gc/combat.mjs:96-102`) — the model for 4.6 and 6.1.
 - _Trust the table_ marking what it ticked, and the same note for a GC (`trustConfirmations` in `dialog-theme.mjs`).

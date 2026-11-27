@@ -919,3 +919,97 @@ test("a grapple is settled from the two check cards, with the Size bonus read on
   assert.deepEqual([typed.total, typed.opponentTotal, typed.critical], [15, 19, false]);
   game.messages = keptMessages;
 });
+
+test("round-3 council: an NPC's grapple damage follows its profile, a special loser's save gets a button, the relay checks its input", async () => {
+  reset();
+  undoNotes.length = 0;
+  const { askGC } = await import("../module/apps/gc-relay.mjs");
+  const injure = (winner, loser) =>
+    settleGrapple(winner, {
+      opening: false,
+      total: 22,
+      opponentTotal: 12,
+      opponentUuid: loser.uuid,
+      benefits: ["injure"]
+    });
+  const npc = (name, npcType, qualities = []) => {
+    const who = character(name, { npcType, npcProfile: { enabled: true, qualities }, activeFeatNames: [] });
+    who.type = "npc";
+    return who;
+  };
+  const victim = character("Victim", { vitality: { value: 30, max: 30 }, wounds: { value: 12, max: 12 } });
+  victim.deleteEmbeddedDocuments = async () => victim.statuses.clear();
+  await injure(npc("Clerk", "standard", [{ id: "non-combatant" }]), victim);
+  assert.match(posted.at(-1).content, /1d3 = \d+ subdual damage/, "a Non-Combatant has no Unarmed proficiency");
+  await injure(npc("Dog", "animal"), victim);
+  assert.match(posted.at(-1).content, /1d3 = \d+ subdual damage/, "an animal with no natural attack");
+  await injure(npc("Wolf", "animal", [{ id: "natural-attack" }]), victim);
+  assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/);
+  await injure(npc("Thug", "standard"), victim);
+  assert.match(posted.at(-1).content, /1d4 = \d+ lethal damage/);
+
+  // A Throw big enough for a massive damage save on a special NPC posts the save as a card with its button.
+  const brute = character("Brute", {
+    abilities: { str: { mod: 20 } },
+    proficiencyTotals: { unarmed: { proficient: true } }
+  });
+  const boss = npc("Boss", "special");
+  Object.assign(boss.system, {
+    vitality: { value: 60, max: 60 },
+    wounds: { value: 10, max: 10 },
+    abilities: { con: { value: 10, mod: 0 } }
+  });
+  await settleGrapple(brute, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: boss.uuid,
+    benefits: ["throw"]
+  });
+  const saveCard = posted.find(data => data.flags?.spycraft2?.pendingSave);
+  assert.ok(saveCard, "the save card is posted");
+  assert.equal(saveCard.flags.spycraft2.pendingSave.kind, "massiveDamage");
+  assert.equal(saveCard.flags.spycraft2.actorUuid, boss.uuid);
+
+  // The GC's relay applies the damage under its own Undo note, and refuses what it cannot apply.
+  const guard = npc("Guard", "special");
+  Object.assign(guard.system, { vitality: { value: 20, max: 20 }, wounds: { value: 10, max: 10 } });
+  await askGC("grappleDamage", { actorUuid: guard.uuid, amount: 4, kind: "lethal", name: "Injure" });
+  assert.equal(guard.system.vitality.value, 16);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Grapple damage: Guard");
+  await assert.rejects(
+    askGC("grappleDamage", { actorUuid: guard.uuid, amount: 0, kind: "lethal" }),
+    /cannot be applied/
+  );
+  await assert.rejects(askGC("grappleDamage", { actorUuid: guard.uuid, amount: 3, kind: "acid" }), /cannot be applied/);
+  await assert.rejects(
+    askGC("grappleDamage", { actorUuid: "Actor.nobody", amount: 3, kind: "lethal" }),
+    /cannot be applied/
+  );
+});
+
+test("round-3 council: a player's grapple Undo note leaves out an opponent the player does not own", async () => {
+  reset();
+  undoNotes.length = 0;
+  const holder = character("Owner", {}),
+    other = character("Unowned", {});
+  other.isOwner = false;
+  const user = game.user,
+    users = game.users;
+  game.user = { ...user, id: "player", isGM: false };
+  game.users = { activeGM: { query: async () => ({ value: true }) }, get: () => null };
+  try {
+    await settleGrapple(holder, {
+      opening: true,
+      total: 20,
+      opponentTotal: 12,
+      opponentUuid: other.uuid,
+      benefits: []
+    });
+  } finally {
+    game.user = user;
+    game.users = users;
+  }
+  const note = undoNotes.at(-1)?.flags.spycraft2.undo;
+  assert.ok(!note || !note.entries.some(entry => entry.name === "Unowned"));
+});

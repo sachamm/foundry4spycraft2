@@ -402,10 +402,17 @@ async function grappleBenefitsChosen(actor, input, outcome) {
 }
 
 /** Whether a grapple winner deals lethal unarmed damage: an agent's Unarmed proficiency, or any armed NPC (p.453). */
-const unarmedProficient = actor =>
-  actor?.type === "agent"
-    ? actor.system?.proficiencyTotals?.unarmed?.proficient === true
-    : !(actor?.system?.qualities ?? []).some(quality => (quality?.id ?? quality) === "non-combatant");
+/**
+ * Whether the grapple winner deals lethal unarmed damage (p.329). An agent reads its Unarmed proficiency. An NPC's
+ * qualities are on its profile: a Non-Combatant has no weapon proficiencies (p.449), and an animal fights with its
+ * natural attack, so one without the Natural Attack quality deals subdual damage.
+ */
+const unarmedProficient = actor => {
+  if (actor?.type === "agent") return actor.system?.proficiencyTotals?.unarmed?.proficient === true;
+  const ids = (actor?.system?.npcProfile?.qualities ?? []).map(quality => quality?.id ?? quality);
+  if (ids.includes("non-combatant")) return false;
+  return actor?.system?.npcType === "animal" ? ids.includes("natural-attack") : true;
+};
 
 /**
  * A grapple benefit's damage onto the loser, through the same steps as a damage card: damage reduction, then a
@@ -413,10 +420,16 @@ const unarmedProficient = actor =>
  * non-lethal totals. Run on the loser owner's client.
  */
 export async function applyGrappleHit(loser, { amount, kind, name }) {
-  const { lethalOnSpecial } = await import("./damage-application.mjs");
+  const { lethalOnSpecial, postDamageReport } = await import("./damage-application.mjs");
   const { npcDamageSave, npcIsSpecial } = await import("./gc/npc-play.mjs");
+  // A save the damage calls for goes on its own card with a button that rolls it, as from a damage card.
+  const withSaveCard = async ({ lines, pendingSave }) => {
+    if (!pendingSave) return lines;
+    await postDamageReport(loser, lines, { pendingSave });
+    return [loc`${esc(loser.name)}: the save it calls for is on the card below.`];
+  };
   if (kind === "subdual" && (loser.type === "agent" || npcIsSpecial(loser)))
-    return (await nonLethalDamage(loser, "subdual", amount, { source: name, attackKind: "unarmed" })).lines;
+    return withSaveCard(await nonLethalDamage(loser, "subdual", amount, { source: name, attackKind: "unarmed" }));
   const dr = Math.max(0, Number(drForAttack(loser.system, "unarmed")) || 0);
   if (loser.type !== "agent" && !npcIsSpecial(loser)) {
     // A standard NPC or animal: its Damage save takes what gets past damage reduction (subdual counts it twice).
@@ -427,7 +440,7 @@ export async function applyGrappleHit(loser, { amount, kind, name }) {
   }
   const { lines, pendingSave } = await lethalOnSpecial(loser, { damage: amount, dr }, name);
   if (pendingSave) lines.push(loc`This calls for a Fortitude save against massive damage, DC ${pendingSave.dc}.`);
-  return lines;
+  return withSaveCard({ lines, pendingSave });
 }
 
 registerRelay("grappleDamage", {
@@ -563,9 +576,10 @@ export async function settleGrapple(actor, options = {}) {
   const tricks = grappleTrickLines(actor.system);
   if (tricks.length)
     benefits.push(loc`Your grapple tricks:`, `<ul>${tricks.map(line => `<li>${esc(line)}</li>`).join("")}</ul>`);
-  // Both wrestlers' conditions go on one Undo note.
+  // Both wrestlers' conditions go on one Undo note when this user owns both. An opponent this user does not own is
+  // changed through the GC, whose own Undo note covers it, so it is left out of this one.
   const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
-  return withUndo([actor, opponent], loc`Grapple: ${actor.name}`, async () => {
+  return withUndo([actor, opponent?.isOwner ? opponent : null], loc`Grapple: ${actor.name}`, async () => {
     await post(actor, [
       loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
       ...outcome.effects.map(esc),

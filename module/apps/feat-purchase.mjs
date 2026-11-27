@@ -1,4 +1,4 @@
-/** Feat Purchase (p.406): after a mission an agent may spend XP on one more feat choice. */
+/** Feat Purchase (p.407): after a mission an agent may spend XP on one more feat choice. */
 import { refuse } from "../error-notices.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { campaignLevelRow, campaignRules, featPurchasePlan } from "../rules/campaign-rules.mjs";
@@ -36,7 +36,7 @@ export async function buyFeatWithXP(actor) {
     yes: { label: loc`Spend ${plan.cost} XP` },
     no: { label: loc`Cancel` },
     rejectClose: false,
-    content: `<p>${loc`Spend ${plan.cost} XP for one more feat choice? Feat Purchase allows this after a mission (p.406).`}</p>`
+    content: `<p>${loc`Spend ${plan.cost} XP for one more feat choice? Feat Purchase allows this after a mission (p.407).`}</p>`
   });
   if (!ok) return null;
   // Worked out again from the current sheet, one purchase at a time: a second dialog left open cannot buy a feat
