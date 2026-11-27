@@ -16,6 +16,25 @@ const proof = (feet, extras = {}) =>
       fallSoftSurface: false
     }
   );
+
+test("falling stress combines Wire Fu with the saved campaign factors before rounding, without multiplying impact for Tense", () => {
+  const p = proof(35);
+  const plan = fallingDamagePlan(p, {
+    result: 19,
+    dice: [6, 4, 3],
+    damageDivisor: 2,
+    stressCampaignPolicy: { multipliers: [2], minimum: 0 }
+  });
+  assert.equal(plan.impact, 6);
+  assert.equal(plan.stress, 9);
+  const both = fallingDamagePlan(p, {
+    result: 19,
+    dice: [6, 4, 3],
+    damageDivisor: 2,
+    stressCampaignPolicy: { multipliers: [2, 0.5], minimum: 1 }
+  });
+  assert.equal(both.stress, 6);
+});
 test("solid, fluid and soft/reduced falls apply the dice cap, actual-height AP and lethal-only stress", () => {
   const p = proof(35);
   assert.deepEqual(fallingDamagePlan(p, { result: 19, dice: [6, 4, 3] }), {

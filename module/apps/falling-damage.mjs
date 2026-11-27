@@ -1,5 +1,5 @@
 import { fallingDamagePlan } from "../rules/falling-damage.mjs";
-import { campaignFallingDamageDivisor } from "../rules/campaign-combat.mjs";
+import { campaignFallingDamageDivisor, campaignStressPolicy } from "../rules/campaign-combat.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { fallDistancePlan } from "../rules/fall-distance.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
@@ -124,6 +124,7 @@ export async function resolveFallingDamage(actor, message, options = {}) {
     surface: input.surface,
     diving: input.diving === true,
     waterDepthFeet: input.waterDepthFeet ?? 0,
+    stressCampaignPolicy: campaignStressPolicy(currentCampaignRules().effects),
     ...(campaignFallingDamageDivisor(actor, currentCampaignRules().effects) === 2 ? { damageDivisor: 2 } : {})
   };
   const plan = () =>
@@ -166,7 +167,8 @@ export async function resolveFallingDamage(actor, message, options = {}) {
       let record = currentResult(actor, message);
       if (
         !record &&
-        campaignFallingDamageDivisor(actor, currentCampaignRules().effects) !== (context.damageDivisor ?? 1)
+        (campaignFallingDamageDivisor(actor, currentCampaignRules().effects) !== (context.damageDivisor ?? 1) ||
+          !sameValues(campaignStressPolicy(currentCampaignRules().effects), context.stressCampaignPolicy ?? null))
       )
         throw Error(loc`The campaign falling rules changed before settlement. Review the current landing again.`);
       if (record?.state === "complete") return record;
@@ -240,7 +242,7 @@ export async function resolveFallingDamage(actor, message, options = {}) {
             card = await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor }),
               ...(message.whisper?.length ? { whisper: [...message.whisper], blind: message.blind === true } : {}),
-              content: `<div class="spycraft2 chat-note"><p>${esc(component === "impact" ? loc`Falling impact: ${amount} ${result.kind} damage; AP ${result.armorPiercing}.` : loc`Falling stress: ${amount} damage.`)}</p><p>${esc(loc`Actual fall ${result.actualDistanceFeet} ft.; damage distance ${result.damageDistanceFeet} ft.; ${result.diceCount}d6. Dice: ${result.dice.join(", ") || "—"}; check reduction ${result.checkReduction}.`)}</p>${result.damageDivisor === 2 ? `<p>${esc(loc`Wire Fu: halve impact and stress after other falling reductions, rounding down.`)}</p>` : ""}</div>`,
+              content: `<div class="spycraft2 chat-note"><p>${esc(component === "impact" ? loc`Falling impact: ${amount} ${result.kind} damage; AP ${result.armorPiercing}.` : loc`Falling stress: ${amount} damage.`)}</p><p>${esc(loc`Actual fall ${result.actualDistanceFeet} ft.; damage distance ${result.damageDistanceFeet} ft.; ${result.diceCount}d6. Dice: ${result.dice.join(", ") || "—"}; check reduction ${result.checkReduction}.`)}</p>${result.damageDivisor === 2 ? `<p>${esc(loc`Wire Fu: impact ×1/2; stress includes its ×1/2 multiplier. Combine stress multipliers additively before rounding down (pp.329,408).`)}</p>` : ""}${result.stressCampaignPolicy ? `<p>${esc(loc`Campaign stress multipliers included in this landing: ${result.stressCampaignPolicy.multipliers.join(", ")}; minimum ${result.stressCampaignPolicy.minimum}. Applying the stress card still checks resistance.`)}</p>` : ""}</div>`,
               flags: {
                 spycraft2: {
                   actorUuid: actor.uuid,
@@ -253,6 +255,9 @@ export async function resolveFallingDamage(actor, message, options = {}) {
                     id,
                     component,
                     kind: component === "stress" ? "stress" : result.kind,
+                    ...(component === "stress" && Object.hasOwn(record.context, "stressCampaignPolicy")
+                      ? { campaignStressAdjusted: true }
+                      : {}),
                     armorPiercing: component === "stress" ? 0 : result.armorPiercing,
                     triggerUuid: message.uuid
                   }

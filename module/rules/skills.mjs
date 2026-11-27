@@ -764,6 +764,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   if (taking && actionDiceCost)
     blockedReasons.push(loc`Choose a rolled check when spending action dice for Hail Mary.`);
   if (taking) {
+    if (method === "take10" && campaign.forbidTake10 === true)
+      blockedReasons.push(loc`Tense campaign quality: taking 10 on skill checks is unavailable (p.408).`);
     if (!safeToTake)
       blockedReasons.push(loc`Taking 10/20 requires being neither distracted nor endangered (pp.97–98).`);
     if (/with permission/i.test(check.time) && gcTakingPermissionConfirmed !== true)

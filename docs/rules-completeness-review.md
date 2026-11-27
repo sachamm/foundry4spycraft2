@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
 **Continuing review, 26 November 2026:** PC creation **9.3/10**;
-combat play **9.4/10**. Implementation continues toward the requested **9.9/10**
+combat play **9.5/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -695,3 +695,30 @@ historical chat results after the qualities ended. All **4,114** Node tests,
 its existing warnings with no errors; formatting, bundling and the text-copy
 check pass. Scores remain **PC creation 9.3/10, combat 9.4/10**. Campaign stress,
 disposition, movement and action-die details remain open in B-180/B-183.
+
+### Continuing pass: campaign stress and Tense taking 10
+
+Mellow and Tense now change actual PC and NPC stress damage. Their separate
+factors combine additively with each other, Firefighter Training and Wire Fu,
+then round down once before resistance. Mellow retains its minimum for a
+positive hit; resistance can still prevent the damage. Explicit final-damage
+entry avoids repeating campaign adjustments. Damage receipts keep the original
+calculation, and a saved landing includes its original campaign stress policy.
+The standard NPC Damage save records its actual campaign-adjusted amount.
+
+Tense now prevents taking 10 on ordinary skill checks, including when a feat
+reduces the time or a GC permits that named use. Taking 20 and rolled checks keep
+their existing restrictions. A real Foundry check that otherwise permitted
+taking 10 was blocked without rolling. Native PC/special/standard NPC stress,
+Wire Fu plus Tense, card application, Undo and landing replay after campaign
+changes all passed without browser errors. All **4,122** Node tests, **988**
+reference assertions, **233** layout checks and **13** pack checks pass. Lint,
+formatting, bundling and the text-copy check pass with the existing warnings.
+
+Review: **PC creation 9.3/10; combat 9.5/10**. The combat dimensions are
+initiative/actions 1.90, attacks/Defense 1.90, damage/recovery 1.95,
+conditions/resources 1.85 and conditional options/environments 1.90. The increase
+credits these executable global campaign rules and their native evidence.
+B-180 still covers disposition and other campaign details; B-183 and B-186–191
+retain the movement, grappling, source-history, environment and advanced combat
+gaps. Neither area has met 9.9/10; implementation continues.

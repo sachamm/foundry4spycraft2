@@ -131,6 +131,46 @@ function actor(resistance = 2) {
 }
 const baseline = { stress: 0, subdual: 0, note: "GC verified actual totals", confirmed: true },
   raw = { source: "hit", kind: "stress", newDamage: 13, damageMode: "stressBeforeResistance", confirmed: true };
+
+test("actual ledger applies campaign stress once before resistance and preserves its receipt after the campaign changes", async () => {
+  const a = actor();
+  a.system.campaignEffects = { stressDamageMultipliers: [2] };
+  await reviewDamageLedger(a, baseline);
+  const r = await applyAccumulatedDamage(a, { ...raw, newDamage: 5 });
+  assert.equal(r.newDamage, 8);
+  assert.equal(r.defenseContext.campaign.multiplier, 2);
+  a.system.campaignEffects = { stressDamageMultipliers: [0.5], stressDamageMinimum: 1 };
+  const replay = await applyAccumulatedDamage(a, { ...raw, newDamage: 5 });
+  assert.deepEqual(replay, r);
+  assert.equal(a.system.accumulatedDamage.stress, 8);
+  const final = await applyAccumulatedDamage(a, {
+    ...raw,
+    source: "already adjusted landing",
+    newDamage: 5,
+    campaignStressAdjusted: true
+  });
+  assert.equal(final.newDamage, 3);
+  const net = await applyAccumulatedDamage(a, {
+    ...raw,
+    source: "GC final net damage",
+    newDamage: 5,
+    damageMode: "net"
+  });
+  assert.equal(net.newDamage, 5);
+});
+
+test("changed campaign modifiers while the actual ledger dialog is open reject the stale stress calculation", async () => {
+  const a = actor();
+  a.system.campaignEffects = { stressDamageMultipliers: [2] };
+  await reviewDamageLedger(a, baseline);
+  response = { ...raw };
+  hook = () => {
+    a.system.campaignEffects = { stressDamageMultipliers: [0.5], stressDamageMinimum: 1 };
+  };
+  await assert.rejects(applyAccumulatedDamage(a), /stress resistance changed/);
+  assert.equal(a.system.accumulatedDamage.stress, 0);
+  hook = null;
+});
 test("actual ledger events apply resistance to each hit before accumulation and create a save only when net total exceeds the threshold", async () => {
   const a = actor();
   await reviewDamageLedger(a, baseline);

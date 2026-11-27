@@ -1,10 +1,20 @@
 import { fallingStress } from "./damage-types.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignStressDamage } from "./campaign-combat.mjs";
 
 /** Resolve the saved fall distances, surface and Acrobatics outcome before armor or damage resistance. */
 export function fallingDamagePlan(
   proof,
-  { surface = "solid", diving = false, waterDepthFeet = 0, result, succeeded, dice = null, damageDivisor = 1 } = {}
+  {
+    surface = "solid",
+    diving = false,
+    waterDepthFeet = 0,
+    result,
+    succeeded,
+    dice = null,
+    damageDivisor = 1,
+    stressCampaignPolicy = null
+  } = {}
 ) {
   if (
     !proof ||
@@ -59,9 +69,16 @@ export function fallingDamagePlan(
     adjustedDice,
     checkReduction,
     ...(damageDivisor === 2 ? { damageDivisor } : {}),
+    ...(stressCampaignPolicy ? { stressCampaignPolicy } : {}),
     impact: total === null ? null : Math.floor(Math.max(count, total - checkReduction) / damageDivisor),
     stress:
-      kind === "lethal" ? Math.floor(fallingStress(Math.floor(proof.actualDistanceFeet), count) / damageDivisor) : 0,
+      kind === "lethal"
+        ? campaignStressDamage(
+            fallingStress(Math.floor(proof.actualDistanceFeet), count),
+            stressCampaignPolicy,
+            damageDivisor === 2 ? [0.5] : []
+          ).adjustedDamage
+        : 0,
     sprawled: !success
   };
 }

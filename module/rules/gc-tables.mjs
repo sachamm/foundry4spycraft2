@@ -10897,7 +10897,12 @@ export const GC_DATA = {
    "xp": -75,
    "gcDice": null,
    "summary": "All stress damage is halved (rounded down, minimum 1).",
-   "effects": {}
+   "effects": {
+    "stressDamageMultipliers": [
+     0.5
+    ],
+    "stressDamageMinimum": 1
+   }
   },
   {
    "id": "mercenary",
@@ -11138,7 +11143,12 @@ export const GC_DATA = {
    "xp": 75,
    "gcDice": 3,
    "summary": "Stress damage x2. Taking 10 on skill checks is off the table for everybody.",
-   "effects": {}
+   "effects": {
+    "forbidTake10": true,
+    "stressDamageMultipliers": [
+     2
+    ]
+   }
   },
   {
    "id": "thriller",

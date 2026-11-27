@@ -24,6 +24,7 @@ import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { manageCombatPersuasion } from "./combat-persuasion.mjs";
 import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
+import { campaignStressPolicy, campaignStressDamage } from "../../rules/campaign-combat.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -247,7 +248,7 @@ export async function npcDamageSave(actor, input = null) {
         ],
         "lethal"
       )}</select></label>
-      <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
+      ${campaignStressPolicy(actor.system.campaignEffects) ? `<label><input type="checkbox" name="campaignStressAdjusted" /> ${loc`Entered stress already includes campaign multipliers (leave unchecked for raw stress)`}</label>` : ""}<label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
       <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
       <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
       loc`Roll Damage save`
@@ -255,9 +256,21 @@ export async function npcDamageSave(actor, input = null) {
     if (!input) return null;
   }
   // The card's large number is the save's total, the one compared with the DC; the die is in the formula beside it.
+  const stressPolicy = campaignStressPolicy(actor.system.campaignEffects);
+  const campaignDamage =
+    input.kind === "stress" && input.campaignStressAdjusted !== true
+      ? campaignStressDamage(Number(input.damage), stressPolicy)
+      : null;
+  if (campaignDamage) input = { ...input, damage: campaignDamage.adjustedDamage };
   const saveBonus = Number(input.bonus ?? state.bonus) || 0;
   const roll = await new Roll(`1d20 ${saveBonus < 0 ? "-" : "+"} ${Math.abs(saveBonus)}`).evaluate(),
     natural = roll.dice?.[0]?.total ?? roll.total - saveBonus;
+  if (
+    input.kind === "stress" &&
+    input.campaignStressAdjusted !== true &&
+    JSON.stringify(campaignStressPolicy(actor.system.campaignEffects)) !== JSON.stringify(stressPolicy)
+  )
+    throw Error(loc`The campaign stress modifiers changed during the Damage save. Review this damage again.`);
   let result;
   try {
     result = resolveDamageSave(state.track, {
@@ -283,6 +296,17 @@ export async function npcDamageSave(actor, input = null) {
           : loc`succeeds: no mechanical effect, the damage lingers`;
   await roll.toMessage({
     speaker: ChatMessage.getSpeaker({ actor }),
+    flags: {
+      spycraft2: {
+        actorUuid: actor.uuid,
+        npcDamageSave: {
+          kind: input.kind,
+          damage: Number(input.damage),
+          campaignStress: campaignDamage,
+          campaignStressAdjusted: input.campaignStressAdjusted === true
+        }
+      }
+    },
     flavor: `${loc`Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} →`} <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
   });
   if (result.state !== "active") {

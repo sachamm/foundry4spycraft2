@@ -63,6 +63,7 @@ export const qualityXP = active =>
   active.filter(quality => quality.scripted).reduce((sum, quality) => sum + quality.xp, 0);
 
 const MERGE = {
+  stressDamageMultipliers: (a, b) => [...a, ...b],
   startingActionDice: (a, b) => a + b,
   skillDC: (a, b) => a + b,
   criticalInjuryActivationCost: (a, b) => a + b,

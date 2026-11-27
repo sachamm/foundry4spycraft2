@@ -1,6 +1,7 @@
 /** Hazards in play: exposing a character to a contagion or a fire, the saves they call for and what follows. */
 import { esc } from "../html.mjs";
 import { refuse } from "../error-notices.mjs";
+import { campaignStressPolicy, campaignStressDamage } from "../rules/campaign-combat.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   FIRE_AP,
@@ -136,8 +137,18 @@ export async function sufferLethal(actor, amount) {
 export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance") {
   if (!amount) return "";
   if (actor.type !== "agent") {
+    amount = campaignStressDamage(
+      amount,
+      campaignStressPolicy(actor.system.campaignEffects),
+      damageMode === "fireStressBeforeDefenses" && actor.system.activeFeatNames?.includes("Firefighter Training")
+        ? [0.5]
+        : []
+    ).adjustedDamage;
     // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
-    if (!(Number(actor.system.vitality?.max) > 0)) return loc`${amount} stress damage: roll the Damage save for it.`;
+    if (!(Number(actor.system.vitality?.max) > 0))
+      return campaignStressPolicy(actor.system.campaignEffects)
+        ? loc`${amount} stress damage after campaign modifiers: roll the Damage save and mark that these modifiers are already included.`
+        : loc`${amount} stress damage: roll the Damage save for it.`;
     const totals = actor.flags?.spycraft2?.nonLethal ?? {},
       stress = Math.max(0, Math.trunc(Number(totals.stress) || 0)) + amount;
     await actor.update({ "flags.spycraft2.nonLethal.stress": stress });

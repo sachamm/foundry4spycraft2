@@ -471,7 +471,8 @@ async function nonLethalDamage(target, kind, amount, facts) {
     weaponProficiency = "",
     armorPiercing = 0,
     armorPiercingAll = false,
-    critical = false
+    critical = false,
+    campaignStressAdjusted = false
   } = facts;
   if (target.type === "agent") {
     try {
@@ -481,6 +482,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
         newDamage: amount,
         criticalHit: critical === true,
         confirmed: true,
+        ...(campaignStressAdjusted ? { campaignStressAdjusted } : {}),
         ...(kind === "subdual"
           ? { damageMode: "subdualBeforeDefenses", attackKind, weaponProficiency, armorPiercing, armorPiercingAll }
           : { damageMode: "stressBeforeResistance" })
@@ -505,7 +507,8 @@ async function nonLethalDamage(target, kind, amount, facts) {
     dr: drForAttack(target.system, attackKind, weaponProficiency),
     armorPiercing,
     armorPiercingAll,
-    critical
+    critical,
+    campaignStressAdjusted
   });
   if (plan.net) await target.update({ "flags.spycraft2.nonLethal": plan.totals });
   const lines = [
@@ -697,6 +700,7 @@ const damageFacts = message => {
           kind: check.fallingDamage.kind,
           type: "",
           armorPiercing: check.fallingDamage.armorPiercing,
+          campaignStressAdjusted: check.fallingDamage.campaignStressAdjusted === true,
           blast: false
         }
       : damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities);
@@ -800,6 +804,7 @@ export async function applyDamage(message, options = {}) {
   const weaponProficiency = check.weaponProficiency ?? attack?.weaponProficiency ?? weapon?.system?.proficiency ?? "";
   const specialistDR = specialistDefense(target.system, weaponProficiency).damageReduction;
   const hit = {
+    campaignStressAdjusted: kind === "stress" && profile.campaignStressAdjusted === true,
     damage,
     dr: drForAttack(target.system, attackKind, weaponProficiency),
     armorPiercing,
@@ -850,7 +855,8 @@ export async function applyDamage(message, options = {}) {
           damage: reduced.net,
           kind,
           blast: input.blast === true,
-          criticalDice
+          criticalDice,
+          campaignStressAdjusted: hit.campaignStressAdjusted
         });
         if (!result) return null;
       }
@@ -889,7 +895,8 @@ export async function applyDamage(message, options = {}) {
         weaponProficiency,
         armorPiercing,
         armorPiercingAll,
-        critical
+        critical,
+        campaignStressAdjusted: hit.campaignStressAdjusted
       }));
     } else lines.push(loc`${esc(target.name)} takes no damage.`);
   } catch (error) {

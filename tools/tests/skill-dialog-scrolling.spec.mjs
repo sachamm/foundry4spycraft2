@@ -14,6 +14,7 @@ import { rollEvidence } from "../../module/rules/outcomes.mjs";
 import { finishGearAcquisition } from "../../module/apps/gear-acquisition.mjs";
 import { manageCombatPersuasion } from "../../module/apps/gc/combat-persuasion.mjs";
 import { settleFavoredGearSession, reviewFavoredGearSession } from "../../module/apps/favored-gear-session.mjs";
+import { npcDamageSave } from "../../module/apps/gc/npc-play.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -212,6 +213,30 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
+test("the actual NPC Damage save keeps the campaign stress choice and roll control reachable at 720px", async ({
+  page
+}) => {
+  const prior = content;
+  try {
+    await npcDamageSave({
+      uuid: "Actor.npc-stress-layout",
+      name: "QA NPC",
+      isOwner: true,
+      system: { npcType: "standard", threatLevel: 1, campaignEffects: { stressDamageMultipliers: [2] } }
+    });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.locator('[name="kind"]').selectOption("stress");
+    await page.locator('[name="campaignStressAdjusted"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+  }
+});
+
 test("the actual Grapple settlement exposes opening Size context and keeps confirmation reachable at 720px", async ({
   page
 }) => {

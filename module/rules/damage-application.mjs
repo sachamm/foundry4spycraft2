@@ -10,6 +10,7 @@ import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
 import { specialistDRIncrement } from "./weapon-specialist.mjs";
 import { injuryThresholds } from "./gc/campaign.mjs";
+import { campaignStressDamage, campaignStressPolicy } from "./campaign-combat.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 const int = value => Math.trunc(Number(value) || 0);
@@ -350,7 +351,11 @@ export function nonLethalHitPlan(system, totals = {}, hit = {}) {
           dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, int(hit.dr) - int(hit.armorPiercing)),
           armorPiercing: 0
         })
-      : reducedDamage({ damage: hit.damage });
+      : reducedDamage({
+          damage: hit.campaignStressAdjusted
+            ? hit.damage
+            : campaignStressDamage(hit.damage, campaignStressPolicy(system.campaignEffects)).adjustedDamage
+        });
   const current = Math.max(0, int(totals[kind]));
   const plan = accumulatedDamagePlan(system, {
     kind,

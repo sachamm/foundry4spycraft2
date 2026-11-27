@@ -1,5 +1,46 @@
 import { loc } from "../i18n.mjs";
 
+/** Keep each factor: p.329 combines multipliers additively, rather than multiplying them. */
+export function campaignStressPolicy(effects = {}) {
+  const multipliers = effects.stressDamageMultipliers ?? [];
+  const minimum = effects.stressDamageMinimum ?? 0;
+  if (
+    !Array.isArray(multipliers) ||
+    multipliers.some(n => !Number.isFinite(n) || n <= 0) ||
+    !Number.isSafeInteger(minimum) ||
+    minimum < 0
+  )
+    throw Error(loc`Review the campaign's stress damage modifiers.`);
+  return multipliers.length ? { multipliers: [...multipliers], minimum } : null;
+}
+export function campaignStressDamage(rawDamage, policy = null, sourceMultipliers = []) {
+  if (
+    policy !== null &&
+    (!policy ||
+      typeof policy !== "object" ||
+      Array.isArray(policy) ||
+      !Array.isArray(policy.multipliers) ||
+      !Number.isSafeInteger(policy.minimum))
+  )
+    throw Error(loc`Review the campaign's stress damage modifiers.`);
+  if (
+    !Number.isSafeInteger(rawDamage) ||
+    rawDamage < 0 ||
+    !Array.isArray(sourceMultipliers) ||
+    sourceMultipliers.some(n => !Number.isFinite(n) || n <= 0)
+  )
+    throw Error(loc`Review the whole stress damage and its source multipliers.`);
+  const checked = campaignStressPolicy(
+    policy ? { stressDamageMultipliers: policy.multipliers, stressDamageMinimum: policy.minimum } : {}
+  );
+  const multipliers = [...(checked?.multipliers ?? []), ...sourceMultipliers];
+  const multiplier = Math.max(0, 1 + multipliers.reduce((sum, n) => sum + n - 1, 0));
+  const adjustedDamage = rawDamage === 0 ? 0 : Math.max(checked?.minimum ?? 0, Math.floor(rawDamage * multiplier));
+  if (!Number.isSafeInteger(adjustedDamage))
+    throw Error(loc`The adjusted stress damage exceeds the supported whole-number range.`);
+  return { rawDamage, multipliers, multiplier, minimum: checked?.minimum ?? 0, adjustedDamage };
+}
+
 /** Campaign combat constants, pp.406–407. Specific feat extensions retain their benefit. */
 export function campaignCQBRange(feats = [], effects = {}) {
   const base = Number.isFinite(effects.cqbRange) && effects.cqbRange >= 0 ? effects.cqbRange : 30;

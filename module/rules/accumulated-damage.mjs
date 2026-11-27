@@ -131,6 +131,7 @@ export function damageLedgerEventPlan(
     criticalHit = false,
     confirmed,
     damageMode = "net",
+    campaignStressAdjusted = false,
     attackKind,
     weaponProficiency = "",
     armorPiercing = 0,
@@ -140,6 +141,8 @@ export function damageLedgerEventPlan(
   at
 ) {
   const ledger = validateDamageLedger(current.ledger);
+  if (typeof campaignStressAdjusted !== "boolean")
+    throw new Error(loc`Confirm whether campaign stress modifiers are already included.`);
   if (typeof source !== "string" || !source.trim() || source.length > 300 || !eventId(id) || !Number.isFinite(at))
     throw new Error(loc`Name this unique damage event with a bounded source reference.`);
   if (!current.events || typeof current.events !== "object" || Array.isArray(current.events))
@@ -161,6 +164,7 @@ export function damageLedgerEventPlan(
     newDamage,
     criticalHit,
     damageMode,
+    ...(campaignStressAdjusted ? { campaignStressAdjusted } : {}),
     ...(damageMode === "subdualBeforeDefenses"
       ? {
           attackKind,
@@ -190,7 +194,10 @@ export function damageLedgerEventPlan(
   assertSnapshot(current, expected);
   if (Object.hasOwn(current.events, id)) throw new Error(loc`The damage-event reference is already in use.`);
   const defenseContext = ["stressBeforeResistance", "fireStressBeforeDefenses"].includes(damageMode)
-    ? stressDefensePlan(system, newDamage, { fromFire: damageMode === "fireStressBeforeDefenses" })
+    ? stressDefensePlan(system, newDamage, {
+        fromFire: damageMode === "fireStressBeforeDefenses",
+        campaignAdjusted: campaignStressAdjusted
+      })
     : damageMode === "subdualBeforeDefenses"
       ? subdualDefensePlan(system, {
           rawDamage: newDamage,

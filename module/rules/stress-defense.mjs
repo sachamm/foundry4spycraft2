@@ -1,22 +1,33 @@
 import { preparedResistanceSource } from "./resistances.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignStressPolicy, campaignStressDamage } from "./campaign-combat.mjs";
 /** p.333 resistance still applies to stress; p.339 stress bypasses all DR. */
 export function stressDefenseSource(system) {
   return {
     ...preparedResistanceSource(system, "stress"),
-    noFear: structuredClone(system.survivalStats.noFear ?? null)
+    noFear: structuredClone(system.survivalStats.noFear ?? null),
+    ...(campaignStressPolicy(system.campaignEffects)
+      ? { campaignStressPolicy: campaignStressPolicy(system.campaignEffects) }
+      : {})
   };
 }
 export const stressDefenseSourceSnapshot = system => JSON.stringify(stressDefenseSource(system));
 export const fireStressDefenseSourceSnapshot = system =>
   JSON.stringify([stressDefenseSource(system), system.activeFeatNames?.includes("Firefighter Training") === true]);
-export function stressDefensePlan(system, rawDamage, { fromFire = false } = {}) {
+export function stressDefensePlan(system, rawDamage, { fromFire = false, campaignAdjusted = false } = {}) {
   if (!Number.isSafeInteger(rawDamage) || rawDamage < 0)
     throw new Error(loc`Enter safe nonnegative whole stress damage before prepared resistance.`);
   if (typeof fromFire !== "boolean") throw new Error(loc`Confirm whether this stress damage was caused by fire.`);
+  if (typeof campaignAdjusted !== "boolean")
+    throw new Error(loc`Confirm whether campaign stress modifiers are already included.`);
   const source = stressDefenseSource(system),
     firefighter = fromFire && system.activeFeatNames?.includes("Firefighter Training") === true,
-    adjustedDamage = firefighter ? Math.floor(rawDamage / 2) : rawDamage,
+    campaign = campaignStressDamage(
+      rawDamage,
+      campaignAdjusted ? null : source.campaignStressPolicy,
+      firefighter ? [0.5] : []
+    ),
+    adjustedDamage = campaign.adjustedDamage,
     resisted = source.resistance === "all" ? adjustedDamage : Math.min(adjustedDamage, source.resistance),
     netDamage = adjustedDamage - resisted;
   return {
@@ -24,6 +35,9 @@ export function stressDefensePlan(system, rawDamage, { fromFire = false } = {}) 
     kind: "stress",
     rawDamage,
     ...source,
+    ...(source.campaignStressPolicy || campaignAdjusted
+      ? { campaign: { ...campaign, alreadyApplied: campaignAdjusted } }
+      : {}),
     ...(fromFire
       ? {
           fire: {
