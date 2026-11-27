@@ -147,7 +147,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-075 | **One hit makes three chat cards** (about 1,160px of chat). The pointer to the next card is fixed; keeping the hit on one card is still open. | DES-44, UX-11, DES-48, UX-12 | M | live |
 | B-076 | **Check Defense opens a 27-field expert dialog.** (It is now a plain button whenever the same person can Resolve the attack.) A one-line summary should come first. | NGC-34, DES-47, SGI-novice-player D8, LR-9 | S | live |
 | B-077 | **Card header never says "who → whom".** The rule notes now sit in the closed Details disclosure; the header still needs the target, and damage cards should say where damage reduction came from and show the arithmetic for subdual after reduction. | DES-46, UX-13, NGC-35, XGC-23, SG-C12, LR-23c, LR-36b | M | live |
 | B-078 | **Finished cards keep live buttons** and do not collapse; "Finish" sits above the primary on the damage card; a GC boost leaves the card contradicting itself. A finished card collapses to one line with its receipts. "Confirm result" may stay after a confirmed result (live check owed). | XGC-14, XGC-03, DES-47, SGI-expert-gc R9, LR-13e | M | live |

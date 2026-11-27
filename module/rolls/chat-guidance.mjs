@@ -14,7 +14,7 @@ export function checkGuidance(check) {
       ? {
           tone: "neutral",
           title: loc`Damage applied`,
-          note: loc`Check who has already taken this damage (listed below) before applying it to anyone else.`
+          note: loc`Check who has already taken this damage before applying it to anyone else.`
         }
       : {
           tone: check.resolved ? "neutral" : "pending",

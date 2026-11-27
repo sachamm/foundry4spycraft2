@@ -476,3 +476,50 @@ test("a mouse click lets go of a button so shortcuts keep working; a keyboard pr
   assert.equal(releaseFocusAfterClick({ detail: 1, target: sheetButton }, {}), false, "focus already moved");
   assert.equal(blurred, 1);
 });
+
+test("a damage card shows what applying it did, as text, one line per outcome", async () => {
+  const { renderDamageResults } = await import("../module/rolls/chat-controls.mjs");
+  const html = new Element("li");
+  renderDamageResults(
+    {
+      checkKind: "damage",
+      damageAppliedBy: {
+        a: { targetUuid: "Actor.k", name: "Kevin", damage: 9, kind: "lethal", report: ["Kevin takes 9 damage."] },
+        b: {
+          targetUuid: "Actor.g",
+          name: "Guard",
+          damage: 4,
+          kind: "lethal",
+          report: ["<img src=x onerror=alert(1)>"]
+        },
+        c: { targetUuid: "Actor.n", name: "Old", damage: 2, kind: "lethal" }
+      }
+    },
+    html
+  );
+  const section = html.content.children[0];
+  assert.equal(section.className, "spycraft2 sc2-damage-results");
+  assert.deepEqual(
+    section.children.map(p => [p.tag, p.textContent, p.innerHTML]),
+    [
+      ["p", "Kevin takes 9 damage.", undefined],
+      ["p", "<img src=x onerror=alert(1)>", undefined]
+    ]
+  );
+  const none = new Element("li");
+  renderDamageResults({ checkKind: "attack", damageAppliedBy: { a: { report: ["x"] } } }, none);
+  assert.equal(none.content, undefined);
+});
+
+test("a damage report kept on the card is plain text within its limits", async () => {
+  const { reportText, validReport } = await import("../module/rules/damage-application.mjs");
+  assert.deepEqual(reportText(["<b>Kevin</b> &amp; Co take 9 damage.", "", 3, "  two   spaces "]), [
+    "Kevin & Co take 9 damage.",
+    "two spaces"
+  ]);
+  assert.equal(reportText(Array(20).fill("x")).length, 12);
+  assert.equal(validReport(undefined), true);
+  assert.equal(validReport(["ok"]), true);
+  assert.equal(validReport([{}]), false);
+  assert.equal(validReport(["x".repeat(401)]), false);
+});

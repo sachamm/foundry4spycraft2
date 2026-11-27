@@ -301,6 +301,28 @@ function row(controls) {
   return element;
 }
 
+/**
+ * What applying a damage card did, under its total: one line per target, from the report kept on the card. Written
+ * as text, never as markup. Records from before reports were kept, or whose outcome had its own card, show nothing.
+ */
+export function renderDamageResults(check, html) {
+  if (check?.checkKind !== "damage" || html.querySelector?.(".sc2-damage-results")) return;
+  const entries = appliedDamageEntries(check).filter(entry => Array.isArray(entry?.report) && entry.report.length);
+  if (!entries.length) return;
+  const doc = html.ownerDocument ?? document;
+  const section = doc.createElement("section");
+  section.className = "spycraft2 sc2-damage-results";
+  section.setAttribute("aria-label", loc`Damage applied`);
+  for (const entry of entries)
+    for (const line of entry.report) {
+      if (typeof line !== "string" || !line) continue;
+      const p = doc.createElement("p");
+      p.textContent = line.slice(0, 400);
+      section.append(p);
+    }
+  (html.querySelector(".message-content") ?? html).append(section);
+}
+
 /** Add this system's buttons to a rendered chat message (the `renderChatMessageHTML` hook). */
 export function renderCheckControls(message, html) {
   const check = message.flags?.spycraft2;
@@ -319,6 +341,7 @@ export function renderCheckControls(message, html) {
   const translated = viewerFlavor(check, game.i18n?.lang);
   const flavor = translated ? html.querySelector(".flavor-text") : null;
   if (flavor) flavor.replaceChildren(safeFlavor(translated, flavor.ownerDocument));
+  renderDamageResults(check, html);
   const actor = fromUuidSync(check.actorUuid);
   // The player whose agent is the target answers from the same card.
   const response = targetResponseControls({ message, check, user: game.user });
