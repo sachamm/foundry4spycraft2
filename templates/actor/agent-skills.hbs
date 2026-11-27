@@ -36,7 +36,7 @@
         <td class="edit-only"><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" aria-label="{{localize 'SPYCRAFT.Action.MiscModifierOf' name=name}}" /></td>
         <td>{{#each totals}}<button type="button" class="sc2-action" data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" aria-label="{{rollLabel}}" {{sc2tip tip}}>{{signed total}}</button>{{#unless @last}} / {{/unless}}{{/each}}</td>
         <td><span {{sc2tip threatTip}}>{{threatLabel}}</span></td>
-        <td><span {{sc2tip capTip}}>{{cap}}</span></td>
+        <td><span {{sc2tip capTip}}>{{capLabel}}</span></td>
       </tr>
     {{/each}}
     </tbody>

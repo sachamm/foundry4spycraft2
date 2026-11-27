@@ -17,7 +17,7 @@ import {
 } from "../../rules/gc/disposition.mjs";
 import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
 import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
-import { campaignSkillChecks, moraleSkillPenalty } from "../../rules/campaign-skills.mjs";
+import { campaignSkillChecks, campaignSkillPolicy, moraleSkillPenalty } from "../../rules/campaign-skills.mjs";
 import { shakenSkillPenalty } from "../../rules/shaken.mjs";
 import { dispositionSkillContext, dispositionTargetContent } from "../target-skill-effects.mjs";
 import { dispositionSkillPlan } from "../../rules/disposition-skills.mjs";
@@ -71,7 +71,12 @@ export function npcSkillPlan(actor, key) {
   const system = actor.system,
     listed = system.npcBuild?.skills?.find(skill => skill.key === key);
   const bonus = listed?.bonus ?? system.competence ?? 0;
-  return { key, bonus, listed: !!listed, cap: stepLookup(TABLES.skillCap, bonus) };
+  return {
+    key,
+    bonus,
+    listed: !!listed,
+    cap: campaignSkillPolicy(system)?.uncapped ? null : stepLookup(TABLES.skillCap, bonus)
+  };
 }
 const npcNamedChecks = skill =>
   skill.checks.filter(
@@ -176,6 +181,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
   const plan = graded
     ? npcSkillPlan(actor, skill.key)
     : { bonus: Number(input.manualBonus) || 0, cap: stepLookup(TABLES.skillCap, Number(input.manualBonus) || 0) };
+  if (campaignSkillPolicy(actor.system)?.uncapped) plan.cap = null;
   const ability = context.combatPersuasion
     ? "cha"
     : skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
@@ -241,7 +247,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       // Players see the card too: the NPC's bonus, cap and modifiers are printed only on a roll kept to the GC.
       flavor:
         (input.secret
-          ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`
+          ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap ?? loc`No cap`}`
           : loc`${skill.name} (${ability.toUpperCase()})`) +
         (namedCheck ? ` / ${esc(namedCheck.name)}` : "") +
         (input.secret && disposition.evidence ? `<br><small>${esc(disposition.notes.join(" "))}</small>` : "") +

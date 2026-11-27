@@ -1,13 +1,24 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 
+export function campaignSkillPolicy(system) {
+  const effects = system.campaignEffects ?? {};
+  for (const key of ["uncappedSkills", "activeSkillChecks"])
+    if (![undefined, 0, 1].includes(effects[key]))
+      throw Error(loc`Review the campaign's skill cap and active-check rules.`);
+  return effects.uncappedSkills === 1 || effects.activeSkillChecks === 1
+    ? { version: 1, uncapped: effects.uncappedSkills === 1, active: effects.activeSkillChecks === 1 }
+    : null;
+}
+
 export function campaignSkillChecks(
   system,
   key,
   check,
   { surprise = false, shiftingDisposition = false, persuadingAction = false } = {}
 ) {
-  const effects = system.campaignEffects ?? {},
+  const policy = campaignSkillPolicy(system),
+    effects = system.campaignEffects ?? {},
     special =
       !system.npcType ||
       ["special", "villain"].includes(system.npcType) ||
@@ -30,22 +41,32 @@ export function campaignSkillChecks(
     ...(penalty ? [{ source: "Paranoid", type: "morale", value: penalty }] : [])
   ];
   return {
+    policy,
     bonuses,
-    evidence: bonuses.length
-      ? {
-          version: 1,
-          skillKey: key,
-          checkId: check.id,
-          surprise: surprise === true,
-          shiftingDisposition: shift,
-          persuadingAction: persuasion || persuadingAction === true,
-          bonus,
-          penalty
-        }
-      : null,
-    notes: bonuses.length
-      ? [loc`Paranoid: morale bonus +${bonus}, morale penalty ${penalty}; each uses normal named-bonus stacking.`]
-      : []
+    evidence:
+      bonuses.length || policy
+        ? {
+            version: policy ? 2 : 1,
+            skillKey: key,
+            checkId: check.id,
+            surprise: surprise === true,
+            shiftingDisposition: shift,
+            persuadingAction: persuasion || persuadingAction === true,
+            bonus,
+            penalty,
+            ...(policy ? { policy } : {})
+          }
+        : null,
+    notes: [
+      ...(bonuses.length
+        ? [loc`Paranoid: morale bonus +${bonus}, morale penalty ${penalty}; each uses normal named-bonus stacking.`]
+        : []),
+      ...(policy
+        ? [
+            loc`Omni-Competent: ${policy.active ? loc`active check` : loc`normal check mode`}; ${policy.uncapped ? loc`no skill result cap` : loc`normal result cap`}.`
+          ]
+        : [])
+    ]
   };
 }
 

@@ -2030,9 +2030,11 @@ function deriveSkillTotals(state) {
       errorReductionZero: B.get(`skills.${sd.key}.errorReductionZero`),
       errorReduction: B.get(`skills.${sd.key}.errorReduction`),
       cap:
-        Math.min(60, capRow + B.get(`skills.${sd.key}.originCap`)) +
-        B.get(`skills.${sd.key}.cap`) +
-        (ranks === 0 ? B.get("untrainedSkillCap") : 0),
+        sys.campaignEffects?.uncappedSkills === 1
+          ? null
+          : Math.min(60, capRow + B.get(`skills.${sd.key}.originCap`)) +
+            B.get(`skills.${sd.key}.cap`) +
+            (ranks === 0 ? B.get("untrainedSkillCap") : 0),
       maxRanks: skillMaxRanks,
       overMax: ranks > skillMaxRanks
     };

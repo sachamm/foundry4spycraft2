@@ -814,20 +814,16 @@ export const ActorSkillRolls = Base =>
             featReminders: input.featReminders,
             photographicMemory: fresh.photographicMemory,
             cardSharkKnowledge: fresh.cardSharkKnowledge,
-            validateSkillContext:
-              fresh.cardSharkKnowledge || fresh.photographicMemory
-                ? () => {
-                    const now = resolveKnowledgeCheck(this.system, input);
-                    if (
-                      now.blocked ||
-                      JSON.stringify([now.cardSharkKnowledge, now.photographicMemory]) !==
-                        JSON.stringify([fresh.cardSharkKnowledge, fresh.photographicMemory])
-                    )
-                      throw new Error(
-                        loc`The Knowledge scope, method or supporting feat source changed before posting.`
-                      );
-                  }
-                : undefined,
+            campaignSkillChecks: fresh.campaignSkillChecks,
+            validateSkillContext: () => {
+              const now = resolveKnowledgeCheck(this.system, input);
+              if (
+                now.blocked ||
+                JSON.stringify([now.cardSharkKnowledge, now.photographicMemory, now.campaignSkillChecks]) !==
+                  JSON.stringify([fresh.cardSharkKnowledge, fresh.photographicMemory, fresh.campaignSkillChecks])
+              )
+                throw new Error(loc`The Knowledge scope, method or supporting feat source changed before posting.`);
+            },
             flavor: `${loc`Knowledge${input.topic ? `: ${esc(input.topic)}` : ""}`}<br><small>${esc(fresh.notes)}</small>`,
             threat: fresh.threat,
             error: fresh.error,

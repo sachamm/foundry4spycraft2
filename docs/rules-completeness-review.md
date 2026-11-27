@@ -1086,3 +1086,33 @@ All **4,202** Node tests, **988** fixture assertions, **13** pack checks and
 formatting, bundling and copy checks pass with existing warnings. Scores remain
 **PC creation 9.4/10 and combat 9.5/10** pending the broader source audit and
 remaining mechanics. The next campaign-skill audit covers Omni-Competent.
+
+### Omni-Competent cap and mode review — 27 November 2026
+
+This quality also had no executable effect. Named PC skill checks now become
+active and have no result cap. The current skill sheet shows the uncapped state;
+skill ranks, maximum purchase ranks and point budgets stay independent.
+Knowledge checks become active without requiring Photographic Memory, while
+taking permissions still require their normal source. Manual and grade-built
+NPC checks both use the uncapped result. NPC GC-only visibility remains an
+explicit choice rather than exposing private statistics.
+
+Campaign skill evidence now records the active/cap policy, alongside Paranoid
+when applicable. The actual PC, NPC and Knowledge entry points preserve it and
+detect adding or removing the quality before posting. Knowledge's guard now
+also covers initially absent campaign policy. Completed cards retain their
+original cap/mode evidence after later campaign changes.
+
+Native Foundry produced an active Notice result of **116** above the ordinary
+cap of **30**, an active Knowledge card and an uncapped manual NPC card. The
+sheet displayed its uncapped figures. Removing the quality restored the live
+cap of 30 without changing saved cards. Native testing caught and fixed the
+manual-NPC path separately from the already-tested grade-built path. Browser
+errors and diagnostics were empty.
+
+All **4,207** Node tests, **988** fixture assertions, **13** pack checks and
+**245** layout checks pass; the final manual-NPC correction also passes the
+focused **21**-test regression run and native verification. Lint, formatting,
+bundling and copy checks pass with existing warnings. Omni-Competent's
+per-penalty reduction remains open, including the pending GC rounding ruling.
+Scores remain **PC creation 9.4/10 and combat 9.5/10**; work continues.

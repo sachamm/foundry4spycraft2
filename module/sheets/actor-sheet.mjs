@@ -1189,6 +1189,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.skills = Object.values(sys.skillTotals ?? {}).map(s => ({
       ...s,
       rollLabel: loc`Roll ${s.name}`,
+      capLabel: s.cap === null ? loc`No cap` : s.cap,
       points: entry?.skills?.[s.key] ?? 0,
       historicalRanks: context.skillLevelInfo?.skills?.[s.key]?.ranks ?? s.ranks,
       purchaseMaxRanks: context.skillLevelInfo?.skills?.[s.key]?.maxRanks ?? s.maxRanks,

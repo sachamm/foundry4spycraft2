@@ -517,7 +517,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const originallySecret = check.mode === "Secret" || (!!secret && check.mode.includes("Secret"));
   const crossCheckAvailable =
     ambush.crossCheckGranted || check.tags.includes("Cross-Check") || (!!attention && originallySecret);
-  const forceActive = activeCore || hailMaryActive || (crossCheckActive && crossCheckAvailable);
+  const forceActive =
+    campaignChecks.policy?.active || activeCore || hailMaryActive || (crossCheckActive && crossCheckAvailable);
   const mode = forceActive ? "Active" : check.mode;
   const synergy = skillSynergy(
     system,
@@ -601,7 +602,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const skillFeats = (system.skillFeatRules ?? []).filter(rule => appliesToSkill(rule, key, applicableFocus));
   const hasFeat = name => skillFeats.some(rule => rule.name === name);
   const cap =
-    hotDice || hailMaryUncap
+    hotDice || hailMaryUncap || campaignChecks.policy?.uncapped
       ? null
       : Math.max(
           0,
