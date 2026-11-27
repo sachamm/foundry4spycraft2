@@ -479,6 +479,87 @@ test("Comedy of Errors widens an NPC's error range on its lowest attribute (p.40
   }
 });
 
+test("an NPC skill check is posted as the named check, with that check's own error range (p.88)", async () => {
+  answer({ skillCheck: "medicine:surgery", ability: "", modifier: 0, error: "", secret: false });
+  let roll = await npc.rollNpcSkill(guard);
+  assert.equal(roll.options.checkKind, "skill");
+  assert.equal(roll.options.skillKey, "medicine");
+  assert.equal(roll.options.checkId, "surgery");
+  assert.equal(roll.options.error, 4);
+  // The sheet's quick roll names only the skill: its first check, at that check's error range.
+  roll = await npc.rollNpcSkill(guard, { key: "acrobatics", ability: "", modifier: 0 });
+  assert.equal(roll.options.checkId, "balance");
+  assert.equal(roll.options.error, 1);
+  roll = await npc.rollNpcSkill(guard, { key: "acrobatics", check: "falling", ability: "", modifier: 0 });
+  assert.equal(roll.options.error, 3);
+  // A typed error range still wins.
+  roll = await npc.rollNpcSkill(guard, { key: "medicine", check: "surgery", modifier: 0, error: 2 });
+  assert.equal(roll.options.error, 2);
+});
+
+test("an NPC's conditions and Size reach its skill checks, halved under Omni-Competent (pp.340–342, 349, 408)", async () => {
+  const system = guard.system;
+  try {
+    system.conditionContext = { sickened: true };
+    let roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", modifier: 0 });
+    assert.equal(roll.data.total, 9 + 2 - 2);
+    system.conditionContext = {};
+    system.sizeHideModifier = -4;
+    roll = await npc.rollNpcSkill(guard, { key: "blend", check: "stealth", ability: "dex", modifier: 0 });
+    assert.equal(roll.data.total, 4 - 4);
+    roll = await npc.rollNpcSkill(guard, { key: "sneak", check: "hide", ability: "dex", modifier: 0 });
+    assert.equal(roll.data.total, 4 - 4);
+    delete system.sizeHideModifier;
+    await state.setCampaign({ qualities: ["omni-competent"] });
+    roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", modifier: -4 });
+    assert.equal(roll.data.total, 9 + 2 - 2);
+  } finally {
+    delete system.conditionContext;
+    delete system.sizeHideModifier;
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
+test("Paranoid gives a special NPC its surprise bonus on a Hide check (p.408)", async () => {
+  const kept = guard.system.npcType;
+  guard.system.npcType = "special";
+  await state.setCampaign({ qualities: ["paranoid"] });
+  try {
+    const roll = await npc.rollNpcSkill(guard, { key: "sneak", check: "hide", ability: "dex", surprise: true });
+    assert.equal(roll.data.total, 4 + 4);
+    const plain = await npc.rollNpcSkill(guard, { key: "sneak", check: "hide", ability: "dex" });
+    assert.equal(plain.data.total, 4);
+  } finally {
+    guard.system.npcType = kept;
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
+test("an animal's trained qualities steady its Morale, and a check off its list warns (p.445)", async () => {
+  const system = guard.system,
+    kept = { type: system.npcType, effects: system.qualityEffects };
+  system.npcType = "animal";
+  system.qualityEffects = { skillOptions: [], trainedQualities: 2 };
+  try {
+    const roll = await npc.rollNpcSkill(guard, { key: "resolve", check: "morale", modifier: 0, riderCharisma: 2 });
+    assert.equal(roll.data.total, 4 + 2 + 2);
+    assert.equal(roll.options.error, 0);
+    assert.equal(roll.options.cap, npc.npcSkillPlan(guard, "resolve").cap + 4);
+    system.qualityEffects = { skillOptions: [], trainedQualities: 1 };
+    const one = await npc.rollNpcSkill(guard, { key: "resolve", check: "morale", modifier: 0, riderCharisma: 2 });
+    assert.equal(one.options.error, 1);
+    assert.equal(one.options.cap, npc.npcSkillPlan(guard, "resolve").cap);
+    const before = warnings.length;
+    await npc.rollNpcSkill(guard, { key: "medicine", check: "surgery" });
+    assert.match(warnings.at(-1), /Animals may not normally make/);
+    await npc.rollNpcSkill(guard, { key: "athletics", check: "swim" });
+    assert.equal(warnings.length, before + 1);
+  } finally {
+    system.npcType = kept.type;
+    system.qualityEffects = kept.effects;
+  }
+});
+
 test("standard NPC Damage saves accumulate, kill and reset; special NPCs are refused", async () => {
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });

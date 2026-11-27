@@ -118,7 +118,7 @@ async function sufferTypedLethal(actor, type, amount, label) {
     rolls.push(flat.roll);
     points += flat.total;
   }
-  lines.push(await sufferStress(actor, points, label));
+  lines.push(await sufferStress(actor, points, label, undefined, { cause: type }));
   return { lines, rolls, lost };
 }
 
@@ -592,7 +592,7 @@ const resolvers = {
       lines.push(await condition(actor, "stun", outcome.stunned, loc`Stunned`));
       lines.push(await condition(actor, "deaf", outcome.deafened, loc`Deafened`));
       const stress = await rollTotal(outcome.stress);
-      lines.push(await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.bang));
+      lines.push(await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.bang, undefined, { cause: "bang" }));
       await post(actor, lines, [stress.roll]);
       lines.length = 0;
     }
@@ -607,7 +607,7 @@ const resolvers = {
       actor,
       [
         await condition(actor, "blind", outcome.blinded, loc`Blinded`),
-        await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.flash)
+        await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.flash, undefined, { cause: "flash" })
       ],
       [stress.roll]
     );

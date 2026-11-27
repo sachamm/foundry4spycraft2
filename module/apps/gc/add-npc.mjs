@@ -9,7 +9,8 @@ import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
 import { cancellable, cancelButton, freeCancel } from "../dialog-kit.mjs";
 import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
-import { getMission } from "./state.mjs";
+import { getMission, teamActors } from "./state.mjs";
+import { minionSquad } from "../../rules/npc-qualities.mjs";
 
 const kindLabel = type =>
   ({ standard: loc`standard`, special: loc`special`, villain: loc`special`, animal: loc`animal` })[type] ?? "";
@@ -93,7 +94,8 @@ export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, 
  * the next free number, so the tracker, the map and the chat cards can tell them apart.
  */
 export function numberedNames(name, count, existing = []) {
-  const pattern = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?: (\\d+))?$`);
+  // A squad's Commander carries a mark after its number, and still counts.
+  const pattern = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?: (\\d+))?(?: \\(.+\\))?$`);
   const used = existing.map(other => pattern.exec(other)).filter(Boolean);
   if (count === 1 && !used.length) return [name];
   let next = Math.max(0, ...used.map(match => Number(match[1] ?? 1))) + 1;
@@ -129,11 +131,17 @@ const DISPOSITIONS = { hostile: -1, neutral: 0, friendly: 1 };
  * Token data for a placement: where each copy goes, what it is called and how it stands toward the team.
  * @returns {object[]} One creation object per token.
  */
-export function placementData(prototype, { corners, names, disposition = "hostile", hidden = false }) {
+export function placementData(
+  prototype,
+  { corners, names, disposition = "hostile", hidden = false, commanderIndex = null }
+) {
   return corners.map((corner, index) => ({
     ...prototype,
     ...corner,
-    name: names[index] ?? prototype.name,
+    name:
+      index === commanderIndex ? loc`${names[index] ?? prototype.name} (Commander)` : (names[index] ?? prototype.name),
+    // The squad's Commander is built at Threat Level +2 (p.447); the mark lives on this token's own data.
+    ...(index === commanderIndex ? { delta: { ...(prototype.delta ?? {}), system: { commander: true } } } : {}),
     hidden,
     ...(disposition in DISPOSITIONS ? { disposition: DISPOSITIONS[disposition] } : {}),
     // Several copies of one NPC are separate people: each keeps its own damage.
@@ -189,12 +197,12 @@ export async function addNpcToScene() {
           `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${g === 0 && i === 0 ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
       )
       .join("")}</select></label>
-      <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" value="1" /></label>
+      <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" placeholder="${esc(loc`1, or a Minion squad`)}" /></label>
       <label>${loc`Stands toward the team as`} <select name="disposition"><option value="hostile" selected>${loc`Hostile`}</option><option value="neutral">${loc`Neutral`}</option><option value="friendly">${loc`Friendly`}</option><option value="keep">${loc`As its own token is set`}</option></select></label>
       <label><input type="checkbox" name="hidden" /> ${loc`Hidden from the players`}</label>
       ${fight ? `<label><input type="checkbox" name="join" checked /> ${loc`Join the fight on the tracker`}</label>` : ""}
       ${mission.name || mission.active ? `<label><input type="checkbox" name="record" /> ${loc`Also record it for mission XP, if its type is not listed yet`}</label>` : ""}
-      <p class="hint">${loc`A compendium NPC is imported the first time and reused after that. Tokens go on free squares around the centre of your view, numbered when there is more than one.`}</p></div>`
+      <p class="hint">${loc`A compendium NPC is imported the first time and reused after that. Tokens go on free squares around the centre of your view, numbered when there is more than one.`} ${loc`Left blank, a Minion comes as a squad the team's size (twice that with Horde), one of them its Commander if it has that quality (pp.447–448).`}</p></div>`
   });
   if (!input) return null;
   if (!input.uuid) return refuse(loc`No NPC is chosen. Clear the search or pick one from the list.`);
@@ -207,7 +215,12 @@ export async function addNpcToScene() {
     actor = importedCopy(input.uuid) ?? (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
   if (actor?.type !== "npc") return refuse(loc`That NPC could not be found.`);
   const prototype = await actor.getTokenDocument();
-  const count = Math.min(20, Math.max(1, Math.trunc(Number(input.copies)) || 1));
+  // A Minion squad has as many members as the team, twice as many under Horde (pp.447–448).
+  const squad = actor.system?.npcProfile?.enabled
+      ? minionSquad(actor.system.npcProfile.qualities, teamActors(mission).length)
+      : null,
+    typed = Math.trunc(Number(input.copies)) || 0;
+  const count = Math.min(20, Math.max(1, typed || squad?.size || 1));
   const origin = viewCentreCorner({
     centre: canvas.stage.pivot,
     gridSize: canvas.grid.size,
@@ -236,10 +249,13 @@ export async function addNpcToScene() {
       corners,
       names,
       disposition: input.disposition,
-      hidden: !!input.hidden
+      hidden: !!input.hidden,
+      commanderIndex: squad?.commander && corners.length > 1 ? 0 : null
     })
   );
   const done = [loc`${tokens.length} × ${actor.name} added to ${scene.name}`];
+  if (!typed && squad) done.push(loc`a Minion squad the team's size`);
+  if (squad?.commander && corners.length > 1) done.push(loc`led by its Commander at Threat Level +2`);
   let joined = false;
   if (input.join && fight) {
     // A fight deleted meanwhile leaves the tokens placed; the notice says they did not join.

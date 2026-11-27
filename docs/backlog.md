@@ -281,6 +281,8 @@ own line on the card, and checked against the page first.
 | B-190 | Cover from characters in the line of fire is named, not valued; scenery is not considered; blast ignores cover other than walls; no distance measuring for skill dialogs. | RW-203, RW-204, RW-346, RW-410 | M |
 | B-191 | Not modelled: team and directed checks; Joint Action's shared Count; Terminal Situations beyond the GC die spend; fire or gas spreading across squares; contagious diseases passing between characters; halving Strength damage underwater; weapons as gadget housings; damage reduction against Charisma damage; Table 5.6 Size modifiers to armor-piercing; dice gained or cost against mission Caliber for favoured gear; conveyance bull-rush reading vehicle actors; unarmed Trip, Feint and grapple variants. | RW-82, RW-215, RW-219, RW-287, code comments | L |
 | B-192 | Second delivery roll and the unchosen roll of a choose-twice check are not attached to the chat message. | J7 | S |
+| B-256 | An agent's Size modifies its Sneak/Hide checks but not its Blend/Stealth checks; the Size table applies to both (p.349). NPCs now take it on both. Agents' Size is also only Small, Medium or Large. | council-rules 2026-11-27 S2 | S |
+| B-257 | A Minion squad's Commander is marked only when Add NPC to scene places the squad; the NPC sheet has no control to mark or clear a token as Commander, and a linked Minion cannot carry the mark (p.447). | council-rules 2026-11-27 R7, E4 | S |
 | B-193 | Data semantics: feat summaries, class features, weapon and armor numbers have no recorded source-to-data audit (gear and vehicles were cross-checked); reference fixtures include invalid rank allocations. | RW (audit-2026-11) | L |
 
 ## Code health (code council, 2026-11-23)
