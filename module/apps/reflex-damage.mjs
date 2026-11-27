@@ -2,7 +2,7 @@ import { refuse } from "../error-notices.mjs";
 import { savingThrowDamagePlan } from "../rules/defense.mjs";
 import { loc } from "../i18n.mjs";
 import { formDialog, raw } from "./dialog-kit.mjs";
-/** Read-only saving-throw adjustment; health and other mitigation are separate. */
+/** Read-only save adjustment; health and other mitigation are separate. */
 export async function checkReflexDamage(actor) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
   const saves = [...(game.messages ?? [])]
@@ -17,13 +17,13 @@ export async function checkReflexDamage(actor) {
       )
       .reverse(),
     esc = foundry.utils.escapeHTML;
-  if (!saves.length) return refuse(loc`Make a saving throw with its recorded context first.`);
+  if (!saves.length) return refuse(loc`Make a save with its recorded context first.`);
   const input = await formDialog({
-    title: loc`Saving throw — damage adjustment`,
+    title: loc`Save — damage adjustment`,
     fields: [
       {
         select: "messageId",
-        label: loc`Recorded saving throw`,
+        label: loc`Recorded save`,
         optionsHtml: raw(
           saves
             .map(
@@ -35,7 +35,7 @@ export async function checkReflexDamage(actor) {
       },
       {
         number: "damage",
-        label: loc`Source damage before this saving-throw adjustment`,
+        label: loc`Source damage before this save adjustment`,
         min: "0",
         step: "1",
         value: "0"
@@ -85,9 +85,9 @@ export async function checkReflexDamage(actor) {
     return refuse(error.message);
   }
   await foundry.applications.api.DialogV2.input({
-    window: { title: loc`Saving throw — damage result` },
+    window: { title: loc`Save — damage result` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p><b>${loc`Damage after the saving throw: ${plan.total}`}</b></p><p>${loc`Source damage ${plan.damage}; ordinary successful-save damage ${plan.normalSuccessDamage}; save ${plan.succeeded ? "succeeded" : "failed"}.`}</p>${plan.context ? `<p>${loc`Recorded Evasion grade ${plan.context.grade}; flat-footed ${plan.context.flatFooted ? "yes" : "no"}; save can reduce damage ${plan.context.reflexReducesDamage ? "yes" : "no"}.`}</p>` : ""}<p>${plan.blockbuster ? loc`Blockbuster: the successful save prevents this damage and its effects.` : plan.evaded ? loc`Evasion: no damage with the successful save.` : plan.halved ? loc`Evasion II: failed-save damage halved, rounded down.` : loc`No additional saving-throw damage adjustment applies.`}</p><p>${loc`Apply other mitigation and health settlement separately. No health or action dice were changed.`}</p></div>`
+    content: `<div class="spycraft2-roll-options"><p><b>${loc`Damage after the save: ${plan.total}`}</b></p><p>${loc`Source damage ${plan.damage}; ordinary successful-save damage ${plan.normalSuccessDamage}; save ${plan.succeeded ? "succeeded" : "failed"}.`}</p>${plan.context ? `<p>${loc`Recorded Evasion grade ${plan.context.grade}; flat-footed ${plan.context.flatFooted ? "yes" : "no"}; save can reduce damage ${plan.context.reflexReducesDamage ? "yes" : "no"}.`}</p>` : ""}<p>${plan.blockbuster ? loc`Blockbuster: the successful save prevents this damage and its effects.` : plan.evaded ? loc`Evasion: no damage with the successful save.` : plan.halved ? loc`Evasion II: failed-save damage halved, rounded down.` : loc`No additional save damage adjustment applies.`}</p><p>${loc`Apply other mitigation and health settlement separately. No health or action dice were changed.`}</p></div>`
   });
   return plan;
 }

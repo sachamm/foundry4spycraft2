@@ -343,7 +343,7 @@ export function reflexDamagePlan(
 export function savingThrowDamagePlan(check, options = {}) {
   const { damage, normalSuccessDamage, succeeded = check.successConfirmed, confirmed, successHalves = false } = options;
   if (check.checkKind !== "save" || !["ref", "fort", "will"].includes(check.checkId) || check.superseded)
-    throw new Error(loc`Choose an original saving throw.`);
+    throw new Error(loc`Choose an original save.`);
   if (confirmed !== true || typeof succeeded !== "boolean" || typeof successHalves !== "boolean")
     throw new Error(loc`The GC must confirm the source damage, ordinary successful-save damage and outcome.`);
   if (typeof check.successConfirmed === "boolean" && succeeded !== check.successConfirmed)
@@ -361,7 +361,7 @@ export function savingThrowDamagePlan(check, options = {}) {
     throw new Error(loc`A save for half must use the source rule's half-damage amount.`);
   const recorded = check.campaignSaveContext;
   if (recorded && (recorded.version !== 1 || typeof recorded.ignoreSuccessfulHalfSave !== "boolean"))
-    throw new Error(loc`Review the saving throw's recorded campaign policy.`);
+    throw new Error(loc`Review the save's recorded campaign policy.`);
   const ordinary = succeeded ? normalSuccessDamage : damage;
   const evasion =
     check.checkId === "ref" && check.evasionContext
