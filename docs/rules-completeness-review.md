@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **8.9/10**;
-combat play **9.0/10**. Implementation continues toward the requested **9.9/10**
+**Continuing review, 26 November 2026:** PC creation **9.0/10**;
+combat play **9.1/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -401,6 +401,24 @@ changing a level grant into historical review, and deliberately losing the
 responses after those writes commit. The resulting records remain valid and
 contain no obsolete allowances. All **4,018** Node tests, lint, formatting and
 bundle checks pass. Full multiplayer and combat play-through work continues.
+
+The first native two-client pass now succeeds. A player uses the real Modular
+dialog; both clients receive the same changed budget and the player sees no GC
+history controls. In a disposable encounter, the player posts an attack, the GC
+resolves it, the player rolls damage from its chat control, and the GC applies
+the rolled amount to an unlinked NPC token. The base NPC remains untouched.
+Undo restores the token's vitality. A DC 24 NPC stress save fails, applies one
+Shaken IV source, and repeated settlement adds no second source; the base NPC
+also remains free of that condition. Neither client reports a page error or
+resource-transaction warning in these flows. Rendering uses headless software
+graphics, so this does not establish interactive performance.
+
+Native evidence raises the continuing scores to **9.0/10** for creation and
+**9.1/10** for combat. Remaining recommendations still include source-data and
+history coverage, campaign exceptions, falling, NPC typed damage, Grapple
+benefits, cooperation and environment rules. The next lifecycle review also
+needs to close a hazard's underlying roll before applying its final effects,
+so later boosts cannot contradict an already applied result. Work continues.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,
