@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
 **Continuing review, 26 November 2026:** PC creation **9.3/10**;
-combat play **9.3/10**. Implementation continues toward the requested **9.9/10**
+combat play **9.4/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -662,3 +662,20 @@ conditional options/environments 1.75 for combat. The remaining recommendations
 are the source audit and additional acquisition histories, current-session
 favored-item reselection after advancement, campaign-quality gaps, group combat
 actions, environmental rules and the remaining special options in the backlog.
+
+Wire Fu now halves falling impact and associated stress, rounding down, under
+the user's confirmed ruling. Other distance, per-die and Acrobatics reductions
+apply first; physical fall height, armor piercing and landing conditions retain
+their ordinary rules. The quality applies to player and special characters,
+including a current NPC promotion. The divisor is saved with the landing's
+durable context and shown on its damage cards. Existing results and interrupted
+settlements retain that context when the quality later ends.
+
+Native Foundry verifies an actual no-check landing, both reduced cards, impact
+application exactly once and Undo, special/standard NPC scope, and replay after
+the quality ends. No page errors or transaction diagnostics occur. All **4,110**
+tests, **988** fixture assertions and **13** pack checks pass; lint, formatting,
+bundling and the text-copy check also pass. Combat rises to **9.4/10**: damage/
+recovery is now 1.95 and conditional options/environments 1.80, with the other
+dimensions unchanged. Creation remains **9.3/10**. Multi-round descent and
+Wire Fu movement still require work; these checks establish the damage rule.

@@ -4,7 +4,7 @@ import { loc } from "../i18n.mjs";
 /** Resolve the saved fall distances, surface and Acrobatics outcome before armor or damage resistance. */
 export function fallingDamagePlan(
   proof,
-  { surface = "solid", diving = false, waterDepthFeet = 0, result, succeeded, dice = null } = {}
+  { surface = "solid", diving = false, waterDepthFeet = 0, result, succeeded, dice = null, damageDivisor = 1 } = {}
 ) {
   if (
     !proof ||
@@ -21,6 +21,7 @@ export function fallingDamagePlan(
     throw Error(loc`Review the recorded fall distances and per-die reductions.`);
   if (!["solid", "fluid"].includes(surface) || typeof diving !== "boolean" || !Number.isFinite(result))
     throw Error(loc`Choose a solid or fluid landing and a recorded Acrobatics result.`);
+  if (![1, 2].includes(damageDivisor)) throw Error(loc`Review the recorded falling damage modifier.`);
   if (
     diving &&
     (surface !== "fluid" || !Number.isFinite(waterDepthFeet) || waterDepthFeet < proof.actualDistanceFeet / 3)
@@ -57,8 +58,10 @@ export function fallingDamagePlan(
     dice,
     adjustedDice,
     checkReduction,
-    impact: total === null ? null : Math.max(count, total - checkReduction),
-    stress: kind === "lethal" ? fallingStress(Math.floor(proof.actualDistanceFeet), count) : 0,
+    ...(damageDivisor === 2 ? { damageDivisor } : {}),
+    impact: total === null ? null : Math.floor(Math.max(count, total - checkReduction) / damageDivisor),
+    stress:
+      kind === "lethal" ? Math.floor(fallingStress(Math.floor(proof.actualDistanceFeet), count) / damageDivisor) : 0,
     sprawled: !success
   };
 }

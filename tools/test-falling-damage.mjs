@@ -4,6 +4,7 @@ import { fallDistancePlan } from "../module/rules/fall-distance.mjs";
 import { fallingDamagePlan } from "../module/rules/falling-damage.mjs";
 import { resolveFallingDamage, recordUncontrolledFall } from "../module/apps/falling-damage.mjs";
 import { quickApplyInput } from "../module/apps/damage-application.mjs";
+import { campaignFallingDamageDivisor } from "../module/rules/campaign-combat.mjs";
 
 const proof = (feet, extras = {}) =>
   fallDistancePlan(
@@ -133,6 +134,81 @@ function fixture(total = 10) {
   return { actor, message, check, messages, calls };
 }
 const landing = { surface: "solid", confirmed: true };
+
+test("Wire Fu halves both impact and lethal-fall stress after distance and per-die reductions, rounded down", () => {
+  const plan = fallingDamagePlan(proof(35), { result: 19, dice: [6, 4, 3], damageDivisor: 2 });
+  assert.equal(plan.impact, 6);
+  assert.equal(plan.stress, 3);
+  assert.equal(plan.armorPiercing, 3);
+  assert.equal(plan.diceCount, 3);
+  assert.equal(plan.sprawled, true);
+  const reduced = fallingDamagePlan(proof(60, { activeFeatNames: ["Spider Mastery"], classLevels: { stuntman: 4 } }), {
+    result: 24,
+    dice: [1, 2, 3, 4, 5, 6],
+    damageDivisor: 2
+  });
+  assert.equal(reduced.impact, 3);
+  assert.equal(reduced.stress, 6);
+  assert.equal(reduced.checkReduction, 6);
+  const fluid = fallingDamagePlan(proof(30), { surface: "fluid", result: 19, dice: [6, 4, 3], damageDivisor: 2 });
+  assert.equal(fluid.impact, 6);
+  assert.equal(fluid.stress, 0);
+  const minimal = fallingDamagePlan(proof(10), { result: 24, dice: [1], damageDivisor: 2 });
+  assert.equal(minimal.impact, 0);
+  assert.throws(() => fallingDamagePlan(proof(35), { result: 19, dice: [6, 4, 3], damageDivisor: 0 }));
+});
+test("Wire Fu covers PCs, special characters and current promotions; ordinary NPCs retain ordinary damage", () => {
+  const effects = { fallingDamageDivisor: 2 };
+  assert.equal(campaignFallingDamageDivisor({ type: "agent", system: {} }, effects), 2);
+  for (const npcType of ["special", "villain"])
+    assert.equal(campaignFallingDamageDivisor({ type: "npc", system: { npcType } }, effects), 2);
+  for (const npcType of ["standard", "animal"])
+    assert.equal(campaignFallingDamageDivisor({ type: "npc", system: { npcType } }, effects), 1);
+  const npc = {
+    type: "npc",
+    system: { npcType: "standard", promotion: { mission: "m" }, usagePeriods: { mission: "m" } }
+  };
+  assert.equal(campaignFallingDamageDivisor(npc, effects), 2);
+  npc.system.usagePeriods.mission = "next";
+  assert.equal(campaignFallingDamageDivisor(npc, effects), 1);
+  assert.equal(campaignFallingDamageDivisor({ type: "agent", system: {} }, {}), 1);
+});
+test("the actual falling controller saves Wire Fu with both applicable cards and retains it after a campaign change", async () => {
+  const f = fixture();
+  f.actor.type = "agent";
+  game.settings.get = (_namespace, key) => (key === "campaign" ? { qualities: ["wire-fu"] } : {});
+  const result = await resolveFallingDamage(f.actor, f.message, landing);
+  assert.equal(result.context.damageDivisor, 2);
+  assert.equal(result.plan.impact, 6);
+  assert.equal(result.plan.stress, 3);
+  assert.equal(f.messages[0].flags.spycraft2.effectiveTotal, 6);
+  assert.equal(f.messages[1].flags.spycraft2.effectiveTotal, 3);
+  assert.match(f.messages[0].content, /Wire Fu/);
+  game.settings.get = () => ({});
+  assert.deepEqual(await resolveFallingDamage(f.actor, f.message, landing), result);
+  assert.equal(f.calls.filter(c => c === "roll").length, 1);
+});
+test("an interrupted Wire Fu settlement recovers under its saved policy after the quality ends", async () => {
+  const f = fixture();
+  f.actor.type = "agent";
+  game.settings.get = (_namespace, key) => (key === "campaign" ? { qualities: ["wire-fu"] } : {});
+  const create = ChatMessage.create;
+  let failed = false;
+  ChatMessage.create = async data => {
+    if (!failed) {
+      failed = true;
+      throw Error("chat write rejected");
+    }
+    return create(data);
+  };
+  await assert.rejects(resolveFallingDamage(f.actor, f.message, landing), /chat write rejected/);
+  game.settings.get = () => ({});
+  ChatMessage.create = create;
+  const result = await resolveFallingDamage(f.actor, f.message, landing);
+  assert.equal(result.plan.impact, 6);
+  assert.equal(result.plan.stress, 3);
+  assert.equal(f.calls.filter(c => c === "roll").length, 1);
+});
 
 test("real controller closes the roll, posts impact/stress with correct quick-apply defaults and lands sprawled once", async () => {
   const f = fixture();

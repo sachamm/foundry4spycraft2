@@ -11176,7 +11176,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Player and special characters may move in any direction, including straight up or along walls. Ending movement off a stable surface triggers the falling rules, but falling damage is halved (rounded down).",
-   "effects": {}
+   "effects": {
+    "fallingDamageDivisor": 2
+   }
   }
  ]
 };
