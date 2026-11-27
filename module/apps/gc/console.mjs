@@ -149,7 +149,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       securityDevice: guard(() => tables.securityDeviceDialog()),
       hazards: guard(() => tables.hazardLookupDialog()),
       events: guard(() => tables.eventReferenceDialog()),
-      possessions: guard(() => tables.randomPossessionsDialog())
+      possessions: guard(() => tables.randomPossessionsDialog()),
+      npcKnowledge: guard(() => tables.npcKnowledgeDialog())
     }
   };
 

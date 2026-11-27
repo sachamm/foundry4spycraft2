@@ -5708,6 +5708,104 @@ export const GC_DATA = {
     "summary": "One Rating goes up by 1 for each quarter to half-year that passes in the campaign",
     "page": 395
    }
+  },
+  "npcKnowledge": {
+   "page": 460,
+   "rulesPage": 458,
+   "nonVillainMax": 3,
+   "villainMax": 7,
+   "knowsNothingCost": {
+    "standard": 1,
+    "minion": 1,
+    "special": 2,
+    "henchman": 2
+   },
+   "footnotes": [
+    "Each grade includes everything below it.",
+    "Grades I–III may be wrong or a red herring, as the GC decides."
+   ],
+   "rows": [
+    {
+     "grade": 1,
+     "min": 0,
+     "max": 4,
+     "ratings": 0,
+     "needs": null,
+     "label": "A description of one suspicious person seen within 10 miles in the last day"
+    },
+    {
+     "grade": 2,
+     "min": 5,
+     "max": 8,
+     "ratings": 0,
+     "needs": null,
+     "label": "Where one suspicious event took place within 10 miles in the last day"
+    },
+    {
+     "grade": 3,
+     "min": 9,
+     "max": 12,
+     "ratings": 0,
+     "needs": null,
+     "label": "The name and outline of the organization thought to be behind a recent nearby event"
+    },
+    {
+     "grade": 4,
+     "min": 13,
+     "max": 16,
+     "ratings": 1,
+     "needs": "villain",
+     "label": "The nearest enemy installation (within 25 miles)"
+    },
+    {
+     "grade": 5,
+     "min": 17,
+     "max": 20,
+     "ratings": 2,
+     "needs": "villain",
+     "label": "Their immediate superior's Career Level and classes"
+    },
+    {
+     "grade": 6,
+     "min": 21,
+     "max": 25,
+     "ratings": 3,
+     "needs": "villain",
+     "label": "Where the nearest enemy henchman is (within 50 miles)"
+    },
+    {
+     "grade": 7,
+     "min": 26,
+     "max": 30,
+     "ratings": 4,
+     "needs": "villain",
+     "label": "Their immediate superior's full statistics"
+    },
+    {
+     "grade": 8,
+     "min": 31,
+     "max": 35,
+     "ratings": 4,
+     "needs": "henchman",
+     "label": "Every enemy installation within 100 miles, and the mastermind's Career Level and classes"
+    },
+    {
+     "grade": 9,
+     "min": 36,
+     "max": 40,
+     "ratings": 5,
+     "needs": "henchman",
+     "label": "The mastermind's full statistics"
+    },
+    {
+     "grade": 10,
+     "min": 41,
+     "max": null,
+     "ratings": 5,
+     "needs": "henchman",
+     "label": "Access codes for every enemy installation within 100 miles"
+    }
+   ]
   }
  },
  "conflicts": {

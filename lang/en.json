@@ -1511,7 +1511,8 @@
     "PostSummary": "Post summary",
     "RemoveOrganizationHint": "Delete this organization from the world.",
     "NoOrganizations": "No organizations. Use Add organization above to record the Agency and its rivals.",
-    "Edit": "Edit"
+    "Edit": "Edit",
+    "NpcKnowledge": "What an NPC knows"
    },
    "ItemItemArmor": {
     "DRMeleeUnarmedAndNonGrenade": "DR: melee, unarmed and non-grenade hurled attacks / all other attacks. Helmets with a Vision penalty apply it to Vision checks, not Reflex saves.",
