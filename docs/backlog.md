@@ -280,7 +280,6 @@ own line on the card, and checked against the page first.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-182 | Laser: die loss per range increment is reminder text; its lower critical cost is not applied (the attack record does not carry the damage type). (p.338) | R-03, RW-286 | S |
 | B-184 | No control for persuading an NPC to join a fight. | R-05 | S |
 | B-185 | Standard NPC Damage save is not adjusted automatically for vitality or wound changes; a manual field exists. *GC to confirm.* (p.452) | R-06 | S |
 | B-186 | Grapple Size limits not enforced; grapple benefit damage (Injure, Throw, Sprawl) is rolled from the weapon card and applied separately; the −4 penalties are by hand. (p.357) | R-07, RW-210, RW-346 | M |

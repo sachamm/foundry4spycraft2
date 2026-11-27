@@ -572,3 +572,38 @@ export function survivalFailure(kind, { standard = false, days = 1, depth = 100 
       throw new Error(loc`Choose a listed survival hazard.`);
   }
 }
+
+/** Whether a weapon deals laser damage: its damage entry says so, or a GC marked its damage type. */
+export const laserWeapon = (weapon = {}) =>
+  weapon.damageType === "laser" || /\blaser\b/i.test(String(weapon.damage ?? ""));
+
+/**
+ * A laser hit's dice at a measured distance (p.338): one die fewer for each range increment past the first, applied to
+ * the first dice term of a damage expression. Without a distance or increment the expression is unchanged.
+ * @returns {{expression: string, removed: number, increments: number|null, note: string}}
+ */
+export function laserDistancePlan(expression, { distanceFeet, increment } = {}) {
+  const distance =
+      distanceFeet === "" || distanceFeet === null || distanceFeet === undefined ? NaN : Number(distanceFeet),
+    step = Number(increment);
+  if (!(distance >= 0) || !(step > 0))
+    return {
+      expression,
+      removed: 0,
+      increments: null,
+      note: loc`Laser: enter the target distance to drop one damage die per range increment past the first (p.338).`
+    };
+  const increments = Math.max(1, Math.ceil(distance / step));
+  const match = String(expression).match(/(\d*)d(\d+)/i);
+  if (!match || increments === 1) return { expression, removed: 0, increments, note: "" };
+  const dice = Number(match[1] || 1),
+    removed = Math.min(dice, increments - 1),
+    left = dice - removed;
+  const replaced = left ? `${left}d${match[2]}` : "0";
+  return {
+    expression: String(expression).replace(match[0], replaced),
+    removed,
+    increments,
+    note: loc`Laser: range increment ${increments}, ${removed} damage die fewer (p.338).`
+  };
+}

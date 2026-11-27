@@ -149,6 +149,11 @@ export function criticalPlan(
       adjustment--;
       sources.push("Overkill –1");
     }
+    // Laser damage (p.338): a threat costs 1 action die less to activate.
+    if (check.attackContext?.laser === true) {
+      adjustment--;
+      sources.push(loc`Laser damage –1`);
+    }
     // Bloodbath (p.406): a player or special character's threat on a hit becomes a critical hit without paying.
     if (threatsAutoActivate() && !["standard", "animal"].includes(system.npcType)) {
       adjustment--;

@@ -228,7 +228,12 @@ export async function resolveAttack(message, options = {}) {
   const foibles = entered && target ? specialistDefense(target.system, check.weaponProficiency).dodge : 0;
   // Gladiators (p.407): +1 against ranged attacks for each Melee or Unarmed Combat feat the target holds.
   const gladiators = entered && target ? gladiatorsDefense(target.system, check.attackContext?.ranged === true) : 0;
-  const defense = baseDefense + (cover?.bonus ?? 0) + foibles + gladiators;
+  // Laser damage ignores every dodge bonus to Defense (p.338), so a known target's dodge bonuses come off.
+  const laserDodge =
+    entered && target && check.attackContext?.laser === true && !target.system?.vulnerable
+      ? Math.max(0, Number(target.system?.defense?.dodgeBonuses) || 0) + foibles
+      : 0;
+  const defense = baseDefense + (cover?.bonus ?? 0) + foibles + gladiators - laserDodge;
   let outcome;
   try {
     outcome = attackOutcome({
