@@ -5,6 +5,7 @@ import { fallingDamagePlan } from "../module/rules/falling-damage.mjs";
 import { resolveFallingDamage, recordUncontrolledFall } from "../module/apps/falling-damage.mjs";
 import { quickApplyInput } from "../module/apps/damage-application.mjs";
 import { campaignFallingDamageDivisor } from "../module/rules/campaign-combat.mjs";
+import { trackFall, currentFall, reviewFallTiming } from "../module/apps/falling-time.mjs";
 
 const proof = (feet, extras = {}) =>
   fallDistancePlan(
@@ -83,7 +84,7 @@ test("successful Acrobatics and per-die class/feat reductions retain the one-per
   assert.throws(() => fallingDamagePlan(p, { result: 0, dice: [7] }));
 });
 
-function fixture(total = 10) {
+function fixture(total = 10, feet = 30) {
   const messages = [],
     calls = [];
   globalThis.game = { ready: false, user: { isGM: true, id: "gc" }, messages, settings: { get: () => ({}) } };
@@ -93,7 +94,14 @@ function fixture(total = 10) {
   globalThis.Roll = class {
     async evaluate() {
       calls.push("roll");
-      this.dice = [{ results: [6, 4, 3].map(result => ({ result, active: true })) }];
+      this.dice = [
+        {
+          results: Array.from({ length: Math.min(20, Math.floor(feet / 10)) }, (_, i) => ({
+            result: [6, 4, 3][i % 3],
+            active: true
+          }))
+        }
+      ];
       return this;
     }
   };
@@ -114,9 +122,16 @@ function fixture(total = 10) {
     rawTotal: total,
     successConfirmed: null,
     effectiveTotal: total,
-    fallDistance: proof(30)
+    fallDistance: proof(feet)
   };
-  const message = { uuid: "ChatMessage.fall", flags: { spycraft2: check } };
+  const message = {
+    uuid: "ChatMessage.fall",
+    flags: { spycraft2: check },
+    async update(patch) {
+      if (patch["flags.spycraft2.fallTimelineId"])
+        this.flags.spycraft2.fallTimelineId = patch["flags.spycraft2.fallTimelineId"];
+    }
+  };
   const actor = {
     uuid: "Actor.fall",
     isOwner: true,
@@ -392,4 +407,91 @@ test("uncontrolled fluid falls post subdual without lethal stress, while invalid
   assert.equal(result.plan.stress, 0);
   assert.equal(f.messages.length, 2);
   assert.equal(f.actor.statuses.has("sprawled"), true);
+});
+
+function timedFixture(feet = 160) {
+  const f = fixture(10, feet);
+  f.actor.type = "agent";
+  f.actor.system = { activeFeatNames: [], classLevels: {} };
+  const combat = { id: "fight", started: true, round: 2, combatant: { initiative: 37 } };
+  game.combat = combat;
+  game.combats = new Map([[combat.id, combat]]);
+  game.time = { worldTime: 0 };
+  return { ...f, combat };
+}
+
+test("tracked combat falls block early RNG, land at the triggering Count and consume one landing identity", async () => {
+  const f = timedFixture();
+  await trackFall(f.actor, { feet: 160, confirmed: true });
+  await assert.rejects(() => trackFall(f.actor, { feet: 160, confirmed: true }), /existing fall/);
+  await assert.rejects(() => resolveFallingDamage(f.actor, f.message, landing), /Landing:/);
+  assert.equal(f.calls.length, 0);
+  f.combat.round = 3;
+  f.combat.combatant.initiative = 38;
+  await assert.rejects(() => resolveFallingDamage(f.actor, f.message, landing), /Landing:/);
+  f.combat.combatant.initiative = 36;
+  await resolveFallingDamage(f.actor, f.message, landing);
+  assert.equal(currentFall(f.actor).state, "landed");
+  assert.equal(f.calls.filter(c => c === "roll").length, 1);
+  const duplicate = { ...f.message, uuid: "ChatMessage.other", flags: structuredClone(f.message.flags) };
+  await assert.rejects(() => resolveFallingDamage(f.actor, duplicate, landing), /different landing result/);
+  await resolveFallingDamage(f.actor, f.message, landing);
+  assert.equal(f.calls.filter(c => c === "roll").length, 1);
+});
+
+test("lost final timing write resumes completion without another damage roll", async () => {
+  const f = timedFixture(30);
+  await trackFall(f.actor, { feet: 30, confirmed: true });
+  const update = f.actor.update.bind(f.actor);
+  let fail = true;
+  f.actor.update = async patch => {
+    if (fail && Object.values(patch).some(value => value?.state === "landed")) {
+      fail = false;
+      throw Error("timing write refused");
+    }
+    return update(patch);
+  };
+  await assert.rejects(() => resolveFallingDamage(f.actor, f.message, landing), /timing write refused/);
+  assert.equal(currentFall(f.actor).state, "landing");
+  await resolveFallingDamage(f.actor, f.message, landing);
+  assert.equal(currentFall(f.actor).state, "landed");
+  assert.equal(f.calls.filter(c => c === "roll").length, 1);
+});
+
+test("ended combats require GC timing review; catches never settle their saved landing", async () => {
+  const f = timedFixture();
+  await trackFall(f.actor, { feet: 160, confirmed: true });
+  f.message.flags.spycraft2.fallTimelineId = currentFall(f.actor).id;
+  f.combat.started = false;
+  game.time.worldTime = 999;
+  await assert.rejects(() => resolveFallingDamage(f.actor, f.message, landing), /original combat or clock/);
+  game.user.isGM = false;
+  await assert.rejects(
+    () => reviewFallTiming(f.actor, { decision: "due", note: "Reviewed", confirmed: true }),
+    /owning GC/
+  );
+  game.user.isGM = true;
+  await reviewFallTiming(f.actor, { decision: "caught", note: "Caught before impact", confirmed: true });
+  await assert.rejects(() => resolveFallingDamage(f.actor, f.message, landing), /ended before impact/);
+  assert.equal(f.calls.length, 0);
+});
+
+test("positive timing writes with lost responses are retained and GC due review permits the original result", async () => {
+  const f = timedFixture();
+  const update = f.actor.update.bind(f.actor);
+  f.actor.update = async patch => {
+    await update(patch);
+    throw Error("response lost");
+  };
+  await trackFall(f.actor, { feet: 160, confirmed: true });
+  assert.equal(currentFall(f.actor).feet, 160);
+  f.combat.started = false;
+  await reviewFallTiming(f.actor, {
+    decision: "due",
+    note: "Original combat ended after landing time",
+    confirmed: true
+  });
+  await resolveFallingDamage(f.actor, f.message, landing);
+  assert.equal(currentFall(f.actor).state, "landed");
+  assert.equal(f.calls.filter(c => c === "roll").length, 1);
 });

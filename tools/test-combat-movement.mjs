@@ -14,6 +14,26 @@ const system = () => ({
     postureMovement: { standardMove: true }
   }),
   input = () => ({ action: "standardMove", distanceFeet: 30, routeConfirmed: true });
+
+test("Wire Fu permits aerial and vertical routes, preserves movement limits and identifies unstable endings", () => {
+  for (const routeDirection of ["air", "vertical"]) {
+    assert.throws(() => combatMovementPlan(system(), { ...input(), routeDirection }), /Wire Fu/);
+    const p = combatMovementPlan(system(), { ...input(), routeDirection, wireFu: true, endsOnStableSurface: false });
+    assert.equal(p.startsFall, true);
+    assert.equal(p.maximumFeet, 30);
+    assert.equal(p.actionCost, "1 half action");
+    assert.equal(combatMovementPlan(system(), { ...input(), routeDirection, wireFu: true }).startsFall, false);
+    assert.throws(
+      () => combatMovementPlan(system(), { ...input(), distanceFeet: 31, routeDirection, wireFu: true }),
+      /allowance/
+    );
+  }
+  assert.equal(
+    combatMovementPlan(system(), { ...input(), distanceFeet: 0, wireFu: true, endsOnStableSurface: false }).startsFall,
+    false
+  );
+  assert.throws(() => combatMovementPlan(system(), { ...input(), wireFu: "yes" }), /route direction/);
+});
 test("Combat Mobility doubles only Total Defense movement and permits the exact Dexterity-bounded Run turns", () => {
   for (let dex = -5; dex <= 10; dex++) {
     const s = system();

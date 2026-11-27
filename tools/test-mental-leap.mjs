@@ -46,6 +46,18 @@ test("all Schemer source limits and three attributes freeze starting dice and te
   assert.throws(() => record({ ...bare(), worldTime: NaN }), /clock/);
   assert.throws(() => record(bare(), "int", "one", { ...combat, turn: 0 }), /initiative/);
 });
+test("losing expert qualification blocks new Mental Leaps while an activated effect and its consequences finish normally", () => {
+  const s = bare(),
+    r = record(s);
+  const suspended = { ...s, activeClassLevels: { schemer: 0 }, mentalLeaps: [r], worldTime: 30 };
+  assert.equal(mentalLeapSource(suspended), null);
+  assert.throws(() => mentalLeapRecord(suspended, { id: "new", ability: "wis" }), /Mental Leap|Schemer|qualified/);
+  assert.equal(mentalLeapState(suspended).bonuses.int, 5);
+  assert.equal(mentalLeapState({ ...suspended, worldTime: 60 }).exhausted, true);
+  assert.equal(mentalLeapState({ ...suspended, worldTime: 179 }).exhausted, true);
+  assert.equal(mentalLeapState({ ...suspended, worldTime: 180 }).exhausted, false);
+});
+
 test("full duration expires at own initiative, then twenty exhausted rounds; combat handoff preserves completed round time and out-of-combat time advances normally", () => {
   const s = bare(),
     r = record(s, "int", "one", combat);

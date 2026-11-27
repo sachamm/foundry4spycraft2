@@ -93,7 +93,10 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Hazards": {
-   "FallWithoutCheck": "Fall without a check"
+   "FallWithoutCheck": "Fall without a check",
+   "TrackFall": "Track a fall",
+   "FinishFallFirst": "Finish or review the existing fall first",
+   "ReviewFallTiming": "Review fall timing"
   },
   "Npc": {
    "HealthBonuses": "Health bonuses",

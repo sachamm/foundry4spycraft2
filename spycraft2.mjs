@@ -13,6 +13,7 @@ import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mj
 import { installPoolMaxHooks } from "./module/apps/pool-max.mjs";
 import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
+import { installFallingTimeHooks } from "./module/apps/falling-time.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
 import { rollPipeline } from "./module/rolls/index.mjs";
 import { registerMigrationSettings, runWorldMigrations } from "./module/migrations/index.mjs";
@@ -236,6 +237,7 @@ Hooks.once("init", () => {
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();
   installCombatStanceHooks();
+  installFallingTimeHooks();
   installPowerStanceInitiativeHooks();
   installPoolMaxHooks();
   installFuriousStanceHooks();

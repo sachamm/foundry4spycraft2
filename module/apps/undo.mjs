@@ -106,6 +106,8 @@ export function snapshot(actor) {
   delete undoFlags.damageApplications;
   delete undoFlags.attackDamageHits;
   delete undoFlags.countShifts;
+  delete undoFlags.fallTimelines;
+  delete undoFlags.activeFallId;
   return {
     data: flatten({ system: source.system ?? {}, flags: { spycraft2: undoFlags } }),
     effects: new Map([...(actor.effects ?? [])].map(effect => [effect.id, effect.toObject?.() ?? { ...effect }])),

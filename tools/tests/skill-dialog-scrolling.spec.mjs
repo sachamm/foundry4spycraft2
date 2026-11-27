@@ -4948,6 +4948,42 @@ for (const height of [768, 1000])
     }
   });
 
+for (const height of [720, 768])
+  test(`fall height and GC timing review remain reachable at ${height}px`, async ({ page }) => {
+    const previous = content,
+      oldGame = game;
+    try {
+      const { trackFall, reviewFallTiming } = await import("../../module/apps/falling-time.mjs");
+      const { fallingTimeRecord } = await import("../../module/rules/falling-time.mjs");
+      globalThis.game = { ...oldGame, user: { id: "gc", isGM: true }, time: { worldTime: 0 } };
+      const source = { uuid: "Actor.fall", type: "agent", isOwner: true, flags: {} };
+      await trackFall(source);
+      await render(page, height);
+      await page.locator("[name=feet]").fill("1001");
+      await page.locator("[name=confirmed]").check();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      let rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y + rect.height).toBeLessThanOrEqual(height);
+      source.flags = {
+        spycraft2: {
+          activeFallId: "fall",
+          fallTimelines: { fall: fallingTimeRecord({ id: "fall", actorUuid: source.uuid, feet: 1001, worldTime: 0 }) }
+        }
+      };
+      await reviewFallTiming(source);
+      await render(page, height);
+      await page.locator("[name=decision]").selectOption("caught");
+      await page.locator("[name=note]").fill("Caught by the confirmed ledge before impact.");
+      await page.locator("[name=confirmed]").check();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y + rect.height).toBeLessThanOrEqual(height);
+    } finally {
+      content = previous;
+      globalThis.game = oldGame;
+    }
+  });
+
 test("routine attack shows target, action and range while retaining every optional form value", async ({ page }) => {
   const previous = content;
   const source = new SpycraftActor();

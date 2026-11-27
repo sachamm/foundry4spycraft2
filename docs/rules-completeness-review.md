@@ -1447,3 +1447,42 @@ integration tests use real prerequisites and do not use that assumption.
 The origins/feats/equipment audit, broader native choices and combat gaps in
 the backlog still prevent a 9.9 rating. Treatment of already-running timed
 abilities after losing requirements awaits the requested ruling.
+
+## Pass 48: physical fall timing and Wire Fu routes
+
+Both areas remain **9.6/10**. A tracked fall now retains its physical height,
+start clock, duration and landing identity beyond reloads. Falls through
+150 feet are immediate; longer falls take one full round through 600 feet,
+then one additional round for each further 400-foot interval. Damage-distance
+reductions do not shorten physical descent. Out-of-turn falls use their actual
+triggering Count, rather than the falling character's next turn or a global
+round boundary. Noncombat falls follow game time.
+
+Landing settlement refuses early damage RNG. One saved landing identity owns
+the descent; competing results cannot repeat its damage. Completion retries
+finish the timing receipt without rolling again, and unrelated Undo cannot
+rewind the fall journal. A GC can record a catch before impact or review an
+ended/changed clock with an actual source note. Already-started landing damage
+keeps its saved height and recovery evidence. Existing retrospective landing
+records remain available when no start was tracked.
+
+Wire Fu movement now offers aerial and vertical routes, preserves ordinary
+movement limits and identifies unstable endings. After confirming completed
+movement, the player can start the physical-fall tracker. Token movement and
+action expenditure remain table actions, as in the existing route checker.
+Its already-implemented impact and stress reduction is unchanged.
+
+Native Foundry exercised the actual start dialog, reload, refusal before the
+triggering Count, a 160-foot landing with 16 actual damage dice, repeated
+settlement retaining the same result, a three-round 1,001-foot descent, a
+catch and actual GC timing review after combat ended. The completed run had
+no browser errors or diagnostic failures. All **4,309** Node tests, **988**
+fixture assertions and **265** layouts pass, together with schemas, lint,
+formatting, bundling and copy checks.
+
+The user confirmed that active expert effects finish their original duration
+and consequences after qualification loss; a Mental Leap regression verifies
+the retained boost and exhaustion while blocking new activations. The user also
+confirmed that Delay keeps its own limits while other round modifiers share
+the ten-Count cap, matching the retained behavior. The wider source audit,
+remaining combat workflows and legacy histories still prevent a 9.9 score.

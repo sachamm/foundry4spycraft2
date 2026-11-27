@@ -11,6 +11,8 @@ import { queueResources } from "../services/transactions.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { esc } from "../html.mjs";
 import { loc } from "../i18n.mjs";
+import { currentFall, fallClock, claimFallLanding, finishFallLanding } from "./falling-time.mjs";
+import { fallingTimeStatus } from "../rules/falling-time.mjs";
 
 const resultKey = message => encodeURIComponent(message.uuid).replaceAll(".", "%2E");
 const currentResult = (actor, message) => actor.flags?.spycraft2?.fallingResults?.[resultKey(message)];
@@ -26,6 +28,12 @@ const eligibleFall = check =>
 /** Record an actual landing when no Acrobatics check was made or available. No check roll or action is invented. */
 export async function recordUncontrolledFall(actor, options = {}) {
   if (!actor?.isOwner || !["agent", "npc"].includes(actor.type)) return null;
+  const timed = currentFall(actor);
+  const active = timed && !["landed", "caught"].includes(timed.state) ? timed : null;
+  if (active) {
+    const status = fallingTimeStatus(active, { actorUuid: actor.uuid, ...fallClock(active) });
+    if (!status.due) throw Error(status.text);
+  }
   let input = options;
   if (input.distanceFeet === undefined) {
     input = await systemDialog.input({
@@ -45,6 +53,8 @@ export async function recordUncontrolledFall(actor, options = {}) {
     fallDistanceFeet: input.distanceFeet,
     fallSoftSurface: input.softSurface === true
   });
+  if (active && proof.actualDistanceFeet !== active.feet)
+    throw Error(loc`Use the tracked fall's actual height, or ask the GC to review its timing and height.`);
   fallingDamagePlan(proof, { result: 0, succeeded: false, surface: input.surface });
   const id = foundry.utils.randomID();
   let message;
@@ -63,7 +73,8 @@ export async function recordUncontrolledFall(actor, options = {}) {
           effectiveTotal: 0,
           actionDiceAllowed: false,
           fallDistance: proof,
-          fallingEvent: { id }
+          fallingEvent: { id },
+          ...(active ? { fallTimelineId: active.id } : {})
         }
       }
     });
@@ -104,7 +115,20 @@ export async function resolveFallingDamage(actor, message, options = {}) {
   if (message.blind && !game.user.isGM) return null;
   const original = rollEvidence(check);
   const previous = currentResult(actor, message);
-  if (previous?.state === "complete") return previous;
+  if (previous?.state === "complete") {
+    await queueResources([actor], () => finishFallLanding(actor, check.fallTimelineId, message));
+    return previous;
+  }
+  const active = currentFall(actor);
+  const timed = check.fallTimelineId
+    ? actor.flags?.spycraft2?.fallTimelines?.[check.fallTimelineId]
+    : active && !["landed", "caught"].includes(active.state)
+      ? structuredClone(active)
+      : null;
+  if (timed) {
+    const status = fallingTimeStatus(timed, { actorUuid: actor.uuid, ...fallClock(timed) });
+    if (!status.due) throw Error(status.text);
+  }
   let input = options;
   if (!previous && !input.surface) {
     input = await systemDialog.input({
@@ -171,7 +195,11 @@ export async function resolveFallingDamage(actor, message, options = {}) {
           !sameValues(campaignStressPolicy(currentCampaignRules().effects), context.stressCampaignPolicy ?? null))
       )
         throw Error(loc`The campaign falling rules changed before settlement. Review the current landing again.`);
-      if (record?.state === "complete") return record;
+      if (record?.state === "complete") {
+        await finishFallLanding(actor, check.fallTimelineId, message);
+        return record;
+      }
+      const timelineId = await claimFallLanding(actor, message, timed);
       if (record && (record.actorUuid !== actor.uuid || record.evidence !== frozen))
         throw Error(loc`The saved falling result no longer matches this character and check. The GC must review it.`);
       if (!record) {
@@ -276,6 +304,7 @@ export async function resolveFallingDamage(actor, message, options = {}) {
         await setConditionStatus(actor, "sprawled", true, { label: loc`Sprawled`, operationId: record.id });
       record = { ...record, state: "complete" };
       await save(actor, message, record);
+      await finishFallLanding(actor, timelineId, message);
       return record;
     },
     { messages: [message] }
@@ -288,7 +317,8 @@ export function fallingDamageControls({ actor, message, check }) {
     check.superseded ||
     !check.fallDistance ||
     !eligibleFall(check) ||
-    currentResult(actor, message)?.state === "complete"
+    (currentResult(actor, message)?.state === "complete" &&
+      (!check.fallTimelineId || actor.flags?.spycraft2?.fallTimelines?.[check.fallTimelineId]?.state === "landed"))
   )
     return null;
   return [{ label: loc`Resolve falling damage`, run: () => resolveFallingDamage(actor, message) }];

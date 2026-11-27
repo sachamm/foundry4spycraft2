@@ -35,11 +35,24 @@ export function combatMovementPlan(
     passesThreateningAdjacency = false,
     routeConfirmed = false,
     stanceDistanceFeet = null,
-    stanceCombat = null
+    stanceCombat = null,
+    wireFu = false,
+    routeDirection = "ground",
+    endsOnStableSurface = true
   } = {}
 ) {
   if (!["standardMove", "run", "totalDefense"].includes(action))
     throw new Error(loc`Choose Standard Move, Run or Total Defense.`);
+  if (
+    typeof wireFu !== "boolean" ||
+    typeof endsOnStableSurface !== "boolean" ||
+    !["ground", "air", "vertical"].includes(routeDirection)
+  )
+    throw Error(loc`Review the route direction and final stable surface.`);
+  if (routeDirection !== "ground" && !wireFu)
+    throw Error(
+      loc`This movement route needs an active Wire Fu campaign quality or a separately adjudicated movement ability.`
+    );
   if ([adjacentThreateningOpponent, passesThreateningAdjacency, routeConfirmed].some(v => typeof v !== "boolean"))
     throw new Error(loc`Confirm each movement circumstance.`);
   // Standing still has no route to confirm (Total Defense in place, for one).
@@ -105,7 +118,16 @@ export function combatMovementPlan(
     becomesFlatFooted: action === "run" && rules.runFlatFooted,
     dodgeBonus: action === "totalDefense" ? 4 : 0,
     routeConfirmed,
+    wireFu,
+    routeDirection,
+    endsOnStableSurface,
+    startsFall: wireFu && distanceFeet > 0 && !endsOnStableSurface,
     notes: [
+      ...(wireFu
+        ? [
+            loc`Wire Fu permits movement through the air or along vertical surfaces. Ordinary action distance, conditions and other movement limits still apply. If the completed movement ends without a stable surface, start a fall from the actual height (p.408).`
+          ]
+        : []),
       ...(stanceMovement
         ? [
             loc`Combat stance: ${stanceMovement.priorFeet} ft. already moved +${stanceMovement.distanceFeet} ft. for this route =${stanceMovement.totalFeet} /${stanceMovement.maximumRoundFeet} ft. this round. Record the completed round total after moving.`

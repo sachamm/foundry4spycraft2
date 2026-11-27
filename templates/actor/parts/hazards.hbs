@@ -1,5 +1,14 @@
 {{!-- Contagions, fire and the other damage types at work on a character; shared by the agent and NPC sheets. --}}
 <div class="hazards">
+  <p><button type="button" class="sc2-action" data-action="trackFall"
+    {{#if fallTiming}}disabled title="{{localize 'SPYCRAFT.Hazards.FinishFallFirst'}}"{{/if}}
+    >{{localize "SPYCRAFT.Hazards.TrackFall"}}</button></p>
+  {{#if fallTiming}}
+    <p class="hazard{{#if fallTiming.due}} due{{/if}}">{{fallTiming.feet}} ft. — {{fallTiming.text}}
+      {{#if canReviewFallTiming}}<button type="button" class="sc2-action" data-action="reviewFallTiming"
+        >{{localize "SPYCRAFT.Hazards.ReviewFallTiming"}}</button>{{/if}}
+    </p>
+  {{/if}}
   <p><button type="button" class="sc2-action" data-action="recordUncontrolledFall">{{localize "SPYCRAFT.Hazards.FallWithoutCheck"}}</button></p>
   <p><b>{{localize "SPYCRAFT.Template.ActorAgentMain.Hazards"}}</b> <button type="button" class="sc2-action" data-action="exposeToContagion">{{localize "SPYCRAFT.Template.ActorAgentMain.ExposeToAContagion"}}</button> <button type="button" class="sc2-action" data-action="exposeToFire">{{localize "SPYCRAFT.Template.ActorAgentMain.FireDamage"}}</button> <button type="button" class="sc2-action" data-action="sufferTypedDamage">{{localize "SPYCRAFT.Template.ActorAgentMain.OtherDamageTypes"}}</button> <button type="button" class="sc2-action" data-action="survivalSave">{{localize "SPYCRAFT.Template.ActorAgentMain.SurvivalSave"}}</button></p>
   {{#each hazards.contagions}}<p class="hazard{{#if due}} due{{/if}}">{{label}}{{#if doses}} ×{{doses}}{{/if}} — {{phase}}, {{localize "SPYCRAFT.Template.ActorAgentMain.FortitudeDC"}} {{dc}} ({{effect}}); {{#if due}}<b>{{localize "SPYCRAFT.Template.ActorAgentMain.SaveDueNow"}}</b>{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.SaveDueIn"}} {{dueIn}}{{/if}} <button type="button" class="sc2-action" data-action="rollContagionSave" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.RollTheSave"}}</button> <button type="button" class="sc2-action" data-action="cureHazard" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.AntidoteOrEnd"}}</button></p>{{/each}}

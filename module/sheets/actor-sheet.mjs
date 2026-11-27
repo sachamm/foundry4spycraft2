@@ -115,6 +115,7 @@ import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { selectCakewalkSkills } from "../apps/cakewalk.mjs";
 import { recordUncontrolledFall } from "../apps/falling-damage.mjs";
+import { trackFall, reviewFallTiming, fallTimingView } from "../apps/falling-time.mjs";
 import { cakewalkSelectionState } from "../rules/cakewalk.mjs";
 import { campaignVitalityDie } from "../rules/campaign-creation.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
@@ -351,6 +352,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         reviewSkillPurchasePolicy,
         selectCakewalkSkills,
         recordUncontrolledFall,
+        trackFall,
+        reviewFallTiming,
         checkReflexDamage,
         takeMobileOffense,
         takeContempt,
@@ -1321,6 +1324,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.favoredGearLevelLabel = loc`Record new-level favored items`;
     if (context.canRecordFavoredLevelChoices && !favoredReceipt) context.canSettleFavoredGear = false;
     context.hazards = hazardsView(this.actor);
+    context.fallTiming = fallTimingView(this.actor);
+    context.canReviewFallTiming = game.user.isGM && this.actor.isOwner;
     context.professor = sys.coreClassIds?.includes("scientist");
     context.trailblazer = sys.coreClassIds?.includes("scout");
 
@@ -1904,6 +1909,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       ...actorWorkflows({
         npcDamageSave: npcDamageSaveWithUndo,
         recordUncontrolledFall,
+        trackFall,
+        reviewFallTiming,
         manageDisposition,
         npcPackages: manageNpcPackages,
         restAndRecover,
