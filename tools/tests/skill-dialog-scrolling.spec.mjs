@@ -12,6 +12,7 @@ import { selectCakewalkSkills } from "../../module/apps/cakewalk.mjs";
 import { resolveFallingDamage, recordUncontrolledFall } from "../../module/apps/falling-damage.mjs";
 import { rollEvidence } from "../../module/rules/outcomes.mjs";
 import { finishGearAcquisition } from "../../module/apps/gear-acquisition.mjs";
+import { manageCombatPersuasion } from "../../module/apps/gc/combat-persuasion.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -227,6 +228,34 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     expect(rect.y + rect.height).toBeLessThanOrEqual(720);
   } finally {
     content = prior;
+  }
+});
+test("combat persuasion side assignments remain reachable with a large cast at 720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    const actors = Array.from({ length: 20 }, (_, i) => ({ uuid: `Actor.${i}`, name: `Combat character ${i}` }));
+    const combat = { id: "persuasion-layout", started: true, combatants: actors.map(actor => ({ actor })) };
+    globalThis.game = { user: { isGM: true }, combat, combats: { get: () => combat }, messages: [] };
+    await manageCombatPersuasion({
+      name: "Uncommitted NPC",
+      type: "npc",
+      isOwner: true,
+      system: { npcType: "standard" }
+    });
+    await render(page, 720);
+    await page.locator('[name="action"]').selectOption("roll");
+    await page.locator('[name="side_19"]').fill("Other side");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    await page.locator("#confirm").click();
+    await expect(page.locator("#confirm")).toBeFocused();
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
   }
 });
 test("interrupted delivery recovery keeps the actual total and GC review reachable at 720px", async ({ page }) => {

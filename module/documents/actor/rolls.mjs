@@ -359,6 +359,7 @@ export const ActorRolls = Base =>
       });
       const check = {
         ...rollPipeline.flags(rollContext),
+        ...(options.combatPersuasion ? { combatPersuasion: options.combatPersuasion } : {}),
         ...(pipelineModifiers.rows.length ? { pipelineModifiers: pipelineModifiers.rows } : {}),
         // Rows contributors added while the total was planned are already inside the total; they are recorded only.
         ...(options.planModifiers?.length ? { planModifiers: options.planModifiers } : {}),

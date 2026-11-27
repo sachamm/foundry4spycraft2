@@ -216,6 +216,8 @@ export const ActorSkillRolls = Base =>
       // Field coercion and lookups registered for this dialog (module/rolls/dialogs/skill.mjs and rule modules).
       input = rollPipeline.read({ dialog: "skill", actor: this, key }, input);
       const check = checks.find(c => c.id === input.check);
+      if (options.combatPersuasion && (check?.id !== "persuasion" || key !== "impress"))
+        return refuse(loc`Combat persuasion requires an Impress/Persuasion check.`);
       const gearItem = input.gearItem ? this.items?.get?.(input.gearItem) : null;
       const workTarget = () =>
         input.weaponWork === true && input.weaponWorkItemId ? this.items?.get?.(input.weaponWorkItemId) : null;
@@ -468,6 +470,7 @@ export const ActorSkillRolls = Base =>
             ability: fresh.ability,
             skillKey: key,
             checkId: check.id,
+            ...(options.combatPersuasion ? { combatPersuasion: options.combatPersuasion } : {}),
             focus: input.focus || checkFocus(key, check),
             cleanAndPolished: cleanAndPolishedApplies(this.system, currentGear?.system),
             gearUuid: currentGear?.uuid ?? "",

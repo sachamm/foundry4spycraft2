@@ -22,6 +22,8 @@ import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
+import { manageCombatPersuasion } from "./combat-persuasion.mjs";
+import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -101,18 +103,17 @@ export async function callQualitySave(actor, id) {
   });
 }
 
-export async function rollNpcSkill(actor, input = null) {
+export async function rollNpcSkill(actor, input = null, context = {}) {
   if (!actor.isOwner) return null;
   const graded = actor.system.npcProfile?.enabled === true;
   if (!input) {
-    const skillRows = SKILLS.map(skill => [
+    const skillRows = SKILLS.filter(skill => !context.combatPersuasion || skill.key === "impress").map(skill => [
       skill.key,
       `${skill.name}${graded ? ` ${signed(npcSkillPlan(actor, skill.key).bonus)}` : ""}`
     ]);
-    const abilityRows = Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => [
-      key,
-      game.i18n.localize(label)
-    ]);
+    const abilityRows = Object.entries(CONFIG.SPYCRAFT.abilities)
+      .filter(([key]) => !context.combatPersuasion || key === "cha")
+      .map(([key, label]) => [key, game.i18n.localize(label)]);
     input = await ask(
       loc`${actor.name}: skill check`,
       `
@@ -130,6 +131,8 @@ export async function rollNpcSkill(actor, input = null) {
   }
   const skill = SKILLS.find(entry => entry.key === input.key);
   if (!skill) return refuse(loc`Choose a skill.`);
+  if (context.combatPersuasion && (skill.key !== "impress" || (input.ability && input.ability !== "cha")))
+    return refuse(loc`Combat persuasion requires Impress/Persuasion with Charisma.`);
   if (
     actor.system.npcType === "animal" &&
     graded &&
@@ -139,8 +142,9 @@ export async function rollNpcSkill(actor, input = null) {
   const plan = graded
     ? npcSkillPlan(actor, skill.key)
     : { bonus: Number(input.manualBonus) || 0, cap: stepLookup(TABLES.skillCap, Number(input.manualBonus) || 0) };
-  const ability =
-    skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
+  const ability = context.combatPersuasion
+    ? "cha"
+    : skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
       ? input.ability
       : skill.abilities[0];
   // Qualities: Fearless, Meek and Strong-Minded by the kind of check, the rest by the boxes ticked.
@@ -186,6 +190,15 @@ export async function rollNpcSkill(actor, input = null) {
       cap: plan.cap,
       error: Math.max(0, Number(input.error) || 0) + quality.errorIncrease,
       npcSkill: skill.key,
+      ...(context.combatPersuasion
+        ? {
+            checkKind: "skill",
+            skillKey: "impress",
+            checkId: "persuasion",
+            combatPersuasion: context.combatPersuasion,
+            campaignSkillDCPolicy: campaignSkillDCPolicy(actor.system.campaignEffects)
+          }
+        : {}),
       ...(input.secret ? { rollMode: "gmroll" } : {})
     }
   );
@@ -350,7 +363,8 @@ export async function manageDisposition(actor) {
         ["shift", loc`Shift by grades`],
         ["set", loc`Set a grade (GC ruling)`],
         ["loyalty", loc`Roll a Loyalty decision`],
-        ["combat", loc`Roll whether the NPC joins a fight`]
+        ["combat", loc`Roll whether the NPC joins a fight`],
+        ["persuade", loc`Persuade the NPC to join combat`]
       ],
       "show"
     )}</select></label>
@@ -368,6 +382,16 @@ export async function manageDisposition(actor) {
     gradeNow = targetId ? dispositionToward(record, targetId) : record.base,
     name = targetId ? (game.actors.get(targetId)?.name ?? targetId) : "everyone else";
   try {
+    if (input.action === "persuade") {
+      if (villain) return refuse(loc`Villains ignore combat disposition effects.`);
+      return await manageCombatPersuasion(actor, {
+        targetId,
+        roll: (persuader, combatPersuasion) =>
+          persuader.type === "npc"
+            ? rollNpcSkill(persuader, null, { combatPersuasion })
+            : persuader.rollSkill("impress", "cha", { initialCheck: "persuasion", combatPersuasion })
+      });
+    }
     if (input.action === "set" || input.action === "shift") {
       let next;
       if (input.action === "set") next = { grade: input.grade, entry: { grade: input.grade, mission, shifted: 0 } };

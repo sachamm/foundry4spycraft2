@@ -262,6 +262,15 @@ export function rollEvidence(check) {
       : []),
     ...(check.attackContext?.flanking?.whirling ? [{ whirlingFlanking: check.attackContext.flanking.whirling }] : []),
     ...(check.tripAttack ? [check.tripAttack] : []),
+    ...(check.combatPersuasion
+      ? [
+          {
+            combatPersuasion: check.combatPersuasion,
+            campaignSkillDCPolicy: check.campaignSkillDCPolicy,
+            cooperative: check.cooperative
+          }
+        ]
+      : []),
     ...(check.attackContext?.damageType ? [{ weaponDamageType: check.attackContext.damageType }] : []),
     ...(check.meleeArmorPiercing
       ? [{ meleeArmorPiercing: check.meleeArmorPiercing, weaponQualities: check.weaponQualities }]

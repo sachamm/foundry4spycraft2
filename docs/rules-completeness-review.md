@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
 **Continuing review, 26 November 2026:** PC creation **9.1/10**;
-combat play **9.2/10**. Implementation continues toward the requested **9.9/10**
+combat play **9.3/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -571,3 +571,22 @@ no duplicate payment, page errors or transaction diagnostics. The recovery dialo
 also passes keyboard and 720px layout checks. All **4,055** tests pass. B-192 is
 closed; the scores remain **9.1/10** for creation and **9.2/10** for combat while
 the remaining source audit and play workflows are implemented.
+
+The disposition control now supports persuading an NPC to join combat (B-184,
+p.458). The GC records sides before the first check; teammates share one durable
+attempt. An actual PC or NPC Impress/Persuasion roll carries the target, combat
+and attempt identity. Resolution closes that check, applies the recorded
+disposition DC and campaign DC policy, and retains the first winning side.
+Adversarial requires an actual Triumph; cooperative helpers cannot replace the
+leader's result. Failed attempts leave other sides eligible. Deleted cards and
+unknown posting failures retain the attempt, while a known cancellation can
+continue the same reservation. Lost write responses and repeated settlement do
+not repeat the roll or outcome. GC Undo notes support explicit corrections.
+
+Native Foundry exercises both a PC and a standard NPC through the disposition
+dialogs, actual skill rolls and successful settlement, then rejects further
+attempts. Both paths finish without page errors or transaction diagnostics.
+The large-cast side dialog is keyboard reachable at 720px, and all **230** layout
+tests pass. Creation remains **9.1/10**; combat rises to **9.3/10** for this
+connected play workflow. The larger source-data audit, remaining environment,
+campaign-quality and special-option gaps still prevent either area reaching 9.9.
