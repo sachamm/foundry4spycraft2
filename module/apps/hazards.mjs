@@ -129,16 +129,27 @@ export async function sufferLethal(actor, amount) {
   return { ...plan, notes: notes.filter(Boolean) };
 }
 
-/** Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure. */
-export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance") {
+/** An animal takes twice the stress that bang, fire or flash damage causes (p.445). */
+export const animalStressMultiplier = (actor, cause) =>
+  actor?.type === "npc" && actor.system?.npcType === "animal" && ["bang", "fire", "flash"].includes(cause) ? 2 : 1;
+
+/**
+ * Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure.
+ * `cause` names the damage type behind the stress (bang, fire, flash), which an animal takes double (p.445).
+ */
+export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance", { cause = "" } = {}) {
   if (!amount) return "";
+  const doubled = animalStressMultiplier(actor, cause) === 2;
+  if (doubled) amount *= 2;
+  const prefix = doubled ? `${loc`An animal takes double stress from ${source} (p.445).`} ` : "";
   if (actor.type !== "agent") {
     // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
-    if (!(Number(actor.system.vitality?.max) > 0)) return loc`${amount} stress damage: roll the Damage save for it.`;
+    if (!(Number(actor.system.vitality?.max) > 0))
+      return prefix + loc`${amount} stress damage: roll the Damage save for it.`;
     const totals = actor.flags?.spycraft2?.nonLethal ?? {},
       stress = Math.max(0, Math.trunc(Number(totals.stress) || 0)) + amount;
     await actor.update({ "flags.spycraft2.nonLethal.stress": stress });
-    return loc`${amount} stress damage: ${stress} in all. Check it against the stress threshold.`;
+    return prefix + loc`${amount} stress damage: ${stress} in all. Check it against the stress threshold.`;
   }
   try {
     await applyAccumulatedDamage(actor, {
@@ -356,7 +367,7 @@ async function sufferFire(actor, state, damage, reduction, label) {
     ...(loss?.notes ?? [])
   ];
   const lost = loss ? loss.vitalityLoss + loss.woundLoss : taken;
-  lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses"));
+  lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses", { cause: "fire" }));
   if (plan.scarSaveDue)
     lines.push(
       loc`This fire has now done ${plan.fire.suffered} damage: make the Fortitude save (DC ${SCAR_SAVE_DC}) against scarring from the sheet.`
