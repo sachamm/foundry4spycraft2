@@ -274,7 +274,6 @@ own line on the card, and checked against the page first.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-185 | Standard NPC Damage save is not adjusted automatically for vitality or wound changes; a manual field exists. *GC to confirm.* (p.452) | R-06 | S |
 | B-186 | Grapple benefit damage (Injure, Throw, Sprawl) is worked out on the Grapple check's card but rolled and applied by hand; the multiple-grappler limits (2, 4 or 8 by Size) are not checked. (p.357) | R-07, RW-210, RW-346 | S |
 | B-187 | "Once per trigger" guards hold only while the chat card exists. Put receipts on the actor. | R-08, JS-08 | M |
 | B-188 | Dramatic-scene Defense and DC boosts are reported for the GC to apply. | RW (gc-tools) | S |

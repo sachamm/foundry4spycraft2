@@ -1,4 +1,5 @@
 import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
+import { damageSaveAdjustment } from "../rules/gc/npc-damage.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
 import { npcFeatEffects } from "../rules/npc-feat-effects.mjs";
 import { ruleName } from "../rules/rule-name.mjs";
@@ -253,6 +254,11 @@ export class NpcData extends BaseActorData {
     if (effects.healthApplied) {
       this.vitality.max += effects.vitality;
       this.wounds.max += effects.wounds;
+    } else if (health && Number.isFinite(this.damageSave) && (effects.vitality || effects.wounds)) {
+      // p.452: a standard NPC's Damage save moves by 1 per wound or per 2 vitality a feat adds or takes away.
+      effects.damageSaveFromHealth = damageSaveAdjustment(effects);
+      this.damageSave += effects.damageSaveFromHealth;
+      effects.healthApplied = true;
     }
     this.featEffects = effects;
   }

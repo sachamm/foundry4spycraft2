@@ -173,7 +173,12 @@ function npcFeatPlay(effects) {
   const healthLeft = !effects.healthApplied && (effects.vitality || effects.wounds);
   return {
     title: loc`Feats in play`,
-    rows: effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
+    rows: [
+      ...effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
+      ...(effects.damageSaveFromHealth
+        ? [loc`Damage save ${signed(effects.damageSaveFromHealth)} from the feats' vitality and wounds (p.452)`]
+        : [])
+    ],
     health: healthLeft
       ? loc`Vitality ${signed(effects.vitality)} and wounds ${signed(effects.wounds)} are not added to typed-in maximums: include them in the numbers above.`
       : "",
