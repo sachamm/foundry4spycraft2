@@ -6,6 +6,7 @@
 import { loc } from "../i18n.mjs";
 import { esc } from "../html.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { undoHook } from "../documents/undo-hook.mjs";
 
 // An empty record is a value too: without it, a record the step created could not be told from one it filled.
 const leaf = value => value === null || typeof value !== "object" || Array.isArray(value) || !Object.keys(value).length;
@@ -190,8 +191,7 @@ export function restoreUpdate(entry) {
  * @param {string} label           What the step was, as the note will say it
  * @param {() => Promise<any>} work
  * @param {object} [extra]         { gcDice: dice to give back, damageCard: {messageId, targetUuid},
- *   cardMarks: [{messageId, key}] marks the step set on a card, cleared so the card's button works again,
- *   mission: mission fields as they were before the step }
+ *   cardMarks: [{messageId, key}] marks the step set on a card, cleared so the card's button works again }
  */
 export async function withUndo(actors, label, work, extra = {}) {
   const list = (actors ?? []).filter(actor => actor?.uuid);
@@ -206,20 +206,14 @@ export async function withUndo(actors, label, work, extra = {}) {
   }
   return result;
 }
+// A document step (a mission XP settlement) leaves its Undo note through this.
+undoHook.run = withUndo;
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
 export function postUndo(
   label,
   entries,
-  {
-    gcDice = 0,
-    damageCard = null,
-    antagonist = null,
-    dcBoost = null,
-    standingPaid = null,
-    cardMarks = null,
-    mission = null
-  } = {}
+  { gcDice = 0, damageCard = null, antagonist = null, dcBoost = null, standingPaid = null, cardMarks = null } = {}
 ) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
@@ -228,7 +222,7 @@ export function postUndo(
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
     flags: {
       spycraft2: {
-        undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, standingPaid, cardMarks, mission, done: false }
+        undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, standingPaid, cardMarks, done: false }
       }
     }
   });
@@ -344,13 +338,6 @@ async function undoRecord(message, record) {
       holder = keys.reduce((value, key) => value?.[key], marked.flags?.spycraft2);
     if (holder?.[last] !== undefined)
       await marked.update({ [`flags.spycraft2.${[...keys, `-=${last}`].join(".")}`]: null }).catch(() => null);
-  }
-  // Mission fields the step set (the XP settled marks, the session dice changes) go back to their earlier values.
-  if (record.mission && Object.keys(record.mission).length && game.user.isGM) {
-    const { updateMission } = await import("./gc/state.mjs");
-    await updateMission(structuredClone(record.mission)).catch(error =>
-      ui.notifications.warn(loc`The mission was not put back: ${error.message}`)
-    );
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;

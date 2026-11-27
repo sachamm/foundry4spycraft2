@@ -55,7 +55,9 @@ const makeActor = (id, type, system, extra = {}) => ({
       const keys = path.split(".");
       let target = this;
       for (const key of keys.slice(0, -1)) target = target[key] ??= {};
-      target[keys.at(-1)] = value;
+      const last = keys.at(-1);
+      if (last.startsWith("-=")) delete target[last.slice(2)];
+      else target[last.replace(/^==/, "")] = value;
     }
     return this;
   },
@@ -398,6 +400,18 @@ test("dice that could not be taken at 0 are not handed back when the change goes
   await state.setCampaign({ qualities: [] });
   await mission.applySessionDiceAdjustments({ quiet: true });
   assert.equal(a1.system.actionDice.value, 1, "only the one die really taken comes back");
+  // A wrong adjustment is undone from its note: the dice and the adjusted mark go back, so it can run again (U5).
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 0);
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo);
+  assert.equal(note.flags.spycraft2.undo.label, "Starting action dice adjusted");
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  await applyUndo({ id: "dice-undo", flags: structuredClone(note.flags), update: async () => null });
+  assert.equal(a1.system.actionDice.value, 1);
+  assert.equal(a1.flags.spycraft2.sessionDiceAdjusted, undefined);
+  await state.setCampaign({ qualities: [] });
   a1.system.actionDice.value = kept.value;
   if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
   else delete a1.flags.spycraft2.sessionDiceAdjusted;

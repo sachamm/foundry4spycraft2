@@ -601,6 +601,19 @@ export async function applySessionDiceAdjustments({ quiet = false } = {}) {
     if (quiet) return 0;
     return decline(loc`No Threat Level or campaign-quality change to starting action dice applies.`);
   }
+  // The dice and each agent's adjusted mark are on one Undo note, so a wrong adjustment can be taken back and run
+  // again.
+  const lines = await withUndo(team, loc`Starting action dice adjusted`, () =>
+    adjustTeamDice(team, { session, effects, bonus, delta, applied })
+  );
+  if (quiet && !lines.some(line => line.includes("→"))) return delta;
+  await say(
+    `<b>${loc`Starting action dice adjusted`}</b> ${loc`(Threat Level bonus ${signed(bonus)}; campaign qualities ${signed(effects.startingActionDice ?? 0)}).`}<br>${lines.join("<br>")}`
+  );
+  return delta;
+}
+
+async function adjustTeamDice(team, { session, effects, bonus, delta, applied }) {
   const lines = [];
   for (const actor of team) {
     // An agent whose dice convert as they are gained (Fortune Favors the Bold at d12: two d6 for each) gains or
@@ -634,11 +647,7 @@ export async function applySessionDiceAdjustments({ quiet = false } = {}) {
       lines.push(loc`${esc(actor.name)}: not adjusted (${esc(error.message)}). Run the adjustment again.`);
     }
   }
-  if (quiet && !lines.some(line => line.includes("→"))) return delta;
-  await say(
-    `<b>${loc`Starting action dice adjusted`}</b> ${loc`(Threat Level bonus ${signed(bonus)}; campaign qualities ${signed(effects.startingActionDice ?? 0)}).`}<br>${lines.join("<br>")}`
-  );
-  return delta;
+  return lines;
 }
 
 /** Mission summary: base XP breakdown, each character's total, and standing rewards. */
