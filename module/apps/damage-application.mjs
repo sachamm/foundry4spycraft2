@@ -692,7 +692,14 @@ const damageFacts = message => {
   const check = message.flags?.spycraft2 ?? {};
   const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null,
     attack = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid)?.flags?.spycraft2 : null,
-    profile = damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities);
+    profile = check.fallingDamage
+      ? {
+          kind: check.fallingDamage.kind,
+          type: "",
+          armorPiercing: check.fallingDamage.armorPiercing,
+          blast: false
+        }
+      : damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities);
   return {
     check,
     weapon,

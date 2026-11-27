@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
 **Continuing review, 26 November 2026:** PC creation **9.0/10**;
-combat play **9.1/10**. Implementation continues toward the requested **9.9/10**
+combat play **9.2/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -464,3 +464,28 @@ disabled and removed; repeated preparation stays +9 and both pools remain zero.
 All **4,032** tests, the 13 rebuilt-pack tests, focused lint, formatting, bundling
 and the text-copy check pass. B-185 is closed. Broader specialist and campaign
 coverage remains open, so no 9.9 claim is warranted yet.
+
+The next combat pass connects saved Acrobatics/Falling checks to damage and
+landing settlement (pp.106,336). It calculates capped d6 impact, per-die source
+reductions, the successful-check reduction/minimum, fluid versus solid landings,
+qualified dives, actual-height AP and lethal-only stress. Failed checks apply
+Sprawled. Separate impact and stress cards use the normal damage application
+controls and preserve private visibility; the damage rolls are closed to boosts.
+Actor records reserve the event before RNG, retain the dice before posting, recover
+lost posting/write responses, and survive deleted cards. An interrupted unknown
+roll requires GC entry of its actual dice and a note rather than another roll.
+
+Native play-through closes the check, rolls 3d6 impact, posts six stress damage,
+applies Sprawled, applies the impact to health, restores it with Undo and retains
+the same result on repeated settlement. It exposed an unconfirmed native outcome
+stored as `null`; regression fixtures now include that representation. No page
+errors or transaction diagnostics occur in the final native flow. All **4,040**
+Node tests, **227** layout tests, lint, formatting, bundle and text-copy checks
+pass. The falling UI uses the existing contributor registration path, preserving
+the architecture's import limits.
+
+PC creation remains **9.0/10**. Combat rises to **9.2/10** for the connected and
+natively verified hazard/damage paths, with remaining B-183 cases still explicit.
+The next creation review targets retained vitality history when a level is removed
+and rebuilt. Neither area is complete; source-data and inherited-choice auditing,
+campaign details and the other combat/environment gaps remain required work.

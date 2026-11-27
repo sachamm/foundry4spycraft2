@@ -9,6 +9,8 @@ import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
 import { settleGrapple } from "../../module/apps/combat-actions.mjs";
 import { reviewTriggeredAttacks } from "../../module/apps/final-attack.mjs";
 import { selectCakewalkSkills } from "../../module/apps/cakewalk.mjs";
+import { resolveFallingDamage } from "../../module/apps/falling-damage.mjs";
+import { rollEvidence } from "../../module/rules/outcomes.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -226,6 +228,62 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     content = prior;
   }
 });
+for (const recovery of [false, true])
+  test(`Falling ${recovery ? "recovery" : "landing"} dialog keeps its final controls reachable at 720px`, async ({
+    page
+  }) => {
+    const prior = content,
+      oldGame = globalThis.game;
+    try {
+      globalThis.game = { user: { isGM: true }, settings: { get: () => ({}) } };
+      const check = {
+        actorUuid: "Actor.layout-fall",
+        checkKind: "skill",
+        skillKey: "acrobatics",
+        checkId: "falling",
+        resolved: true,
+        effectiveTotal: 10,
+        fallDistance: { version: 1, actualDistanceFeet: 30, damageDistanceFeet: 30 }
+      };
+      const message = { uuid: "ChatMessage.layout-fall", flags: { spycraft2: check } };
+      const actor = { uuid: check.actorUuid, isOwner: true, flags: {} };
+      if (recovery)
+        actor.flags = {
+          spycraft2: {
+            fallingResults: {
+              [encodeURIComponent(message.uuid).replaceAll(".", "%2E")]: {
+                actorUuid: actor.uuid,
+                evidence: rollEvidence(check),
+                state: "reserved",
+                context: { surface: "solid" }
+              }
+            }
+          }
+        };
+      await resolveFallingDamage(actor, message);
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      if (recovery) {
+        await page.getByLabel("Actual d6 results (comma separated)", { exact: true }).fill("6, 4, 3");
+        await page.getByLabel("GC review note", { exact: true }).fill("Actual dice confirmed");
+      } else {
+        await page.getByRole("combobox", { name: "Landing surface" }).selectOption("fluid");
+        await page.locator('[name="diving"]').check();
+        await page.getByLabel("Water depth (feet)", { exact: true }).fill("10");
+      }
+      await page.locator('[name="confirmed"]').check();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+      await page.locator("#confirm").click();
+      await expect(page.locator("#confirm")).toBeFocused();
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+    }
+  });
+
 test("Cakewalk's actual Intel dialog keeps every skill and the confirmation reachable at 720px", async ({ page }) => {
   const prior = content,
     oldGame = globalThis.game;
@@ -1346,7 +1404,7 @@ test("Falling distance and soft-landing declarations remain reachable with expan
     await page.locator("[name=fallDistanceFeet]").fill("50");
     await page.locator("[name=fallSoftSurface]").check();
     await page.locator("[name=fallConfirmed]").check();
-    await expect(page.locator("body")).toContainText("actual and damage distances separately");
+    await expect(page.locator("body")).toContainText("post impact and stress cards");
     await page.locator("#confirm").scrollIntoViewIfNeeded();
     const b = await page.locator("#confirm").boundingBox();
     expect(b.y).toBeGreaterThanOrEqual(0);
