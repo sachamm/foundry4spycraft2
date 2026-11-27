@@ -185,6 +185,8 @@ export const RECORD_SHAPES = {
         kind: "string",
         missionId: "string",
         requested: "number",
+        resistance: "number",
+        resistanceSource: "string",
         source: "string",
         version: "number",
         worldTime: "number"

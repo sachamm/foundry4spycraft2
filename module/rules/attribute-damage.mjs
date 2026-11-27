@@ -1,6 +1,7 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "./equal.mjs";
+import { notTheFaceCharismaResistance } from "./not-the-face.mjs";
 /** Attribute damage and mission-end recovery, p.17. Current scores may be negative. */
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const clean = () => ({ version: 1, events: [], recoveries: [] });
@@ -22,9 +23,14 @@ function validApplication(e) {
     nonnegative(e.amount) &&
     Number.isSafeInteger(e.requested) &&
     e.requested > 0 &&
+    nonnegative(e.resistance ?? 0) &&
+    (e.resistance === undefined || (e.ability === "cha" && e.resistanceSource === "Not the Face")) &&
     (e.floor === null || Number.isSafeInteger(e.floor)) &&
     Number.isSafeInteger(e.before - e.amount) &&
-    e.amount === (e.floor === null ? e.requested : Math.min(e.requested, Math.max(0, e.before - e.floor)))
+    e.amount ===
+      (e.floor === null
+        ? Math.max(0, e.requested - (e.resistance ?? 0))
+        : Math.min(Math.max(0, e.requested - (e.resistance ?? 0)), Math.max(0, e.before - e.floor)))
   );
 }
 /** Saved totals are never authoritative; each allocation consumes an actual source event once. */
@@ -137,11 +143,20 @@ export function attributeDamagePlan(
   const before = system.abilities?.[ability]?.value;
   if (!Number.isSafeInteger(before))
     throw new Error(loc`Review the actual current attribute score before applying damage.`);
-  const applied = floor === null ? amount : Math.min(amount, Math.max(0, before - floor)),
+  const resistance = ability === "cha" ? notTheFaceCharismaResistance(system) : 0,
+    net = Math.max(0, amount - resistance),
+    applied = floor === null ? net : Math.min(net, Math.max(0, before - floor)),
     after = before - applied;
   if (!Number.isSafeInteger(after))
     throw new Error(loc`The resulting attribute score is outside the supported integer range.`);
-  const event = { version: 1, ...request, worldTime, before, amount: applied },
+  const event = {
+      version: 1,
+      ...request,
+      worldTime,
+      before,
+      amount: applied,
+      ...(resistance ? { resistance, resistanceSource: "Not the Face" } : {})
+    },
     record = structuredClone(state.record);
   record.events.push(event);
   const result = attributeDamageState({ attributeDamage: record });

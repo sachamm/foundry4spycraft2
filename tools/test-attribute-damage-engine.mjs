@@ -10,6 +10,7 @@ import {
 } from "../module/rules/attribute-damage.mjs";
 import { attributeActionBlock } from "../module/rules/attributes.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { sufferAttributeLoss } from "../module/apps/hazards.mjs";
 const keys = ["str", "dex", "con", "int", "wis", "cha"],
   cls = {
     id: "test",
@@ -136,6 +137,55 @@ test("negative typed scores reach existing collapse rules, and recovering damage
     assert.equal(healed.abilities[ability].base, 12);
   }
 });
+test("actual hazard attribute loss applies current defensive Charisma resistance and re-derives it after damage and expiry", async () => {
+  const priorGame = globalThis.game,
+    priorFoundry = globalThis.foundry;
+  try {
+    const raw = source();
+    raw.abilities.cha.base = 16;
+    raw.fightDefensively = { version: 1, combatId: "combat", combatantId: "own", startRound: 2, dueRound: 3 };
+    raw.fightDefensivelyCombatContext = {
+      id: "combat",
+      started: true,
+      round: 2,
+      turn: 1,
+      combatantId: "own",
+      ownTurnIndex: 1
+    };
+    const items = [cls, { id: "not-face", type: "feat", name: "Not the Face", system: { granted: true, bonuses: [] } }];
+    let serial = 0;
+    globalThis.game = { time: { worldTime: 126 } };
+    globalThis.foundry = { utils: { randomID: () => `charisma${++serial}` } };
+    const actor = {
+      type: "agent",
+      system: computeAgent(raw, items, cfg),
+      async update(patch) {
+        raw.attributeDamage = structuredClone(patch["system.attributeDamage"]);
+        this.system = computeAgent(raw, items, cfg);
+      }
+    };
+    assert.equal(actor.system.notTheFaceDR, 3);
+    const first = await sufferAttributeLoss(actor, { ability: "cha", permanent: "all" }, 5, "QA Charisma hazard");
+    assert.equal(first.total, 2);
+    assert.ok(first.lines.some(line => line.includes("resists 3")));
+    assert.equal(actor.system.abilities.cha.value, 14);
+    assert.equal(actor.system.notTheFaceDR, 2);
+    const second = await sufferAttributeLoss(actor, { ability: "cha" }, 3, "QA second Charisma hazard");
+    assert.equal(second.total, 1);
+    assert.equal(actor.system.abilities.cha.value, 13);
+    raw.fightDefensivelyCombatContext.round = 3;
+    actor.system = computeAgent(raw, items, cfg);
+    assert.equal(actor.system.notTheFaceDR, 0);
+    const expired = await sufferAttributeLoss(actor, { ability: "cha" }, 1, "QA expired protection");
+    assert.equal(expired.total, 1);
+    assert.equal(actor.system.abilities.cha.value, 12);
+    assert.equal(actor.system.attributeDamageState.needsReview, false);
+  } finally {
+    globalThis.game = priorGame;
+    globalThis.foundry = priorFoundry;
+  }
+});
+
 test("damage derivation is idempotent and excludes both temporary and permanent INT damage from legacy earned-point/focus reconstruction", () => {
   for (const kind of ["temporary", "permanent"]) {
     const raw = source();

@@ -24,6 +24,7 @@ import {
   scarChecked
 } from "../rules/hazards.mjs";
 import { attributeDamagePlan } from "../rules/attribute-damage.mjs";
+import { notTheFaceCharismaResistance } from "../rules/not-the-face.mjs";
 import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS } from "../rules/damage-types.mjs";
 import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
@@ -164,7 +165,9 @@ export async function sufferAttributeLoss(actor, effect, rolled, source) {
     if (actor.type !== "agent") {
       // An NPC's attributes are the numbers on its sheet: lower the score itself.
       const score = Math.max(0, Math.trunc(Number(actor.system.abilities?.[loss.ability]?.value) || 0)),
-        amount = Math.min(score, loss.amount);
+        resistance = loss.ability === "cha" ? notTheFaceCharismaResistance(actor.system) : 0,
+        amount = Math.min(score, Math.max(0, loss.amount - resistance));
+      if (resistance) lines.push(loc`Not the Face resists ${Math.min(loss.amount, resistance)} Charisma damage.`);
       if (amount) await actor.update({ [`system.abilities.${loss.ability}.value`]: score - amount });
       total += amount;
       lines.push(
@@ -186,6 +189,8 @@ export async function sufferAttributeLoss(actor, effect, rolled, source) {
       });
       await actor.update({ "system.attributeDamage": plan.record });
       total += plan.event.amount;
+      if (plan.event.resistance)
+        lines.push(loc`Not the Face resists ${Math.min(plan.event.requested, plan.event.resistance)} Charisma damage.`);
       lines.push(
         loss.kind === "permanent"
           ? loc`${plan.event.amount} permanent ${loss.ability.toUpperCase()} damage.`

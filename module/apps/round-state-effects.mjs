@@ -124,8 +124,22 @@ const mirrorEffects = actor =>
     .filter(effect => effect.flags?.spycraft2?.roundState)
     .map(effect => ({ id: effect.id, name: effect.name, key: effect.flags.spycraft2.roundState }));
 
+const pendingSyncs = new WeakMap();
+/** Re-read effects and state after the preceding write; overlapping actor/combat hooks must not reuse a plan. */
+export function syncRoundStateEffects(actor, options = {}) {
+  const pending = (pendingSyncs.get(actor) ?? Promise.resolve())
+    .catch(() => {})
+    .then(() => applyRoundStateEffects(actor, options));
+  pendingSyncs.set(actor, pending);
+  const clear = () => {
+    if (pendingSyncs.get(actor) === pending) pendingSyncs.delete(actor);
+  };
+  pending.then(clear, clear);
+  return pending;
+}
+
 /** Bring one character's mirror effects in line with its states. Returns what was changed. */
-export async function syncRoundStateEffects(actor, { states = ROUND_STATES } = {}) {
+async function applyRoundStateEffects(actor, { states = ROUND_STATES } = {}) {
   const plan = planRoundStateEffects(mirrorEffects(actor), activeRoundStates(actor.system, states));
   if (plan.remove.length) await actor.deleteEmbeddedDocuments("ActiveEffect", plan.remove, { render: false });
   if (plan.rename.length)

@@ -529,3 +529,21 @@ Foundry verifies the real sheet button, a 30-foot solid landing, 3d6 impact, six
 stress and Sprawled, with no page errors or transaction diagnostics. All **4,046**
 tests and **228** layout checks pass. Multi-round descent and the pending Wire Fu
 interpretation remain in B-183; scores remain **9.1/10** and **9.2/10**.
+
+The p.204 review connects Not the Face's Charisma **damage resistance** to the
+attribute ledger and hazard loss workflow. It uses the current Charisma modifier
+while a defensive declaration is active; resistance is recorded on the original
+event, applies before an attribute floor and may prevent the entire loss. Old
+ledger events remain valid. Replaying an event after healing, feat loss or expiry
+retains its original protection; other attributes are unaffected. This addresses
+the resistance previously described as unmodelled Charisma DR in B-191.
+
+Native Foundry verifies incoming five damage minus three resistance, then incoming
+three minus two after Charisma falls, and an unprotected loss after the round
+expires. The ledger stays valid. That play-through also exposed two local hooks
+deleting the same expired display effect; per-actor mirror synchronization now
+serializes and re-reads each plan. Regression tests cover competing create/delete
+requests and recovery after a failed write. The final native pass has no page
+errors or transaction diagnostics. All **4,051** tests, native schemas, lint,
+formatting, bundling and the text-copy check pass. Scores remain **9.1/10** and
+**9.2/10** while the larger remaining areas are addressed.

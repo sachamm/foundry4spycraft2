@@ -41,6 +41,50 @@ test("typed damage adds actual temporary/permanent sources for all six attribute
     assert.equal(s.abilities[ability].value, 7);
   }
 });
+
+test("Not the Face resists Charisma damage while defending, with the original protection retained after expiry and healing", () => {
+  for (const kind of ["temporary", "permanent"])
+    for (const mode of ["totalDefenseState", "fightDefensivelyState"]) {
+      const s = state();
+      s.activeFeatNames = ["Not the Face"];
+      s[mode] = { active: true };
+      s.abilities.cha = { value: 16, mod: 3 };
+      const event = request({ ability: "cha", kind, amount: 5, floor: null });
+      const result = apply(s, event);
+      assert.equal(result.event.resistance, 3);
+      assert.equal(result.event.amount, 2);
+      assert.equal(result.after, 14);
+      assert.equal(attributeDamageState(s).byAbility.cha[kind], 2);
+      s[mode].active = false;
+      s.activeFeatNames = [];
+      s.abilities.cha.value = 16;
+      const replay = attributeDamagePlan(s, event);
+      assert.equal(replay.alreadyApplied, true);
+      assert.equal(replay.event.amount, 2);
+      assert.equal(replay.event.resistance, 3);
+    }
+});
+
+test("Charisma protection permits fully resisted receipts, applies before attribute floors, and never protects other attributes", () => {
+  const s = state();
+  s.activeFeatNames = ["Not the Face"];
+  s.totalDefenseState = { active: true };
+  const zero = attributeDamagePlan(s, request({ ability: "cha", amount: 1, floor: null }));
+  assert.equal(zero.event.amount, 0);
+  assert.equal(zero.after, 12);
+  assert.equal(attributeDamageState({ ...s, attributeDamage: zero.record }).needsReview, false);
+  const floor = attributeDamagePlan(s, request({ ability: "cha", amount: 5, floor: 10 }));
+  assert.equal(floor.event.amount, 2);
+  assert.equal(attributeDamagePlan(s, request({ ability: "wis", amount: 5, floor: null })).event.amount, 5);
+  s.abilities.cha.value = 8;
+  assert.equal(attributeDamagePlan(s, request({ ability: "cha", amount: 1, floor: null })).event.resistance, undefined);
+  s.abilities.cha.value = 16;
+  s.totalDefenseState.active = false;
+  assert.equal(attributeDamagePlan(s, request({ ability: "cha", amount: 1, floor: null })).event.resistance, undefined);
+  const bad = structuredClone(zero.record);
+  bad.events[0].resistance = -1;
+  assert.equal(attributeDamageState({ attributeDamage: bad }).needsReview, true);
+});
 test("bounded source damage never reduces Wisdom below six, never heals a lower score, and records zero-damage victories once", () => {
   for (let score = -5; score <= 20; score++) {
     const s = state();

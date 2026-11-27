@@ -113,3 +113,54 @@ test("syncing writes only the differences and leaves other effects alone", async
   await syncRoundStateEffects(actor, { states });
   assert.deepEqual(calls, []);
 });
+
+test("overlapping actor and combat updates cannot delete an expired mirror twice or create duplicate mirrors", async () => {
+  let deleted = 0,
+    created = 0;
+  const actor = {
+    uuid: "Actor.race",
+    system: { stance: "Side", defense: true },
+    effects: [{ id: "old", name: "Expired", flags: { spycraft2: { roundState: "boost" } } }],
+    async deleteEmbeddedDocuments(_type, ids) {
+      await Promise.resolve();
+      for (const id of ids) {
+        assert.ok(
+          this.effects.some(e => e.id === id),
+          "delete must target a still-existing effect"
+        );
+        this.effects = this.effects.filter(e => e.id !== id);
+        deleted++;
+      }
+    },
+    async updateEmbeddedDocuments() {
+      throw Error("unexpected rename");
+    },
+    async createEmbeddedDocuments(_type, rows) {
+      await Promise.resolve();
+      this.effects.push(...rows.map(row => ({ ...row, id: `new${++created}` })));
+    }
+  };
+  await Promise.all([
+    syncRoundStateEffects(actor, { states }),
+    syncRoundStateEffects(actor, { states }),
+    syncRoundStateEffects(actor, { states })
+  ]);
+  assert.equal(deleted, 1);
+  assert.equal(created, 2);
+  assert.equal(new Set(actor.effects.map(e => e.flags.spycraft2.roundState)).size, 2);
+});
+
+test("a failed mirror write does not poison later synchronization", async () => {
+  let failures = 1;
+  const actor = {
+    system: {},
+    effects: [{ id: "old", name: "Expired", flags: { spycraft2: { roundState: "boost" } } }],
+    async deleteEmbeddedDocuments() {
+      if (failures--) throw Error("interrupted deletion");
+      this.effects = [];
+    }
+  };
+  await assert.rejects(syncRoundStateEffects(actor, { states }), /interrupted deletion/);
+  await syncRoundStateEffects(actor, { states });
+  assert.deepEqual(actor.effects, []);
+});
