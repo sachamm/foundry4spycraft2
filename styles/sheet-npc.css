@@ -241,8 +241,10 @@
 /* Items and notes fold under a summary drawn as a section bar, so every section on the sheet has the same label. */
 .spycraft2.sheet.npc .npc-notes > summary {
   margin: var(--sc2-space-3) 0 var(--sc2-space-2);
+  align-content: center;
   padding: 4px 8px;
-  min-height: 26px;
+  /* The shared touch-size floor for a summary (ui-style-guide 6.6), not the section bar's own 26px. */
+  min-height: 44px;
   font: 600 14px/1.4 var(--font-primary, sans-serif);
   letter-spacing: 0.02em;
   color: var(--sc2-on-bar);

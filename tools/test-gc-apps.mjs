@@ -1690,3 +1690,24 @@ test("an objective half typed in the inline field survives a console redraw", as
     globalThis.document = keep;
   }
 });
+
+test("the inline objective gives its words back when the save fails", async () => {
+  const field = { value: "2 Tap the line", focus() {} };
+  const target = { closest: () => ({ querySelector: () => field }) };
+  const context = { element: { querySelector: () => field }, render() {} };
+  const warned = [];
+  const warn = ui.notifications.warn;
+  ui.notifications.warn = message => warned.push(message);
+  const settings = game.settings.set;
+  game.settings.set = async () => {
+    throw new Error("Setting refused");
+  };
+  try {
+    await GCConsole.DEFAULT_OPTIONS.actions.quickObjective.call(context, { detail: 0 }, target);
+  } finally {
+    game.settings.set = settings;
+    ui.notifications.warn = warn;
+  }
+  assert.equal(field.value, "2 Tap the line");
+  assert.deepEqual(warned, ["Setting refused"]);
+});

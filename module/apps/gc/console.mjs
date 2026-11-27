@@ -177,10 +177,19 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         if (!field?.value.trim()) return field?.focus();
         const text = field.value;
         field.value = "";
-        if (!(await mission.addObjectiveLines(text))) {
+        // Nothing saved, or the save failed: the words go back, unless something new was typed meanwhile.
+        const giveBack = () => {
           const now = this.element?.querySelector("input[name='quickObjective']") ?? field;
           if (!now.value) now.value = text;
+        };
+        let added = 0;
+        try {
+          added = await mission.addObjectiveLines(text);
+        } catch (error) {
+          giveBack();
+          throw error;
         }
+        if (!added) giveBack();
       }),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
