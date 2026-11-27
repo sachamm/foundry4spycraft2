@@ -19,7 +19,11 @@ import {
   recordFavoredGearLevelChoices
 } from "../../module/apps/favored-gear-session.mjs";
 import { npcDamageSave } from "../../module/apps/gc/npc-play.mjs";
-import { reviewCrossroadsMissionXP, reviewCrossroadsSession } from "../../module/apps/crossroads-xp.mjs";
+import {
+  reviewCrossroadsMissionXP,
+  reviewCrossroadsSession,
+  completeCrossroads
+} from "../../module/apps/crossroads-xp.mjs";
 import { ActorActionDice } from "../../module/documents/actor/action-dice.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
@@ -219,7 +223,7 @@ test("extra-attack claim recovery shows readable choices and keeps its GC confir
     globalThis.game = oldGame;
   }
 });
-for (const mode of ["eligibility", "session", "settlement"])
+for (const mode of ["eligibility", "session", "award", "settlement"])
   test(`Crossroads XP ${mode} keeps actual source fields and confirmation reachable at720px`, async ({ page }) => {
     const prior = content,
       oldGame = game;
@@ -241,6 +245,14 @@ for (const mode of ["eligibility", "session", "settlement"])
           }
         }
       };
+      if (mode === "award") {
+        system.crossroadsTitle = "";
+        system.subplots = [
+          { name: "Completed one", kind: "standard", complete: true },
+          { name: "Completed two", kind: "standard", complete: true },
+          { name: "Actual Crossroads story", kind: "seasoned", complete: false }
+        ];
+      }
       const actor = {
         uuid: "Actor.title-layout",
         name: "QA Crossroads",
@@ -252,10 +264,15 @@ for (const mode of ["eligibility", "session", "settlement"])
       };
       if (mode === "eligibility") await reviewCrossroadsMissionXP(actor);
       else if (mode === "session") await reviewCrossroadsSession(actor);
+      else if (mode === "award") await completeCrossroads(actor);
       else await ActorActionDice(class {}).prototype.settleMissionXP.call(actor);
       await render(page, 720);
       await page.setViewportSize({ width: 1280, height: 720 });
-      if (mode !== "settlement") {
+      if (mode === "award") {
+        await page.getByRole("combobox", { name: "Crossroads Subplot", exact: true }).selectOption("2");
+        await page.locator('[name="note"]').fill("GC confirmed completion and entry requirements");
+        await page.locator('[name="confirmed"]').check();
+      } else if (mode !== "settlement") {
         await page
           .getByRole("combobox", {
             name: mode === "session" ? "Title eligible for this session" : "Title eligible for this mission"

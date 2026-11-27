@@ -11,6 +11,7 @@ import { characterMissionXP } from "../module/rules/gc/mission.mjs";
 import {
   reviewCrossroadsMissionXP,
   reviewCrossroadsSession,
+  completeCrossroads,
   crossroadsXPContext
 } from "../module/apps/crossroads-xp.mjs";
 import { crossroadsSessionPolicy } from "../module/rules/crossroads-session.mjs";
@@ -204,6 +205,66 @@ const input = {
   note: "Confirmed title was already eligible for this mission",
   confirmed: true
 };
+function awardController() {
+  const c = controller();
+  c.a.system.crossroadsTitle = "";
+  c.a.system.actionDice = { value: 3, max: 4 };
+  c.a.system.subplots = [
+    { name: "Completed one", kind: "standard", complete: true },
+    { name: "Completed two", kind: "standard", complete: true },
+    { name: "Actual Crossroads", notes: "Saved note", kind: "seasoned", complete: false }
+  ];
+  return c;
+}
+const awardInput = { index: 2, note: "GC confirmed completion and entry requirements", confirmed: true };
+test("the actual title controller writes completion, title, prior eligibility and Undo once despite a lost response", async () => {
+  for (const lost of [false, true]) {
+    const { a, posts } = awardController(),
+      update = a.update.bind(a);
+    if (lost)
+      a.update = async patch => {
+        await update(patch);
+        throw Error("response lost");
+      };
+    const r = await completeCrossroads(a, awardInput);
+    assert.equal(r.title, "seasoned");
+    assert.equal(a.system.subplots[2].complete, true);
+    assert.equal(a.system.crossroadsTitle, "seasoned");
+    assert.equal(crossroadsSessionPolicy(crossroadsXPContext(a)).bonus, 0);
+    assert.equal(a.system.actionDice.value, 3);
+    assert.equal(a.system.xp, 1000);
+    assert.equal(Object.keys(a.flags.spycraft2.crossroadsAwards).length, 1);
+    assert.ok(posts[0].flags.spycraft2.undo);
+    await assert.rejects(completeCrossroads(a, awardInput), /no unfinished/);
+    assert.equal(posts.length, 1);
+  }
+});
+test("changed story or campaign rules during completion and rejected writes cannot award a title", async () => {
+  for (const change of [
+    a => {
+      a.system.subplots[2].notes = "Changed";
+    },
+    a => {
+      a.system.campaignEffects = { forbidCrossroads: true };
+    }
+  ]) {
+    const { a } = awardController();
+    foundry.applications.api.DialogV2.input = async () => {
+      change(a);
+      return awardInput;
+    };
+    await assert.rejects(completeCrossroads(a), /changed during completion/);
+    assert.equal(a.system.crossroadsTitle, "");
+    assert.equal(a.system.subplots[2].complete, false);
+  }
+  const { a } = awardController();
+  a.update = async () => {
+    throw Error("write rejected");
+  };
+  await assert.rejects(completeCrossroads(a, awardInput), /write rejected/);
+  assert.equal(a.system.crossroadsTitle, "");
+  assert.equal(a.system.actionDice.value, 3);
+});
 test("session eligibility controller preserves dice and XP and records an undoable correction after a lost response", async () => {
   const { a, posts } = controller();
   a.system.actionDice = { value: 3, max: 5 };

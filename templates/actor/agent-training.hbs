@@ -26,6 +26,9 @@
       <button type="button" class="sc2-action" data-action="reviewCrossroadsSession">{{crossroadsSessionReviewLabel}}</button>
     </p>
   {{/if}}{{/if}}
+  {{#if isGM}}{{#if canCompleteCrossroads}}
+    <p><button type="button" class="sc2-action" data-action="completeCrossroads">{{completeCrossroadsLabel}}</button></p>
+  {{/if}}{{/if}}
   <div class="edit-only">
 
   <div class="cols">

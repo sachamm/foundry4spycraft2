@@ -867,3 +867,30 @@ existing warnings.
 
 Scores remain **PC creation 9.4/10 and combat 9.5/10**. Title awards and the
 broader B-193 audit remain open; no credit is claimed for unreviewed mechanics.
+
+### Continuing pass: complete Crossroads and award titles
+
+The owning GC can now choose an unfinished typed Crossroads, confirm the story
+and original entry requirements, and complete it with its corresponding title
+in one actor write. Current eligibility is preserved before the title changes.
+Unknown session or mission history must be reviewed first. Entry levels,
+completed standard stories, earlier titles, Routine, duplicate attempts and the
+unfinished-story limit are checked again inside the resource transaction.
+
+The receipt keeps the earlier title, selected story, level, period eligibility,
+reviewer and note. Repeated completion cannot award another title. Successful
+writes with lost responses are recognized, and Undo restores the story, title
+and eligibility. Current dice and XP remain unchanged; the normal Subplot XP
+still belongs in mission settlement, as the dialog explains.
+
+Native Play-mode controls completed a Weathered Crossroads for actual Soldier 7.
+The title and story changed together; current XP 55,000, ordinary dice 3 and
+starting count 5 were preserved. Current-mission Crossroads XP stayed 0%; a
+new-mission snapshot made it 5%. A repeated completion was blocked, and native
+Undo restored Seasoned and the unfinished story. Browser errors and diagnostics
+were empty.
+
+All **4,168** Node tests, **988** independent fixture assertions and **240**
+layout checks pass. Lint, formatting, bundling and copy checks pass with existing
+warnings. Scores remain **PC creation 9.4/10 and combat 9.5/10** pending the
+broader source audit and remaining play gaps. The next pass continues that work.

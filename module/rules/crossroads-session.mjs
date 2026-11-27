@@ -27,9 +27,11 @@ export function crossroadsSessionPolicy(system) {
       !valid(review.eligibleTitle) ||
       !valid(review.ownedTitle) ||
       rank(review.eligibleTitle) > rank(review.ownedTitle) ||
+      typeof review.id !== "string" ||
       !review.id ||
       typeof review.note !== "string" ||
       !review.note.trim() ||
+      typeof review.reviewerId !== "string" ||
       !review.reviewerId
     )
       throw Error(loc`Review the saved session Crossroads eligibility record.`);

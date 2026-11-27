@@ -6,6 +6,7 @@ import {
   missionSettlementDefaults,
   reviewCrossroadsMissionXP,
   reviewCrossroadsSession,
+  completeCrossroads,
   crossroadsXPContext
 } from "../../apps/gc/mission-defaults.mjs";
 import { crossroadsMissionXPPolicy } from "../../rules/crossroads-xp.mjs";
@@ -67,6 +68,9 @@ export const ActorActionDice = Base =>
     }
     reviewCrossroadsSession(options = {}) {
       return reviewCrossroadsSession(this, options);
+    }
+    completeCrossroads(options = {}) {
+      return completeCrossroads(this, options);
     }
     get actionDiceFundingSystem() {
       return {
