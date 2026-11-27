@@ -25,7 +25,10 @@ import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { spendWeaponShots, weaponAmmunition } from "./ammunition-use.mjs";
 import { recentResults, recentResultsHint } from "./opposed-checks.mjs";
-import { grappleCardFacts } from "../rules/grapple-check.mjs";
+import { grappleBenefitDamage, grappleCardFacts } from "../rules/grapple-check.mjs";
+import { drForAttack } from "../rules/damage-application.mjs";
+import { rollTotal, sufferLethal } from "./hazards.mjs";
+import { nonLethalDamage } from "./non-lethal-damage.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
@@ -393,10 +396,38 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     if (!change.active && who && !who.statuses?.has(change.id)) continue;
     lines.push(await changeGrappleCondition(who, change.id, change.active, label));
   }
-  if (chosen.includes("sprawl")) lines.push(loc`Sprawl Opponent: roll 1d4 + Strength subdual damage and apply it.`);
-  if (chosen.some(id => ["injure", "throw", "useWeapon"].includes(id)))
-    lines.push(loc`Roll the damage from the weapon's card and apply it to the opponent.`);
+  for (const id of chosen) lines.push(...(await grappleBenefitHit(winner, loser, id)));
+  if (chosen.includes("useWeapon")) lines.push(loc`Use Weapon: roll the damage from the weapon's card and apply it.`);
   return lines;
+}
+
+/**
+ * Roll a damaging grapple benefit (Injure, Throw, Sprawl, pp.357–358) and apply it to the loser this user owns,
+ * inside the grapple's Undo note. A loser owned by someone else gets the rolled number for the GC to apply.
+ */
+async function grappleBenefitHit(winner, loser, id) {
+  const damage = winner ? grappleBenefitDamage(winner.system, id) : null;
+  if (!damage) return [];
+  const [name] = grappleBenefitText(id),
+    { total } = await rollTotal(damage.formula),
+    amount = Math.max(damage.minimum, total);
+  const rolled = loc`${esc(name)}: ${damage.formula} = ${amount} ${damage.kind === "subdual" ? loc`subdual` : loc`lethal`} damage.`;
+  if (!loser) return [rolled, loc`Apply it to the opponent from the damage tools.`];
+  if (!loser.isOwner) return [rolled, loc`The GC applies it to ${esc(loser.name)}.`];
+  if (damage.kind === "subdual") {
+    const { lines } = await nonLethalDamage(loser, "subdual", amount, { source: name, attackKind: "unarmed" });
+    return [rolled, ...lines];
+  }
+  const dr = Math.max(0, Number(drForAttack(loser.system, "unarmed")) || 0),
+    net = Math.max(0, amount - dr);
+  const loss = await sufferLethal(loser, net);
+  return [
+    rolled,
+    loss
+      ? loc`${esc(loser.name)}: ${net} after damage reduction ${dr}, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
+      : loc`${esc(loser.name)}: ${net} after damage reduction ${dr}; a standard character makes a Damage save for it.`,
+    ...(loss?.notes ?? [])
+  ];
 }
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */

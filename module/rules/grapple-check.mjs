@@ -35,6 +35,24 @@ export function grappleDamageNote(system) {
   return loc`Benefits that deal damage: Injure ${dice}${signedValue(unarmed.damageBonus ?? str)} (or a 1-handed weapon's); Throw ${dice}${signedValue((unarmed.damageBonus ?? str) + Math.max(1, str))}, and the opponent is sprawled and free; Sprawl 1d4${signedValue(str)} subdual, and you become prone.`;
 }
 
+/**
+ * The roll for a grapple benefit that deals damage (pp.357–358): Injure is unarmed damage, Throw adds the Strength
+ * modifier again (at least 1), and Sprawl is 1d4 + Strength subdual. Null for any other benefit, and for Use Weapon,
+ * whose damage comes from the weapon's own card.
+ */
+export function grappleBenefitDamage(system, id) {
+  const str = Number(system?.abilities?.str?.mod) || 0,
+    unarmed = system?.unarmed ?? { die: 3, extraDice: 0, damageBonus: str },
+    dice = `${1 + (unarmed.extraDice ?? 0)}d${unarmed.die ?? 3}`,
+    bonus = unarmed.damageBonus ?? str,
+    term = n => (n ? `${n < 0 ? "-" : "+"} ${Math.abs(n)}` : "");
+  if (id === "injure") return { formula: `${dice} ${term(bonus)}`.trim(), kind: "lethal", minimum: 1 };
+  if (id === "throw")
+    return { formula: `${dice} ${term(bonus + Math.max(1, str))}`.trim(), kind: "lethal", minimum: 1 };
+  if (id === "sprawl") return { formula: `1d4 ${term(str)}`.trim(), kind: "subdual", minimum: 1 };
+  return null;
+}
+
 export function grappleCheckPlan(
   system,
   key,

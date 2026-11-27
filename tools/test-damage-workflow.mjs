@@ -489,7 +489,7 @@ test("a special damage type is handed to an agent's own rules, with the dialog o
 test("grapple benefits the winner takes change conditions on both sides", async () => {
   reset();
   const kevin = character("Grappler", { activeFeatNames: [] });
-  const foe = character("Foe", {});
+  const foe = character("Foe", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 } });
   const remove = who => async () => who.statuses.clear();
   foe.deleteEmbeddedDocuments = remove(foe);
   await settleGrapple(kevin, { opening: true, total: 20, opponentTotal: 12, opponentUuid: foe.uuid, benefits: [] });
@@ -511,7 +511,17 @@ test("grapple benefits the winner takes change conditions on both sides", async 
     benefits: ["sprawl"]
   });
   assert.deepEqual([foe.statuses.has("sprawled"), kevin.statuses.has("prone")], [true, true]);
-  assert.match(posted.at(-1).content, /1d4 \+ Strength subdual/);
+  assert.match(posted.at(-1).content, /1d4 = \d+ subdual damage/);
+  const before = foe.system.vitality.value;
+  await settleGrapple(kevin, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: foe.uuid,
+    benefits: ["injure"]
+  });
+  assert.match(posted.at(-1).content, /Injure[^:]*: 1d3 = \d+ lethal damage/);
+  assert.ok(foe.system.vitality.value < before, "Injure's damage is applied to the loser");
 });
 
 test("rest wears off a special NPC's stress and subdual damage", async () => {

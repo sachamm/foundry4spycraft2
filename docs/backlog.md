@@ -274,7 +274,6 @@ own line on the card, and checked against the page first.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-186 | Grapple benefit damage (Injure, Throw, Sprawl) is worked out on the Grapple check's card but rolled and applied by hand. (p.357) | R-07, RW-210, RW-346 | S |
 | B-187 | "Once per trigger" guards hold only while the chat card exists. Put receipts on the actor. | R-08, JS-08 | M |
 | B-188 | Dramatic-scene Defense and DC boosts are reported for the GC to apply. | RW (gc-tools) | S |
 | B-189 | NPC feats and class abilities beyond plain numbers (threat ranges, abilities) stay reminders; a failed stress save on a special NPC leaves Shaken to a button; stress thresholds from a hazard; special damage types other than bang, flash and explosive are applied as ordinary damage. | RW-223, RW-344, RW-345, RW-411 | M |
