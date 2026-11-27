@@ -117,7 +117,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
 | B-050 | **One mission record per world, with no drafts or archive.** "Plan the next mission" files the ended mission as a journal entry under Mission records; there are still no named drafts, duplicate or import. (B-001 is the urgent part.) | XGC-31, CX-D10, CX-N11, CX-U15, XGC-35 | L | live |
-| B-051 | **Entering a mission, the rest.** Rows now have Edit and the add dialogs offer "Add another". Still open: add and edit inline in the list, and paste several objectives at once | XGC-32, NGC-11, NGC-12, DES-07 | M | live |
 | B-052 | **Mission record, the rule checks.** The dialog now puts name, Caliber and team first, folds the rest, shows a live Threat Level line and says what was saved. *GC to confirm* the Threat Level formula as labelled (pp.422–423) and the standing payout when a −2 adjustment cannot lower a Threat Level of 1 (pp.435–440) | NGC-07, NGC-08, NGC-09, DES-06, DES-32, UX-21, XGC-28, CX-E7 | M | live |
 | B-054 | **One wrap-up view**: earned XP with its breakdown, unresolved objectives, exposure and standing, each with the person, the amount and the balance before and after, and a settled state. Today an infraction debits at once, a complication counts as earned at once, and the XP report is a long chat message. | CX-D12, CX-N14, CX-E20, NGC-15, NGC-40 | L | code |
 | B-055 | "Record an antagonist" uses jargon and a preview that looks wrong. | XGC-27, NGC-14 | S | live |

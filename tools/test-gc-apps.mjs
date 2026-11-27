@@ -1644,3 +1644,27 @@ test("the fluid event dialog finds an event's refusal before closing", async () 
   assert.notEqual(fluidEventRefusal(pressed, "press", {}), "");
   assert.equal(fluidEventRefusal({ ...pressed, flags: {} }, "press", {}), "");
 });
+
+test("objectives typed as lines read a leading grade and a closing ! for critical", async () => {
+  assert.deepEqual(
+    mission.parseObjectiveLines("3 Steal the plans !\n- Photograph the courier\n\n5: Free the asset\n9 lives"),
+    [
+      { name: "Steal the plans", grade: 3, critical: true },
+      { name: "Photograph the courier", grade: 1, critical: false },
+      { name: "Free the asset", grade: 5, critical: false },
+      { name: "9 lives", grade: 1, critical: false }
+    ]
+  );
+  const before = state.getMission().objectives.length;
+  assert.equal(await mission.addObjectiveLines("2 Tap the line\n4 Burn the files !"), 2);
+  const added = state.getMission().objectives.slice(before);
+  assert.deepEqual(
+    added.map(entry => [entry.name, entry.grade, entry.critical, entry.complete]),
+    [
+      ["Tap the line", 2, false, false],
+      ["Burn the files", 4, true, false]
+    ]
+  );
+  assert.equal(await mission.addObjectiveLines("   \n"), 0);
+  await state.updateMission(m => ({ objectives: m.objectives.slice(0, before) }));
+});

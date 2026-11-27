@@ -620,6 +620,56 @@ export async function addObjective({ another = false, edit = null } = {}) {
   return addObjective({ another: true });
 }
 
+/**
+ * Objectives typed as lines: an optional grade 1 to 5 first, then the name, and a closing "!" for a critical one, as
+ * in "3 Steal the plans !". A list bullet is dropped; a line with no grade is grade 1.
+ */
+export function parseObjectiveLines(text) {
+  return String(text ?? "")
+    .split(/\r?\n/)
+    .map(line => line.trim().replace(/^[-*•]\s*/, ""))
+    .filter(Boolean)
+    .map(line => {
+      const critical = /\s*!$/.test(line);
+      let rest = line.replace(/\s*!$/, "").trim();
+      const graded = /^([1-5])(?:\s*[:.)-])?\s+(.+)$/.exec(rest);
+      const grade = graded ? Number(graded[1]) : 1;
+      if (graded) rest = graded[2].trim();
+      return rest ? { name: rest, grade, critical } : null;
+    })
+    .filter(Boolean);
+}
+
+/** Add parsed objectives in one save; returns how many were added. */
+export async function addObjectiveLines(text) {
+  requireGC();
+  const rows = parseObjectiveLines(text).map(row => ({
+    id: foundry.utils.randomID(),
+    ...row,
+    complete: false,
+    scenes: 1
+  }));
+  if (!rows.length) return 0;
+  await updateMission(mission => ({ objectives: [...mission.objectives, ...rows] }));
+  ui.notifications.info(rows.length === 1 ? loc`Added ${rows[0].name}.` : loc`Added ${rows.length} objectives.`);
+  return rows.length;
+}
+
+/** Paste several objectives at once, one per line, from a brief or the GC's notes. */
+export async function pasteObjectives() {
+  requireGC();
+  const input = await ask(
+    loc`Paste objectives — grade × 25 XP (p.431)`,
+    `
+    <p>${loc`One objective per line. Start a line with its grade (1 to 5) and end it with ! if it is critical; a line with no grade is grade 1.`}</p>
+    <label>${loc`Objectives`} <textarea name="lines" rows="6" placeholder="${esc(loc`3 Steal the plans !`)}"></textarea></label>`,
+    loc`Add objectives`,
+    values => (parseObjectiveLines(values.lines).length ? "" : loc`Type at least one objective.`)
+  );
+  if (!input) return 0;
+  return addObjectiveLines(input.lines);
+}
+
 /** Edit one antagonist row in place: the same dialog as Record for XP, filled in, replacing the row by its id. */
 export async function editAntagonist(id) {
   const row = getMission().antagonists.find(entry => entry.id === id);

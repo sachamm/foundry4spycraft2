@@ -168,6 +168,16 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return result;
       }),
       addObjective: guard(() => mission.addObjective()),
+      pasteObjectives: guard(() => mission.pasteObjectives()),
+      // The inline field under the list: Enter or Add saves what is typed, and the field empties for the next one.
+      quickObjective: guard(async function (event, target) {
+        const field = target.closest(".gc-quick-add")?.querySelector("input[name='quickObjective']");
+        if (!field?.value.trim()) return field?.focus();
+        const text = field.value;
+        field.value = "";
+        if (!(await mission.addObjectiveLines(text))) field.value = text;
+        this._focusQuickAdd = true;
+      }),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
@@ -358,6 +368,14 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       });
       row.addEventListener("pointerleave", () => this._clearHover());
     }
+    const quick = this.element.querySelector("input[name='quickObjective']");
+    quick?.addEventListener("keydown", event => {
+      if (event.key !== "Enter" || event.isComposing) return;
+      event.preventDefault();
+      quick.closest(".gc-quick-add")?.querySelector("[data-action='quickObjective']")?.click();
+    });
+    if (this._focusQuickAdd) quick?.focus();
+    this._focusQuickAdd = false;
     this._wireActorDrops();
     this._announceTurn(context);
     installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));

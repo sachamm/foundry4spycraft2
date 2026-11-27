@@ -411,7 +411,7 @@
 }
 .gc-console-body .gc-views button {
   width: 100%;
-  min-height: 32px;
+  min-height: var(--sc2-control);
   white-space: nowrap;
 }
 .gc-console-body .gc-views button[aria-pressed="true"] {
@@ -517,7 +517,7 @@
 }
 .gc-console-body .gc-turn-bar button {
   width: 100%;
-  min-height: 32px;
+  min-height: var(--sc2-control);
   margin: 0;
   white-space: normal;
 }
@@ -788,4 +788,18 @@
 /* With damage waiting the card button leads; the mob attack then takes a full row so Delay and Ready pair up. */
 .gc-console-body details.gc-section .controls .gc-apply-first ~ [data-action="mobAttack"] {
   grid-column: 1 / -1;
+}
+
+/* Inline objective entry under the Objectives buttons: a full-width field with its Add button at the end. */
+.gc-console-body .gc-quick-add {
+  display: flex;
+  gap: var(--sc2-space-1);
+  align-items: center;
+  margin: 0 0 var(--sc2-space-1);
+}
+
+.gc-console-body .gc-quick-add input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--sc2-control);
 }

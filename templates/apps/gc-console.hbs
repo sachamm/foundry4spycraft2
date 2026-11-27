@@ -132,7 +132,11 @@
   </details>
   <details class="gc-section" data-section="objectives" data-view-hidden="{{hiddenSections.objectives}}" data-state="{{sections.objectives.state}}" {{#if sections.objectives.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Objectives"}}</span><span class="gc-note">{{counts.objectives}}</span></summary>
-    {{#if shown.prep}}<p class="controls"><button type="button" data-action="addObjective">{{localize "SPYCRAFT.Console.AddObjective"}}</button></p>{{/if}}
+    {{#if shown.prep}}<p class="controls"><button type="button" data-action="addObjective">{{localize "SPYCRAFT.Console.AddObjective"}}</button>
+      <button type="button" data-action="pasteObjectives">{{localize "SPYCRAFT.Console.PasteObjectives"}}</button></p>
+    <p class="gc-quick-add"><input type="text" name="quickObjective" aria-label="{{localize 'SPYCRAFT.Console.QuickObjective'}}"
+      placeholder="{{localize 'SPYCRAFT.Console.QuickObjectivePlaceholder'}}" data-tooltip="{{localize 'SPYCRAFT.Console.QuickObjectiveHint'}}" />
+      <button type="button" class="sc2-action" data-action="quickObjective">{{localize "SPYCRAFT.Console.QuickAdd"}}</button></p>{{/if}}
     <ul class="gc-rows">{{#each mission.objectives}}
       <li class="gc-row"><span class="gc-row-text">{{#if complete}}✔{{else}}○{{/if}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Grade"}} {{grade}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{#if critical}} · <b>{{localize "SPYCRAFT.Template.AppsGcConsole.Critical"}}</b>{{/if}}</span>
     <span class="gc-row-actions">
