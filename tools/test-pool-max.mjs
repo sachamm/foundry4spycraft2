@@ -87,9 +87,12 @@ test("a pool without a usable value or maximum is skipped and keeps what was rec
   });
 });
 
+let actorSequence = 0;
 globalThis.Actor = class {
   constructor() {
-    this.uuid = "Actor.new";
+    this.id = `actor${++actorSequence}`;
+    this.uuid = `Actor.${this.id}`;
+    game.actors.set(this.id, this);
     this.type = "agent";
     this.isOwner = true;
     this.flags = { other: { keep: true } };
@@ -113,11 +116,38 @@ globalThis.Actor = class {
     return this;
   }
 };
-globalThis.game = { user: { isGM: true }, settings: { get: () => undefined }, time: { worldTime: 0 } };
+globalThis.game = {
+  actors: new Map(),
+  user: { isGM: true },
+  settings: { get: () => undefined },
+  time: { worldTime: 0 }
+};
 globalThis.foundry = { utils: { randomID: () => "id" } };
 globalThis.ui = { notifications: { warn: () => null } };
 const { SpycraftActor } = await import("../module/documents/actor.mjs");
 const { followPoolMax } = await import("../module/apps/pool-max.mjs");
+
+test("pool bookkeeping ignores unsaved previews, detached database copies and removed actors, but follows a live synthetic token", async () => {
+  const a = new SpycraftActor();
+  const detached = Object.assign(Object.create(Object.getPrototypeOf(a)), a, { updates: [] });
+  assert.equal(followPoolMax(detached), null);
+  const preview = Object.assign(Object.create(Object.getPrototypeOf(a)), a, { id: null, uuid: null, updates: [] });
+  assert.equal(followPoolMax(preview), null);
+  game.actors.delete(a.id);
+  assert.equal(followPoolMax(a), null);
+  const tokenActor = new SpycraftActor();
+  tokenActor.isToken = true;
+  const scene = { id: "scene", tokens: new Map() };
+  const token = { id: "token", parent: scene, actor: tokenActor };
+  tokenActor.token = token;
+  scene.tokens.set(token.id, token);
+  game.scenes = new Map([[scene.id, scene]]);
+  assert.ok(await followPoolMax(tokenActor));
+  scene.tokens.delete(token.id);
+  assert.equal(followPoolMax(tokenActor), null);
+  assert.equal(detached.updates.length, 0);
+  assert.equal(preview.updates.length, 0);
+});
 
 test("blank agents capture original campaign creation rules while imports, played characters and supplied history are preserved", async () => {
   const settings = game.settings;
@@ -204,11 +234,11 @@ test("a created agent fills to its maximums once, then follows a new class level
 
 test("any re-preparation after the world is ready (a combat round, a teammate's bonus) makes the writer follow a moved maximum", async () => {
   globalThis.Actor.prototype.prepareData = function () {};
-  const listeners = [];
+  const listeners = new Map();
   globalThis.Hooks = {
     once: () => null,
-    on: (_event, fn) => listeners.push(fn),
-    callAll: (_event, ...args) => listeners.forEach(fn => fn(...args))
+    on: (event, fn) => listeners.set(event, [...(listeners.get(event) ?? []), fn]),
+    callAll: (event, ...args) => (listeners.get(event) ?? []).forEach(fn => fn(...args))
   };
   const { installPoolMaxHooks } = await import("../module/apps/pool-max.mjs");
   installPoolMaxHooks();
@@ -226,6 +256,7 @@ test("any re-preparation after the world is ready (a combat round, a teammate's 
   assert.equal(a.updates.length, 0);
   game.ready = true;
   try {
+    Hooks.callAll("createActor", a);
     a.prepareData();
     await new Promise(resolve => setTimeout(resolve, 0));
     assert.equal(a.system.wounds.value, 14);

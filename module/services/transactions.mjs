@@ -329,10 +329,12 @@ export async function runNativeResourceTransaction(
         failures.push(error);
       }
     // Cleanup failure must not pretend a committed resource action failed and invite a duplicate retry.
-    if (failures.length)
+    if (failures.length) {
+      console.warn("Field Agent's Handbook | Resource lock cleanup failed", ...failures);
       ui.notifications.warn(
         loc`Resource transaction finished, but its lock needs GC recovery. Check the recorded result before retrying.`
       );
+    }
   }
   return result;
 }

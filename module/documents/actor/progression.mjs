@@ -3,7 +3,7 @@ import { refuse, refuseStep } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollCareerVitality, reviewCareerVitality } from "../../apps/vitality.mjs";
 import { deferredSkillDeadline } from "../../rules/deferred-skills.mjs";
-import { queueResources } from "../../services/transactions.mjs";
+import { queueResources, isResourceLock } from "../../services/transactions.mjs";
 import { featAcquisition, captureFeatAcquisition } from "../../rules/feat-acquisition.mjs";
 import { checkPrerequisites, prerequisitesUseSkills } from "../../rules/prerequisites.mjs";
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
@@ -96,12 +96,14 @@ export const ActorProgression = Base =>
       if (this.type !== "agent" || !this.isOwner || this.system.companionOf?.ownerUuid) return null;
       const context = () => ({
         system: this.system.toObject?.() ?? structuredClone(this.system),
-        items: this.items.map(i => ({
-          id: i.id,
-          name: i.name,
-          type: i.type,
-          system: i.system.toObject?.() ?? structuredClone(i.system)
-        })),
+        items: this.items
+          .filter(i => !isResourceLock(i))
+          .map(i => ({
+            id: i.id,
+            name: i.name,
+            type: i.type,
+            system: i.system.toObject?.() ?? structuredClone(i.system)
+          })),
         effects: currentCampaignRules().effects,
         policy: this.flags?.spycraft2?.creationPolicy ?? null,
         trade: this.flags?.spycraft2?.modularTrade ?? null,
@@ -111,18 +113,33 @@ export const ActorProgression = Base =>
       const expected = context();
       const allowed = () =>
         this.isOwner &&
+        !this.system.companionOf?.ownerUuid &&
         (game.user?.isGM ||
           (this.system.level <= 1 &&
             String(this.usagePeriods?.mission ?? "initial") === "initial" &&
             !game.settings?.get("spycraft2", "mission")?.active));
       if (!allowed()) throw new Error(loc`Only the GC can revise Modular trades after character creation.`);
-      const prepared = computeAgent(structuredClone(expected.system), expected.items, CONFIG.SPYCRAFT, {
-        campaignEffects: expected.effects,
-        creationPolicy: expected.policy,
-        modularTrade: null,
-        creationAttributes: this.flags?.spycraft2?.creationAttributes,
-        featPurchases: this.flags?.spycraft2?.featPurchases
+      const prepare = context =>
+        computeAgent(structuredClone(context.system), context.items, CONFIG.SPYCRAFT, {
+          campaignEffects: context.effects,
+          creationPolicy: context.policy,
+          modularTrade: null,
+          creationAttributes: this.flags?.spycraft2?.creationAttributes,
+          featPurchases: this.flags?.spycraft2?.featPurchases
+        });
+      const prepared = prepare(expected);
+      const signature = (context, prepared) => ({
+        level: context.system.progression?.length ?? context.system.level,
+        companionOf: context.system.companionOf ?? null,
+        effects: context.effects,
+        policy: context.policy,
+        trade: context.trade,
+        mission: context.mission,
+        period: context.period,
+        available: prepared.modularCreation?.available,
+        budget: prepared.modularCreation?.originalBudget
       });
+      const expectedSignature = signature(expected, prepared);
       if (!prepared.campaignEffects.modularCreation)
         throw new Error(loc`Modular must be part of this character's original creation rules.`);
       const available = prepared.modularCreation.available,
@@ -152,7 +169,8 @@ export const ActorProgression = Base =>
         );
       }
       return queueResources([this], async () => {
-        if (!allowed() || !same(context(), expected))
+        const current = context();
+        if (!allowed() || !same(signature(current, prepare(current)), expectedSignature))
           throw new Error(loc`The character, campaign or trade changed. Review the current creation trade again.`);
         const record = {
           version: 1,

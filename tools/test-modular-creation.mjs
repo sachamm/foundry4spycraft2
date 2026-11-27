@@ -128,6 +128,44 @@ test("the actual creation workflow saves only the trade, guards player timing an
   const saved = await a.configureModularCreation(trade(2));
   assert.equal(saved.bought, 2);
   assert.deepEqual(a.system, before);
+  a.system.vitality = { value: 5, max: 10 };
+  game.spycraft2 = {
+    resourceLocks: {
+      run: async (_actors, work) => {
+        a.system.vitality.value = 4;
+        const lock = {
+          id: "sc2ResourceLock1",
+          type: "gear",
+          flags: { spycraft2: { resourceLock: { token: "native-lock" } } },
+          system: {}
+        };
+        a.items.push(lock);
+        try {
+          return await work();
+        } finally {
+          a.items.splice(a.items.indexOf(lock), 1);
+        }
+      }
+    }
+  };
+  assert.equal(
+    (await a.configureModularCreation(trade(1))).bought,
+    1,
+    "Bookkeeping items and current vitality do not change creation allowances"
+  );
+  const originalItems = a.items;
+  a.items = structuredClone(a.items);
+  game.spycraft2.resourceLocks.run = async (_actors, work) => {
+    a.items[0].system.bonuses[0].value = "2";
+    return work();
+  };
+  await assert.rejects(
+    a.configureModularCreation(trade(0, { basicCombat: 1 })),
+    /character, campaign or trade changed/
+  );
+  assert.equal(a.flags.spycraft2.modularTrade.bought, 1, "Actual allowance changes still reject the stale trade");
+  a.items = originalItems;
+  delete game.spycraft2;
   a.usagePeriods.mission = "second";
   await assert.rejects(a.configureModularCreation(trade()), /Only the GC/);
   game.user.isGM = true;

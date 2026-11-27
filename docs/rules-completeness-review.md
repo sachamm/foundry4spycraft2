@@ -373,6 +373,23 @@ saves add nothing, and Constructs retain immunity. Drained and hazard-sourced
 NPC stress thresholds remain open. All **4,013** Node tests, lint and copied-text
 checks pass. This is a narrow part of the remaining NPC damage work; the scores
 remain **8.9/10** and **9.0/10**.
+
+Native Foundry **14.370** testing now uses a fresh isolated QA world and separate
+GC/player accounts. The GC's real actor creation, Origin import, class-level
+addition, Small Screen cap, Modular purchase and original-policy retention after
+season changes have run. The rendered sheet correctly keeps unfinished skill,
+feat and other creation choices visible; this is not yet a completed-character
+or multiplayer combat play-through.
+
+That pass exposed two runtime failures missed by the stand-ins. Pool-max
+bookkeeping ran on unsaved previews and detached database reads, producing
+invalid lock work and extra test actors; it now writes only the live world actor
+or live synthetic token, including a creation hook after insertion. Modular's
+stale-dialog comparison included bookkeeping items and current health; it now
+rechecks the actual creation allowances, policy, level and mission context.
+The native rerun creates exactly one actor and records no transaction warnings
+or page errors. All **4,014** Node tests, formatting and lint pass. Further native
+multiplayer and combat checks continue before any higher completeness claim.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,

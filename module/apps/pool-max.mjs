@@ -12,8 +12,14 @@ import { poolMaxPlan, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 
 const planFor = actor => poolMaxPlan(actor.system, actor.flags?.spycraft2?.[POOL_MAX_FLAG], poolRules(actor.type));
 /** Agents, and NPCs: a special NPC's vitality and wounds come from its build and the Threat Level. */
-// A compendium entry is never written to: it is followed once it is imported.
-const followed = actor => !actor?.pack && (actor?.type === "agent" || actor?.type === "npc");
+// Preparation also runs on unsaved creation previews and detached database reads. Only the live world document writes.
+const followed = actor => {
+  if (!actor?.id || actor.pack || !["agent", "npc"].includes(actor.type)) return false;
+  if (!actor.isToken) return globalThis.game?.actors?.get?.(actor.id) === actor;
+  const token = actor.token,
+    scene = token?.parent;
+  return !!scene && game.scenes?.get?.(scene.id) === scene && scene.tokens?.get?.(token.id)?.actor === actor;
+};
 
 /** Write the plan for one agent. Returns the update written, or null when nothing changed. */
 export function followPoolMax(actor) {
@@ -23,6 +29,7 @@ export function followPoolMax(actor) {
   return queueResources(
     [actor],
     async () => {
+      if (!followed(actor) || !actor.isOwner) return null;
       const patch = planFor(actor);
       if (!Object.keys(patch).length) return null;
       await actor.update(patch, { spycraft2PoolMax: true });
@@ -59,6 +66,7 @@ export function schedulePoolMax(actor) {
 
 export function installPoolMaxHooks() {
   Hooks.on("spycraft2.agentPrepared", schedulePoolMax);
+  Hooks.on("createActor", schedulePoolMax);
   // Every preparation after the world is ready schedules a check (actor.mjs prepareData). Agents prepared before
   // then, or while the start-up migration ran, are checked here once; agents made before this was added get their
   // current maximums recorded with their values untouched.
