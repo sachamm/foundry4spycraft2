@@ -343,6 +343,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           classId: str(),
           vitality: int(0, { min: 0 }),
           careerEntryId: str(),
+          /** The mission period the level was gained in, for the one-level-between-missions limit (p.27). */
+          mission: str(),
           vitalityRollId: str(),
           vitalityReviewId: str(),
           /** INT modifier when points were earned; null reconstructs legacy history. */

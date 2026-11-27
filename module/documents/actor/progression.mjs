@@ -9,6 +9,7 @@ import { checkPrerequisites, prerequisitesUseSkills } from "../../rules/prerequi
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignLevelRow, levelsBetweenMissions } from "../../rules/campaign-rules.mjs";
 import { esc } from "../../html.mjs";
 
 export const ActorProgression = Base =>
@@ -49,6 +50,34 @@ export const ActorProgression = Base =>
           loc`Spend all deferred skill points before gaining another level (I Can Swim, p.200): ${deferred.join("; ")}.`
         );
       if (sys.progression.length >= 20) return refuseStep(game.i18n.localize("SPYCRAFT.Class.MaxLevel"));
+      // Past level 1, a level needs its XP and comes between missions, one at a time (two under Fast Growth) (p.27).
+      // The GC may grant a level anyway after confirming.
+      const mission = String(sys.usagePeriods?.mission ?? "initial");
+      if (sys.progression.length >= 1) {
+        const next = sys.progression.length + 1,
+          needed = campaignLevelRow(CONFIG.SPYCRAFT.tables?.levels?.[next])?.xp,
+          gained = sys.progression.slice(1).filter(entry => entry.mission === mission).length,
+          allowed = levelsBetweenMissions();
+        const problems = [
+          ...(Number.isFinite(needed) && (Number(sys.xp) || 0) < needed
+            ? [loc`Career Level ${next} needs ${needed} XP; this character has ${Number(sys.xp) || 0}.`]
+            : []),
+          ...(gained >= allowed
+            ? [
+                loc`${allowed === 1 ? loc`A level has` : loc`${allowed} levels have`} already been gained since the last mission.`
+              ]
+            : [])
+        ];
+        if (problems.length) {
+          if (!game.user?.isGM) return refuseStep(`${problems.join(" ")} ${loc`Ask the GC to grant it.`}`);
+          const grant = await systemDialog.confirm({
+            window: { title: loc`Grant a level` },
+            content: `<p>${esc(problems.join(" "))}</p><p>${esc(loc`Grant the level anyway?`)}</p>`,
+            rejectClose: false
+          });
+          if (!grant) return null;
+        }
+      }
       const ident = classData.system?.identifier || classData.name;
       let cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === ident);
       const definition = cls?.system ?? classData.system;
@@ -72,7 +101,7 @@ export const ActorProgression = Base =>
       }
       const progression = [
         ...sys.progression.map(p => ({ ...p })),
-        { classId: ident, careerEntryId: foundry.utils.randomID(), vitality: 0, skills: {}, expertEntry }
+        { classId: ident, careerEntryId: foundry.utils.randomID(), vitality: 0, skills: {}, expertEntry, mission }
       ];
       const preview = this.system.toObject?.() ?? foundry.utils.deepClone(this.system);
       Object.assign(preview, this.attributeRuleContext);

@@ -372,6 +372,12 @@ export function abilityIncreaseLevels(effects = campaignRules()) {
  * returned as it is. Feats: 1 at Level 1 and one more every 3 levels; proficiencies: one every 2 levels from Level 3;
  * interests: one every 4 levels from Level 2; attribute increases: one every 4 levels.
  */
+/** How many levels a character may gain between two missions: 1, or 2 under Fast Growth (pp.27, 407). */
+export const levelsBetweenMissions = (effects = campaignRules()) =>
+  Number.isSafeInteger(effects.levelsBetweenMissions) && effects.levelsBetweenMissions > 0
+    ? effects.levelsBetweenMissions
+    : 1;
+
 export function campaignLevelRow(row, effects = campaignRules()) {
   if (!row) return row;
   const growth = campaignGrowth(effects),

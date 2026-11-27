@@ -11443,7 +11443,8 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "XP needed for each level is halved (rounded down), and up to 2 levels may be gained between missions.",
    "effects": {
-    "xpToLevelFraction": 0.5
+    "xpToLevelFraction": 0.5,
+    "levelsBetweenMissions": 2
    }
   },
   {
