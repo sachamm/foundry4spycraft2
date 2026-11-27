@@ -17,7 +17,7 @@
 import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { loc, locKey } from "../i18n.mjs";
-import { appliedDamageEntries } from "../rules/damage-application.mjs";
+import { appliedDamageEntries, validReport } from "../rules/damage-application.mjs";
 
 export const RELAY_QUERY = "spycraft2.relay";
 const actions = new Map();
@@ -178,7 +178,8 @@ const MARKS = {
     typeof value?.targetUuid === "string" &&
     typeof value?.name === "string" &&
     Number.isFinite(value?.damage) &&
-    typeof value?.kind === "string"
+    typeof value?.kind === "string" &&
+    validReport(value?.report)
 };
 
 // Each damage record gets its own key, so two applies close together both survive: rewriting one array from a stale

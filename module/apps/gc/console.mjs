@@ -168,6 +168,29 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return result;
       }),
       addObjective: guard(() => mission.addObjective()),
+      pasteObjectives: guard(() => mission.pasteObjectives()),
+      // The inline field under the list: Enter or Add saves what is typed, and the field empties for the next one.
+      quickObjective: guard(async function (event, target) {
+        const field = target.closest(".gc-quick-add")?.querySelector("input[name='quickObjective']");
+        // The field, not the Add button that Enter clicks, keeps the keyboard for the next objective.
+        if (event?.detail === 0) this._pressed = { quick: true };
+        if (!field?.value.trim()) return field?.focus();
+        const text = field.value;
+        field.value = "";
+        // Nothing saved, or the save failed: the words go back, unless something new was typed meanwhile.
+        const giveBack = () => {
+          const now = this.element?.querySelector("input[name='quickObjective']") ?? field;
+          if (!now.value) now.value = text;
+        };
+        let added = 0;
+        try {
+          added = await mission.addObjectiveLines(text);
+        } catch (error) {
+          giveBack();
+          throw error;
+        }
+        if (!added) giveBack();
+      }),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
@@ -358,6 +381,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       });
       row.addEventListener("pointerleave", () => this._clearHover());
     }
+    const quick = this.element.querySelector("input[name='quickObjective']");
+    quick?.addEventListener("keydown", event => {
+      if (event.key !== "Enter" || event.isComposing) return;
+      event.preventDefault();
+      quick.closest(".gc-quick-add")?.querySelector("[data-action='quickObjective']")?.click();
+    });
     this._wireActorDrops();
     this._announceTurn(context);
     installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
@@ -484,6 +513,7 @@ const twins = (root, wanted) =>
 const controlKey = (element, root = null) => {
   if (!element?.dataset) return null;
   if (element.matches?.(".sc2-tool-search input")) return { search: true };
+  if (element.matches?.("input[name='quickObjective']")) return { quick: true };
   // A section heading has no action of its own: it is found again by its section.
   if (element.matches?.("summary")) {
     const section = element.closest?.("details[data-section]")?.dataset.section;
@@ -522,7 +552,9 @@ export function captureConsoleState(root) {
     focus: controlKey(active, root),
     selection: active?.matches?.("input") ? [active.selectionStart, active.selectionEnd] : null,
     // Kept by their summary's words, so a list that is drawn or left out does not shift the others.
-    more: [...root.querySelectorAll("details.gc-more")].filter(details => details.open).map(moreKey)
+    more: [...root.querySelectorAll("details.gc-more")].filter(details => details.open).map(moreKey),
+    // An objective half typed in the inline field survives a redraw from a fight or a setting change.
+    draft: root.querySelector("input[name='quickObjective']")?.value ?? ""
   };
 }
 
@@ -539,6 +571,8 @@ function nextRow(root, focus) {
 /** Put the kept state back onto a freshly drawn console. */
 export function restoreConsoleState(root, kept) {
   if (!root?.querySelector || !kept) return;
+  const draftField = kept.draft ? root.querySelector("input[name='quickObjective']") : null;
+  if (draftField && !draftField.value) draftField.value = kept.draft;
   for (const details of root.querySelectorAll("details.gc-more"))
     if (kept.more?.includes(moreKey(details))) details.open = true;
   if (kept.focus) {
@@ -548,9 +582,11 @@ export function restoreConsoleState(root, kept) {
       : null;
     const target = kept.focus.search
       ? root.querySelector(".sc2-tool-search input")
-      : kept.focus.action
-        ? (same[kept.focus.nth ?? 0] ?? same[0] ?? nextRow(root, kept.focus) ?? heading)
-        : heading;
+      : kept.focus.quick
+        ? root.querySelector("input[name='quickObjective']")
+        : kept.focus.action
+          ? (same[kept.focus.nth ?? 0] ?? same[0] ?? nextRow(root, kept.focus) ?? heading)
+          : heading;
     target?.focus?.({ preventScroll: true });
     if (kept.selection && target?.setSelectionRange)
       try {

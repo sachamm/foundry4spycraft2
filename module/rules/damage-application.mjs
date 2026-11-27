@@ -106,6 +106,33 @@ export function criticalDamageDefaults(attack, damageMessageId = "") {
   return { critical: true, criticalDice: dice, ouch: false, laterShot: false };
 }
 
+const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", "#039": "'", nbsp: " " };
+/**
+ * A damage report's lines as plain text, at most 12 lines of 400 characters, for keeping on the damage card itself.
+ * Tags are dropped and entities read back, so the card can show them as text and nothing in them is run as markup.
+ */
+export function reportText(lines) {
+  return (Array.isArray(lines) ? lines : [])
+    .filter(line => typeof line === "string")
+    .map(line =>
+      line
+        .replace(/<[^>]*>/g, "")
+        .replace(/&(amp|lt|gt|quot|#0?39|nbsp);/g, (_, key) => ENTITIES[key])
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 400)
+    )
+    .filter(Boolean)
+    .slice(0, 12);
+}
+
+/** Whether a damage record's report is fit to show: plain strings within the limits reportText keeps to. */
+export const validReport = report =>
+  report === undefined ||
+  (Array.isArray(report) &&
+    report.length <= 12 &&
+    report.every(line => typeof line === "string" && line.length <= 400));
+
 /**
  * Every "damage applied" record on a damage card. Records used to be one array, rewritten whole on each apply, so two
  * close applies could drop one; new records are keyed under damageAppliedBy, and old cards keep their array.

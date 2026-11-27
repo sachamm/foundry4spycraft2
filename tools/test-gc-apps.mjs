@@ -1644,3 +1644,70 @@ test("the fluid event dialog finds an event's refusal before closing", async () 
   assert.notEqual(fluidEventRefusal(pressed, "press", {}), "");
   assert.equal(fluidEventRefusal({ ...pressed, flags: {} }, "press", {}), "");
 });
+
+test("objectives typed as lines read a leading grade and a closing ! for critical", async () => {
+  assert.deepEqual(
+    mission.parseObjectiveLines("3 Steal the plans !\n- Photograph the courier\n\n5: Free the asset\n9 lives"),
+    [
+      { name: "Steal the plans", grade: 3, critical: true },
+      { name: "Photograph the courier", grade: 1, critical: false },
+      { name: "Free the asset", grade: 5, critical: false },
+      { name: "9 lives", grade: 1, critical: false }
+    ]
+  );
+  const before = state.getMission().objectives.length;
+  assert.equal(await mission.addObjectiveLines("2 Tap the line\n4 Burn the files !"), 2);
+  const added = state.getMission().objectives.slice(before);
+  assert.deepEqual(
+    added.map(entry => [entry.name, entry.grade, entry.critical, entry.complete]),
+    [
+      ["Tap the line", 2, false, false],
+      ["Burn the files", 4, true, false]
+    ]
+  );
+  assert.equal(await mission.addObjectiveLines("   \n"), 0);
+  await state.updateMission(m => ({ objectives: m.objectives.slice(0, before) }));
+});
+
+test("an objective half typed in the inline field survives a console redraw", async () => {
+  const { captureConsoleState, restoreConsoleState } = await import("../module/apps/gc/console.mjs");
+  const keep = globalThis.document;
+  globalThis.document = { activeElement: null };
+  try {
+    const root = field => ({
+      querySelector: selector => (selector === "input[name='quickObjective']" ? field : null),
+      querySelectorAll: () => [],
+      contains: () => false,
+      scrollHeight: 0,
+      clientHeight: 0
+    });
+    const kept = captureConsoleState(root({ value: "3 Tap the line" }));
+    assert.equal(kept.draft, "3 Tap the line");
+    const fresh = { value: "" };
+    restoreConsoleState(root(fresh), kept);
+    assert.equal(fresh.value, "3 Tap the line");
+  } finally {
+    globalThis.document = keep;
+  }
+});
+
+test("the inline objective gives its words back when the save fails", async () => {
+  const field = { value: "2 Tap the line", focus() {} };
+  const target = { closest: () => ({ querySelector: () => field }) };
+  const context = { element: { querySelector: () => field }, render() {} };
+  const warned = [];
+  const warn = ui.notifications.warn;
+  ui.notifications.warn = message => warned.push(message);
+  const settings = game.settings.set;
+  game.settings.set = async () => {
+    throw new Error("Setting refused");
+  };
+  try {
+    await GCConsole.DEFAULT_OPTIONS.actions.quickObjective.call(context, { detail: 0 }, target);
+  } finally {
+    game.settings.set = settings;
+    ui.notifications.warn = warn;
+  }
+  assert.equal(field.value, "2 Tap the line");
+  assert.deepEqual(warned, ["Setting refused"]);
+});

@@ -2008,6 +2008,16 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     super._onRender(context, options);
     this.element.classList.toggle("play-mode", !context.editMode);
     this.element.classList.toggle("edit-mode", !!context.editMode);
+    // Disclosures keep their state across redraws, per view: Items and notes opens in Edit, and stays as the GC left it.
+    this._open ??= {};
+    const mode = context.editMode ? "edit" : "play";
+    for (const details of this.element.querySelectorAll("details[data-key]")) {
+      const key = `${mode}:${details.dataset.key}`;
+      if (Object.hasOwn(this._open, key)) details.open = this._open[key];
+      details.addEventListener("toggle", () => {
+        this._open[key] = details.open;
+      });
+    }
     enableHotbarDrag(this.element, this.actor);
   }
 

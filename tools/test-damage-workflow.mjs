@@ -166,6 +166,9 @@ test("an attack that cannot be confirmed keeps no resolution, and a resolved one
   assert.match(warnings.at(-1), /already been resolved/);
 });
 
+/** The outcome lines a damage card keeps for its newest apply. */
+const onCard = message => (appliedDamageEntries(message.flags.spycraft2).at(-1)?.report ?? []).join(" ");
+
 test("lethal damage comes off a special character's vitality and wounds and sets the conditions", async () => {
   reset();
   const kevin = character("Kevin", {
@@ -177,14 +180,17 @@ test("lethal damage comes off a special character's vitality and wounds and sets
   await applyDamage(damage, { targetUuid: kevin.uuid, damage: 11, kind: "lethal", attackKind: "rangedWeapon" });
   assert.deepEqual([kevin.system.vitality.value, kevin.system.wounds.value], [0, 9]);
   assert.equal(kevin.statuses.has("fatigued"), true);
-  assert.match(posted.at(-1).content, /takes 9 damage \(11 less damage reduction 2\)/);
+  // A plain outcome is kept on the damage card, not posted as a card of its own.
+  assert.equal(posted.length, 0);
+  assert.match(onCard(damage), /takes 9 damage \(11 less damage reduction 2\)/);
   const note = undoNotes.at(-1).flags.spycraft2.undo;
   assert.equal(note.label, "11 lethal damage applied to Kevin");
   assert.ok(note.entries[0].restore.some(([path]) => path.startsWith("system.vitality")));
   assert.equal(note.damageCard.targetUuid, note.entries[0].uuid);
-  assert.deepEqual(appliedDamageEntries(damage.flags.spycraft2), [
-    { targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }
-  ]);
+  assert.deepEqual(
+    appliedDamageEntries(damage.flags.spycraft2).map(({ report, ...entry }) => entry),
+    [{ targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }]
+  );
   // A critical hit while vitality remains goes to wounds; armor-piercing lowers the DR.
   kevin.system.vitality.value = 10;
   await applyDamage(damage, {
@@ -453,7 +459,8 @@ test("a special NPC's stress and subdual damage is totalled and its threshold sa
   const damage = card("d4", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 8 });
   await applyDamage(damage, { targetUuid: boss.uuid, damage: 8, kind: "subdual" });
   assert.deepEqual(nonLethalTotals(boss), { stress: 0, subdual: 8 });
-  assert.equal(posted.at(-1).flags, undefined, "below the threshold: no save");
+  assert.equal(posted.length, 0, "below the threshold: no save, and the outcome stays on the damage card");
+  assert.ok(onCard(damage));
   await applyDamage(damage, { targetUuid: boss.uuid, damage: 6, kind: "subdual" });
   assert.equal(nonLethalTotals(boss).subdual, 14);
   const save = posted.at(-1).flags.spycraft2.pendingSave;
@@ -683,7 +690,7 @@ test("wound loss from applied damage records its end-of-round Initiative change"
   const modifiers = combatant.flags.spycraft2.fluid.modifiers;
   assert.equal(modifiers.length, 1);
   assert.equal(modifiers[0].amount, -2);
-  assert.match(posted.at(-1).content, /Initiative -2 at the end of the round/);
+  assert.match(onCard(damage), /Initiative -2 at the end of the round/);
   game.combat = undefined;
 });
 
@@ -1074,4 +1081,14 @@ test("the grapple's Undo note does not take in changes made while the benefit di
   assert.equal(winner.system.vitality.value, 5);
   const note = undoNotes.at(-1)?.flags.spycraft2.undo;
   assert.ok(!note || !JSON.stringify(note.entries).includes('"vitality"'), "the vitality loss is not on the note");
+});
+
+test("an outcome on a whispered damage card keeps a card of its own", async () => {
+  reset();
+  const kevin = character("Kevin", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
+  const damage = card("dw", { actorUuid: "Actor.Guard", checkKind: "damage", effectiveTotal: 5 });
+  damage.whisper = ["gm"];
+  await applyDamage(damage, { targetUuid: kevin.uuid, damage: 5, kind: "lethal" });
+  assert.match(posted.at(-1).content, /Kevin/);
+  assert.equal(appliedDamageEntries(damage.flags.spycraft2).at(-1).report, undefined);
 });

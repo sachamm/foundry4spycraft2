@@ -26,7 +26,19 @@ export function sheetPlacement(wanted, room, kind = "") {
   const width = Math.round(Math.max(Math.min(minWidthOf(kind), wanted.width), Math.min(wanted.width, available)));
   const top = 60 + step;
   const height = Math.round(Math.max(360, Math.min(wanted.height, room.height - top - GAP)));
-  return { left: CONTROLS + step, top, width, height };
+  return { left: clearOf(room.avoid, CONTROLS + step, width, room), top, width, height };
+}
+
+/**
+ * A left edge that keeps the sheet off a window the GC works from (the GC Console in its own window): beside it
+ * when there is room on the map for both, otherwise the usual place.
+ */
+function clearOf(avoid, left, width, room) {
+  if (!avoid || ![avoid.left, avoid.width].every(Number.isFinite)) return left;
+  const right = avoid.left + avoid.width;
+  if (left + width <= avoid.left || left >= right) return left;
+  const after = right + GAP;
+  return after + width <= room.width - room.sidebar ? after : left;
 }
 
 /** The room the browser window gives right now. */
@@ -37,8 +49,15 @@ export function currentRoom() {
     width: globalThis.innerWidth ?? 1600,
     height: globalThis.innerHeight ?? 900,
     sidebar: Number.isFinite(sidebar) && sidebar > 0 ? sidebar : 348,
-    open: doc?.querySelectorAll?.(".spycraft2.sheet.actor").length ?? 0
+    open: doc?.querySelectorAll?.(".spycraft2.sheet.actor").length ?? 0,
+    avoid: consoleWindow(doc)
   };
+}
+
+/** The GC Console's own window, where one is open: a new sheet opens beside it rather than over it. */
+function consoleWindow(doc) {
+  const rect = doc?.querySelector?.(".application.gc-console")?.getBoundingClientRect?.();
+  return rect && rect.width > 0 ? { left: rect.left, width: rect.width } : null;
 }
 
 const STORE = kind => `spycraft2.sheetPlacement.${kind}`;

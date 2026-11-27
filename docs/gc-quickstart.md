@@ -25,7 +25,8 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
 1. **Make or import the agents.** Each player creates an agent actor and follows the setup list on its sheet. The
    Sample Agents compendium has finished characters if you want to start at once.
 2. **Record the mission.** Press **Edit mission** and enter the name, the team and the Caliber. Add objectives
-   (**Add objective**) and any complications you have planned; these set the XP award. A row's **Remove** leaves an
+   (**Add objective**, or type `3 Steal the plans !` in the field under it and press Enter: grade first, `!` for a
+   critical one; **Paste several** takes one per line) and any complications you have planned; these set the XP award. A row's **Remove** leaves an
    Undo note in the chat, so a slip costs nothing.
 3. **Prepare the opposition.** Create NPC actors (see [npc-creation.md](npc-creation.md)) and place them with
    **Add NPC to scene** in the Antagonists section.

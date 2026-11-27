@@ -21,6 +21,7 @@ import { enhanceDamageDialog } from "./dialog-sections.mjs";
 import {
   attackKindOf,
   appliedDamageEntries,
+  reportText,
   attackOutcome,
   criticalDamageDefaults,
   damageProfile,
@@ -798,16 +799,29 @@ export async function applyDamage(message, options = {}) {
         : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
     );
   }
-  if (lines.filter(Boolean).length) await postDamageReport(target, lines, { pendingSave, rolls });
+  // A plain outcome on an open card is written on the damage card itself, so one hit does not add a third card; one
+  // with a save to roll or dice to show keeps its own card, as does any outcome on a whispered or blind card.
+  const report = reportText(lines),
+    inline =
+      !failed && !pendingSave && !rolls.length && report.length > 0 && !message.blind && !message.whisper?.length;
+  if (!inline && lines.filter(Boolean).length) await postDamageReport(target, lines, { pendingSave, rolls });
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
   if (failed) return null;
-  // When the card cannot be marked the report above is the record.
-  await markCard(
+  // When the card cannot be marked the report above is the record; an outcome meant for the card is posted instead.
+  const marked = await markCard(
     message,
     "damageAppliedEntry",
-    { targetUuid: target.uuid, name: target.name, damage, kind, ...(ouch ? { ouch: true, net: result.net } : {}) },
+    {
+      targetUuid: target.uuid,
+      name: target.name,
+      damage,
+      kind,
+      ...(ouch ? { ouch: true, net: result.net } : {}),
+      ...(inline ? { report } : {})
+    },
     { quiet: true }
   );
+  if (inline && !marked) await postDamageReport(target, lines, { pendingSave, rolls });
   // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
   // become normal hits.
   const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
