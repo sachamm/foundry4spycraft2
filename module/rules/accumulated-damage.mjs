@@ -135,7 +135,8 @@ export function damageLedgerEventPlan(
     attackKind,
     weaponProficiency = "",
     armorPiercing = 0,
-    armorPiercingAll = false
+    armorPiercingAll = false,
+    typedDamageType = null
   } = {},
   id,
   at
@@ -159,6 +160,8 @@ export function damageLedgerEventPlan(
     (damageMode === "subdualBeforeDefenses" && kind !== "subdual")
   )
     throw new Error(loc`Choose resolved net damage or the matching stress/subdual defense calculation.`);
+  if (typedDamageType !== null && (kind !== "subdual" || damageMode !== "subdualBeforeDefenses"))
+    throw new Error(loc`Typed subdual resistance requires the original subdual defense calculation.`);
   const request = {
     kind,
     newDamage,
@@ -168,6 +171,7 @@ export function damageLedgerEventPlan(
     ...(damageMode === "subdualBeforeDefenses"
       ? {
           attackKind,
+          ...(typedDamageType !== null ? { typedDamageType } : {}),
           ...(weaponProficiency ? { weaponProficiency } : {}),
           armorPiercing: armorPiercingAll ? 0 : armorPiercing,
           armorPiercingAll
@@ -205,7 +209,8 @@ export function damageLedgerEventPlan(
           weaponProficiency,
           armorPiercing,
           armorPiercingAll,
-          criticalHit
+          criticalHit,
+          typedDamageType
         })
       : null;
   if (defenseContext?.criticalBruisingReview)

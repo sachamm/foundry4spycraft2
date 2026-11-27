@@ -36,6 +36,7 @@ import {
 } from "../rules/damage-application.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
+import { damageResistancePlan } from "../rules/resistances.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
@@ -954,9 +955,21 @@ export async function applyDamage(message, options = {}) {
       } else if (!isSpecial(target)) {
         // Standard NPCs and animals: damage reduction, then a Damage save on what is left.
         const reduced = standardReduction(kind, hit);
-        if (reduced.stopped)
-          lines.push(loc`${esc(target.name)}: damage reduction ${reduced.dr} stops all ${damage} damage.`);
-        else if (reduced.net < 1) lines.push(loc`${esc(target.name)} takes no damage.`);
+        if (reduced.stopped) {
+          const bruise = damageResistancePlan(target.system, "subdual", 1);
+          if (critical && bruise.net)
+            throw Error(loc`The GC must review this critical hit's bruising before applying its subdual save.`);
+          result = await npcDamageSave(target, {
+            damage: 1,
+            kind: "subdual",
+            blast: input.blast === true,
+            criticalDice: 0
+          });
+          if (!result) return null;
+          lines.push(
+            loc`${esc(target.name)}: DR stops the original hit; one subdual bruising point is resolved with resistance.`
+          );
+        } else if (reduced.net < 1) lines.push(loc`${esc(target.name)} takes no damage.`);
         else {
           if (reduced.dr) lines.push(loc`${esc(target.name)}: ${damage} less damage reduction ${reduced.dr}.`);
           result = await npcDamageSave(target, {

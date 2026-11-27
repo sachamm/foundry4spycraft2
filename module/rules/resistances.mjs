@@ -67,6 +67,13 @@ export function damageResistanceSource(system, type) {
   return { version: 1, key, ...preparedResistanceSource(system, key) };
 }
 
+export function subdualTypeSource(system, type = null) {
+  if (type === null) return null;
+  if (!["cold", "heat", "electrical"].includes(type))
+    throw new Error(loc`Choose cold, heat or electrical damage for typed subdual resistance.`);
+  return damageResistanceSource(system, type);
+}
+
 /** p.333: subtract resistance after DR; reducing damage to zero also prevents its accompanying effects. */
 export function damageResistancePlan(system, type, damage, source = damageResistanceSource(system, type)) {
   const valid = value => value === "all" || (Number.isSafeInteger(value) && value >= 0);

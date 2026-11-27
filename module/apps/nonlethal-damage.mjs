@@ -61,7 +61,8 @@ export async function nonLethalDamage(target, kind, amount, facts) {
     armorPiercing = 0,
     armorPiercingAll = false,
     critical = false,
-    campaignStressAdjusted = false
+    campaignStressAdjusted = false,
+    typedDamageType = null
   } = facts;
   if (target.type === "agent") {
     try {
@@ -73,7 +74,14 @@ export async function nonLethalDamage(target, kind, amount, facts) {
         confirmed: true,
         ...(campaignStressAdjusted ? { campaignStressAdjusted } : {}),
         ...(kind === "subdual"
-          ? { damageMode: "subdualBeforeDefenses", attackKind, weaponProficiency, armorPiercing, armorPiercingAll }
+          ? {
+              damageMode: "subdualBeforeDefenses",
+              attackKind,
+              weaponProficiency,
+              armorPiercing,
+              armorPiercingAll,
+              typedDamageType
+            }
           : { damageMode: "stressBeforeResistance" })
       });
       return {
@@ -98,7 +106,8 @@ export async function nonLethalDamage(target, kind, amount, facts) {
     armorPiercing,
     armorPiercingAll,
     critical,
-    campaignStressAdjusted
+    campaignStressAdjusted,
+    typedDamageType
   });
   if (plan.net) await target.update({ "flags.spycraft2.nonLethal": plan.totals });
   const lines = [

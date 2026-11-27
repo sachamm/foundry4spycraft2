@@ -13,7 +13,7 @@ import { armorTrainingDRForAttack } from "./armor-training.mjs";
 import { injuryThresholds } from "./gc/campaign.mjs";
 import { campaignStressDamage, campaignStressPolicy } from "./campaign-combat.mjs";
 import { DAMAGE_TYPES } from "./damage-types.mjs";
-import { damageResistancePlan } from "./resistances.mjs";
+import { damageResistancePlan, subdualTypeSource } from "./resistances.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
 const int = value => Math.trunc(Number(value) || 0);
@@ -387,13 +387,20 @@ export function nonLethalHitPlan(system, totals = {}, hit = {}) {
         });
   const bruising = kind === "subdual" && reduced.stopped ? 1 : 0,
     resistance = damageResistancePlan(system, kind, reduced.net + bruising),
+    typedSource = subdualTypeSource(system, hit.typedDamageType),
+    typedResistance = typedSource
+      ? damageResistancePlan(system, hit.typedDamageType, resistance.net, typedSource)
+      : null,
+    net = typedResistance?.net ?? resistance.net,
     current = Math.max(0, int(totals[kind]));
-  if (hit.critical === true && bruising && resistance.net)
+  if (typedSource && kind !== "subdual")
+    throw new Error(loc`Cold, heat and electrical defenses require subdual damage.`);
+  if (hit.critical === true && bruising && net)
     throw new Error(loc`The GC must review this critical hit's bruising before applying its subdual save.`);
   const plan = accumulatedDamagePlan(system, {
     kind,
     currentDamage: current,
-    newDamage: resistance.net,
+    newDamage: net,
     criticalHit: hit.critical === true,
     confirmed: true
   });
@@ -402,8 +409,9 @@ export function nonLethalHitPlan(system, totals = {}, hit = {}) {
     ...reduced,
     bruising,
     resistance,
-    net: resistance.net,
-    stopped: resistance.net === 0,
+    ...(typedResistance ? { typedResistance } : {}),
+    net,
+    stopped: net === 0,
     damage: hit.damage,
     totals: { ...totals, [kind]: plan.total }
   };

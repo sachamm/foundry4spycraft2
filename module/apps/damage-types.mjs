@@ -55,7 +55,7 @@ import { drForAttack, reducedDamage } from "../rules/damage-application.mjs";
 import { npcDamageSave } from "./gc/npc-damage-save.mjs";
 import { npcIsSpecial } from "../rules/gc/npc-state.mjs";
 import { evasionSaveContext, reflexDamagePlan } from "../rules/save-avoidance.mjs";
-import { damageResistanceSource, damageResistancePlan } from "../rules/resistances.mjs";
+import { damageResistanceSource, damageResistancePlan, subdualTypeSource } from "../rules/resistances.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
@@ -90,21 +90,30 @@ async function condition(actor, id, rounds, label) {
 }
 
 /** Record subdual damage through the ledger, so thresholds and the Fortitude save follow. */
-async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = {}) {
+async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = {}, typedDamageType = null) {
   if (!amount) return { line: "", net: 0 };
   const context = typedHitContext(hitContext);
   if (actor.type === "npc" && !npcIsSpecial(actor)) {
     const dr = drForAttack(actor.system, context.attackKind, context.weaponProficiency),
       reduction = defenses.armorPiercingAll ? 0 : 2 * Math.max(0, dr - (defenses.armorPiercing ?? 0)),
-      net = reducedDamage({ damage: amount, dr: reduction }).net,
-      result = net
-        ? await npcDamageSave(actor, {
-            damage: net,
-            kind: "subdual",
-            criticalDice: context.criticalDice,
-            blast: context.blast
-          })
-        : null;
+      reduced = reducedDamage({ damage: amount, dr: reduction }),
+      net = reduced.net + (reduced.stopped ? 1 : 0),
+      generic = damageResistancePlan(actor.system, "subdual", net),
+      typedSource = subdualTypeSource(actor.system, typedDamageType),
+      final = typedSource
+        ? damageResistancePlan(actor.system, typedDamageType, generic.net, typedSource).net
+        : generic.net;
+    if (context.critical && reduced.stopped && final)
+      throw Error(loc`The GC must review this critical hit's bruising before applying its subdual save.`);
+    const result = net
+      ? await npcDamageSave(actor, {
+          damage: net,
+          kind: "subdual",
+          criticalDice: context.criticalDice,
+          blast: context.blast,
+          typedDamageType
+        })
+      : null;
     if (net && !result)
       throw Error(
         loc`The standard character's subdual Damage save was not recorded. Review its actual damage before retrying.`
@@ -118,7 +127,11 @@ async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = 
     };
   }
   if (actor.type === "npc" && Number(actor.system.vitality?.max) > 0) {
-    const result = await postNonLethalDamage(actor, "subdual", amount, source, { ...defenses, ...context });
+    const result = await postNonLethalDamage(actor, "subdual", amount, source, {
+      ...defenses,
+      ...context,
+      typedDamageType
+    });
     return {
       line: loc`${result.net} subdual damage recorded; any required Fortitude save is on its damage report.`,
       net: result.net
@@ -129,6 +142,7 @@ async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = 
     kind: "subdual",
     newDamage: amount,
     damageMode: "subdualBeforeDefenses",
+    typedDamageType,
     ...defenses,
     attackKind: context.attackKind,
     weaponProficiency: context.weaponProficiency,
@@ -460,7 +474,14 @@ async function applyVacuum(actor, damage, source, rolls = [], hitContext = {}, r
 }
 
 async function sufferSurroundings(actor, type, { amount, source, temperature, medium, armor, hitContext }) {
-  const applied = await sufferSubdual(actor, amount, DAMAGE_TYPE_LABELS[type], { armorPiercingAll: true }, hitContext);
+  const applied = await sufferSubdual(
+    actor,
+    amount,
+    DAMAGE_TYPE_LABELS[type],
+    { armorPiercingAll: true },
+    hitContext,
+    type
+  );
   if (!applied.net) return post(actor, [applied.line]);
   const lines = [applied.line];
   let interval = null;
@@ -496,7 +517,8 @@ async function sufferElectrical(actor, { amount, source, hitContext }) {
     amount,
     DAMAGE_TYPE_LABELS.electrical,
     { armorPiercing: amount },
-    hitContext
+    hitContext,
+    "electrical"
   );
   if (!applied.net) return post(actor, [applied.line]);
   const lines = [

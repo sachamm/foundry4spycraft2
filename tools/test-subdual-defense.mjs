@@ -21,6 +21,25 @@ function prepared({ melee = 3, other = 1, resistance = 0, training = {}, natural
   return sys;
 }
 const event = { rawDamage: 10, attackKind: "unarmed" };
+test("typed subdual applies both generic and specific resistance after DR and preserves Not the Face", () => {
+  const sys = prepared({ resistance: 2 });
+  sys.survivalStats.resistances.CD = 4;
+  const plan = subdualDefensePlan(sys, { rawDamage: 14, attackKind: "other", typedDamageType: "cold" });
+  assert.equal(plan.netDamage, 6);
+  assert.equal(plan.typedResistance.source.key, "CD");
+  assert.equal(
+    subdualDefensePlan(sys, { rawDamage: 14, attackKind: "other", typedDamageType: "cold", armorPiercingAll: true })
+      .netDamage,
+    8
+  );
+  sys.survivalStats.resistances.CD = "all";
+  assert.equal(subdualDefensePlan(sys, { ...event, typedDamageType: "cold", criticalHit: true }).netDamage, 0);
+  assert.throws(() => subdualDefensePlan(sys, { ...event, typedDamageType: "laser" }));
+  sys.notTheFaceDR = 3;
+  sys.armorDRByAttack.unarmed += 3;
+  assert.equal(subdualDefensePlan(sys, { rawDamage: 18, attackKind: "unarmed" }).listedDR, 6);
+});
+
 test("AP reduces listed DR before each remaining point absorbs two subdual; AP(all) and AP at least equal to DR bypass it", () => {
   const sys = prepared(),
     normal = subdualDefensePlan(sys, event),
@@ -168,6 +187,32 @@ const baseline = { stress: 0, subdual: 14, note: "GC verified actual totals", co
     armorPiercing: 0,
     confirmed: true
   };
+
+test("typed ledger events retain original resistance and refuse changes before committing", async () => {
+  const a = actor({ resistance: 2 });
+  a.system.survivalStats.resistances.EL = 4;
+  await reviewDamageLedger(a, { ...baseline, subdual: 0 });
+  const input = { ...raw, typedDamageType: "electrical", armorPiercingAll: true };
+  const record = await applyAccumulatedDamage(a, input);
+  assert.equal(record.newDamage, 4);
+  assert.equal(record.request.typedDamageType, "electrical");
+  assert.equal(record.defenseContext.typedResistance.source.resistance, 4);
+  a.system.survivalStats.resistances.EL = 0;
+  assert.deepEqual(await applyAccumulatedDamage(a, input), record, "a completed event retains its source policy");
+  await assert.rejects(applyAccumulatedDamage(a, { ...input, typedDamageType: "cold" }), /different damage/);
+  game.spycraft2.resourceLocks = {
+    run: async (_actors, work) => {
+      a.system.survivalStats.resistances.EL = 5;
+      return work();
+    }
+  };
+  try {
+    await assert.rejects(applyAccumulatedDamage(a, { ...input, source: "new-hit" }), /defenses changed/);
+    assert.equal(a.system.accumulatedDamage.subdual, 4);
+  } finally {
+    delete game.spycraft2.resourceLocks;
+  }
+});
 
 test("Foibles is applied and retained in a real subdual ledger event with its incoming proficiency", async () => {
   const a = actor();

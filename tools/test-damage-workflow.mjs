@@ -1280,6 +1280,68 @@ test("generic NPC subdual resistance prevents cold, heat and electrical exposure
     }
 });
 
+test("NPC type-specific cold, heat and electrical resistance combines with subdual resistance after AP/DR", async () => {
+  for (const role of ["standard", "special"])
+    for (const type of ["cold", "heat", "electrical"])
+      for (const full of [true, false]) {
+        reset();
+        const code = { cold: "CD", heat: "HT", electrical: "EL" }[type];
+        const actor = character(`Typed-resistance-${role}-${type}-${full}`, {
+          npcType: role,
+          damageSave: 30,
+          stressThreshold: 100,
+          subdualThreshold: 100,
+          dr: { other: 3 },
+          vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+          wounds: { value: 20, max: 20 },
+          survivalStats: { resistances: { subdual: 2, [code]: full ? 8 : 4 }, resistanceSources: [] }
+        });
+        actor.type = "npc";
+        const hit = card(`typed-subdual-${role}-${type}-${full}`, {
+          actorUuid: "Actor.Kevin",
+          checkKind: "damage",
+          effectiveTotal: full ? 6 : 14
+        });
+        await applyDamage(hit, { targetUuid: actor.uuid, damage: full ? 6 : 14, kind: "lethal", type });
+        const expected = full ? 0 : 8;
+        if (role === "standard")
+          assert.equal(
+            posted.find(m => m.flags?.spycraft2?.npcDamageSave)?.flags.spycraft2.npcDamageSave.damage ?? 0,
+            expected
+          );
+        else assert.equal(actor.flags.spycraft2?.nonLethal?.subdual ?? 0, expected);
+        assert.equal(actor.system.hazards?.exposure?.suffered ?? 0, expected);
+        if (full) assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0);
+      }
+});
+
+test("standard characters receive bruising when DR stops an ordinary hit, with resistance afterward", async () => {
+  for (const kind of ["lethal", "subdual"])
+    for (const resistance of [0, 1]) {
+      reset();
+      const actor = character(`Standard-bruise-${kind}-${resistance}`, {
+        npcType: "standard",
+        damageSave: 30,
+        dr: { other: 4 },
+        survivalStats: { resistances: { subdual: resistance }, resistanceSources: [] }
+      });
+      actor.type = "npc";
+      const hit = card(`standard-bruise-${kind}-${resistance}`, {
+        actorUuid: "Actor.Kevin",
+        checkKind: "damage",
+        effectiveTotal: 3
+      });
+      await applyDamage(hit, { targetUuid: actor.uuid, damage: 3, kind });
+      const reports = posted.filter(m => m.flags?.spycraft2?.npcDamageSave);
+      assert.equal(reports.length, resistance ? 0 : 1);
+      if (!resistance)
+        assert.deepEqual(
+          [reports[0].flags.spycraft2.npcDamageSave.kind, reports[0].flags.spycraft2.npcDamageSave.damage],
+          ["subdual", 1]
+        );
+    }
+});
+
 test("typed electrical subdual retains its original melee DR column and tracks only net exposure", async () => {
   for (const special of [false, true]) {
     reset();

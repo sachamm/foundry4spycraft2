@@ -1,7 +1,7 @@
 # PC creation and combat rules review
 
 **Continuing review, 27 November 2026:** PC creation **9.6/10**;
-combat play **9.7/10**. Implementation continues toward the requested **9.9/10**
+combat play **9.8/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
 
@@ -1919,3 +1919,43 @@ Continue type-specific cold/heat/electrical resistance and standard-character
 bruising when DR stops a hit; the latter remains inconsistent with the corrected
 special-character path. Other documented recovery/timing and source/build audits
 still prevent the requested 9.9 scores.
+
+## Pass 65: Type-specific subdual defenses and a complete Test Subject
+
+PC creation remains **9.6/10**; combat rises to **9.8/10**. Cold, heat and
+electrical damage now applies its specific resistance as well as ordinary
+subdual resistance after AP and doubled DR. Agent ledger requests retain the
+damage type and original defense proof, reject changed defenses before commit,
+and preserve completed events across later gear changes. Both NPC health models
+use the same ordering; full protection prevents exposure and accompanying saves.
+The prepared Not the Face DR increment is accepted when validating a real
+incoming subdual event instead of rejecting an otherwise consistent defense.
+
+Standard NPCs now resolve the one-point subdual bruise from an ordinary injury
+fully stopped by DR, with subdual resistance afterward. Unresolved critical
+bruising that survives resistance requires GC handling before a save is rolled.
+Typed lethal hits stopped by DR still need alignment; this pass does not claim
+that remaining case complete.
+
+Native Foundry verified twelve legal standard/special NPC builds across cold,
+heat and electrical damage. Their resistance qualities used at most eight total
+applications. Full critical hits rolled no dice; partial hits left eight subdual
+and correctly tracked exposure. Standard electrical damage additionally rolled
+its actual stress Damage save. Two more native cases proved ordinary lethal
+damage stopped by DR produces a one-point subdual Damage save, while resistance
+1 prevents that save without RNG. Those runs had no browser errors/diagnostics.
+
+A Brainy/Test Subject Scientist 1 variant also reaches Play with **36/36**
+attribute points, **52/52** skill points, legal contacts, and no setup tasks. Its
+two actual origin choices prepare cold/electrical resistance 4. Replacing the
+Researcher allowance correctly required a rank-1 contact instead of rank 2.
+At 1280×720 Play and the complete build survived reload. An actual three-point
+cold hit recorded zero damage; six electrical damage recorded two subdual with
+the origin's source proof and correct exposure, leaving vitality/wounds intact.
+The only diagnostics were Foundry's expected minimum-resolution notices. This
+adds an origin-choice variant, not a fifth distinct complete class build.
+
+All **4,370** Node tests and **988** reference assertions pass, as do schema,
+lint, formatting, bundle and copy checks. Remaining source/data audits constrain
+PC creation's score. Continue typed lethal bruising, initial fire totals,
+injury/recovery timing and Drained, alongside the existing broader backlog.

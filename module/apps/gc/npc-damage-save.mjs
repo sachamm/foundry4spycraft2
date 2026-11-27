@@ -6,7 +6,7 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
-import { damageResistancePlan } from "../../rules/resistances.mjs";
+import { damageResistancePlan, subdualTypeSource } from "../../rules/resistances.mjs";
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
@@ -90,17 +90,37 @@ export async function npcDamageSave(actor, input = null) {
       ? campaignStressDamage(Number(input.damage), stressPolicy)
       : null;
   if (campaignDamage) input = { ...input, damage: campaignDamage.adjustedDamage };
-  let resistance = null;
+  const typedSource = subdualTypeSource(actor.system, input.typedDamageType);
+  if (typedSource && input.kind !== "subdual")
+    return refuse(loc`Cold, heat and electrical defenses require subdual damage.`);
+  let resistance = null,
+    typedResistance = null;
   if (["stress", "subdual"].includes(input.kind)) {
     resistance = damageResistancePlan(actor.system, input.kind, Number(input.damage));
-    input = { ...input, damage: resistance.net };
-    if (!resistance.net) {
+    typedResistance = typedSource
+      ? damageResistancePlan(actor.system, input.typedDamageType, resistance.net, typedSource)
+      : null;
+    input = { ...input, damage: typedResistance?.net ?? resistance.net };
+    if (!input.damage) {
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
         content: `<div class="spycraft2 chat-note"><p>${loc`${esc(actor.name)}: no ${input.kind} damage remains after campaign modifiers and resistance; no Damage save is needed.`}</p></div>`,
-        flags: { spycraft2: { actorUuid: actor.uuid, checkKind: "note", npcDamagePrevented: resistance } }
+        flags: {
+          spycraft2: {
+            actorUuid: actor.uuid,
+            checkKind: "note",
+            npcDamagePrevented: { resistance, ...(typedResistance ? { typedResistance } : {}) }
+          }
+        }
       });
-      return { damage: 0, prevented: true, state: state.track.state, track: state.track, resistance };
+      return {
+        damage: 0,
+        prevented: true,
+        state: state.track.state,
+        track: state.track,
+        resistance,
+        ...(typedResistance ? { typedResistance } : {})
+      };
     }
   }
   const roll = await new Roll(`1d20 ${saveBonus < 0 ? "-" : "+"} ${Math.abs(saveBonus)}`).evaluate(),
@@ -144,7 +164,8 @@ export async function npcDamageSave(actor, input = null) {
           damage: Number(input.damage),
           campaignStress: campaignDamage,
           campaignStressAdjusted: input.campaignStressAdjusted === true,
-          ...(resistance ? { resistance } : {})
+          ...(resistance ? { resistance } : {}),
+          ...(typedResistance ? { typedResistance } : {})
         }
       }
     },
@@ -163,5 +184,10 @@ export async function npcDamageSave(actor, input = null) {
       for (const combatant of combat.combatants)
         if (combatant.actor === actor && !combatant.defeated) await combatant.update({ defeated: true });
   }
-  return { ...result, damage: Number(input.damage), ...(resistance ? { resistance } : {}) };
+  return {
+    ...result,
+    damage: Number(input.damage),
+    ...(resistance ? { resistance } : {}),
+    ...(typedResistance ? { typedResistance } : {})
+  };
 }
