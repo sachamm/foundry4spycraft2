@@ -35,7 +35,8 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
 1. Press **Start mission** in Prep's Mission section the first time the mission is played. This fixes the Threat
    Level from the team. The console then opens in Play.
 2. Press **Begin session** at the start of every session (once one has begun, the button reads **Begin a new
-   session…**). This starts the session, sets up the GC action dice and
+   session…**). It asks how many player characters are at the table (the GC's pool counts those present, p.397),
+   then starts the session, sets up the GC action dice and
    gives each agent its starting action dice, with any Threat Level bonus. The status strip then shows when the
    session began. The two can be pressed in either order: whichever comes second adds only what the first could not.
 3. Press **Next scene** each time the scene changes; between fights it is Play's filled button. A notice confirms it.

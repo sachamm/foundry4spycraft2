@@ -63,9 +63,12 @@ export function registerGCSettings() {
     type: Boolean,
     default: true
   });
-  // Set once every first-session step has been done, so the list does not return with each new mission.
+  // Where this GC last left the console's window.
+  game.settings.register(SYSTEM, "gcConsolePosition", { scope: "client", config: false, type: Object, default: {} });
+  // Set once every first-session step has been done, so the list does not return with each new mission. Each GC
+  // keeps their own: a second GC joining a world still sees the list until they have done the steps.
   game.settings.register(SYSTEM, "gcFirstSessionDone", {
-    scope: "world",
+    scope: "client",
     config: false,
     type: Boolean,
     default: false

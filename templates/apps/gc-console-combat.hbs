@@ -57,7 +57,9 @@
       <li class="gc-combat-head" aria-hidden="true"><span>{{localize "SPYCRAFT.Console.Combatant"}}</span><span>{{localize "SPYCRAFT.Console.CountHeading"}}</span></li>
       {{#each combat.combatants}}<li{{#if current}} class="gc-current-turn" aria-current="true"{{/if}}{{#if defeated}} data-defeated="true"{{/if}}>
         <button type="button" class="gc-row-button" data-action="openCombatant" data-id="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.RowHint'}}"><span
-          class="gc-row-name">{{name}}{{#if notes}} <span class="gc-note">{{notes}}</span>{{/if}}</span><span
+          class="gc-row-name">{{#if img}}<img class="gc-row-img" src="{{img}}" alt="" width="20" height="20" loading="lazy" />{{/if}}{{#if hidden}}<i
+          class="fa-solid fa-eye-slash" role="img" aria-label="{{localize 'SPYCRAFT.Console.HiddenCombatant'}}"
+          data-tooltip="{{localize 'SPYCRAFT.Console.HiddenCombatant'}}"></i> {{/if}}{{name}}{{#if notes}} <span class="gc-note">{{notes}}</span>{{/if}}</span><span
           class="gc-row-count" aria-label="{{count}}">{{countValue}}</span></button></li>{{/each}}
     </ul>
     {{#if combat.started}}

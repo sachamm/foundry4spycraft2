@@ -210,7 +210,7 @@
    "AddComplication": "Add complication",
    "RecordAntagonist": "Record for XP",
    "Shortcuts": "Keyboard shortcuts",
-   "ShortcutsLine": "Next turn {next} · Previous turn {previous} · Card next step {card} · GC boost {boost} · Spend dice {spend} · Acting sheet {sheet} · Console {console}. Change them under Configure Controls.",
+   "ShortcutsLine": "Next turn {next} · Previous turn {previous} · Card next step {card} · GC boost {boost} · Spend dice {spend} · Acting sheet {sheet} · Console {console} · Attack with weapon 1 or 2: Alt+1, Alt+2. Holding Alt also lights every token's border on the map (Foundry's own highlight).",
    "OpenWindow": "Open in a window",
    "OpenWindowHint": "Opens the console as a window, so the chat log stays in the sidebar",
    "AdjustPool": "Adjust or award GC dice…",
@@ -251,7 +251,9 @@
    "DropPlace": "Drop an NPC here to place it on the scene",
    "NoFightNote": "none",
    "DoneHint": "Marks the objective met, or clears the mark",
-   "FightTools": "Fight tools"
+   "FightTools": "Fight tools",
+   "HiddenCombatant": "Hidden from the players",
+   "OpenControls": "Configure Controls…"
   },
   "Ability": {
    "str": "Strength",

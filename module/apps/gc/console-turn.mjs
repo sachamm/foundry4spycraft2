@@ -157,6 +157,9 @@ export function combatRows(combat) {
     return {
       id: combatant.id,
       name: labels.get(combatant.id) ?? combatant.name,
+      img: combatant.img || combatant.token?.texture?.src || combatant.actor?.img || "",
+      // Hidden from the players in the tracker: marked here, so the GC knows the table cannot see it.
+      hidden: !!combatant.hidden,
       current,
       defeated: !!combatant.isDefeated,
       count: Number.isFinite(combatant.initiative) ? loc`Count ${combatant.initiative}` : loc`not rolled`,

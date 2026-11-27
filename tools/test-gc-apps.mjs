@@ -1453,3 +1453,12 @@ test("round-3 council: an NPC card's critical is priced like an agent's, a free 
   assert.equal(await gcActivateThreat(plain, guard, { preset: "hit.wounds" }), null);
   assert.equal(plain.flags.spycraft2.criticalSuccess, undefined);
 });
+
+// Last: it begins a session, which later tests do not expect.
+test("Begin session sets the GC pool from the player characters present, not the whole team", async () => {
+  const { gcDiceStatus } = await import("../module/services/gc-dice.mjs");
+  answer({ present: 1 });
+  assert.equal(await mission.beginSession(), true);
+  assert.equal(gcDiceStatus().playersPresent, 1);
+  assert.equal(gcDiceStatus().value, 1 + 2 * state.getMission().caliber);
+});

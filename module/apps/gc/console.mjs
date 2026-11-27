@@ -199,6 +199,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       ),
       surprise: guard(() => combat.surpriseRoundDialog()),
       fightAddSelected: guard(() => combat.addSelectedToFight()),
+      openControls: guard(() => {
+        const Controls = foundry.applications?.sidebar?.apps?.ControlsConfig;
+        return Controls
+          ? new Controls().render({ force: true })
+          : refuse(loc`Open Configure Controls from Game Settings.`);
+      }),
       fightEnd: guard(() => combat.endFight()),
       combatReference: guard(() => combat.combatReferenceDialog()),
       openCombatant: guard((event, target) =>
@@ -800,8 +806,9 @@ export function registerGCConsoleTab() {
   Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());
   for (const hook of ["createCombatant", "deleteCombatant", "updateCombatant"])
     Hooks.on(hook, combatant => viewed(combatant?.parent) && refreshSoon());
-  Hooks.on("updateActor", actor => {
-    if (inFight(actor)) refreshSoon();
+  // Only a change the console shows: a flag-only write (a card's bookkeeping, a remembered choice) is not redrawn.
+  Hooks.on("updateActor", (actor, changed) => {
+    if (inFight(actor) && (changed?.system || changed?.name || changed?.img)) refreshSoon();
   });
   for (const hook of ["createActiveEffect", "deleteActiveEffect"])
     Hooks.on(hook, effect => {
@@ -810,8 +817,14 @@ export function registerGCConsoleTab() {
   // A weapon added, changed or removed, or an effect switched on or off, changes what the acting block offers.
   for (const hook of ["updateActiveEffect", "createItem", "updateItem", "deleteItem"])
     Hooks.on(hook, document => {
+      if (document?.documentName === "Item" && document.type !== "weapon") return;
       if (inFight(document?.parent)) refreshSoon();
     });
+  Hooks.on("closeGCConsole", app => {
+    if (!app?.isPopout || !app.position) return;
+    const { left, top, width, height } = app.position;
+    game.settings.set("spycraft2", "gcConsolePosition", { left, top, width, height }).catch(() => null);
+  });
   CONFIG.ui.gc = GCConsole;
   const Sidebar = CONFIG.ui.sidebar;
   const tabs = Object.entries(Sidebar.TABS).filter(([name]) => name !== "gc");
@@ -833,7 +846,12 @@ export async function openGCConsole({ window: windowed = readSetting("gcConsoleW
   const instance = ui.gc;
   game.spycraft2.gc.console = instance;
   if (windowed && typeof instance.renderPopout === "function") {
+    const opened = !instance.popout?.rendered;
     const popout = (await instance.renderPopout()) ?? instance.popout;
+    // A fresh window goes where this GC last left it.
+    const kept = readSetting("gcConsolePosition", {});
+    if (opened && Number.isFinite(kept?.left) && Number.isFinite(kept?.top))
+      popout?.setPosition?.({ left: kept.left, top: kept.top, width: kept.width, height: kept.height });
     // A minimised window is opened out again, not just raised as its title bar.
     if (popout?.minimized) await popout.maximize?.();
     popout?.bringToFront?.();

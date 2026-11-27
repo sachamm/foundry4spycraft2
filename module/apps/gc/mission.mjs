@@ -129,18 +129,27 @@ export async function beginSession() {
     caliber = mission.caliber;
   const fights = runningFights(),
     dice = gcDiceStatus();
-  const ok = await confirmStep(loc`Begin a session`, [
+  const lines = [
     ...(dice.current
       ? [loc`A session has already begun. Beginning another refills the GC's action dice and resets every agent's.`]
       : []),
     ...(fights ? [loc`A fight is running (${fights}).`] : []),
     loc`Start a new session: abilities usable once per session come back and each agent's action dice reset.`,
-    loc`GC action dice: ${players} player character(s) + 2 × Caliber ${caliber} = ${players + 2 * caliber}.`,
+    loc`GC action dice: player characters at the table + 2 × Caliber ${caliber} (team of ${players}: ${players + 2 * caliber}).`,
     loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
-  ]);
-  if (!ok) return null;
+  ];
+  // The GC's pool counts the player characters present this session, which can be fewer than the team (p.397).
+  const input = await ask(
+    loc`Begin a session`,
+    `<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>
+    <label>${loc`Player characters present`} <input type="number" name="present" min="1" value="${Math.max(1, players)}" /></label>`,
+    loc`Begin session`,
+    values => (Number(values.present) >= 1 ? "" : loc`At least one player character must be present.`)
+  );
+  if (!input) return null;
+  const present = Math.max(1, Math.trunc(Number(input.present)) || players || 1);
   await startUsagePeriod("session");
-  await initializeGCDice({ playersPresent: players, caliber, replaceExisting: gcDiceStatus().current });
+  await initializeGCDice({ playersPresent: present, caliber, replaceExisting: gcDiceStatus().current });
   await applySessionDiceAdjustments();
   return true;
 }
