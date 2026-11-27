@@ -108,6 +108,44 @@ function actor() {
 }
 const event = (id = "event", grade = 2) => ({ id, grade, source: "Opponent ability " + id, confirmed: true });
 const state = a => shakenStateFromActor(a);
+
+test("special NPC stress saves apply the recorded Shaken tier once per event, including legacy cards, while successful saves and constructs gain no source", async () => {
+  const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
+  await import("../module/apps/damage-application.mjs");
+  const resolve = hazardSaveResolvers.get("thresholdSave");
+  for (const grade of [1, 2, 3, 4]) {
+    const a = actor();
+    a.type = "npc";
+    a.system.npcType = "special";
+    globalThis.ChatMessage = { getSpeaker: () => ({}), create: async data => data };
+    const save = {
+      damageKind: "stress",
+      stressGrade: grade,
+      eventId: `npc-stress-${grade}`,
+      failureOutcome: `Shaken ${["", "I", "II", "III", "IV"][grade]}`
+    };
+    await resolve(a, { id: "save" }, save, true);
+    assert.equal(a.effects.length, 0);
+    await resolve(a, { id: "save" }, save, false);
+    assert.equal(state(a).grade, grade);
+    await resolve(a, { id: "replacement" }, save, false);
+    assert.equal(a.effects.length, 1, "A reroll/replacement or repeated result cannot add the condition twice");
+  }
+  const legacy = actor();
+  legacy.type = "npc";
+  await resolve(legacy, { id: "legacy-save" }, { damageKind: "stress", failureOutcome: "Shaken II" }, false);
+  assert.equal(state(legacy).grade, 2);
+  const construct = actor();
+  construct.type = "npc";
+  construct.system.npcProfile = { enabled: true, qualities: [{ id: "construct" }] };
+  await resolve(
+    construct,
+    { id: "construct-save" },
+    { damageKind: "stress", stressGrade: 2, eventId: "construct" },
+    false
+  );
+  assert.equal(construct.effects.length, 0);
+});
 const resolve = {
   disposition: "keep",
   confirmed: true,

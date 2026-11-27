@@ -56,6 +56,7 @@ import { refuse } from "../error-notices.mjs";
 import { COVER_GRADES } from "../rules/cover.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
 import { currentInjuryEffects, currentCampaignRules } from "../rules/gc/campaign.mjs";
+import { applyShaken } from "./shaken-application.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -524,6 +525,8 @@ async function nonLethalDamage(target, kind, amount, facts) {
       label: kind === "stress" ? loc`Stress damage` : loc`Subdual damage`,
       damageKind: kind,
       failureOutcome: plan.failureOutcome,
+      eventId: foundry.utils.randomID(),
+      stressGrade: kind === "stress" && plan.tier >= 1 && plan.tier <= 4 ? plan.tier : null,
       knockoutBase: plan.knockoutBase
     }
   };
@@ -641,12 +644,37 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
 /** A stress or subdual threshold on a character without a ledger (pp.339–340). */
 hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded, check) => {
   if (succeeded) return post(actor, [loc`${esc(actor.name)} makes the save: no further effect.`]);
-  if (save.damageKind === "stress")
+  if (save.damageKind === "stress") {
+    const legacyGrade = { "Shaken I": 1, "Shaken II": 2, "Shaken III": 3, "Shaken IV": 4 }[save.failureOutcome];
+    const grade = save.stressGrade ?? legacyGrade;
+    if (Number.isSafeInteger(grade) && grade >= 1 && grade <= 4) {
+      if (
+        actor.type === "npc" &&
+        actor.system.npcProfile?.enabled &&
+        actor.system.npcProfile.qualities?.some(q => q.id === "construct")
+      )
+        return post(actor, [loc`Construct: Shaken does not apply.`]);
+      const reference = save.eventId ?? message?.id;
+      if (typeof reference !== "string" || !/^[A-Za-z0-9_-]{1,64}$/.test(reference))
+        throw new Error(
+          loc`This stress save needs a stable event reference before applying Shaken. Ask the GC to review its source.`
+        );
+      const application = await applyShaken(actor, {
+        id: `stress-${reference}`,
+        grade,
+        source: loc`Failed stress damage save`,
+        confirmed: true
+      });
+      if (!application)
+        throw new Error(loc`Shaken was not recorded. Review ownership and the stress event before retrying.`);
+      return post(actor, [loc`${esc(actor.name)} fails the stress save: Shaken grade ${grade} recorded.`]);
+    }
     return post(actor, [
       save.failureOutcome
-        ? loc`${esc(actor.name)} fails the save: ${esc(save.failureOutcome)}. Use "Apply Shaken" on the sheet to record it.`
+        ? loc`${esc(actor.name)} fails the save: ${esc(save.failureOutcome)}. The GC resolves this effect.`
         : loc`${esc(actor.name)} fails the save from a critical hit below every threshold: the GC decides the effect.`
     ]);
+  }
   const time = knockoutDuration(save.knockoutBase, save.dc, Number(check?.effectiveTotal));
   return post(actor, [
     time

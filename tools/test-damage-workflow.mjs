@@ -595,6 +595,12 @@ test("a special NPC's stress and subdual damage is totalled and its threshold sa
   await hazardSaveResolvers.get("thresholdSave")(boss, {}, save, false, { effectiveTotal: 7 });
   assert.equal(boss.statuses.has("unconscious"), true);
   assert.match(posted.at(-1).content, /unconscious for 2 round/);
+  const stressCard = card("npc-stress", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 14 });
+  await applyDamage(stressCard, { targetUuid: boss.uuid, damage: 14, kind: "stress" });
+  const stressSave = posted.at(-1).flags.spycraft2.pendingSave;
+  assert.equal(stressSave.stressGrade, 1);
+  assert.equal(stressSave.failureOutcome, "Shaken I");
+  assert.equal(typeof stressSave.eventId, "string");
 });
 
 test("a blast is applied to each character caught, halved by distance", async () => {

@@ -364,6 +364,15 @@ and resuming a mission does not refresh it. The full suite passes **4,012** Node
 tests and **224** browser checks; native schemas, lint, formatting, bundle and
 copied-text checks also pass. Scores remain **8.9/10** and **9.0/10** while the
 remaining creation data/history and combat gaps are worked through.
+
+Special NPC failed stress saves now apply Shaken I–IV through the existing
+condition application journal. New pending saves preserve numeric tiers and an
+event reference; repeated settlement and replacement rolls cannot add another
+source for that event. Legacy named Shaken outcomes are supported, successful
+saves add nothing, and Constructs retain immunity. Drained and hazard-sourced
+NPC stress thresholds remain open. All **4,013** Node tests, lint and copied-text
+checks pass. This is a narrow part of the remaining NPC damage work; the scores
+remain **8.9/10** and **9.0/10**.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,
