@@ -103,6 +103,20 @@
    "Waiting": "Replacement available next mission",
    "Review": "Review companion loss"
   },
+  "AcidSources": {
+   "Title": "Acid attacks",
+   "Equipment": "Track acid on struck equipment separately, including its Damage saves and washing.",
+   "Remaining": "Remaining acid before DR",
+   "Suffered": "Actual damage from this attack",
+   "NextRound": "Apply next round",
+   "EndRound": "Halve at round end",
+   "Wash": "Wash away (full action)",
+   "Injury": "Roll this attack's injury save",
+   "InjuryPending": "Keep the original injury save and resolve its outcome.",
+   "Review": "Review acid attack",
+   "NeedsReview": "GC review needed before more damage or dice.",
+   "Legacy": "Older acid history may combine several attacks. The GC must verify its totals, timing and armor before continuing."
+  },
   "CareerZero": {
    "OriginOnly": "GC: finish Origin-only creation at Career Level 0",
    "FeatHistory": "GC: this feat was acquired during Career Level 0 Origin creation",

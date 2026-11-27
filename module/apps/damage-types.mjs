@@ -15,11 +15,8 @@ import {
   VACUUM,
   acidFirstDamage,
   acidHitsArmor,
-  acidInjuryChecked,
-  acidRoundPlan,
   acidSavePlan,
   addExposure,
-  applyAcid,
   bangOutcome,
   breathRounds,
   electricalFailure,
@@ -29,7 +26,6 @@ import {
   explosiveStunRounds,
   exposureInterval,
   flashOutcome,
-  halveAcid,
   survivalFailure,
   survivalReset,
   survivalSaveMade,
@@ -52,7 +48,7 @@ import {
 } from "./hazards.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { postNonLethalDamage } from "./nonlethal-damage.mjs";
-import { drForAttack, reducedDamage } from "../rules/damage-application.mjs";
+import { drForAttack, drWithoutWornArmor, reducedDamage } from "../rules/damage-application.mjs";
 import { npcDamageSave } from "./gc/npc-damage-save.mjs";
 import { npcIsSpecial } from "../rules/gc/npc-state.mjs";
 import { evasionSaveContext, reflexDamagePlan } from "../rules/save-avoidance.mjs";
@@ -61,6 +57,18 @@ import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
+import {
+  acidSourceId,
+  acidAttackPlan,
+  readAcidSource,
+  beginAcidRound,
+  settleAcidRound,
+  halveAcidSource
+} from "../rules/acid-sources.mjs";
+import { rollAcidSourceInjury, markAcidSourceInjury, migrateAcidHistory, reviewAcidSource } from "./acid-sources.mjs";
+import { queueResources } from "../services/transactions.mjs";
+import { same } from "../rules/equal.mjs";
+import { snapshot, undoEntry, postUndo } from "./undo.mjs";
 
 const halfSavePolicy = actor => ({
   ignoreSuccessfulHalfSave: ignoresSuccessfulHalfSave(actor, currentCampaignRules().effects)
@@ -72,6 +80,31 @@ const ignoredHazard = actor =>
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
 const has = (actor, id) => actor.statuses?.has(id) === true;
+const equippedArmorIds = actor =>
+  [...(actor.items ?? [])]
+    .filter(
+      item =>
+        item.type === "armor" &&
+        item.system?.equipped &&
+        item.system.carried !== false &&
+        !item.system.reserve &&
+        !item.system.destroyed
+    )
+    .map(item => item.uuid ?? item.id)
+    .filter(Boolean)
+    .sort();
+const acidDefenses = (actor, context, ap) => ({
+  unarmored: Math.max(0, drWithoutWornArmor(actor.system, context.attackKind, context.weaponProficiency) - ap),
+  armored: Math.max(0, drForAttack(actor.system, context.attackKind, context.weaponProficiency) - ap),
+  armorIds: equippedArmorIds(actor)
+});
+const acidCombat = actor =>
+  game.combat?.started &&
+  Number.isSafeInteger(game.combat.round) &&
+  game.combat.round >= 1 &&
+  [...(game.combat.combatants ?? [])].some(c => c.actor?.uuid === actor.uuid)
+    ? { id: game.combat.id, round: game.combat.round }
+    : null;
 const ARMORS = () => [
   ["none", loc`None`],
   ["partial", loc`Partial`],
@@ -169,7 +202,7 @@ async function sufferTypedLethal(
 ) {
   const resistance = damageResistancePlan(actor.system, type, amount, resistanceSource);
   const bruise =
-    stopped && !resistance.negatesEffects ? await sufferBruise(actor, hitContext, bruiseResistanceSource) : "";
+    stopped && !resistance.negatesEffects ? await sufferBruise(actor, hitContext, bruiseResistanceSource, label) : "";
   amount = resistance.net;
   const loss = await sufferLethal(actor, amount, hitContext);
   if (!loss)
@@ -253,6 +286,7 @@ export async function sufferTypedDamage(actor, preset = {}) {
         <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
         <label>${loc`Armor worn (acid, heat)`} <select name="armor">${mark(options(ARMORS()), known.armor)}</select></label>
         <label>${loc`Acid: DR remaining without worn armor, after armor-piercing`} <input type="number" name="unarmoredReduction" min="0" step="1" value="${Number.isSafeInteger(known.unarmoredReduction) ? known.unarmoredReduction : ""}" /></label>
+        <label>${loc`Acid: original armor-piercing value`} <input type="number" name="armorPiercing" min="1" step="1" value="${Number.isSafeInteger(known.armorPiercing) ? Math.max(1, known.armorPiercing) : 1}" /></label>
         <label>${loc`Acid: half actions given up next Count to shed armor or an item (+1 each)`} <input type="number" name="halfActions" min="0" max="2" step="1" value="0" /></label>
         <label><input type="checkbox" name="removeArmor" /> ${loc`Acid: those actions remove the worn armor`}</label>
         <label>${loc`Explosive: moved during the last Count`} <select name="moved">${options([
@@ -309,6 +343,11 @@ export async function sufferTypedDamage(actor, preset = {}) {
         }
       case "acid":
         if (
+          input.armorPiercing != null &&
+          (!Number.isSafeInteger(Number(input.armorPiercing)) || Number(input.armorPiercing) < 1)
+        )
+          return refuse(loc`Acid requires an original AP value of at least 1; enter the DR left after that AP.`);
+        if (
           !Number.isSafeInteger(Number(input.halfActions ?? 0)) ||
           Number(input.halfActions ?? 0) < 0 ||
           Number(input.halfActions ?? 0) > 2
@@ -334,6 +373,11 @@ export async function sufferTypedDamage(actor, preset = {}) {
           halfActions: input.halfActions,
           unarmoredReduction: (input.armor ?? "none") === "none" ? reduction : Number(input.unarmoredReduction),
           removeArmor: input.removeArmor === true,
+          armorPiercing: input.armorPiercing,
+          sourceId: input.sourceId,
+          sourceLabel: input.sourceLabel ?? input.source,
+          armorSaveVerified: input.armorSaveVerified === true,
+          armorSaveOutcome: input.armorSaveOutcome,
           hitContext
         });
       case "explosive":
@@ -373,7 +417,20 @@ export async function sufferTypedDamage(actor, preset = {}) {
 
 async function startAcid(
   actor,
-  { amount, reduction, armor, halfActions, unarmoredReduction, removeArmor, hitContext }
+  {
+    amount,
+    reduction,
+    armor,
+    halfActions,
+    unarmoredReduction,
+    removeArmor,
+    hitContext,
+    armorPiercing,
+    sourceId,
+    sourceLabel,
+    armorSaveVerified,
+    armorSaveOutcome
+  }
 ) {
   const lines = [],
     rolls = [],
@@ -382,7 +439,13 @@ async function startAcid(
     return post(actor, [
       loc`Acid resistance prevents this hit and its accompanying effects; earlier acid is unchanged.`
     ]);
-  let dr = reduction;
+  await migrateAcidHistory(actor);
+  const armorIds = equippedArmorIds(actor),
+    armorUuid = armorIds.length === 1 ? armorIds[0] : "";
+  let dr = reduction,
+    armorHit = false,
+    armorPresent = false,
+    armorVerified = false;
   if (removeArmor) {
     dr = unarmoredReduction;
     lines.push(
@@ -392,8 +455,53 @@ async function startAcid(
     const roll = await rollTotal("1d6");
     rolls.push(roll.roll);
     const hit = acidHitsArmor(armor, roll.total);
-    if (hit) lines.push(loc`Acid strikes the armor (1d6: ${roll.total}): the armor makes a Damage save against it.`);
-    else {
+    armorHit = hit;
+    if (hit) {
+      lines.push(loc`Acid strikes the armor (1d6: ${roll.total}): resolve its Damage save before applying armor DR.`);
+      await post(actor, lines.splice(0), rolls.splice(0));
+      let outcome = {
+        verified: armorSaveVerified,
+        outcome: armorSaveOutcome,
+        armorPiercing,
+        reduction: dr,
+        unarmoredReduction
+      };
+      if (!outcome.verified || !["passed", "failed"].includes(outcome.outcome))
+        outcome = await systemDialog.input({
+          window: { title: loc`Acid on armor` },
+          rejectClose: false,
+          ok: { label: loc`Continue to Reflex save` },
+          content: `<p>${loc`Keep the original coverage roll. Resolve the struck armor's actual Damage save against this acid, then declare its result; a failed save removes that armor's DR against this attack.`}</p><p>${amount} ${loc`acid before DR`}</p><label>${loc`Original AP`} <input type="number" name="armorPiercing" min="1" step="1" value="${Number.isSafeInteger(Number(armorPiercing)) ? Number(armorPiercing) : ""}" ${Number.isSafeInteger(Number(armorPiercing)) && Number(armorPiercing) >= 1 ? "readonly" : ""} required /></label><label>${loc`Remaining total DR after AP`} <input type="number" name="reduction" min="0" step="1" value="${dr}" required /></label><label>${loc`Remaining non-armor DR after AP`} <input type="number" name="unarmoredReduction" min="0" step="1" value="${unarmoredReduction}" required /></label><label>${loc`Actual armor save result`} <select name="outcome"><option value="passed">${loc`Armor saved; its DR applies`}</option><option value="failed">${loc`Armor failed; only non-armor DR applies`}</option></select></label><label><input type="checkbox" name="verified" /> ${loc`The GC confirms the armor's actual Damage save is resolved`}</label>`
+        });
+      if (!outcome) return null;
+      if (outcome.verified !== true || !["passed", "failed"].includes(outcome.outcome))
+        return refuse(loc`Confirm the armor's actual Damage save before applying this acid.`);
+      if (outcome.armorPiercing != null) {
+        if (!Number.isSafeInteger(Number(outcome.armorPiercing)) || Number(outcome.armorPiercing) < 1)
+          return refuse(loc`Confirm the acid's actual AP before the character's save.`);
+        if (
+          Number.isSafeInteger(Number(armorPiercing)) &&
+          Number(armorPiercing) >= 1 &&
+          Number(outcome.armorPiercing) !== Number(armorPiercing)
+        )
+          return refuse(
+            loc`Keep the original attack's AP when resolving its armor and character saves. The GC can review a mistaken attack separately.`
+          );
+        armorPiercing = Number(outcome.armorPiercing);
+      }
+      dr = Number(outcome.reduction ?? dr);
+      unarmoredReduction = Number(outcome.unarmoredReduction ?? unarmoredReduction);
+      if (
+        !Number.isSafeInteger(dr) ||
+        !Number.isSafeInteger(unarmoredReduction) ||
+        unarmoredReduction < 0 ||
+        dr < unarmoredReduction
+      )
+        return refuse(loc`Confirm the actual armored and non-armor DR remaining after AP.`);
+      armorVerified = true;
+      armorPresent = outcome.outcome === "passed";
+      if (!armorPresent) dr = unarmoredReduction;
+    } else {
       dr = unarmoredReduction;
       lines.push(loc`Acid strikes the clothes (1d6: ${roll.total}): the armor's damage reduction does not apply.`);
     }
@@ -414,6 +522,20 @@ async function startAcid(
       bonusLabel: loc`Half actions given up`,
       damage: amount,
       reduction: dr,
+      acidSourceId: sourceId ?? foundry.utils.randomID(),
+      acidSourceLabel: String(sourceLabel || loc`Acid attack`).slice(0, 100),
+      acidProtection:
+        Number.isSafeInteger(Number(armorPiercing)) && Number(armorPiercing) >= 1
+          ? {
+              ap: Number(armorPiercing),
+              reduction: dr,
+              unarmoredReduction,
+              armorHit,
+              armorPresent,
+              armorSaveVerified: armorVerified,
+              armorUuid: armorHit ? armorUuid : ""
+            }
+          : null,
       hitContext
     }
   });
@@ -576,30 +698,186 @@ async function sufferElectrical(actor, { amount, source, hitContext }) {
 /* -------------------------------------------- */
 
 /** Acid on a character: start of round, end of round, washing, the injury save. */
-export async function acidStep(actor, step) {
+export async function acidStep(actor, step, sourceId = "", options = {}) {
   if (!owned(actor)) return null;
-  const state = hazardState(actor.system);
-  if (!state.acid) return refuse(loc`No acid is on this character.`);
-  if (step === "round") {
-    const plan = acidRoundPlan(state),
-      result = await sufferTypedLethal(actor, "acid", plan.damage, loc`Acid (lingering)`);
-    const suffered = state.acid.suffered + result.damage,
-      acid = result.resistance.negatesEffects ? null : { ...plan.hazards.acid, suffered };
-    await writeHazards(actor, { ...plan.hazards, acid });
-    if (acid && !acid.injuryChecked && suffered >= 25)
-      result.lines.push(loc`This acid has now done 25 or more damage: roll the injury save.`);
-    return post(actor, result.lines, result.rolls);
+  const migrated = await migrateAcidHistory(actor);
+  if (migrated)
+    return game.user?.isGM
+      ? reviewAcidSource(actor, migrated)
+      : refuse(loc`The GC must review the older merged acid history before continuing.`);
+  const rows = Object.entries(hazardState(actor.system).acidSources ?? {});
+  if (!sourceId) {
+    const relevant = rows.filter(([, row]) =>
+      step === "injury" ? row.suffered >= 25 && !row.injuryChecked : row.damage > 0
+    );
+    if (!relevant.length) return refuse(loc`No matching acid attack needs this step.`);
+    if (relevant.length === 1) sourceId = relevant[0][0];
+    else {
+      const input = await systemDialog.input({
+        window: { title: loc`Choose acid attack` },
+        rejectClose: false,
+        content: `<label>${loc`Original acid attack`} <select name="sourceId">${relevant.map(([id, row]) => `<option value="${esc(id)}">${esc(row.label)} (${row.damage}; ${row.suffered})</option>`).join("")}</select></label>`
+      });
+      if (!input) return null;
+      sourceId = input.sourceId;
+    }
   }
+  const original = structuredClone(readAcidSource(hazardState(actor.system), sourceId));
+  if (step === "review" || original.needsReview || original.roundAttempt?.state === "applying")
+    return game.user?.isGM
+      ? reviewAcidSource(actor, sourceId)
+      : refuse(loc`The GC must review this acid attack's unknown or interrupted history.`);
+  if (step === "injury") return rollAcidSourceInjury(actor, sourceId);
   if (step === "end" || step === "wash") {
-    const next = halveAcid(state);
-    await writeHazards(actor, next);
-    return post(actor, [
-      step === "wash" ? loc`A full action washing the acid: it is halved.` : loc`End of the round: the acid is halved.`,
-      next.acid ? loc`The acid now does ${next.acid.damage} damage.` : loc`The acid is gone.`
-    ]);
+    return queueResources([actor], async () => {
+      const before = acidStepSnapshot(actor, sourceId),
+        state = hazardState(actor.system),
+        plan = halveAcidSource(state, sourceId, step);
+      await writeHazards(actor, plan.hazards);
+      const entry = undoEntry(actor, before, acidStepSnapshot(actor, sourceId));
+      if (entry)
+        await postUndo(
+          step === "wash" ? loc`Full action washing ${original.label}` : loc`End-of-round halving: ${original.label}`,
+          [entry]
+        );
+      const report = await post(actor, [
+        loc`${esc(original.label)}: remaining acid ${plan.source.damage}; actual damage suffered ${plan.source.suffered}.`,
+        ...(plan.source.suffered >= 25 && !plan.source.injuryChecked
+          ? [loc`Its injury save is still owed, even if no acid remains.`]
+          : [])
+      ]);
+      return step === "wash" ? { washed: true, message: report } : report;
+    });
   }
-  if (step === "injury") return injurySave(actor, "acid", DAMAGE_TYPES.acid.injuries[0], "acid");
-  return null;
+  if (step !== "round") return null;
+  const context = typedHitContext(original.hitContext),
+    ap = original.protection.ap,
+    defenses = acidDefenses(actor, context, ap),
+    { unarmored, armored } = defenses,
+    armorRelevant =
+      original.protection.armorHit &&
+      original.protection.armorPresent &&
+      (!original.protection.armorUuid || defenses.armorIds.includes(original.protection.armorUuid));
+  const input =
+    options.confirmed === true
+      ? options
+      : await systemDialog.input({
+          window: { title: loc`Next acid round` },
+          rejectClose: false,
+          ok: { label: loc`Apply round damage` },
+          content: `<p>${esc(original.label)}: ${original.damage} ${loc`acid before DR`}; AP ${ap}.</p><p>${loc`Confirm that the next round has started. Use the original attack's AP and struck layer; resolve any affected armor's Damage saves before counting its DR.`}</p><label>${loc`Remaining total DR after AP`} <input type="number" name="reduction" min="0" step="1" value="${armorRelevant ? armored : unarmored}" required /></label><label>${loc`Remaining non-armor DR after AP`} <input type="number" name="unarmoredReduction" min="0" step="1" value="${unarmored}" required /></label>${armorRelevant ? `<label><input type="checkbox" name="armorPresent" checked /> ${loc`The original armor still supplies DR against this attack`}</label><label><input type="checkbox" name="armorSaveVerified" /> ${loc`The GC confirms the affected armor's actual save result or removal`}</label>` : ""}<label><input type="checkbox" name="confirmed" /> ${loc`The GC confirms this is the next acid round and these are its actual defenses`}</label>`
+        });
+  if (!input) return null;
+  if (input.confirmed !== true || (armorRelevant && input.armorSaveVerified !== true))
+    return refuse(loc`Confirm the next round and any affected armor's actual outcome before applying acid.`);
+  const armorPresent = armorRelevant && input.armorPresent === true;
+  const protection = {
+      ...original.protection,
+      reduction: Number(armorPresent ? input.reduction : input.unarmoredReduction),
+      unarmoredReduction: Number(input.unarmoredReduction),
+      armorPresent,
+      armorSaveVerified: armorRelevant ? input.armorSaveVerified === true : original.protection.armorSaveVerified
+    },
+    attempt = foundry.utils.randomID();
+  let before, plan, priorEvents, resistanceSource, bruiseResistanceSource;
+  await queueResources([actor], async () => {
+    const state = hazardState(actor.system);
+    if (!same(readAcidSource(state, sourceId), original))
+      throw Error(loc`The acid attack changed while this round was being prepared. Reopen it.`);
+    if (Object.values(state.acidSources ?? {}).some(source => source.roundAttempt?.state === "applying"))
+      throw Error(loc`Finish or review the other interrupted acid round before applying more damage.`);
+    const currentDefenses = acidDefenses(actor, context, ap);
+    if (
+      currentDefenses.unarmored !== defenses.unarmored ||
+      (armorPresent &&
+        (currentDefenses.armored !== defenses.armored || !same(currentDefenses.armorIds, defenses.armorIds)))
+    )
+      throw Error(
+        loc`The character's acid protection changed while the form was open. Reopen the round with its current defenses.`
+      );
+    if (
+      Object.values(actor.flags?.spycraft2?.damageApplications ?? {}).some(row =>
+        ["applying", "needsReview", "undoing"].includes(row.state)
+      ) ||
+      Object.values(actor.flags?.spycraft2?.hazardResolutions ?? {}).some(row => row.state === "started")
+    )
+      throw Error(loc`Finish or review the character's interrupted damage before another acid round.`);
+    priorEvents = structuredClone(actor.flags?.spycraft2?.damageEvents ?? {});
+    before = acidStepSnapshot(actor, sourceId, attempt);
+    resistanceSource = structuredClone(damageResistanceSource(actor.system, "acid"));
+    bruiseResistanceSource = structuredClone(damageResistanceSource(actor.system, "subdual"));
+    plan = beginAcidRound(state, sourceId, {
+      attempt,
+      protection,
+      combat: acidCombat(actor),
+      resistanceSource,
+      bruiseResistanceSource
+    });
+    await writeHazards(actor, plan.hazards);
+  });
+  const result = await sufferTypedLethal(
+    actor,
+    "acid",
+    plan.net,
+    `${original.label} [${attempt}]`,
+    context,
+    resistanceSource,
+    { stopped: plan.stopped, bruiseResistanceSource }
+  );
+  await queueResources([actor], async () => {
+    const next = settleAcidRound(hazardState(actor.system), sourceId, {
+      attempt,
+      suffered: result.damage,
+      effectsPrevented: result.effectsPrevented
+    });
+    await writeHazards(actor, next.hazards);
+    if (next.injurySaveDue)
+      result.lines.push(
+        loc`This attack has reached the acid injury threshold; its original save remains available after washing.`
+      );
+    const events = actor.flags?.spycraft2?.damageEvents ?? {},
+      overlaps = [...new Set([...Object.keys(priorEvents), ...Object.keys(events)])].some(
+        id => !String(events[id]?.source ?? "").includes(`[${attempt}]`) && !same(priorEvents[id], events[id])
+      );
+    if (overlaps)
+      result.lines.push(
+        loc`Other damage events changed during this round. The GC must verify its actual health and ledger before reversing it.`
+      );
+    else {
+      const entry = undoEntry(actor, before, acidStepSnapshot(actor, sourceId, attempt));
+      if (entry) await postUndo(loc`Acid round: ${original.label}`, [entry]);
+    }
+  });
+  return post(actor, result.lines, result.rolls);
+}
+
+/** Exclude wallets and unrelated ability uses from acid Undo while retaining damage and its own source. */
+function acidStepSnapshot(actor, id, attempt = "") {
+  const value = snapshot(actor),
+    prefixes = [
+      "system.vitality",
+      "system.wounds",
+      "system.accumulatedDamage",
+      "system.damageTrack",
+      "system.hazards.acid",
+      `system.hazards.acidSources.${id}`,
+      "flags.spycraft2.damageEvents",
+      "flags.spycraft2.nonLethal"
+    ];
+  value.data = Object.fromEntries(
+    Object.entries(value.data).filter(([key]) => {
+      if (key.startsWith("flags.spycraft2.damageEvents.")) {
+        const event = actor.flags?.spycraft2?.damageEvents?.[key.split(".")[3]];
+        return !!attempt && String(event?.source ?? "").includes(`[${attempt}]`);
+      }
+      return prefixes.some(prefix => key === prefix || key.startsWith(`${prefix}.`));
+    })
+  );
+  // Keep container presence without capturing unrelated children; Undo must not remove their ancestors.
+  value.data.flags = {};
+  value.data["flags.spycraft2"] = {};
+  value.data["flags.spycraft2.damageEvents"] ??= {};
+  return value;
 }
 
 /** Cold, heat or electrical: the Fortitude save against its subdual damage failed. */
@@ -778,18 +1056,22 @@ const resolvers = {
   },
   async acid(actor, message, save, succeeded, check) {
     if (ignoresHazard(actor, save, succeeded)) return ignoredHazard(actor);
+    const id = save.acidSourceId ?? message?.id ?? foundry.utils.randomID();
+    if (!acidSourceId(id) || Object.hasOwn(hazardState(actor.system).acidSources ?? {}, id))
+      throw Error(loc`This acid attack already has damage history or needs GC review. Do not apply it again.`);
     const adjustment = typedReflexDamage(save, succeeded, check, acidFirstDamage(save.damage, true)),
       first = adjustment.total,
-      taken = Math.max(0, first - Math.max(0, save.reduction ?? 0)),
-      result = await sufferTypedLethal(
-        actor,
-        "acid",
-        taken,
-        DAMAGE_TYPE_LABELS.acid,
-        save.hitContext,
-        savedResistance(save),
-        { stopped: first > 0 && taken === 0, bruiseResistanceSource: save.bruiseResistanceSource ?? null }
-      );
+      taken = Math.max(0, first - Math.max(0, save.reduction ?? 0));
+    if (first > 0) await migrateAcidHistory(actor);
+    const result = await sufferTypedLethal(
+      actor,
+      "acid",
+      taken,
+      DAMAGE_TYPE_LABELS.acid,
+      save.hitContext,
+      savedResistance(save),
+      { stopped: first > 0 && taken === 0, bruiseResistanceSource: save.bruiseResistanceSource ?? null }
+    );
     result.lines.unshift(
       adjustment.evaded
         ? loc`Evasion prevents this acid damage; any earlier acid remains.`
@@ -799,11 +1081,23 @@ const resolvers = {
             ? loc`The Reflex save succeeds: the acid is halved.`
             : loc`The Reflex save fails: full acid damage.`
     );
-    const next = applyAcid(hazardState(actor.system), {
-      damage: result.effectsPrevented ? 0 : first,
-      suffered: result.damage,
-      worldTime: now()
-    });
+    const state = hazardState(actor.system),
+      next =
+        result.effectsPrevented || first === 0
+          ? state
+          : acidAttackPlan(state, {
+              id,
+              label: (save.acidSourceLabel && save.acidSourceLabel !== loc`Acid attack`
+                ? loc`${String(save.acidSourceLabel).slice(0, 80)} — attack ${Object.keys(state.acidSources ?? {}).length + 1}`
+                : loc`Acid attack ${Object.keys(state.acidSources ?? {}).length + 1}`
+              ).slice(0, 100),
+              damage: first,
+              suffered: result.damage,
+              protection: save.acidProtection ?? null,
+              at: now(),
+              combat: acidCombat(actor),
+              hitContext: typedHitContext(save.hitContext)
+            }).hazards;
     await writeHazards(actor, next);
     if (next.acid)
       result.lines.push(
@@ -831,8 +1125,13 @@ const resolvers = {
   },
   async typedInjury(actor, message, save, succeeded) {
     const state = hazardState(actor.system);
-    if (save.where === "acid") await writeHazards(actor, acidInjuryChecked(state));
-    else if (state.exposure)
+    if (save.where === "acid" && save.acidSourceId) await markAcidSourceInjury(actor, save);
+    else if (save.where === "acid") {
+      await migrateAcidHistory(actor);
+      throw Error(
+        loc`The older injury card does not identify one acid attack. The GC must keep its original result and review the matching attack.`
+      );
+    } else if (state.exposure)
       await writeHazards(actor, {
         ...state,
         exposure: {

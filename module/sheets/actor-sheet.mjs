@@ -541,9 +541,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       declareTwoHit() {
         return declareDarting(this.actor, { kind: "twoHit" });
       },
-      acidStep(event, target) {
-        return acidStep(this.actor, target.dataset.step);
-      },
+      acidStep: costsAction(
+        result => (result?.washed ? "full" : null),
+        function (event, target) {
+          return acidStep(this.actor, target.dataset.step, target.dataset.acidSource);
+        }
+      ),
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
       },
@@ -2013,9 +2016,12 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       reviewFireSource(event, target) {
         return reviewFireSource(this.actor, target.dataset.fireSource);
       },
-      acidStep(event, target) {
-        return acidStep(this.actor, target.dataset.step);
-      },
+      acidStep: costsAction(
+        result => (result?.washed ? "full" : null),
+        function (event, target) {
+          return acidStep(this.actor, target.dataset.step, target.dataset.acidSource);
+        }
+      ),
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
       },

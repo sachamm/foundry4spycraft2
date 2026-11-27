@@ -78,23 +78,30 @@
   {{/if}}
   </p>
   {{/if}}
-  {{#if hazards.acid}}
-  <p class="hazard due">
-  <b>
-  {{localize "SPYCRAFT.Template.ActorAgentMain.Acid"}}
-  </b> {{hazards.acid.damage}} ({{localize "SPYCRAFT.Template.ActorAgentMain.TakenFromThisAcid"}} {{hazards.acid.suffered}}) <button type="button" class="sc2-action" data-action="acidStep" data-step="round">
-  {{localize "SPYCRAFT.Template.ActorAgentMain.StartOfRound"}}
-  </button>
-  <button type="button" class="sc2-action" data-action="acidStep" data-step="end">
-  {{localize "SPYCRAFT.Template.ActorAgentMain.EndOfRoundHalve"}}
-  </button>
-  <button type="button" class="sc2-action" data-action="acidStep" data-step="wash">
-  {{localize "SPYCRAFT.Template.ActorAgentMain.WashItOff"}}
-  </button>
-  <button type="button" class="sc2-action" data-action="acidStep" data-step="injury">
-  {{localize "SPYCRAFT.Template.ActorAgentMain.ScarringSave"}}
-  </button>
-  </p>
+  {{#if hazards.acidLegacyNeedsReview}}
+    <p class="bad">{{localize "SPYCRAFT.AcidSources.Legacy"}}</p>
+    {{#if hazards.acidCanReview}}<button type="button" class="sc2-action" data-action="acidStep" data-step="review">{{localize "SPYCRAFT.AcidSources.Review"}}</button>{{/if}}
+  {{/if}}
+  {{#if hazards.acidSources}}
+    <details class="acid-sources" {{#if hazards.acidNeedsAttention}}open{{/if}}>
+      <summary>{{localize "SPYCRAFT.AcidSources.Title"}}</summary>
+      <ul class="plain">
+        {{#each hazards.acidSources}}
+          <li>
+            <b>{{label}}</b>
+            <p>{{localize "SPYCRAFT.AcidSources.Remaining"}}: {{damage}} · {{localize "SPYCRAFT.AcidSources.Suffered"}}: {{suffered}}</p>
+            {{#if armorAffected}}<p class="muted">{{localize "SPYCRAFT.AcidSources.Equipment"}}</p>{{/if}}
+            {{#if needsReview}}<p class="bad">{{localize "SPYCRAFT.AcidSources.NeedsReview"}}</p>{{/if}}
+            {{#if canRound}}<button type="button" class="sc2-action" data-action="acidStep" data-step="round" data-acid-source="{{id}}">{{localize "SPYCRAFT.AcidSources.NextRound"}}</button>{{/if}}
+            {{#if canEnd}}<button type="button" class="sc2-action" data-action="acidStep" data-step="end" data-acid-source="{{id}}">{{localize "SPYCRAFT.AcidSources.EndRound"}}</button>{{/if}}
+            {{#if canWash}}<button type="button" class="sc2-action" data-action="acidStep" data-step="wash" data-acid-source="{{id}}">{{localize "SPYCRAFT.AcidSources.Wash"}}</button>{{/if}}
+            {{#if canInjury}}<button type="button" class="sc2-action" data-action="acidStep" data-step="injury" data-acid-source="{{id}}">{{localize "SPYCRAFT.AcidSources.Injury"}}</button>{{/if}}
+            {{#if injuryPending}}<p class="muted">{{localize "SPYCRAFT.AcidSources.InjuryPending"}}</p>{{/if}}
+            {{#if canReview}}<button type="button" class="sc2-action" data-action="acidStep" data-step="review" data-acid-source="{{id}}">{{localize "SPYCRAFT.AcidSources.Review"}}</button>{{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    </details>
   {{/if}}
   {{#if hazards.exposure}}
   <p class="hazard">

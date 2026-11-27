@@ -311,8 +311,16 @@ const acidEntry = acid =>
       }
     : null;
 
+const requireLegacyAcid = hazards => {
+  if (Object.keys(hazards?.acidSources ?? {}).length || Array.isArray(hazards?.acid?.sourceIds))
+    throw Error(
+      loc`Choose one acid attack with its own damage, timing and injury history; do not change the combined summary.`
+    );
+};
+
 /** Put acid on a character, or more on top of acid already there (the larger amount lingers). */
 export function applyAcid(hazards, { damage, suffered = 0, worldTime = null } = {}) {
+  requireLegacyAcid(hazards);
   const amount = whole(damage, loc`Acid damage`),
     current = acidEntry(hazards?.acid);
   const lingering = Math.max(current?.damage ?? 0, amount);
@@ -330,6 +338,7 @@ export function applyAcid(hazards, { damage, suffered = 0, worldTime = null } = 
 
 /** The start of a round: the lingering acid's damage is taken again. */
 export function acidRoundPlan(hazards) {
+  requireLegacyAcid(hazards);
   const acid = acidEntry(hazards?.acid);
   if (!acid) throw new Error(loc`No acid is on this character.`);
   const suffered = acid.suffered + acid.damage;
@@ -342,6 +351,7 @@ export function acidRoundPlan(hazards) {
 
 /** The end of a round, or a full action washing it off: the acid is halved, rounded down; at 0 it is gone. */
 export function halveAcid(hazards) {
+  requireLegacyAcid(hazards);
   const acid = acidEntry(hazards?.acid);
   if (!acid) return hazards;
   const damage = Math.floor(acid.damage / 2);
@@ -350,6 +360,7 @@ export function halveAcid(hazards) {
 
 /** Record that this acid's injury save has been made. */
 export function acidInjuryChecked(hazards) {
+  requireLegacyAcid(hazards);
   return hazards?.acid ? { ...hazards, acid: { ...hazards.acid, injuryChecked: true } } : hazards;
 }
 

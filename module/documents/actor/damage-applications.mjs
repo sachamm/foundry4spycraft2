@@ -11,6 +11,10 @@ export async function beginDamageApplication(actor, check, messageId, input) {
     signature = damageApplicationSignature(check, input);
   const lease = {};
   await queueResources([actor], async () => {
+    if (
+      Object.values(actor.system?.hazards?.acidSources ?? {}).some(source => source.roundAttempt?.state === "applying")
+    )
+      throw Error(loc`Finish or review this target's interrupted acid round before applying another hit.`);
     if (Object.values(actor.flags?.spycraft2?.hazardResolutions ?? {}).some(r => r.state === "started"))
       throw Error(loc`Finish or review this target's pending hazard result before applying another hit.`);
     if (Object.values(damageApplications(actor)).some(r => ["applying", "needsReview", "undoing"].includes(r.state)))

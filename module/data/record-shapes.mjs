@@ -166,10 +166,57 @@ export const RECORD_SHAPES = {
     },
     acid: {
       $also: "null",
+      version: "number",
+      sourceIds: ["string"],
       damage: "number",
       suffered: "number",
       injuryChecked: "boolean",
       startedAt: "null|number"
+    },
+    acidSources: {
+      "*": {
+        version: "number",
+        provenSingleAttack: "boolean",
+        label: "string",
+        damage: "number",
+        suffered: "number",
+        phase: "string",
+        rounds: "number",
+        injuryChecked: "boolean",
+        needsReview: "boolean",
+        startedAt: "null|number",
+        lastCombat: { $also: "null", id: "string", round: "number" },
+        hitContext: {
+          critical: "boolean",
+          criticalDice: "number",
+          blast: "boolean",
+          attackKind: "string",
+          weaponProficiency: "string"
+        },
+        protection: {
+          $also: "null",
+          ap: "number",
+          reduction: "number",
+          unarmoredReduction: "number",
+          armorHit: "boolean",
+          armorPresent: "boolean",
+          armorSaveVerified: "boolean",
+          armorUuid: "string"
+        },
+        roundAttempt: {
+          attempt: "string",
+          resistanceSource: "any",
+          bruiseResistanceSource: "any",
+          state: "string",
+          damage: "number",
+          reduction: "number",
+          net: "number",
+          suffered: "number",
+          combat: { $also: "null", id: "string", round: "number" }
+        },
+        injuryRoll: { attempt: "string", state: "string", messageUuid: "null|string" },
+        review: { note: "string", reviewer: "string", at: "number" }
+      }
     },
     exposure: {
       $also: "null",

@@ -103,6 +103,7 @@ export function hazardState(system) {
     ...(stored?.fireSources ? { fireSources: { ...stored.fireSources } } : {}),
     // Other damage types and survival saves (module/rules/damage-types.mjs).
     acid: stored?.acid ? { ...stored.acid } : null,
+    ...(stored?.acidSources ? { acidSources: { ...stored.acidSources } } : {}),
     exposure: stored?.exposure
       ? { ...stored.exposure, injuriesChecked: [...(stored.exposure.injuriesChecked ?? [])] }
       : null,

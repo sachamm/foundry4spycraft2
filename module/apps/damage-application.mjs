@@ -974,6 +974,9 @@ export async function applyDamage(message, options = {}) {
                   reduction,
                   ...(type === "acid"
                     ? {
+                        armorPiercing,
+                        sourceId: message.id,
+                        sourceLabel: weapon?.name ?? loc`Acid attack`,
                         armor: { P: "partial", M: "moderate", F: "full" }[target.system.armor?.armorType] ?? "none",
                         unarmoredReduction: armorPiercingAll
                           ? 0

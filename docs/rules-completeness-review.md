@@ -2275,3 +2275,40 @@ fell 75→74. All **4,419** Node tests and **988** engine checks pass, alongside
 lint, formatting and bundle checks. The latest **269** layout cases and native
 schema checks remain applicable; no layout or schema changed in this pass.
 Ongoing acid still needs per-attack protection, timing and injury history.
+
+## Pass 77: Independent acid attacks, armor saves and retained injuries
+
+PC creation remains **9.8/10**; combat remains **9.8/10**. The acid workflow
+now retains each original attack separately. Round damage uses its captured AP,
+original contact layer, current declared post-AP protection and captured current
+resistance. Actual armor Damage saves are declared before the character save;
+a failed save or removed armor leaves non-armor protection intact. Equipment
+corrosion and washing remain separately adjudicated on the affected item.
+
+Each attack has guarded start/end/wash phases, a durable round intent before
+health or secondary dice, and actual damage totals for its own 25-point injury
+threshold. Washing to zero retains an owed Fortitude save. Its original save
+claim survives lost responses; a repeated click cannot create replacement dice.
+Legacy merged histories require explicit GC review and proof of one original
+attack before further automatic damage. Closing unknown merged exposures does
+not invent historical AP or roll an injury from their combined total.
+
+GC correction and sparse Undo preserve unrelated action-die and ability use.
+Changed armor during confirmation is refused before damage; resistance is frozen
+when the round begins. Interrupted rounds block overlapping hit/hazard delivery
+until the GC verifies the actual health, dice and source history. Old pure acid
+helpers reject the modern compatibility summary instead of modifying a merged
+exposure. Per-attack labels and equipment reminders appear on both actor sheets.
+
+Native Foundry verified separate totals, real round damage, Undo, washing,
+one original injury save after washing, actual GC correction and persistence.
+Separate native armor runs used an equipped EOD suit with explicitly controlled
+object-save bonuses: actual failing and passing object saves selected the
+correct protection before actual Reflex and health changes. These bonuses are
+test controls, not assertions about the suit's printed save bonus. No unexpected
+runtime errors were observed. The correction form's last control was reachable
+at 669.5px in a 720px viewport.
+
+All **4,435** Node tests, **988** engine checks and **275** layout cases pass,
+with schema, lint, formatting, bundle and copy checks. Continue Drained,
+secondary-effect timing and the remaining conditional creation-option audit.

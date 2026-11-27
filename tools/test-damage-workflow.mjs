@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { evasionSaveContext } from "../module/rules/save-avoidance.mjs";
 import { damageResistanceSource } from "../module/rules/resistances.mjs";
+import { acidAttackPlan, halveAcidSource } from "../module/rules/acid-sources.mjs";
 
 /* Foundry stand-ins: enough for the attack, damage, ammunition and opposed-check workflows to run. */
 const registry = new Map();
@@ -40,7 +41,8 @@ globalThis.ChatMessage = {
   create: async data => ((data.flags?.spycraft2?.undo ? undoNotes : posted).push(data), data)
 };
 globalThis.game = {
-  user: { isGM: true, targets: [] },
+  user: { id: "gc", isGM: true, targets: [] },
+  time: { worldTime: 0 },
   actors: [],
   combats: [],
   messages: [],
@@ -1035,8 +1037,20 @@ test("typed Reflex damage uses recorded Evasion, retains earlier acid and preser
       check
     );
     assert.equal(actor.system.vitality.value, 100 - impact);
-    if (kind === "acid") assert.equal(actor.system.hazards.acid.damage, impact || 3);
-    else {
+    if (kind === "acid") {
+      assert.equal(
+        actor.system.hazards.acid.damage,
+        impact ? impact + 3 : 3,
+        "an older attack stays separate from the new exposure"
+      );
+      if (impact)
+        assert.deepEqual(
+          Object.values(actor.system.hazards.acidSources)
+            .map(row => row.damage)
+            .sort((a, b) => a - b),
+          [3, impact].sort((a, b) => a - b)
+        );
+    } else {
       assert.equal(saves[0][0], "fort", "Evasion does not remove the separate stun save");
       assert.ok(posted.flatMap(m => m.rolls ?? []).some(r => r.formula === "1d4"));
     }
@@ -1593,16 +1607,38 @@ test("ongoing acid and fire use current resistance and count only damage that ge
     stressThreshold: 10,
     subdualThreshold: 10,
     survivalStats: { resistances: { AD: 4, FR: 4 }, resistanceSources: [] },
-    hazards: { acid: { damage: 7, suffered: 10, injuryChecked: false, startedAt: 0 } }
+    hazards: halveAcidSource(
+      acidAttackPlan(
+        {},
+        {
+          id: "existing",
+          label: "Original acid attack",
+          damage: 14,
+          suffered: 10,
+          at: 0,
+          protection: {
+            ap: 1,
+            reduction: 0,
+            unarmoredReduction: 0,
+            armorHit: false,
+            armorPresent: false,
+            armorSaveVerified: false
+          }
+        }
+      ).hazards,
+      "existing",
+      "end"
+    ).hazards
   });
   actor.type = "npc";
-  await acidStep(actor, "round");
+  await acidStep(actor, "round", "existing", { confirmed: true, reduction: 0, unarmoredReduction: 0 });
   assert.equal(actor.system.vitality.value, 97);
   assert.equal(actor.system.hazards.acid.suffered, 13);
   actor.system.survivalStats.resistances.AD = 8;
   await sufferTypedDamage(actor, { type: "acid", amount: 6, armor: "none" });
   assert.equal(actor.system.hazards.acid.damage, 7, "a separate fully resisted hit leaves earlier acid alone");
-  await acidStep(actor, "round");
+  await acidStep(actor, "end", "existing");
+  await acidStep(actor, "round", "existing", { confirmed: true, reduction: 0, unarmoredReduction: 0 });
   assert.equal(actor.system.hazards.acid, null);
   actor.system.hazards.fire = { damage: 7, ap: 0, suffered: 10, scarChecked: false, startedAt: 0 };
   await burningRound(actor, { reduction: 0 });
@@ -1639,6 +1675,252 @@ test("NPC stress and subdual resistance reaches ordinary hits without dice or to
       assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0);
       assert.equal(actor.system.vitality.value, 100);
     }
+});
+
+function acidRoundCharacter(name, { damage = 8, suffered = 8, ready = true } = {}) {
+  let hazards = acidAttackPlan(
+    {},
+    {
+      id: "attack",
+      label: name,
+      damage,
+      suffered,
+      at: 0,
+      protection: {
+        ap: 1,
+        reduction: 2,
+        unarmoredReduction: 2,
+        armorHit: false,
+        armorPresent: false,
+        armorSaveVerified: false
+      }
+    }
+  ).hazards;
+  if (ready) hazards = halveAcidSource(hazards, "attack", "end").hazards;
+  const actor = character(name, {
+    npcType: "special",
+    dr: { other: 3 },
+    vitality: { value: 50, max: 50 },
+    wounds: { value: 20, max: 20 },
+    stressThreshold: 10,
+    subdualThreshold: 10,
+    actionDice: { value: 2 },
+    hazards
+  });
+  actor.type = "npc";
+  return actor;
+}
+
+test("acid round Undo restores its damage and source without refunding an unrelated action-die spend", async () => {
+  const { acidStep } = await import("../module/apps/damage-types.mjs"),
+    { applyUndo } = await import("../module/apps/undo.mjs");
+  const actor = acidRoundCharacter("Acid-round-Undo"),
+    update = actor.update;
+  let spent = false;
+  actor.update = async function (change) {
+    if (!spent && Object.hasOwn(change, "system.vitality.value")) {
+      spent = true;
+      this.system.actionDice.value = 1;
+      this.flags.spycraft2 ??= {};
+      this.flags.spycraft2.abilityUse = "unrelated";
+    }
+    return update.call(this, change);
+  };
+  await acidStep(actor, "round", "attack", { confirmed: true, reduction: 2, unarmoredReduction: 2 });
+  assert.equal(actor.system.vitality.value, 48);
+  assert.equal(actor.system.hazards.acidSources.attack.suffered, 10);
+  const raw = undoNotes.at(-1),
+    note = document({ ...raw, uuid: "ChatMessage.acid-round-undo", isOwner: true });
+  await applyUndo(note);
+  assert.equal(actor.system.vitality.value, 50);
+  assert.equal(actor.system.hazards.acidSources.attack.suffered, 8);
+  assert.equal(actor.system.hazards.acidSources.attack.phase, "round");
+  assert.equal(actor.system.actionDice.value, 1);
+  assert.equal(actor.flags.spycraft2.abilityUse, "unrelated");
+});
+
+test("an interrupted acid round blocks other hits and requires a verified GC correction before retrying", async () => {
+  const { acidStep } = await import("../module/apps/damage-types.mjs"),
+    { reviewAcidSource } = await import("../module/apps/acid-sources.mjs");
+  const actor = acidRoundCharacter("Interrupted-acid-round"),
+    update = actor.update;
+  actor.update = async function (change) {
+    if (Object.hasOwn(change, "system.vitality.value")) throw Error("Injected acid health delivery failure");
+    return update.call(this, change);
+  };
+  await assert.rejects(
+    acidStep(actor, "round", "attack", { confirmed: true, reduction: 2, unarmoredReduction: 2 }),
+    /delivery failure/
+  );
+  actor.update = update;
+  assert.equal(actor.system.hazards.acidSources.attack.roundAttempt.state, "applying");
+  assert.equal(actor.system.vitality.value, 50);
+  const incoming = card("hit-during-acid-review", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 6 });
+  await assert.rejects(
+    applyDamage(incoming, { targetUuid: actor.uuid, damage: 6, kind: "lethal" }),
+    /interrupted acid round/
+  );
+  const oldInput = foundry.applications.api.DialogV2.input;
+  try {
+    foundry.applications.api.DialogV2.input = async () => ({
+      label: actor.name,
+      damage: 4,
+      suffered: 8,
+      phase: "round",
+      injuryChecked: false,
+      ap: 1,
+      reduction: 2,
+      unarmoredReduction: 2,
+      armorHit: false,
+      armorPresent: false,
+      armorSaveVerified: false,
+      note: "Confirmed the original round delivered no health changes"
+    });
+    await reviewAcidSource(actor, "attack");
+    assert.equal(actor.system.hazards.acidSources.attack.roundAttempt.state, "reviewed");
+  } finally {
+    foundry.applications.api.DialogV2.input = oldInput;
+  }
+  await acidStep(actor, "round", "attack", { confirmed: true, reduction: 2, unarmoredReduction: 2 });
+  assert.equal(actor.system.vitality.value, 48);
+});
+
+test("the actual acid injury workflow rolls once after washing and binds its outcome to that attack", async () => {
+  const { acidStep } = await import("../module/apps/damage-types.mjs"),
+    { rollAcidSourceInjury } = await import("../module/apps/acid-sources.mjs");
+  const actor = acidRoundCharacter("Washed-acid-injury", { damage: 30, suffered: 25, ready: false });
+  while (actor.system.hazards.acidSources.attack.damage) await acidStep(actor, "wash", "attack");
+  let rolls = 0;
+  actor.rollSave = async (key, options) => {
+    rolls++;
+    return card("original-acid-injury", {
+      actorUuid: actor.uuid,
+      checkKind: "save",
+      checkId: key,
+      effectiveTotal: 20,
+      rawTotal: 20,
+      resolved: true,
+      successConfirmed: true,
+      hazardSave: options.hazardSave
+    });
+  };
+  const original = await rollAcidSourceInjury(actor, "attack");
+  assert.equal(await rollAcidSourceInjury(actor, "attack"), original);
+  assert.equal(rolls, 1);
+  await resolveHazardSave(actor, original);
+  assert.equal(actor.system.hazards.acid, null);
+  assert.equal(actor.system.hazards.acidSources.attack.injuryChecked, true);
+  await assert.rejects(rollAcidSourceInjury(actor, "attack"), /actual acid total/);
+  assert.equal(rolls, 1);
+});
+
+test("a lost acid injury response reuses its posted card and never rolls a replacement", async () => {
+  const { rollAcidSourceInjury } = await import("../module/apps/acid-sources.mjs");
+  const actor = acidRoundCharacter("Lost-acid-injury-response", { damage: 30, suffered: 25, ready: false }),
+    oldMessages = game.messages;
+  game.messages = [];
+  let rolls = 0;
+  try {
+    actor.rollSave = async (key, options) => {
+      rolls++;
+      const message = card("posted-acid-injury", {
+        actorUuid: actor.uuid,
+        checkKind: "save",
+        checkId: key,
+        hazardSave: options.hazardSave
+      });
+      game.messages.push(message);
+      throw Error("Posted injury response lost");
+    };
+    const message = await rollAcidSourceInjury(actor, "attack");
+    assert.equal(message.uuid, "ChatMessage.posted-acid-injury");
+    assert.equal(await rollAcidSourceInjury(actor, "attack"), message);
+    assert.equal(rolls, 1);
+  } finally {
+    game.messages = oldMessages;
+  }
+});
+
+test("only a proven pre-roll acid cancellation releases its injury claim; uncertain dice require GC review", async () => {
+  const { rollAcidSourceInjury } = await import("../module/apps/acid-sources.mjs");
+  const actor = acidRoundCharacter("Cancelled-acid-injury", { damage: 30, suffered: 25, ready: false });
+  actor.rollSave = async () => null;
+  assert.equal(await rollAcidSourceInjury(actor, "attack"), null);
+  assert.equal(actor.system.hazards.acidSources.attack.injuryRoll, undefined);
+  let calls = 0;
+  actor.rollSave = async () => {
+    calls++;
+    throw Error("Unknown original dice result");
+  };
+  await assert.rejects(rollAcidSourceInjury(actor, "attack"), /Unknown original/);
+  assert.equal(actor.system.hazards.acidSources.attack.injuryRoll.state, "needsReview");
+  await assert.rejects(rollAcidSourceInjury(actor, "attack"), /original dice/);
+  assert.equal(calls, 1);
+});
+
+test("a stale GC acid review cannot overwrite a changed attack", async () => {
+  const { reviewAcidSource } = await import("../module/apps/acid-sources.mjs");
+  const actor = acidRoundCharacter("Stale-acid-review"),
+    oldInput = foundry.applications.api.DialogV2.input;
+  try {
+    foundry.applications.api.DialogV2.input = async () => {
+      actor.system.hazards.acidSources.attack.suffered = 9;
+      return {
+        label: actor.name,
+        damage: 4,
+        suffered: 8,
+        phase: "round",
+        injuryChecked: false,
+        ap: 1,
+        reduction: 2,
+        unarmoredReduction: 2,
+        note: "Stale original form"
+      };
+    };
+    await assert.rejects(reviewAcidSource(actor, "attack"), /attack changed/);
+    assert.equal(actor.system.hazards.acidSources.attack.suffered, 9);
+    assert.equal(actor.system.vitality.value, 50);
+  } finally {
+    foundry.applications.api.DialogV2.input = oldInput;
+  }
+});
+
+test("a changed DR source invalidates the prepared acid round before health or its intent changes", async () => {
+  const { acidStep } = await import("../module/apps/damage-types.mjs"),
+    actor = acidRoundCharacter("Changed-acid-protection"),
+    oldInput = foundry.applications.api.DialogV2.input;
+  try {
+    foundry.applications.api.DialogV2.input = async () => {
+      actor.system.dr.other = 4;
+      return { confirmed: true, reduction: 2, unarmoredReduction: 2 };
+    };
+    await assert.rejects(acidStep(actor, "round", "attack"), /protection changed/);
+    assert.equal(actor.system.vitality.value, 50);
+    assert.equal(actor.system.hazards.acidSources.attack.roundAttempt, undefined);
+  } finally {
+    foundry.applications.api.DialogV2.input = oldInput;
+  }
+});
+
+test("an acid round retains resistance from its own intent if the current protection changes during delivery", async () => {
+  const { acidStep } = await import("../module/apps/damage-types.mjs"),
+    { checkRecord } = await import("../module/rules/record-check.mjs"),
+    { RECORD_SHAPES } = await import("../module/data/record-shapes.mjs");
+  const actor = acidRoundCharacter("Retained-round-resistance"),
+    update = actor.update;
+  actor.system.survivalStats.resistances.AD = 1;
+  const original = damageResistanceSource(actor.system, "acid");
+  actor.update = async function (change) {
+    const result = await update.call(this, change);
+    if (change["system.==hazards"]?.acidSources?.attack?.roundAttempt?.state === "applying")
+      this.system.survivalStats.resistances.AD = 0;
+    return result;
+  };
+  await acidStep(actor, "round", "attack", { confirmed: true, reduction: 2, unarmoredReduction: 2 });
+  assert.equal(actor.system.vitality.value, 49, "4 remaining acid - 2 DR - original resistance 1");
+  assert.equal(actor.system.hazards.acidSources.attack.suffered, 9);
+  assert.deepEqual(actor.system.hazards.acidSources.attack.roundAttempt.resistanceSource, original);
+  assert.deepEqual(checkRecord(RECORD_SHAPES.hazards, actor.system.hazards), []);
 });
 
 test("NPC partial resistance follows DR for subdual and bypasses DR for stress", async () => {

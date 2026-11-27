@@ -19,7 +19,8 @@ export default defineConfig({
     "chat-compact.spec.mjs",
     "keep-place.spec.mjs",
     "attribute-abbreviations.spec.mjs",
-    "chat-dice.spec.mjs"
+    "chat-dice.spec.mjs",
+    "acid-sources.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

@@ -86,6 +86,12 @@ export async function beginHazardResolution(actor, message) {
       if (Object.values(records(actor)).some(r => r.state === "started"))
         throw Error(loc`Finish or review this character's pending hazard before applying another save.`);
       if (
+        Object.values(actor.system?.hazards?.acidSources ?? {}).some(
+          source => source.roundAttempt?.state === "applying"
+        )
+      )
+        throw Error(loc`Finish or review this character's interrupted acid round before applying another hazard save.`);
+      if (
         Object.values(actor.flags?.spycraft2?.damageApplications ?? {}).some(r =>
           ["applying", "needsReview", "undoing"].includes(r.state)
         )

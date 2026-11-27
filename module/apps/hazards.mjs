@@ -48,6 +48,7 @@ import { loc } from "../i18n.mjs";
 import { damageResistancePlan, damageResistanceSource } from "../rules/resistances.mjs";
 import { fireExposurePlan, legacyFireSourcePlan, readFireSource } from "../rules/fire-sources.mjs";
 import { rollFireSourceSave, markFireSourceScarring } from "./fire-sources.mjs";
+import { acidInjuryDue } from "../rules/acid-sources.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -124,6 +125,32 @@ export function hazardsView(actor) {
       source => source.needsReview || (!source.scarChecked && source.suffered >= 25)
     ),
     acid: state.acid,
+    acidLegacyNeedsReview: !!state.acid && !Array.isArray(state.acid.sourceIds),
+    acidCanReview: owned(actor) && game.user?.isGM === true,
+    acidSources: Object.entries(state.acidSources ?? {}).map(([id, source]) => {
+      const pending = source.roundAttempt?.state === "applying",
+        review = source.needsReview || pending,
+        active = source.damage > 0,
+        due = acidInjuryDue(source);
+      return {
+        ...source,
+        id,
+        active,
+        due,
+        needsReview: review,
+        canRound: owned(actor) && active && source.phase === "round" && !review,
+        canEnd: owned(actor) && active && source.phase === "end" && !review,
+        canWash: owned(actor) && active && !review,
+        canInjury: owned(actor) && due && !review && !source.injuryRoll,
+        injuryPending: due && !!source.injuryRoll,
+        armorAffected: source.protection?.armorHit === true,
+        canReview: owned(actor) && game.user?.isGM === true
+      };
+    }),
+    acidNeedsAttention: Object.values(state.acidSources ?? {}).some(
+      source =>
+        source.damage > 0 || source.needsReview || source.roundAttempt?.state === "applying" || acidInjuryDue(source)
+    ),
     exposure: state.exposure
       ? { ...state.exposure, label: DAMAGE_TYPE_LABELS[state.exposure.type] ?? state.exposure.type }
       : null,
@@ -189,7 +216,7 @@ export async function sufferLethal(actor, amount, hitContext = {}) {
 }
 
 /** The one subdual point left by DR (p.332), already past DR and before subdual resistance. */
-export async function sufferBruise(actor, hitContext = {}, originalSource = undefined) {
+export async function sufferBruise(actor, hitContext = {}, originalSource = undefined, eventSource = "") {
   const context = typedHitContext(hitContext);
   const current = damageResistanceSource(actor.system, "subdual");
   const plan = damageResistancePlan(
@@ -207,7 +234,7 @@ export async function sufferBruise(actor, hitContext = {}, originalSource = unde
   if (!plan.net) return loc`Subdual resistance prevents the one bruising point; no subdual save is required.`;
   if (actor.type === "agent") {
     const record = await applyAccumulatedDamage(actor, {
-      source: `bruise-${foundry.utils.randomID()}`,
+      source: `${eventSource ? `${eventSource}: ` : ""}bruise-${foundry.utils.randomID()}`,
       kind: "subdual",
       newDamage: 1,
       damageMode: "subdualBeforeDefenses",
