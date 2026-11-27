@@ -43,21 +43,5 @@ rollPipeline.register({
   id: "campaignSkillDC",
   order: 9596,
   kinds: ["skill"],
-  record: ["campaignSkillDCPolicy"],
-  chatControls({ actor, check, message }) {
-    if (
-      !actor?.isOwner ||
-      !check.campaignSkillDCPolicy ||
-      check.superseded ||
-      check.resolved ||
-      typeof check.successConfirmed === "boolean"
-    )
-      return null;
-    return [
-      {
-        label: loc`Resolve against campaign DC`,
-        run: async () => (await import("../apps/campaign-skill-dc.mjs")).resolveCampaignSkillDC(actor, message)
-      }
-    ];
-  }
+  record: ["campaignSkillDCPolicy"]
 });

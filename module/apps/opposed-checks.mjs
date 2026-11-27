@@ -10,6 +10,25 @@ import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { opposedOutcome } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { resolveCampaignSkillDC } from "./campaign-skill-dc.mjs";
+
+// Fixed-DC campaign resolution sits beside the existing opposed-result comparison.
+rollPipeline.register({
+  id: "campaignSkillDCControl",
+  order: 9596.5,
+  kinds: ["skill"],
+  chatControls({ actor, check, message }) {
+    if (
+      !actor?.isOwner ||
+      !check.campaignSkillDCPolicy ||
+      check.superseded ||
+      check.resolved ||
+      typeof check.successConfirmed === "boolean"
+    )
+      return null;
+    return [{ label: loc`Resolve against campaign DC`, run: () => resolveCampaignSkillDC(actor, message) }];
+  }
+});
 
 const RECENT = 40;
 const visible = message => !message.blind || game.user?.isGM === true;
