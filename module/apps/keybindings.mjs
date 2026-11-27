@@ -15,14 +15,81 @@ export function newestCardButton(root, selector) {
   return null;
 }
 
-/** Press the matching button on the newest chat card that has one. Returns whether a button was pressed. */
-export function pressNewestCard(selector) {
-  const button = newestCardButton(document.querySelector("#chat") ?? document, selector);
-  if (!button) return false;
+/** Every place a chat log is drawn: the sidebar and a popped-out chat window. */
+const chatRoots = () => {
+  const roots = [document.querySelector("#chat"), globalThis.ui?.chat?.popout?.element].filter(Boolean);
+  return roots.length ? roots : [document];
+};
+/** The button's own words and the card's speaker, for the notice that says what was pressed. */
+function describePress(button) {
+  const id = button.closest?.("[data-message-id]")?.dataset.messageId,
+    message = globalThis.game?.messages?.get?.(id),
+    who = message?.speaker?.alias ?? message?.alias ?? loc`the newest card`;
+  return { label: button.textContent?.trim() || loc`its next step`, who };
+}
+
+/**
+ * Press the matching button on the newest chat card that has one, and say which card it was.
+ * Returns whether a button was pressed.
+ */
+export function pressNewestCard(selector, { notify = false } = {}) {
+  const buttons = chatRoots()
+    .map(root => newestCardButton(root, selector))
+    .filter(Boolean);
+  const button = buttons.at(-1) ?? null;
+  if (!button) {
+    if (notify) ui.notifications.info(loc`No chat card is waiting for a next step.`);
+    return false;
+  }
+  if (notify) {
+    const { label, who } = describePress(button);
+    ui.notifications.info(loc`${label}: ${who}.`);
+  }
   button.click();
   return true;
 }
-const press = selector => () => pressNewestCard(selector);
+const press = selector => () => (pressNewestCard(selector, { notify: true }), true);
+
+/**
+ * Press the next step on the newest card about this combatant: its actor posted it, or the card is about its token.
+ * Another combatant's card, or a player's card about someone else, is never pressed in its place.
+ * @param {Combatant} combatant
+ */
+export function pressActorCard(combatant, selector) {
+  const actorId = combatant?.actor?.id,
+    tokenId = combatant?.tokenId ?? combatant?.token?.id;
+  const about = card => {
+    const message = globalThis.game?.messages?.get?.(card.dataset?.messageId);
+    const speaker = message?.speaker ?? {};
+    return (tokenId && speaker.token === tokenId) || (!speaker.token && actorId && speaker.actor === actorId);
+  };
+  for (const root of chatRoots()) {
+    const cards = [...(root.querySelectorAll?.("[data-message-id]") ?? [])].filter(about).reverse();
+    for (const card of cards) {
+      const button = [...card.querySelectorAll(selector)].find(candidate => !candidate.disabled);
+      if (!button) continue;
+      const { label } = describePress(button);
+      ui.notifications.info(loc`${label}: ${combatant.name}.`);
+      button.click();
+      return true;
+    }
+  }
+  ui.notifications.info(loc`No card of ${combatant?.name ?? loc`this combatant`} is waiting for a next step.`);
+  return false;
+}
+
+/** The keys bound to one of this system's shortcuts, as a person reads them ("Alt+N"), or "" when unbound. */
+export function shortcutLabel(id) {
+  try {
+    const bound = globalThis.game?.keybindings?.get?.("spycraft2", id) ?? [];
+    const first = bound[0];
+    if (!first?.key) return "";
+    const key = first.key.replace(/^Key/, "").replace(/^Digit/, "");
+    return [...(first.modifiers ?? []), key].join("+");
+  } catch {
+    return "";
+  }
+}
 
 /**
  * The card a GC boost shortcut acts on: the one under the pointer, else the newest card this user posted that can
@@ -150,6 +217,20 @@ const bindings = ({ openConsole }) => [
     [{ key: "Enter", modifiers: ["Alt"] }],
     false,
     press("button.sc2-primary-action[data-roll-control]")
+  ],
+  [
+    "spendDice",
+    locKey`Spend GC action dice`,
+    locKey`Opens Spend dice, with the acting NPC chosen when one is acting.`,
+    [{ key: "KeyD", modifiers: ["Alt"] }],
+    true,
+    () => {
+      const actor = game.combat?.started ? game.combat.combatant?.actor : null;
+      import("./gc/spend.mjs")
+        .then(module => module.spendGCDice({ preferActor: actor?.type === "npc" ? actor : null }))
+        .catch(error => ui.notifications.warn(error.message));
+      return true;
+    }
   ],
   [
     "gcBoost",

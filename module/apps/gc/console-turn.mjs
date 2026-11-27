@@ -112,6 +112,8 @@ export function combatRows(combat) {
       current,
       defeated: !!combatant.isDefeated,
       count: Number.isFinite(combatant.initiative) ? loc`Count ${combatant.initiative}` : loc`not rolled`,
+      // The number alone, for the list's Count column; "—" until rolled.
+      countValue: Number.isFinite(combatant.initiative) ? String(combatant.initiative) : "—",
       notes: notes.join(", "),
       // Kept for callers that read the older fields.
       pending: pending ? signed(pending) : "",
@@ -143,16 +145,33 @@ export function mobGroups(combat) {
 }
 
 /** Show a combatant: centre the map on its token, select it and open its sheet. */
-export async function openCombatant(combat, id) {
+/**
+ * A combat row works as the tracker's does: a press selects the token and pans to it; a double press (or the acting
+ * name) opens the sheet as well, so a run of quick looks does not stack sheets.
+ */
+export async function openCombatant(combat, id, { sheet = false } = {}) {
   const combatant = combat?.combatants?.get(id);
   if (!combatant) return null;
   const token = combatant.token?.object;
   if (token && globalThis.canvas?.ready) {
     token.control?.({ releaseOthers: true });
-    await canvas.animatePan?.({ x: token.center.x, y: token.center.y, duration: 250 });
+    // Not awaited: the sheet does not wait for the camera.
+    canvas.animatePan?.({ x: token.center.x, y: token.center.y, duration: 250 });
   }
-  combatant.actor?.sheet?.render(true);
+  if (sheet || !token) combatant.actor?.sheet?.render(true);
   return combatant;
+}
+
+/** Light up a row's token on the map while the pointer is over the row, as the tracker does. */
+export function hoverCombatant(combat, id, on) {
+  const token = combat?.combatants?.get(id)?.token?.object;
+  if (!token?.visible) return;
+  try {
+    if (on) token._onHoverIn?.(new PointerEvent("pointerenter"), { hoverOutOthers: true });
+    else token._onHoverOut?.(new PointerEvent("pointerleave"));
+  } catch {
+    /* a token mid-redraw */
+  }
 }
 
 /** Attack with one of the acting character's weapons: straight to hit or miss with one target, else the dialog. */

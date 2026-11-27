@@ -175,7 +175,7 @@ test("the NPC sheet offers the agent's combat outcomes and registers each of the
 // Most template lines are far too long to review, and reformatting them all at once would hide real changes. Until a
 // file is reformatted, these limits stop the long lines from growing in number or in length. Lower them as files are
 // reformatted (render the file before and after to prove the markup did not change).
-const LONG_LINE_LIMITS = { over200: 439, over500: 100, over1000: 14, longest: 1542 };
+const LONG_LINE_LIMITS = { over200: 406, over500: 100, over1000: 14, longest: 1542 };
 
 test("template line lengths do not get worse", () => {
   const lengths = paths.flatMap(path => sourceOf(path).split("\n")).map(line => line.length);

@@ -138,7 +138,7 @@ export function initializeGCDice({ playersPresent, caliber, replaceExisting = fa
       );
     const value = startingGCDice(playersPresent, caliber),
       pool = withController(
-        { value, session: epoch(), playersPresent, caliber, lastReason: "Session start" },
+        { value, session: epoch(), playersPresent, caliber, lastReason: "Session start", startedAt: Date.now() },
         controller
       );
     await game.settings.set("spycraft2", "gcActionDice", pool);

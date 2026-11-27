@@ -14,6 +14,13 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createEnvironment, ROOT } from "../lib/hbs-harness.mjs";
 import { systemCss } from "../lib/system-css.mjs";
+import {
+  VIEWS,
+  VIEW_SECTIONS,
+  consoleSections,
+  firstSessionChecklist,
+  primaryAction
+} from "../../module/apps/gc/console-view.mjs";
 
 const outDir = process.argv[2] ?? join(ROOT, "tools/ui-lab/out");
 mkdirSync(outDir, { recursive: true });
@@ -25,18 +32,38 @@ execFileSync(process.execPath, ["--test", "--test-reporter=dot", join(ROOT, "too
 const base = JSON.parse(readFileSync(contextFile, "utf8"));
 const clone = value => JSON.parse(JSON.stringify(value));
 
-function withView(context, view, combatStarted = false) {
+/**
+ * Set a scenario's state and work out everything that follows from it with the console's own rules
+ * (module/apps/gc/console-view.mjs): the view's sections, which start open, the checklist and the one filled button.
+ */
+function withState(context, { view, active, ended, combat = null, firstSession = null }) {
   context.view = view;
   context.views = context.views.map(entry => ({ ...entry, active: entry.id === view }));
-  context.shown = { prep: view === "prep", play: view === "play", wrap: view === "wrap" };
-  // Mirrors VIEW_SECTIONS in module/apps/gc/console.mjs.
-  const sections = {
-    prep: ["mission", "objectives", "antagonists", "complications", "organizations", "campaign", "reference"],
-    play: ["combat", "dice", "objectives", "antagonists", "conflicts", "clock", "reference"],
-    wrap: ["mission", "objectives", "antagonists", "campaign"]
-  };
+  context.shown = Object.fromEntries(VIEWS.map(id => [id, id === view]));
+  context.mission.active = active;
+  context.mission.ended = ended;
+  context.status.missionState = active ? "active" : ended ? "ended" : "not started";
+  context.xp.label = active || ended ? "Base XP earned so far" : "Planned base XP";
   for (const id of Object.keys(context.hiddenSections))
-    context.hiddenSections[id] = !((sections[view] ?? []).includes(id) || (id === "combat" && combatStarted));
+    context.hiddenSections[id] = !(VIEW_SECTIONS[view].includes(id) || (id === "combat" && !!combat?.started));
+  context.sections = consoleSections({ missionActive: active, combat: !!combat, conflictsRunning: false });
+  if (firstSession) {
+    context.checklist = firstSessionChecklist({ mission: context.mission, ...firstSession });
+    if (!firstSession.diceCurrent) {
+      context.session = { begun: false, at: "", note: "" };
+      context.status.dice = "not set up";
+      context.status.session = "not begun";
+      context.dice.current = false;
+    }
+  } else context.checklist.complete = true;
+  context.primary = primaryAction({
+    view,
+    checklistShown: view === "prep" && !context.checklist.complete,
+    missionActive: active,
+    missionEnded: ended,
+    diceCurrent: !!context.dice.current,
+    combat
+  });
   return context;
 }
 
@@ -82,55 +109,42 @@ function fight(context, { started = true } = {}) {
       current: started && index === 2,
       defeated: false,
       count: `Count ${count}`,
+      countValue: started || index < 5 ? String(count) : "—",
       notes
     })),
-    mobs: [{ key: "guard", label: "Mob attack: Guard (Rook) ×3" }],
-    unrolled: started ? 0 : 3
+    mobs: started ? [{ key: "guard", label: "Mob attack: Guard (Rook) ×3" }] : [],
+    unrolled: started ? 0 : 3,
+    unrolledNames: started ? "" : "Colonel Dragan, Agent Okafor, Driver",
+    scene: "Embassy",
+    elsewhere: false
   };
-  context.sections.combat = { open: true, state: "open" };
   context.status.turn = started ? "Round 2: Guard (Rook)" : "Fight not begun";
   return context;
 }
 
 const scenarios = {
-  "prep-first-session": () => {
-    const c = withView(clone(base), "prep");
-    c.mission.active = false;
-    c.mission.ended = false;
-    c.status.missionState = "not started";
-    c.checklist.complete = false;
-    return c;
-  },
-  "prep-planned": () => {
-    const c = withView(clone(base), "prep");
-    c.mission.active = false;
-    c.status.missionState = "not started";
-    c.checklist.complete = true;
-    return c;
-  },
-  "play-no-fight": () => {
-    const c = withView(clone(base), "play");
-    c.checklist.complete = true;
-    return c;
-  },
-  "play-fight-setup": () => {
-    const c = fight(withView(clone(base), "play"), { started: false });
-    c.checklist.complete = true;
-    return c;
-  },
-  "play-fight": () => {
-    const c = fight(withView(clone(base), "play", true), { started: true });
-    c.checklist.complete = true;
-    return c;
-  },
-  wrap: () => {
-    const c = withView(clone(base), "wrap");
-    c.mission.active = false;
-    c.mission.ended = true;
-    c.status.missionState = "ended";
-    c.checklist.complete = true;
-    return c;
-  }
+  "prep-first-session": () =>
+    withState(clone(base), {
+      view: "prep",
+      active: false,
+      ended: false,
+      // A world on its first evening: the mission recorded and its NPCs placed, nothing started yet.
+      firstSession: { diceCurrent: false, npcActors: 3, combatSeen: false }
+    }),
+  "prep-planned": () => withState(clone(base), { view: "prep", active: false, ended: false }),
+  "play-no-fight": () => withState(clone(base), { view: "play", active: true, ended: false }),
+  "play-fight-setup": () =>
+    fight(
+      withState(clone(base), { view: "play", active: true, ended: false, combat: { started: false, unrolled: 3 } }),
+      { started: false }
+    ),
+  "play-fight": () =>
+    fight(
+      withState(clone(base), { view: "play", active: true, ended: false, combat: { started: true, unrolled: 0 } }),
+      { started: true }
+    ),
+  "wrap-active": () => withState(clone(base), { view: "wrap", active: true, ended: false }),
+  wrap: () => withState(clone(base), { view: "wrap", active: false, ended: true })
 };
 
 const environment = createEnvironment();
@@ -160,8 +174,8 @@ for (const [name, make] of Object.entries(scenarios)) {
   ]) {
     const wrapper =
       frame === "sidebar"
-        ? `<div id="sidebar" class="sidebar-tab">${body}</div>`
-        : `<div id="popout" class="application">${body}</div>`;
+        ? `<div id="sidebar"><section class="spycraft2 gc-console sidebar-tab active">${body}</section></div>`
+        : `<div id="popout" class="spycraft2 gc-console sidebar-tab sidebar-popout application">${body}</div>`;
     const html = `<!doctype html><html><head><meta charset="utf-8"><style>${foundryStandIn}\n${css}</style></head><body class="theme-dark">${wrapper}</body></html>`;
     if (frame === "sidebar") writeFileSync(join(outDir, `${name}.html`), html);
     const page = await browser.newPage({ viewport: { width: frame === "sidebar" ? 300 : 720, height } });
@@ -184,9 +198,9 @@ for (const [name, make] of Object.entries(scenarios)) {
         statusStripHeight: Math.round(document.querySelector(".gc-now")?.getBoundingClientRect().height ?? 0),
         nextTurnTop: top('[data-action="nextTurn"]'),
         primaryButtons: [...document.querySelectorAll(".gc-primary")]
-          .filter(node => node.offsetParent)
+          .filter(node => node.checkVisibility())
           .map(node => node.textContent.trim()),
-        visibleButtons: [...document.querySelectorAll("button")].filter(node => node.offsetParent).length
+        visibleButtons: [...document.querySelectorAll("button")].filter(node => node.checkVisibility()).length
       };
     });
     await page.screenshot({ path: join(outDir, `${name}-${frame}.png`), fullPage: true });

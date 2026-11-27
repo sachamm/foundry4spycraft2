@@ -31,7 +31,7 @@ import {
   missionEpoch
 } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
-import { withUndo } from "../undo.mjs";
+import { withUndo, postUndo } from "../undo.mjs";
 import { standingStatus, liquidationCheck } from "../../rules/standing.mjs";
 import { startUsagePeriod } from "../../services/periods.mjs";
 import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
@@ -626,8 +626,9 @@ export async function addComplication() {
 }
 
 /** Toggle or remove one list entry: list is a mission array name, key matches entry.id or entry.key. */
-export async function changeEntry(list, key, change) {
+export async function changeEntry(list, key, change, { notify = false } = {}) {
   requireGC();
+  if (change === "remove") return removeEntry(list, key, { notify });
   return updateMission(mission => ({
     [list]: (mission[list] ?? []).flatMap(entry => {
       if ((entry.key ?? entry.id) !== key) return [entry];
@@ -638,6 +639,32 @@ export async function changeEntry(list, key, change) {
       return [{ ...entry, [change]: !entry[change] }];
     })
   }));
+}
+
+/** What a mission row is called in a notice: its own name, else its table name. */
+const rowName = entry => entry?.name ?? entry?.objective ?? entry?.id ?? loc`the row`;
+
+/**
+ * Take a row off the mission record and leave an Undo note that puts it back where it was. The note restores the
+ * row only within the same run of the mission.
+ */
+async function removeEntry(list, key, { notify = false } = {}) {
+  const mission = getMission(),
+    rows = mission[list] ?? [],
+    index = rows.findIndex(entry => (entry.key ?? entry.id) === key);
+  if (index < 0) return null;
+  const entry = rows[index];
+  await updateMission(now => ({ [list]: (now[list] ?? []).filter(row => (row.key ?? row.id) !== key) }));
+  const name = rowName(entry);
+  try {
+    await postUndo(loc`Removed from the mission: ${name}`, [], {
+      missionRow: { list, key, entry, index, period: missionEpoch() }
+    });
+  } catch (error) {
+    console.warn("Field Agent's Handbook | No Undo note could be left for this removal.", error);
+  }
+  if (notify) ui.notifications.info(loc`Removed ${name}. The Undo note in the chat puts it back.`);
+  return entry;
 }
 
 /** Exposure (p.435): an infraction immediately reduces the character's Reputation or Net Worth. */

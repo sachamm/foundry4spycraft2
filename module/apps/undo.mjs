@@ -220,7 +220,8 @@ export function postUndo(
     dcBoost = null,
     standingPaid = null,
     cardMarks = null,
-    addedInfractions = null
+    addedInfractions = null,
+    missionRow = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -240,6 +241,7 @@ export function postUndo(
           standingPaid,
           cardMarks,
           addedInfractions,
+          missionRow,
           done: false
         }
       }
@@ -359,6 +361,21 @@ async function undoRecord(message, record) {
       await updateMission(now => ({
         infractions: (now.infractions ?? []).filter(entry => !added.ids.includes(entry?.id))
       })).catch(error => ui.notifications.warn(loc`The exposure rows were not taken off: ${error.message}`));
+  }
+  // A row taken off the mission record goes back where it was, within the run of the mission that removed it.
+  const row = record.missionRow;
+  if (row?.list && row.entry && game.user.isGM) {
+    const { updateMission, missionEpoch } = await import("./gc/state.mjs");
+    const same = entry => (entry?.key ?? entry?.id) === row.key;
+    if (row.period !== missionEpoch())
+      ui.notifications.warn(loc`A later mission has begun, so the removed row was not put back.`);
+    else
+      await updateMission(now => {
+        const rows = [...(now[row.list] ?? [])];
+        if (rows.some(same)) return {};
+        rows.splice(Math.min(Number(row.index) || 0, rows.length), 0, row.entry);
+        return { [row.list]: rows };
+      }).catch(error => ui.notifications.warn(loc`The mission row was not put back: ${error.message}`));
   }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {

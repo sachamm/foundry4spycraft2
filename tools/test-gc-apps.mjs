@@ -1126,7 +1126,8 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
     registerGCConsoleTab();
     registerGCConsoleTab();
     assert.equal(CONFIG.ui.gc, GCConsole);
-    assert.deepEqual(Object.keys(CONFIG.ui.sidebar.TABS), ["gc", "chat", "combat", "scenes"]);
+    // Beside the tracker it works with; Chat keeps its place at the front.
+    assert.deepEqual(Object.keys(CONFIG.ui.sidebar.TABS), ["chat", "combat", "gc", "scenes"]);
     assert.equal(CONFIG.ui.sidebar.TABS.gc.gmOnly, true);
     const calls = [];
     ui.gc = {
@@ -1137,9 +1138,18 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
         calls.push(["activate"]);
       }
     };
+    // With no pop-out to offer, the console opens in the sidebar.
     assert.equal(await openGCConsole(), ui.gc);
     assert.equal(game.spycraft2.gc.console, ui.gc);
     assert.deepEqual(calls, [["render", { force: true }], ["activate"]]);
+    // By default it opens as a window, so the chat log stays in the sidebar.
+    const popout = { bringToFront: () => calls.push(["front"]) };
+    ui.gc.renderPopout = async () => (calls.push(["popout"]), popout);
+    assert.equal(await openGCConsole(), popout);
+    assert.deepEqual(calls.slice(2), [["popout"], ["front"]]);
+    assert.equal(await openGCConsole({ window: false }), ui.gc);
+    calls.splice(2);
+    delete ui.gc.renderPopout;
     game.user.isGM = false;
     assert.equal(GCConsole.prototype._canRender({}), false);
     await openGCConsole();

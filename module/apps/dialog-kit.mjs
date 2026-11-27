@@ -159,7 +159,7 @@ export function freeCancel(root) {
  * @param {string} [spec.ok]       Label of the main button: the action it takes ("Add objective"), not "Confirm"
  * @param {object} [spec.dialog]   Further DialogV2 options
  */
-export function formDialog({ title, intro, fields, ok, dialog = {} }) {
+export function formDialog({ title, intro, fields, ok, validate = null, dialog = {} }) {
   return cancellable(systemDialog.input, {
     window: { title },
     rejectClose: false,
@@ -168,11 +168,71 @@ export function formDialog({ title, intro, fields, ok, dialog = {} }) {
     buttons: [cancelButton()],
     ...dialog,
     render: (event, app) => {
-      wireConditionalFields(app?.element ?? event?.target);
-      freeCancel(app?.element ?? event?.target);
+      const root = app?.element ?? event?.target;
+      wireConditionalFields(root);
+      freeCancel(root);
+      if (validate) holdUntilValid(root, validate);
       return dialog.render?.(event, app);
     }
   });
+}
+
+/** The form's values by field name, as the dialog will hand them back (checkboxes as booleans). */
+export function formValues(form) {
+  const values = {};
+  for (const control of form?.elements ?? []) {
+    if (!control.name || control.disabled) continue;
+    if (control.type === "checkbox") values[control.name] = control.checked;
+    else if (control.type === "radio") {
+      if (control.checked) values[control.name] = control.value;
+    } else values[control.name] = control.value;
+  }
+  return values;
+}
+
+/**
+ * Keep a dialog open while its entry would be refused: the reason shows inside the dialog, next to the button, and
+ * what was typed stays. `validate(values)` returns the reason, or nothing when the entry can go ahead; it may be async.
+ * Cancel is never held.
+ */
+export function holdUntilValid(root, validate) {
+  const form = root?.querySelector?.("form") ?? (root?.matches?.("form") ? root : null);
+  if (!form || form.dataset.sc2Validated) return;
+  form.dataset.sc2Validated = "true";
+  let passed = false;
+  // Listened for on the dialog, before the form's own submit handler, so a refused entry never reaches it.
+  root.addEventListener(
+    "submit",
+    event => {
+      const submitter = event.submitter;
+      if (submitter?.dataset?.action === "cancel" || passed) {
+        passed = false;
+        return;
+      }
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      Promise.resolve()
+        .then(() => validate(formValues(form)))
+        .then(reason => {
+          let alert = form.querySelector(".sc2-dialog-refusal");
+          if (reason) {
+            if (!alert) {
+              alert = document.createElement("p");
+              alert.className = "sc2-dialog-refusal";
+              alert.setAttribute("role", "alert");
+              (form.querySelector(".form-footer, footer") ?? form.lastElementChild)?.before(alert);
+            }
+            alert.textContent = String(reason);
+            return;
+          }
+          alert?.remove();
+          passed = true;
+          form.requestSubmit(submitter ?? undefined);
+        })
+        .catch(error => console.warn("Field Agent's Handbook | A dialog check failed.", error));
+    },
+    { capture: true }
+  );
 }
 
 /** The Cancel button every option dialog carries. */

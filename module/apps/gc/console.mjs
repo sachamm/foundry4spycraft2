@@ -30,8 +30,16 @@ import * as organizations from "./organizations.mjs";
 import * as tables from "./tables.mjs";
 import { addNpcToScene } from "./add-npc.mjs";
 import * as turn from "./console-turn.mjs";
+import {
+  VIEWS,
+  VIEW_SECTIONS,
+  consoleView,
+  consoleSections,
+  firstSessionChecklist,
+  primaryAction
+} from "./console-view.mjs";
 import { npcDamageSaveWithUndo } from "./npc-play.mjs";
-import { pressNewestCard } from "../keybindings.mjs";
+import { pressActorCard, shortcutLabel } from "../keybindings.mjs";
 import {
   advanceClock,
   advanceClockDialog,
@@ -46,12 +54,17 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
 const ROMAN = ["I", "II", "III", "IV", "V"];
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
-/** A console action runs once at a time: a second press while it is still working, or its dialog is open, is dropped. */
+/**
+ * A console action runs once at a time: a second press while it is still working, or its dialog is open, is dropped.
+ * A press from the keyboard is remembered before the work starts, so the redraw after a dialog gives the focus back to
+ * the same control (or, when the control is gone, to its section) instead of dropping it to the page.
+ */
 const guard = work => {
   let busy = false;
   return async function (event, target) {
     if (busy) return;
     busy = true;
+    if (event?.detail === 0 && this?.element) this._pressed = controlKey(target, this.element);
     try {
       await work.call(this, event, target);
     } catch (error) {
@@ -62,6 +75,24 @@ const guard = work => {
     this.render();
   };
 };
+
+/**
+ * The combatant an acting-block button was drawn for, while it is still the one acting. When the turn has moved on
+ * (another GC, a player's Delay, a shortcut), nothing is done and the GC is told: returns false.
+ */
+function actingCombatant(target) {
+  const wanted = target?.dataset?.combatant,
+    now = game.combat?.started ? game.combat.combatant : null;
+  if (!now) {
+    ui.notifications.warn(loc`No combatant is acting now; nothing was done.`);
+    return false;
+  }
+  if (wanted && now.id !== wanted) {
+    ui.notifications.warn(loc`The turn has moved to ${now.name}; nothing was done.`);
+    return false;
+  }
+  return now;
+}
 
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
@@ -96,9 +127,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
       previousTurn: guard(() => combat.stepBackTurn(game.combat)),
       nextTurn: guard(() => (game.combat?.started ? game.combat.nextTurn() : game.combat?.startCombat())),
+      consoleWindow: guard(() => openGCConsole({ window: true })),
       addComplication: guard(() => mission.addComplication()),
       entry: guard((event, target) =>
-        mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change)
+        mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change, { notify: true })
       ),
       recordInfraction: guard(() => mission.recordInfraction()),
       sessionDice: guard(() => mission.applySessionDiceAdjustments()),
@@ -111,11 +143,34 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         const m = getMission();
         return manageGCDice({ playersPresent: teamActors(m).length, caliber: m.caliber });
       }),
-      beginSession: guard(() => mission.beginSession()),
-      nextScene: guard(() => mission.nextScene()),
+      beginSession: guard(async () => {
+        if (!(await mission.beginSession())) return;
+        const dice = gcDiceStatus();
+        ui.notifications.info(
+          loc`Session begun: the GC has ${dice.value} action dice, and every agent's action dice and session abilities are reset.`
+        );
+      }),
+      nextScene: guard(async () => {
+        if (!(await mission.nextScene())) return;
+        const m = getMission();
+        ui.notifications.info(
+          m.active
+            ? loc`Scene ${(m.scenesPlayed ?? 0) + 1} begun: scene abilities are back and standard NPCs' damage is cleared.`
+            : loc`New scene begun: scene abilities are back and standard NPCs' damage is cleared.`
+        );
+      }),
       spendDice: guard(() => spend.spendGCDice()),
-      dramaticOn: guard(() => spend.setDramaticScene(true)),
-      dramaticOff: guard(() => spend.setDramaticScene(false)),
+      actingSpendDice: guard((event, target) => {
+        const acting = actingCombatant(target);
+        if (acting === false) return null;
+        return spend.spendGCDice({ preferActor: acting?.actor ?? null });
+      }),
+      dramaticOn: guard(async () => {
+        if (await spend.setDramaticScene(true)) ui.notifications.info(loc`This scene is now dramatic (no dice spent).`);
+      }),
+      dramaticOff: guard(async () => {
+        if (await spend.setDramaticScene(false)) ui.notifications.info(loc`This scene is back to standard.`);
+      }),
       doubleInitiative: guard(() => spend.doubleOpponentInitiative()),
       fluidEvent: guard(() => combat.fluidEventDialog()),
       groupInitiative: guard((event, target) =>
@@ -123,18 +178,42 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       ),
       surprise: guard(() => combat.surpriseRoundDialog()),
       combatReference: guard(() => combat.combatReferenceDialog()),
-      openCombatant: guard((event, target) => turn.openCombatant(game.combat, target.dataset.id)),
-      actingAttack: guard((event, target) =>
-        turn.attackWith(game.combat?.combatant?.actor, target.dataset.id, event, game.combat?.combatant)
+      openCombatant: guard((event, target) =>
+        turn.openCombatant(game.combat, target.dataset.id, { sheet: target.dataset.sheet === "true" || event.shiftKey })
       ),
-      actingSpend: guard((event, target) => combat.spendTurnAction(game.combat?.combatant, target.dataset.kind)),
-      actingDamageSave: guard(() => npcDamageSaveWithUndo(game.combat?.combatant?.actor)),
-      actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),
-      actingReady: guard(() => combat.readyCombatant(game.combat?.combatant)),
-      actingOutcome: guard((event, target) => turn.actingOutcome(game.combat?.combatant?.actor, target.dataset.step)),
-      cardNextStep: guard(() => {
-        if (!pressNewestCard("button.sc2-primary-action[data-roll-control]"))
-          ui.notifications.info(loc`No chat card is waiting for a next step.`);
+      // Each acting button carries the combatant it was drawn for; a turn that has moved since is not acted on.
+      actingAttack: guard((event, target) => {
+        const acting = actingCombatant(target);
+        return acting && turn.attackWith(acting.actor, target.dataset.id, event, acting);
+      }),
+      actingSpend: guard(async (event, target) => {
+        const acting = actingCombatant(target);
+        if (!acting) return null;
+        const result = await combat.spendTurnAction(acting, target.dataset.kind);
+        if (result && target.dataset.kind === "reset")
+          ui.notifications.info(loc`${acting.name} has this turn's actions back.`);
+        return result;
+      }),
+      actingDamageSave: guard((event, target) => {
+        const acting = actingCombatant(target);
+        return acting && npcDamageSaveWithUndo(acting.actor);
+      }),
+      actingDelay: guard((event, target) => {
+        const acting = actingCombatant(target);
+        return acting && combat.delayCombatant(acting);
+      }),
+      actingReady: guard((event, target) => {
+        const acting = actingCombatant(target);
+        return acting && combat.readyCombatant(acting);
+      }),
+      actingOutcome: guard((event, target) => {
+        const acting = actingCombatant(target);
+        return acting && turn.actingOutcome(acting.actor, target.dataset.step);
+      }),
+      cardNextStep: guard((event, target) => {
+        const acting = actingCombatant(target);
+        if (!acting) return null;
+        return pressActorCard(acting, "button.sc2-primary-action[data-roll-control]");
       }),
       mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
       consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
@@ -160,7 +239,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static PARTS = {
     main: {
       template: "systems/spycraft2/templates/apps/gc-console.hbs",
-      templates: ["systems/spycraft2/templates/apps/gc-console-combat.hbs"],
+      templates: [
+        "systems/spycraft2/templates/apps/gc-console-combat.hbs",
+        "systems/spycraft2/templates/apps/gc-console-session.hbs"
+      ],
       scrollable: [""]
     }
   };
@@ -171,12 +253,15 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   }
 
   async _prepareContext(options) {
-    return { ...(await super._prepareContext(options)), ...consoleContext() };
+    return { ...(await super._prepareContext(options)), ...consoleContext(), windowed: !!this.isPopout };
   }
 
   /** What the GC was looking at, kept across a redraw: the scroll position, the focused control and open sub-lists. */
   _preRender(context, options) {
     this._kept = captureConsoleState(this.element);
+    // A keyboard press that opened a dialog left the focus on the page; the pressed control gets it back.
+    if (this._kept && this._pressed && !this._kept.focus) this._kept.focus = this._pressed;
+    this._pressed = null;
     return super._preRender?.(context, options);
   }
 
@@ -192,6 +277,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         if (details.open === initial && !storedSections()[key]) return;
         rememberSection(key, details.dataset.state, details.open);
       });
+    }
+    // Combat rows follow the tracker: a double press opens the sheet, and the pointer over a row lights its token.
+    for (const row of this.element.querySelectorAll('.gc-combat-rows [data-action="openCombatant"]')) {
+      row.addEventListener("dblclick", () => turn.openCombatant(game.combat, row.dataset.id, { sheet: true }));
+      row.addEventListener("pointerenter", () => turn.hoverCombatant(game.combat, row.dataset.id, true));
+      row.addEventListener("pointerleave", () => turn.hoverCombatant(game.combat, row.dataset.id, false));
     }
     installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
@@ -222,8 +313,13 @@ const controlKey = (element, root = null) => {
   const { action, list, key, change, id, view, kind, seconds, single, planned } = element.dataset;
   if (!action) return null;
   const wanted = { action, list, key, change, id, view, kind, seconds, single, planned };
-  // The same action can stand in two places (the acting block and the list): the place is kept too.
-  return { ...wanted, nth: Math.max(0, twins(root, wanted).indexOf(element)) };
+  // The same action can stand in two places (the acting block and the list): the place is kept too. When the
+  // control is gone after the redraw (a removed row), the focus goes to its section's heading.
+  return {
+    ...wanted,
+    nth: Math.max(0, twins(root, wanted).indexOf(element)),
+    section: element.closest?.("details[data-section]")?.dataset.section ?? null
+  };
 };
 
 /** Read the parts of the console's state that a redraw would otherwise drop. */
@@ -251,11 +347,14 @@ export function restoreConsoleState(root, kept) {
   });
   if (kept.focus) {
     const same = kept.focus.action ? twins(root, kept.focus) : [];
+    const heading = kept.focus.section
+      ? root.querySelector(`details[data-section="${kept.focus.section}"] > summary`)
+      : null;
     const target = kept.focus.search
       ? root.querySelector(".sc2-tool-search input")
-      : kept.focus.section
-        ? root.querySelector(`details[data-section="${kept.focus.section}"] > summary`)
-        : (same[kept.focus.nth ?? 0] ?? same[0]);
+      : kept.focus.action
+        ? (same[kept.focus.nth ?? 0] ?? same[0] ?? heading)
+        : heading;
     target?.focus?.({ preventScroll: true });
     if (kept.selection && target?.setSelectionRange)
       try {
@@ -270,7 +369,6 @@ export function restoreConsoleState(root, kept) {
 }
 
 const VIEW_SETTING = "gcConsoleView";
-const VIEWS = ["prep", "play", "wrap"];
 /** The state the view choice belongs to: a choice made while planning does not hold once a fight is on. */
 const viewState = () => {
   const m = getMission();
@@ -278,69 +376,10 @@ const viewState = () => {
 };
 /** What the choice was made in: this fight, or outside a fight. A choice made in one fight does not hold in the next. */
 const viewKey = () => game.combat?.id ?? null;
-/** The view in use: the GC's choice for the current state, or the one that state calls for. */
-export function consoleView(state, stored = null, key = null) {
-  if (stored && stored.state === state && (stored.key ?? null) === key && VIEWS.includes(stored.view))
-    return stored.view;
-  return state === "planning" ? "prep" : state === "ended" ? "wrap" : "play";
-}
 function rememberView(view, state) {
   if (!VIEWS.includes(view)) return null;
   return game.settings.set("spycraft2", VIEW_SETTING, { view, state, key: viewKey() });
 }
-/** Which sections each view shows. A search looks through all of them. */
-const VIEW_SECTIONS = {
-  prep: ["mission", "objectives", "antagonists", "complications", "organizations", "campaign", "reference"],
-  play: ["combat", "dice", "objectives", "antagonists", "conflicts", "clock", "reference"],
-  wrap: ["mission", "objectives", "antagonists", "campaign"]
-};
-
-/**
- * The first-session steps, ticked from what the world already holds. Shown in the Prep view until all are done.
- */
-export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatSeen }) {
-  const steps = [
-    {
-      id: "mission",
-      label: loc`Record the mission: name, team and Caliber`,
-      done: !!mission.name,
-      action: "editMission"
-    },
-    {
-      id: "objectives",
-      label: loc`Add at least one objective`,
-      done: (mission.objectives ?? []).length > 0,
-      action: "addObjective"
-    },
-    {
-      id: "npcs",
-      label: loc`Prepare the opposition: make an NPC and place it`,
-      done: npcActors > 0,
-      action: "addNpcToScene"
-    },
-    {
-      id: "start",
-      label: loc`Start mission (fixes the Threat Level)`,
-      done: !!mission.active || !!mission.ended,
-      action: "startMission"
-    },
-    {
-      id: "session",
-      label: loc`Begin session (GC dice and starting action dice)`,
-      done: !!diceCurrent,
-      action: "beginSession"
-    },
-    { id: "combat", label: loc`First combat: add tokens to the tracker, roll Initiative`, done: !!combatSeen }
-  ];
-  const next = steps.find(step => !step.done);
-  return {
-    steps: steps.map(step => ({ ...step, next: step === next })),
-    done: steps.filter(step => step.done).length,
-    total: steps.length,
-    complete: !next
-  };
-}
-
 const SECTION_SETTING = "gcConsoleSections";
 function storedSections() {
   return readSetting(SECTION_SETTING, {}) ?? {};
@@ -350,45 +389,22 @@ function rememberSection(section, state, open) {
   return game.settings.set("spycraft2", SECTION_SETTING, stored);
 }
 
-/**
- * Which console sections start open. Each section opens by default when the game state makes it the one in use
- * (the mission before it starts, combat while one runs, and so on). A GC's own choice is kept until that state changes.
- */
-export function consoleSections({ missionActive, combat, conflictsRunning }, stored = {}) {
-  const states = {
-    clock: "always",
-    mission: missionActive ? "active" : "planning",
-    objectives: missionActive ? "active" : "planning",
-    antagonists: missionActive ? "active" : "planning",
-    complications: "always",
-    dice: missionActive ? "active" : "planning",
-    combat: combat ? "running" : "idle",
-    conflicts: conflictsRunning ? "running" : "idle",
-    organizations: "always",
-    campaign: "always",
-    reference: "always"
-  };
-  const defaults = {
-    clock: false,
-    mission: !missionActive,
-    objectives: missionActive,
-    antagonists: false,
-    complications: false,
-    dice: missionActive,
-    combat: !!combat,
-    conflicts: conflictsRunning,
-    organizations: false,
-    campaign: false,
-    reference: false
-  };
-  return Object.fromEntries(
-    Object.keys(states).map(key => {
-      const choice = stored[key];
-      const open = choice && choice.state === states[key] ? !!choice.open : defaults[key];
-      return [key, { open, state: states[key] }];
-    })
-  );
-}
+/** A tooltip with its shortcut, when one is bound: "Ends this turn (Alt+N)". */
+const withKey = (text, id) => {
+  const key = shortcutLabel(id);
+  return key ? `${text} (${key})` : text;
+};
+
+/** A clock time for "Session begun 19:42", in the GC's own locale. */
+const timeOfDay = stamp => {
+  try {
+    return new Date(stamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+};
+
+export { consoleView, consoleSections, firstSessionChecklist, primaryAction };
 
 /** Everything the console shows, as plain data (also used by tests). */
 export function consoleContext() {
@@ -416,6 +432,7 @@ export function consoleContext() {
   const state = combatNow ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning",
     view = consoleView(state, readSetting(VIEW_SETTING, null), viewKey());
   const acting = turn.actingBlock(combatNow),
+    started = !!combatNow?.started,
     // Only receipts for the agents on the team now: one who left does not stand in for one who joined.
     paid = team.filter(actor => m.standingPaid?.[actor.id]).length;
   const checklist = firstSessionChecklist({
@@ -429,7 +446,44 @@ export function consoleContext() {
   if (readSetting("gcFirstSessionDone", false)) checklist.complete = true;
   else if (checklist.complete && game.user?.isGM)
     Promise.resolve(game.settings.set("spycraft2", "gcFirstSessionDone", true)).catch(() => {});
+  // The session's own starting number, once begun: what it was set up with, not what the team would give now.
+  const starting =
+      dice.current && Number.isSafeInteger(dice.playersPresent)
+        ? dice.playersPresent + 2 * (Number(dice.caliber) || m.caliber)
+        : team.length + 2 * m.caliber,
+    sessionAt = dice.current && dice.startedAt ? timeOfDay(dice.startedAt) : "";
   return {
+    primary: primaryAction({
+      view,
+      checklistShown: view === "prep" && !checklist.complete,
+      missionActive: !!m.active,
+      missionEnded: !!m.ended,
+      diceCurrent: !!dice.current,
+      combat: combatNow
+        ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length }
+        : null
+    }),
+    session: {
+      begun: !!dice.current,
+      at: sessionAt,
+      note: dice.current ? (sessionAt ? loc`Session begun ${sessionAt}` : loc`Session begun`) : ""
+    },
+    // Each tooltip says what the button changes, then its key, so the shortcuts are learnt where they are used.
+    tips: {
+      nextTurn: withKey(loc`Ends this turn and moves to the next combatant`, "nextTurn"),
+      previousTurn: withKey(loc`Steps the fight back one turn`, "previousTurn"),
+      spendDice: withKey(loc`Opens Spend dice with the acting NPC chosen`, "spendDice"),
+      cardNextStep: withKey(
+        loc`Presses the main button (Roll damage, Apply) on the newest chat card about this combatant, and says which`,
+        "cardPrimary"
+      )
+    },
+    shortcuts: Object.fromEntries(
+      ["nextTurn", "previousTurn", "cardPrimary", "gcConsole", "gcBoost", "activeSheet", "spendDice"].map(id => [
+        id,
+        shortcutLabel(id)
+      ])
+    ),
     view,
     views: [
       { id: "prep", label: loc`Prep`, hint: loc`Mission record, opposition and campaign` },
@@ -448,7 +502,14 @@ export function consoleContext() {
     status: {
       mission: m.name || loc`No mission recorded`,
       missionState: m.active ? loc`active` : m.ended ? loc`ended` : loc`not started`,
-      scene: `${m.scenesPlayed ? loc`Scene ${m.scenesPlayed}, ` : ""}${scene.dramatic ? loc`dramatic` : loc`standard`}`,
+      // The scene's kind, not the campaign's era: "period" reads as the decade in a Historical campaign.
+      scene: m.scenesPlayed
+        ? scene.dramatic
+          ? loc`Scene ${m.scenesPlayed + 1} · dramatic`
+          : loc`Scene ${m.scenesPlayed + 1} · standard`
+        : scene.dramatic
+          ? loc`Dramatic`
+          : loc`Standard`,
       turn: combatNow
         ? combatNow.started
           ? loc`Round ${combatNow.round}: ${combatNow.combatant?.name ?? "—"}`
@@ -457,9 +518,12 @@ export function consoleContext() {
       // Awards can take the pool past its starting number; "left of" would then read oddly.
       dice: !dice.current
         ? loc`not set up`
-        : dice.value > team.length + 2 * m.caliber
+        : dice.value > starting
           ? loc`${dice.value} left`
-          : loc`${dice.value} left of ${team.length + 2 * m.caliber}`
+          : loc`${dice.value} left of ${starting}`,
+      session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`,
+      // While planning, the strip shows what the mission will be, not a fight that cannot be running yet.
+      threat: loc`${tl} · Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`
     },
     wrap: {
       standing:
@@ -490,8 +554,8 @@ export function consoleContext() {
       caliberLabel: ROMAN[m.caliber - 1] ?? m.caliber,
       threatLevel: tl,
       threatNote: m.threatOverride
-        ? "fixed"
-        : `${live.base}${live.adjust ? ` ${signed(live.adjust)}` : ""}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
+        ? loc`set by hand`
+        : `${live.adjust ? loc`team ${live.base}, ${signed(live.adjust)} adjustment` : loc`from the team's levels`}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
       bonusDice: threatBonusActionDice(tl, levels),
       team: team.map(actor => {
         const status = standingStatus(actor.system);
@@ -506,6 +570,7 @@ export function consoleContext() {
       }),
       standing,
       canRaiseCaliber: m.caliber < 5,
+      nextCaliberLabel: ROMAN[m.caliber] ?? m.caliber + 1,
       objectives: m.objectives.map(objective => ({ ...objective, xp: objective.grade * 25 })),
       antagonists: m.antagonists.map(entry => ({
         ...entry,
@@ -529,12 +594,21 @@ export function consoleContext() {
       }))
     },
     xp: {
+      // Before the mission starts nothing is earned yet: the figure is what the mission plans to give.
+      label: m.active || m.ended ? loc`Base XP earned so far` : loc`Planned base XP`,
       earned: earned.total,
       planned: planned.total,
       warnings: planned.warnings,
       perScene: m.scenesPlayed ? Math.round(earned.total / m.scenesPlayed) : null
     },
-    dice: { ...dice, expected: team.length + 2 * m.caliber },
+    dice: {
+      ...dice,
+      expected: starting,
+      formula:
+        dice.current && Number.isSafeInteger(dice.playersPresent)
+          ? loc`${dice.playersPresent} players present + 2 × Caliber ${ROMAN[(Number(dice.caliber) || m.caliber) - 1] ?? m.caliber}`
+          : loc`${team.length} agents on the team + 2 × Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`
+    },
     scene,
     season: qualities
       .filter(quality => quality.source === "season")
@@ -553,15 +627,25 @@ export function consoleContext() {
     combat: combatNow
       ? {
           round: combatNow.round,
-          started: combatNow.started,
+          started,
           surprise: combatNow.flags?.spycraft2?.surprise ?? null,
           acting,
           combatants: turn.combatRows(combatNow),
-          mobs: turn.mobGroups(combatNow).map(group => ({
-            key: group.key,
-            label: loc`Mob attack: ${group.name} ×${group.count}`
-          })),
-          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length
+          // Before the fight begins a mob cannot attack: the buttons wait for it.
+          mobs: started
+            ? turn.mobGroups(combatNow).map(group => ({
+                key: group.key,
+                label: loc`Mob attack: ${group.name} ×${group.count}`
+              }))
+            : [],
+          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
+          unrolledNames: combatNow.turns
+            .filter(c => !Number.isFinite(c.initiative))
+            .map(c => c.name)
+            .join(", "),
+          scene: combatNow.scene?.name ?? loc`no scene`,
+          // The fight the console runs is named when it is not this scene's, so Next turn is not pressed on another.
+          elsewhere: !!(combatNow.scene && globalThis.canvas?.scene && combatNow.scene.id !== canvas.scene.id)
         }
       : null,
     conflicts: conflictList,
@@ -611,14 +695,28 @@ export function registerGCConsoleTab() {
   CONFIG.ui.gc = GCConsole;
   const Sidebar = CONFIG.ui.sidebar;
   const tabs = Object.entries(Sidebar.TABS).filter(([name]) => name !== "gc");
-  tabs.unshift(["gc", { tooltip: loc`GC Console`, icon: "fa-solid fa-user-secret", gmOnly: true }]);
+  // Beside the tracker it works with, so Chat keeps its usual place at the front.
+  const after = tabs.findIndex(([name]) => name === "combat");
+  tabs.splice(after < 0 ? tabs.length : after + 1, 0, [
+    "gc",
+    { tooltip: loc`GC Console`, icon: "fa-solid fa-user-secret", gmOnly: true }
+  ]);
   Sidebar.TABS = Object.fromEntries(tabs);
 }
 
-export async function openGCConsole() {
+/**
+ * Open the console. By default it opens in its own window, so the chat log, where the cards are resolved, stays in
+ * the sidebar beside it; the "GC Console in its own window" setting turns that off. The sidebar tab still works.
+ */
+export async function openGCConsole({ window: windowed = readSetting("gcConsoleWindow", true) } = {}) {
   if (!game.user.isGM) return refuse(loc`The GC Console is for the Game Control.`);
   const instance = ui.gc;
   game.spycraft2.gc.console = instance;
+  if (windowed && typeof instance.renderPopout === "function") {
+    const popout = (await instance.renderPopout()) ?? instance.popout;
+    popout?.bringToFront?.();
+    return popout ?? instance;
+  }
   await instance.render({ force: true });
   instance.activate();
   return instance;

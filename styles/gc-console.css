@@ -475,3 +475,144 @@
 .gc-console-body .gc-row-count {
   font-family: var(--sc2-num);
 }
+
+/* ---------- Fight layout: the turn bar first, the acting combatant compact, the order as a two-column list ---------- */
+/* Next turn stays in view while the console scrolls, so it never has to be looked for. */
+.gc-console-body .gc-turn-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 6px 0;
+  padding: 4px 0;
+  background: var(--sc2-surface);
+}
+.gc-console-body .gc-turn-bar button {
+  width: 100%;
+  min-height: 32px;
+  margin: 0;
+  white-space: normal;
+}
+.gc-console-body .gc-turn-bar button.gc-primary {
+  grid-column: 1 / -1;
+}
+.gc-console-body .gc-acting-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 10px;
+  margin: 0 0 4px;
+}
+.gc-console-body .gc-acting-facts > div {
+  min-width: 0;
+}
+.gc-console-body .gc-acting-facts .gc-wide {
+  grid-column: 1 / -1;
+}
+.gc-console-body .gc-acting-facts dt {
+  display: inline;
+  color: var(--sc2-ink-muted);
+  font-size: var(--sc2-text-s);
+}
+.gc-console-body .gc-acting-facts dt::after {
+  content: ": ";
+}
+.gc-console-body .gc-acting-facts dd {
+  display: inline;
+  margin: 0;
+  font-weight: 600;
+}
+/* The weapons are the acting combatant's main choices: drawn heavier than the bookkeeping buttons. */
+.gc-console-body .gc-weapons button {
+  font-weight: 700;
+  border-color: var(--sc2-rule-strong);
+}
+.gc-console-body ul.gc-combat-rows .gc-row-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  color: var(--sc2-ink);
+}
+.gc-console-body .gc-combat-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 0 7px;
+  color: var(--sc2-ink-muted);
+  font-size: var(--sc2-text-s);
+}
+.gc-console-body .gc-row-count {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  min-width: 2ch;
+}
+.gc-console-body .gc-current-turn .gc-row-button {
+  background: var(--sc2-action-tint);
+  border-color: var(--sc2-action);
+}
+.gc-console-body [data-defeated="true"] .gc-row-name {
+  text-decoration: line-through;
+}
+/* Mission rows: the text, then its buttons on their own line, with Remove set apart. */
+.gc-console-body ul.gc-rows {
+  padding: 0;
+  list-style: none;
+}
+.gc-console-body .gc-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 25%, transparent));
+}
+.gc-console-body .gc-row-text {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.gc-console-body .gc-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.gc-console-body .gc-row-actions .gc-danger {
+  margin-inline-start: 12px;
+}
+.gc-console-body button[aria-pressed="true"].sc2-action {
+  background: var(--sc2-action-tint);
+  border-color: var(--sc2-action);
+}
+.gc-console-body button[aria-pressed="true"].sc2-action[data-change="critical"]::before {
+  content: "✓ ";
+}
+.gc-console-body button.gc-danger {
+  color: var(--sc2-danger);
+  border-color: var(--sc2-danger);
+}
+.gc-console-body button.gc-danger:hover {
+  background: var(--sc2-danger-tint);
+}
+.gc-console-body .gc-session-note {
+  grid-column: 1 / -1;
+  align-self: center;
+}
+.gc-console-body .gc-window-link {
+  margin: 0 0 4px;
+  text-align: end;
+}
+.gc-console-body .gc-window-link button {
+  width: auto;
+  min-height: 24px;
+  font-size: var(--sc2-text-s);
+}
+
+/* A dialog's refusal stays inside the dialog, beside the button, and what was typed is kept. */
+.sc2-dialog-refusal {
+  margin: 6px 0 0;
+  padding: 4px 8px;
+  color: var(--sc2-danger, #a3262f);
+  background: var(--sc2-danger-tint, rgba(163, 38, 47, 0.08));
+  border-inline-start: 3px solid currentColor;
+}

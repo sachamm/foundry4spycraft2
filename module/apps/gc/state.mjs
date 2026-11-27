@@ -55,6 +55,14 @@ export function registerGCSettings() {
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
   game.settings.register(SYSTEM, "gcConsoleView", { scope: "client", config: false, type: Object, default: {} });
+  game.settings.register(SYSTEM, "gcConsoleWindow", {
+    name: locKey`GC Console in its own window`,
+    hint: locKey`Alt+G opens the GC Console as a window beside the chat log, instead of in the chat's place in the sidebar.`,
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: true
+  });
   // Set once every first-session step has been done, so the list does not return with each new mission.
   game.settings.register(SYSTEM, "gcFirstSessionDone", {
     scope: "world",

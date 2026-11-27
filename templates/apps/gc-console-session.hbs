@@ -1,0 +1,9 @@
+  <p class="controls gc-session-steps">
+    {{#if session.begun}}<span class="gc-note gc-session-note">{{session.note}}</span>
+    <button type="button" data-action="beginSession" data-tooltip="{{localize 'SPYCRAFT.Console.BeginSessionHint'}}">{{localize "SPYCRAFT.Console.BeginNewSession"}}</button>
+    {{else}}
+      <button type="button" class="{{#if (eq @root.primary "beginSession")}}gc-primary{{/if}}" data-action="beginSession"
+        data-tooltip="{{localize 'SPYCRAFT.Console.BeginSessionHint'}}">{{localize "SPYCRAFT.Console.BeginSession"}}</button>{{/if}}
+    <button type="button" data-action="nextScene" data-tooltip="{{localize 'SPYCRAFT.Console.NextSceneHint'}}">{{localize "SPYCRAFT.Console.NextScene"}}</button>
+    <button type="button" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button>
+  </p>

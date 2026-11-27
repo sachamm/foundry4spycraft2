@@ -24,7 +24,7 @@ import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -47,13 +47,65 @@ export async function rollGCDie(faces, { explodeLow = false } = {}) {
   return { faces, rolls, rollObjects, total: rolls.reduce((sum, value) => sum + value, 0) };
 }
 
-const npcActors = () => {
-  const controlled = (canvas?.tokens?.controlled ?? [])
-    .map(token => token.actor)
-    .filter(actor => actor?.type === "npc");
-  const all = [...(game.actors ?? [])].filter(actor => actor.type === "npc");
-  return [...new Set([...controlled, ...all])];
-};
+/**
+ * The NPCs a spend can name, in the order a GC looks for them: the one asked for (the acting NPC), the NPCs in the
+ * viewed fight with their Count, the selected tokens, then the rest of the world under their own label. A token copy
+ * and its sidebar actor are told apart by that label.
+ * @returns {Array<[string, string, Actor]>} uuid, label, actor
+ */
+export function npcChoices(preferActor = null) {
+  const rows = new Map();
+  const add = (actor, label) => {
+    if (actor?.type !== "npc" || rows.has(actor.uuid)) return;
+    rows.set(actor.uuid, [actor.uuid, label, actor]);
+  };
+  if (preferActor) add(preferActor, loc`${preferActor.name} (acting)`);
+  for (const combatant of game.combat?.turns ?? [])
+    add(
+      combatant.actor,
+      Number.isFinite(combatant.initiative)
+        ? loc`${combatant.name} · Count ${combatant.initiative}`
+        : loc`${combatant.name} · in this fight`
+    );
+  for (const token of canvas?.tokens?.controlled ?? [])
+    add(token.actor, loc`${token.name ?? token.actor?.name} · selected`);
+  const inFight = rows.size > 0;
+  for (const actor of game.actors ?? []) add(actor, inFight ? loc`${actor.name} (not in this fight)` : actor.name);
+  return [...rows.values()];
+}
+
+/** Why a spend dialog's entry would be refused, or "" when it can go ahead. Read before the dialog closes. */
+function spendRefusal(values, { dramatic, status }) {
+  const spend = GC_SPENDS.find(entry => entry.id === values.id);
+  if (!spend) return loc`Choose a use for the action dice.`;
+  const actor = spend.needsNpc && values.actorId ? globalThis.fromUuidSync?.(values.actorId) : null;
+  if (spend.needsNpc && actor?.type !== "npc") return loc`Choose the NPC this applies to.`;
+  if (values.id === "boostDC" && !String(values.dcCheck ?? "").trim())
+    return loc`Name the check whose DC rises, so its earlier boosts are counted.`;
+  try {
+    const quality = values.id === "campaignQuality" ? campaignQuality(values.qualityId) : null;
+    const plan = planSpend(values.id, {
+      npc: actor ? spendProfile(actor) : null,
+      dramatic,
+      dice: Number(values.dice) || 1,
+      checkKind: values.checkKind,
+      alreadyBoostedDC:
+        values.id === "boostDC"
+          ? Number(getSceneState().dcBoostsByCheck?.[String(values.dcCheck).trim().toLowerCase()]?.count) || 0
+          : 0,
+      eventCost: Number(values.eventCost) || 1,
+      triggered: !!values.triggered,
+      free: !!values.free,
+      qualityCost: quality?.gcDice ?? null,
+      fromDeath: !values.fromCapture,
+      inCombat: !!game.combat?.started
+    });
+    if (plan.cost > status.value) return loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`;
+  } catch (error) {
+    return error.message;
+  }
+  return "";
+}
 
 /**
  * Spend GC action dice on one of the listed uses. `input` may pre-fill the dialog:
@@ -66,7 +118,7 @@ export async function spendGCDice(input = {}) {
   const dramatic = isDramaticScene(),
     scene = getSceneState();
   if (!input.id) {
-    const actors = npcActors();
+    const actors = npcChoices(input.preferActor ?? null);
     const uses = GC_SPENDS.filter(spend => dramatic || !spend.dramaticOnly).map(spend => [
       spend.id,
       `${spend.label} (p.${spend.page})`
@@ -79,7 +131,7 @@ export async function spendGCDice(input = {}) {
       loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
-      <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
+      <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(([uuid, label]) => [uuid, label])], actors[0]?.[0] ?? "")}</select></label>
       <label data-when="id=activateThreat|activateError">${loc`Threat or error scored with`} <select name="checkKind">${options(
         [
           ["attack", "an attack"],
@@ -103,7 +155,9 @@ export async function spendGCDice(input = {}) {
       ])}</select></label>
       <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
       <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
-      loc`Spend dice`
+      loc`Spend dice`,
+      // A spend that would be refused keeps the dialog open with the reason, so nothing typed is lost.
+      values => spendRefusal(values, { dramatic, status })
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };

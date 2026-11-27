@@ -7,7 +7,7 @@ import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
-import { cancellable, cancelButton, freeCancel } from "../dialog-kit.mjs";
+import { cancellable, cancelButton, freeCancel, holdUntilValid } from "../dialog-kit.mjs";
 import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
 import { getMission, teamActors } from "./state.mjs";
 import { minionSquad } from "../../rules/npc-qualities.mjs";
@@ -187,6 +187,10 @@ export async function addNpcToScene() {
     buttons: [cancelButton()],
     render: (_event, dialog) => {
       freeCancel(dialog?.element);
+      // An entry with no NPC picked stays open with the reason, so the search and the other choices are kept.
+      holdUntilValid(dialog?.element, values =>
+        values.uuid ? "" : loc`No NPC is chosen. Clear the search or pick one from the list.`
+      );
       return filterList(dialog);
     },
     content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" autofocus /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list">${[

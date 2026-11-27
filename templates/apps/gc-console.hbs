@@ -1,115 +1,198 @@
 <section class="spycraft2 gc-console-body">
   <div class="gc-now" role="status">
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}</span><b class="sc2-value">{{status.mission}}</b><span class="gc-note">{{status.missionState}}</span></div>
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}</span><b
+      class="sc2-value">{{status.mission}}</b><span class="gc-note">{{status.missionState}}</span></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.ScenePeriod"}}</span><b class="sc2-value">{{status.scene}}</b></div>
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.Combat"}}</span><b class="sc2-value">{{status.turn}}</b></div>
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.GCActionDice"}}</span><b class="sc2-value">{{status.dice}}</b></div>
+    {{#if shown.prep}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.ThreatLevel"}}</span><b class="sc2-value">{{status.threat}}</b></div>
+    {{else}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.Combat"}}</span><b class="sc2-value">{{status.turn}}</b></div>{{/if}}
+    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.GCActionDice"}}</span><b
+      class="sc2-value">{{status.dice}}</b><span class="gc-note">{{localize "SPYCRAFT.Console.Session"}} {{status.session}}</span></div>
   </div>
-  <div class="gc-views" role="group" aria-label="{{localize 'SPYCRAFT.Console.Views'}}">{{#each views}}<button type="button" data-action="consoleView" data-view="{{id}}" aria-pressed="{{active}}" data-tooltip="{{hint}}">{{label}}</button>{{/each}}</div>
+  <div class="gc-views" role="group" aria-label="{{localize 'SPYCRAFT.Console.Views'}}">{{#each views}}
+    <button type="button" data-action="consoleView" data-view="{{id}}" aria-pressed="{{active}}" data-tooltip="{{hint}}">{{label}}</button>{{/each}}</div>
+  {{#unless windowed}}<p class="gc-window-link">
+    <button type="button" class="sc2-action" data-action="consoleWindow" data-tooltip="{{localize 'SPYCRAFT.Console.OpenWindowHint'}}">{{localize "SPYCRAFT.Console.OpenWindow"}}</button>
+    </p>{{/unless}}
   {{#if shown.prep}}{{#unless checklist.complete}}
   <section class="gc-checklist" aria-label="{{localize 'SPYCRAFT.Console.FirstSession'}}">
     <h3>{{localize "SPYCRAFT.Console.FirstSession"}} <span class="gc-note">{{checklist.done}}/{{checklist.total}}</span></h3>
-    <ol>{{#each checklist.steps}}<li data-done="{{done}}"{{#if next}} aria-current="step"{{/if}}><span class="gc-check" role="img" aria-label="{{#if done}}{{localize 'SPYCRAFT.Console.StepDone'}}{{else}}{{localize 'SPYCRAFT.Console.StepToDo'}}{{/if}}">{{#if done}}✔{{else}}○{{/if}}</span> <span>{{label}}</span>{{#if next}}{{#if action}} <button type="button" class="gc-primary" data-action="{{action}}">{{localize "SPYCRAFT.Console.DoThis"}}</button>{{/if}}{{/if}}</li>{{/each}}</ol>
+    <ol>{{#each checklist.steps}}<li data-done="{{done}}"{{#if next}} aria-current="step"{{/if}}><span
+      class="gc-check" role="img" aria-label="{{#if done}}{{localize 'SPYCRAFT.Console.StepDone'}}{{else}}{{localize 'SPYCRAFT.Console.StepToDo'}}{{/if}}">{{#if done}}✔{{else}}○{{/if}}</span> <span>{{label}}</span>{{#if next}}{{#if action}} 
+      <button type="button" class="gc-primary" data-action="{{action}}"{{#if view}} data-view="{{view}}"{{/if}}>{{localize "SPYCRAFT.Console.DoThis"}}</button>{{/if}}{{/if}}</li>{{/each}}</ol>
     <p class="gc-note">{{localize "SPYCRAFT.Console.QuickstartPointer"}}</p>
   </section>
   {{/unless}}{{/if}}
-  {{#if shown.play}}
-  <p class="controls gc-session-steps">
-    <button type="button" data-action="beginSession" {{#unless dice.current}}class="gc-primary"{{/unless}} data-tooltip="{{localize 'SPYCRAFT.Console.BeginSessionHint'}}">{{localize "SPYCRAFT.Console.BeginSession"}}</button>
-    <button type="button" data-action="nextScene" data-tooltip="{{localize 'SPYCRAFT.Console.NextSceneHint'}}">{{localize "SPYCRAFT.Console.NextScene"}}</button>
-    <button type="button" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button>
-  </p>
-  {{/if}}
+  {{#if shown.play}}{{#unless combat}}{{> "systems/spycraft2/templates/apps/gc-console-session.hbs"}}{{/unless}}{{/if}}
   {{#if shown.wrap}}
   <section class="gc-wrap" aria-label="{{localize 'SPYCRAFT.Console.WrapUp'}}">
     <h3>{{localize "SPYCRAFT.Console.WrapUp"}}</h3>
     <ol>
-      <li><button type="button" class="gc-primary" data-action="missionReport" data-planned="false">{{localize "SPYCRAFT.Template.AppsGcConsole.XPReport"}}</button> <span class="gc-note">{{localize "SPYCRAFT.Console.WrapXP" earned=xp.earned}}</span></li>
-      <li><button type="button" data-action="recordInfraction">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordExposureInfraction"}}</button> <span class="gc-note">{{localize "SPYCRAFT.Console.WrapInfractions" count=wrap.infractions}}</span></li>
+      <li>
+        <button type="button" class="{{#if (eq @root.primary "missionReport")}} gc-primary{{/if}}" data-action="missionReport"
+          data-planned="false">{{localize "SPYCRAFT.Template.AppsGcConsole.XPReport"}}</button> <span
+          class="gc-note">{{localize "SPYCRAFT.Console.WrapXP" earned=xp.earned}}</span></li>
+      <li>
+        <button type="button" data-action="recordInfraction">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordExposureInfraction"}}</button> <span
+          class="gc-note">{{localize "SPYCRAFT.Console.WrapInfractions" count=wrap.infractions}}</span></li>
       <li><button type="button" data-action="awardStanding">{{localize "SPYCRAFT.Template.AppsGcConsole.AwardReputationNetWorth"}}</button> <span class="gc-note">{{wrap.standing}}</span></li>
-      <li>{{#if mission.active}}<button type="button" data-action="endMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EndMission"}}</button>{{else if mission.ended}}<span class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span> <button type="button" data-action="resumeMission">{{localize "SPYCRAFT.Console.ResumeMission"}}</button>{{else}}<span class="gc-note">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</li>
+      <li>{{#if mission.active}}
+        <button type="button" class="{{#if (eq @root.primary "endMission")}} gc-primary{{/if}}" data-action="endMission"
+          data-tooltip="{{localize 'SPYCRAFT.Console.EndMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.EndMission"}}</button>{{else if mission.ended}}<span
+          class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span> 
+        <button type="button" data-action="resumeMission">{{localize "SPYCRAFT.Console.ResumeMission"}}</button>{{else}}<span
+          class="gc-note">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</li>
     </ol>
     <p class="gc-note">{{localize "SPYCRAFT.Console.WrapSettle"}}</p>
   </section>
   {{/if}}
-  {{#if combat}}{{> "systems/spycraft2/templates/apps/gc-console-combat.hbs"}}{{/if}}
+  {{#if combat}}{{> "systems/spycraft2/templates/apps/gc-console-combat.hbs"}}{{#if shown.play}}{{> "systems/spycraft2/templates/apps/gc-console-session.hbs"}}{{/if}}{{/if}}
   <details class="gc-section" data-section="clock" data-view-hidden="{{hiddenSections.clock}}" data-state="{{sections.clock.state}}" {{#if sections.clock.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{clock.title}}</span><span class="gc-note">{{clock.now}}</span></summary>
-    <p class="controls gc-clock-steps">{{#each clock.steps}}<button type="button" data-action="clockStep" data-seconds="{{seconds}}">{{label}}</button>{{/each}}<button type="button" data-action="clockAdvance">{{clock.advance}}</button><button type="button" data-action="clockDate">{{clock.setDate}}</button><button type="button" data-action="clockOpen">{{clock.open}}</button></p>
+    <p class="controls gc-clock-steps">{{#each clock.steps}}<button type="button" data-action="clockStep" data-seconds="{{seconds}}">{{label}}</button>{{/each}}
+      <button type="button" data-action="clockAdvance">{{clock.advance}}</button><button type="button" data-action="clockDate">{{clock.setDate}}</button>
+      <button type="button" data-action="clockOpen">{{clock.open}}</button></p>
   </details>
   <details class="gc-section" data-section="mission" data-view-hidden="{{hiddenSections.mission}}" data-state="{{sections.mission.state}}" {{#if sections.mission.open}}open{{/if}}>
-    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}{{#if mission.name}}: {{mission.name}}{{/if}} {{#if mission.active}}<span class="tag">{{localize "SPYCRAFT.Template.AppsGcConsole.Active"}}</span>{{else if mission.ended}}<span class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span>{{else}}<span class="tag muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</span></summary>
+    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}{{#if mission.name}}: {{mission.name}}{{/if}} {{#if mission.active}}<span
+      class="tag">{{localize "SPYCRAFT.Template.AppsGcConsole.Active"}}</span>{{else if mission.ended}}<span
+      class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span>{{else}}<span class="tag muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</span></summary>
     <div class="gc-facts">
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b class="sc2-value">{{mission.threatLevel}}</b>{{#if mission.threatNote}}<span class="gc-note">{{mission.threatNote}}</span>{{/if}}</div>
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b
+        class="sc2-value">{{mission.threatLevel}}</b>{{#if mission.threatNote}}<span class="gc-note">{{mission.threatNote}}</span>{{/if}}</div>
       <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorth}}</span></div>
-      {{#if mission.bonusDice}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingDice"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.StartingDiceValue" dice=mission.bonusDice}}</span></div>{{/if}}
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Team"}}</span><span class="sc2-value">{{#each mission.team}}{{name}} (L{{level}}){{#if standingStatus}} <span class="bad">{{standingStatus}}</span>{{/if}}{{#unless @last}}, {{/unless}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NoAgents"}}{{/each}}</span></div>
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span
+        class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorth}}</span></div>
+      {{#if mission.bonusDice}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingDice"}}</span><span
+        class="sc2-value">{{localize "SPYCRAFT.Console.StartingDiceValue" dice=mission.bonusDice}}</span></div>{{/if}}
+      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Team"}}</span><span
+        class="sc2-value">{{#each mission.team}}{{name}} (L{{level}}){{#if standingStatus}} <span class="bad">{{standingStatus}}</span>{{/if}}{{#unless @last}}, {{/unless}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NoAgents"}}{{/each}}</span></div>
     </div>
     <p class="controls">
-      {{#if mission.active}}<button type="button" class="gc-primary" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button><button type="button" data-action="endMission" data-tooltip="{{localize 'SPYCRAFT.Console.EndMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.EndMission"}}</button>
-      {{else if mission.ended}}<button type="button" class="gc-primary" data-action="resumeMission" data-tooltip="{{localize 'SPYCRAFT.Console.ResumeMissionHint'}}">{{localize "SPYCRAFT.Console.ResumeMission"}}</button><button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button><button type="button" data-action="startMission" data-tooltip="{{localize 'SPYCRAFT.Console.StartAgainHint'}}">{{localize "SPYCRAFT.Console.StartAgain"}}</button>
-      {{else}}<button type="button" class="gc-primary" data-action="startMission" data-tooltip="{{localize 'SPYCRAFT.Console.StartMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.StartMission"}}</button><button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>{{/if}}
+      {{#if mission.active}}
+        <button type="button" class="{{#if (eq @root.primary "editMission")}} gc-primary{{/if}}" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>
+        <button type="button" data-action="endMission" data-tooltip="{{localize 'SPYCRAFT.Console.EndMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.EndMission"}}</button>
+      {{else if mission.ended}}
+        <button type="button" class="{{#if (eq @root.primary "resumeMission")}} gc-primary{{/if}}" data-action="resumeMission"
+          data-tooltip="{{localize 'SPYCRAFT.Console.ResumeMissionHint'}}">{{localize "SPYCRAFT.Console.ResumeMission"}}</button>
+        <button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>
+        <button type="button" data-action="startMission" data-tooltip="{{localize 'SPYCRAFT.Console.StartAgainHint'}}">{{localize "SPYCRAFT.Console.StartAgain"}}</button>
+      {{else}}
+        <button type="button" class="{{#if (eq @root.primary "startMission")}} gc-primary{{/if}}" data-action="startMission"
+          data-tooltip="{{localize 'SPYCRAFT.Console.StartMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.StartMission"}}</button>
+        <button type="button" data-action="editMission">{{localize "SPYCRAFT.Template.AppsGcConsole.EditMission"}}</button>{{/if}}
     </p>
     <div class="gc-facts">
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.BaseXPEarnedSoFar"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.XPValue" earned=xp.earned planned=xp.planned}}</span></div>
-      {{#if xp.perScene}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.XPPerScene"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.XPPerSceneValue" xp=xp.perScene scenes=mission.scenesPlayed}}</span></div>{{/if}}
+      <div class="sc2-field"><span class="sc2-caption">{{xp.label}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.XPValue" earned=xp.earned planned=xp.planned}}</span></div>
+      {{#if xp.perScene}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.XPPerScene"}}</span><span
+        class="sc2-value">{{localize "SPYCRAFT.Console.XPPerSceneValue" xp=xp.perScene scenes=mission.scenesPlayed}}</span></div>{{/if}}
     </div>
     {{#if xp.warnings.length}}<p>{{#each xp.warnings}}<span class="bad">{{this}}</span> {{/each}}</p>{{/if}}
-    <p class="controls"><button type="button" data-action="sceneAdvance">{{localize "SPYCRAFT.Template.AppsGcConsole.CorrectTheSceneCount"}}</button><button type="button" data-action="missionReport" data-planned="false">{{localize "SPYCRAFT.Template.AppsGcConsole.XPReport"}}</button></p>
+    <p class="controls"><button type="button" data-action="sceneAdvance">{{localize "SPYCRAFT.Console.SetScenes"}}</button>
+      <button type="button" data-action="missionReport" data-planned="false">{{localize "SPYCRAFT.Template.AppsGcConsole.XPReport"}}</button></p>
     <details class="gc-more">
       <summary>{{localize "SPYCRAFT.Console.MoreMissionTools"}}</summary>
       <p class="controls">
-      {{#if mission.active}}<button type="button" data-action="recalculateTL">{{localize "SPYCRAFT.Template.AppsGcConsole.RecalculateThreatLevel"}}</button>{{/if}}<button type="button" data-action="missionReport" data-planned="true">{{localize "SPYCRAFT.Template.AppsGcConsole.PlannedXP"}}</button><button type="button" data-action="recordInfraction">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordExposureInfraction"}}</button><button type="button" data-action="awardStanding">{{localize "SPYCRAFT.Template.AppsGcConsole.AwardReputationNetWorth"}}</button>
-      <button type="button" data-action="clearMission">{{localize "SPYCRAFT.Template.AppsGcConsole.ClearRecord"}}</button>
-      {{#if mission.canRaiseCaliber}}<button type="button" data-action="caliberIncrease">{{localize "SPYCRAFT.Template.AppsGcConsole.Caliber1GCGains2Dice"}}</button>{{/if}}
+      {{#if mission.active}}<button type="button" data-action="recalculateTL">{{localize "SPYCRAFT.Template.AppsGcConsole.RecalculateThreatLevel"}}</button>{{/if}}
+        <button type="button" data-action="missionReport" data-planned="true">{{localize "SPYCRAFT.Template.AppsGcConsole.PlannedXP"}}</button>
+        <button type="button" data-action="recordInfraction">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordExposureInfraction"}}</button>
+        <button type="button" data-action="awardStanding">{{localize "SPYCRAFT.Template.AppsGcConsole.AwardReputationNetWorth"}}</button>
+      <button type="button" class="gc-danger" data-action="clearMission">{{localize "SPYCRAFT.Template.AppsGcConsole.ClearRecord"}}</button>
+      {{#if mission.canRaiseCaliber}}<button type="button" data-action="caliberIncrease">{{localize "SPYCRAFT.Console.RaiseCaliber" caliber=mission.nextCaliberLabel}}</button>{{/if}}
       <button type="button" data-action="sessionDice">{{localize "SPYCRAFT.Template.AppsGcConsole.ApplyStartingDiceAdjustments"}}</button>
       </p>
     </details>
-    {{#if mission.infractions.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.Infractions"}} {{#each mission.infractions}}{{actorName}} — {{name}} ({{penalty}} {{currency}}){{#unless @last}}; {{/unless}}{{/each}}</p>{{/if}}
+    {{#if mission.infractions.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.Infractions"}} {{#each mission.infractions}}{{actorName}} — {{name}} ({{penalty}} {{currency}}){{#unless @last}}; {{/unless}}{{/each}}
+      </p>{{/if}}
   </details>
   <details class="gc-section" data-section="objectives" data-view-hidden="{{hiddenSections.objectives}}" data-state="{{sections.objectives.state}}" {{#if sections.objectives.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Objectives"}}</span><span class="gc-note">{{counts.objectives}}</span></summary>
-    <p class="controls"><button type="button" class="gc-primary" data-action="addObjective">{{localize "SPYCRAFT.Template.AppsGcConsole.Add"}}</button></p>
-    <ul data-sc2-display="icon">{{#each mission.objectives}}<li>{{#if complete}}✔{{else}}○{{/if}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Grade"}} {{grade}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{#if critical}} · <b>{{localize "SPYCRAFT.Template.AppsGcConsole.Critical"}}</b>{{/if}}
-    <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}" data-change="complete">{{#if complete}}{{localize "SPYCRAFT.Template.AppsGcConsole.Undo"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.Complete"}}{{/if}}</button> <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}" data-change="critical">{{localize "SPYCRAFT.Template.AppsGcConsole.Critical"}}</button> <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{else}}<li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoneYet"}}</li>{{/each}}</ul>
+    {{#if shown.prep}}<p class="controls"><button type="button" data-action="addObjective">{{localize "SPYCRAFT.Console.AddObjective"}}</button></p>{{/if}}
+    <ul class="gc-rows">{{#each mission.objectives}}
+      <li class="gc-row"><span class="gc-row-text">{{#if complete}}✔{{else}}○{{/if}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Grade"}} {{grade}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{#if critical}} · <b>{{localize "SPYCRAFT.Template.AppsGcConsole.Critical"}}</b>{{/if}}</span>
+    <span class="gc-row-actions">
+      <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}"
+        data-change="complete" aria-pressed="{{#if complete}}true{{else}}false{{/if}}" aria-label="{{#if complete}}{{localize 'SPYCRAFT.Console.MarkNotDoneNamed' name=name}}{{else}}{{localize 'SPYCRAFT.Console.MarkDoneNamed' name=name}}{{/if}}">{{#if complete}}{{localize "SPYCRAFT.Console.MarkNotDone"}}{{else}}{{localize "SPYCRAFT.Console.MarkDone"}}{{/if}}</button>
+      {{#if @root.shown.prep}}
+      <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}"
+        data-change="critical" aria-pressed="{{#if critical}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Console.CriticalNamed' name=name}}">{{localize "SPYCRAFT.Console.CriticalToggle"}}</button>
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="objectives" data-key="{{id}}"
+        data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button>{{/if}}</span></li>{{else}}<li
+        class="muted">{{localize "SPYCRAFT.Console.NoObjectives"}}</li>{{/each}}</ul>
   </details>
   <details class="gc-section" data-section="antagonists" data-view-hidden="{{hiddenSections.antagonists}}" data-state="{{sections.antagonists.state}}" {{#if sections.antagonists.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Antagonists"}}</span><span class="gc-note">{{counts.antagonists}}</span></summary>
-    <p class="controls"><button type="button" class="gc-primary" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button> <button type="button" class="sc2-action" data-action="addAntagonist" data-tooltip="{{localize 'SPYCRAFT.Template.AppsGcConsole.RecordForXPHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordForXP"}}</button></p>
-    <ul data-sc2-display="icon">{{#each mission.antagonists}}<li>{{#if encountered}}✔{{else}}○{{/if}} {{name}} — {{#if perScene}}{{#if promoted}}{{localize "SPYCRAFT.Template.AppsGcConsole.PromotedPerScene" scenes=scenes}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.FullPerScene" scenes=scenes}}{{/if}}
-    <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}" data-change="scenesUp">{{localize "SPYCRAFT.Template.AppsGcConsole.AddAScene"}}</button>{{#if moreScenes}} <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}" data-change="scenesDown">{{localize "SPYCRAFT.Template.AppsGcConsole.RemoveAScene"}}</button>{{/if}}{{else}}{{type}}, {{#if reward.special}}{{localize "SPYCRAFT.Template.AppsGcConsole.SpecialXPTimes" xp=reward.xp times=reward.multiplier total=reward.total}}{{else}}{{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{/if}}{{/if}}
-    <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}" data-change="encountered">{{#if encountered}}{{localize "SPYCRAFT.Template.AppsGcConsole.NotFaced"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.FacedAsAThreat"}}{{/if}}</button> <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{else}}<li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoneYet"}}</li>{{/each}}</ul>
+    {{#if shown.prep}}<p class="controls"><button type="button" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button> 
+      <button type="button" data-action="addAntagonist" data-tooltip="{{localize 'SPYCRAFT.Template.AppsGcConsole.RecordForXPHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordForXP"}}</button>
+      </p>{{/if}}
+    <ul class="gc-rows">{{#each mission.antagonists}}
+      <li class="gc-row"><span class="gc-row-text">{{#if encountered}}✔{{else}}○{{/if}} {{name}} — {{#if perScene}}{{#if promoted}}{{localize "SPYCRAFT.Template.AppsGcConsole.PromotedPerScene" scenes=scenes}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.FullPerScene" scenes=scenes}}{{/if}}
+{{else}}{{type}}, {{#if reward.special}}{{localize "SPYCRAFT.Template.AppsGcConsole.SpecialXPTimes" xp=reward.xp times=reward.multiplier total=reward.total}}{{else}}{{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{/if}}{{/if}}</span>
+    <span class="gc-row-actions">
+      <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}"
+        data-change="encountered" aria-pressed="{{#if encountered}}true{{else}}false{{/if}}">{{#if encountered}}{{localize "SPYCRAFT.Template.AppsGcConsole.NotFaced"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.FacedAsAThreat"}}{{/if}}</button>{{#if perScene}}
+      <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}"
+        data-change="scenesUp">{{localize "SPYCRAFT.Template.AppsGcConsole.AddAScene"}}</button>{{#if moreScenes}}
+      <button type="button" class="sc2-action" data-action="entry" data-list="antagonists" data-key="{{id}}"
+        data-change="scenesDown">{{localize "SPYCRAFT.Template.AppsGcConsole.RemoveAScene"}}</button>{{/if}}{{/if}}
+      {{#if @root.shown.prep}}
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="antagonists" data-key="{{id}}"
+        data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button>{{/if}}</span></li>{{else}}<li
+        class="muted">{{localize "SPYCRAFT.Console.NoAntagonists"}}</li>{{/each}}</ul>
   </details>
-  <details class="gc-section" data-section="complications" data-view-hidden="{{hiddenSections.complications}}" data-state="{{sections.complications.state}}" {{#if sections.complications.open}}open{{/if}}>
+  <details class="gc-section" data-section="complications" data-view-hidden="{{hiddenSections.complications}}"
+    data-state="{{sections.complications.state}}" {{#if sections.complications.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Complications"}}</span></summary>
-    <p class="controls"><button type="button" class="gc-primary" data-action="addComplication">{{localize "SPYCRAFT.Template.AppsGcConsole.Add"}}</button></p>
+    <p class="controls"><button type="button" data-action="addComplication">{{localize "SPYCRAFT.Console.AddComplication"}}</button></p>
     <ul data-sc2-display="icon">
     <li>{{localize "SPYCRAFT.Template.AppsGcConsole.ScriptedDramaticScenes"}} {{mission.dramaticScenes}}{{#if mission.timeLimit}} {{localize "SPYCRAFT.Template.AppsGcConsole.TimeLimit"}}{{/if}}{{#if mission.bundleCommonItems}} · {{mission.bundleCommonItems}} {{localize "SPYCRAFT.Template.AppsGcConsole.CommonItemsInTheBundle"}}{{/if}}</li>
-    {{#each mission.qualities}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQuality"}} {{name}} {{#if added}}{{localize "SPYCRAFT.Template.AppsGcConsole.AddedInPlayNoXP"}}{{else}}({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{/if}} <button type="button" class="sc2-action" data-action="entry" data-list="qualities" data-key="{{key}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.security}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Security"}} {{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}}) <button type="button" class="sc2-action" data-action="entry" data-list="security" data-key="{{key}}" data-change="ignored">{{localize "SPYCRAFT.Template.AppsGcConsole.Ignored"}}</button> <button type="button" class="sc2-action" data-action="entry" data-list="security" data-key="{{key}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.gearRestrictions}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.GearRestriction"}} {{name}} <button type="button" class="sc2-action" data-action="entry" data-list="gearRestrictions" data-key="{{key}}" data-change="ignored">{{localize "SPYCRAFT.Template.AppsGcConsole.Ignored"}}</button> <button type="button" class="sc2-action" data-action="entry" data-list="gearRestrictions" data-key="{{key}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.exposure}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Exposure"}} {{name}} <button type="button" class="sc2-action" data-action="entry" data-list="exposure" data-key="{{key}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.bundle}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Bundle"}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Caliber2"}} {{caliber}}) <button type="button" class="sc2-action" data-action="entry" data-list="bundle" data-key="{{key}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.otherComplications}}<li>{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}}) <button type="button" class="sc2-action" data-action="entry" data-list="otherComplications" data-key="{{key}}" data-change="ignored">{{localize "SPYCRAFT.Template.AppsGcConsole.Ignored"}}</button> <button type="button" class="sc2-action" data-action="entry" data-list="otherComplications" data-key="{{key}}" data-change="remove">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.qualities}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQuality"}} {{name}} {{#if added}}{{localize "SPYCRAFT.Template.AppsGcConsole.AddedInPlayNoXP"}}{{else}}({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{/if}} 
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="qualities" data-key="{{key}}"
+        data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.security}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Security"}} {{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}}) 
+      <button type="button" class="sc2-action" data-action="entry" data-list="security" data-key="{{key}}" data-change="ignored">{{localize "SPYCRAFT.Template.AppsGcConsole.Ignored"}}</button> 
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="security" data-key="{{key}}"
+        data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.gearRestrictions}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.GearRestriction"}} {{name}} 
+      <button type="button" class="sc2-action" data-action="entry" data-list="gearRestrictions" data-key="{{key}}"
+        data-change="ignored">{{localize "SPYCRAFT.Template.AppsGcConsole.Ignored"}}</button> 
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="gearRestrictions"
+        data-key="{{key}}" data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.exposure}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Exposure"}} {{name}} 
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="exposure" data-key="{{key}}"
+        data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.bundle}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Bundle"}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Caliber2"}} {{caliber}}) 
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="bundle" data-key="{{key}}"
+        data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.otherComplications}}<li>{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}}) 
+      <button type="button" class="sc2-action" data-action="entry" data-list="otherComplications" data-key="{{key}}"
+        data-change="ignored">{{localize "SPYCRAFT.Template.AppsGcConsole.Ignored"}}</button> 
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="otherComplications"
+        data-key="{{key}}" data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
     </ul>
   </details>
   <details class="gc-section" data-section="dice" data-view-hidden="{{hiddenSections.dice}}" data-state="{{sections.dice.state}}" {{#if sections.dice.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.SceneAndGCActionDice"}}</span><span class="gc-note">{{#if dice.current}}{{dice.value}}{{/if}}</span></summary>
     <div class="gc-facts">
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.GCActionDice"}}</span><b class="sc2-value">{{#if dice.current}}{{dice.value}}{{else}}{{localize "SPYCRAFT.Console.NotSetUp"}}{{/if}}</b></div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingNumber"}}</span><span class="sc2-value">{{localize "SPYCRAFT.Console.StartingNumberValue" dice=dice.expected}}</span></div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Scene"}}</span><b class="sc2-value">{{#if scene.dramatic}}{{localize "SPYCRAFT.Template.AppsGcConsole.Dramatic"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.Standard"}}{{/if}}</b></div>
+      <div class="sc2-field" data-tooltip="{{dice.formula}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingNumber"}}</span><span
+        class="sc2-value">{{dice.expected}}</span><span class="gc-note">{{dice.formula}}</span></div>
     </div>
-    <p class="controls"><button type="button" data-action="gcDice">{{#if dice.current}}{{localize "SPYCRAFT.Template.AppsGcConsole.PoolHintsAndAwards"}}{{else}}{{localize "SPYCRAFT.Console.SetUpPool"}}{{/if}}</button><button type="button" class="gc-primary" data-action="spendDice">{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>
-    {{#if scene.dramatic}}<button type="button" data-action="dramaticOff">{{localize "SPYCRAFT.Template.AppsGcConsole.ReturnToAStandardScene"}}</button><button type="button" data-action="doubleInitiative">{{localize "SPYCRAFT.Template.AppsGcConsole.DoubleOpponentsInitiative"}}</button>{{else}}<button type="button" data-action="dramaticOn">{{localize "SPYCRAFT.Template.AppsGcConsole.ScriptedDramaticSceneNoCost"}}</button>{{/if}}</p>
+    <p class="controls">
+      <button type="button" class="{{#if (eq @root.primary "spendDice")}} gc-primary{{/if}}" data-action="spendDice"
+        data-tooltip="{{@root.shortcuts.spendDice}}">{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>
+      <button type="button" data-action="gcDice" data-tooltip="{{localize 'SPYCRAFT.Console.AdjustPoolHint'}}">{{#if dice.current}}{{localize "SPYCRAFT.Console.AdjustPool"}}{{else}}{{localize "SPYCRAFT.Console.SetUpPool"}}{{/if}}</button>
+    {{#if scene.dramatic}}<button type="button" data-action="dramaticOff">{{localize "SPYCRAFT.Template.AppsGcConsole.ReturnToAStandardScene"}}</button>
+      <button type="button" data-action="doubleInitiative">{{localize "SPYCRAFT.Template.AppsGcConsole.DoubleOpponentsInitiative"}}</button>{{else}}
+      <button type="button" data-action="dramaticOn">{{localize "SPYCRAFT.Template.AppsGcConsole.ScriptedDramaticSceneNoCost"}}</button>{{/if}}</p>
   </details>
   {{#unless combat}}{{> "systems/spycraft2/templates/apps/gc-console-combat.hbs"}}{{/unless}}
   <details class="gc-section" data-section="conflicts" data-view-hidden="{{hiddenSections.conflicts}}" data-state="{{sections.conflicts.state}}" {{#if sections.conflicts.open}}open{{/if}}>
-    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.DramaticConflicts"}}</span>{{#if counts.conflicts}}<span class="gc-note">{{counts.conflicts}}</span>{{/if}}</summary>
-    <p class="controls"><button type="button" class="gc-primary" data-action="startConflict">{{localize "SPYCRAFT.Template.AppsGcConsole.Start"}}</button></p>
+    <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.DramaticConflicts"}}</span>{{#if counts.conflicts}}<span
+      class="gc-note">{{counts.conflicts}}</span>{{/if}}</summary>
+    <p class="controls"><button type="button" data-action="startConflict">{{localize "SPYCRAFT.Template.AppsGcConsole.Start"}}</button></p>
     <ul data-sc2-display="icon">{{#each conflicts}}<li><b>{{name}}</b> ({{type}}{{localize "SPYCRAFT.Template.AppsGcConsole.Round2"}} {{round}}{{localize "SPYCRAFT.Template.AppsGcConsole.Lead"}} <b>{{lead}}</b>, {{predator}} {{localize "SPYCRAFT.Template.AppsGcConsole.Vs"}} {{prey}} · {{#if winner}}{{localize "SPYCRAFT.Template.AppsGcConsole.Ended"}} {{winner}} {{localize "SPYCRAFT.Template.AppsGcConsole.Wins"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.Step"}} {{step}}{{/if}}
-    {{#unless winner}}<button type="button" class="sc2-action" data-action="advanceConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.NextStep"}}</button> · {{/unless}}<button type="button" class="sc2-action" data-action="manageConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Manage"}}</button></li>{{else}}<li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoneRunning"}}</li>{{/each}}</ul>
+    {{#unless winner}}<button type="button" class="sc2-action" data-action="advanceConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.NextStep"}}</button> · {{/unless}}
+      <button type="button" class="sc2-action" data-action="manageConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Manage"}}</button></li>{{else}}<li
+        class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoneRunning"}}</li>{{/each}}</ul>
   </details>
   <details class="gc-section" data-section="organizations"
     data-view-hidden="{{hiddenSections.organizations}}" data-state="{{sections.organizations.state}}"
@@ -119,7 +202,7 @@
       {{#if organizations.length}}<span class="gc-note">{{organizations.length}}</span>{{/if}}
     </summary>
     <p class="controls">
-      <button type="button" class="gc-primary" data-action="addOrganization"
+      <button type="button" data-action="addOrganization"
         data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.AddOrganizationHint"}}">
         {{localize "SPYCRAFT.Template.AppsGcConsole.AddOrganization"}}</button>
     </p>
@@ -134,7 +217,7 @@
           {{localize "SPYCRAFT.Template.AppsGcConsole.PostSummary"}}</button>
         <button type="button" class="sc2-action" data-action="editOrganization" data-id="{{id}}">
           {{localize "SPYCRAFT.Template.AppsGcConsole.Edit"}}</button>
-        <button type="button" class="sc2-action" data-action="removeOrganization" data-id="{{id}}"
+        <button type="button" class="sc2-action gc-danger" data-action="removeOrganization" data-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}"
           data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.RemoveOrganizationHint"}}">
           {{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button>
       </li>
@@ -145,15 +228,22 @@
   </details>
   <details class="gc-section" data-section="campaign" data-view-hidden="{{hiddenSections.campaign}}" data-state="{{sections.campaign.state}}" {{#if sections.campaign.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQualities"}}</span></summary>
-    <p class="controls"><button type="button" class="gc-primary" data-action="seasonQualities">{{localize "SPYCRAFT.Template.AppsGcConsole.SeasonQualities"}}</button></p>
-    <ul data-sc2-display="icon">{{#each season}}<li data-tooltip="{{summary}}">{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP3"}} {{summary}}</li>{{else}}<li class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoSeasonLongQualities"}}</li>{{/each}}</ul>
+    <p class="controls"><button type="button" data-action="seasonQualities">{{localize "SPYCRAFT.Template.AppsGcConsole.SeasonQualities"}}</button></p>
+    <ul data-sc2-display="icon">{{#each season}}<li data-tooltip="{{summary}}">{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP3"}} {{summary}}</li>{{else}}<li
+      class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoSeasonLongQualities"}}</li>{{/each}}</ul>
     {{#if ruleLines.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.RulesInForce"}}</p>
     <ul data-sc2-display="icon">{{#each ruleLines}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
-    {{#each effectConflicts}}<p class="bad">{{key}} {{localize "SPYCRAFT.Template.AppsGcConsole.IsSetDifferentlyBy"}} {{qualities}}{{localize "SPYCRAFT.Template.AppsGcConsole.GCRulingNeeded"}}</p>{{/each}}
+    {{#each effectConflicts}}<p class="bad">{{key}} {{localize "SPYCRAFT.Template.AppsGcConsole.IsSetDifferentlyBy"}} {{qualities}}{{localize "SPYCRAFT.Template.AppsGcConsole.GCRulingNeeded"}}
+      </p>{{/each}}
   </details>
   <details class="gc-section" data-section="reference" data-view-hidden="{{hiddenSections.reference}}" data-state="{{sections.reference.state}}" {{#if sections.reference.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Reference"}}</span></summary>
-    <p class="controls"><button type="button" data-action="securityDevice">{{localize "SPYCRAFT.Template.AppsGcConsole.SecurityDevice"}}</button><button type="button" data-action="hazards">{{localize "SPYCRAFT.Template.AppsGcConsole.HazardsNatureSFury"}}</button><button type="button" data-action="events">{{localize "SPYCRAFT.Template.AppsGcConsole.Events"}}</button><button type="button" data-action="possessions">{{localize "SPYCRAFT.Template.AppsGcConsole.RandomPossessions"}}</button>
+    <p class="controls"><button type="button" data-action="securityDevice">{{localize "SPYCRAFT.Template.AppsGcConsole.SecurityDevice"}}</button>
+      <button type="button" data-action="hazards">{{localize "SPYCRAFT.Template.AppsGcConsole.HazardsNatureSFury"}}</button>
+      <button type="button" data-action="events">{{localize "SPYCRAFT.Template.AppsGcConsole.Events"}}</button>
+      <button type="button" data-action="possessions">{{localize "SPYCRAFT.Template.AppsGcConsole.RandomPossessions"}}</button>
     <button type="button" data-action="npcKnowledge">{{localize "SPYCRAFT.Template.AppsGcConsole.NpcKnowledge"}}</button></p>
+    <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole}}
+      </p>
   </details>
 </section>
