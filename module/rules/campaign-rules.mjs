@@ -109,6 +109,9 @@ export function campaignSkillDC(dc, effects = campaignRules()) {
   return dc + shift;
 }
 
+/** Blockbuster (p.406): a player character's successful save that would halve damage resists it entirely. */
+export const halfSaveResistsFully = (effects = campaignRules()) => effects.halfSaveResistsFully === true;
+
 /** Bloodbath: a player or special character's threat on a successful attack becomes a critical hit for free. */
 export const threatsAutoActivate = (effects = campaignRules()) => effects.autoActivateThreats === true;
 
@@ -199,6 +202,8 @@ export function campaignRuleLines(effects = campaignRules()) {
     lines.push(loc`Medicine error ranges ${effects.medicineError > 0 ? "+" : "−"}${Math.abs(effects.medicineError)}.`);
   if (Number.isFinite(effects.skillDC) && effects.skillDC)
     lines.push(loc`Skill DCs ${effects.skillDC > 0 ? "+" : "−"}${Math.abs(effects.skillDC)}.`);
+  if (halfSaveResistsFully(effects))
+    lines.push(loc`A player character's successful save that would halve damage avoids it entirely.`);
   if (threatsAutoActivate(effects))
     lines.push(loc`Threats on hits by player and special characters are critical hits.`);
   if (leadAdvantageShift(effects))

@@ -296,7 +296,7 @@ export function evasionSaveContext(system, { flatFooted = false, reflexReducesDa
 /** Evasion adjustment only: apply other damage reductions and health settlement separately. */
 export function reflexDamagePlan(
   check,
-  { damage, normalSuccessDamage, succeeded = check.successConfirmed, confirmed = false } = {}
+  { damage, normalSuccessDamage, succeeded = check.successConfirmed, confirmed = false, blockbuster = false } = {}
 ) {
   const context = check.evasionContext;
   if (
@@ -330,8 +330,22 @@ export function reflexDamagePlan(
     eligible = context.reflexReducesDamage && !context.flatFooted && context.grade >= 1;
   const evaded = eligible && succeeded,
     halved = eligible && !succeeded && context.grade >= 2;
-  const total = evaded ? 0 : halved ? Math.floor(damage / 2) : ordinary;
-  return { damage, normalSuccessDamage, succeeded, ordinary, total, evaded, halved, eligible, context: { ...context } };
+  // Blockbuster (p.406): a player character's successful save that would halve the damage resists all of it.
+  const resisted =
+    blockbuster === true && succeeded && normalSuccessDamage > 0 && normalSuccessDamage <= Math.ceil(damage / 2);
+  const total = evaded || resisted ? 0 : halved ? Math.floor(damage / 2) : ordinary;
+  return {
+    damage,
+    normalSuccessDamage,
+    succeeded,
+    ordinary,
+    total,
+    evaded,
+    halved,
+    resisted,
+    eligible,
+    context: { ...context }
+  };
 }
 
 // Uncanny Dodge against a security device as part of a Reflex save plan.

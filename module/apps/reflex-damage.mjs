@@ -1,6 +1,7 @@
 import { refuse } from "../error-notices.mjs";
 import { reflexDamagePlan } from "../rules/defense.mjs";
 import { loc } from "../i18n.mjs";
+import { halfSaveResistsFully } from "../rules/campaign-rules.mjs";
 import { formDialog, raw } from "./dialog-kit.mjs";
 /** Read-only Evasion adjustment using a recorded Reflex save; health and other mitigation are separate. */
 export async function checkReflexDamage(actor) {
@@ -77,7 +78,8 @@ export async function checkReflexDamage(actor) {
       damage: number("damage"),
       normalSuccessDamage: number("normalSuccessDamage"),
       succeeded: input.succeeded === "true" ? true : input.succeeded === "false" ? false : null,
-      confirmed: input.confirmed === true
+      confirmed: input.confirmed === true,
+      blockbuster: actor.type === "agent" && halfSaveResistsFully()
     });
   } catch (error) {
     return refuse(error.message);
@@ -85,7 +87,7 @@ export async function checkReflexDamage(actor) {
   await foundry.applications.api.DialogV2.input({
     window: { title: loc`Reflex save — damage result` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p><b>${loc`Damage after the save and Evasion: ${plan.total}`}</b></p><p>${loc`Source damage ${plan.damage}; ordinary successful-save damage ${plan.normalSuccessDamage}; save ${plan.succeeded ? "succeeded" : "failed"}.`}</p><p>${loc`Recorded Evasion grade ${plan.context.grade}; flat-footed ${plan.context.flatFooted ? "yes" : "no"}; save can reduce damage ${plan.context.reflexReducesDamage ? "yes" : "no"}.`}</p><p>${plan.evaded ? loc`Evasion: no damage with the successful save.` : plan.halved ? loc`Evasion II: failed-save damage halved, rounded down.` : loc`No Evasion damage adjustment applies.`}</p><p>${loc`Apply other mitigation and health settlement separately. No health or action dice were changed.`}</p></div>`
+    content: `<div class="spycraft2-roll-options"><p><b>${loc`Damage after the save and Evasion: ${plan.total}`}</b></p><p>${loc`Source damage ${plan.damage}; ordinary successful-save damage ${plan.normalSuccessDamage}; save ${plan.succeeded ? "succeeded" : "failed"}.`}</p><p>${loc`Recorded Evasion grade ${plan.context.grade}; flat-footed ${plan.context.flatFooted ? "yes" : "no"}; save can reduce damage ${plan.context.reflexReducesDamage ? "yes" : "no"}.`}</p><p>${plan.evaded ? loc`Evasion: no damage with the successful save.` : plan.resisted ? loc`Blockbuster: the successful save resists all of it (p.406).` : plan.halved ? loc`Evasion II: failed-save damage halved, rounded down.` : loc`No Evasion damage adjustment applies.`}</p><p>${loc`Apply other mitigation and health settlement separately. No health or action dice were changed.`}</p></div>`
   });
   return plan;
 }

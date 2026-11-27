@@ -156,11 +156,8 @@ export function criticalPlan(
       adjustment--;
       sources.push(loc`Laser damage –1`);
     }
-    // Bloodbath (p.406): a player or special character's threat on a hit becomes a critical hit without paying.
-    if (threatsAutoActivate() && !["standard", "animal"].includes(system.npcType)) {
-      adjustment--;
-      sources.push(loc`Bloodbath campaign quality –1`);
-    }
+    // Bloodbath (p.406): a player or special character's threat on a hit is a critical hit outright, whatever its
+    // usual price; it is the attacker who must pay 1 die to stop it. Its cost is set to 0 below.
   }
   if (kind === "failure") {
     if (check.cleanAndPolished) {
@@ -218,6 +215,15 @@ export function criticalPlan(
     sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
   }
   let cost = Math.max(minimum, baseCost + adjustment);
+  if (
+    kind === "success" &&
+    check.checkKind === "attack" &&
+    threatsAutoActivate() &&
+    !["standard", "animal"].includes(system.npcType)
+  ) {
+    cost = 0;
+    sources.push(loc`Bloodbath: a critical hit at no cost; the attacker may spend 1 action die to stop it (p.406)`);
+  }
   // Comedy of Errors (p.406): no more than 2 action dice may be spent activating a skill error, so an effect that
   // costs more cannot be bought.
   const errorCap = campaignErrorActivationCap();

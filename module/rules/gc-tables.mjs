@@ -11238,7 +11238,8 @@ export const GC_DATA = {
    "gcDice": 2,
    "summary": "Explosion blast increments are tripled. A player character whose successful save would halve damage or an effect ignores it completely instead. Interrupted range increments no longer raise explosion damage.",
    "effects": {
-    "blastIncrementMultiplier": 3
+    "blastIncrementMultiplier": 3,
+    "halfSaveResistsFully": true
    }
   },
   {

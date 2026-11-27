@@ -288,3 +288,23 @@ test("cover save outcome evidence preserves ordinary legacy checks but rejects c
   assert.equal(rollEvidenceMatches(e, legacy), false);
   assert.equal(rollEvidenceMatches(rollEvidence(legacy), legacy), true);
 });
+test("Blockbuster: a player character's successful half-damage save resists all of it (p.406)", () => {
+  const half = reflexDamagePlan(check(0), { ...declare, damage: 17, normalSuccessDamage: 8, succeeded: true });
+  assert.equal(half.total, 8);
+  const resisted = reflexDamagePlan(check(0), {
+    ...declare,
+    damage: 17,
+    normalSuccessDamage: 8,
+    succeeded: true,
+    blockbuster: true
+  });
+  assert.deepEqual([resisted.total, resisted.resisted], [0, true]);
+  const failed = reflexDamagePlan(check(0), {
+    ...declare,
+    damage: 17,
+    normalSuccessDamage: 8,
+    succeeded: false,
+    blockbuster: true
+  });
+  assert.equal(failed.total, 17, "only a successful save");
+});
