@@ -43,7 +43,8 @@
         <button type="button" class="{{#if (eq @root.primary "endMission")}} gc-primary{{/if}}" data-action="endMission"
           data-tooltip="{{localize 'SPYCRAFT.Console.EndMissionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.EndMission"}}</button>{{else if mission.ended}}<span
           class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span> 
-        <button type="button" data-action="resumeMission">{{localize "SPYCRAFT.Console.ResumeMission"}}</button>{{else}}<span
+        <button type="button" data-action="resumeMission">{{localize "SPYCRAFT.Console.ResumeMission"}}</button>
+        <button type="button" data-action="planNextMission" data-tooltip="{{localize 'SPYCRAFT.Console.PlanNextHint'}}">{{localize "SPYCRAFT.Console.PlanNext"}}</button>{{else}}<span
           class="gc-note">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</li>
     </ol>
     <p class="gc-note">{{localize "SPYCRAFT.Console.WrapSettle"}}</p>

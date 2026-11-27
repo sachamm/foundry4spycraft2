@@ -968,6 +968,34 @@ test("removing a mission row leaves an Undo note that puts it back in its place"
   assert.deepEqual(state.getMission().objectives, before);
 });
 
+test("planning the next mission files the ended one in a journal entry and keeps the team and Caliber", async () => {
+  const kept = structuredClone(state.getMission());
+  const made = [];
+  const previous = { Folder: CONFIG.Folder, JournalEntry: CONFIG.JournalEntry, folders: game.folders };
+  CONFIG.Folder = { documentClass: { create: async data => (made.push(["folder", data]), { id: "f1", ...data }) } };
+  CONFIG.JournalEntry = { documentClass: { create: async data => (made.push(["journal", data]), data) } };
+  game.folders = [];
+  try {
+    await state.setMission({ ...kept, active: true, ended: false });
+    assert.equal(await mission.planNextMission(), false, "an active mission is ended first");
+    await state.setMission({ ...kept, active: false, ended: true, name: "Cold <Open>" });
+    const entry = await mission.planNextMission();
+    assert.equal(entry.name, "Cold <Open>");
+    assert.equal(entry.folder, "f1");
+    assert.match(entry.pages[0].text.content, /Cold &lt;Open&gt;|Objectives/);
+    assert.doesNotMatch(entry.pages[0].text.content, /<Open>/, "names are escaped");
+    const fresh = state.getMission();
+    assert.equal(fresh.name, "");
+    assert.deepEqual(fresh.team, kept.team);
+    assert.equal(fresh.caliber, kept.caliber);
+    assert.deepEqual(fresh.objectives, []);
+  } finally {
+    Object.assign(CONFIG, { Folder: previous.Folder, JournalEntry: previous.JournalEntry });
+    game.folders = previous.folders;
+    await state.setMission(kept);
+  }
+});
+
 test("each view has one filled button, chosen from the state", async () => {
   const { primaryAction } = await import("../module/apps/gc/console-view.mjs");
   const base = { checklistShown: false, missionActive: true, missionEnded: false, diceCurrent: true, combat: null };

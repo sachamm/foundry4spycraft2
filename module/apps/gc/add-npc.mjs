@@ -169,7 +169,7 @@ export async function joinFight(combat, tokens) {
   );
 }
 
-export async function addNpcToScene() {
+export async function addNpcToScene({ uuid = null } = {}) {
   if (!game.user.isGM) return null;
   if (!canvas?.ready || !canvas.scene) return refuse(loc`View a scene first, then add the NPC to it.`);
   const sceneId = canvas.scene.id;
@@ -198,7 +198,7 @@ export async function addNpcToScene() {
     ]
       .map(
         ([source, rows], g) =>
-          `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${g === 0 && i === 0 ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
+          `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${(uuid ? row.uuid === uuid : g === 0 && i === 0) ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
       )
       .join("")}</select></label>
       <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" placeholder="${esc(loc`1, or a Minion squad`)}" /></label>

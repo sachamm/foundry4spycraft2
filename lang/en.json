@@ -89,7 +89,8 @@
    "RollDamageSave": "Roll Damage save…",
    "RollDamageSaveHint": "Enter the damage this NPC just took, then roll its Damage save against the next DC.",
    "ResetTrack": "Reset Damage save track",
-   "ResetTrackHint": "Clears the damage taken and failed saves, and brings the NPC back up."
+   "ResetTrackHint": "Clears the damage taken and failed saves, and brings the NPC back up.",
+   "NoWeapons": "No weapons yet. Browse weapons to give this NPC one, or add a blank one to fill in."
   },
   "Play": {
    "TrainedSkills": "Trained skills",
@@ -219,7 +220,9 @@
    "NoObjectives": "No objectives yet. Add one to set the mission's XP.",
    "NoAntagonists": "No antagonists recorded. Add an NPC to the scene, or record one for XP.",
    "ThreatValue": "{level} ({note})",
-   "FirstSessionNext": "First session, next: {step}"
+   "FirstSessionNext": "First session, next: {step}",
+   "PlanNext": "Plan the next mission…",
+   "PlanNextHint": "Files this mission in a journal entry and starts a new record with the same team and Caliber"
   },
   "Ability": {
    "str": "Strength",

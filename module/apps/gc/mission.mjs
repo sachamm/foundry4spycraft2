@@ -39,7 +39,7 @@ import { systemDialog } from "../dialog-theme.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -303,6 +303,71 @@ function criticalExposure(mission) {
   };
 }
 
+/** The ended mission as a short record, for the journal entry "Plan the next mission" leaves behind. */
+export function missionRecordHtml(mission, { xp = null, team = [] } = {}) {
+  const list = (title, rows) =>
+    rows.length ? `<h2>${esc(title)}</h2><ul>${rows.map(row => `<li>${row}</li>`).join("")}</ul>` : "";
+  return [
+    `<p>${esc(loc`Caliber ${mission.caliber}, Threat Level ${mission.threatLevel ?? "—"}, ${mission.scenesPlayed ?? 0} scene(s) played.`)}</p>`,
+    xp === null ? "" : `<p>${esc(loc`Base XP earned: ${xp}.`)}</p>`,
+    list(
+      loc`Team`,
+      team.map(actor => esc(actor.name))
+    ),
+    list(
+      loc`Objectives`,
+      (mission.objectives ?? []).map(
+        entry =>
+          `${entry.complete ? "✔" : "○"} ${esc(entry.name)} (${esc(loc`grade ${entry.grade}`)}${entry.critical ? `, ${esc(loc`critical`)}` : ""})`
+      )
+    ),
+    list(
+      loc`Antagonists`,
+      (mission.antagonists ?? []).map(entry => `${entry.encountered ? "✔" : "○"} ${esc(entry.name)}`)
+    ),
+    list(
+      loc`Exposure`,
+      (mission.infractions ?? []).map(entry => esc(`${entry.name} (${entry.penalty} ${entry.currency})`))
+    ),
+    mission.notes ? `<h2>${esc(loc`Notes`)}</h2><p>${esc(mission.notes)}</p>` : ""
+  ].join("");
+}
+
+/**
+ * Plan the next mission once this one has ended: its record goes into a journal entry in a "Mission records" folder,
+ * and a fresh record starts that keeps the team and the Caliber. Asks first.
+ */
+export async function planNextMission() {
+  requireGC();
+  const mission = getMission();
+  if (mission.active) return refuse(loc`End the mission first; its record is kept for the XP report until then.`);
+  const name = mission.name || loc`Unnamed mission`;
+  const ok = await confirmStep(
+    loc`Plan the next mission`,
+    [
+      loc`The record of ${name} goes into a journal entry in the Mission records folder, so it can be read later.`,
+      loc`A new mission record starts with the same team and Caliber; objectives, antagonists, complications, exposure and scenes start empty.`,
+      loc`Settle every agent's XP and standing before this: the new record no longer holds the old figures.`
+    ],
+    loc`Plan the next mission`
+  );
+  if (!ok) return null;
+  const xp = missionXP().total,
+    team = teamActors(mission);
+  let folder = [...(game.folders ?? [])].find(
+    entry => entry.type === "JournalEntry" && entry.name === loc`Mission records`
+  );
+  folder ??= await CONFIG.Folder.documentClass.create({ name: loc`Mission records`, type: "JournalEntry" });
+  const entry = await CONFIG.JournalEntry.documentClass.create({
+    name,
+    folder: folder?.id ?? null,
+    pages: [{ name, type: "text", text: { content: missionRecordHtml(mission, { xp, team }) } }]
+  });
+  await setMission({ ...defaultMission(), team: [...(mission.team ?? [])], caliber: mission.caliber });
+  ui.notifications.info(loc`${name} is filed under Mission records. The new mission keeps the team and Caliber.`);
+  return entry;
+}
+
 /** End the mission after asking: the record stays for the XP report, settlement and the standing payout. */
 export async function endMission({ clear = false } = {}) {
   requireGC();
@@ -413,7 +478,7 @@ const sessionStarted = () => {
   }
 };
 
-export async function addObjective() {
+export async function addObjective({ another = false } = {}) {
   requireGC();
   const categories = [...new Set(T.objectives.map(objective => objective.category))];
   const samples = categories
@@ -428,8 +493,11 @@ export async function addObjective() {
     <label>${loc`Sample (Table 7.6)`} <select name="sample"><option value="">${loc`Custom`}</option>${samples}</select></label>
     <label>${loc`Name (state exactly how it is completed)`} <input name="name" /></label>
     <label>${loc`Grade for a custom objective`} <input type="number" name="grade" min="1" max="5" value="1" /></label>
-    <label><input type="checkbox" name="critical" /> ${loc`Critical objective (failing it causes exposure)`}</label>`,
-    loc`Add objective`
+    <label><input type="checkbox" name="critical" /> ${loc`Critical objective (failing it causes exposure)`}</label>
+    <label><input type="checkbox" name="another"${another ? " checked" : ""} /> ${loc`Add another after this one`}</label>`,
+    loc`Add objective`,
+    // A custom objective needs its own words: a blank one would be saved as "Objective".
+    values => (!values.sample && !String(values.name ?? "").trim() ? loc`Name the objective, or pick a sample.` : "")
   );
   if (!input) return null;
   const [sampleName, sampleGrade] = String(input.sample || "").split("|");
@@ -441,17 +509,27 @@ export async function addObjective() {
     complete: false,
     scenes: 1
   };
-  return updateMission(mission => ({ objectives: [...mission.objectives, objective] }));
+  const saved = await updateMission(mission => ({ objectives: [...mission.objectives, objective] }));
+  if (!input.another) return saved;
+  ui.notifications.info(loc`Added ${objective.name}.`);
+  // The next one opens at once, so a five-objective mission is one sitting, not five trips to the console.
+  return addObjective({ another: true });
 }
 
-export async function addAntagonist() {
+export async function addAntagonist({ uuid = "" } = {}) {
   requireGC();
   const npcs = [...game.actors].filter(actor => actor.type === "npc");
   const input = await ask(
     loc`Add an antagonist (p.452)`,
     `
     <p>${loc`Each NPC type counts once per mission however many appear; a special NPC counts four times its reward; a ‘full’ special NPC built with the character rules earns 300 XP per scene instead.`}</p>
-    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${options(npcs.map(actor => [actor.uuid, `${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : " (enter XP)"}`]))}</select></label>
+    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${options(
+      npcs.map(actor => [
+        actor.uuid,
+        `${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : " (enter XP)"}`
+      ]),
+      uuid
+    )}</select></label>
     <label>${loc`Name`} <input name="name" /></label>
     <label>${loc`XP reward if not read from the actor`} <input type="number" name="xp" min="0" value="0" /></label>
     <label>${loc`Type`} <select name="type">${options(

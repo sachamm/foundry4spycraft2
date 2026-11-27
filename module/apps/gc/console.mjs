@@ -120,6 +120,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       startMission: guard(() => mission.startMission()),
       endMission: guard(() => mission.endMission()),
       resumeMission: guard(() => mission.resumeMission()),
+      planNextMission: guard(() => mission.planNextMission()),
       clearMission: guard(async () => {
         if (
           await systemDialog.confirm({
@@ -298,10 +299,43 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       row.addEventListener("pointerenter", () => turn.hoverCombatant(game.combat, row.dataset.id, true));
       row.addEventListener("pointerleave", () => turn.hoverCombatant(game.combat, row.dataset.id, false));
     }
+    this._wireActorDrops();
     installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
     restoreConsoleState(this.element, this._kept);
     this._kept = null;
+  }
+
+  /**
+   * An NPC dragged from the Actors directory or a compendium: dropped on Antagonists it is recorded for XP, dropped
+   * anywhere else it opens Add NPC to scene with that NPC chosen. Both open their dialog, so nothing happens unasked.
+   */
+  _wireActorDrops() {
+    const body = this.element.querySelector(".gc-console-body");
+    if (!body) return;
+    body.addEventListener("dragover", event => {
+      if ([...(event.dataTransfer?.types ?? [])].includes("text/plain")) event.preventDefault();
+    });
+    body.addEventListener("drop", async event => {
+      let data = null;
+      try {
+        data = JSON.parse(event.dataTransfer?.getData("text/plain") || "null");
+      } catch {
+        return;
+      }
+      if (data?.type !== "Actor" || !data.uuid) return;
+      event.preventDefault();
+      const actor = await fromUuid(data.uuid);
+      if (actor?.type !== "npc") return refuse(loc`Only an NPC can be dropped on the GC Console.`);
+      const section = event.target?.closest?.("details[data-section]")?.dataset.section;
+      try {
+        if (section === "antagonists") await mission.addAntagonist({ uuid: actor.pack ? "" : actor.uuid });
+        else await addNpcToScene({ uuid: actor.uuid });
+      } catch (error) {
+        ui.notifications.warn(error.message);
+      }
+      this.render();
+    });
   }
 
   async _onFirstRender(context, options) {
