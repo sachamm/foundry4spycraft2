@@ -416,9 +416,14 @@ graphics, so this does not establish interactive performance.
 Native evidence raises the continuing scores to **9.0/10** for creation and
 **9.1/10** for combat. Remaining recommendations still include source-data and
 history coverage, campaign exceptions, falling, NPC typed damage, Grapple
-benefits, cooperation and environment rules. The next lifecycle review also
-needs to close a hazard's underlying roll before applying its final effects,
-so later boosts cannot contradict an already applied result. Work continues.
+benefits, cooperation and environment rules. Hazard settlement now confirms and
+closes its underlying roll before applying effects. Refused closure applies no
+effect; interrupted effects can retry against the frozen roll. Six regression
+tests cover that ordering, retained adjudication, retries and rejected stale or
+foreign results. All **4,024** Node tests pass, as do the bundle and focused lint
+checks. The native two-client attack, damage, Undo and NPC Shaken flow passes
+again with no page errors or transaction diagnostics. Other hazard kinds and
+cross-client effect receipts still require review. Work continues.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,

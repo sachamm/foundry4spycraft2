@@ -487,11 +487,26 @@ export async function extinguish(actor) {
  */
 export const hazardSaveResolvers = new Map();
 
-/** Apply what a posted hazard save decides. The save's own result is read when the button is pressed. */
+/** Freeze a posted save before applying its effects; an interrupted application may retry the frozen result. */
 export async function resolveHazardSave(actor, message) {
-  const check = message.flags?.spycraft2,
+  let check = message.flags?.spycraft2,
     save = check?.hazardSave;
-  if (!save || save.resolved || !owned(actor)) return null;
+  if (!save || save.resolved || check.superseded || !owned(actor) || check.actorUuid !== actor.uuid) return null;
+  if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
+  if (!Number.isFinite(save.dc) || !Number.isFinite(check.effectiveTotal)) return null;
+  if (!check.resolved) {
+    if (typeof check.successConfirmed !== "boolean") {
+      const confirmed = await actor.confirmCheckOutcome(message, {
+        succeeded: check.effectiveTotal >= save.dc,
+        difficultyClass: save.dc
+      });
+      if (!confirmed) return null;
+    }
+    if (!(await actor.finishCheck(message))) return null;
+    check = message.flags?.spycraft2;
+    save = check?.hazardSave;
+    if (!check?.resolved || check.superseded || !save || save.resolved) return null;
+  }
   const succeeded =
     typeof check.successConfirmed === "boolean" ? check.successConfirmed : check.effectiveTotal >= save.dc;
   if (hazardSaveResolvers.has(save.kind))
