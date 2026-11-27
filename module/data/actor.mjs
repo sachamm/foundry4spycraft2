@@ -8,10 +8,22 @@ import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { shakenStateFromActor, shakenRules } from "../rules/shaken.mjs";
 import { getRestraintReleaseReview, getPendingRestraintMoves } from "../rules/restraints.mjs";
 import { getReserveReview } from "../rules/reserve-transactions.mjs";
-import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
+import {
+  conditionContextFromStatuses,
+  conditionNpcProfile,
+  npcSkillConditionContext
+} from "../rules/npc-conditions.mjs";
 import { getBaffledReview } from "../rules/baffled.mjs";
 import { isResourceLock } from "../services/transactions.mjs";
 import { pointmanLevel } from "../rules/action-dice.mjs";
+import {
+  attributeCollapsePlan,
+  attributeDefensePlan,
+  conditionAbilityPenalty,
+  conditionRollPenalties
+} from "../rules/attributes.mjs";
+import { sizeRow, sizeWounds } from "../rules/size.mjs";
+import { deathThreshold } from "../rules/health.mjs";
 import { defaultNpcProfile, computeNpcProfile, npcTableValue } from "../rules/npcs.mjs";
 const missionThreatLevelSetting = () => {
   try {
@@ -126,20 +138,48 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
     const shaken = shakenRules(this);
     this.shakenRules = shaken;
     for (const ability of Object.values(this.abilities)) ability.mod = Math.floor((ability.value - 10) / 2);
+    // Conditions from the token's statuses, read the same way as an agent's (pp.340–342).
+    this.conditionContext ??= npcSkillConditionContext(this.parent);
+    // Size (Table 5.13, p.349): Defense, attack and Stealth/Hide modifiers and the death threshold.
+    const size = sizeRow(this.qualityEffects?.size);
+    this.size = size.size;
+    this.sizeModifier = size.modifier;
+    this.sizeHideModifier = size.hide;
+    this.deathThreshold = deathThreshold(size.size);
+    this.attributeCollapse = attributeCollapsePlan(this);
+    const conditions = conditionRollPenalties(this),
+      drunk = this.conditionContext.drunk === true ? -2 : 0;
+    this.conditionPenalties = conditions;
     for (const [key, save] of Object.entries(this.saves)) {
       const ability = CONFIG.SPYCRAFT.saves[key].ability;
       save.total =
-        save.base + this.abilities[ability].mod + (["ref", "will"].includes(key) ? shaken.reflexWillPenalty : 0);
+        save.base +
+        this.abilities[ability].mod +
+        conditions.save +
+        (["ref", "will"].includes(key) ? shaken.reflexWillPenalty + drunk : 0);
     }
-    this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod;
+    // Flat-footed, sprawled, stunned, blinded, helpless and the rest take away a positive Dexterity (pp.341–342).
+    const defenseState = attributeDefensePlan(this);
+    this.helpless = defenseState.helpless;
+    this.vulnerable = defenseState.vulnerable;
+    this.defense.dexterity = defenseState.dexterity;
+    this.defense.total = 10 + this.defense.bonus + defenseState.dexterity + this.sizeModifier;
     this.underminedCombatContext = underminedCombatContext(this);
     this.underminedState = underminedState(this);
     this.initiative.total =
-      this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty - this.underminedState.penalty;
+      this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty + drunk - this.underminedState.penalty;
+    // conditionRollPenalties' attack figure already holds the Shaken attack penalty.
+    const melee = cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + this.sizeModifier;
     this.attack = {
-      melee: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
-      unarmed: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
-      ranged: cheapShotPenalty(this, "dex") + this.bab + this.abilities.dex.mod + shaken.attackPenalty
+      melee: melee + conditions.attack + conditions.meleeAttack,
+      unarmed: melee + conditions.attack + conditions.meleeAttack,
+      ranged:
+        cheapShotPenalty(this, "dex") +
+        this.bab +
+        this.abilities.dex.mod +
+        this.sizeModifier +
+        conditions.attack +
+        conditionAbilityPenalty(this, "dex")
     };
     this.skillTotals = {};
     this.warnings = [];
@@ -226,6 +266,8 @@ export class NpcData extends BaseActorData {
         this.damageSave = null;
       }
     }
+    // A special NPC's wounds follow its Size (Table 5.13, p.349); a standard NPC's Damage save does not.
+    if (this.wounds.max > 0) this.wounds.max = sizeWounds(this.wounds.max, this.size);
     this.applyFeatEffects({ health: true });
     this.competence = result.competence;
     this.warnings = [
@@ -704,37 +746,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     this.actionDieAwardReview = this.parent.flags?.spycraft2?.actionDieAwardReview ?? null;
     this.actionDiceSettlementReview = getActionDieSettlementReview(this.parent);
     this.worldTime = globalThis.game?.time?.worldTime;
-    const statuses = this.parent.statuses ?? new Set();
-    this.conditionContext = Object.fromEntries(
-      Object.entries({
-        nauseated: ["nauseated"],
-        dazed: ["dazed"],
-        stunned: ["stunned", "stun"],
-        dead: ["dead"],
-        paralyzed: ["paralyzed", "paralysis"],
-        fatigued: ["fatigued"],
-        exhausted: ["exhausted"],
-        unconscious: ["unconscious"],
-        helpless: ["helpless"],
-        vulnerable: ["vulnerable"],
-        sickened: ["sickened"],
-        drunk: ["drunk"],
-        crouched: ["crouched", "crouching"],
-        mute: ["mute"],
-        baffled: ["baffled"],
-        incompetent: ["incompetent"],
-        entangled: ["entangled"],
-        bound: ["bound"],
-        blinded: ["blinded", "blind"],
-        deafened: ["deafened", "deaf"],
-        flatFooted: ["flat-footed", "flatFooted"],
-        sprawled: ["sprawled"],
-        prone: ["prone"],
-        held: ["held"],
-        pinned: ["pinned"],
-        sleeping: ["sleeping", "sleep", "asleep"]
-      }).map(([key, ids]) => [key, ids.some(id => statuses.has(id))])
-    );
+    this.conditionContext = conditionContextFromStatuses(this.parent.statuses);
     this.bonusPoolChecks = {};
     for (const pool of Object.values(this.bonusActionDice ?? {})) {
       if (!pool?.messageUuid) continue;
