@@ -8,7 +8,7 @@ import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
 import { cancellable, cancelButton, freeCancel, holdUntilValid } from "../dialog-kit.mjs";
-import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
+import { antagonistRecorded, antagonistRowFor, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
 import { getMission, missionEpoch, teamActors } from "./state.mjs";
 import { minionSquad } from "../../rules/npc-qualities.mjs";
 import { postUndo } from "../undo.mjs";
@@ -314,13 +314,19 @@ export async function addNpcToScene({ uuid = null } = {}) {
     const entry = recorded;
     done.push(entry?.xp ? loc`recorded for mission XP` : loc`recorded for mission XP with 0 XP: enter its reward`);
   }
-  // A type already on the list is faced once it walks into a fight.
+  // A type already on the list is faced once it walks into a fight; Undo takes that mark back with the tokens.
+  const rowBefore = !recorded && joined ? antagonistRowFor(actor) : null,
+    wasOpen = rowBefore && !rowBefore.encountered ? structuredClone(rowBefore) : null;
   if (joined) await markAntagonistsFaced([actor]).catch(() => 0);
   ui.notifications.info(`${done.join("; ")}.`);
   // A slip (the wrong NPC, too many) is taken back from the note: the tokens go, and their combatants with them.
   await postUndo(loc`Placed ${tokens.length} × ${actor.name}`, [], {
     // The antagonist row this placing recorded goes too; a row that was there before stays.
     ...(recorded ? { antagonist: { id: recorded.id, entry: null, period: missionEpoch() } } : {}),
+    // A row that was there before stays, but loses the faced mark this placing gave it.
+    ...(wasOpen && antagonistRowFor(actor)?.encountered
+      ? { antagonist: { id: wasOpen.id, entry: wasOpen, period: missionEpoch() } }
+      : {}),
     placedTokens: {
       scene: scene.id,
       ids: tokens.map(token => token.id),
