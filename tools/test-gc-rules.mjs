@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { GC_DATA } from "../module/rules/gc-tables.mjs";
 import {
+  antagonistReward,
   defaultMission,
   defaultThreatLevel,
   threatLevel,
@@ -827,4 +828,14 @@ test("Delay counts toward the round's ±10 limit; Press does not (p.324)", () =>
   assert.equal(delayed.delta, -2);
   assert.equal(delayed.capped, true);
   assert.equal(endOfRound(12, [fluidModifier("finalAttack", { times: 3 })]).delta, -6);
+});
+
+test("a special antagonist's reward shows its four-times multiplier (p.452)", () => {
+  assert.deepEqual(antagonistReward({ type: "special", xp: 84 }), { xp: 84, multiplier: 4, total: 336, special: true });
+  assert.deepEqual(antagonistReward({ type: "standard", xp: 30 }), {
+    xp: 30,
+    multiplier: 1,
+    total: 30,
+    special: false
+  });
 });

@@ -1522,7 +1522,8 @@
     "FullPerScene": "A full special NPC, so 300 XP for each of its {scenes} scene(s).",
     "AddAScene": "Add a scene",
     "RemoveAScene": "Remove a scene",
-    "CorrectTheSceneCount": "Correct the scene count"
+    "CorrectTheSceneCount": "Correct the scene count",
+    "SpecialXPTimes": "{xp} × {times} = {total} XP (a special antagonist counts 4 times, p.452)"
    },
    "ItemItemArmor": {
     "DRMeleeUnarmedAndNonGrenade": "DR: melee, unarmed and non-grenade hurled attacks / all other attacks. Helmets with a Vision penalty apply it to Vision checks, not Reflex saves.",

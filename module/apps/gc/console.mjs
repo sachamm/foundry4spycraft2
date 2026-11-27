@@ -5,7 +5,7 @@ import { installToolSearch } from "../tool-search.mjs";
 import { installResolutionGuide } from "../resolution-guide.mjs";
 /** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
 import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
-import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
+import { antagonistReward, threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
 import { campaignYear, periodMoneyModifier } from "../../rules/period-money.mjs";
@@ -503,7 +503,8 @@ export function consoleContext() {
       antagonists: m.antagonists.map(entry => ({
         ...entry,
         perScene: !!(entry.full || entry.promoted),
-        moreScenes: (Number(entry.scenes) || 1) > 1
+        moreScenes: (Number(entry.scenes) || 1) > 1,
+        reward: antagonistReward(entry)
       })),
       qualities: named(m.qualities, id => campaignQuality(id)?.name).map(entry => ({
         ...entry,

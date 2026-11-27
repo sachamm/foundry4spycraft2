@@ -10,6 +10,13 @@ const M = GC_DATA.core.mission;
 const whole = (value, min, max) => Number.isSafeInteger(value) && value >= min && value <= max;
 const count = value => (whole(value, 0, 1000) ? value : 0);
 
+/** p.452: what one standard or special antagonist adds to the mission reward (a special one counts 4 times). */
+export function antagonistReward(entry) {
+  const xp = Math.max(0, Math.trunc(Number(entry?.xp) || 0)),
+    multiplier = entry?.type === "special" ? M.specialMultiplier : 1;
+  return { xp, multiplier, total: xp * multiplier, special: multiplier > 1 };
+}
+
 export function defaultMission() {
   return {
     version: 1,
