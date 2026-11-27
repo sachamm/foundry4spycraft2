@@ -4,7 +4,8 @@ import {
   actionDiceFundingContext,
   actionDicePoolFingerprint,
   bonusPoolForCheck,
-  actionDicePaymentRefund
+  actionDicePaymentRefund,
+  spentPoolDie
 } from "./bonus-pools.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { RESOURCE_LOCK_ID } from "./resource-locks.mjs";
@@ -108,15 +109,16 @@ export function multipartActionDicePlan(
         const pool = bonusPoolForCheck(system, bonusPoolId, message, { periods });
         if (!pool.available) throw new Error(pool.reason);
         const ad = system.actionDice ?? {},
-          threshold = Math.max(2, pool.die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
+          die = spentPoolDie(system, pool.die),
+          threshold = Math.max(2, die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
         funding = {
           bonusPoolId,
           label: pool.label,
           paymentPath: "system.bonusActionDice." + bonusPoolId + ".remaining",
           balance: pool.remaining,
-          die: pool.die,
+          die,
           poolFingerprint: actionDicePoolFingerprint(pool),
-          system: { ...system, actionDice: { ...ad, value: pool.remaining, die: pool.die, explodeAt: threshold } }
+          system: { ...system, actionDice: { ...ad, value: pool.remaining, die, explodeAt: threshold } }
         };
       } else {
         if (check.actionDiceAllowed === false) throw new Error(loc`Ordinary action dice cannot fund this result.`);

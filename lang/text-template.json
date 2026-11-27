@@ -7279,6 +7279,7 @@
    "TheCurrentSceneIsAlreadyDramatic_1tgihxq": "The current scene is already dramatic.",
    "TheCurrentVitalityValueDisagreesWith_1ro4bxh": "The current vitality value disagrees with its recorded history. Review it before continuing.",
    "TheCurrentWeaponGripIsUnavailable_0uhvcrh": "The current weapon grip is unavailable.",
+   "TheDCBoostCountWasNot_13e1rx5": "The DC boost count was not put back: {0}",
    "TheDCKeepsRisingUntilThe_1aey11l": "The DC keeps rising until the character rises above 60 ft. (p.349).",
    "TheDCMustBeMoreThan_050y48s": "The DC must be more than 20 above Career Level.",
    "TheDCOfRisesBy_05plz4y": "The DC of {0} rises by {1}.",

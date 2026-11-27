@@ -536,6 +536,11 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   result = await spend.spendGCDice({ id: "boostDC", dcCheck: "Vault door" });
   assert.equal(result.die.total, 18, "dramatic scene: a natural 1 explodes too");
   assert.equal(state.getSceneState().dcBoostsByCheck["vault door"].count, 1, "counted against that check");
+  assert.equal(
+    messages.findLast(message => message.flags?.spycraft2?.undo).flags.spycraft2.undo.dcBoost.key,
+    "vault door",
+    "its Undo note can take the boost off the count"
+  );
   await state.setSceneState({ dcBoostsByCheck: { "vault door": { name: "Vault door", count: 3 } } });
   await spend.spendGCDice({ id: "boostDC", dcCheck: "vault door" });
   assert.match(warnings.at(-1), /Only 3 action dice may boost one DC/);

@@ -206,13 +206,13 @@ export async function withUndo(actors, label, work, extra = {}) {
 }
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
-export function postUndo(label, entries, { gcDice = 0, damageCard = null, antagonist = null } = {}) {
+export function postUndo(label, entries, { gcDice = 0, damageCard = null, antagonist = null, dcBoost = null } = {}) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
     // The GC sees every note, so a step a player took can be undone by the GC too.
     whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
-    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, antagonist, done: false } } }
+    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, done: false } } }
   });
 }
 
@@ -294,6 +294,16 @@ async function undoRecord(message, record) {
           ? now.antagonists.map(entry => (mine(entry) ? was : entry))
           : now.antagonists.filter(entry => !mine(entry))
       })).catch(error => ui.notifications.warn(loc`The antagonist list was not put back: ${error.message}`));
+  }
+  // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
+  if (record.dcBoost?.key && game.user.isGM) {
+    const { getSceneState, setSceneState } = await import("./gc/state.mjs");
+    const scene = getSceneState(),
+      counted = scene.dcBoostsByCheck?.[record.dcBoost.key];
+    if (scene.scene === record.dcBoost.scene && counted?.count > 0)
+      await setSceneState({
+        dcBoostsByCheck: { ...scene.dcBoostsByCheck, [record.dcBoost.key]: { ...counted, count: counted.count - 1 } }
+      }).catch(error => ui.notifications.warn(loc`The DC boost count was not put back: ${error.message}`));
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;

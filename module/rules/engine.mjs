@@ -2235,9 +2235,25 @@ function deriveWealthAndGear(state) {
   const picks = {};
   for (const g of GEAR) picks[g] = { available: gearBase[g] + B.get(`gear.${g}`) + (misc[`gear${g}`] ?? 0), spent: 0 };
   picks.CHA = { available: Math.max(0, abil.cha.mod), spent: 0 };
+  // Big Budget (p.405): a pick pushed past Caliber V also brings one Caliber I item of the same type, at no pick.
+  const missionReserves = currentReserves(sys),
+    overflow = missionReserves ? campaignGearCaliber(missionReserves.caliber).pastV : false,
+    tops = {},
+    ones = {};
   for (const i of items) {
     const p = i.system?.pick;
-    if (p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i)) picks[p].spent += i.system?.pickCount ?? 1;
+    if (!(p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i))) continue;
+    const count = i.system?.pickCount ?? 1;
+    picks[p].spent += count;
+    if (overflow && ["weapon", "armor", "gear"].includes(i.type)) {
+      if (i.system.caliber === 5) tops[p] = (tops[p] ?? 0) + count;
+      else if (i.system.caliber === 1) ones[p] = (ones[p] ?? 0) + count;
+    }
+  }
+  for (const p of Object.keys(tops)) {
+    const free = Math.min(tops[p], ones[p] ?? 0);
+    if (free) picks[p].spent -= free;
+    picks[p].bigBudgetExtras = free;
   }
   const reservedAllocations = reserveAllocations(sys);
   for (const key of Object.keys(picks)) picks[key].spent += reservedAllocations[key] ?? 0;

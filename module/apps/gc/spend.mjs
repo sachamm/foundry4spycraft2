@@ -141,7 +141,8 @@ export async function spendGCDice(input = {}) {
   // A spend made from a chat card changes that card's own result, which a note cannot take back: no note is left.
   const undoable = !input.onCard && !["dramaticScene", "campaignQuality"].includes(input.id),
     beforeSpend = actor && undoable ? snapshot(actor) : null;
-  let antagonistBefore = null;
+  let antagonistBefore = null,
+    dcBoostMade = null;
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
   if (plan.cost > 0) {
@@ -218,7 +219,9 @@ export async function spendGCDice(input = {}) {
           dcCheck ? loc`The DC of ${esc(dcCheck)} rises by ${die.total}.` : loc`The DC rises by ${die.total}.`
         );
         if (dcKey) {
-          const now = getSceneState().dcBoostsByCheck ?? {};
+          const scene = getSceneState(),
+            now = scene.dcBoostsByCheck ?? {};
+          dcBoostMade = { scene: scene.scene, key: dcKey };
           await setSceneState({
             dcBoostsByCheck: {
               ...now,
@@ -249,7 +252,8 @@ export async function spendGCDice(input = {}) {
       if (entry || plan.cost > 0)
         await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], {
           gcDice: plan.cost,
-          antagonist: antagonistBefore
+          antagonist: antagonistBefore,
+          dcBoost: dcBoostMade
         });
     } catch (error) {
       console.warn("Field Agent's Handbook | No Undo note could be left for this spend.", error);

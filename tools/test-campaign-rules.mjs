@@ -246,3 +246,13 @@ test("a fall: dice per 10 ft. up to 20d6, a made Falling check, armor piercing, 
   assert.equal(campaignFallingDamage(9, { special: true }, effectsOf("wire-fu")), 4);
   assert.equal(campaignFallingDamage(9, { special: false }, effectsOf("wire-fu")), 9);
 });
+
+test("Spirited raises a bonus pool's die when it is spent, not the pool on record (p.408)", async () => {
+  const { spentPoolDie } = await import("../module/rules/bonus-pools.mjs");
+  assert.equal(spentPoolDie({}, 4), 4);
+  withQualities(["spirited"], () => {
+    assert.equal(spentPoolDie({}, 4), 6);
+    assert.equal(spentPoolDie({}, 12), 12);
+    assert.equal(spentPoolDie({ npcType: "special" }, 4), 4, "player characters only");
+  });
+});

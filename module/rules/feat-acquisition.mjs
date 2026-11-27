@@ -1,4 +1,12 @@
 import { loc } from "../i18n.mjs";
+import { campaignFeatTrees } from "./campaign-rules.mjs";
+import { SPYCRAFT } from "../config.mjs";
+
+/** The keys of the feat trees a season quality opens (its data names the tree by label). */
+const openFeatTrees = () =>
+  campaignFeatTrees().map(
+    label => Object.keys(SPYCRAFT.featTrees).find(key => SPYCRAFT.featTrees[key] === label) ?? label
+  );
 /** Explicit class bonus-feat sources, including Scientist Intense Study (p.42). */
 export function classFeatSources(items, progression) {
   const sources = [];
@@ -40,7 +48,8 @@ export function featAcquisition(feat, sources, items, { preview = false } = {}) 
     career = feat.system.acquiredAtLevel || 1;
   if (!source)
     return { ok: false, levelAllowance: 0, reason: loc`The selected class bonus-feat source is unavailable.` };
-  if (source.tree !== "any" && source.tree !== feat.system.tree)
+  // A tree a season quality opens may stand in for any feat choice, class bonus feats included (pp.405–408).
+  if (source.tree !== "any" && source.tree !== feat.system.tree && !openFeatTrees().includes(feat.system.tree))
     return {
       ok: false,
       levelAllowance: 0,

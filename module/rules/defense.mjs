@@ -111,11 +111,6 @@ export function incomingDefensePlan(system, options = {}) {
   const triggerman = system.classLevels?.triggerman ?? 0,
     eyeOfStorm = adjacent && triggerman >= 4 ? 3 : 0;
   const extraDodge = noDodge ? 0 : eyeOfStorm;
-  const circling = circlingDefensePlan({
-    ...options.circling,
-    ranged,
-    dodgeBonus: noDodge ? 0 : (system.defense.dodgeBonuses ?? 0) + extraDodge
-  });
   const cover = coverPlan({ ...options.cover, defenderSystem: system, ranged });
   const sharpshooter = sharpshooterDefensePlan(system, { ...options.cover, ranged }),
     greatSword = greatSwordDefensePlan(system, { ranged }),
@@ -128,6 +123,12 @@ export function incomingDefensePlan(system, options = {}) {
     anticipate = noDodge || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
   // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies.
   const foibles = specialistDefense(system, options.attackerProficiency ?? "", { vulnerable: noDodge });
+  // Circling Stance halves every dodge bonus the defender has against this attack, these ones included.
+  const circling = circlingDefensePlan({
+    ...options.circling,
+    ranged,
+    dodgeBonus: noDodge ? 0 : (system.defense.dodgeBonuses ?? 0) + extraDodge + foibles.dodge + dueling + anticipate
+  });
   // Gladiators (p.407): +1 against ranged attacks for each Melee or Unarmed Combat feat.
   const gladiators = gladiatorsDefense(system, ranged);
   const total =
