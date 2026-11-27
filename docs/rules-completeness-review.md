@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 26 November 2026:** PC creation **9.1/10**;
+**Continuing review, 26 November 2026:** PC creation **9.2/10**;
 combat play **9.3/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -601,3 +601,25 @@ including Fit's Athletics cap bonus. The fixture check grows from **482** to
 **988** assertions. These remain partial numerical builds with outstanding setup
 choices; they are not evidence of completed native PC creation. Scores remain
 **9.1/10** and **9.3/10** while that workflow and the larger B-193 audit continue.
+
+The native creation pass exposed Training choices that could consume the final
+allowance while leaving no setup task for an invalid selection. Blank or
+ambiguous contact names, malformed contact grades, duplicate or blank focuses,
+invalid proficiencies, duplicate Interests and over-budget Training selections
+now remain explicit setup errors. Saved selections are preserved for correction;
+invalid grades cannot provide negative spending, and invalid proficiency values
+cannot grant a benefit. Existing temporary-focus provenance warnings also remain
+visible in setup rather than disappearing among informational warnings.
+
+The native level-one Soldier now completes all setup tasks with zero warnings,
+including its original Small Screen/Big Budget/Modular creation policy, Contract
+Pro and Talented choices, class bonus feat, three recorded feat acquisitions,
+20 skill points, weapon proficiency/forte picks, all five focus choices, two
+Interests, two contacts and five Wealth points. An unnamed contact is first
+verified as an error, then corrected through the actual Training field. Reloading
+retains the choices and reopens the completed character in Play mode. The 1280×720
+pass has no page errors; Foundry itself reports its higher minimum resolution,
+so that check establishes this sheet flow rather than general core compatibility
+at 720px. All **4,081** tests, **988** fixture assertions, native schemas, lint,
+formatting, bundling and the text-copy check pass. Creation rises to **9.2/10**;
+combat remains **9.3/10**. Broader source and option coverage remains outstanding.

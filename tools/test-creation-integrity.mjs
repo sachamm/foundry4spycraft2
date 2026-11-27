@@ -57,3 +57,103 @@ test("first-level maximum, later die boundaries and missing rolls retain their s
   computeAgent(s, [cls], cfg);
   assert.ok(s.todo.some(t => /Vitality not rolled/.test(t.text)));
 });
+
+test("an unnamed contact cannot silently complete Training even when its grade spends the final choice", () => {
+  const s = agent(1, { contacts: [{ name: " ", rank: 1 }] });
+  computeAgent(s, [cls], cfg);
+  assert.equal(s.contactPicks.remaining, 0);
+  assert.ok(s.todo.some(t => t.tab === "training" && t.error && /Contact 1/.test(t.text)));
+  assert.equal(s.contacts[0].name, " ");
+});
+test("malformed contact grades cannot spend negative choices or hide invalid saved rows", () => {
+  for (const rank of [-1, 0, 1.5, 5, Infinity, "1", null]) {
+    const s = agent(1, {
+      contacts: [
+        { name: "Valid", rank: 1 },
+        { name: "Review", rank }
+      ]
+    });
+    computeAgent(s, [cls], cfg);
+    assert.equal(s.contactPicks.used, 1);
+    assert.equal(s.contacts[1].rank, rank);
+    assert.ok(
+      s.todo.some(t => t.error && /whole grade/.test(t.text)),
+      String(rank)
+    );
+  }
+});
+test("contact names must identify distinct choices and over-budget grades remain setup errors", () => {
+  const s = agent(1, {
+    contacts: [
+      { name: "Ada", rank: 1 },
+      { name: " ada ", rank: 1 }
+    ]
+  });
+  computeAgent(s, [cls], cfg);
+  assert.equal(s.contactPicks.used, 2);
+  assert.equal(s.contacts.length, 2);
+  assert.ok(s.todo.some(t => t.error && /distinct names/.test(t.text)));
+  assert.ok(s.todo.some(t => t.error && /Contacts:.*over the limit/.test(t.text)));
+});
+test("blank and duplicate focus entries give no extra focus and remain visible for correction", () => {
+  const s = agent(1, { focuses: { cultures: [" ", "North America", " north america "] } });
+  computeAgent(s, [cls], cfg);
+  assert.deepEqual(s.focusTotals.cultures, ["North America"]);
+  assert.equal(s.focuses.cultures.length, 3);
+  assert.ok(s.todo.some(t => t.error && /name each focus/.test(t.text)));
+  assert.ok(s.todo.some(t => t.error && /distinct focuses/.test(t.text)));
+});
+test("excess focus picks and duplicate or excess Interests keep Training unfinished", () => {
+  for (const patch of [
+    { focuses: { cultures: ["A", "B", "C", "D"] } },
+    { interests: "Chess, chess" },
+    { interests: "A, B, C, D, E, F, G, H" }
+  ]) {
+    const s = agent(1, patch);
+    computeAgent(s, [cls], cfg);
+    assert.ok(s.todo.some(t => t.tab === "training" && t.error));
+  }
+});
+test("invalid, unearned and unknown proficiency selections remain setup errors without granting benefits", () => {
+  for (const patch of [
+    { edged: { forte: true } },
+    { edged: { proficient: "false" } },
+    { mystery: { proficient: true } }
+  ]) {
+    const s = agent(1, { proficiencies: patch });
+    computeAgent(s, [cls], cfg);
+    assert.ok(s.todo.some(t => t.tab === "training" && t.error));
+    assert.equal(s.proficiencyTotals.edged.forte, false);
+    if (patch.edged?.proficient === "false") assert.equal(s.proficiencyTotals.edged.proficient, false);
+  }
+  const s = agent(1, {
+    proficiencies: Object.fromEntries(
+      Object.keys(cfg.proficiencies).map(key => [key, { proficient: true, forte: true }])
+    )
+  });
+  computeAgent(s, [cls], cfg);
+  assert.ok(s.proficiencyPicks.remaining < 0);
+  assert.ok(s.todo.some(t => t.tab === "training" && t.error));
+});
+test("too many unfinished Subplots remain setup errors while completed Subplots do not consume the allowance", () => {
+  const s = agent(1, {
+    subplots: [
+      { name: "A", complete: false },
+      { name: "B", complete: false }
+    ]
+  });
+  computeAgent(s, [cls], cfg);
+  assert.ok(s.todo.some(t => t.error && /Subplots:/.test(t.text)));
+  s.subplots[1].complete = true;
+  computeAgent(s, [cls], cfg);
+  assert.ok(!s.todo.some(t => t.error && /Subplots:/.test(t.text)));
+});
+test("legal named contacts, interests, focuses and proficiency choices acquire no new Training error", () => {
+  const s = agent(1, {
+    contacts: [{ name: "Ada", rank: 1 }],
+    interests: "Chess",
+    focuses: { cultures: ["North America"] }
+  });
+  computeAgent(s, [cls], cfg);
+  assert.ok(!s.todo.some(t => t.tab === "training" && t.error));
+});

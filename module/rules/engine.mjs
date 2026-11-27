@@ -107,7 +107,7 @@ import {
   bigStickStatus,
   bigStickMatches
 } from "./gear.mjs";
-import { proficiencyTotals, focusTotals } from "./training.mjs";
+import { proficiencyTotals, focusTotals, contactChoices } from "./training.mjs";
 import { purchasedSkillRanks, availableSkillPoints } from "./checks.mjs";
 import { loc } from "../i18n.mjs";
 
@@ -1421,6 +1421,8 @@ function deriveOtherBonuses(state) {
   sys.proficiencyTotals = proficiency.totals;
   sys.proficiencyPicks = proficiency.picks;
   warnings.push(...proficiency.warnings);
+  for (const text of proficiency.warnings)
+    state.todo.push({ order: 50, tab: "training", error: true, always: true, text });
   sys.weaponSpecialist = weaponSpecialist(sys, items, cfg);
 
   const small = sys.aging.small;
@@ -2176,6 +2178,7 @@ function deriveProficiencies(state) {
   sys.forcedFocuses = Object.fromEntries(Object.entries(focuses.forced).map(([key, value]) => [key, [...value]]));
   sys.focusPicks = focuses.picks;
   warnings.push(...focuses.warnings);
+  for (const text of focuses.warnings) todo.push({ order: 51, tab: "training", error: true, always: true, text });
   for (const entry of focuses.pending) {
     const pending = typeof entry === "string" ? { tab: "training", text: entry } : entry;
     todo.push({ order: 51, tab: pending.tab, text: pending.text });
@@ -2194,12 +2197,20 @@ function deriveProficiencies(state) {
     available: Math.max(0, tb.interestBase + B.get("interests") - (sys.relinquishedInterests ?? 0)),
     used: new Set(interestList.map(norm)).size
   };
-  if (sys.interestPicks.used !== interestList.length) warnings.push(loc`Interests must be distinct.`);
+  if (sys.interestPicks.used !== interestList.length) {
+    const text = loc`Interests must be distinct.`;
+    warnings.push(text);
+    todo.push({ order: 52, tab: "training", error: true, always: true, text });
+  }
   sys.interestPicks.remaining = sys.interestPicks.available - sys.interestPicks.used;
   if (sys.interestPicks.remaining > 0)
     todo.push({ order: 52, tab: "training", text: loc`${plural(sys.interestPicks.remaining, "interest")} to choose.` });
 
-  if (sys.interestPicks.remaining < 0) warnings.push(loc`Interests: ${-sys.interestPicks.remaining} over the limit.`);
+  if (sys.interestPicks.remaining < 0) {
+    const text = loc`Interests: ${-sys.interestPicks.remaining} over the limit.`;
+    warnings.push(text);
+    todo.push({ order: 52, tab: "training", error: true, always: true, text });
+  }
   sys.contactFeatBindings = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id) && Object.hasOwn(CONTACT_FEATS, i.name))
     .map(i => ({
@@ -2224,10 +2235,18 @@ function deriveProficiencies(state) {
     sys.contactFeatGrants.reduce((n, g) => n + g.credit, 0) +
     sys.networkingContactFeatGrants.filter(g => g.valid).length +
     Math.floor((purchasedRanks.networking ?? 0) / 4);
-  const contactsUsed = (sys.contacts ?? []).reduce((n, c) => n + (Number(c.rank) || 0), 0);
+  const contactReview = contactChoices(sys.contacts ?? []),
+    contactsUsed = contactReview.used;
+  for (const text of contactReview.warnings) {
+    warnings.push(text);
+    todo.push({ order: 53, tab: "training", error: true, always: true, text });
+  }
   sys.contactPicks = { available: contactsAvail, used: contactsUsed, remaining: contactsAvail - contactsUsed };
-  if (contactsUsed > contactsAvail)
-    warnings.push(loc`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`);
+  if (contactsUsed > contactsAvail) {
+    const text = loc`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`;
+    warnings.push(text);
+    todo.push({ order: 53, tab: "training", error: true, always: true, text });
+  }
   if (contactsUsed < contactsAvail)
     todo.push({
       order: 53,
@@ -2252,10 +2271,11 @@ function deriveProficiencies(state) {
     warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);
     todo.push({ order: 54, tab: "training", text: loc`Trouble Magnet: keep at least one unfinished Subplot in play.` });
   }
-  if (sys.subplotPicks.used > sys.subplotPicks.available)
-    warnings.push(
-      loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`
-    );
+  if (sys.subplotPicks.used > sys.subplotPicks.available) {
+    const text = loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`;
+    warnings.push(text);
+    todo.push({ order: 54, tab: "training", error: true, always: true, text });
+  }
 }
 
 /** Step 12: wealth and mission gear. */

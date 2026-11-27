@@ -12,18 +12,26 @@ export function proficiencyTotals(system, cfg, bonus, available) {
   // Picks beyond the earned allowance are recorded but give nothing; they are dropped in list order (pp.27–28).
   const unpaid = [];
   const pay = () => used++ < available;
+  for (const [key, selected] of Object.entries(system.proficiencies ?? {}))
+    if (!Object.hasOwn(cfg.proficiencies, key) && (selected?.proficient || selected?.forte))
+      warnings.push(loc`Unknown weapon proficiency ${key}: choose a listed proficiency.`);
   for (const key of Object.keys(cfg.proficiencies)) {
     const selected = system.proficiencies?.[key] ?? {};
+    for (const field of ["proficient", "forte"])
+      if (selected[field] !== undefined && typeof selected[field] !== "boolean")
+        warnings.push(loc`${cfg.proficiencies[key].label}: review the saved ${field} selection.`);
+    const selectedProficiency = selected.proficient === true,
+      selectedForte = selected.forte === true;
     const granted = bonus(`prof.${key}`) > 0;
     const forteGranted = bonus(`forte.${key}`) > 0;
-    const paidProficiency = !!selected.proficient && !granted ? pay() : false;
-    if (selected.proficient && !granted && !paidProficiency) unpaid.push(cfg.proficiencies[key].label);
+    const paidProficiency = selectedProficiency && !granted ? pay() : false;
+    if (selectedProficiency && !granted && !paidProficiency) unpaid.push(cfg.proficiencies[key].label);
     const proficient = granted || paidProficiency;
-    const paidForte = !!selected.forte && !forteGranted && proficient ? pay() : false;
-    if (selected.forte && !forteGranted && proficient && !paidForte)
+    const paidForte = selectedForte && !forteGranted && proficient ? pay() : false;
+    if (selectedForte && !forteGranted && proficient && !paidForte)
       unpaid.push(loc`${cfg.proficiencies[key].label} forte`);
     const forte = proficient && (forteGranted || paidForte);
-    if ((selected.forte || forteGranted) && !proficient)
+    if ((selectedForte || forteGranted) && !proficient)
       warnings.push(loc`${cfg.proficiencies[key].label}: a forte requires its weapon proficiency.`);
     totals[key] = { proficient, forte, granted, forteGranted };
     hints[key] = granted;
@@ -34,15 +42,31 @@ export function proficiencyTotals(system, cfg, bonus, available) {
 
 export function focusTotals(system, items, cfg, bonus, { level, startingIntelligence, activeFeatIds = new Set() }) {
   const aliases = cfg.tables.focusAliases ?? {};
-  const canonical = value => aliases[value] ?? value;
+  const canonical = value => (typeof value === "string" ? String(aliases[value.trim()] ?? value).trim() : "");
   const groups = ["cultures", "drive", "profession", "science"];
-  const totals = Object.fromEntries(
-    groups.map(key => [key, [...new Set((system.focuses?.[key] ?? []).map(canonical))]])
-  );
+  const totals = {};
   const forced = Object.fromEntries(groups.map(key => [key, new Set()]));
   const warnings = [],
     pending = [],
     forteGrants = [];
+  for (const key of groups) {
+    const seen = new Set();
+    totals[key] = [];
+    for (const value of system.focuses?.[key] ?? []) {
+      const focus = canonical(value),
+        normalized = norm(focus);
+      if (!focus || focus.length > 200) {
+        warnings.push(loc`${key}: name each focus with 1–200 characters.`);
+        continue;
+      }
+      if (seen.has(normalized)) {
+        warnings.push(loc`${key}: ${focus} is listed more than once; choose distinct focuses.`);
+        continue;
+      }
+      seen.add(normalized);
+      totals[key].push(focus);
+    }
+  }
   for (const item of items.filter(i => i.type === "origin")) {
     const rules = cfg.tables.originFocuses?.[originRuleName(item)] ?? {};
     for (const [key, values] of Object.entries(rules.fixed ?? {}))
@@ -192,6 +216,25 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
       loc`Ordinary focus selections exceed their permanent allowance; temporary Depth of Study choices must use their source on Training. Review legacy choice provenance.`
     );
   return { totals, forced, picks, warnings, pending, temporaryGrants, activeFortes };
+}
+
+/** Contacts spend whole grades; incomplete or ambiguous rows stay visible for correction. */
+export function contactChoices(contacts = []) {
+  const warnings = [],
+    names = new Map();
+  let used = 0;
+  for (const [index, contact] of contacts.entries()) {
+    const name = typeof contact?.name === "string" ? contact.name.trim() : "";
+    if (!name || name.length > 200) warnings.push(loc`Contact ${index + 1}: enter a name with 1–200 characters.`);
+    else names.set(norm(name), [...(names.get(norm(name)) ?? []), index + 1]);
+    if (!Number.isSafeInteger(contact?.rank) || contact.rank < 1 || contact.rank > 4)
+      warnings.push(loc`Contact ${index + 1}: choose a whole grade from acquaintance (1) to partner (4).`);
+    else used += contact.rank;
+  }
+  for (const rows of names.values())
+    if (rows.length > 1)
+      warnings.push(loc`Contacts ${rows.join(", ")}: use distinct names so each contact can be identified.`);
+  return { used, warnings };
 }
 
 /** pp.98,171,200: temporary Depth of Study owns its two choices, never permanent selections. */
