@@ -250,10 +250,9 @@ export async function rollGearAcquisition(actor, options = {}) {
         throw new Error(loc`The Request cost changed before payment. Review its funding again.`);
       const abilityId = plan.abilityId ?? plan.requestAbility,
         beforeUse = abilityId ? structuredClone(actor.system.resourceUses?.[abilityId]) : null;
-      const deferredDelivery = plan.automatic && plan.freePick;
-      // Free origin benefits use the existing journaled delivery settlement after posting; no Request dice are rolled.
-      const deliveryRoll =
-        plan.automatic && !deferredDelivery ? await new Roll(plan.delivery.formula).evaluate() : null;
+      const immediateDelivery = plan.automatic && plan.delivery.formula === "0";
+      const deferredDelivery = plan.automatic && !immediateDelivery;
+      // Random delivery starts only in the journaled settlement; immediate benefits need no Roll.
       const attempt = {
         id,
         epoch: missionEpoch(actor.system),
@@ -275,10 +274,10 @@ export async function rollGearAcquisition(actor, options = {}) {
         localHeroFeats: plan.localHeroFeats ?? [],
         location: plan.location ?? "",
         deliveryMultiplier: plan.deliveryMultiplier ?? 1,
-        delivery: deliveryRoll
+        delivery: immediateDelivery
           ? {
               formula: plan.delivery.formula,
-              total: Math.ceil(deliveryRoll.total * (plan.deliveryMultiplier ?? 1)),
+              total: 0,
               unit: plan.delivery.unit
             }
           : null,
@@ -291,6 +290,7 @@ export async function rollGearAcquisition(actor, options = {}) {
         gearAbility: plan.gearAbility ?? null,
         commonCost: plan.commonCost ?? null,
         automatic: plan.automatic,
+        ...(plan.automatic ? { automaticSource: structuredClone(plan.requestBenefit) } : {}),
         abilityName: plan.abilityName,
         preparationHours: plan.preparationHours ?? 0,
         messageUuid: "",
@@ -339,8 +339,7 @@ export async function rollGearAcquisition(actor, options = {}) {
               message = await ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor }),
                 content: `<p>${loc`${esc(plan.abilityName)}: ${esc(plan.name)} requested automatically; ${plan.freePick ? loc`no Reserve pick consumed` : loc`one ${esc(plan.pick)} Reserve pick consumed`}, ${plan.cost ? loc`${plan.cost} action dice spent (${plan.surcharge} Shaken surcharge)` : loc`no action dice spent`}. ${deferredDelivery ? loc`No Request check is rolled. Resolve delivery once from this card, then claim the Resource after it arrives.` : loc`Available after ${attempt.delivery.total} ${attempt.delivery.unit}.`} ${plan.preparationHours ? loc` One hour of preparation completed before the Request.` : ""} Claim on Gear after delivery.`}</p>`,
-                // The delivery-time roll, so its dice can be seen behind the time given.
-                rolls: deliveryRoll ? [deliveryRoll] : [],
+                rolls: [],
                 flags: {
                   spycraft2: {
                     actorUuid: actor.uuid,
@@ -720,6 +719,8 @@ export function finishGearAcquisition(actor, message, options = {}) {
         record = currentReserves(actor.system),
         id = check.gearAttempt?.id,
         attempt = record?.attempts?.[id];
+      if (attempt?.automaticSource && !same(attempt.automaticSource, check.requestBenefit))
+        throw Error(loc`The automatic Request's saved source differs from its card. Review the original acquisition.`);
       if (!attempt || attempt.epoch !== record.epoch || check.gearAttempt.epoch !== record.epoch)
         throw new Error(loc`This acquisition belongs to an earlier mission or has no reserve transaction.`);
       if (check.superseded) throw new Error(loc`Resolve the replacement acquisition check instead.`);
@@ -749,7 +750,7 @@ export function finishGearAcquisition(actor, message, options = {}) {
             "flags.spycraft2.resolved": true,
             "flags.spycraft2.successConfirmed": result.success,
             "flags.spycraft2.gearAttempt": gearAttempt,
-            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${attempt.freePick ? loc`Automatic origin Resource benefit recorded; delivery settlement follows.` : loc`Final result ${check.effectiveTotal} recorded; delivery settlement follows.`}</strong>`
+            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${attempt.automatic ? loc`Automatic Request benefit recorded; delivery settlement follows.` : loc`Final result ${check.effectiveTotal} recorded; delivery settlement follows.`}</strong>`
           });
         } catch (error) {
           const current = message.flags?.spycraft2;

@@ -396,6 +396,30 @@ export function acquisitionOutcome(attempt, total) {
       throw Error(loc`Review the saved automatic origin Resource benefit.`);
     return { success: true, status: "succeeded" };
   }
+  if (attempt.automatic === true) {
+    const saved = attempt.automaticSource,
+      source = saved?.source;
+    if (
+      attempt.kind !== "request" ||
+      typeof attempt.requestAbility !== "string" ||
+      !attempt.requestAbility ||
+      saved?.version !== 1 ||
+      saved.id !== attempt.requestAbility ||
+      source?.id !== attempt.requestAbility ||
+      source.workflow !== "requestBenefit" ||
+      source.automatic !== true ||
+      typeof saved.epoch !== "string" ||
+      !saved.epoch ||
+      (source.period === "mission" && saved.epoch !== attempt.epoch) ||
+      (source.category && source.category !== attempt.category) ||
+      !Number.isSafeInteger(attempt.caliber) ||
+      attempt.caliber < 1 ||
+      attempt.caliber > 5 ||
+      (source.maximumDC && 10 * attempt.caliber > source.maximumDC)
+    )
+      throw Error(loc`Review the original automatic Request source before settling its delivery.`);
+    return { success: true, status: "succeeded" };
+  }
   if (!Number.isFinite(total)) throw new Error(loc`A finite final check result is required.`);
   return { success: total >= attempt.dc, status: total >= attempt.dc ? "succeeded" : "failed" };
 }

@@ -818,22 +818,34 @@ test("free origin posting refusal restores its unrolled use and does not allocat
   }
 });
 
-test("automatic Request rolls delivery, consumes one use and pick, is immediately claimable after delivery, and duplicate use is blocked", async () => {
+const automaticCard = (data, uuid) => ({
+  ...data,
+  uuid,
+  rolls: data.rolls ?? [],
+  async update(patch) {
+    update(this, patch);
+  }
+});
+
+test("automatic Request reserves its use and pick before delivery RNG, then settles and claims once", async () => {
   const a = new SpycraftActor();
   a.system = withRequestBenefits();
   a.system.missionReserves.caliber = 1;
   let posts = 0;
   ChatMessage.create = async data => {
     posts++;
-    return { ...data, uuid: "ChatMessage.auto" };
+    return automaticCard(data, "ChatMessage.auto");
   };
   const input = { ...request, caliber: 4, requestAbility: "requestExecutiveDecision", networkConfirmed: true };
   const m = await a.rollGearAcquisition(input),
-    id = m.flags.spycraft2.gearAttempt.id,
-    attempt = a.system.missionReserves.attempts[id];
-  assert.equal(m.flags.spycraft2.resolved, true);
+    id = m.flags.spycraft2.gearAttempt.id;
+  assert.equal(m.flags.spycraft2.resolved, false);
+  assert.equal(m.rolls.length, 0);
   assert.equal(m.flags.spycraft2.actionDiceAllowed, false);
   assert.equal(m.flags.spycraft2.rawTotal, undefined);
+  assert.equal(a.system.missionReserves.attempts[id].success, null);
+  await a.finishCheck(m);
+  const attempt = a.system.missionReserves.attempts[id];
   assert.equal(attempt.success, true);
   assert.equal(attempt.status, "succeeded");
   assert.equal(attempt.delivery.total, 7);
@@ -849,6 +861,126 @@ test("automatic Request rolls delivery, consumes one use and pick, is immediatel
   });
   assert.equal(item.system.reserveAcquisition.attemptId, id);
 });
+test("automatic delivery begins only after reservation, retains unknown RNG for GC review and ignores later loss of an already-awarded source", async () => {
+  const oldCreate = ChatMessage.create,
+    oldEvaluate = Roll.prototype.evaluate,
+    oldUser = game.user;
+  const a = new SpycraftActor();
+  a.system = withRequestBenefits();
+  const rng = [];
+  let fail = true;
+  ChatMessage.create = async data => automaticCard(data, "ChatMessage.automaticRecovery");
+  Roll.prototype.evaluate = async function (...args) {
+    if (/d\d/i.test(this.formula)) {
+      const attempt = Object.values(a.system.missionReserves.attempts)[0];
+      assert.equal(a.system.resourceUses.requestExecutiveDecision.used, 1);
+      assert.equal(a.system.missionReserves.picks.R, 0);
+      assert.equal(attempt.automaticSource.source.automatic, true);
+      rng.push(this.formula);
+      if (fail) {
+        fail = false;
+        throw Error("automatic delivery result unknown");
+      }
+    }
+    return oldEvaluate.apply(this, args);
+  };
+  try {
+    game.user = { isGM: true, id: "gc" };
+    const m = await a.rollGearAcquisition({
+      ...request,
+      requestAbility: "requestExecutiveDecision",
+      networkConfirmed: true
+    });
+    assert.deepEqual(rng, []);
+    await assert.rejects(a.finishCheck(m), /automatic delivery result unknown/);
+    assert.equal(m.flags.spycraft2.gearAttempt.settlement.stage, "rolling");
+    game.user = { isGM: false, id: "player" };
+    await assert.rejects(a.finishCheck(m), /GC review/);
+    assert.equal(rng.length, 1);
+    game.user = { isGM: true, id: "gc" };
+    a.system.limitedUses = [];
+    a.system.classLevels = {};
+    const result = await finishAcquisition(a, m, {
+      deliveryTotal: 9,
+      confirmed: true,
+      note: "Actual delivery total reviewed after interruption"
+    });
+    assert.equal(result.success, true);
+    assert.equal(result.delivery.total, 9);
+    await a.finishCheck(m);
+    assert.equal(rng.length, 1);
+    assert.equal(a.system.resourceUses.requestExecutiveDecision.used, 1);
+    assert.equal(a.system.missionReserves.picks.R, 0);
+  } finally {
+    ChatMessage.create = oldCreate;
+    Roll.prototype.evaluate = oldEvaluate;
+    game.user = oldUser;
+  }
+});
+
+test("automatic Request outcomes require their frozen source, original period and grade rather than a fabricated check total", () => {
+  const s = withRequestBenefits(),
+    plan = gearAcquisitionPlan(s, { ...request, requestAbility: "requestExecutiveDecision", networkConfirmed: true });
+  const attempt = { ...plan, id: "source", epoch: "mission1", automaticSource: plan.requestBenefit };
+  assert.deepEqual(acquisitionOutcome(attempt, undefined), { success: true, status: "succeeded" });
+  for (const mutate of [
+    a => delete a.automaticSource,
+    a => (a.automaticSource.source.automatic = false),
+    a => (a.automaticSource.id = "other"),
+    a => (a.automaticSource.epoch = "old"),
+    a => (a.category = "CHA"),
+    a => (a.caliber = 6)
+  ]) {
+    const copy = structuredClone(attempt);
+    mutate(copy);
+    if (copy.category === "CHA") copy.automaticSource.source.category = "R";
+    assert.throws(() => acquisitionOutcome(copy, 100), /original automatic Request source/);
+  }
+});
+
+test("an immediately available Political Resource spends its source and pick without creating any Roll", async () => {
+  const oldCreate = ChatMessage.create,
+    oldEvaluate = Roll.prototype.evaluate;
+  ChatMessage.create = async data => automaticCard(data, "ChatMessage.immediateResource");
+  Roll.prototype.evaluate = async () => {
+    throw Error("Immediate Resource must not evaluate a Roll");
+  };
+  try {
+    const a = new SpycraftActor();
+    a.system = system();
+    a.system.activeFeatNames = ["Political Immunity"];
+    a.system.resourceUses = {};
+    a.system.actionDice.value = 0;
+    a.system.limitedUses = requestSources(a.system, []);
+    a.system.missionReserves = reserveInitialization(a.system, [], { ...initialize, caliber: 3 });
+    const input = {
+      ...request,
+      caliber: 3,
+      name: "Legal immunity (Power Rating 6)",
+      requestAbility: "requestPoliticalImmunity",
+      networkConfirmed: true
+    };
+    const m = await a.rollGearAcquisition(input),
+      id = m.flags.spycraft2.gearAttempt.id;
+    assert.equal(m.rolls.length, 0);
+    assert.equal(m.flags.spycraft2.rawTotal, undefined);
+    assert.equal(m.flags.spycraft2.resolved, true);
+    assert.equal(a.system.missionReserves.attempts[id].delivery.total, 0);
+    const item = await a.claimGearAcquisition({
+      attemptId: id,
+      itemData: { name: input.name, type: "gear", system: { gearCategory: "R", caliber: 3, powerRating: 6 } },
+      delivered: true,
+      gcConfirmed: true
+    });
+    assert.equal(item.system.pick, "R");
+    assert.equal(a.system.missionReserves.picks.R, 0);
+    assert.equal(a.system.resourceUses.requestPoliticalImmunity.used, 1);
+  } finally {
+    ChatMessage.create = oldCreate;
+    Roll.prototype.evaluate = oldEvaluate;
+  }
+});
+
 test("failed automatic posting refunds the use and reserve; a failed supplementary chat-link write preserves the committed acquisition", async () => {
   const input = { ...request, requestAbility: "requestExecutiveDecision", networkConfirmed: true };
   const a = new SpycraftActor();
@@ -869,7 +1001,8 @@ test("failed automatic posting refunds the use and reserve; a failed supplementa
   const m = await a.rollGearAcquisition(input);
   assert.ok(m);
   assert.equal(a.system.resourceUses.requestExecutiveDecision.used, 1);
-  assert.equal(Object.values(a.system.missionReserves.attempts)[0].success, true);
+  assert.equal(Object.values(a.system.missionReserves.attempts)[0].success, null);
+  assert.equal(Object.values(a.system.missionReserves.attempts)[0].automaticSource.source.automatic, true);
   assert.equal(a.system.missionReserves.picks.R, 0);
 });
 
@@ -970,9 +1103,11 @@ test("Behind the Scenes records automatic success and preparation, refunds faile
   await assert.rejects(a.rollGearAcquisition(behindInput), /behind post failed/);
   assert.equal(a.system.resourceUses.requestBehindScenes, undefined);
   assert.equal(a.system.missionReserves.picks.R, 1);
-  ChatMessage.create = async data => ({ ...data, uuid: "ChatMessage.behind" });
-  const m = await a.rollGearAcquisition(behindInput),
-    attempt = a.system.missionReserves.attempts[m.flags.spycraft2.gearAttempt.id];
+  ChatMessage.create = async data => automaticCard(data, "ChatMessage.behind");
+  const m = await a.rollGearAcquisition(behindInput);
+  assert.equal(m.rolls.length, 0);
+  await a.finishCheck(m);
+  const attempt = a.system.missionReserves.attempts[m.flags.spycraft2.gearAttempt.id];
   assert.equal(attempt.success, true);
   assert.equal(attempt.preparationHours, 1);
   assert.match(m.content, /Behind the Scenes I/);
@@ -2061,7 +2196,7 @@ test("Executive Decision remains automatic while paying its post-waiver surcharg
   let posts = 0;
   ChatMessage.create = async data => {
     posts++;
-    return { ...data, uuid: "ChatMessage.executiveShaken" };
+    return automaticCard(data, "ChatMessage.executiveShaken");
   };
   try {
     const m = await a.rollGearAcquisition({
@@ -2069,6 +2204,8 @@ test("Executive Decision remains automatic while paying its post-waiver surcharg
       requestAbility: "requestExecutiveDecision",
       networkConfirmed: true
     });
+    assert.equal(m.rolls.length, 0);
+    await a.finishCheck(m);
     const attempt = a.system.missionReserves.attempts[m.flags.spycraft2.gearAttempt.id];
     assert.equal(posts, 1);
     assert.equal(m.flags.spycraft2.resolved, true);

@@ -135,8 +135,8 @@ core("gearAcquisitionControl", 9010, ctx => {
   const attempt = actor.system.missionReserves?.attempts?.[check.gearAttempt?.id];
   if (
     check.checkKind === "request" &&
-    check.requestBenefit?.source?.freePick &&
-    attempt?.freePick &&
+    check.requestBenefit?.source?.automatic &&
+    attempt?.automatic &&
     attempt.requestAbility === check.requestBenefit.id &&
     attempt.epoch === check.gearAttempt.epoch &&
     actor.isOwner &&

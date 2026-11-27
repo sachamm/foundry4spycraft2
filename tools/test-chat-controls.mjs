@@ -86,7 +86,7 @@ test("an automatic origin Resource with no check total offers only delivery and 
     rawTotal: undefined,
     checkKind: "request",
     actionDiceAllowed: false,
-    requestBenefit: { id: "requestPrivileged", source: { freePick: true } },
+    requestBenefit: { id: "requestPrivileged", source: { freePick: true, automatic: true } },
     gearAttempt: { id: "a", epoch: "mission" }
   });
   assert.deepEqual(labels(msg), ["card:Resolve delivery"]);

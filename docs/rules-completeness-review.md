@@ -1573,5 +1573,29 @@ field, keeping their morale-source assertions meaningful.
 The remaining origin/feat and equipment audit is still open. This work also
 identified earlier delivery RNG in the other automatic Request paths, before
 their acquisition reservation; those paths still need durable-result review.
+
+## Pass 52: automatic Request reservation and interrupted delivery
+
+Both areas remain **9.6/10**. All automatic Request benefits now reserve their
+actual source, period, use and acquisition before random delivery. Immediate
+benefits create no Roll. Other automatic benefits post a delivery action without
+inventing a Request check or numeric check result. The frozen source survives
+later qualification changes, while mismatched sources and periods are refused.
+
+Native Foundry completed a Soldier 1/Advocate 2 with all three skill budgets
+spent legally and no remaining setup tasks. Behind the Scenes reserved its
+benefit before RNG, survived reload, rolled delivery once and claimed one
+Resource. A second case lost the delivery response after the actual roll;
+following reload, the actual GC dialog recorded that captured total with a
+review note. The saved constant Roll and receipt proved recovery without new
+random dice. Retrying spent neither another use nor another Reserve pick.
+The recovery action waited for an abandoned startup bookkeeping lock to expire;
+no foreground lock was automatically removed. The completed run had no browser
+errors or diagnostics.
+
+All **4,324** Node tests, **988** fixture assertions and **267** layouts pass.
+Schemas, lint, formatting, bundling and copy checks pass. Four distinct complete
+native PC builds now have evidence. Remaining named Resource restrictions,
+equipment and feat auditing, legacy histories and combat gaps remain open.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.
