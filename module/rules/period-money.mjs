@@ -36,12 +36,14 @@ export function periodMoneyModifier({ effects = campaignRules(), year = campaign
   return effects.historicalMoney ? historicalMoneyModifier(year) : 1;
 }
 
-/** A money value or actual cost after Table 7.4, rounded to the dollar (a nonzero amount never falls below $1). */
+/** A money value or actual cost after Table 7.4, rounded to the dollar (a nonzero amount never rounds to $0). */
 export function periodMoney(amount, options) {
   const value = Number(amount);
   if (!Number.isFinite(value)) return amount;
   const modifier = periodMoneyModifier(options);
   if (modifier === 1) return value;
   const scaled = Math.round(value * modifier);
-  return value > 0 ? Math.max(1, scaled) : scaled;
+  if (value > 0) return Math.max(1, scaled);
+  // A small loss stays a loss of at least $1, and never becomes −0.
+  return value < 0 ? Math.min(-1, scaled) : 0;
 }

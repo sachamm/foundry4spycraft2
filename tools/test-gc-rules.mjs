@@ -62,6 +62,7 @@ import {
   CAMPAIGN_QUALITIES,
   activeQualities,
   qualityAddition,
+  qualityClash,
   qualityXP,
   campaignEffects,
   injuryThresholds,
@@ -708,6 +709,19 @@ test("campaign quality catalog", () => {
   assert.deepEqual([find("bleak").xp, find("bleak").gcDice], [75, null]);
   assert.deepEqual([find("gritty").xp, find("gritty").gcDice], [100, 4]);
   assert.deepEqual([find("bulletproof").xp, find("bulletproof").gcDice], [-75, 1]);
+});
+test("Faction and Freelance may never be in force together (p.407)", () => {
+  assert.throws(
+    () => qualityAddition("freelance", { scope: "season", active: activeQualities(["faction"]) }),
+    /Freelance and Faction cannot be in force together \(p\.407\)/
+  );
+  assert.throws(
+    () => qualityAddition("faction", { scope: "season", active: activeQualities(["freelance"]) }),
+    /cannot be in force together/
+  );
+  assert.equal(qualityAddition("hybrid", { scope: "season", active: activeQualities(["faction"]) }).xp, 0);
+  assert.match(qualityClash(["faction", "historical", "freelance"]), /Faction and Freelance/);
+  assert.equal(qualityClash(["faction", "historical"]), "");
 });
 test("adding qualities by scope, XP and combined effects", () => {
   assert.throws(() => qualityAddition("fast-feats", { scope: "scripted" }), /whole season/);

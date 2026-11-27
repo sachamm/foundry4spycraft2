@@ -11406,6 +11406,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "All player characters serve one large organization and use the Faction gear rules. They earn only Reputation, never Net Worth. Cannot be combined with Freelance.",
+   "excludes": [
+    "freelance"
+   ],
    "effects": {
     "gearRules": "faction"
    }
@@ -11503,6 +11506,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "PCs are independents backed by a web of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
+   "excludes": [
+    "faction"
+   ],
    "effects": {
     "gearRules": "freelance"
    }
@@ -11585,7 +11591,8 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "Pick a year for the season. Gear that did not exist yet is available only as a gadget (Housing or effect), at +1 Caliber (cap V). Table 7.4 scales monetary values and actual costs by era: x0.01 for 1875-1900 rising to x1 from 1990.",
    "effects": {
-    "historicalMoney": true
+    "historicalMoney": true,
+    "historicalGear": true
    }
   },
   {
@@ -11732,7 +11739,8 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "Every gear pick for any character, NPCs included, drops 1 Caliber; a pick pushed below Caliber I is lost. Each PC starts with a Debt Subplot.",
    "effects": {
-    "gearCaliberShift": -1
+    "gearCaliberShift": -1,
+    "debtSubplot": true
    }
   },
   {

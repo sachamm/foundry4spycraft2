@@ -532,6 +532,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       ),
       subplots: new ArrayField(new SchemaField({ name: str(), notes: str(), complete: new BooleanField() })),
       gearPickLosses: record("gearPickLosses"),
+      /** Mission gear picks a Gear Restriction takes (Table 7.8, p.437), by category, chosen at Intel. */
+      gearRestrictionLosses: record("gearRestrictionLosses"),
       missionReserves: record("missionReserves", { nullable: true, initial: null }),
       armorMissionGrant: record("armorMissionGrant", { nullable: true, initial: null }),
       bigStickMissionPick: record("bigStickMissionPick", { nullable: true, initial: null }),

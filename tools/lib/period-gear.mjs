@@ -5,9 +5,12 @@
 
 const GEAR_LISTS = ["electronics", "gadgets", "resources", "security", "tradecraft"];
 
-/** The year a weapon row's printed table gives, kept in its rules note as "First year: N." */
+/**
+ * The year a weapon row's printed table gives: its `year` field, copied as a bare label from the Year column of the
+ * weapon tables (pp.250–271), or, on older rows, a rules note that reads "First year: N."
+ */
 export function bookWeaponYear(row) {
-  return /First year: ([^.]+)\./.exec(row.rulesNote ?? "")?.[1]?.trim() ?? "";
+  return String(row.year ?? "").trim() || (/First year: ([^.]+)\./.exec(row.rulesNote ?? "")?.[1]?.trim() ?? "");
 }
 
 /**
@@ -44,11 +47,17 @@ export function addPeriodGear({ equipment, gear, gearSummaries, vehicles, upgrad
 }
 
 /**
- * Give every row a `year`: the book's where it prints one, ours otherwise ("" for "always").
- * A row with neither is an error, so new data cannot arrive undated.
+ * Give every row a `year`: the book's where it prints one, ours otherwise ("" for "always"). The printed year always
+ * wins, so gear-years.json may list only rows the book leaves undated; a weapon listed there despite a printed year
+ * is an error. A row with neither is an error too, so new data cannot arrive undated.
  */
 export function dateGear({ equipment, gear, vehicles, upgrades, kits, ammunition }, years) {
   const missing = [];
+  const overridden = equipment.weapons.filter(row => bookWeaponYear(row) && years.weapons?.[row.name] !== undefined);
+  if (overridden.length)
+    throw new Error(
+      `gear-years.json dates ${overridden.length} weapons the book dates:\n  ${overridden.map(r => r.name).join("\n  ")}`
+    );
   const date = (group, row, key = row.name) => {
     if (row.year) return;
     const ours = years[group]?.[key];

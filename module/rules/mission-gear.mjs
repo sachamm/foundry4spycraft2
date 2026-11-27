@@ -1,5 +1,6 @@
 import { equipmentCategory } from "./gear.mjs";
 import { currentReserves, missionEpoch } from "./gear-acquisition.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
 import { loc } from "../i18n.mjs";
 /** Reviewed mission-pick exceptions. Upgrade buying/effects at Caliber V remain separate. */
 export const MISSION_CALIBER_SOURCES = {
@@ -96,7 +97,7 @@ export function missionCaliberMatches(system, item) {
     recordItemIds(record).slice(0, missionCaliberLimit(system, stamp.source)).includes(item.id) &&
     record.missionCaliber === mission.caliber &&
     eligibleItem(system, item, source) &&
-    item.system.caliber <= mission.caliber + 1
+    (historicalCaliber(item.system).caliber ?? 6) <= mission.caliber + 1
   );
 }
 export function missionCaliberOptions(system, items = []) {

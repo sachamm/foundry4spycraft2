@@ -278,6 +278,7 @@
    "ShowFuture": "Show future gear",
    "NotYet": "Not yet",
    "NotYetHint": "This came out after the game clock's year. The GC decides whether it can be had.",
+   "GadgetHint": "Historical: this came out after the game clock's year, so it can only be had as a gadget Housing or effect, one Caliber higher (p.407).",
    "CaliberFilter": "Filter by Caliber",
    "AnyCaliber": "Any Caliber",
    "RestrictedFilter": "Filter restricted items",
@@ -729,7 +730,9 @@
     "ReviewInvalidWellFundedCashGrant": "Review invalid Well-Funded cash grant records.",
     "ToolShedFindAGradeIII": "Tool Shed: find a Grade III kit",
     "GCReviewToolShedUses": "GC review Tool Shed uses",
-    "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)"
+    "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)",
+    "GearRestrictionPicks": "Gear Restriction: {count} mission gear pick(s) lost this mission (p.437)",
+    "GearRestrictionGCChooses": "The GC chooses which picks this mission's Gear Restriction takes."
    },
    "ActorAgentHeader": {
     "DoneEditingReturnToPlay": "Done editing · Return to play",
@@ -805,6 +808,10 @@
     "Included": "included)",
     "UntilOwnCountInRound": "until own Count in round",
     "CurrentConditions": "Current conditions",
+    "Burned": "Burned",
+    "BurnedHint": "Negative standing (p.440): no mission gear, Requests or Gear checks, only personal Possessions, until standing is back above 0.",
+    "Liquidation": "Targeted for liquidation",
+    "LiquidationHint": "Standing below −20 or −$1,000,000 (p.440): burned, and the GC rolls for a Marked for Death event at each mission's start.",
     "CombatTools": "Combat tools",
     "AttacksReactions": "Attacks & reactions",
     "DisarmTricksAndFinalAttacks": "Disarm, tricks and final attacks",

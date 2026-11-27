@@ -7,6 +7,7 @@ import {
   campaignLevelRow,
   campaignStartingAttributeCap,
   campaignSubplotBonus,
+  campaignDebtSubplot,
   crossroadsAllowed,
   campaignPointBuy,
   campaignFeatTrees,
@@ -16,6 +17,9 @@ import {
   fragileVitality
 } from "./campaign-rules.mjs";
 import { periodMoney } from "./period-money.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
+import { applyGearRestrictions, gearRestrictionsInForce } from "./gear-restrictions.mjs";
+import { standingStatus } from "./standing.mjs";
 import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
@@ -2185,6 +2189,13 @@ function deriveProficiencies(state) {
     warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);
     todo.push({ order: 54, tab: "training", text: loc`Trouble Magnet: keep at least one unfinished Subplot in play.` });
   }
+  // Shoe String Budget (p.408): each agent begins with a Debt Subplot (p.55); remind until one is recorded.
+  if (campaignDebtSubplot() && !(sys.subplots ?? []).some(row => /\bdebt\b/i.test(String(row.name ?? ""))))
+    todo.push({
+      order: 54,
+      tab: "training",
+      text: loc`Shoe String Budget: record the Debt Subplot every agent starts with (pp.55, 408).`
+    });
   if (sys.subplotPicks.used > sys.subplotPicks.available)
     warnings.push(
       loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`
@@ -2282,6 +2293,31 @@ function deriveWealthAndGear(state) {
     picks[key].remaining = picks[key].available - picks[key].spent;
     if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
   }
+  // Negative standing (p.440): a burned agent keeps only personal Possessions, so no mission gear may be held.
+  sys.standingStatus = standingStatus(sys);
+  if (sys.standingStatus.burned) {
+    const held = items.filter(
+      i => ["weapon", "armor", "gear"].includes(i.type) && i.system?.pick && !i.system.possessionSource
+    ).length;
+    warnings.push(
+      sys.standingStatus.liquidation
+        ? loc`Targeted for liquidation (p.440): no mission gear, Requests or Gear checks, only personal Possessions.`
+        : loc`Burned (p.440): no mission gear, Requests or Gear checks, only personal Possessions, until standing is back above 0.`
+    );
+    if (held) warnings.push(loc`Burned: ${held} mission gear pick(s) are still on this sheet (p.440).`);
+  }
+  // Gear Restrictions (Table 7.8, p.437): the mission's lost picks, in the categories chosen at Intel, and any list of
+  // allowed weapons or Mechanisms the GC keeps with the mission.
+  const restriction = gearRestrictionsInForce(),
+    restrictionLosses = sys.gearRestrictionLosses ?? {};
+  warnings.push(...applyGearRestrictions(picks, restrictionLosses, items, restriction));
+  sys.gearRestriction = {
+    picks: restriction?.picks ?? 0,
+    chooser: restriction?.chooser ?? "player",
+    lists: restriction?.lists ?? [],
+    // Shown while picks are lost, or while an earlier mission's losses are left to clear.
+    show: (restriction?.picks ?? 0) > 0 || Object.values(restrictionLosses).some(value => Number(value) > 0)
+  };
   sys.ammunitionConfigurations = {};
   for (const item of items.filter(i => i.type === "weapon")) {
     const configuration = ammunitionConfiguration(item.system);
@@ -2313,11 +2349,19 @@ function deriveWealthAndGear(state) {
   const charismaCategories = sys.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"];
   for (const item of items.filter(item => ["weapon", "armor", "gear"].includes(item.type) && item.system.pick)) {
     const category = equipmentCategory(item),
-      pick = item.system.pick;
+      pick = item.system.pick,
+      // Historical (p.407): an item newer than the campaign year is a gadget one Caliber higher, never past V.
+      era = historicalCaliber(item.system),
+      caliber = era.caliber ?? 6;
+    if (!era.available && !managedAcquisition(sys, item))
+      warnings.push(
+        loc`${item.name}: not yet introduced in the campaign year, and a gadget of it would pass Caliber V, so it cannot be had under Historical (p.407).`
+      );
     if (
       activeReserves &&
+      era.available &&
       !managedAcquisition(sys, item) &&
-      item.system.caliber > campaignGearCaliber(activeReserves.caliber).caliber
+      caliber > campaignGearCaliber(activeReserves.caliber).caliber
     ) {
       const exception =
         bigStickMatches(sys, item) &&
@@ -2333,10 +2377,12 @@ function deriveWealthAndGear(state) {
         !item.system.common &&
         !item.system.ammunitionOnly &&
         !item.system.reserve &&
-        item.system.caliber <= activeReserves.caliber + 1;
+        caliber <= activeReserves.caliber + 1;
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
-          loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
+          era.gadget
+            ? loc`${item.name}: not yet introduced in the campaign year, so it is a Caliber ${["I", "II", "III", "IV", "V"][caliber - 1]} gadget (Historical, p.407), above this mission’s allowance.`
+            : loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
         );
     }
 

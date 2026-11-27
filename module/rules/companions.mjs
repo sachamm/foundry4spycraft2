@@ -18,6 +18,7 @@
  */
 import { NPC_RULES } from "./npc-tables.mjs";
 import { loc } from "../i18n.mjs";
+import { periodMoney } from "./period-money.mjs";
 
 export const ANIMAL_PARTNER = "Animal Partner";
 export const PERSONAL_LIEUTENANT = "Personal Lieutenant";
@@ -87,8 +88,8 @@ export function companionSlots(ownerSystem, linked = []) {
   };
 }
 
-/** What the owner loses when a companion dies. */
-export const companionLoss = ownerSystem => {
+/** What the owner loses when a companion dies; the Net Worth follows Table 7.4 under Historical (p.407). */
+export const companionLoss = (ownerSystem, moneyOptions) => {
   const level = Number(ownerSystem?.level) || 0;
-  return { reputation: level, netWorth: level * 50000 };
+  return { reputation: level, netWorth: periodMoney(level * 50000, moneyOptions) };
 };

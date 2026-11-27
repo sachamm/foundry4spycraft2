@@ -1176,3 +1176,56 @@ test("End mission can record exposure for a critical objective left undone (pp.4
     await state.setMission(saved);
   }
 });
+
+test("a mission Caliber increase reaches the team's reserves, with an Undo, and reminds them of the swap (p.398)", async () => {
+  const saved = state.getMission(),
+    a1 = actors.get("a1"),
+    a2 = actors.get("a2"),
+    before = { a1: structuredClone(a1.system), a2: structuredClone(a2.system) };
+  try {
+    await state.setMission({ ...saved, active: true, ended: false, caliber: 1, team: ["a1", "a2"] });
+    a1.system.usagePeriods = { mission: "m1" };
+    a1.system.missionReserves = { epoch: "m1", caliber: 1, picks: { W: 1 }, spent: {}, common: 0 };
+    a2.system.usagePeriods = { mission: "m1" };
+    delete a2.system.missionReserves;
+    const start = messages.length;
+    assert.equal(await spend.recordCaliberIncrease(3), 2);
+    assert.equal(state.getMission().caliber, 3);
+    assert.equal(a1.system.missionReserves.caliber, 3);
+    assert.equal(a2.system.missionReserves, undefined, "no reserves yet: nothing to raise");
+    const posted = messages.slice(start);
+    const undo = posted.find(m => m.flags?.spycraft2?.undo);
+    assert.equal(undo?.flags.spycraft2.undo.entries.length, 1, "an Undo note for the one agent changed");
+    assert.ok(posted.some(m => /Mission Caliber is now III/.test(m.content) && /p\.398/.test(m.content)));
+  } finally {
+    await state.setMission(saved);
+    a1.system = before.a1;
+    a2.system = before.a2;
+  }
+});
+
+test("a mission's start rolls liquidation for each targeted agent and keeps the count, with an Undo (p.440)", async () => {
+  const a3 = actors.get("a3"),
+    a4 = actors.get("a4"),
+    before = { a3: a3.system.reputation, a4: a4.system.reputation, flags3: a3.flags, flags4: a4.flags };
+  try {
+    a3.system.reputation = -25;
+    a3.flags = { spycraft2: { liquidationMissions: 1 } };
+    a4.flags = { spycraft2: { liquidationMissions: 2 } };
+    const start = messages.length;
+    dice(6);
+    const results = await mission.rollLiquidations([a3, a4]);
+    assert.deepEqual(results, [{ actor: "a3", missions: 2, total: 6, target: 6, marked: true }]);
+    assert.equal(a3.flags.spycraft2.liquidationMissions, 2);
+    assert.equal(a4.flags.spycraft2.liquidationMissions, 0, "no longer targeted: the run of missions ends");
+    const posted = messages.slice(start);
+    assert.ok(posted.some(m => /Marked for Death: a3 is the target/.test(m.content)));
+    assert.ok(posted.some(m => m.flags?.spycraft2?.undo));
+    assert.deepEqual(await mission.rollLiquidations([a4]), [], "nothing to roll or clear");
+  } finally {
+    a3.system.reputation = before.a3;
+    a4.system.reputation = before.a4;
+    a3.flags = before.flags3;
+    a4.flags = before.flags4;
+  }
+});

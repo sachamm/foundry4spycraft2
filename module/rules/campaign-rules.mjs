@@ -152,7 +152,7 @@ export function paranoidModifier({ surpriseCheck = false, dispositionCheck = fal
 }
 
 /** One line per quality effect that this module applies, for the GC Console. */
-export function campaignRuleLines(effects = campaignRules()) {
+export function campaignRuleLines(effects = campaignRules(), { money = amount => amount } = {}) {
   const lines = [];
   const gear = Math.trunc(number(effects.gearCaliberShift, 0));
   if (gear)
@@ -161,6 +161,8 @@ export function campaignRuleLines(effects = campaignRules()) {
         ? loc`Gear picks: +${gear} Caliber over the mission's (past V, an extra Caliber I item of that type).`
         : loc`Gear picks: ${gear} Caliber under the mission's (below I, the pick is lost).`
     );
+  if (effects.historicalGear)
+    lines.push(loc`Gear not yet introduced in the campaign year: a gadget at +1 Caliber, none past V (p.407).`);
   if (campaignWealthBonus(effects)) lines.push(loc`Starting Wealth +${campaignWealthBonus(effects)}.`);
   const growth = campaignGrowth(effects);
   if (growth.xpFraction !== 1) lines.push(loc`XP for each level ×${growth.xpFraction}.`);
@@ -227,6 +229,7 @@ export function campaignRuleLines(effects = campaignRules()) {
   if (effects.featPurchase) lines.push(loc`After a mission an agent may buy a feat for 1,000 XP per career level.`);
   if (effects.modularFeats) lines.push(loc`At creation a feat costs 2 attribute points, or gives 2 when given up.`);
   if (effects.noCrossroads) lines.push(loc`No Crossroads Subplots, so no Crossroads Titles.`);
+  if (campaignDebtSubplot(effects)) lines.push(loc`Every agent starts with a Debt Subplot (p.55).`);
   if (campaignSubplotBonus(effects))
     lines.push(loc`Each agent may have ${campaignSubplotBonus(effects)} more Subplot(s) in play.`);
   if (effects.closedStandOffs) lines.push(loc`Nobody may interrupt or join a Stand Off.`);
@@ -240,7 +243,8 @@ export function campaignRuleLines(effects = campaignRules()) {
     );
   if (effects.revolvingDoor)
     lines.push(
-      loc`An agent killed in a standard scene with the body whole may return next mission for 200 Reputation or $10,000,000.`
+      // The price is a money value, so Historical scales it by Table 7.4 (p.407): `money` does that.
+      loc`An agent killed in a standard scene with the body whole may return next mission for 200 Reputation or $${money(10000000).toLocaleString("en-US")}.`
     );
   return lines;
 }
@@ -523,6 +527,9 @@ export function featPurchasePlan(system, levelRow, effects = campaignRules()) {
 }
 
 /** Soap (p.408): extra Subplots each character may have in play. */
+/** Shoe String Budget (p.408): every player character starts with a Debt Subplot (p.55). */
+export const campaignDebtSubplot = (effects = campaignRules()) => effects.debtSubplot === true;
+
 export const campaignSubplotBonus = (effects = campaignRules()) =>
   Number.isSafeInteger(effects.subplotLimitBonus) ? effects.subplotLimitBonus : 0;
 

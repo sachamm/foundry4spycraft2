@@ -1,5 +1,5 @@
 /** Spending GC action dice (pp.397–399, 424, 452): pay from the session pool, roll the right die and apply what can be applied. */
-import { snapshot, undoEntry, postUndo } from "../undo.mjs";
+import { snapshot, undoEntry, postUndo, withUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { adjustGCDice, gcDiceStatus } from "../../services/gc-dice.mjs";
@@ -14,7 +14,8 @@ import {
   isDramaticScene,
   getMission,
   updateMission,
-  qualitiesInForce
+  qualitiesInForce,
+  teamActors
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
 import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
@@ -336,5 +337,20 @@ export async function recordCaliberIncrease(caliber) {
   const steps = caliber - mission.caliber;
   if (gcDiceStatus().current) await adjustGCDice(2 * steps, `Mission Caliber increased to ${caliber}`);
   await updateMission({ caliber });
+  // The raised Caliber caps every pick and Request for the rest of the mission, so it reaches the team's reserves.
+  // Loaded here, not at the top, so the console does not change the order the roll contributors register in.
+  const { reserveCaliberIncrease } = await import("../../rules/gear-acquisition.mjs");
+  const roman = CONFIG.SPYCRAFT.calibers[caliber],
+    team = teamActors().filter(actor => reserveCaliberIncrease(actor.system, caliber));
+  if (team.length)
+    await withUndo(team, loc`Team reserves raised to mission Caliber ${roman}`, () =>
+      Promise.all(team.map(actor => actor.update(reserveCaliberIncrease(actor.system, caliber))))
+    );
+  await ChatMessage.create({
+    speaker: { alias: loc`Game Control` },
+    content: esc(
+      loc`Mission Caliber is now ${roman}. At the end of this scene, agents may trade mission gear for new picks at Caliber ${roman}, and it caps every Request for the rest of the mission (p.398).`
+    )
+  });
   return steps;
 }

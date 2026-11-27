@@ -594,6 +594,9 @@ export const RECORD_SHAPES = {
   gearPickLosses: {
     "*": "any"
   },
+  gearRestrictionLosses: {
+    "*": "any"
+  },
   inheritedChoices: {
     "*": "any"
   },

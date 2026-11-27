@@ -28,11 +28,26 @@ export function activeQualities(season = [], mission = []) {
   return rows;
 }
 
+/**
+ * Some qualities may never be in force together, such as Faction and Freelance (p.407); either row may list the
+ * other under `excludes`. Returns the refusal for the first such pair among these ids, or "".
+ */
+export function qualityClash(ids = []) {
+  const rows = [...new Set(ids)].map(campaignQuality).filter(Boolean);
+  for (const [index, quality] of rows.entries())
+    for (const other of rows.slice(index + 1))
+      if (quality.excludes?.includes(other.id) || other.excludes?.includes(quality.id))
+        return loc`${quality.name} and ${other.name} cannot be in force together (p.${quality.page}). Keep one of them.`;
+  return "";
+}
+
 /** Can this quality be added to the list, and at what cost? */
 export function qualityAddition(id, { scope, active = [] }) {
   const quality = campaignQuality(id);
   if (!quality) throw new Error(loc`Unknown campaign quality.`);
   if (active.some(entry => entry.id === id)) throw new Error(loc`${quality.name} is already in force.`);
+  const clash = qualityClash([id, ...active.map(entry => entry.id)]);
+  if (clash) throw new Error(clash);
   if (scope === "season") return { quality, cost: 0, xp: quality.xp };
   if (quality.seasonOnly) throw new Error(loc`${quality.name} can only be applied to a whole season.`);
   if (scope === "scripted") return { quality, cost: 0, xp: quality.xp };
