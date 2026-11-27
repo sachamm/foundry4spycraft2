@@ -123,6 +123,9 @@ export async function rollGearAcquisition(actor, options = {}) {
      .map(s => `<option value="${esc(s.id)}" ${selectedAbility === s.id ? "selected" : ""}>${esc(s.name)}</option>`)
      .join("")}</select></label>
    <label><input type="checkbox" name="networkConfirmed" /> ${loc`Automatic Request: the GC confirms our network can fulfill this Request`}</label>
+   <label>${loc`Political feat option`} <select name="politicalOption"><option value="">${loc`Select only with a Political Request feat`}</option><option value="invitation">${loc`Invitation (Political Clout)`}</option><option value="extradition">${loc`Extradition (Political Favors)`}</option><option value="legalImmunity">${loc`Legal immunity (Political Immunity)`}</option></select></label>
+   <label>${loc`Political Resource Power Rating`} <input name="politicalPowerRating" type="number" min="6" max="6" value="6" /></label>
+   <label><input type="checkbox" name="politicalOptionConfirmed" /> ${loc`The GC confirms this exact Political option and Power Rating. Only Political Clout waives the base Request action-die cost.`}</label>
    <label><input type="checkbox" name="hourAvailable" /> ${loc`Spend one hour preparing: Sources consultation (in person/by phone) or Behind the Scenes city supporters`}</label>
    <label>${loc`Sources option`} <select name="sourcesOption"><option value="">${loc`Select only with Sources`}</option><option value="dossier">${loc`Dossier (Sources I+)`}</option><option value="skillTraining">${loc`Skill training (Sources II+)`}</option><option value="legalImmunity">${loc`Legal immunity (Sources III)`}</option></select></label>
    <label><input type="checkbox" name="sourcesOptionConfirmed" /> ${loc`The GC confirms this is that actual Resource option (Sources only)`}</label>
@@ -266,6 +269,8 @@ export async function rollGearAcquisition(actor, options = {}) {
         surcharge: plan.surcharge ?? 0,
         dc: plan.dc,
         sourcesOption: plan.sourcesOption ?? "",
+        politicalOption: plan.politicalOption ?? "",
+        politicalPowerRating: plan.politicalPowerRating ?? null,
         outsideFaction: !!plan.outsideFaction,
         requestLevel: plan.requestLevel ?? null,
         bonusSources: plan.bonusSources ?? [],
@@ -853,7 +858,10 @@ export async function claimGearAcquisition(actor, options = {}) {
           description: `<p>${esc(spec.description)}</p>`,
           caliber: initial.caliber,
           common: initial.kind === "common",
-          gearCategory: initial.category
+          gearCategory: initial.category,
+          ...(initial.politicalPowerRating !== null && initial.politicalPowerRating !== undefined
+            ? { powerRating: initial.politicalPowerRating }
+            : {})
         }
       };
     }
@@ -867,6 +875,8 @@ export async function claimGearAcquisition(actor, options = {}) {
     if (!input.gcConfirmed || (attempt.kind === "request" && !input.delivered))
       throw new Error(loc`Confirm the item specifications and any required delivery before claiming.`);
     const data = structuredClone(input.itemData);
+    if (attempt.politicalPowerRating != null && Number(data.system?.powerRating) !== attempt.politicalPowerRating)
+      throw Error(loc`Claim the original Political Resource with its recorded Power Rating 6.`);
     delete data._id;
     if (
       !["weapon", "armor", "gear"].includes(data.type) ||
@@ -936,7 +946,14 @@ export async function claimGearAcquisition(actor, options = {}) {
         ...data.flags,
         spycraft2: {
           ...data.flags?.spycraft2,
-          acquisitionClaim: { id: claimId, epoch: record.epoch, attemptId: attempt.id }
+          acquisitionClaim: {
+            id: claimId,
+            epoch: record.epoch,
+            attemptId: attempt.id,
+            ...(attempt.politicalOption
+              ? { politicalOption: attempt.politicalOption, powerRating: attempt.politicalPowerRating }
+              : {})
+          }
         }
       };
       try {

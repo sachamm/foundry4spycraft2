@@ -204,6 +204,9 @@ export function gearAcquisitionPlan(
     requestAbility = "",
     originResource = "",
     originResourceConfirmed = false,
+    politicalOption = "",
+    politicalPowerRating = null,
+    politicalOptionConfirmed = false,
     networkConfirmed = false,
     hourAvailable = false,
     homeTurf = false,
@@ -284,6 +287,15 @@ export function gearAcquisitionPlan(
     );
   if (benefit?.category && benefit.category !== category)
     throw new Error(loc`This Request benefit requires its specified equipment category.`);
+  if (
+    benefit?.requestOption &&
+    (politicalOption !== benefit.requestOption ||
+      politicalOptionConfirmed !== true ||
+      (benefit.powerRating !== null && Number(politicalPowerRating) !== benefit.powerRating))
+  )
+    throw Error(
+      loc`Confirm the Political feat's exact option: invitation, extradition or legal immunity. Resource benefits require Power Rating 6.`
+    );
   if (benefit?.automatic && !networkConfirmed)
     throw new Error(loc`The GC must confirm the Faction or Freelance network can fulfill this Request.`);
   if (benefit?.city && location !== "largeCity")
@@ -300,7 +312,7 @@ export function gearAcquisitionPlan(
     ? resourceUsePlan(benefit, system.resourceUses, system.usagePeriods, system.actionDice?.value ?? 0)
     : null;
   if (use?.blocked) throw new Error(use.reason);
-  const baseCost = benefit ? 0 : caliber,
+  const baseCost = benefit && !benefit.requestCost ? 0 : caliber,
     costPlan = shakenActionDieCost(system, { baseCost, payer: false });
   if (costPlan.blocked) throw new Error(costPlan.reason);
   const cost = costPlan.cost,
@@ -345,6 +357,8 @@ export function gearAcquisitionPlan(
   return {
     requestBenefit: requestBenefitContext(system, requestAbility),
     sourcesOption: benefit?.consultSources ? sourcesOption : "",
+    politicalOption: benefit?.requestOption ?? "",
+    politicalPowerRating: benefit?.powerRating ?? null,
     outsideFaction: !!benefit?.outsideFaction,
     requestLevel: benefit?.requestLevel ?? null,
     homeTurf: local.homeTurf,
@@ -412,6 +426,8 @@ export function acquisitionOutcome(attempt, total) {
       !saved.epoch ||
       (source.period === "mission" && saved.epoch !== attempt.epoch) ||
       (source.category && source.category !== attempt.category) ||
+      (source.requestOption &&
+        (source.requestOption !== attempt.politicalOption || source.powerRating !== attempt.politicalPowerRating)) ||
       !Number.isSafeInteger(attempt.caliber) ||
       attempt.caliber < 1 ||
       attempt.caliber > 5 ||

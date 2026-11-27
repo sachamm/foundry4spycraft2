@@ -1597,5 +1597,23 @@ All **4,324** Node tests, **988** fixture assertions and **267** layouts pass.
 Schemas, lint, formatting, bundling and copy checks pass. Four distinct complete
 native PC builds now have evidence. Remaining named Resource restrictions,
 equipment and feat auditing, legacy histories and combat gaps remain open.
+
+## Pass 53: Political Request option, Power Rating and cost
+
+Both areas remain **9.6/10**. Source review on printed p.204 found that only
+Political Clout waives the Request action-die cost. Favors and Immunity now pay
+the normal Caliber cost, with ordinary Shaken surcharges and shared funding.
+All three still skip the check and delivery wait. Each now requires its named
+option and GC confirmation; the two Resources require Power Rating 6.
+The saved acquisition binds the option and rating, and a claim with a different
+rating is refused. Custom Resource records receive the already declared rating.
+
+All **4,324** Node tests, **988** fixture assertions and **267** layouts pass,
+including paid automatic settlement, wrong-option/rating refusal, exhausted
+funding, a zero-cost Clout request and no random dice for immediate delivery.
+Schemas, lint, formatting, bundling and copy checks pass. A live form experiment
+using a qualified Advocate stalled during its Freelance setup before the form
+opened; it is not counted as successful native evidence. This verification gap
+remains in B-193 alongside the wider character/source audit.
 The free origin paths added here use deferred, journaled delivery instead.
 Neither score yet meets the requested 9.9 target.

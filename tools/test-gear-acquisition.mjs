@@ -950,7 +950,7 @@ test("an immediately available Political Resource spends its source and pick wit
     a.system = system();
     a.system.activeFeatNames = ["Political Immunity"];
     a.system.resourceUses = {};
-    a.system.actionDice.value = 0;
+    a.system.actionDice.value = 3;
     a.system.limitedUses = requestSources(a.system, []);
     a.system.missionReserves = reserveInitialization(a.system, [], { ...initialize, caliber: 3 });
     const input = {
@@ -958,6 +958,9 @@ test("an immediately available Political Resource spends its source and pick wit
       caliber: 3,
       name: "Legal immunity (Power Rating 6)",
       requestAbility: "requestPoliticalImmunity",
+      politicalOption: "legalImmunity",
+      politicalPowerRating: 6,
+      politicalOptionConfirmed: true,
       networkConfirmed: true
     };
     const m = await a.rollGearAcquisition(input),
@@ -966,6 +969,16 @@ test("an immediately available Political Resource spends its source and pick wit
     assert.equal(m.flags.spycraft2.rawTotal, undefined);
     assert.equal(m.flags.spycraft2.resolved, true);
     assert.equal(a.system.missionReserves.attempts[id].delivery.total, 0);
+    assert.equal(a.system.actionDice.value, 0, "the three-die Request cost is paid even though no check is rolled");
+    await assert.rejects(
+      a.claimGearAcquisition({
+        attemptId: id,
+        itemData: { name: input.name, type: "gear", system: { gearCategory: "R", caliber: 3, powerRating: 5 } },
+        delivered: true,
+        gcConfirmed: true
+      }),
+      /Power Rating 6/
+    );
     const item = await a.claimGearAcquisition({
       attemptId: id,
       itemData: { name: input.name, type: "gear", system: { gearCategory: "R", caliber: 3, powerRating: 6 } },
@@ -973,6 +986,7 @@ test("an immediately available Political Resource spends its source and pick wit
       gcConfirmed: true
     });
     assert.equal(item.system.pick, "R");
+    assert.equal(item.flags.spycraft2.acquisitionClaim.politicalOption, "legalImmunity");
     assert.equal(a.system.missionReserves.picks.R, 0);
     assert.equal(a.system.resourceUses.requestPoliticalImmunity.used, 1);
   } finally {
@@ -2720,7 +2734,7 @@ test("settled Request replay rejects newly added modern source markers without r
     assert.equal(a.items.length, 0);
   }
 });
-test("Political Clout, Favors and Immunity: once per mission, automatic, no action dice and immediately available", async () => {
+test("Political Requests enforce their exact option and Power Rating; only Clout waives action dice", async () => {
   const { IMMEDIATE_DELIVERY } = await import("../module/rules/gear-acquisition.mjs");
   const feats = ["Political Clout", "Political Favors", "Political Immunity"],
     specs = requestSources({ activeFeatNames: feats }, []);
@@ -2739,10 +2753,39 @@ test("Political Clout, Favors and Immunity: once per mission, automatic, no acti
   s.resourceUses = {};
   s.limitedUses = requestSources(s, []);
   s.missionReserves = reserveInitialization(s, [], initialize);
-  s.actionDice.value = 0;
-  const input = { ...request, requestAbility: "requestPoliticalImmunity", networkConfirmed: true };
+  const input = {
+    ...request,
+    requestAbility: "requestPoliticalImmunity",
+    networkConfirmed: true,
+    politicalOption: "legalImmunity",
+    politicalPowerRating: 6,
+    politicalOptionConfirmed: true
+  };
   const p = gearAcquisitionPlan(s, input);
-  assert.equal(p.cost, 0);
+  assert.equal(p.cost, 2);
+  assert.equal(p.politicalOption, "legalImmunity");
+  assert.equal(p.politicalPowerRating, 6);
+  for (const patch of [
+    { politicalOption: "extradition" },
+    { politicalPowerRating: 5 },
+    { politicalOptionConfirmed: false }
+  ])
+    assert.throws(() => gearAcquisitionPlan(s, { ...input, ...patch }), /exact option/);
+  assert.throws(() => gearAcquisitionPlan(s, { ...input, availableFunding: 0 }), /Not enough/);
+  assert.equal(
+    gearAcquisitionPlan(s, { ...input, requestAbility: "requestPoliticalFavors", politicalOption: "extradition" }).cost,
+    2
+  );
+  s.missionReserves.picks.S = 1;
+  const clout = gearAcquisitionPlan(s, {
+    ...input,
+    requestAbility: "requestPoliticalClout",
+    politicalOption: "invitation",
+    category: "S",
+    pick: "S",
+    availableFunding: 0
+  });
+  assert.equal(clout.cost, 0);
   assert.equal(p.automatic, true);
   assert.equal(p.delivery, IMMEDIATE_DELIVERY);
   assert.equal(p.abilityRecord.epoch, "mission1");
