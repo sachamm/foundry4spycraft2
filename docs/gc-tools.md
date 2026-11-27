@@ -121,6 +121,9 @@ These shortcuts are listed under Configure Controls, where each can be changed o
 A button clicked with the mouse lets go of the focus, so the shortcuts keep working after a click. Alt+S follows the
 turn: the sheet it opened last closes when it opens the next one.
 
+On Linux and Windows some browsers use Alt with a digit to switch tabs. If Alt+1 or Alt+2 changes the tab instead,
+rebind them under Configure Controls (the button sits in the console's Reference section).
+
 Every control is also reachable with Tab; Enter submits a dialog and Esc cancels it.
 
 ### Undo
