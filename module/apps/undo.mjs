@@ -206,13 +206,19 @@ export async function withUndo(actors, label, work, extra = {}) {
 }
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
-export function postUndo(label, entries, { gcDice = 0, damageCard = null, antagonist = null, dcBoost = null } = {}) {
+export function postUndo(
+  label,
+  entries,
+  { gcDice = 0, damageCard = null, antagonist = null, dcBoost = null, standingPaid = null } = {}
+) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
     // The GC sees every note, so a step a player took can be undone by the GC too.
     whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
-    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, done: false } } }
+    flags: {
+      spycraft2: { undo: { label, entries, gcDice, damageCard, antagonist, dcBoost, standingPaid, done: false } }
+    }
   });
 }
 
@@ -284,16 +290,28 @@ async function undoRecord(message, record) {
     );
   }
   // A promotion's antagonist row goes back to what it was; the rest of the mission's list is left alone.
-  if (record.antagonist?.uuid && game.user.isGM) {
+  if (record.antagonist?.id && game.user.isGM) {
     const { getMission, updateMission } = await import("./gc/state.mjs");
-    const { uuid, entry: was } = record.antagonist,
-      mine = entry => entry.typeKey === uuid || entry.uuid === uuid;
+    const { id, entry: was } = record.antagonist,
+      mine = entry => entry.id === id;
     if ((getMission().antagonists ?? []).some(mine))
       await updateMission(now => ({
         antagonists: was
           ? now.antagonists.map(entry => (mine(entry) ? was : entry))
           : now.antagonists.filter(entry => !mine(entry))
       })).catch(error => ui.notifications.warn(loc`The antagonist list was not put back: ${error.message}`));
+  }
+  // A standing payout's paid marks go back to what they were, so those agents can be paid again.
+  if (record.standingPaid && Object.keys(record.standingPaid).length && game.user.isGM) {
+    const { updateMission } = await import("./gc/state.mjs");
+    await updateMission(now => {
+      const paid = { ...(now.standingPaid ?? {}) };
+      for (const [id, was] of Object.entries(record.standingPaid)) {
+        if (was) paid[id] = was;
+        else delete paid[id];
+      }
+      return { standingPaid: paid };
+    }).catch(error => ui.notifications.warn(loc`The standing paid marks were not put back: ${error.message}`));
   }
   // A DC boost counted against its check in this scene is taken off that check's count; other checks are left alone.
   if (record.dcBoost?.key && game.user.isGM) {

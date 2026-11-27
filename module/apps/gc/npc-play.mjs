@@ -189,7 +189,14 @@ export async function rollNpcSkill(actor, input = null) {
         total
       ),
       cap: plan.cap,
-      error: Math.max(0, Number(input.error) || 0) + quality.errorIncrease,
+      // A macro that names no error range gets the base one, 1 (p.88).
+      error:
+        (input.error === undefined ||
+        input.error === null ||
+        input.error === "" ||
+        !Number.isFinite(Number(input.error))
+          ? 1
+          : Math.max(0, Number(input.error))) + quality.errorIncrease,
       npcSkill: skill.key,
       ...(input.secret ? { rollMode: "gmroll" } : {})
     }

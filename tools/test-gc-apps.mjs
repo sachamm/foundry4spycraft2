@@ -325,7 +325,7 @@ test("the standing award pays each agent once per mission; a correction pays aga
   await mission.awardStanding();
   assert.equal(actors.get("a2").system.reputation, 14, "paid agents are skipped on a retry");
   assert.equal(actors.get("a3").system.reputation, 26);
-  assert.match(lastMessage(), /to a3, a4\./);
+  assert.match(lastMessage(), /awarded: a3 \(Reputation \+12\), a4 \(Reputation \+12\)\./);
   answer({ currency: "reputation", again: true });
   await mission.awardStanding();
   assert.equal(actors.get("a2").system.reputation, 26, "the correction pays everyone");
@@ -516,7 +516,8 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
     state.getMission().antagonists.find(entry => entry.uuid === guard.uuid || entry.typeKey === guard.uuid);
   assert.deepEqual([promotedRow().promoted, promotedRow().scenes], [true, 1], "its XP is counted per scene");
   const promoteNote = messages.findLast(message => message.flags?.spycraft2?.undo)?.flags.spycraft2.undo;
-  assert.equal(promoteNote.antagonist.uuid, guard.uuid, "the Undo note can put the antagonist row back");
+  assert.equal(promoteNote.antagonist.id, promotedRow().id, "the Undo note can put the antagonist row back");
+  assert.equal(promotedRow().encountered, true, "a promoted NPC is in play, so it has been faced");
   assert.notEqual(promoteNote.antagonist.entry?.promoted, true);
   await mission.changeEntry("antagonists", promotedRow().id, "scenesUp");
   assert.equal(promotedRow().scenes, 2);
@@ -773,7 +774,7 @@ test("console context summarises everything without throwing", async () => {
   const context = consoleContext();
   assert.equal(context.mission.threatLevel, 6);
   assert.equal(context.mission.caliberLabel, "III");
-  assert.equal(context.xp.earned, 325);
+  assert.equal(context.xp.earned, 625, "the promoted guard counts 300 for its scene");
   assert.equal(context.dice.expected, 10);
   assert.equal(context.scene.dramatic, false);
   assert.ok(Array.isArray(context.conflicts));

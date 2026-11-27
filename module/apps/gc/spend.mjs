@@ -17,7 +17,7 @@ import {
   qualitiesInForce
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
-import { markAntagonistPromoted } from "./mission.mjs";
+import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
@@ -181,16 +181,13 @@ export async function spendGCDice(input = {}) {
         break;
       case "promote":
         // Undo puts the antagonist row back as it was, or takes it off when the promotion recorded it.
-        antagonistBefore = {
-          uuid: actor.uuid,
-          entry:
-            getMission().antagonists.find(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid) ?? null
-        };
+        antagonistBefore = { entry: antagonistRowFor(actor) };
         await actor.update({
           "system.promotion": { mission: String(actor.system.usagePeriods?.mission ?? "initial") }
         });
         // A promoted antagonist's XP is worked out as a full special NPC's, per scene (pp.398, 452).
         lines.push(await markAntagonistPromoted(actor));
+        antagonistBefore.id = antagonistRowFor(actor)?.id ?? null;
         break;
       case "healNpc": {
         if (npcIsSpecial(actor)) lines.push(loc`Restore ${die.total} vitality or 2 wounds on the sheet.`);
@@ -252,7 +249,7 @@ export async function spendGCDice(input = {}) {
       if (entry || plan.cost > 0)
         await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], {
           gcDice: plan.cost,
-          antagonist: antagonistBefore,
+          antagonist: antagonistBefore?.id ? antagonistBefore : null,
           dcBoost: dcBoostMade
         });
     } catch (error) {

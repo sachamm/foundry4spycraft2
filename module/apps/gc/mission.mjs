@@ -29,6 +29,7 @@ import {
   setCampaign
 } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
+import { withUndo } from "../undo.mjs";
 import { startUsagePeriod } from "../../services/periods.mjs";
 import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
@@ -177,11 +178,14 @@ export async function correctSceneCount() {
 /** Mark a promoted NPC's antagonist row so its XP is worked out per scene; returns the line for the spend card. */
 export async function markAntagonistPromoted(actor) {
   requireGC();
-  const mine = entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid;
+  const mine = rowOf(actor);
   if (!getMission().antagonists.some(mine)) await recordAntagonist(actor);
+  // A GC promotes an NPC that is in play, so it has been faced and its reward counts (pp.398, 452).
   await updateMission(now => ({
     antagonists: now.antagonists.map(entry =>
-      mine(entry) ? { ...entry, promoted: true, scenes: Math.max(1, Number(entry.scenes) || 1) } : entry
+      mine(entry)
+        ? { ...entry, promoted: true, encountered: true, scenes: Math.max(1, Number(entry.scenes) || 1) }
+        : entry
     )
   }));
   return loc`${actor.name} is special until the mission ends; its XP counts 300 for each scene it appears in. Add scenes on the console's Antagonists list.`;
@@ -353,7 +357,7 @@ export async function addAntagonist() {
   const antagonist = {
     id: foundry.utils.randomID(),
     uuid: actor?.uuid ?? null,
-    typeKey: actor ? (actor.isToken ? (actor.token?.baseActor?.uuid ?? actor.uuid) : actor.uuid) : null,
+    typeKey: actor ? typeKeyOf(actor) : null,
     name: String(input.name || "").trim() || actor?.name || "Antagonist",
     xp: Number.isFinite(actor?.system.npcBuild?.xp) ? actor.system.npcBuild.xp : Number(input.xp) || 0,
     type: input.type || (["special", "villain"].includes(actor?.system.npcType) ? "special" : "standard"),
@@ -364,16 +368,25 @@ export async function addAntagonist() {
   return updateMission(mission => ({ antagonists: [...mission.antagonists, antagonist] }));
 }
 
+/** The key an NPC's type is listed under: an unlinked token's base actor, so its copies count once (p.398). */
+const typeKeyOf = actor => (actor.isToken ? (actor.token?.baseActor?.uuid ?? actor.uuid) : actor.uuid);
+/** Whether an antagonist row is this NPC's: by its type, or by the actor or token recorded. */
+const rowOf = actor => entry =>
+  entry.typeKey === actor.uuid || entry.uuid === actor.uuid || entry.typeKey === typeKeyOf(actor);
+
+/** This NPC's antagonist row on the mission's XP record, or null. */
+export const antagonistRowFor = actor => (actor ? (getMission().antagonists.find(rowOf(actor)) ?? null) : null);
+
 /** Whether the mission's XP record already lists this NPC's type. */
-export const antagonistRecorded = actor =>
-  !!actor && getMission().antagonists.some(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid);
+export const antagonistRecorded = actor => !!actor && getMission().antagonists.some(rowOf(actor));
 
 /**
  * Mark the listed antagonists among these actors as faced: an NPC that is in a running fight has been met. Only an
  * active mission is touched, and only rows that are not marked yet. Returns how many rows changed.
  */
 export async function markAntagonistsFaced(actors) {
-  const uuids = new Set([...(actors ?? [])].filter(Boolean).map(actor => actor.uuid));
+  // A token's own uuid and its base actor's both count, so rows keyed either way are found.
+  const uuids = new Set([...(actors ?? [])].filter(Boolean).flatMap(actor => [actor.uuid, typeKeyOf(actor)]));
   const open = entry => !entry.encountered && (uuids.has(entry.typeKey) || uuids.has(entry.uuid));
   const mission = getMission();
   if (!game.user?.isGM || !mission.active || !uuids.size || !mission.antagonists.some(open)) return 0;
@@ -391,7 +404,7 @@ export async function recordAntagonist(actor, { encountered = false } = {}) {
   const antagonist = {
     id: foundry.utils.randomID(),
     uuid: actor.uuid,
-    typeKey: actor.uuid,
+    typeKey: typeKeyOf(actor),
     name: actor.name,
     xp: Number.isFinite(actor.system.npcBuild?.xp) ? actor.system.npcBuild.xp : 0,
     type: ["special", "villain"].includes(actor.system.npcType) ? "special" : "standard",
@@ -516,7 +529,8 @@ export async function recordInfraction() {
   const rows = pool.flatMap(objective =>
     objective.infractions.map((infraction, i) => [
       `${objective.id}|${i}`,
-      `${objective.objective}: ${infraction.name} (${infraction.reputation} / −${money(infraction.netWorth)})`.slice(
+      // Net Worth as it will be charged: scaled by Table 7.4 under Historical.
+      `${objective.objective}: ${infraction.name} (${infraction.reputation} / −${money(-exposurePenalty(infraction).netWorth)})`.slice(
         0,
         150
       )
@@ -695,10 +709,11 @@ export async function awardStanding() {
     <ul>${rows || `<li>${loc`No agents are on the team.`}</li>`}</ul>
     <label>${loc`Paid in`} <select name="currency">${options(
       [
+        ["byAgent", loc`Each agent's affiliation: Faction in Reputation, Freelance in Net Worth`],
         ["reputation", `Reputation ${signed(standing.reputation)}`],
         ["netWorth", `Net Worth +${money(standing.netWorth)}`]
       ],
-      effects.gearRules === "freelance" ? "netWorth" : "reputation"
+      effects.gearRules === "freelance" ? "netWorth" : effects.gearRules === "hybrid" ? "byAgent" : "reputation"
     )}</select></label>
     ${anyPaid ? `<label><input type="checkbox" name="again" /> ${loc`Correction: pay everyone the full reward again, including those already paid`}</label>` : ""}`)
     ]
@@ -706,31 +721,48 @@ export async function awardStanding() {
   if (!input) return null;
   // The record is read again: another dialog, or another GC, may have paid while this one was open.
   const paidNow = () => getMission().standingPaid ?? {};
-  const amount = standing[input.currency],
-    due = team.filter(actor => input.again || !paidNow()[actor.id]);
+  // Under Hybrid (p.407) each agent is paid in the currency of their own affiliation.
+  const currencyOf = actor =>
+    input.currency === "byAgent"
+      ? actor.system.affiliationType === "freelance"
+        ? "netWorth"
+        : "reputation"
+      : input.currency;
+  const due = team.filter(actor => input.again || !paidNow()[actor.id]);
   if (!due.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
   if (payingStanding) return decline(loc`A standing payout is already running.`);
   payingStanding = true;
-  const done = [];
+  const done = [],
+    paidBefore = {};
+  let paidAmount = null;
   try {
-    for (const actor of due) {
-      if (!input.again && paidNow()[actor.id]) continue;
-      // Recorded before the agent is paid, so an interrupted payout can never pay the same agent twice.
-      await updateMission(m => ({
-        standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: { currency: input.currency, amount } }
-      }));
-      await actor.update({ [`system.${input.currency}`]: (actor.system[input.currency] ?? 0) + amount });
-      done.push(actor.name);
-    }
+    // The Undo note gives the standing back and clears these agents' paid marks, so the payout can be made again.
+    await withUndo(
+      due,
+      loc`Mission standing paid`,
+      async () => {
+        for (const actor of due) {
+          if (!input.again && paidNow()[actor.id]) continue;
+          const currency = currencyOf(actor),
+            amount = standing[currency];
+          paidBefore[actor.id] = paidNow()[actor.id] ?? null;
+          // Recorded before the agent is paid, so an interrupted payout can never pay the same agent twice.
+          await updateMission(m => ({
+            standingPaid: { ...(m.standingPaid ?? {}), [actor.id]: { currency, amount } }
+          }));
+          await actor.update({ [`system.${currency}`]: (actor.system[currency] ?? 0) + amount });
+          done.push(`${actor.name} (${label({ currency, amount })})`);
+          paidAmount = amount;
+        }
+      },
+      () => ({ standingPaid: paidBefore })
+    );
   } finally {
     payingStanding = false;
   }
   if (!done.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
-  await say(
-    loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(done.join(", "))}.`,
-    false
-  );
-  return amount;
+  await say(loc`Mission standing awarded: ${esc(done.join(", "))}.`, false);
+  return paidAmount;
 }
 
 /** Season-long campaign qualities (p.405). */

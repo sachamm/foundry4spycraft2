@@ -267,7 +267,8 @@ export class NpcData extends BaseActorData {
     return {
       ...super.defineSchema(),
       threatLevel: int(1, { min: 1 }),
-      followMission: new BooleanField(),
+      // A new NPC follows the mission's Threat Level (p.423); one saved before keeps its stored choice.
+      followMission: new BooleanField({ initial: true }),
       promotion: record("promotion", { nullable: true, initial: null }),
       manualDamageSave: int(0),
       damageSaveAdjust: int(0),
