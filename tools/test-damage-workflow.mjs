@@ -1220,6 +1220,131 @@ test("pending acid and explosive damage retain resistance from the original hit 
     }
 });
 
+test("typed lethal DR-stopped hits bruise across all health models, with explosive stress kept separate", async () => {
+  const { sufferTypedDamage } = await import("../module/apps/damage-types.mjs");
+  const { exposeToFire } = await import("../module/apps/hazards.mjs");
+  const oldTime = game.time;
+  game.time = { worldTime: 0 };
+  try {
+    for (const role of ["agent", "standard", "special"])
+      for (const type of ["acid", "collision", "explosive", "fire", "laser"]) {
+        reset();
+        const actor = character(`Typed-bruise-${role}-${type}`, {
+          npcType: role,
+          damageSave: 30,
+          level: 1,
+          vitality: { value: 100, max: role === "standard" ? 0 : 100 },
+          wounds: { value: 20, max: 20 },
+          dr: { melee: 20, other: 20 },
+          armorDRByAttack: { unarmed: 20, meleeWeapon: 20, hurledWeapon: 20, rangedWeapon: 20, other: 20 },
+          damageReductionComponents: { natural: 20, class: 0, armorMelee: 0, armorOther: 0, feat: 0 },
+          stressThreshold: 100,
+          subdualThreshold: 100,
+          abilities: { con: { value: 20 } },
+          accumulatedDamage: { version: 1, revision: 1, stress: 0, subdual: 0, pending: [] }
+        });
+        if (role !== "agent") actor.type = "npc";
+        const saves = [];
+        actor.rollSave = async (key, options) => (saves.push(options.hazardSave), { flags: {} });
+        if (type === "fire") await exposeToFire(actor, { damage: 12, reduction: 20 });
+        else {
+          await sufferTypedDamage(actor, { type, amount: 12, reduction: 20 });
+          if (["acid", "explosive"].includes(type)) {
+            const save = saves.shift();
+            await hazardSaveResolvers.get(save.kind)(actor, {}, save, false, {
+              checkKind: "save",
+              checkId: "ref",
+              successConfirmed: false,
+              effectiveTotal: 0,
+              evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true })
+            });
+          }
+        }
+        assert.equal(actor.system.vitality.value, 100, `${role} ${type}: no lethal loss`);
+        assert.equal(actor.system.hazards?.acid ?? null, null, "DR-stopped acid adds no lingering exposure");
+        if (role === "agent") {
+          assert.equal(actor.system.accumulatedDamage.subdual, 1, type);
+          assert.equal(actor.system.accumulatedDamage.stress, type === "explosive" ? 5 : 0, type);
+        } else if (role === "special") {
+          assert.equal(actor.flags.spycraft2.nonLethal.subdual, 1, type);
+          assert.equal(actor.flags.spycraft2.nonLethal.stress ?? 0, type === "explosive" ? 5 : 0, type);
+        } else {
+          const reports = posted
+            .filter(m => m.flags?.spycraft2?.npcDamageSave)
+            .map(m => m.flags.spycraft2.npcDamageSave);
+          assert.deepEqual(
+            reports.map(r => [r.kind, r.damage]),
+            type === "explosive"
+              ? [
+                  ["subdual", 1],
+                  ["stress", 5]
+                ]
+              : [["subdual", 1]],
+            type
+          );
+        }
+        assert.equal(saves.length, type === "explosive" ? 1 : 0, "only the explosive follow-up remains");
+      }
+  } finally {
+    game.time = oldTime;
+  }
+});
+
+test("typed bruising resistance prevents replacement dice, while a penetrating critical bruise requires GC review", async () => {
+  const { sufferTypedDamage } = await import("../module/apps/damage-types.mjs");
+  for (const resistance of [0, 1]) {
+    reset();
+    const actor = character(`Critical-bruise-${resistance}`, {
+      npcType: "special",
+      vitality: { value: 100, max: 100 },
+      wounds: { value: 20, max: 20 },
+      survivalStats: { resistances: { subdual: resistance }, resistanceSources: [] }
+    });
+    actor.type = "npc";
+    const result = await sufferTypedDamage(actor, {
+      type: "collision",
+      amount: 2,
+      reduction: 8,
+      hitContext: { critical: true, criticalDice: 2 }
+    });
+    assert.equal(Boolean(result), resistance === 1);
+    if (!resistance) assert.ok(warnings.some(w => /critical hit's bruising/.test(w)));
+    assert.equal(actor.system.vitality.value, 100);
+    assert.equal(actor.flags.spycraft2?.nonLethal, undefined);
+    assert.equal(posted.flatMap(m => m.rolls ?? []).length, 0);
+  }
+});
+
+test("pending typed bruising refuses changed or unknown original resistance before effects", async () => {
+  reset();
+  const { sufferTypedDamage } = await import("../module/apps/damage-types.mjs");
+  const actor = character("Changed-bruise", {
+    npcType: "special",
+    vitality: { value: 100, max: 100 },
+    wounds: { value: 20, max: 20 }
+  });
+  actor.type = "npc";
+  let save;
+  actor.rollSave = async (key, options) => ((save = options.hazardSave), { flags: {} });
+  await sufferTypedDamage(actor, { type: "acid", amount: 12, reduction: 20 });
+  actor.system.survivalStats.resistances.subdual = 2;
+  const check = {
+    checkKind: "save",
+    checkId: "ref",
+    successConfirmed: false,
+    effectiveTotal: 0,
+    evasionContext: evasionSaveContext(actor.system, { reflexReducesDamage: true })
+  };
+  await assert.rejects(hazardSaveResolvers.get("acid")(actor, {}, save, false, check), /Bruising resistance changed/);
+  delete save.bruiseResistanceSource;
+  await assert.rejects(
+    hazardSaveResolvers.get("acid")(actor, {}, save, false, check),
+    /original damage and prepared resistance/
+  );
+  assert.equal(actor.system.vitality.value, 100);
+  assert.equal(actor.flags.spycraft2?.nonLethal, undefined);
+});
+
 test("ongoing acid and fire use current resistance and count only damage that gets through", async () => {
   reset();
   const { acidStep, sufferTypedDamage } = await import("../module/apps/damage-types.mjs");

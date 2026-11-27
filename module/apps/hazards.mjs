@@ -45,7 +45,7 @@ import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { currentInjuryEffects } from "../rules/gc/campaign.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
-import { damageResistancePlan } from "../rules/resistances.mjs";
+import { damageResistancePlan, damageResistanceSource } from "../rules/resistances.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -169,6 +169,43 @@ export async function sufferLethal(actor, amount, hitContext = {}) {
   if (plan.fatigued) notes.push(await setCondition(actor, "fatigued", loc`Fatigued`));
   if (plan.stateChanged) notes.push(...(await woundConditions(actor, plan.state)));
   return { ...plan, notes: notes.filter(Boolean) };
+}
+
+/** The one subdual point left by DR (p.332), already past DR and before subdual resistance. */
+export async function sufferBruise(actor, hitContext = {}, originalSource = undefined) {
+  const context = typedHitContext(hitContext);
+  const current = damageResistanceSource(actor.system, "subdual");
+  const plan = damageResistancePlan(
+    actor.system,
+    "subdual",
+    1,
+    originalSource === undefined ? current : originalSource
+  );
+  if (originalSource !== undefined && JSON.stringify(originalSource) !== JSON.stringify(current))
+    throw Error(
+      loc`Bruising resistance changed after the original save. The GC must apply the verified original bruising outcome.`
+    );
+  if (context.critical && plan.net)
+    throw Error(loc`The GC must review this critical hit's bruising before applying its subdual save.`);
+  if (!plan.net) return loc`Subdual resistance prevents the one bruising point; no subdual save is required.`;
+  if (actor.type === "agent") {
+    const record = await applyAccumulatedDamage(actor, {
+      source: `bruise-${foundry.utils.randomID()}`,
+      kind: "subdual",
+      newDamage: 1,
+      damageMode: "subdualBeforeDefenses",
+      attackKind: context.attackKind,
+      weaponProficiency: context.weaponProficiency,
+      armorPiercingAll: true,
+      confirmed: true
+    });
+    if (!record) throw Error(loc`Bruising was not recorded. Review the actual subdual damage before continuing.`);
+  } else if (npcIsSpecial(actor)) {
+    await postNonLethalDamage(actor, "subdual", 1, loc`Bruising`, { armorPiercingAll: true });
+  } else if (!(await npcDamageSave(actor, { damage: 1, kind: "subdual" }))) {
+    throw Error(loc`The bruising Damage save was not recorded. Review the actual result before continuing.`);
+  }
+  return loc`Damage reduction stops the injury; one subdual bruising point is recorded after resistance.`;
 }
 
 /** Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure. */
@@ -414,6 +451,8 @@ async function resolveContagionSave(actor, message, save, succeeded) {
 async function sufferFire(actor, state, damage, reduction, label, hitContext = {}) {
   const resistance = damageResistancePlan(actor.system, "fire", Math.max(0, damage - Math.max(0, reduction))),
     taken = resistance.net,
+    stopped = damage > 0 && damage <= Math.max(0, reduction),
+    bruise = stopped && !resistance.negatesEffects ? await sufferBruise(actor, hitContext) : "",
     loss = await sufferLethal(actor, taken, hitContext),
     plan = fireDamagePlan(state.fire, taken);
   if (!loss)
@@ -428,6 +467,7 @@ async function sufferFire(actor, state, damage, reduction, label, hitContext = {
       : loc`${label}: ${taken} fire damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`,
     ...(loss?.notes ?? [])
   ];
+  if (bruise) lines.push(bruise);
   const lost = loss.standard ? loss.damage : loss.vitalityLoss + loss.woundLoss;
   lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses"));
   if (plan.scarSaveDue)
@@ -435,7 +475,7 @@ async function sufferFire(actor, state, damage, reduction, label, hitContext = {
       loc`This fire has now done ${plan.fire.suffered} damage: make the Fortitude save (DC ${SCAR_SAVE_DC}) against scarring from the sheet.`
     );
   if (resistance.resisted) lines.push(loc`Fire resistance prevents ${resistance.resisted} damage.`);
-  return { lines, fire: plan.fire, negatesEffects: resistance.negatesEffects };
+  return { lines, fire: plan.fire, negatesEffects: resistance.negatesEffects || stopped };
 }
 
 /** A fire in the character's square, contact with a fire, or a fire attack: damage now, then a save or catch fire. */

@@ -46,6 +46,7 @@ import {
   rollTotal,
   sufferAttributeLoss,
   sufferLethal,
+  sufferBruise,
   sufferStress,
   writeHazards
 } from "./hazards.mjs";
@@ -157,8 +158,18 @@ async function sufferSubdual(actor, amount, source, defenses = {}, hitContext = 
 }
 
 /** Lethal damage now and the stress its type adds for what was lost. Returns the report lines. */
-async function sufferTypedLethal(actor, type, amount, label, hitContext = {}, resistanceSource) {
+async function sufferTypedLethal(
+  actor,
+  type,
+  amount,
+  label,
+  hitContext = {},
+  resistanceSource,
+  { stopped = false, bruiseResistanceSource } = {}
+) {
   const resistance = damageResistancePlan(actor.system, type, amount, resistanceSource);
+  const bruise =
+    stopped && !resistance.negatesEffects ? await sufferBruise(actor, hitContext, bruiseResistanceSource) : "";
   amount = resistance.net;
   const loss = await sufferLethal(actor, amount, hitContext);
   if (!loss)
@@ -175,6 +186,7 @@ async function sufferTypedLethal(actor, type, amount, label, hitContext = {}, re
     ],
     lost = loss.standard ? loss.damage : loss.vitalityLoss + loss.woundLoss,
     stress = typedStress(type, lost);
+  if (bruise) lines.push(bruise);
   let points = stress.points;
   const rolls = [];
   if (stress.formula && !resistance.negatesEffects) {
@@ -184,7 +196,14 @@ async function sufferTypedLethal(actor, type, amount, label, hitContext = {}, re
   }
   if (resistance.resisted) lines.push(loc`Resistance prevents ${resistance.resisted} ${label} damage.`);
   if (!resistance.negatesEffects) lines.push(await sufferStress(actor, points, label));
-  return { lines, rolls, lost, damage: amount, resistance };
+  return {
+    lines,
+    rolls,
+    lost,
+    damage: amount,
+    resistance,
+    effectsPrevented: resistance.negatesEffects || (stopped && type !== "explosive")
+  };
 }
 
 /** Ask for an injury save that a running total of one type has earned. */
@@ -327,7 +346,15 @@ export async function sufferTypedDamage(actor, preset = {}) {
       case "electrical":
         return sufferElectrical(actor, { amount, source, hitContext });
       default: {
-        const result = await sufferTypedLethal(actor, type, Math.max(0, amount - reduction), label, hitContext);
+        const result = await sufferTypedLethal(
+          actor,
+          type,
+          Math.max(0, amount - reduction),
+          label,
+          hitContext,
+          undefined,
+          { stopped: amount > 0 && reduction >= amount }
+        );
         if (type === "collision" && (classFeatureLevels(actor.system)?.stuntman ?? 0) >= 4)
           result.lines.push(
             loc`Fall Guy: each collision damage die is 2 lower (minimum 1 per die); lower the damage entered if that was not done.`
@@ -379,6 +406,7 @@ async function startAcid(
     hazardSave: {
       kind: "acid",
       resistanceSource,
+      bruiseResistanceSource: damageResistanceSource(actor.system, "subdual"),
       ...halfSavePolicy(actor),
       label: DAMAGE_TYPE_LABELS.acid,
       dc: plan.dc,
@@ -403,6 +431,7 @@ async function startExplosive(actor, input) {
   const save = {
     kind: "explosiveReflex",
     resistanceSource,
+    bruiseResistanceSource: damageResistanceSource(actor.system, "subdual"),
     ...halfSavePolicy(actor),
     label: loc`Explosive (Reflex)`,
     dc: plan.dc,
@@ -689,7 +718,8 @@ async function resolveExplosiveReflex(actor, message, save, succeeded, check) {
       taken,
       DAMAGE_TYPE_LABELS.explosive,
       save.hitContext,
-      savedResistance(save)
+      savedResistance(save),
+      { stopped: adjustment.total > 0 && taken === 0, bruiseResistanceSource: save.bruiseResistanceSource ?? null }
     );
   if (result.resistance.negatesEffects) return post(actor, result.lines, result.rolls);
   result.lines.unshift(
@@ -757,7 +787,8 @@ const resolvers = {
         taken,
         DAMAGE_TYPE_LABELS.acid,
         save.hitContext,
-        savedResistance(save)
+        savedResistance(save),
+        { stopped: first > 0 && taken === 0, bruiseResistanceSource: save.bruiseResistanceSource ?? null }
       );
     result.lines.unshift(
       adjustment.evaded
@@ -769,7 +800,7 @@ const resolvers = {
             : loc`The Reflex save fails: full acid damage.`
     );
     const next = applyAcid(hazardState(actor.system), {
-      damage: result.resistance.negatesEffects ? 0 : first,
+      damage: result.effectsPrevented ? 0 : first,
       suffered: result.damage,
       worldTime: now()
     });

@@ -2077,3 +2077,31 @@ All **4,380** Node tests and **988** engine assertions pass. Schema, lint,
 formatting and bundle checks pass; the previous **13** pack and **267** layout
 checks remain applicable. Continue typed lethal bruising, initial fire totals,
 injury/recovery timing, Drained and broader creation-choice evidence.
+
+## Pass 70: Typed lethal bruising and protected secondary effects
+
+Both areas remain **9.8/10**. Initial acid, collision, explosive, fire and laser
+hits stopped by DR now leave the required one subdual bruising point. Agents use
+their ledger; special NPCs use running totals; standard NPCs make their actual
+subdual Damage save. Subdual resistance applies after the bruise, without taking
+DR off again. A penetrating critical bruise still requires GC review before
+mutation; fully resisted bruising requires no replacement dice.
+
+DR-stopped acid adds no lingering exposure and protected fire does not demand a
+new catch-fire save. Explosives preserve their explicit independent stress and
+follow-up save. Evasion that prevents the incoming impact does not create a
+bruise. Pending acid/explosive saves retain the original subdual-resistance proof;
+changed resistance or a legacy save without that proof requires actual-outcome
+GC review rather than silently applying current defenses.
+
+Native Foundry verified ten controlled standard/special cases across all five
+types, including actual acid/explosive saves and standard bruising Damage saves.
+No lethal health was lost; protected acid/fire left no new exposure. An additional
+Scientist clone wearing an actual vest recorded one collision bruise through the
+real agent ledger without lethal or stress loss. No browser errors were reported.
+
+All **4,382** full-suite tests and **988** engine checks passed; a final critical
+bruise regression then passed with the **55** affected workflow tests. Schema,
+lint, formatting, bundle and copy checks pass. Ongoing acid's DR/source tracking,
+initial fire totals and scarring, wider injury/recovery timing, Drained and the
+remaining creation-choice evidence still constrain the requested final scores.
