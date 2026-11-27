@@ -141,6 +141,7 @@ export async function spendGCDice(input = {}) {
   // A spend made from a chat card changes that card's own result, which a note cannot take back: no note is left.
   const undoable = !input.onCard && !["dramaticScene", "campaignQuality"].includes(input.id),
     beforeSpend = actor && undoable ? snapshot(actor) : null;
+  let antagonistBefore = null;
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
   if (plan.cost > 0) {
@@ -178,6 +179,12 @@ export async function spendGCDice(input = {}) {
         lines.push(esc(quality.summary));
         break;
       case "promote":
+        // Undo puts the antagonist row back as it was, or takes it off when the promotion recorded it.
+        antagonistBefore = {
+          uuid: actor.uuid,
+          entry:
+            getMission().antagonists.find(entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid) ?? null
+        };
         await actor.update({
           "system.promotion": { mission: String(actor.system.usagePeriods?.mission ?? "initial") }
         });
@@ -240,7 +247,10 @@ export async function spendGCDice(input = {}) {
     try {
       const entry = beforeSpend ? undoEntry(actor, beforeSpend, snapshot(actor)) : null;
       if (entry || plan.cost > 0)
-        await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], { gcDice: plan.cost });
+        await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], {
+          gcDice: plan.cost,
+          antagonist: antagonistBefore
+        });
     } catch (error) {
       console.warn("Field Agent's Handbook | No Undo note could be left for this spend.", error);
     }

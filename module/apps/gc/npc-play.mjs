@@ -21,6 +21,7 @@ import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
+import { campaignSkillPlan } from "../../rules/campaign-rules.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
@@ -155,6 +156,9 @@ export async function rollNpcSkill(actor, input = null) {
   // Feat items on the NPC that add a plain number to this skill.
   const featBonus = Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0);
   if (featBonus) quality.rows.push({ label: loc`Feats`, value: featBonus });
+  // Comedy of Errors widens the error range of a check made with the NPC's lowest attribute (p.406).
+  const campaignError = campaignSkillPlan(actor.system, skill.key, { attributes: skill.abilities }, { ability });
+  if (campaignError.errorIncrease) quality.errorIncrease += campaignError.errorIncrease;
   const total =
     plan.bonus +
     (actor.system.abilities[ability]?.mod ?? 0) +

@@ -8,7 +8,7 @@ import {
   setCampaignYearSource
 } from "../module/rules/period-money.mjs";
 import { parseStandingCost } from "../module/rules/standing.mjs";
-import { missionStanding } from "../module/rules/gc/mission.mjs";
+import { exposurePenalty, missionStanding } from "../module/rules/gc/mission.mjs";
 
 test("Table 7.4 by year", () => {
   assert.equal(historicalMoneyModifier(1955), 0.1);
@@ -39,4 +39,14 @@ test("standing costs and Net Worth awards follow the registered year", t => {
   assert.equal(parseStandingCost("15/$750,000").netWorth, Math.round(before * 0.3));
   assert.equal(parseStandingCost("2 Reputation").netWorth, 30000);
   assert.equal(missionStanding({ caliber: 2 }).netWorth, Math.round(award * 0.3));
+});
+
+test("an exposure penalty's Net Worth follows the year; Reputation does not", t => {
+  t.after(() => {
+    setCampaignRulesSource(null);
+    setCampaignYearSource(null);
+  });
+  setCampaignRulesSource(() => ({ historicalMoney: true }));
+  setCampaignYearSource(() => 1955);
+  assert.deepEqual(exposurePenalty({ reputation: -10, netWorth: -100000 }), { reputation: -10, netWorth: -10000 });
 });

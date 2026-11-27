@@ -270,5 +270,6 @@ export function exposurePenalty(infraction, { preventing = false, halve = false,
       magnitude = Math.floor(magnitude * honorMultiplier);
     return -magnitude;
   };
-  return { reputation: scale(infraction?.reputation), netWorth: scale(infraction?.netWorth) };
+  // Net Worth is in modern dollars; under Historical it follows Table 7.4 like every other amount.
+  return { reputation: scale(infraction?.reputation), netWorth: periodMoney(scale(infraction?.netWorth)) };
 }

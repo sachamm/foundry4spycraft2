@@ -462,6 +462,23 @@ test("NPC skill check uses Competence or the skilled bonus plus the attribute", 
   assert.equal(roll.options.rollMode, "gmroll");
 });
 
+test("Comedy of Errors widens an NPC's error range on its lowest attribute (p.406)", async () => {
+  const abilities = guard.system.abilities;
+  guard.system.abilities = Object.fromEntries(
+    Object.entries(abilities).map(([key, value]) => [key, { ...value, value: key === "wis" ? 8 : 14 }])
+  );
+  await state.setCampaign({ qualities: ["comedy-of-errors"] });
+  try {
+    answer({ key: "notice", ability: "wis", modifier: 0, error: 1, secret: false });
+    assert.equal((await npc.rollNpcSkill(guard)).options.error, 3);
+    answer({ key: "notice", ability: "int", modifier: 0, error: 1, secret: false });
+    assert.equal((await npc.rollNpcSkill(guard)).options.error, 1);
+  } finally {
+    guard.system.abilities = abilities;
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
 test("standard NPC Damage saves accumulate, kill and reset; special NPCs are refused", async () => {
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });
@@ -498,6 +515,9 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   const promotedRow = () =>
     state.getMission().antagonists.find(entry => entry.uuid === guard.uuid || entry.typeKey === guard.uuid);
   assert.deepEqual([promotedRow().promoted, promotedRow().scenes], [true, 1], "its XP is counted per scene");
+  const promoteNote = messages.findLast(message => message.flags?.spycraft2?.undo)?.flags.spycraft2.undo;
+  assert.equal(promoteNote.antagonist.uuid, guard.uuid, "the Undo note can put the antagonist row back");
+  assert.notEqual(promoteNote.antagonist.entry?.promoted, true);
   await mission.changeEntry("antagonists", promotedRow().id, "scenesUp");
   assert.equal(promotedRow().scenes, 2);
   await mission.changeEntry("antagonists", promotedRow().id, "scenesDown");

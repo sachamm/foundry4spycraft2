@@ -206,13 +206,13 @@ export async function withUndo(actors, label, work, extra = {}) {
 }
 
 /** Leave the Undo note: one line, seen only by whoever took the step. */
-export function postUndo(label, entries, { gcDice = 0, damageCard = null } = {}) {
+export function postUndo(label, entries, { gcDice = 0, damageCard = null, antagonist = null } = {}) {
   return ChatMessage.create({
     speaker: { alias: loc`Undo` },
     // The GC sees every note, so a step a player took can be undone by the GC too.
     whisper: [...new Set([game.user.id, ...(ChatMessage.getWhisperRecipients?.("GM") ?? []).map(user => user.id)])],
     content: `<div class="spycraft2 chat-note sc2-undo-note"><p>${esc(label)}</p></div>`,
-    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, done: false } } }
+    flags: { spycraft2: { undo: { label, entries, gcDice, damageCard, antagonist, done: false } } }
   });
 }
 
@@ -282,6 +282,18 @@ async function undoRecord(message, record) {
     await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>
       ui.notifications.warn(loc`The GC action dice were not given back: ${error.message}`)
     );
+  }
+  // A promotion's antagonist row goes back to what it was; the rest of the mission's list is left alone.
+  if (record.antagonist?.uuid && game.user.isGM) {
+    const { getMission, updateMission } = await import("./gc/state.mjs");
+    const { uuid, entry: was } = record.antagonist,
+      mine = entry => entry.typeKey === uuid || entry.uuid === uuid;
+    if ((getMission().antagonists ?? []).some(mine))
+      await updateMission(now => ({
+        antagonists: was
+          ? now.antagonists.map(entry => (mine(entry) ? was : entry))
+          : now.antagonists.filter(entry => !mine(entry))
+      })).catch(error => ui.notifications.warn(loc`The antagonist list was not put back: ${error.message}`));
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;
