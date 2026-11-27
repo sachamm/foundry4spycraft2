@@ -75,15 +75,20 @@ async function condition(actor, id, rounds, label) {
   }
 }
 
-/** Record subdual damage through the ledger, so thresholds and the Fortitude save follow. */
-async function sufferSubdual(actor, amount, source) {
+/**
+ * Record subdual damage through the ledger, so thresholds and the Fortitude save follow. Damage already reduced
+ * (a fall works out its own DR) is recorded as it is; anything else meets the "other source" DR and resistance.
+ */
+async function sufferSubdual(actor, amount, source, { net = false } = {}) {
   if (!amount) return "";
   try {
     await applyAccumulatedDamage(actor, {
       source: `${source} [${foundry.utils.randomID(6)}]`,
       kind: "subdual",
       newDamage: amount,
-      damageMode: "subdualBeforeDefenses",
+      ...(net
+        ? { damageMode: "net" }
+        : { damageMode: "subdualBeforeDefenses", attackKind: "other", armorPiercing: 0, armorPiercingAll: false }),
       confirmed: true
     });
     return loc`${amount} subdual damage recorded; roll any Fortitude save it calls for from the sheet.`;
@@ -410,7 +415,7 @@ export async function sufferFall(actor, preset = {}) {
       loc`Fall of ${plan.feet} ft.: ${plan.formula} = ${roll.total}${outcome.landed ? loc`, less a quarter of the Falling check (${result})` : ""}${outcome.halved ? loc`, halved by Wire Fu` : ""}: ${outcome.damage} ${outcome.kind} damage, armor piercing ${plan.armorPiercing}.`
     ];
     const rolls = [roll.roll];
-    if (outcome.kind === "subdual") lines.push(await sufferSubdual(actor, outcome.net, loc`Falling`));
+    if (outcome.kind === "subdual") lines.push(await sufferSubdual(actor, outcome.net, loc`Falling`, { net: true }));
     else {
       const loss = await sufferLethal(actor, outcome.net);
       lines.push(

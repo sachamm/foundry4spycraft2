@@ -218,7 +218,12 @@ export async function startMission() {
     scenesPlayed: 0,
     standingPaid: {},
     objectives: (mission.objectives ?? []).map(objective => ({ ...objective, complete: false })),
-    antagonists: (mission.antagonists ?? []).map(antagonist => ({ ...antagonist, encountered: false }))
+    // A promotion lasts one mission (p.398), so a new run starts the NPC as standard again.
+    antagonists: (mission.antagonists ?? []).map(({ promoted: _promoted, ...antagonist }) => ({
+      ...antagonist,
+      encountered: false,
+      ...(antagonist.full ? {} : { scenes: 1 })
+    }))
   }));
   const tl = await fixThreatLevel(),
     mission = getMission(),

@@ -4,6 +4,7 @@ import { systemDialog } from "./dialog-theme.mjs";
 import { campaignLevelRow, campaignRules, featPurchasePlan } from "../rules/campaign-rules.mjs";
 import { TABLES } from "../rules/tables.mjs";
 import { loc } from "../i18n.mjs";
+import { queueRuleState } from "./rule-resource-scope.mjs";
 
 const levelRow = level => {
   const row = TABLES.levels.find(entry => entry.level === level);
@@ -37,12 +38,20 @@ export async function buyFeatWithXP(actor) {
     content: `<p>${loc`Spend ${plan.cost} XP for one more feat choice? Feat Purchase allows this after a mission (p.406).`}</p>`
   });
   if (!ok) return null;
-  await actor.update({
-    "system.xp": plan.xp,
-    "system.featTrades.purchased": (actor.system.featTrades?.purchased ?? 0) + 1
+  // Worked out again from the current sheet, one purchase at a time: a second dialog left open cannot buy a feat
+  // with XP the first one already spent.
+  const spent = await queueRuleState(actor, async () => {
+    const now = featPurchasePlan(actor.system, levelRow(actor.system.level));
+    if (!now.allowed || now.cost !== plan.cost) return null;
+    await actor.update({
+      "system.xp": now.xp,
+      "system.featTrades.purchased": (actor.system.featTrades?.purchased ?? 0) + 1
+    });
+    return now;
   });
+  if (!spent) return refuse(loc`The XP or level changed while the dialog was open. Open Buy a feat again.`);
   return ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
-    content: `<p>${loc`${actor.name} spent ${plan.cost} XP on one more feat choice (Feat Purchase).`}</p>`
+    content: `<p>${loc`${actor.name} spent ${spent.cost} XP on one more feat choice (Feat Purchase).`}</p>`
   });
 }

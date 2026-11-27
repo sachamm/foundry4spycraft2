@@ -334,7 +334,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       abilities: new SchemaField(abilities),
       pointBuyBudget: int(36, { min: 0 }),
       /** Which attribute each level-based increase went to: { l4: "int", l8: "", … } */
-      abilityIncreases: new SchemaField(Object.fromEntries([4, 8, 12, 16, 20].map(l => [`l${l}`, str()]))),
+      abilityIncreases: new SchemaField(Object.fromEntries(Array.from({ length: 18 }, (_, i) => [`l${i + 3}`, str()]))),
 
       /** One entry per career level, in order. */
       progression: new ArrayField(

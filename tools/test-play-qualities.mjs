@@ -123,3 +123,21 @@ test("Catch Phrase reminds the table on a threat, and the reminder qualities lis
   const lines = campaignRuleLines({ catchPhrase: true, goodAndEvil: true, revolvingDoor: true });
   assert.equal(lines.length, 3);
 });
+
+test("under Gritty a Table of Ouch injury at 0 vitality can be activated for 0 dice", () => {
+  const check = { checkKind: "attack", threatConfirmed: true };
+  const options = {
+    kind: "success",
+    baseCost: 0,
+    effect: "Table of Ouch injury",
+    effectConfirmed: true,
+    beforeDamage: true,
+    available: 0
+  };
+  assert.equal(criticalPlan({}, check, options).blocked, true, "a cost of 0 is refused without Gritty");
+  withRules({ criticalInjuryActivationCost: -1 }, () => {
+    const plan = criticalPlan({}, check, options);
+    assert.equal(plan.blocked, false, plan.reason);
+    assert.equal(plan.cost, 0);
+  });
+});

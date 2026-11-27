@@ -1,5 +1,5 @@
 import { triumphAt } from "./check-candidates.mjs";
-import { campaignErrorActivationCap, threatsAutoActivate } from "./campaign-rules.mjs";
+import { campaignErrorActivationCap, criticalInjuryCostShift, threatsAutoActivate } from "./campaign-rules.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { cleaveCriticalPlan } from "./cleave.mjs";
 import { finesseCriticalEligible } from "./finesse.mjs";
@@ -51,7 +51,9 @@ export function criticalPlan(
     return reject(loc`An opponent within line of sight must pay to activate this error (p.62).`);
   if (kind === "failure" && check.boostSpent > 0)
     return reject(loc`Error activation must be decided before the acting character boosts the result.`);
-  if (!Number.isSafeInteger(baseCost) || baseCost < 1 || (check.checkKind === "attack" && baseCost > 4))
+  // Gritty (p.406) can bring a Table of Ouch injury down to a table cost of 0 on an attack.
+  const lowestCost = kind === "success" && check.checkKind === "attack" && criticalInjuryCostShift() < 0 ? 0 : 1;
+  if (!Number.isSafeInteger(baseCost) || baseCost < lowestCost || (check.checkKind === "attack" && baseCost > 4))
     return reject(loc`Choose the effect’s whole-number table cost (1–4 for attack results).`);
   if (!effectConfirmed || !String(effect).trim())
     return reject(
