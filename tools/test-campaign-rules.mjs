@@ -393,3 +393,14 @@ test("a saved injury keeps the table's Surgery DC, and the campaign shift is app
     assert.equal(surgeryDCNow(gritty), campaignMedicineDC(plain.surgeryDC, effects));
   });
 });
+
+test("Spider Mastery and Fall Guy take each falling die lower, at least 1 a die (Codex)", async () => {
+  const { fallDieReduction, reducedFallTotal } = await import("../module/rules/damage-types.mjs");
+  assert.equal(fallDieReduction({ activeFeatNames: ["Spider Mastery"] }), 1);
+  assert.equal(fallDieReduction({ activeFeatNames: [], classLevels: { stuntman: 4 } }), 2);
+  assert.equal(reducedFallTotal({ total: 12, faces: [6, 6], dice: 2 }, 1), 10);
+  assert.equal(reducedFallTotal({ total: 12, faces: [6, 6], dice: 2 }, 2), 8);
+  assert.equal(reducedFallTotal({ total: 3, faces: [1, 2], dice: 2 }, 2), 2, "never below 1 a die");
+  assert.equal(reducedFallTotal({ total: 12, dice: 2 }, 1), 10);
+  assert.equal(reducedFallTotal({ total: 12, faces: [6, 6], dice: 2 }, 0), 12);
+});

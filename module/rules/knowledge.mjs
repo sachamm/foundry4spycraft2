@@ -11,6 +11,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { underwaterCheckPlan } from "./environment.mjs";
 import { tenSecondSolutionEligible, cunningPlanEffect } from "./class-checks.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignRules } from "./campaign-rules.mjs";
 const normal = value =>
   String(value ?? "")
     .trim()
@@ -55,7 +56,9 @@ export function resolveKnowledgeCheck(
       blockedReason: loc`Choose the one skill the GC considers relevant to the Knowledge check.`
     };
   const cardShark = cardSharkKnowledgePlan(system, { gamblingKnowledge, topic });
-  active = active === true || cardShark.active;
+  // Omni-Competent (p.408) makes every check active, Knowledge checks too, with no feat needed for it.
+  const campaignActive = campaignRules().allChecksActive === true;
+  active = active === true || cardShark.active || campaignActive;
   const photo = system.activeFeatNames?.includes("Photographic Memory"),
     taking = method === "take10" || method === "take20";
   const reasons = [];
@@ -77,7 +80,7 @@ export function resolveKnowledgeCheck(
   });
   if (incapacity) reasons.push(incapacity);
   if (!["roll", "take10", "take20"].includes(method)) reasons.push(loc`Unknown Knowledge check method.`);
-  if ((taking || (active && !cardShark.active)) && !photo)
+  if ((taking || (active && !cardShark.active && !campaignActive)) && !photo)
     reasons.push(loc`Active Knowledge checks and taking 10/20 require Photographic Memory.`);
   if (taking && !safeToTake) reasons.push(loc`Taking 10/20 requires being neither distracted nor endangered.`);
   if (

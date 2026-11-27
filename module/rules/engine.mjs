@@ -2257,14 +2257,24 @@ function deriveWealthAndGear(state) {
     const count = i.system?.pickCount ?? 1;
     picks[p].spent += count;
     if (overflow && ["weapon", "armor", "gear"].includes(i.type)) {
-      if (i.system.caliber === 5) tops[p] = (tops[p] ?? 0) + count;
-      else if (i.system.caliber === 1) ones[p] = (ones[p] ?? 0) + count;
+      // The free item must be of the same equipment category as the one pushed past V, from the same pick.
+      const key = `${p}|${equipmentCategory(i)}`;
+      if (i.system.caliber === 5) tops[key] = (tops[key] ?? 0) + count;
+      else if (i.system.caliber === 1) ones[key] = (ones[key] ?? 0) + count;
     }
   }
-  for (const p of Object.keys(tops)) {
-    const free = Math.min(tops[p], ones[p] ?? 0);
+  for (const key of Object.keys(tops)) {
+    const p = key.split("|")[0],
+      free = Math.min(tops[key], ones[key] ?? 0);
     if (free) picks[p].spent -= free;
-    picks[p].bigBudgetExtras = free;
+    picks[p].bigBudgetExtras = (picks[p].bigBudgetExtras ?? 0) + free;
+  }
+  // Shoe String Budget (p.408): a pick that falls below Caliber I is lost, so a Caliber I mission's picks buy nothing.
+  if (missionReserves && campaignGearCaliber(missionReserves.caliber).lost) {
+    for (const key of Object.keys(picks)) picks[key].available = 0;
+    warnings.push(
+      loc`Shoe String Budget: this mission's gear picks fall below Caliber I, so they are lost and buy no gear (p.408).`
+    );
   }
   const reservedAllocations = reserveAllocations(sys);
   for (const key of Object.keys(picks)) picks[key].spent += reservedAllocations[key] ?? 0;

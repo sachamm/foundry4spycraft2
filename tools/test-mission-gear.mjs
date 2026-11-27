@@ -337,7 +337,35 @@ test("Big Budget (p.405): a Caliber V pick's extra Caliber I item of the same ty
     computeAgent(s, [cls, ...pair], cfg);
     assert.equal(s.gearPicks.V.spent, 1);
     assert.equal(s.gearPicks.V.bigBudgetExtras, 1);
+    // The free item must be of the same equipment category: a Caliber I weapon on the same pick is not free.
+    s = build();
+    computeAgent(
+      s,
+      [cls, pair[0], { ...pair[1], type: "weapon", system: { ...pair[1].system, gearCategory: "" } }],
+      cfg
+    );
+    assert.equal(s.gearPicks.V.bigBudgetExtras ?? 0, 0);
+    assert.equal(s.gearPicks.V.spent, 2);
   } finally {
     setCampaignRulesSource(null);
   }
+});
+
+test("Shoe String Budget (p.408): a Caliber I mission's picks fall below I and buy no gear", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const s = {
+    ...system(1),
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10 }])),
+    progression: [],
+    misc: {}
+  };
+  setCampaignRulesSource(() => ({ gearCaliberShift: -1 }));
+  try {
+    computeAgent(s, [car({ caliber: 1 })], cfg);
+  } finally {
+    setCampaignRulesSource(null);
+  }
+  assert.equal(s.gearPicks.V.available, 0);
+  assert.ok(s.gearPicks.V.remaining < 0);
+  assert.ok(s.warnings.some(w => /Shoe String Budget/.test(w)));
 });

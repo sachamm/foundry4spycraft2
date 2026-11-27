@@ -37,7 +37,9 @@ import {
   survivalSaveMade,
   survivalSavePlan,
   typedStress,
-  vacuumDamage
+  vacuumDamage,
+  fallDieReduction,
+  reducedFallTotal
 } from "../rules/damage-types.mjs";
 import { hazardState } from "../rules/hazards.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
@@ -432,14 +434,24 @@ export async function sufferFall(actor, preset = {}) {
       const result = String(input.checkResult ?? "").trim() === "" ? null : Math.trunc(Number(input.checkResult));
       if (!plan.dice) return post(actor, [loc`A fall of ${plan.counted} ft. deals no damage (p.336).`]);
       const roll = await rollTotal(plan.formula),
+        // Spider Mastery and Fall Guy take each die lower, never below 1 (p.196).
+        reduction = fallDieReduction(actor.system),
+        rolled = reducedFallTotal(
+          {
+            total: roll.total,
+            faces: roll.roll?.dice?.flatMap(die => die.results.filter(r => r.active !== false).map(r => r.result)),
+            dice: plan.dice
+          },
+          reduction
+        ),
         outcome = fallingOutcome(plan, {
-          rolled: roll.total,
+          rolled,
           checkResult: result,
           dr: Math.max(0, Math.trunc(Number(input.dr) || 0)),
           halve: wireFu && special
         });
       const lines = [
-        loc`Fall of ${plan.feet} ft.: ${plan.formula} = ${roll.total}${outcome.landed ? loc`, less a quarter of the Falling check (${result})` : ""}${outcome.halved ? loc`, halved by Wire Fu` : ""}: ${outcome.damage} ${outcome.kind} damage, armor piercing ${plan.armorPiercing}.`
+        loc`Fall of ${plan.feet} ft.: ${plan.formula} = ${roll.total}${reduction ? loc`, ${rolled} after −${reduction} a die` : ""}${outcome.landed ? loc`, less a quarter of the Falling check (${result})` : ""}${outcome.halved ? loc`, halved by Wire Fu` : ""}: ${outcome.damage} ${outcome.kind} damage, armor piercing ${plan.armorPiercing}.`
       ];
       const rolls = [roll.roll];
       if (outcome.kind === "subdual")

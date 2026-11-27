@@ -1,6 +1,7 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { stable } from "./equal.mjs";
+import { fallDieReduction } from "./damage-types.mjs";
 /** Equilibrium Basics p.194 and soft/ yielding landing p.336: damage-distance calculation only. */
 export function fallDistancePlan(
   system,
@@ -28,11 +29,9 @@ export function fallDistancePlan(
     ],
     reductionFeet = reductions.reduce((n, r) => n + r.feet, 0),
     damageDistanceFeet = Math.max(0, fallDistanceFeet - reductionFeet);
-  // Spider Mastery, p.196: each die of falling damage is 1 lower, never below 1.
-  const spider = names.includes("Spider Mastery");
-  // Fall Guy (Stuntman 4th): each die of falling damage is 2 lower.
-  const fallGuy = (system?.classLevels?.stuntman ?? 0) >= 4,
-    perDieReduction = (spider ? 1 : 0) + (fallGuy ? 2 : 0);
+  const spider = names.includes("Spider Mastery"),
+    fallGuy = (system?.classLevels?.stuntman ?? 0) >= 4,
+    perDieReduction = fallDieReduction(system);
   return {
     version: 1,
     context: { fallDeclared: true, fallDistanceFeet, fallSoftSurface, fallConfirmed: true },

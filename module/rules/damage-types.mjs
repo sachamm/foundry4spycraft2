@@ -611,3 +611,22 @@ export function laserDistancePlan(expression, { distanceFeet, increment } = {}) 
     note: loc`Laser: range increment ${increments}, ${removed} damage die fewer (p.338).`
   };
 }
+
+/**
+ * How much lower each die of falling damage is for this character: Spider Mastery 1 (p.196), Fall Guy (Stuntman
+ * 4th level) 2. Each die still deals at least 1.
+ */
+export function fallDieReduction(system) {
+  const names = Array.isArray(system?.activeFeatNames) ? system.activeFeatNames : [];
+  return (names.includes("Spider Mastery") ? 1 : 0) + ((system?.classLevels?.stuntman ?? 0) >= 4 ? 2 : 0);
+}
+
+/**
+ * The falling dice's total after a per-die reduction, each die at least 1. `faces` are the rolled dice; without them
+ * the reduction comes off the total, still at least 1 a die.
+ */
+export function reducedFallTotal({ total, faces = null, dice = 0 }, reduction = 0) {
+  if (!reduction) return total;
+  if (Array.isArray(faces) && faces.length) return faces.reduce((sum, face) => sum + Math.max(1, face - reduction), 0);
+  return Math.max(dice, total - reduction * dice);
+}
