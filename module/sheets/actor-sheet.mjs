@@ -104,7 +104,12 @@ import { rollCheapShot } from "../apps/cheap-shot.mjs";
 import { rollDisarm } from "../apps/disarm.mjs";
 import { declareTwoWeapon, reviewTwoWeapon, takeTwoWeaponFinalAttack } from "../apps/two-weapon.mjs";
 import { checkNumericalAdvantage } from "../apps/numerical-advantage.mjs";
-import { criticalInjuryReviews } from "../apps/critical-injuries.mjs";
+import {
+  criticalInjuryReviews,
+  criticalInjuryRows,
+  markInjuryHealed,
+  recordInjurySurgery
+} from "../apps/critical-injuries.mjs";
 import { takeTotalDefense } from "../apps/total-defense.mjs";
 import { checkCombatMovement } from "../apps/combat-movement.mjs";
 import { activateCombatExpertise } from "../apps/combat-expertise.mjs";
@@ -460,6 +465,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       reviewCriticalInjury(event, target) {
         return this.actor.reviewCriticalInjury(target.dataset.injury);
+      },
+      recordInjurySurgery(event, target) {
+        return recordInjurySurgery(this.actor, target.dataset.injury);
+      },
+      markInjuryHealed(event, target) {
+        return markInjuryHealed(this.actor, target.dataset.injury);
       },
       takeTotalDefense: costsAction("full", function () {
         return takeTotalDefense(this.actor);
@@ -1206,7 +1217,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       .filter(([, v]) => v.slots || v.spent || v.owned)
       .map(([k, v]) => ({ key: k, label: cfg.featTrees[k], ...v }));
     context.coreAbilities = sys.coreAbilities ?? [];
-    context.criticalInjuryReviews = criticalInjuryReviews(this.actor);
+    // A rolled injury is a row with its effect and care; only a record that needs the GC stays a review line.
+    context.criticalInjuries = criticalInjuryRows(this.actor);
+    context.criticalInjuryReviews = criticalInjuryReviews(this.actor).filter(
+      review => !context.criticalInjuries.some(row => row.id === review.id)
+    );
     context.startedCharacterCombat = this.actor.participatingCombat?.started === true;
     context.mobileOffense = uses.find(s => s.id === "mobileOffense");
     context.contempt = uses.find(s => s.id === "contempt");
