@@ -1,4 +1,5 @@
 import { fallingDamagePlan } from "../rules/falling-damage.mjs";
+import { fallDistancePlan } from "../rules/fall-distance.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { sameValues } from "../rules/equal.mjs";
 import { recordReplacementPatch } from "../rules/record-patch.mjs";
@@ -11,6 +12,65 @@ import { loc } from "../i18n.mjs";
 
 const resultKey = message => encodeURIComponent(message.uuid).replaceAll(".", "%2E");
 const currentResult = (actor, message) => actor.flags?.spycraft2?.fallingResults?.[resultKey(message)];
+const eligibleFall = check =>
+  check &&
+  ((check.checkKind === "skill" && check.skillKey === "acrobatics" && check.checkId === "falling") ||
+    (check.checkKind === "fallEvent" &&
+      check.uncontrolledFall === true &&
+      check.resolved === true &&
+      check.successConfirmed === false &&
+      check.effectiveTotal === 0));
+
+/** Record an actual landing when no Acrobatics check was made or available. No check roll or action is invented. */
+export async function recordUncontrolledFall(actor, options = {}) {
+  if (!actor?.isOwner || !["agent", "npc"].includes(actor.type)) return null;
+  let input = options;
+  if (input.distanceFeet === undefined) {
+    input = await systemDialog.input({
+      window: { title: loc`Fall without an Acrobatics check` },
+      rejectClose: false,
+      ok: { label: loc`Record fall` },
+      content: `<div class="spycraft2-roll-options"><p>${loc`Record a landing when no Acrobatics/Falling check was made. The character takes the ordinary impact and becomes Sprawled; qualified distance and per-die benefits still apply.`}</p><label>${loc`Actual fall distance (feet)`} <input name="distanceFeet" type="number" min="0" step="any" required /></label><label>${loc`Landing surface`} <select name="surface"><option value="solid">${loc`Solid: lethal damage`}</option><option value="fluid">${loc`Fluid: subdual damage`}</option></select></label><label><input name="softSurface" type="checkbox" /> ${loc`The landing surface is soft or yielding`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this landing and that no Acrobatics check was made`}</label></div>`
+    });
+    if (!input) return null;
+    input.distanceFeet = String(input.distanceFeet ?? "").trim() ? Number(input.distanceFeet) : NaN;
+  }
+  if (input.confirmed !== true || !["solid", "fluid"].includes(input.surface))
+    throw Error(loc`Confirm the actual landing surface and absence of an Acrobatics check.`);
+  const proof = fallDistancePlan(actor.system, {
+    fallDeclared: true,
+    fallConfirmed: true,
+    fallDistanceFeet: input.distanceFeet,
+    fallSoftSurface: input.softSurface === true
+  });
+  fallingDamagePlan(proof, { result: 0, succeeded: false, surface: input.surface });
+  const id = foundry.utils.randomID();
+  let message;
+  try {
+    message = await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: `<div class="spycraft2 chat-note"><p>${esc(loc`Uncontrolled fall: ${input.distanceFeet} feet, ${input.surface === "solid" ? loc`solid landing` : loc`fluid landing`}. No Acrobatics check was made.`)}</p></div>`,
+      flags: {
+        spycraft2: {
+          actorUuid: actor.uuid,
+          checkKind: "fallEvent",
+          uncontrolledFall: true,
+          resolved: true,
+          successConfirmed: false,
+          rawTotal: 0,
+          effectiveTotal: 0,
+          actionDiceAllowed: false,
+          fallDistance: proof,
+          fallingEvent: { id }
+        }
+      }
+    });
+  } catch (error) {
+    message = postedReceipt(actor, "fallingEvent", id);
+    if (!message) throw error;
+  }
+  return { message, result: await resolveFallingDamage(actor, message, { surface: input.surface, confirmed: true }) };
+}
 async function save(actor, message, record) {
   try {
     await actor.update(
@@ -34,9 +94,7 @@ export async function resolveFallingDamage(actor, message, options = {}) {
     !actor?.isOwner ||
     check?.actorUuid !== actor.uuid ||
     check.superseded ||
-    check.checkKind !== "skill" ||
-    check.skillKey !== "acrobatics" ||
-    check.checkId !== "falling" ||
+    !eligibleFall(check) ||
     !check.fallDistance ||
     !message.uuid
   )
@@ -216,8 +274,7 @@ export function fallingDamageControls({ actor, message, check }) {
     !actor?.isOwner ||
     check.superseded ||
     !check.fallDistance ||
-    check.skillKey !== "acrobatics" ||
-    check.checkId !== "falling" ||
+    !eligibleFall(check) ||
     currentResult(actor, message)?.state === "complete"
   )
     return null;

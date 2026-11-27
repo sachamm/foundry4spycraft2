@@ -91,6 +91,9 @@
    "Interrupted": "Review an interrupted action",
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
+  "Hazards": {
+   "FallWithoutCheck": "Fall without a check"
+  },
   "Npc": {
    "HealthBonuses": "Health bonuses",
    "PinnedResults": "What these choices give",

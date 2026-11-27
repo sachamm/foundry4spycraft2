@@ -14,7 +14,7 @@ rollPipeline.register({
 });
 rollPipeline.register({
   id: "fallingDamageControl",
-  kinds: ["skill"],
+  kinds: ["skill", "fallEvent"],
   order: 9732,
   chatControls: fallingDamageControls
 });

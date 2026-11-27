@@ -9,7 +9,7 @@ import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
 import { settleGrapple } from "../../module/apps/combat-actions.mjs";
 import { reviewTriggeredAttacks } from "../../module/apps/final-attack.mjs";
 import { selectCakewalkSkills } from "../../module/apps/cakewalk.mjs";
-import { resolveFallingDamage } from "../../module/apps/falling-damage.mjs";
+import { resolveFallingDamage, recordUncontrolledFall } from "../../module/apps/falling-damage.mjs";
 import { rollEvidence } from "../../module/rules/outcomes.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
@@ -228,6 +228,27 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     content = prior;
   }
 });
+test("a fall without a check keeps distance, surface and confirmation reachable at 720px", async ({ page }) => {
+  const prior = content;
+  try {
+    await recordUncontrolledFall({ type: "agent", isOwner: true });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByLabel("Actual fall distance (feet)", { exact: true }).fill("50");
+    await page.getByRole("combobox", { name: "Landing surface" }).selectOption("fluid");
+    await page.locator('[name="softSurface"]').check();
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    await page.locator("#confirm").click();
+    await expect(page.locator("#confirm")).toBeFocused();
+  } finally {
+    content = prior;
+  }
+});
+
 for (const recovery of [false, true])
   test(`Falling ${recovery ? "recovery" : "landing"} dialog keeps its final controls reachable at 720px`, async ({
     page

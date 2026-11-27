@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { fallDistancePlan } from "../module/rules/fall-distance.mjs";
 import { fallingDamagePlan } from "../module/rules/falling-damage.mjs";
-import { resolveFallingDamage } from "../module/apps/falling-damage.mjs";
+import { resolveFallingDamage, recordUncontrolledFall } from "../module/apps/falling-damage.mjs";
 import { quickApplyInput } from "../module/apps/damage-application.mjs";
 
 const proof = (feet, extras = {}) =>
@@ -249,4 +249,52 @@ test("a private Falling result keeps its damage cards private and a changed divi
     /does not match/
   );
   assert.equal(other.calls.length, 0);
+});
+
+test("a fall without a check uses qualified reductions and ordinary landing effects without inventing a skill roll", async () => {
+  for (const lostResponse of [false, true]) {
+    const f = fixture();
+    f.actor.type = "agent";
+    f.actor.system = { activeFeatNames: ["Equilibrium Basics"], classLevels: { stuntman: 4 } };
+    if (lostResponse) {
+      const post = ChatMessage.create;
+      ChatMessage.create = async data => {
+        await post(data);
+        throw Error("response lost");
+      };
+    }
+    const { message, result } = await recordUncontrolledFall(f.actor, {
+      distanceFeet: 50,
+      surface: "solid",
+      confirmed: true
+    });
+    assert.equal(message.flags.spycraft2.checkKind, "fallEvent");
+    assert.equal(message.flags.spycraft2.successConfirmed, false);
+    assert.equal(result.plan.damageDistanceFeet, 30);
+    assert.equal(result.plan.impact, 7);
+    assert.equal(result.plan.stress, 6);
+    assert.equal(f.messages.length, 3);
+    assert.equal(f.calls.includes("confirm"), false);
+    assert.equal(f.calls.includes("finish"), false);
+    assert.equal(f.calls.filter(c => c === "roll").length, 1, "only impact dice roll");
+    await resolveFallingDamage(f.actor, message);
+    assert.equal(f.calls.filter(c => c === "roll").length, 1);
+  }
+});
+
+test("uncontrolled fluid falls post subdual without lethal stress, while invalid or unconfirmed events do nothing", async () => {
+  const f = fixture();
+  f.actor.type = "npc";
+  f.actor.system = { activeFeatNames: [] };
+  for (const input of [
+    { distanceFeet: 30, surface: "fluid" },
+    { distanceFeet: NaN, surface: "fluid", confirmed: true }
+  ])
+    await assert.rejects(recordUncontrolledFall(f.actor, input));
+  assert.deepEqual(f.calls, []);
+  const { result } = await recordUncontrolledFall(f.actor, { distanceFeet: 30, surface: "fluid", confirmed: true });
+  assert.equal(result.plan.kind, "subdual");
+  assert.equal(result.plan.stress, 0);
+  assert.equal(f.messages.length, 2);
+  assert.equal(f.actor.statuses.has("sprawled"), true);
 });

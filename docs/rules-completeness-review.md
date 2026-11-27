@@ -518,3 +518,14 @@ All **4,044** tests pass. Native Foundry posts the first borrowed Cold Read use,
 refuses a second, retains exactly one use and one receipt, and reports no page
 errors or transaction diagnostics. Scores remain **9.1/10** and **9.2/10** while
 the remaining inherited effects and source-data coverage are reviewed.
+
+The falling follow-up adds an agent/NPC hazard control for an actual landing
+without an Acrobatics check. It records an environmental event, retains qualified
+distance/per-die benefits, and uses the same durable impact/stress/Sprawled path.
+It neither rolls an invented skill check nor consumes a voluntary action. Lost
+posting responses recover the event and its cards. Solid and fluid cases have
+regressions, and the dialog's final controls remain reachable at 720px. Native
+Foundry verifies the real sheet button, a 30-foot solid landing, 3d6 impact, six
+stress and Sprawled, with no page errors or transaction diagnostics. All **4,046**
+tests and **228** layout checks pass. Multi-round descent and the pending Wire Fu
+interpretation remain in B-183; scores remain **9.1/10** and **9.2/10**.

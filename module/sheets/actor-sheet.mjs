@@ -114,6 +114,7 @@ import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { selectCakewalkSkills } from "../apps/cakewalk.mjs";
+import { recordUncontrolledFall } from "../apps/falling-damage.mjs";
 import { cakewalkSelectionState } from "../rules/cakewalk.mjs";
 import { campaignVitalityDie } from "../rules/campaign-creation.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
@@ -337,6 +338,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       // Buttons that hand the actor to a workflow.
       ...actorWorkflows({
         selectCakewalkSkills,
+        recordUncontrolledFall,
         checkReflexDamage,
         takeMobileOffense,
         takeContempt,
@@ -1796,6 +1798,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       // Buttons that hand the actor to a workflow.
       ...actorWorkflows({
         npcDamageSave: npcDamageSaveWithUndo,
+        recordUncontrolledFall,
         manageDisposition,
         npcPackages: manageNpcPackages,
         restAndRecover,
