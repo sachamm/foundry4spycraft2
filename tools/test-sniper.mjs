@@ -142,7 +142,14 @@ globalThis.foundry = {
   utils: { escapeHTML: s => String(s), deepClone: structuredClone },
   applications: { api: { DialogV2: { input: async () => ({ chosen }) } } }
 };
-globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  create: async data => {
+    if (failPost) throw Error("post failed");
+    posts.push(data);
+    return data;
+  }
+};
 globalThis.ui = {
   notifications: {
     warn: s => {
@@ -167,10 +174,9 @@ globalThis.Roll = class {
   async evaluate() {
     return this;
   }
-  async toMessage(data) {
-    if (failPost) throw Error("post failed");
-    posts.push(data);
-    return data;
+  async toMessage(data, options = {}) {
+    const prepared = { ...data, rolls: [this] };
+    return options.create === false ? prepared : ChatMessage.create(prepared);
   }
 };
 const { SpycraftActor } = await import("../module/documents/actor.mjs");

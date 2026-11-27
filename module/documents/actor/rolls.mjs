@@ -308,7 +308,8 @@ export const ActorRolls = Base =>
         await endCombatStance(this, this.system.combatStance?.id);
       let roll = await new Roll(twenty ? rollFormula.replace(/^1d20\b/, "20") : rollFormula, data).evaluate();
       let alternatives = null,
-        chosenIndex = 0;
+        chosenIndex = 0,
+        alternativeRolls = [];
       if (chooseTwice) {
         const second = await new Roll(rollFormula, data).evaluate(),
           rolls = [roll, second];
@@ -320,6 +321,7 @@ export const ActorRolls = Base =>
         });
         chosenIndex = Number(selection?.chosen) === 1 ? 1 : 0;
         roll = rolls[chosenIndex];
+        alternativeRolls = rolls.filter(r => r !== roll);
       }
       for (const payment of [options.preRollFunding, options.rerollFunding])
         if (
@@ -469,12 +471,23 @@ export const ActorRolls = Base =>
           return await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
             content: String(roll.total),
-            rolls: [roll],
+            rolls: [roll, ...alternativeRolls],
             blind: check.drivingStance.visibility.blind,
             whisper: check.drivingStance.visibility.whisper,
             flavor: checkFlavor(check),
             flags: { spycraft2: check }
           });
+        if (alternativeRolls.length) {
+          const prepared = await roll.toMessage(
+            {
+              speaker: ChatMessage.getSpeaker({ actor: this }),
+              flavor: checkFlavor(check),
+              flags: { spycraft2: check }
+            },
+            { ...messageModeOption(rollMode), create: false }
+          );
+          return await ChatMessage.create({ ...prepared, rolls: [roll, ...alternativeRolls] });
+        }
         return await roll.toMessage(
           { speaker: ChatMessage.getSpeaker({ actor: this }), flavor: checkFlavor(check), flags: { spycraft2: check } },
           messageModeOption(rollMode)

@@ -132,7 +132,14 @@ globalThis.foundry = {
     }
   }
 };
-globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  create: async data => {
+    if (failPost) throw Error("post failed");
+    messages.push(data);
+    return data;
+  }
+};
 globalThis.Roll = class {
   constructor(formula, data) {
     const natural = formula.includes("1d20") ? dice.shift() : 10;
@@ -142,10 +149,9 @@ globalThis.Roll = class {
   async evaluate() {
     return this;
   }
-  async toMessage(data) {
-    if (failPost) throw Error("post failed");
-    messages.push(data);
-    return data;
+  async toMessage(data, options = {}) {
+    const prepared = { ...data, rolls: [this] };
+    return options.create === false ? prepared : ChatMessage.create(prepared);
   }
 };
 const { SpycraftActor } = await import("../module/documents/actor.mjs");

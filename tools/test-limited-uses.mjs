@@ -200,7 +200,10 @@ globalThis.Actor = class {
 };
 globalThis.game = { settings: { get: () => ({ scene: "a" }) }, i18n: { localize: s => s, format: s => s } };
 globalThis.CONFIG = { SPYCRAFT: cfg };
-globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  create: async data => ({ uuid: `ChatMessage.${++posts}`, data, options: {} })
+};
 globalThis.ui = { notifications: { warn: () => null } };
 globalThis.foundry = {
   utils: { escapeHTML: s => s },
@@ -217,6 +220,7 @@ globalThis.Roll = class {
     return this;
   }
   async toMessage(data, options) {
+    if (options?.create === false) return { ...data, rolls: [this] };
     posts++;
     return { uuid: `ChatMessage.${posts}`, data, options };
   }
@@ -282,6 +286,9 @@ test("Bright Idea preserves both alternatives and the chosen natural die; Practi
   assert.equal(result.data.flags.spycraft2.rolledTotal, 8);
   assert.equal(result.data.flags.spycraft2.rawTotal, 15);
   assert.equal(result.data.flags.spycraft2.alternatives.length, 2);
+  assert.equal(result.data.rolls.length, 2);
+  assert.equal(result.data.rolls[0].dice[0].total, 3, "the preferred raw roll stays primary");
+  assert.equal(result.data.rolls[1].dice[0].total, 19, "the unchosen actual dice remain attached");
   outcomes = [1];
   const error = await actor.rollCheck("1d20 + @total", { total: 5 }, { practiceMakesPerfect: true, error: 1 });
   assert.equal(error.data.flags.spycraft2.rawTotal, 6);

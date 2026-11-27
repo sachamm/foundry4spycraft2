@@ -547,3 +547,14 @@ requests and recovery after a failed write. The final native pass has no page
 errors or transaction diagnostics. All **4,051** tests, native schemas, lint,
 formatting, bundling and the text-copy check pass. Scores remain **9.1/10** and
 **9.2/10** while the larger remaining areas are addressed.
+
+The chat-evidence review fixes half of B-192: every choose-twice check now posts
+both actual Roll objects in one message creation. The preferred result stays
+first, preserving consumers that resolve from the primary roll; the existing
+alternative totals and chosen index retain original order. Native message
+preparation applies visibility before both rolls are attached. A native blind
+check confirms two complete rolls, the second selection as primary, and retained
+GC-only visibility. Existing test doubles now model native preparation without
+posting, so resource rollback and lost-response tests still exercise the actual
+posting boundary. All **4,051** tests, focused lint, formatting and bundling pass.
+Delivery-roll attachment and write-failure replay remain the next B-192 work.

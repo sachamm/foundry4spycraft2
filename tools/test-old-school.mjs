@@ -100,7 +100,23 @@ globalThis.foundry = {
   applications: { api: { DialogV2: { input: async () => null } } }
 };
 globalThis.ui = { notifications: { warn: message => ({ native: true, message }) } };
-globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.ChatMessage = { getSpeaker: () => ({}), create: postRoll };
+async function postRoll(data) {
+  await hook?.("post", data.rolls[0], data);
+  if (failPost === "before") throw Error("post failed");
+  const m = {
+    ...data,
+    id: "r" + ++serial,
+    uuid: "ChatMessage.r" + serial,
+    async update(p) {
+      apply(this, p);
+      return this;
+    }
+  };
+  posts.push(m);
+  if (failPost === "committed") throw Error("post committed then rejected");
+  return m;
+}
 globalThis.fromUuid = async uuid => posts.find(m => m.uuid === uuid) ?? actors.find(a => a.uuid === uuid) ?? null;
 globalThis.Roll = class {
   constructor(formula, data = {}) {
@@ -135,22 +151,9 @@ globalThis.Roll = class {
     Object.assign(r, data);
     return r;
   }
-  async toMessage(data) {
-    await hook?.("post", this, data);
-    if (failPost === "before") throw Error("post failed");
-    const m = {
-      ...data,
-      id: "r" + ++serial,
-      uuid: "ChatMessage.r" + serial,
-      rolls: [this],
-      async update(p) {
-        apply(this, p);
-        return this;
-      }
-    };
-    posts.push(m);
-    if (failPost === "committed") throw Error("post committed then rejected");
-    return m;
+  async toMessage(data, options = {}) {
+    const prepared = { ...data, rolls: [this] };
+    return options.create === false ? prepared : ChatMessage.create(prepared);
   }
 };
 const { SpycraftActor } = await import("../module/documents/actor.mjs");

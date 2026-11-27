@@ -185,7 +185,7 @@ class Message {
     Object.assign(this, copy(data));
     this.id = "m" + ++serial;
     this.uuid = "ChatMessage." + this.id;
-    this.blind = options.rollMode === "blindroll";
+    this.blind = data.blind ?? options.rollMode === "blindroll";
     this.deleted = false;
   }
   async update(patch) {
@@ -250,7 +250,15 @@ globalThis.foundry = {
   },
   applications: { api: { DialogV2: { input: async options => (dialog ? dialog(options) : null) } } }
 };
-globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  create: async data => {
+    if (data.flags && failOriginalPost) throw Error("original post failed");
+    const m = new Message(data);
+    messages.push(m);
+    return m;
+  }
+};
 globalThis.ui = {
   notifications: {
     warn: s => {
@@ -274,6 +282,7 @@ globalThis.Roll = class {
     return this;
   }
   async toMessage(data, options) {
+    if (options?.create === false) return { ...data, rolls: [this], blind: options.rollMode === "blindroll" };
     if (data.flags && failOriginalPost) throw Error("original post failed");
     if (!data.flags && failSupplement) throw Error("supplement failed");
     const m = new Message(data, options);
