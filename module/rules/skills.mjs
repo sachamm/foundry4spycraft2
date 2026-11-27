@@ -583,7 +583,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       medical.errorIncrease +
       terms.sum("errorIncrease") +
       Math.max(0, Math.trunc(Number(vehicleErrorIncrease) || 0)) +
-      ((skill.ranks === 0 && !hailMaryUntrained) || missingFocus ? 2 : 0)
+      // A check without the needed focus is made untrained (p.98), so the 1-die Hail Mary lifts its +2 as well.
+      ((skill.ranks === 0 || missingFocus) && !hailMaryUntrained ? 2 : 0)
   );
   const zeroReduction =
     classEffects.errorReductionZero +
@@ -703,7 +704,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   if (crossCheckActive && !crossCheckAvailable) blockedReasons.push(loc`This check does not have the Cross-Check tag.`);
   if (hailMaryActive && !originallySecret && !check.mode.includes("Passive"))
     blockedReasons.push(loc`This Hail Mary option applies only to passive or secret checks.`);
-  if (hailMaryUntrained && skill.ranks > 0)
+  if (hailMaryUntrained && skill.ranks > 0 && !missingFocus)
     blockedReasons.push(loc`This Hail Mary option applies only to untrained checks.`);
   if (synergy.reason) blockedReasons.push(synergy.reason);
   if (cap !== null && cap < 5)
