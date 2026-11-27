@@ -92,6 +92,7 @@ import {
 import { skillFeatRules, limitedUseAbilities } from "./limited-uses.mjs";
 import { inheritedClassFeatures } from "./inherited-classes.mjs";
 import { classFeatSources, featAcquisition, historicalFeatEligibility } from "./feat-acquisition.mjs";
+import { isCareerZeroCreation, featAcquisitionLevel } from "./career-zero.mjs";
 /**
  * Spycraft 2.0 character engine: derives an agent's modifiers and final totals from its build choices.
  *
@@ -306,7 +307,7 @@ function startPass(state) {
     }
     if (
       (!feat.system.granted || feat.system.featKind === "temporary") &&
-      (feat.system.acquiredAtLevel || 1) > (sys.progression?.length ?? 0)
+      featAcquisitionLevel(feat.system) > (sys.progression?.length ?? 0)
     ) {
       warnings.push(loc`${feat.name}: has not been acquired at this career level.`);
       continue;
@@ -452,7 +453,10 @@ function deriveCareerLevels(state) {
   }
   if (
     !level &&
-    !(sys.companionOf?.feat === PERSONAL_LIEUTENANT && lieutenantAdvancement(sys, sys.lieutenantOwner).level === 0)
+    !(
+      isCareerZeroCreation(sys) &&
+      (sys.originOnlyCreation || lieutenantAdvancement(sys, sys.lieutenantOwner).level === 0)
+    )
   )
     todo.push({
       order: 3,
@@ -563,7 +567,7 @@ function collectBonusSources(state) {
         origin: true,
         bonuses: [...(i.system.bonuses ?? []), ...selected.bonuses],
         rank: 1,
-        acquiredAtLevel: 1
+        acquiredAtLevel: 0
       });
     } else if (i.type === "feat" && activeFeatIds.has(i.id)) {
       const selected = resolveFeatChoices(i, sys, items, cfg, activeFeatIds);
@@ -571,7 +575,9 @@ function collectBonusSources(state) {
       if (selected.pending.length)
         todo.push({ order: 42, tab: "feats", text: `${i.name}: ${selected.pending.join("; ")}.` });
       featChoiceBonuses.set(i.id, selected.bonuses);
-      linkedSkillPairs.push(...selected.linkedSkills.map(skills => ({ skills, level: i.system.acquiredAtLevel || 1 })));
+      linkedSkillPairs.push(
+        ...selected.linkedSkills.map(skills => ({ skills, level: featAcquisitionLevel(i.system) }))
+      );
       sources.push({
         name: i.name,
         bonuses: [
@@ -585,7 +591,7 @@ function collectBonusSources(state) {
               : [])
         ],
         rank: 1,
-        acquiredAtLevel: i.system.acquiredAtLevel || 1,
+        acquiredAtLevel: featAcquisitionLevel(i.system),
         candidate: ruleName(i) === "Candidate",
         fieldOfExpertise: i.system.choice === "Field of Expertise"
       });
@@ -1075,7 +1081,7 @@ function deriveAttributes(state) {
       skill: cfg.skills[item.system.choice]
         ? item.system.choice
         : Object.values(cfg.skills).find(skill => norm(skill.name) === norm(item.system.choice))?.key,
-      career: item.system.acquiredAtLevel || 1
+      career: featAcquisitionLevel(item.system)
     }))
     .filter(item => item.skill);
   const phdLocks = classItems
@@ -1236,7 +1242,7 @@ function deriveSkillRanks(state) {
         i.type === "feat" &&
         ruleName(i) === "Training" &&
         activeFeatIds.has(i.id) &&
-        (i.system.acquiredAtLevel || 1) === idx + 1
+        Math.max(1, featAcquisitionLevel(i.system)) === idx + 1
     )) {
       let used = 0;
       for (const [key, raw] of Object.entries(feat.system.trainingSkills ?? {})) {
@@ -1302,6 +1308,11 @@ function deriveSkillRanks(state) {
     });
   });
   for (const k of Object.keys(skillRanks)) skillRanks[k] = Math.floor(skillRanks[k]);
+  sys.bankedTrainingPoints =
+    !progression.length && isCareerZeroCreation(sys)
+      ? 5 *
+        items.filter(item => item.type === "feat" && ruleName(item) === "Training" && activeFeatIds.has(item.id)).length
+      : 0;
   Object.assign(state, {
     skillDefs,
     talentClassSkill,
@@ -2726,7 +2737,7 @@ function settlePrerequisites(state) {
         { featTree: f.system.tree, featChoices: usable }
       ),
       prerequisiteLevel: acquisition.effectiveLevel,
-      acquisitionLevel: f.system.acquiredAtLevel || 1,
+      acquisitionLevel: featAcquisitionLevel(f.system),
       manualConfirmed: f.system.manualPrerequisitesConfirmed
     };
     let res = !legalFeatIds.has(f.id)
@@ -2842,9 +2853,7 @@ function settlePrerequisites(state) {
   sys.rollDataExtras = rd;
   sys.warnings = warnings;
   // Before the first class level only the opening steps are worth listing.
-  sys.todo = (level || sys.companionOf?.feat === PERSONAL_LIEUTENANT ? todo : todo.filter(t => t.always)).sort(
-    (a, b) => a.order - b.order
-  );
+  sys.todo = (level || isCareerZeroCreation(sys) ? todo : todo.filter(t => t.always)).sort((a, b) => a.order - b.order);
   return sys;
 }
 

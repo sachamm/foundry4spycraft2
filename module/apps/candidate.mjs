@@ -1,4 +1,5 @@
 import { ruleName } from "../rules/rule-name.mjs";
+import { featAcquisitionLevel } from "../rules/career-zero.mjs";
 import { CANDIDATE_KEYS, CANDIDATE_CHOICES, reviewedCandidateBasis } from "../rules/candidate.mjs";
 import { loc } from "../i18n.mjs";
 /** An explicit correction of missing/imported acquisition history, never a later free re-choice. */
@@ -11,7 +12,7 @@ export async function reviewCandidate(item, options = {}) {
     item.parent?.type !== "agent"
   )
     throw new Error(loc`Only an owning GC can correct Candidate attribute history.`);
-  if ((item.system.acquiredAtLevel || 1) !== 1)
+  if (featAcquisitionLevel(item.system) !== 1)
     throw new Error(loc`Candidate must have been acquired at the first career level.`);
   const before = JSON.stringify([
       item.name,

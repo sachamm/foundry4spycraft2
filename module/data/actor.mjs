@@ -462,6 +462,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     return {
       abilities: new SchemaField(abilities),
       pointBuyBudget: int(36, { min: 0 }),
+      originOnlyCreation: new BooleanField(),
       /** Optional milestones cover campaign cadences too. Existing l4/l8/etc. choices retain their exact keys. */
       abilityIncreases: new SchemaField(Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`l${i + 1}`, str()]))),
 

@@ -114,6 +114,7 @@ test("Personal Lieutenant review, slots and the cost of losing a companion", () 
     "an active Origin-granted feat bypasses its ordinary acquisition requirement"
   );
   assert.equal(companionSlots({ ...boss, level: 0 }, []).personalLieutenant, 0);
+  assert.equal(companionSlots({ ...boss, level: 0, originOnlyCreation: true }, []).personalLieutenant, 1);
   assert.deepEqual(companionLoss(boss), { reputation: 9, netWorth: 450000 });
 });
 
@@ -172,14 +173,17 @@ test("lieutenant advancement follows the original acquisition cadence and never 
     [6, 8, 4],
     [1, 1, 0],
     [1, 2, 0],
-    [1, 3, 1]
+    [1, 3, 1],
+    [0, 0, 0],
+    [0, 1, 0],
+    [0, 2, 1]
   ]) {
     assert.deepEqual(
       lieutenantAdvancement({ companionOf: { ownerLevelAtAcquisition: acquired } }, { level: current }),
       { level: expected, needsReview: false }
     );
   }
-  for (const acquired of [undefined, 0, -1, 4.5, 10])
+  for (const acquired of [undefined, -1, 4.5, 10])
     assert.deepEqual(lieutenantAdvancement({ companionOf: { ownerLevelAtAcquisition: acquired } }, { level: 9 }), {
       level: null,
       needsReview: true

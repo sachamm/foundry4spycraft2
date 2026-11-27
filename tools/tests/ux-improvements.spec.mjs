@@ -9,6 +9,7 @@ const feedback = data(read("module/sheets/save-feedback.mjs").replace('"../i18n.
 const attackUX = uiModuleUrl("module/apps/attack-dialog-ux.mjs");
 const browserSource = data(
   read("module/apps/browser.mjs")
+    .replace('"../rules/career-zero.mjs"', JSON.stringify(uiModuleUrl("module/rules/career-zero.mjs")))
     .replace('import { enrich } from "../sheets/enrich.mjs";', 'const enrich = async html => html ?? "";')
     .replace(
       'import { refuse } from "../error-notices.mjs";',

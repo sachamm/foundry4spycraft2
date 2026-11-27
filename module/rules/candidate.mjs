@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { featAcquisitionLevel } from "./career-zero.mjs";
 export const CANDIDATE_KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 export const CANDIDATE_CHOICES = Object.fromEntries(
   CANDIDATE_KEYS.flatMap((key, i) =>
@@ -17,7 +18,7 @@ export function candidatePlan(system, feat) {
   if (!Object.hasOwn(CANDIDATE_CHOICES, choice))
     throw new Error(loc`Candidate: choose two different attributes, resolving any lowest-score tie.`);
   if (
-    (feat.system.acquiredAtLevel || 1) !== 1 ||
+    featAcquisitionLevel(feat.system) !== 1 ||
     basis?.level !== 1 ||
     !validScores(basis.scores) ||
     basis.choice !== choice ||

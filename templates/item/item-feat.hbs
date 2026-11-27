@@ -9,6 +9,7 @@
     {{#if isGM}}{{#if historicalReview}}<label><input type="checkbox" name="system.historicalPrerequisitesConfirmed" {{checked system.historicalPrerequisitesConfirmed}} /> {{localize "SPYCRAFT.Template.ItemItemFeat.GCConfirmedPrerequisiteEligibilityAtThe"}}</label>{{/if}}{{/if}}
     <label>{{localize "SPYCRAFT.Template.ItemItemFeat.BonusFeatSource"}} <select name="system.acquisitionSource">{{selectOptions acquisitionSources selected=system.acquisitionSource}}</select></label>
     <label>{{localize "SPYCRAFT.Template.ItemItemFeat.CareerLevelAcquired"}} <input type="number" name="system.acquiredAtLevel" value="{{system.acquiredAtLevel}}" min="0" max="20" /></label>
+    {{#if isGM}}<label><input type="checkbox" name="system.acquiredAtCareerZero" {{checked system.acquiredAtCareerZero}} /> {{localize "SPYCRAFT.CareerZero.FeatHistory"}}</label>{{/if}}
     <label>{{localize "SPYCRAFT.Template.ItemItemFeat.Restrictions"}} <input type="text" name="system.restrictions" value="{{system.restrictions}}" /></label>
     {{#if isGM}}{{#if system.prerequisitesNotChecked}}<label><input type="checkbox" name="system.manualPrerequisitesConfirmed" {{checked system.manualPrerequisitesConfirmed}} /> {{localize "SPYCRAFT.Template.ItemItemFeat.GCConfirmedThePrerequisitesRequiringManual"}}</label>{{/if}}{{/if}}
     <label><input type="checkbox" name="system.granted" {{checked system.granted}} /> {{localize "SPYCRAFT.Feat.Granted"}}{{#if system.grantSource}} ({{system.grantSource}}){{/if}}</label>

@@ -12,6 +12,7 @@
       {{/if}}{{/if}}
     </span>
   </h3>
+  {{#if isGM}}{{#unless system.level}}<label class="edit-only"><input type="checkbox" name="system.originOnlyCreation" {{checked system.originOnlyCreation}} /> {{localize "SPYCRAFT.CareerZero.OriginOnly"}}</label>{{/unless}}{{/if}}
   {{#if editable}}{{#if system.campaignEffects.modularCreation}}
     <p class="edit-only"><button type="button" data-action="configureModularCreation">
       {{localize "SPYCRAFT.CampaignGear.ModularTrade"}}

@@ -1,4 +1,5 @@
 import { refuse } from "../error-notices.mjs";
+import { isCareerZeroCreation } from "../rules/career-zero.mjs";
 import { enrich } from "../sheets/enrich.mjs";
 import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
@@ -462,7 +463,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       const data = doc.toObject();
       delete data._id;
       if (doc.type === "feat") {
-        data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);
+        data.system.acquiredAtCareerZero = isCareerZeroCreation(this.actor.system);
+        data.system.acquiredAtLevel = data.system.acquiredAtCareerZero ? 0 : Math.max(1, this.actor.system.level ?? 1);
         data.system.acquisitionSource = this.filters.acquisitionSource;
       }
       await this.actor.createEmbeddedDocuments("Item", [data]);

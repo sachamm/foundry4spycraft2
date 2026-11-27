@@ -129,6 +129,7 @@ export class FeatData extends BaseItemData {
       acquisitionCheck: record("acquisitionCheck", { nullable: true, initial: null }),
       historicalPrerequisitesConfirmed: new BooleanField(),
       acquiredAtLevel: int(0, { min: 0, max: 20 }),
+      acquiredAtCareerZero: new BooleanField(),
       /** Granted by an origin or class (does not use a feat slot). */
       granted: new BooleanField(),
       grantSource: str(),

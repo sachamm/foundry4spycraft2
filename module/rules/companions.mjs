@@ -83,7 +83,7 @@ export function animalPartnerReview(ownerSystem, npc) {
 export function lieutenantAdvancement(system, ownerSystem) {
   const acquired = system.companionOf?.ownerLevelAtAcquisition,
     current = ownerSystem?.level;
-  if (!Number.isSafeInteger(acquired) || acquired < 1 || !Number.isSafeInteger(current) || current < acquired)
+  if (!Number.isSafeInteger(acquired) || acquired < 0 || !Number.isSafeInteger(current) || current < acquired)
     return { level: null, needsReview: true };
   return { level: Math.floor(acquired / 2) + Math.floor((current - acquired) / 2), needsReview: false };
 }
@@ -127,7 +127,8 @@ export function companionSlots(ownerSystem, linked = []) {
   return {
     animalPartner: Math.max(0, count(ownerSystem, ANIMAL_PARTNER) - partners),
     personalLieutenant:
-      ownerSystem?.activeFeatNames?.includes(PERSONAL_LIEUTENANT) && (ownerSystem.level ?? 0) >= 1
+      ownerSystem?.activeFeatNames?.includes(PERSONAL_LIEUTENANT) &&
+      ((ownerSystem.level ?? 0) >= 1 || (ownerSystem.level === 0 && ownerSystem.originOnlyCreation === true))
         ? Math.max(0, 1 - lieutenants)
         : 0
   };

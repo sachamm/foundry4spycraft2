@@ -50,7 +50,7 @@ test("a stale GC history form cannot overwrite a changed companion link", async 
 test("invalid original levels and cancelled reviews leave the build and original history intact", async () => {
   const actor = lieutenant(),
     before = structuredClone(actor.system);
-  for (const acquired of ["0", "10", "2.5", "invalid"]) {
+  for (const acquired of ["-1", "10", "2.5", "invalid"]) {
     answer = () => ({ ownerUuid: owner.uuid, ownerLevelAtAcquisition: acquired, note: "Checked" });
     await assert.rejects(reviewLieutenantHistory(actor), /original Career Level/);
     assert.deepEqual(actor.system, before);

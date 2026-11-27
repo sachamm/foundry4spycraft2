@@ -175,6 +175,13 @@ export class SpycraftActor extends ActorRolls(
   /** Placed tokens still called by the old name (with or without a number) follow too, on the renaming client. */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
+    if (
+      this.type === "agent" &&
+      this.isOwner &&
+      userId === game.user?.id &&
+      (Object.hasOwn(changed.system ?? {}, "originOnlyCreation") || Object.hasOwn(changed, "system.originOnlyCreation"))
+    )
+      this.syncGrantedFeats().catch(error => console.error(error));
     const old = options?.spycraft2RenamedFrom;
     if (!old || this.isToken || this.type !== "npc" || userId !== game.user?.id || typeof changed.name !== "string")
       return;

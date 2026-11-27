@@ -2220,3 +2220,37 @@ removing later review fields. The loss-review final control ended at 619px in a
 All **4,417** Node tests, **988** engine checks and **269** layout cases pass,
 alongside schema, lint, formatting, bundle and copy checks. Continue Career Level
 0 owner/Origin-choice cases and the recorded combat gaps before awarding 9.9.
+
+## Pass 75: Explicit Career Level 0 creation and feat history
+
+Both areas remain **9.8/10**. A GC setting allows Origin-only creation at Career
+Level 0 while ordinary new characters retain first-class guidance. All actual
+Origin choices remain in readiness. An explicit feat-history flag distinguishes
+real level-0 acquisitions from legacy unknown levels. The browser, native item
+creation, prerequisite snapshots, source timing, grant synchronization and later
+advancement preserve that distinction. Candidate still requires acquisition at
+level 1, matching its explicit prerequisite on p.208.
+
+Training at level 0 retains five points without granting ranks above the table's
+zero cap. The Skills tab states that allowance; the first class level applies its
+recorded allocations once under the normal rank limits. Its feat text specifies
+the purchase benefit without requiring an immediate purchase. No class history
+or higher skill rank is invented for a classless character.
+
+Native Foundry verified a complete 36-point Brainy/Researcher level 0 character,
+including the actual GC creation checkbox, a chosen Training feat with recorded
+level-0 eligibility, Science focus, Interests, contact and Wealth allocation.
+It had no setup tasks, zero ranks and five retained Training points. Advancing
+to Soldier 1 applied the five saved points and preserved the original feat history;
+that later unallocated class build is not counted as another complete PC.
+A complete Brainy/Playboy level 0 owner also created a complete 32-point
+Brainy/Celebrity lieutenant 0. Both had no setup tasks. Owner level 1 retained
+lieutenant level 0; owner level 2 produced the level-1 advancement task. Reload
+preserved both characters' original acquisition records.
+
+All **4,419** Node tests, **988** engine checks and **269** layout cases pass,
+alongside schema, lint, formatting, bundle and copy checks. The golden comparison
+adds only the new retained-Training field: every prior property of all 64 sample
+agent/level cases is unchanged. The isolated catalog keyboard fixture now loads
+the actual new rules dependency and passes. Continue ongoing acid protection,
+secondary effects, Drained and remaining conditional creation-option auditing.

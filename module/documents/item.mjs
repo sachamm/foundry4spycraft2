@@ -1,4 +1,5 @@
 import { ruleName } from "../rules/rule-name.mjs";
+import { isCareerZeroCreation, featAcquisitionLevel } from "../rules/career-zero.mjs";
 import { captureCandidateBasis } from "../rules/candidate.mjs";
 import { CONTACT_FEATS } from "../rules/contact-feats.mjs";
 import {
@@ -53,19 +54,23 @@ export class SpycraftItem extends Item {
       this.parent?.type === "agent" &&
       (!this.system.granted || this.system.featKind === "temporary")
     ) {
-      const career = this.system.acquiredAtLevel || Math.max(1, this.parent.system.level);
-      const changes = { "system.acquiredAtLevel": career };
+      const zero = isCareerZeroCreation(this.parent.system) && this.system.featKind !== "temporary",
+        career =
+          this.system.acquiredAtCareerZero === true
+            ? featAcquisitionLevel(this.system)
+            : this.system.acquiredAtLevel || (zero ? 0 : Math.max(1, this.parent.system.level));
+      const changes = { "system.acquiredAtLevel": career, "system.acquiredAtCareerZero": career === 0 };
       if (ruleName(this) === "Candidate" && career === 1 && this.parent.system.level === 1)
         changes["system.candidateBasis"] = captureCandidateBasis(this.parent.system, this.system.choice);
       if (this.parent.system.level === career)
         changes["system.acquisitionCheck"] = captureFeatAcquisition(
           this.parent,
-          { ...this.system, acquiredAtLevel: career },
+          { ...this.system, acquiredAtLevel: career, acquiredAtCareerZero: career === 0 },
           this.id
         );
       else if (career < this.parent.system.level) {
         const prior = this.system.acquisitionCheck,
-          next = { ...this.system, acquiredAtLevel: career };
+          next = { ...this.system, acquiredAtLevel: career, acquiredAtCareerZero: career === 0 };
         if (
           !prior ||
           prior.level !== career ||
@@ -131,6 +136,7 @@ export class SpycraftItem extends Item {
     if (!moved && this.type === "feat" && this.parent?.type === "agent") {
       const keys = [
         "acquiredAtLevel",
+        "acquiredAtCareerZero",
         "acquisitionSource",
         "tree",
         "prerequisites",
@@ -166,7 +172,7 @@ export class SpycraftItem extends Item {
         }
         let snapshot = null;
         if (!next.granted || next.featKind === "temporary") {
-          const career = next.acquiredAtLevel || 1;
+          const career = featAcquisitionLevel(next);
           if (confirmedNow)
             snapshot = { ok: true, unmet: [], level: career, signature: featAcquisitionSignature(next), manual: true };
           else if (career === this.parent.system.level) snapshot = captureFeatAcquisition(this.parent, next, this.id);

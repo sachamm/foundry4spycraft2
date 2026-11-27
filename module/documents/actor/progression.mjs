@@ -5,6 +5,7 @@ import { rollCareerVitality, reviewCareerVitality } from "../../apps/vitality.mj
 import { deferredSkillDeadline } from "../../rules/deferred-skills.mjs";
 import { queueResources, isResourceLock } from "../../services/transactions.mjs";
 import { featAcquisition, captureFeatAcquisition } from "../../rules/feat-acquisition.mjs";
+import { isCareerZeroCreation, featAcquisitionLevel } from "../../rules/career-zero.mjs";
 import { checkPrerequisites, prerequisitesUseSkills } from "../../rules/prerequisites.mjs";
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
@@ -590,7 +591,7 @@ export const ActorProgression = Base =>
           item.type === "feat" &&
           !item.system.granted &&
           !item.system.acquisitionCheck &&
-          (item.system.acquiredAtLevel || 1) === progression.length
+          featAcquisitionLevel(item.system) === progression.length
       ))
         await feat.update({ "system.acquisitionCheck": captureFeatAcquisition(this, feat.system, feat.id) });
       return cls;
@@ -707,7 +708,8 @@ export const ActorProgression = Base =>
       };
       for (const item of this.items) {
         if (item.type === "origin")
-          for (const name of item.system.grants ?? []) add({ name, source: item.name, level: 1 });
+          for (const name of item.system.grants ?? [])
+            add({ name, source: item.name, level: isCareerZeroCreation(this.system) ? 0 : 1 });
         if (item.type !== "class") continue;
         const id = item.system.identifier || item.name;
         for (const grant of item.system.featGrants ?? []) {
@@ -755,7 +757,11 @@ export const ActorProgression = Base =>
         kept.add(existing.id);
         if (existing.system.granted) {
           const update = { _id: existing.id };
-          if (existing.system.acquiredAtLevel !== spec.level) update["system.acquiredAtLevel"] = spec.level;
+          const originGrant = [...this.items].some(item => item.type === "origin" && item.name === spec.source);
+          const career = originGrant && existing.system.acquiredAtCareerZero ? 0 : spec.level;
+          if (existing.system.acquiredAtLevel !== career) update["system.acquiredAtLevel"] = career;
+          if (existing.system.acquiredAtCareerZero !== (career === 0))
+            update["system.acquiredAtCareerZero"] = career === 0;
           if (existing.system.grantSource !== spec.source) update["system.grantSource"] = spec.source;
           if (Object.keys(update).length > 1) toUpdate.push(update);
         }
@@ -771,7 +777,12 @@ export const ActorProgression = Base =>
             data = doc.toObject();
             delete data._id;
           } else data = { name: spec.name, type: "feat", system: {} };
-          Object.assign(data.system, { granted: true, grantSource: spec.source, acquiredAtLevel: spec.level });
+          Object.assign(data.system, {
+            granted: true,
+            grantSource: spec.source,
+            acquiredAtLevel: spec.level,
+            acquiredAtCareerZero: spec.level === 0
+          });
           if (spec.choice) data.system.choice = spec.choice;
           toCreate.push(data);
         }

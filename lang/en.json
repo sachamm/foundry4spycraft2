@@ -103,6 +103,11 @@
    "Waiting": "Replacement available next mission",
    "Review": "Review companion loss"
   },
+  "CareerZero": {
+   "OriginOnly": "GC: finish Origin-only creation at Career Level 0",
+   "FeatHistory": "GC: this feat was acquired during Career Level 0 Origin creation",
+   "TrainingBank": "Training provides {count} skill points for the first class level. No ranks are granted while the level-0 rank limit is 0."
+  },
   "Lieutenant": {
    "CareerLevel": "Career Level",
    "Provisioning": "The owner supplies Wealth and all equipment. Record requests and personal gear against the owner's allowance.",

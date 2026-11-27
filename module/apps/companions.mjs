@@ -12,6 +12,7 @@ import { defaultNpcProfile } from "../rules/npcs.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { ruleName } from "../rules/rule-name.mjs";
+import { featAcquisitionLevel } from "../rules/career-zero.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { same } from "../rules/equal.mjs";
 import { esc } from "../html.mjs";
@@ -28,6 +29,20 @@ import { postUndo } from "./undo.mjs";
 const losses = owner => owner.flags?.spycraft2?.companionLosses ?? {};
 const mission = () => companionMission(game.settings?.get?.("spycraft2", "usagePeriods"));
 const lossPath = uuid => `flags.spycraft2.companionLosses.${companionLossKey(uuid)}`;
+const lieutenantAcquisition = owner => {
+  const source = [...(owner.items ?? [])].find(item => item.type === "feat" && ruleName(item) === PERSONAL_LIEUTENANT);
+  if (!source) return null;
+  if (
+    owner.system.level === 0 &&
+    owner.system.originOnlyCreation &&
+    source.system.granted &&
+    [...owner.items].some(item => item.type === "origin" && item.system.grants?.includes(PERSONAL_LIEUTENANT))
+  )
+    return 0;
+  return source.system.acquiredAtCareerZero === true || source.system.acquiredAtLevel > 0
+    ? featAcquisitionLevel(source.system)
+    : null;
+};
 
 /** The companions linked to this owner. */
 export function linkedCompanions(owner) {
@@ -63,8 +78,7 @@ export function linkedCompanions(owner) {
 export function companionsContext(owner) {
   const feats = owner.system.activeFeatNames ?? [];
   const linked = linkedCompanions(owner);
-  const acquired = [...(owner.items ?? [])].find(item => item.type === "feat" && ruleName(item) === PERSONAL_LIEUTENANT)
-      ?.system.acquiredAtLevel,
+  const acquired = lieutenantAcquisition(owner),
     advancement = lieutenantAdvancement({ companionOf: { ownerLevelAtAcquisition: acquired } }, owner.system);
   const creationNeedsReview = owner.flags?.spycraft2?.companionCreation?.state === "creating";
   const occupied = linked.filter(row => !row.replacementAvailable),
@@ -99,14 +113,13 @@ async function createCompanionLocked(owner, feat) {
     return refuse(loc`Each Animal Partner selection grants one animal; all are linked.`);
   if (feat === PERSONAL_LIEUTENANT && !slots.personalLieutenant)
     return refuse(
-      loc`Personal Lieutenant requires an active feat, an owner with a Career Level, and no lieutenant already linked.`
+      loc`Personal Lieutenant requires an active feat, an owner with a Career Level or confirmed level-0 creation, and an available companion slot.`
     );
   const ownership = { ...owner.ownership },
     companionOf = { ownerUuid: owner.uuid, feat };
   if (feat === PERSONAL_LIEUTENANT) {
-    const source = [...owner.items].find(item => item.type === "feat" && ruleName(item) === feat),
-      acquired = source?.system.acquiredAtLevel;
-    if (Number.isSafeInteger(acquired) && acquired >= 1 && acquired <= owner.system.level)
+    const acquired = lieutenantAcquisition(owner);
+    if (Number.isSafeInteger(acquired) && acquired >= 0 && acquired <= owner.system.level)
       companionOf.ownerLevelAtAcquisition = acquired;
   }
   const data =
@@ -274,7 +287,7 @@ export async function reviewLieutenantHistory(actor) {
     window: { title: loc`Review lieutenant advancement` },
     rejectClose: false,
     ok: { label: loc`Record review` },
-    content: `<p>${loc`Verify when the owner gained Personal Lieutenant. Keep the lieutenant's existing build and original dice; correct any level difference through normal advancement.`}</p><label>${loc`Owner UUID`} <input name="ownerUuid" value="${esc(original.ownerUuid)}" required /></label><label>${loc`Owner Career Level when the feat was gained`} <input type="number" name="ownerLevelAtAcquisition" min="1" max="20" step="1" value="${original.ownerLevelAtAcquisition ?? ""}" required /></label><label>${loc`Reason for this history correction`} <textarea name="note" maxlength="500" required></textarea></label>`
+    content: `<p>${loc`Verify when the owner gained Personal Lieutenant. Keep the lieutenant's existing build and original dice; correct any level difference through normal advancement.`}</p><label>${loc`Owner UUID`} <input name="ownerUuid" value="${esc(original.ownerUuid)}" required /></label><label>${loc`Owner Career Level when the feat was gained`} <input type="number" name="ownerLevelAtAcquisition" min="0" max="20" step="1" value="${original.ownerLevelAtAcquisition ?? ""}" required /></label><label>${loc`Reason for this history correction`} <textarea name="note" maxlength="500" required></textarea></label>`
   });
   if (!input) return null;
   const owner = fromUuidSync(String(input.ownerUuid).trim());
@@ -286,7 +299,7 @@ export async function reviewLieutenantHistory(actor) {
       note = String(input.note ?? "").trim();
     if (
       !Number.isSafeInteger(acquired) ||
-      acquired < 1 ||
+      acquired < 0 ||
       acquired > owner.system.level ||
       !note ||
       !owner.system.activeFeatNames?.includes(PERSONAL_LIEUTENANT)

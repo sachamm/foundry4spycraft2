@@ -5471,7 +5471,7 @@
    "PersonalLieutenantOnlyTheSingleStarting_0vp5tex": "Personal Lieutenant: only the single starting die may be spent. The GC must review any extra saved dice.",
    "PersonalLieutenantRecordedAdvancementCal_0lhnpee": "Personal Lieutenant: recorded advancement calls for Career Level {0}; the saved build is level {1}.",
    "PersonalLieutenantRequestEquipmentThroug_1f6on15": "Personal Lieutenant: request equipment through the owner's picks; the lieutenant has no mission gear allowance.",
-   "PersonalLieutenantRequiresAnActiveFeat_1swc9mm": "Personal Lieutenant requires an active feat, an owner with a Career Level, and no lieutenant already linked.",
+   "PersonalLieutenantRequiresAnActiveFeat_1ayl41p": "Personal Lieutenant requires an active feat, an owner with a Career Level or confirmed level-0 creation, and an available companion slot.",
    "PersonalLieutenantTheGCMustReview_097efla": "Personal Lieutenant: the GC must review this old delivery and supply equipment through the owner.",
    "PersonalLieutenantTheGCMustReview_1sdviwa": "Personal Lieutenant: the GC must review extra saved action dice; only the single starting die is allowed.",
    "PersonalLieutenantTheGCMustVerify_0x37d31": "Personal Lieutenant: the GC must verify the owner's Career Level when the feat was gained.",

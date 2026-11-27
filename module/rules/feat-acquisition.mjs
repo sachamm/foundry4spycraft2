@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { featAcquisitionLevel } from "./career-zero.mjs";
 import { campaignFeatReplacementAllowed } from "./campaign-creation.mjs";
 /** Explicit class bonus-feat sources, including Scientist Intense Study (p.42). */
 export function classFeatSources(items, progression) {
@@ -38,7 +39,7 @@ export function featAcquisition(feat, sources, items, { preview = false, campaig
   const key = feat.system.acquisitionSource;
   if (!key || feat.system.granted) return { ok: true, levelAllowance: 0 };
   const source = sources.find(s => s.id === key),
-    career = feat.system.acquiredAtLevel || 1;
+    career = featAcquisitionLevel(feat.system);
   if (!source) return { ok: false, levelAllowance: 0, reason: loc`The selected bonus-feat source is unavailable.` };
   const replaced = campaignFeatReplacementAllowed(source.tree, feat.system.tree, campaignEffects);
   if (source.tree !== "any" && source.tree !== feat.system.tree && !replaced)
@@ -89,7 +90,8 @@ export function featAcquisitionSignature(system) {
     canonical({
       prerequisites: system.prerequisites ?? null,
       tree: system.tree,
-      source: system.acquisitionSource ?? ""
+      source: system.acquisitionSource ?? "",
+      ...(system.acquiredAtCareerZero === true ? { acquiredAtCareerZero: true } : {})
     })
   );
 }
@@ -103,7 +105,10 @@ export function captureFeatAcquisition(actor, system, excludeFeatId = null) {
   });
   return {
     ...result,
-    level: system.acquiredAtLevel || actor.system.level,
+    level:
+      system.acquiredAtCareerZero === true
+        ? featAcquisitionLevel(system)
+        : system.acquiredAtLevel || actor.system.level,
     signature: featAcquisitionSignature(system)
   };
 }
@@ -115,7 +120,7 @@ export function pendingFeatAcquisition(
   return {
     ok: false,
     unmet: [reason],
-    level: system.acquiredAtLevel || 1,
+    level: featAcquisitionLevel(system),
     signature: featAcquisitionSignature(system),
     needsReview: true
   };
@@ -124,7 +129,7 @@ export function historicalFeatEligibility(system) {
   const snapshot = system.acquisitionCheck;
   if (!snapshot) return { ok: true, unknown: true };
   if (
-    snapshot.level !== (system.acquiredAtLevel || 1) ||
+    snapshot.level !== featAcquisitionLevel(system) ||
     !featAcquisitionSignaturesMatch(snapshot.signature, featAcquisitionSignature(system))
   )
     return {
