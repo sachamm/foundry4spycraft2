@@ -124,3 +124,7 @@
   padding: 8px 24px;
   background: var(--sc2-surface-sunk);
 }
+/* Builder fields meet the standard control height, like every other input on the sheets. */
+.spycraft2 .npc-builder :is(select, input[type="number"], input[type="text"]) {
+  min-height: var(--sc2-control, 36px);
+}

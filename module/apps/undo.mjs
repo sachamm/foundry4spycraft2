@@ -255,7 +255,8 @@ export function postUndo(
     cardMarks = null,
     addedInfractions = null,
     missionRow = null,
-    placedTokens = null
+    placedTokens = null,
+    combatSurprise = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -280,6 +281,7 @@ export function postUndo(
           addedInfractions,
           missionRow,
           placedTokens,
+          combatSurprise,
           done: false
         }
       }
@@ -430,6 +432,16 @@ async function undoRecord(message, record) {
         rows.splice(Math.min(Number(row.index) || 0, rows.length), 0, row.entry);
         return { [row.list]: rows };
       }).catch(error => ui.notifications.warn(loc`The mission row was not put back: ${error.message}`));
+  }
+  // A surprise round set from the console: the fight's mark goes back to what it was.
+  const surprise = record.combatSurprise;
+  if (surprise?.combat && game.user.isGM) {
+    const fight = game.combats?.get(surprise.combat);
+    if (!fight) ui.notifications.warn(loc`That fight has ended, so its surprise round was left as it is.`);
+    else
+      await fight
+        .update({ "flags.spycraft2.surprise": surprise.was ?? null })
+        .catch(error => ui.notifications.warn(loc`The surprise round was not put back: ${error.message}`));
   }
   // Tokens Add NPC placed come off their scene, and with them the combatants they joined as; other tokens stay.
   const placed = record.placedTokens;

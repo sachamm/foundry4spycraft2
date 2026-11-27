@@ -44,6 +44,47 @@
   </div>
   {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
   {{/if}}
+  {{!-- Figures next, in reading and Tab order alike: attributes, then the statistics. --}}
+  <div class="abilities-row">
+    {{#each abilities}}
+      <div class="ability"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}"
+        aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}><span class="ability-name">{{label}}</span><span
+        class="ability-abbr">{{abbr}}</span></button>
+        <b class="sc2-value play-only" {{sc2tip tip}}>{{signed mod}}</b><small class="play-only">{{value}}</small>
+        <input name="system.abilities.{{key}}.value" type="number" value="{{value}}" class="w-2 edit-only"
+          aria-label="{{localize 'SPYCRAFT.Action.ScoreOf' name=label}}" /> <span class="mod edit-only">{{signed mod}}</span></div>
+    {{/each}}
+  </div>
+  {{#unless system.npcProfile.enabled}}
+  <div class="stat-grid">
+    <div
+      class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><input
+      name="system.bab" type="number" value="{{system.bab}}"
+      class="w-2 edit-only"
+      aria-label="{{localize 'SPYCRAFT.BAB'}}" /><b
+      class="play-only">{{signed system.bab}}</b></div>
+    {{#each saves}}<div
+      class="stat"><button type="button"
+      class="sc2-action"
+      data-action="rollSave"
+      data-save="{{key}}">{{label}}</button><input
+      name="system.saves.{{key}}.base" type="number" value="{{base}}"
+      class="w-2 edit-only"
+      aria-label="{{localize 'SPYCRAFT.Action.BaseOf' name=label}}" /><b>{{signed total}}</b></div>{{/each}}
+    <div
+      class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><input
+      name="system.defense.bonus" type="number" value="{{system.defense.bonus}}"
+      class="w-2 edit-only"
+      aria-label="{{localize 'SPYCRAFT.Action.BonusTo' name=(localize 'SPYCRAFT.Defense')}}" /><b>{{system.defense.total}}</b></div>
+    <div
+      class="stat"><span>{{localize "SPYCRAFT.Initiative"}}</span><input
+      name="system.initiative.bonus" type="number" value="{{system.initiative.bonus}}"
+      class="w-2 edit-only"
+      aria-label="{{localize 'SPYCRAFT.Action.BonusTo' name=(localize 'SPYCRAFT.Initiative')}}" /><b>{{signed system.initiative.total}}</b></div>
+  </div>
+  {{else}}
+  {{> "systems/spycraft2/templates/actor/npc-graded-play.hbs"}}
+  {{/unless}}
   {{!-- Weapons first: attacking is what an NPC does most in play. --}}
   {{#if editable}}{{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Weapons" type="weapon" browse="SPYCRAFT.Template.ActorAgentGear.BrowseWeapons" add="SPYCRAFT.Template.ActorAgentGear.AddWeapon"}}
   {{else}}<h3>{{localize "SPYCRAFT.Weapons"}}</h3>{{/if}}
@@ -121,46 +162,6 @@
         class="w-2" /></label>{{/unless}}</p></div>{{/unless}}
     {{> "systems/spycraft2/templates/actor/parts/hazards.hbs"}}
   </div>
-  <div class="abilities-row">
-    {{#each abilities}}
-      <div class="ability"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}"
-        aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}><span class="ability-name">{{label}}</span><span
-        class="ability-abbr">{{abbr}}</span></button>
-        <b class="sc2-value play-only" {{sc2tip tip}}>{{signed mod}}</b><small class="play-only">{{value}}</small>
-        <input name="system.abilities.{{key}}.value" type="number" value="{{value}}" class="w-2 edit-only"
-          aria-label="{{localize 'SPYCRAFT.Action.ScoreOf' name=label}}" /> <span class="mod edit-only">{{signed mod}}</span></div>
-    {{/each}}
-  </div>
-  {{#unless system.npcProfile.enabled}}
-  <div class="stat-grid">
-    <div
-      class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><input
-      name="system.bab" type="number" value="{{system.bab}}"
-      class="w-2 edit-only"
-      aria-label="{{localize 'SPYCRAFT.BAB'}}" /><b
-      class="play-only">{{signed system.bab}}</b></div>
-    {{#each saves}}<div
-      class="stat"><button type="button"
-      class="sc2-action"
-      data-action="rollSave"
-      data-save="{{key}}">{{label}}</button><input
-      name="system.saves.{{key}}.base" type="number" value="{{base}}"
-      class="w-2 edit-only"
-      aria-label="{{localize 'SPYCRAFT.Action.BaseOf' name=label}}" /><b>{{signed total}}</b></div>{{/each}}
-    <div
-      class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><input
-      name="system.defense.bonus" type="number" value="{{system.defense.bonus}}"
-      class="w-2 edit-only"
-      aria-label="{{localize 'SPYCRAFT.Action.BonusTo' name=(localize 'SPYCRAFT.Defense')}}" /><b>{{system.defense.total}}</b></div>
-    <div
-      class="stat"><span>{{localize "SPYCRAFT.Initiative"}}</span><input
-      name="system.initiative.bonus" type="number" value="{{system.initiative.bonus}}"
-      class="w-2 edit-only"
-      aria-label="{{localize 'SPYCRAFT.Action.BonusTo' name=(localize 'SPYCRAFT.Initiative')}}" /><b>{{signed system.initiative.total}}</b></div>
-  </div>
-  {{else}}
-  {{> "systems/spycraft2/templates/actor/npc-graded-play.hbs"}}
-  {{/unless}}
   {{#if system.qualityEffects.notes.length}}<div class="npc-qualities-play">
     <h3>{{localize "SPYCRAFT.Template.ActorNpcSheet.QualitiesInPlay"}}</h3>
     <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>

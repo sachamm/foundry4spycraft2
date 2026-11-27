@@ -39,6 +39,7 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 import { markAntagonistsFaced } from "./mission.mjs";
+import { postUndo, withUndo } from "../undo.mjs";
 
 const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -129,6 +130,37 @@ export function fluidCombatClass(Base) {
       );
     }
   };
+}
+
+/**
+ * What recordFluidEvent would refuse for these values, worked out without writing anything, so the dialog can say it
+ * and stay open with the choices kept. "" when the event can be recorded.
+ */
+export function fluidEventRefusal(combatant, id, input = {}) {
+  if (!combatant) return loc`Choose a combatant.`;
+  if (!combatant.isOwner) return loc`You do not control that combatant.`;
+  const count = combatant.initiative;
+  if (!Number.isFinite(count)) return loc`${combatant.name} has not rolled Initiative yet: roll it first.`;
+  const state = fluidForRound(combatant, combatant.parent?.round);
+  try {
+    if (id === "delay")
+      delay(count, Number(input.times) || 1, { initiativeBonus: bonusOf(combatant), usedThisRound: state.delayed });
+    else if (id === "press") press(count, { pressedThisRound: state.pressed });
+    else if (id === "ready") readyTrigger(count, Number(input.triggerCount));
+    else {
+      const modifier = fluidModifier(id, {
+        times: Number(input.times) || 1,
+        amount: input.amount === undefined || input.amount === "" ? null : Number(input.amount),
+        weapon: input.weapon ?? "",
+        intBonus: Math.max(0, combatant.actor?.system?.abilities?.int?.mod ?? 0)
+      });
+      const added = addFluidModifier(state.modifiers, modifier);
+      if (!added.added) return added.reason;
+    }
+  } catch (error) {
+    return error.message;
+  }
+  return "";
 }
 
 /** Record one Table 5.2 event against a combatant for the current round; immediate ones change the Count now. */
@@ -282,14 +314,17 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
         values.id
       );
       if (timed && !(Number(values.times) >= 1)) return loc`Times it applies must be 1 or more.`;
-      return "";
+      return fluidEventRefusal(combat.combatants.get(values.combatantId), values.id, values);
     }
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
   try {
-    const result = await recordFluidEvent(combatant, input.id, input);
-    const label = FLUID_EVENTS.find(event => event.id === input.id).label;
+    // The Undo note puts the Count and the round's fluid record back, as long as nothing changed them since.
+    const label = FLUID_EVENTS.find(event => event.id === input.id)?.label ?? input.id;
+    const result = await withUndo([combatant.actor], loc`Fluid initiative: ${combatant.name}, ${label}`, () =>
+      recordFluidEvent(combatant, input.id, input)
+    );
     await say(
       `${esc(combatant.name)}: ${esc(label)} — ${result.pending === undefined ? `${loc`Initiative Count is now`} <b>${result.count}</b>.` : loc`${result.pending > 0 ? "+" : ""}${result.pending} pending at the end of the round.`}${result.note ? ` ${esc(result.note)}` : ""}`
     );
@@ -525,9 +560,12 @@ export async function surpriseRoundDialog(combat = game.combat) {
   } catch (error) {
     return refuse(error.message);
   }
+  const was = combat.flags?.spycraft2?.surprise ?? null;
   await combat.update({
     "flags.spycraft2.surprise": result.occurs ? { winners: result.winners, round: combat.round } : null
   });
+  // Undo sets the fight's surprise mark back to what it was before.
+  await postUndo(loc`Surprise round set`, [], { combatSurprise: { combat: combat.id, was } }).catch(() => null);
   await say(
     result.occurs
       ? `<b>${loc`Surprise round:`}</b> ${loc`${result.winners[0] === "players" ? "the player characters" : "the opponents"} act — 1 free, half or full action each, in Initiative order. Everyone else waits for round 1.`}`

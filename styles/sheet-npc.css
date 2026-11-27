@@ -143,23 +143,14 @@
 .spycraft2 .sc2-track i.on:is(.mark-broken, .mark-destroyed) {
   background: var(--sc2-danger);
 }
-/* Figures first: attributes and statistics sit directly under the name, ahead of the action lists. */
+/* Figures first: the template puts attributes and statistics directly under the name (after the builder in Edit),
+   so what is seen first is also what Tab reaches first. */
 .spycraft2.sheet.npc .spycraft2-sheet.npc {
   display: flex;
   flex-direction: column;
 }
 .spycraft2.sheet.npc .spycraft2-sheet.npc > * {
   flex: 0 0 auto;
-  order: 3;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .sheet-header {
-  order: 0;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .abilities-row {
-  order: 1;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > :is(.npc-graded-play, .stat-grid) {
-  order: 2;
 }
 .spycraft2.sheet.npc .npc-results .sc2-caption {
   letter-spacing: 0.02em;

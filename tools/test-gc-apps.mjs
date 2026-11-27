@@ -1605,3 +1605,18 @@ test("campaign qualities say whether the system applies them, and effect keys re
   assert.equal(qualityHandling({ effects: { goodAndEvil: true, attackModifier: 1 } }), "partly");
   assert.equal(effectLabel("gearCaliberShift"), "gear Caliber shift");
 });
+
+test("the fluid event dialog finds an event's refusal before closing", async () => {
+  const { fluidEventRefusal } = await import("../module/apps/gc/combat.mjs");
+  const fight = { round: 1 };
+  const unrolled = { name: "Guard", isOwner: true, initiative: null, parent: fight, flags: {} };
+  assert.match(fluidEventRefusal(unrolled, "press", {}), /not rolled Initiative/);
+  assert.match(fluidEventRefusal({ ...unrolled, isOwner: false }, "press", {}), /do not control/);
+  const pressed = {
+    ...unrolled,
+    initiative: 30,
+    flags: { spycraft2: { fluid: { round: 1, pressed: true, modifiers: [] } } }
+  };
+  assert.notEqual(fluidEventRefusal(pressed, "press", {}), "");
+  assert.equal(fluidEventRefusal({ ...pressed, flags: {} }, "press", {}), "");
+});
