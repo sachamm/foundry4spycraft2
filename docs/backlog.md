@@ -284,6 +284,8 @@ own line on the card, and checked against the page first.
 | B-193 | Data semantics: feat summaries, class features, weapon and armor numbers have no recorded source-to-data audit (gear and vehicles were cross-checked); reference fixtures include invalid rank allocations. | RW (audit-2026-11) | L |
 | B-256 | Weapons now carry the year printed in the weapon tables (pp.250–271) instead of our date. World copies and agents' weapons that the version 6 migration dated earlier keep the old year; correcting them needs a migration, and so a system version bump. | R1 (council-rules-2026-11-27) | S |
 | B-257 | Mission Caliber (p.398): before an agent allocates reserves, the sheet does not check mission picks against the mission's Caliber, because the engine reads it only from the reserves record. The Undo left by a Caliber increase puts the team's reserves back but not the mission record or the GC's dice. | R4 (council-rules-2026-11-27) | S |
+| B-258 | Historical (p.407): an item not yet introduced is checked at its gadget Caliber, but the sheet does not ask for it to be taken as a gadget Housing or effect with a G pick; dropping one onto a sheet from outside the browser shows no tag. | E1 (council-rules-2026-11-27) | M |
+| B-259 | Liquidation (p.440): a hit on the Start mission roll names the Marked for Death event (p.399) in chat but does not add it to the mission as a scripted event. Standing at exactly 0 after a negative spell counts as no longer burned. | R6 (council-rules-2026-11-27) | S |
 
 ## Code health (code council, 2026-11-23)
 
