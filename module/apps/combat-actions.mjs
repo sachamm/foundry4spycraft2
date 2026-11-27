@@ -359,13 +359,13 @@ const CONDITION_LABELS = () => ({
  * Let the winner of a grapple check take the benefits it earned, and change the conditions they bring on the
  * characters this user owns. `input.benefits` (a list of benefit ids) skips the dialog.
  */
-async function grappleBenefitsChosen(actor, input, outcome) {
+/** Ask the winner which grapple benefits it takes, unless the input already names them. */
+async function chooseGrappleBenefits(actor, input, outcome) {
   if (!outcome.benefits || outcome.winner === "tie") return [];
-  const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
-  const winner = outcome.winner === "actor" ? actor : opponent,
-    loser = outcome.winner === "actor" ? opponent : actor;
   let chosen = input.benefits;
   if (!Array.isArray(chosen)) {
+    const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null,
+      winner = outcome.winner === "actor" ? actor : opponent;
     const list = GRAPPLE_BENEFITS.map(benefit => {
       const [name, summary] = grappleBenefitText(benefit.id);
       return `<option value="${benefit.id}">${esc(name)} — ${esc(summary)}</option>`;
@@ -387,6 +387,15 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     if (!picked) return [];
     chosen = Array.from({ length: outcome.benefits }, (_, index) => picked[`benefit${index}`]).filter(Boolean);
   }
+  return chosen;
+}
+
+async function grappleBenefitsChosen(actor, input, outcome) {
+  if (!outcome.benefits || outcome.winner === "tie") return [];
+  const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+  const winner = outcome.winner === "actor" ? actor : opponent,
+    loser = outcome.winner === "actor" ? opponent : actor;
+  const chosen = Array.isArray(input.benefits) ? input.benefits : [];
   if (!chosen.length) return [];
   const labels = CONDITION_LABELS(),
     lines = [
@@ -596,6 +605,9 @@ export async function settleGrapple(actor, options = {}) {
   // Both wrestlers' conditions go on one Undo note when this user owns both. An opponent this user does not own is
   // changed through the GC, whose own Undo note covers it, so it is left out of this one.
   const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+  // The benefits are chosen before the Undo note's before-pictures are taken, so nothing that happens while the
+  // dialog is open is put back with the grapple.
+  input = { ...input, benefits: await chooseGrappleBenefits(actor, input, outcome) };
   return withUndo([actor, opponent?.isOwner ? opponent : null], loc`Grapple: ${actor.name}`, async () => {
     await post(actor, [
       loc`Grapple: ${input.total} against ${input.opponentTotal}.`,

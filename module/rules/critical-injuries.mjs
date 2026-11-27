@@ -87,14 +87,22 @@ export function criticalInjuryResult(plan, dieResult) {
     listed: !!row,
     injuryId: row?.[1] ?? null,
     name: row?.[2] ?? loc`Unlisted result — GC adjudication required`,
-    // Surgery is a Medicine check, so the campaign's Medicine and skill DC qualities move it (pp.406–407).
-    surgeryDC: Number.isFinite(row?.[3]) ? campaignMedicineDC(row[3]) : (row?.[3] ?? null),
+    // The table's own Surgery DC, kept stable so a saved record still validates when the campaign qualities change.
+    // surgeryDCNow() gives the DC in force today.
+    surgeryDC: row?.[3] ?? null,
     healingTime: row?.[4] ?? null,
     notes:
       row?.[5] ??
       loc`The printed table ends at 70. This total is preserved without assigning an invented or capped injury.`
   };
 }
+/**
+ * The Surgery DC for an injury result as the campaign stands now: Surgery is a Medicine check, so the Medicine and
+ * skill DC qualities move it (pp.406–407).
+ */
+export const surgeryDCNow = result =>
+  Number.isFinite(result?.surgeryDC) ? campaignMedicineDC(result.surgeryDC) : (result?.surgeryDC ?? null);
+
 export function validateCriticalInjuryRecord(record) {
   const plan = criticalInjuryRollPlan(
     { activeFeatNames: record?.die === 10 ? ["Guts"] : [] },

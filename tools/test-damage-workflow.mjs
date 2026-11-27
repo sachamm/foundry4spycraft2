@@ -1031,3 +1031,24 @@ test("round-3 council: a player's grapple Undo note leaves out an opponent the p
   const note = undoNotes.at(-1)?.flags.spycraft2.undo;
   assert.ok(!note || !note.entries.some(entry => entry.name === "Unowned"));
 });
+
+test("the grapple's Undo note does not take in changes made while the benefit dialog is open (Codex)", async () => {
+  reset();
+  undoNotes.length = 0;
+  const winner = character("Picker", { vitality: { value: 10, max: 10 } }),
+    loser = character("Picked", {});
+  const dialogs = foundry.applications.api.DialogV2,
+    input = dialogs.input;
+  dialogs.input = async () => {
+    winner.system.vitality.value = 5;
+    return null;
+  };
+  try {
+    await settleGrapple(winner, { opening: false, total: 22, opponentTotal: 12, opponentUuid: loser.uuid });
+  } finally {
+    dialogs.input = input;
+  }
+  assert.equal(winner.system.vitality.value, 5);
+  const note = undoNotes.at(-1)?.flags.spycraft2.undo;
+  assert.ok(!note || !JSON.stringify(note.entries).includes('"vitality"'), "the vitality loss is not on the note");
+});

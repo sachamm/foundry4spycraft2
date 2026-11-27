@@ -381,3 +381,15 @@ test("the leader's card prints the helpers' worked-out DC, with the campaign shi
   withQualities(["comedy-of-errors"], () => assert.match(cooperativeNotes(leader)[0], /DC 35/));
   withQualities(["cakewalk"], () => assert.match(cooperativeNotes(leader)[0], /DC 25/));
 });
+
+test("a saved injury keeps the table's Surgery DC, and the campaign shift is applied when it is shown (Codex)", async () => {
+  const { criticalInjuryResult, surgeryDCNow } = await import("../module/rules/critical-injuries.mjs");
+  const { campaignMedicineDC } = await import("../module/rules/campaign-rules.mjs");
+  const plan = { damage: 20, die: 20 },
+    plain = criticalInjuryResult(plan, 10);
+  withQualities(["gritty"], effects => {
+    const gritty = criticalInjuryResult(plan, 10);
+    assert.deepEqual(gritty, plain, "the stored result does not depend on the qualities in force");
+    assert.equal(surgeryDCNow(gritty), campaignMedicineDC(plain.surgeryDC, effects));
+  });
+});

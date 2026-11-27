@@ -284,6 +284,8 @@ export async function rollGearAcquisition(actor, options = {}) {
         pick: plan.pick ?? "",
         category: plan.category ?? "",
         caliber: plan.caliber ?? 0,
+        // Historical (p.407): the catalog item's own Caliber, when it is Requested as a gadget one Caliber higher.
+        ...(plan.historicalGadget ? { itemCaliber: plan.ownCaliber, historicalGadget: true } : {}),
         cost: plan.cost,
         baseCost: plan.baseCost ?? 0,
         surcharge: plan.surcharge ?? 0,
@@ -685,7 +687,7 @@ export async function claimGearAcquisition(actor, options = {}) {
       initial.kind === "common"
         ? d.system.common && d.system.caliber === 0
         : (equipmentCategory(d) === initial.category || (d.type === "gear" && d.system.kitGrade > 0)) &&
-          d.system.caliber === initial.caliber
+          d.system.caliber === (initial.itemCaliber ?? initial.caliber)
     );
     if (doc) {
       input.itemData = doc.toObject();
@@ -710,7 +712,7 @@ export async function claimGearAcquisition(actor, options = {}) {
           quantity: 1,
           weight: Number(spec.weight),
           description: `<p>${esc(spec.description)}</p>`,
-          caliber: initial.caliber,
+          caliber: initial.itemCaliber ?? initial.caliber,
           common: initial.kind === "common",
           gearCategory: initial.category
         }
@@ -752,7 +754,8 @@ export async function claimGearAcquisition(actor, options = {}) {
     }
     if (
       attempt.kind === "request" &&
-      (equipmentCategory(data) !== attempt.category || data.system?.caliber !== attempt.caliber)
+      (equipmentCategory(data) !== attempt.category ||
+        data.system?.caliber !== (attempt.itemCaliber ?? attempt.caliber))
     )
       throw new Error(loc`The claimed item must match the requested equipment category and Caliber.`);
     const bundle = Number(data.system.bundleSize ?? 1),

@@ -37,7 +37,7 @@ import { campaignStress, gladiatorsDefense } from "../rules/campaign-rules.mjs";
 import { resolvedTargetRole } from "../rules/npc-qualities.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
-import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
+import { criticalInjuryResult, criticalInjuryRollPlan, surgeryDCNow } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration, setCondition as condition, woundConditions } from "./wound-conditions.mjs";
@@ -533,7 +533,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     rolls.push(roll);
     lines.push(
       result.listed
-        ? loc`Critical injury (${result.total}): ${esc(result.name)}. Surgery DC ${result.surgeryDC}.`
+        ? loc`Critical injury (${result.total}): ${esc(result.name)}. Surgery DC ${surgeryDCNow(result)}.`
         : loc`Critical injury (${result.total}): ${esc(result.name)}.`
     );
   }
@@ -789,7 +789,7 @@ export async function applyDamage(message, options = {}) {
     rolls.push(roll);
     lines.push(
       injury.listed
-        ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${injury.surgeryDC}.`
+        ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${surgeryDCNow(injury)}.`
         : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
     );
   }

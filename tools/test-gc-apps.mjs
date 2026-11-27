@@ -1157,6 +1157,11 @@ test("an agent's Triumph since the mission began ticks the settlement's Triumph 
     assert.equal(missionSettlementDefaults().triumph, false, "one from before the mission does not count");
     game.messages.push({ timestamp: 2000, speaker: { actor: "a1" }, flags: { spycraft2: { triumphed: true } } });
     assert.equal(missionSettlementDefaults().triumph, true);
+    // An agent who is not on the mission's team does not count.
+    await state.updateMission({ team: ["a2"] });
+    assert.equal(missionSettlementDefaults().triumph, false, "a1 is not on this team");
+    await state.updateMission({ team: ["a1", "a2"] });
+    assert.equal(missionSettlementDefaults().triumph, true);
   } finally {
     delete game.messages;
     await state.setMission(saved);

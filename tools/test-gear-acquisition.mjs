@@ -2363,3 +2363,16 @@ test("reserves take the mission record's Caliber, and a GC increase raises them 
   sys.usagePeriods.mission = "next";
   assert.equal(reserveCaliberIncrease(sys, 4), null, "an earlier mission's reserves are left alone");
 });
+test("a Historical gadget Requested one Caliber higher is claimed as the catalog item at its own Caliber (p.407)", async () => {
+  const actor = new SpycraftActor();
+  await actor.allocateMissionReserves(initialize);
+  const msg = await actor.rollGearAcquisition(request);
+  const id = msg.flags.spycraft2.gearAttempt.id;
+  await actor.finishCheck(msg);
+  // As the Request records it under Historical: the gadget's Caliber, and the item's own.
+  const attempt = actor.system.missionReserves.attempts[id];
+  Object.assign(attempt, { caliber: attempt.caliber + 1, itemCaliber: attempt.caliber, historicalGadget: true });
+  const itemData = { name: request.name, type: "gear", system: { gearCategory: "R", caliber: attempt.itemCaliber } };
+  const item = await actor.claimGearAcquisition({ attemptId: id, itemData, delivered: true, gcConfirmed: true });
+  assert.equal(item.system.caliber, attempt.itemCaliber);
+});

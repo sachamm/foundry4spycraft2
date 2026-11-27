@@ -3,6 +3,7 @@ import {
   criticalInjuryResult,
   validateCriticalInjuryRecord,
   recoveredInjuryRollJSON,
+  surgeryDCNow,
   CRITICAL_INJURY_HEALING_NOTE
 } from "../rules/critical-injuries.mjs";
 import { queueResources } from "../services/transactions.mjs";
@@ -57,7 +58,7 @@ async function deliver(a, r) {
     roll = Roll.fromData(JSON.parse(r.rollJSON));
   const data = {
     speaker: ChatMessage.getSpeaker({ actor: a }),
-    flavor: `${loc`Table of Ouch — ${esc(result.name)}`}<br><small>${loc`${esc(r.source)}; damage suffered ${r.damage}; ${r.die === 10 ? loc`Guts: d10` : loc`standard d20`}. ${result.listed ? loc`Surgery DC ${result.surgeryDC}; healing ${esc(result.healingTime)}. ` : ""}${esc(result.notes)} ${esc(CRITICAL_INJURY_HEALING_NOTE)} Apply injury effects and any stress/healing rolls at the table.`}</small>`,
+    flavor: `${loc`Table of Ouch — ${esc(result.name)}`}<br><small>${loc`${esc(r.source)}; damage suffered ${r.damage}; ${r.die === 10 ? loc`Guts: d10` : loc`standard d20`}. ${result.listed ? loc`Surgery DC ${surgeryDCNow(result)}; healing ${esc(result.healingTime)}. ` : ""}${esc(result.notes)} ${esc(CRITICAL_INJURY_HEALING_NOTE)} Apply injury effects and any stress/healing rolls at the table.`}</small>`,
     flags: {
       spycraft2: { actorUuid: a.uuid, checkKind: "criticalInjury", actionDiceAllowed: false, criticalInjuryRoll: r }
     }
@@ -95,7 +96,7 @@ export function criticalInjuryRows(actor) {
         effect: result.notes,
         source: record.source,
         facts: result.listed
-          ? loc`Total ${result.total} · Surgery DC ${result.surgeryDC} · healing ${result.healingTime}`
+          ? loc`Total ${result.total} · Surgery DC ${surgeryDCNow(result)} · healing ${result.healingTime}`
           : loc`Total ${result.total}`,
         surgery: surgeries ? loc`Surgery has taken ${surgeries * 2} off the healing time.` : "",
         canSurgery: result.listed && care.healed !== true,

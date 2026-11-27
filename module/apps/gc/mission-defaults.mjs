@@ -13,14 +13,22 @@ export const missionCatalog = {
   }
 };
 
-/** Whether an agent's card shows a Triumph since this mission run began (p.331), for the settlement's default. */
+/** The mission's team, as teamActors() in state.mjs reads it: the listed agents, or else every player's agent. */
+function missionTeamIds(mission) {
+  const agents = [...(globalThis.game?.actors ?? [])].filter(actor => actor.type === "agent"),
+    listed = (mission.team ?? []).filter(id => agents.some(actor => actor.id === id));
+  return new Set(listed.length ? listed : agents.filter(actor => actor.hasPlayerOwner).map(actor => actor.id));
+}
+
+/** Whether a team agent's card shows a Triumph since this mission run began (p.331), for the settlement's default. */
 function missionTriumph(mission) {
   if (!Number.isFinite(mission?.startedAt)) return false;
+  const team = missionTeamIds(mission);
   return [...(globalThis.game?.messages ?? [])].some(message => {
     const check = message.flags?.spycraft2;
     if (!check?.triumphed || check.superseded || (message.timestamp ?? 0) < mission.startedAt) return false;
     const actor = globalThis.game?.actors?.get?.(message.speaker?.actor);
-    return actor?.type === "agent";
+    return actor?.type === "agent" && team.has(actor.id);
   });
 }
 
