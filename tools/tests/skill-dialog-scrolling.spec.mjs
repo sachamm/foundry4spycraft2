@@ -8,6 +8,7 @@ import { ActorProgression } from "../../module/documents/actor/progression.mjs";
 import { creationPolicyRecord } from "../../module/rules/creation-policy.mjs";
 import { settleGrapple } from "../../module/apps/combat-actions.mjs";
 import { reviewTriggeredAttacks } from "../../module/apps/final-attack.mjs";
+import { selectCakewalkSkills } from "../../module/apps/cakewalk.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -225,6 +226,37 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     content = prior;
   }
 });
+test("Cakewalk's actual Intel dialog keeps every skill and the confirmation reachable at 720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = {
+      user: { isGM: true },
+      settings: { get: (_id, key) => (key === "campaign" ? { qualities: ["cakewalk"] } : { mission: "qa" }) }
+    };
+    await selectCakewalkSkills({ type: "agent", isOwner: true, system: { abilities: { int: { mod: 2 } } } });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    for (const key of Object.keys(cfg.skills)) {
+      const field = page.locator(`[name="skill-${key}"]`);
+      await field.scrollIntoViewIfNeeded();
+      await expect(field).toBeVisible();
+    }
+    await page.locator('[name="intelPhaseConfirmed"]').check();
+    await page.locator('[name="review"]').check();
+    await page.getByLabel("GC review note", { exact: true }).fill("Original Intel choices checked");
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    await page.locator("#confirm").click();
+    await expect(page.locator("#confirm")).toBeFocused();
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
+
 test("Modular's actual creation trade keeps every tree, review note and confirmation reachable at 720px", async ({
   page
 }) => {

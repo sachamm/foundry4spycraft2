@@ -479,6 +479,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         fortes: new ArrayField(new StringField())
       }),
       startingIntelligenceModifier: new NumberField({ nullable: true, initial: null, integer: true }),
+      cakewalkSkills: record("cakewalkSkills", { nullable: true, initial: null }),
       skillFortes: new ArrayField(new SchemaField({ skill: str(), focus: str(), forte: str() })),
       crossroadsTitle: str(),
       relinquishedInterests: int(0, { min: 0 }),

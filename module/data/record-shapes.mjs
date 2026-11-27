@@ -17,6 +17,13 @@
  * or alters an update, because a shape learnt from examples can be incomplete.
  */
 export const RECORD_SHAPES = {
+  cakewalkSkills: {
+    version: "number",
+    epoch: "string",
+    intelligenceModifier: "number",
+    skills: ["string"],
+    note: "string"
+  },
   accumulatedDamage: {
     lastReview: {
       $also: "null",

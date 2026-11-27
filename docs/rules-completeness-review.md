@@ -440,3 +440,15 @@ and Damage save totals, including source removal and legacy corrections.
 All **4,026** Node tests and **224** layout tests pass. Native schemas, lint and
 the text-copy check also pass. Non-feat temporary health effects remain in B-185;
 the scores remain **9.0/10** and **9.1/10** pending further coverage.
+
+Cakewalk now has a mission-scoped Intel selection on the PC skill sheet. Actual
+skill checks apply its error reduction and normal taking-10 time, including when
+other campaign timing rules are present. The recorded Intel Intelligence allowance
+survives later attribute changes; a new mission expires the selection. Duplicate,
+excess, invalid, companion and NPC selections are rejected. A second selection
+requires an owning GC's correction note. The workflow serializes competing choices,
+rechecks mission/context changes and recognizes committed writes after lost
+responses. All **4,030** Node tests, native schemas and the added 720px dialog
+check pass. An actual native skill-sheet button/dialog records two skills and
+changes taking-10 time from 2× to 1×, with no page errors or transaction diagnostics.
+The review scores remain unchanged while the larger documented gaps are addressed.

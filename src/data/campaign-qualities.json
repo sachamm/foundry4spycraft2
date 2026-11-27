@@ -101,7 +101,8 @@
     "summary": "All skill DCs drop by 5 (minimum 10). In the Intel Phase each player character picks skills up to his Intelligence modifier; for the mission those get error range -2 (minimum 1) and taking 10 needs no doubled time.",
     "effects": {
       "skillDC": -5,
-      "skillDCMinimum": 10
+      "skillDCMinimum": 10,
+      "cakewalkIntel": true
     }
   },
   {

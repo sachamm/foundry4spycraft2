@@ -1,5 +1,6 @@
 import { checkFocus, isHideCheck } from "./check-identity.mjs";
 import { campaignSkillDCPolicy } from "./campaign-skill-dc.mjs";
+import { cakewalkSkillSelected } from "./cakewalk.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
 import "./stalking-stance.mjs";
@@ -556,7 +557,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const campaignErrorIncrease =
     (lowestAttribute ? (campaign.lowestAttributeSkillError ?? 0) : 0) +
     (key === "medicine" ? Math.max(0, campaign.medicineError ?? 0) : 0);
-  const campaignErrorReduction = key === "medicine" ? Math.max(0, -(campaign.medicineError ?? 0)) : 0;
+  const cakewalk = cakewalkSkillSelected(system, key);
+  const campaignErrorReduction =
+    (key === "medicine" ? Math.max(0, -(campaign.medicineError ?? 0)) : 0) + (cakewalk ? 2 : 0);
   const errorFloor = Math.max(
     skill.errorFloor ?? 0,
     ...conditional.filter(row => row.kind === "errorFloor").map(row => row.value)
@@ -718,6 +721,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       method,
       take10Base: campaign.take10Base ?? 2,
       take10Normal:
+        cakewalk ||
         tracking.take10Normal ||
         hasForte ||
         skill.take10TimeMultiplier === 1 ||
@@ -1213,7 +1217,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     blocked: blockedReasons.length > 0,
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
-      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int"
+      cakewalk || ((system.classLevels?.schemer ?? 0) >= 10 && selected === "int")
         ? 1
         : skill.take10TimeMultiplier === 1
           ? 1

@@ -113,6 +113,8 @@ import { checkIncomingDefense } from "../apps/incoming-defense.mjs";
 import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
+import { selectCakewalkSkills } from "../apps/cakewalk.mjs";
+import { cakewalkSelectionState } from "../rules/cakewalk.mjs";
 import { campaignVitalityDie } from "../rules/campaign-creation.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
@@ -334,6 +336,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ),
       // Buttons that hand the actor to a workflow.
       ...actorWorkflows({
+        selectCakewalkSkills,
         checkReflexDamage,
         takeMobileOffense,
         takeContempt,
@@ -779,6 +782,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const context = await super._prepareContext(options);
     const actor = this.actor;
     const sys = actor.system;
+    const cakewalk = cakewalkSelectionState(sys);
+    context.cakewalk = cakewalk.enabled
+      ? {
+          label: loc`Cakewalk mission skills`,
+          selected: cakewalk.selected.map(key => CONFIG.SPYCRAFT.skills[key]?.name ?? key).join(", ") || loc`None`,
+          warning: cakewalk.needsReview ? loc`The saved selection is invalid; the GC must review it.` : "",
+          action: cakewalk.recorded ? loc`Review mission skills` : loc`Choose mission skills`,
+          canChoose: this.isEditable && ((!cakewalk.recorded && !cakewalk.needsReview) || game.user.isGM)
+        }
+      : null;
     // The status getter is not cached: it reads a setting, scans the combats and maps every limited-use ability.
     // Read it once per render.
     const uses = actor.limitedUseStatus ?? [];
