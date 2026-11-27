@@ -308,3 +308,13 @@ test("Blockbuster: a player character's successful half-damage save resists all 
   });
   assert.equal(failed.total, 17, "only a successful save");
 });
+test("Tense forbids Evasion III's take 10 on a Reflex save too (p.408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  setCampaignRulesSource(() => ({ noTakeTen: true }));
+  try {
+    await assert.rejects(actor().rollSave("ref", { checkMethod: "take10", reflexReducesDamage: true }), /Tense/);
+  } finally {
+    setCampaignRulesSource(null);
+  }
+  assert.notEqual(await actor().rollSave("ref", { checkMethod: "take10", reflexReducesDamage: true }), false);
+});

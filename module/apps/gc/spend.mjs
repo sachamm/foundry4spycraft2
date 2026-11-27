@@ -15,7 +15,8 @@ import {
   getMission,
   updateMission,
   qualitiesInForce,
-  teamActors
+  teamActors,
+  missionEpoch
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
 import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
@@ -187,7 +188,8 @@ export async function spendGCDice(input = {}) {
         break;
       case "promote":
         // Undo puts the antagonist row back as it was, or takes it off when the promotion recorded it.
-        antagonistBefore = { entry: antagonistRowFor(actor) };
+        // The mission period is kept, so Undo puts the row back only within this run of the mission.
+        antagonistBefore = { entry: antagonistRowFor(actor), period: missionEpoch() };
         await actor.update({
           "system.promotion": { mission: String(actor.system.usagePeriods?.mission ?? "initial") }
         });

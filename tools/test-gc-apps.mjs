@@ -621,6 +621,19 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   assert.equal(promoteNote.antagonist.id, promotedRow().id, "the Undo note can put the antagonist row back");
   assert.equal(promotedRow().encountered, true, "a promoted NPC is in play, so it has been faced");
   assert.notEqual(promoteNote.antagonist.entry?.promoted, true);
+  assert.equal(promoteNote.antagonist.period, state.missionEpoch());
+  {
+    // Undone after a later run of the mission has begun: the row that run keeps is left alone.
+    const { applyUndo } = await import("../module/apps/undo.mjs");
+    const periods = game.settings.get("spycraft2", "usagePeriods"),
+      rowsBefore = structuredClone(state.getMission().antagonists);
+    await game.settings.set("spycraft2", "usagePeriods", { ...periods, mission: "a-later-run" });
+    const stale = structuredClone({ ...promoteNote, entries: [], gcDice: 0 });
+    await applyUndo({ id: "stale-promotion", flags: { spycraft2: { undo: stale } }, update: async () => null });
+    assert.deepEqual(state.getMission().antagonists, rowsBefore);
+    assert.match(warnings.at(-1), /later mission has begun/);
+    await game.settings.set("spycraft2", "usagePeriods", periods);
+  }
   await mission.changeEntry("antagonists", promotedRow().id, "scenesUp");
   assert.equal(promotedRow().scenes, 2);
   await mission.changeEntry("antagonists", promotedRow().id, "scenesDown");

@@ -315,11 +315,16 @@ async function undoRecord(message, record) {
     );
   }
   // A promotion's antagonist row goes back to what it was; the rest of the mission's list is left alone.
+  // Only within the run of the mission that promoted: a later run keeps its own row as it is.
   if (record.antagonist?.id && game.user.isGM) {
-    const { getMission, updateMission } = await import("./gc/state.mjs");
-    const { id, entry: was } = record.antagonist,
+    const { getMission, updateMission, missionEpoch } = await import("./gc/state.mjs");
+    const { id, entry: was, period } = record.antagonist,
       mine = entry => entry.id === id;
-    if ((getMission().antagonists ?? []).some(mine))
+    if (period !== undefined && period !== missionEpoch())
+      ui.notifications.warn(
+        loc`The NPC was put back, but a later mission has begun, so its antagonist row was left as it is.`
+      );
+    else if ((getMission().antagonists ?? []).some(mine))
       await updateMission(now => ({
         antagonists: was
           ? now.antagonists.map(entry => (mine(entry) ? was : entry))

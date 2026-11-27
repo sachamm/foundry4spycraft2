@@ -88,9 +88,10 @@ export const ActorRolls = Base =>
       // An NPC skill roll from the GC tools is marked with npcSkill rather than its own check kind.
       if (["skill", "knowledge"].includes(checkKind) || options.npcSkill) {
         if (skillCapsLifted()) cap = null;
-        const refusal = takeTenRefusal(checkMethod);
-        if (refusal) throw new Error(refusal);
       }
+      // Tense forbids taking 10 on any check, saves too (Evasion III's take 10 on Reflex saves).
+      const refusal = takeTenRefusal(checkMethod);
+      if (refusal) throw new Error(refusal);
       const triumphAt = triumphResult();
       const attributeDamage = attributeDamageEvidence(this.system, checkKind);
       if (Object.hasOwn(options, "attributeDamage"))
