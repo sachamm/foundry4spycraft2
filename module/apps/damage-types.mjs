@@ -464,7 +464,9 @@ export async function sufferFall(actor, preset = {}) {
 /* -------------------------------------------- */
 
 /** Acid on a character: start of round, end of round, washing, the injury save. */
-export async function acidStep(actor, step) {
+export const acidStep = (actor, step) =>
+  owned(actor) ? withUndo([actor], loc`Acid: ${actor.name}`, () => acidStepWork(actor, step)) : null;
+async function acidStepWork(actor, step) {
   if (!owned(actor)) return null;
   const state = hazardState(actor.system);
   if (!state.acid) return refuse(loc`No acid is on this character.`);
@@ -488,7 +490,11 @@ export async function acidStep(actor, step) {
 }
 
 /** Cold, heat or electrical: the Fortitude save against its subdual damage failed. */
-export async function exposureFailedSave(actor) {
+export const exposureFailedSave = actor =>
+  owned(actor)
+    ? withUndo([actor], loc`Failed exposure save: ${actor.name}`, () => exposureFailedSaveWork(actor))
+    : null;
+async function exposureFailedSaveWork(actor) {
   if (!owned(actor)) return null;
   const exposure = hazardState(actor.system).exposure;
   if (!exposure) return null;
@@ -525,7 +531,9 @@ export async function exposureFailedSave(actor) {
 }
 
 /** The character leaves the source of cold, heat, vacuum or the shock. */
-export async function endTypedExposure(actor) {
+export const endTypedExposure = actor =>
+  owned(actor) ? withUndo([actor], loc`Clear of the source: ${actor.name}`, () => endTypedExposureWork(actor)) : null;
+async function endTypedExposureWork(actor) {
   if (!owned(actor)) return null;
   await writeHazards(actor, endExposure(hazardState(actor.system)));
   return post(actor, [loc`The character is clear of the source; its running total ends.`]);
@@ -565,7 +573,9 @@ export async function survivalSave(actor, preset = {}) {
 }
 
 /** The survival hazard has ended: the next save starts at its base DC. */
-export async function endSurvivalHazard(actor, kind) {
+export const endSurvivalHazard = (actor, kind) =>
+  owned(actor) ? withUndo([actor], loc`Hazard over: ${actor.name}`, () => endSurvivalHazardWork(actor, kind)) : null;
+async function endSurvivalHazardWork(actor, kind) {
   if (!owned(actor)) return null;
   await writeHazards(actor, survivalReset(hazardState(actor.system), kind));
   return post(actor, [loc`${SURVIVAL_LABELS[kind]}: over; the next save starts again at its base DC.`]);
