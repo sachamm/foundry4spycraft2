@@ -161,6 +161,17 @@ test("every action a template names is registered by a sheet or an application",
   assert.deepEqual(missing, [], "A button names an action no sheet or application registers.");
 });
 
+test("the NPC sheet offers the agent's combat outcomes and registers each of them", () => {
+  const buttons = readFileSync(join(ROOT, "templates/actor/parts/combat-outcome-buttons.hbs"), "utf8"),
+    actions = [...buttons.matchAll(/data-action="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(actions.length, 8);
+  for (const sheet of ["templates/actor/npc-sheet.hbs", "templates/actor/play/combat-outcomes.hbs"])
+    assert.match(readFileSync(join(ROOT, sheet), "utf8"), /parts\/combat-outcome-buttons\.hbs/, sheet);
+  const source = readFileSync(join(ROOT, "module/sheets/actor-sheet.mjs"), "utf8"),
+    npc = source.slice(source.indexOf("class SpycraftNpcSheet"));
+  for (const action of actions) assert.match(npc, new RegExp(`\\b${action}[,\\n]`), action);
+});
+
 // Most template lines are far too long to review, and reformatting them all at once would hide real changes. Until a
 // file is reformatted, these limits stop the long lines from growing in number or in length. Lower them as files are
 // reformatted (render the file before and after to prove the markup did not change).

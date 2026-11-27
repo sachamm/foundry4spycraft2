@@ -149,6 +149,7 @@
    "DamageSave": "Damage save…",
    "CardNextStep": "Next step on the newest card",
    "CardNextStepHint": "Presses the main button of the newest chat card, such as Roll damage or Apply",
+   "ActingOutcomes": "Combat outcomes",
    "Unrolled": "Combatants with no Initiative Count yet: {count}.",
    "EndMissionHint": "Asks first. The record is kept for the XP report, XP settlement and standing",
    "ResumeMission": "Resume mission",

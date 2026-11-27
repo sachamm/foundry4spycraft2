@@ -707,6 +707,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         ].map(name => `${TPL}/play/${name}.hbs`),
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/parts/use-counter.hbs`
       ],
       scrollable: [""]
@@ -1793,7 +1794,16 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         sufferTypedDamage,
         survivalSave,
         exposureFailedSave,
-        endTypedExposure
+        endTypedExposure,
+        // The same combat outcomes as the agent's Play tab, so the GC can settle them for an NPC.
+        manageTripOutcomes,
+        manageFeintOutcomes,
+        settleGrapple,
+        recordAnticipate,
+        standOff,
+        tireResult,
+        coupDeGraceSave,
+        cancelReady
       }),
       toggleEditMode() {
         if (!this.isEditable) return;
@@ -1871,6 +1881,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       templates: [
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/npc-graded-play.hbs`,
         `${TPL}/npc-builder.hbs`,
         "systems/spycraft2/templates/parts/editor.hbs"

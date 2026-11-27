@@ -2,20 +2,13 @@
   <summary><span>{{localize "SPYCRAFT.Template.ActorAgentMain.RecordedOutcomes"}}</span><small>{{localize "SPYCRAFT.Template.ActorAgentMain.ResolveAnAttackAlreadyRolled"}}</small></summary>
   <p class="hint">{{localize "SPYCRAFT.Template.ActorAgentMain.UseTheseToolsAfterAnAttack"}}</p>
   <div class="tool-actions">
-    <button type="button" class="sc2-action" data-action="manageTripOutcomes">{{localize "SPYCRAFT.Template.ActorAgentMain.TripOutcomes"}}</button>
-    <button type="button" class="sc2-action" data-action="manageFeintOutcomes">{{localize "SPYCRAFT.Template.ActorAgentMain.FeintOutcomes"}}</button>
     <button type="button" class="sc2-action" data-action="manageTakedown">{{localize "SPYCRAFT.Template.ActorAgentMain.TakedownSavesOutcomes"}}</button>
     <button type="button" class="sc2-action" data-action="manageMeleeTradeoff">{{localize "SPYCRAFT.Template.ActorAgentMain.RecordedAttackBenefits"}}</button>
     <button type="button" class="sc2-action" data-action="manageCheapShots">{{localize "SPYCRAFT.Template.ActorAgentMain.CheapShotOutcomesRecovery"}}</button>
     {{#if combatTools.fend}}<button type="button" class="sc2-action" data-action="recordFendMovement">{{localize "SPYCRAFT.Template.ActorAgentMain.FendMovement"}}</button>{{/if}}
     {{#if combatTools.threadNeedle}}<button type="button" class="sc2-action" data-action="manageThreadNeedle">{{localize "SPYCRAFT.Template.ActorAgentMain.ThreadTheNeedleOutcome"}}</button>{{/if}}
     {{#if combatTools.stanceDamage}}<button type="button" class="sc2-action" data-action="manageStanceDamage">{{localize "SPYCRAFT.Template.ActorAgentMain.StanceDamage"}}</button>{{/if}}
-    <button type="button" class="sc2-action" data-action="settleGrapple">{{localize "SPYCRAFT.Template.ActorAgentMain.SettleAGrapple"}}</button>
-    <button type="button" class="sc2-action" data-action="recordAnticipate">{{localize "SPYCRAFT.Template.ActorAgentMain.AnticipateResult"}}</button>
-    <button type="button" class="sc2-action" data-action="standOff">{{localize "SPYCRAFT.Template.ActorAgentMain.StandOff"}}</button>
-    <button type="button" class="sc2-action" data-action="tireResult">{{localize "SPYCRAFT.Template.ActorAgentMain.TireResult"}}</button>
-    <button type="button" class="sc2-action" data-action="coupDeGraceSave">{{localize "SPYCRAFT.Template.ActorAgentMain.SurviveACoupDeGrace"}}</button>
-    <button type="button" class="sc2-action" data-action="cancelReady">{{localize "SPYCRAFT.Template.ActorAgentMain.CancelAReadiedAction"}}</button>
+    {{> "systems/spycraft2/templates/actor/parts/combat-outcome-buttons.hbs"}}
     {{#if combatTools.drivingStance}}<button type="button" class="sc2-action" data-action="manageDrivingStance">{{localize "SPYCRAFT.Template.ActorAgentMain.DrivingStanceOutcome"}}</button>{{/if}}
   </div>
 </details>

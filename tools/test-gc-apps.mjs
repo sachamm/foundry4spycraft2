@@ -839,6 +839,12 @@ test("the Combat section names the acting combatant, words each row and finds th
   assert.equal(acting.name, "a1");
   assert.equal(acting.halfActions, "2 half actions left");
   assert.equal(acting.npc, false);
+  // The combat outcomes the sheets offer, each settled by a function of that name (U2).
+  assert.deepEqual(
+    acting.outcomes.map(row => row.step),
+    turnTools.ACTING_OUTCOMES.map(([step]) => step)
+  );
+  for (const [step, , load] of turnTools.ACTING_OUTCOMES) assert.equal(typeof (await load())[step], "function", step);
   const rows = turnTools.combatRows(fight);
   assert.deepEqual(
     rows.map(row => [row.id, row.count, row.current]),

@@ -130,6 +130,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       actingDamageSave: guard(() => npcDamageSaveWithUndo(game.combat?.combatant?.actor)),
       actingDelay: guard(() => combat.delayCombatant(game.combat?.combatant)),
       actingReady: guard(() => combat.readyCombatant(game.combat?.combatant)),
+      actingOutcome: guard((event, target) => turn.actingOutcome(game.combat?.combatant?.actor, target.dataset.step)),
       cardNextStep: guard(() => {
         if (!pressNewestCard("button.sc2-primary-action[data-roll-control]"))
           ui.notifications.info(loc`No chat card is waiting for a next step.`);
