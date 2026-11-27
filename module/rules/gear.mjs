@@ -967,6 +967,7 @@ export function possessionBudget(items, allowance = "", system = {}) {
     unclassified: gear.filter(
       i =>
         !i.system.possessionSource &&
+        !i.system.campaignBonusOf &&
         !i.system.pick &&
         !i.system.reserveAcquisition &&
         !i.system.common &&
@@ -1090,7 +1091,8 @@ export function bigStickStatus(system, items = []) {
   const record = system.bigStickMissionPick?.epoch === epoch ? system.bigStickMissionPick : null;
   const warnings = [];
   const validCaliber = Number.isSafeInteger(mission?.caliber) && mission.caliber >= 1 && mission.caliber <= 5;
-  if (mission && !validCaliber) warnings.push(loc`Review the recorded mission Caliber before using Big Stick.`);
+  if (mission && !validCaliber && (active || record))
+    warnings.push(loc`Review the recorded mission Caliber before using Big Stick.`);
   if (record) {
     const item = items.find(i => i.id === record.itemId);
     if (!item) warnings.push(loc`Big Stick: the selected mission weapon is missing; its exception remains used.`);

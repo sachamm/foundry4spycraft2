@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Big Budget mission overflow now links each extra Caliber I item to a funded source pick, including
+  class-raised picks and Armor Use. Reserves reduce the available source budget; duplicate, oversized,
+  wrong-category or simultaneously paid claims remain setup errors.
+
 - Campaign Caliber changes now apply to ordinary mission-pick limits, class-raised mission picks, Big Stick
   and Armor Use. Class exceptions retain their source mission/grade records. Vehicle mission picks receive
   the same Caliber checks as other gear, and malformed mission Caliber stays reviewable without breaking preparation.

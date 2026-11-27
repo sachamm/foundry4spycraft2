@@ -1,9 +1,31 @@
 {{#if vehiclePossessionSources}}
-<label>{{localize "SPYCRAFT.CampaignGear.PersonalSource"}} <select name="system.possessionSource">{{selectOptions vehiclePossessionSources selected=system.possessionSource}}</select></label>
-{{#if system.possessionSource}}<label><input type="checkbox" name="system.possessionApproved" {{checked system.possessionApproved}} /> {{localize "SPYCRAFT.CampaignGear.Approved"}}</label>{{/if}}
-{{#if (sc2eq system.possessionSource "wealth")}}{{#unless system.pick}}<label>{{localize "SPYCRAFT.CampaignGear.PickCount"}} <input name="system.pickCount" type="number" min="1" step="1" value="{{system.pickCount}}" /></label>{{/unless}}{{/if}}
+  <label>{{localize "SPYCRAFT.CampaignGear.PersonalSource"}}
+    <select name="system.possessionSource">{{selectOptions vehiclePossessionSources selected=system.possessionSource}}</select>
+  </label>
+  {{#if system.possessionSource}}
+    <label><input type="checkbox" name="system.possessionApproved" {{checked system.possessionApproved}} />
+      {{localize "SPYCRAFT.CampaignGear.Approved"}}
+    </label>
+  {{/if}}
+  {{#if (sc2eq system.possessionSource "wealth")}}
+    {{#unless system.pick}}
+      <label>{{localize "SPYCRAFT.CampaignGear.PickCount"}}
+        <input name="system.pickCount" type="number" min="1" step="1" value="{{system.pickCount}}" />
+      </label>
+    {{/unless}}
+  {{/if}}
 {{/if}}
 {{#if campaignBonusOptions}}
-<label>{{localize "SPYCRAFT.CampaignGear.ExtraFrom"}} <select name="system.campaignBonusOf">{{selectOptions campaignBonusOptions selected=system.campaignBonusOf}}</select></label>
-<p class="hint">{{localize "SPYCRAFT.CampaignGear.ExtraHint"}}</p>
+  <label>
+    {{#if campaignBonusLabel}}{{campaignBonusLabel}}{{else}}{{localize "SPYCRAFT.CampaignGear.ExtraFrom"}}{{/if}}
+    <select name="system.campaignBonusOf">{{selectOptions campaignBonusOptions selected=system.campaignBonusOf}}</select>
+  </label>
+  <p class="hint">
+    {{#if campaignBonusHint}}{{campaignBonusHint}}{{else}}{{localize "SPYCRAFT.CampaignGear.ExtraHint"}}{{/if}}
+  </p>
+  {{#if campaignBonusLabel}}{{#if system.campaignBonusOf}}{{#unless system.pick}}
+    <label>{{localize "SPYCRAFT.CampaignGear.ExtraCount"}}
+      <input name="system.pickCount" type="number" min="1" step="1" value="{{system.pickCount}}" />
+    </label>
+  {{/unless}}{{/if}}{{/if}}
 {{/if}}

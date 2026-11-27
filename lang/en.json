@@ -17,6 +17,8 @@
  },
  "SPYCRAFT": {
   "CampaignGear": {
+   "ExtraCount": "Extra Caliber I picks",
+   "ExtraMissionRemaining": "Unassigned extra Caliber I mission items: {count}.",
    "PersonalSource": "Personal gear source",
    "Approved": "The GC approved this Possession",
    "PickCount": "Possessions picks",

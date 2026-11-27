@@ -67,7 +67,7 @@ import { sneakAttackCapacity } from "./sneak-attack.mjs";
 import { eagleEyeState, sniperMagicTouchBonus } from "./sniper.mjs";
 import { markPrerequisiteBonus } from "./marks.mjs";
 import { classGearWarnings } from "./class-gear.mjs";
-import { missionCaliberOptions, missionCaliberMatches } from "./mission-gear.mjs";
+import { missionCaliberOptions, missionCaliberMatches, campaignMissionBonusPicks } from "./mission-gear.mjs";
 import { isResourceLock } from "./resource-locks.mjs";
 import { improvedFortuneBonus, actionDieAwardSummary } from "./action-dice.mjs";
 import { currentReserves, reserveAllocations, managedAcquisition, hasProcure } from "./gear-acquisition.mjs";
@@ -2254,6 +2254,13 @@ function deriveWealthAndGear(state) {
     picks[key].remaining = picks[key].available - picks[key].spent;
     if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
   }
+  if (
+    sys.campaignEffects.gearCaliberShift ||
+    items.some(i => i.system?.campaignBonusOf && !i.system.possessionSource)
+  ) {
+    sys.campaignMissionBonusPicks = campaignMissionBonusPicks(sys, items);
+    warnings.push(...sys.campaignMissionBonusPicks.warnings);
+  } else delete sys.campaignMissionBonusPicks;
   sys.ammunitionConfigurations = {};
   for (const item of items.filter(i => i.type === "weapon")) {
     const configuration = ammunitionConfiguration(item.system);

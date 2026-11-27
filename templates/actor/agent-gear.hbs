@@ -103,6 +103,12 @@
   <p><button type="button" class="sc2-action" data-action="browse" data-type="gear"><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.BrowseKits"}}</button></p>
   <p>{{localize "SPYCRAFT.Template.ActorAgentGear.CarriedWeight"}} {{system.encumbrance.weight}} {{localize "SPYCRAFT.Template.ActorAgentGear.Lbs"}} {{system.encumbrance.load}} {{localize "SPYCRAFT.Template.ActorAgentGear.Load"}} {{system.encumbrance.condition}} {{localize "SPYCRAFT.Template.ActorAgentGear.DR"}} {{system.dr.melee}} / {{system.dr.other}} {{localize "SPYCRAFT.Template.ActorAgentGear.MeleeOtherAttacks"}}</p>
   <h3>{{localize "SPYCRAFT.GearPicks"}}</h3>
+  {{#if system.campaignMissionBonusPicks}}
+    <p>{{system.campaignMissionBonusPicks.summary}}</p>
+    {{#if system.campaignMissionBonusPicks.sources.length}}
+      <p>{{localize "SPYCRAFT.CampaignGear.ExtraMissionRemaining" count=system.campaignMissionBonusPicks.unassigned}}</p>
+    {{/if}}
+  {{/if}}
   <div class="gear-picks">
     {{#each gearPicks}}<span class="slot {{#if (sc2lt remaining 0)}}bad{{/if}}" data-tooltip="{{label}}"><b>{{key}}</b> {{spent}} / {{available}}</span>{{/each}}
   </div>

@@ -8,7 +8,7 @@ import {
   bigStickPlan,
   bigStickStatus
 } from "../module/rules/gear.mjs";
-import { missionCaliberPlan, missionCaliberMatches } from "../module/rules/mission-gear.mjs";
+import { missionCaliberPlan, missionCaliberMatches, campaignMissionBonusPicks } from "../module/rules/mission-gear.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 
@@ -134,4 +134,88 @@ test("the full engine checks shifted mission limits for vehicle gear and reviews
   assert.ok(warns(1, -1).some(w => /Caliber exceeds/.test(w)));
   for (const bad of [0, "3", undefined, NaN])
     assert.ok(warns(bad, 1).some(w => /Review the recorded mission Caliber/.test(w)));
+});
+
+test("mission overflow is limited by paid source picks after reserves and validates category, Caliber, quantity and acquisition", () => {
+  const s = {
+    ...policy(1),
+    usagePeriods: { mission: "m" },
+    missionReserves: { epoch: "m", caliber: 5, picks: {}, spent: {} },
+    gearPicks: { W: { available: 1 } }
+  };
+  const primary = item("primary", 5, { possessionSource: "", pick: "W" });
+  const bonus = item("bonus", 1, { possessionSource: "", campaignBonusOf: "primary" });
+  let p = campaignMissionBonusPicks(s, [primary, bonus]);
+  assert.equal(p.assignments[0].funded, 1);
+  assert.deepEqual(p.warnings, []);
+  for (const patch of [
+    { caliber: 2 },
+    { quantity: 2 },
+    { pick: "W" },
+    { common: true },
+    { reserveAcquisition: {} },
+    { campaignBonusOf: "missing" }
+  ]) {
+    p = campaignMissionBonusPicks(s, [primary, { ...bonus, system: { ...bonus.system, ...patch } }]);
+    assert.equal(p.assignments[0].funded, 0);
+    assert.ok(p.warnings.length);
+  }
+  assert.equal(campaignMissionBonusPicks(s, [primary, { ...bonus, type: "armor" }]).assignments[0].funded, 0);
+  s.missionReserves.picks.W = 1;
+  assert.equal(campaignMissionBonusPicks(s, [primary, bonus]).assignments[0].funded, 0);
+  s.missionReserves.picks.W = 0;
+  const duplicate = item("duplicate", 1, { possessionSource: "", campaignBonusOf: "primary" });
+  assert.equal(
+    campaignMissionBonusPicks(s, [primary, bonus, duplicate]).assignments.reduce((n, row) => n + row.funded, 0),
+    1
+  );
+});
+
+test("class-raised mission picks and Armor Use create only their own eligible overflow, without charging the extra item", () => {
+  const s = {
+    ...policy(1),
+    usagePeriods: { mission: "m" },
+    missionReserves: { epoch: "m", caliber: 4, picks: {}, spent: {} },
+    gearPicks: { V: { available: 1 } },
+    classLevels: { wheelman: 1 }
+  };
+  const car = item("car", 5, { possessionSource: "", pick: "V" }, "vehicle");
+  const p = missionCaliberPlan(s, [car], { source: "customRide", itemId: car.id, intelConfirmed: true });
+  car.system.missionCaliberGrant = p.stamp;
+  s.missionCaliberPicks = { customRide: p.record };
+  const bike = item("bike", 1, { possessionSource: "", campaignBonusOf: "car" }, "vehicle");
+  assert.equal(campaignMissionBonusPicks(s, [car, bike]).assignments[0].funded, 1);
+  assert.equal(bike.system.pick, undefined);
+  const armor = item("armor", 5, { possessionSource: "" }, "armor");
+  const a = { ...policy(1), legacyAbilities: { armorUse: { freeArmorCaliber: 5 } } };
+  const grant = armorGrantPlan(a, [armor], { itemId: armor.id, intelConfirmed: true });
+  a.armorMissionGrant = grant.record;
+  armor.system.armorMissionGrant = grant.stamp;
+  const extra = item("helmet", 1, { possessionSource: "", campaignBonusOf: "armor" }, "armor");
+  assert.equal(campaignMissionBonusPicks(a, [armor, extra]).assignments[0].funded, 1);
+  assert.equal(
+    campaignMissionBonusPicks(a, [armor, { ...extra, type: "gear", system: { ...extra.system, gearCategory: "S" } }])
+      .assignments[0].funded,
+    0
+  );
+});
+
+test("full engine mission overflow spends only its source pick and keeps the extra item classified", () => {
+  const s = {
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+    progression: [],
+    misc: { gearW: 1 },
+    usagePeriods: { mission: "m" },
+    missionReserves: { epoch: "m", caliber: 5, picks: {}, spent: {}, common: 0 }
+  };
+  const main = item("main", 5, { possessionSource: "", pick: "W" });
+  const extra = item("extra", 1, { possessionSource: "", campaignBonusOf: "main" });
+  computeAgent(s, [main, extra], cfg, { campaignEffects: policy(1).campaignEffects });
+  assert.equal(s.gearPicks.W.spent, 1);
+  assert.equal(s.campaignMissionBonusPicks.assignments[0].funded, 1);
+  assert.equal(s.wealth.possessions.budget.unclassified, 0);
+  assert.deepEqual(s.campaignMissionBonusPicks.warnings, []);
+  computeAgent(s, [main, extra], cfg, { campaignEffects: {} });
+  assert.equal(s.campaignMissionBonusPicks.assignments[0].funded, 0);
+  assert.ok(s.warnings.some(w => /extra mission item/.test(w)));
 });

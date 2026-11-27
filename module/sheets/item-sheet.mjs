@@ -270,6 +270,23 @@ export class SpycraftItemSheet extends KeepPlace(HandlebarsApplicationMixin(Save
         ]);
         if (sys.campaignBonusOf && !Object.hasOwn(context.campaignBonusOptions, sys.campaignBonusOf))
           context.campaignBonusOptions[sys.campaignBonusOf] = loc`Missing source Possession — review link`;
+      } else if (
+        !sys.possessionSource &&
+        (sys.campaignBonusOf || (!sys.pick && item.actor?.system.campaignMissionBonusPicks?.sources?.length))
+      ) {
+        context.campaignBonusOptions = Object.fromEntries([
+          ["", loc`No extra mission-item source`],
+          ...(item.actor?.system.campaignMissionBonusPicks?.sources ?? [])
+            .filter(
+              source =>
+                source.id !== item.id && source.category === category && (!source.type || source.type === item.type)
+            )
+            .map(source => [source.id, source.name])
+        ]);
+        if (sys.campaignBonusOf && !Object.hasOwn(context.campaignBonusOptions, sys.campaignBonusOf))
+          context.campaignBonusOptions[sys.campaignBonusOf] = loc`Unavailable mission source — review link`;
+        context.campaignBonusLabel = loc`Big Budget extra Caliber I mission item from`;
+        context.campaignBonusHint = loc`This extra item uses no paid mission pick. Its source must supply an unused bonus pick in the same gear category.`;
       }
       if (item.type === "vehicle")
         context.vehiclePossessionSources = {
