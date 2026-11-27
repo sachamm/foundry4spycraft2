@@ -105,7 +105,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       awardStanding: guard(() => mission.awardStanding()),
       seasonQualities: guard(() => mission.editSeasonQualities()),
       caliberIncrease: guard(() => spend.recordCaliberIncrease(getMission().caliber + 1)),
-      sceneAdvance: guard(() => updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }))),
+      sceneAdvance: guard(() => mission.correctSceneCount()),
       gcDice: guard(() => {
         const m = getMission();
         return manageGCDice({ playersPresent: teamActors(m).length, caliber: m.caliber });
@@ -500,7 +500,11 @@ export function consoleContext() {
       standing,
       canRaiseCaliber: m.caliber < 5,
       objectives: m.objectives.map(objective => ({ ...objective, xp: objective.grade * 25 })),
-      antagonists: m.antagonists,
+      antagonists: m.antagonists.map(entry => ({
+        ...entry,
+        perScene: !!(entry.full || entry.promoted),
+        moreScenes: (Number(entry.scenes) || 1) > 1
+      })),
       qualities: named(m.qualities, id => campaignQuality(id)?.name).map(entry => ({
         ...entry,
         xp: entry.scripted === false ? 0 : (campaignQuality(entry.id)?.xp ?? 0),

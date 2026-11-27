@@ -95,7 +95,8 @@ globalThis.foundry = {
       DialogV2: {
         input: async () => {
           if (!dialogAnswers.length) throw new Error("Unexpected dialog");
-          return dialogAnswers.shift();
+          const answer = dialogAnswers.shift();
+          return typeof answer === "function" ? answer() : answer;
         },
         confirm: async () => {
           const answer = confirmAnswers.length ? confirmAnswers.shift() : true;
@@ -332,9 +333,10 @@ test("the standing award pays each agent once per mission; a correction pays aga
 });
 
 test("End mission asks first, keeps the record for settlement, and Resume reopens it unchanged", async () => {
-  confirmAnswers.push(false);
+  dialogAnswers.push(null);
   assert.equal(await mission.endMission(), null);
   assert.equal(state.getMission().active, true, "cancelled");
+  dialogAnswers.push({ countFinalScene: false });
   assert.equal(await mission.endMission(), true);
   let m = state.getMission();
   assert.deepEqual([m.active, m.ended], [false, true]);
@@ -352,9 +354,9 @@ test("a change made while End mission is asking is kept; a record ended by an ol
   const id = state.getMission().objectives[0].id;
   await mission.changeEntry("objectives", id, "complete");
   assert.equal(state.getMission().objectives[0].complete, false);
-  confirmAnswers.push(async () => {
+  dialogAnswers.push(async () => {
     await mission.changeEntry("objectives", id, "complete");
-    return true;
+    return { countFinalScene: false };
   });
   await mission.endMission();
   assert.equal(state.getMission().objectives[0].complete, true, "ticked while the question was open");
@@ -366,7 +368,10 @@ test("a change made while End mission is asking is kept; a record ended by an ol
 });
 
 test("starting an ended mission again asks, then clears the last run's results", async () => {
+  const scenes = state.getMission().scenesPlayed ?? 0;
+  dialogAnswers.push({ countFinalScene: true });
   await mission.endMission();
+  assert.equal(state.getMission().scenesPlayed, scenes + 1, "the scene being played is counted");
   confirmAnswers.push(false);
   assert.equal(await mission.startMission(), null);
   assert.equal(state.getMission().objectives[0].complete, true, "cancelled: nothing cleared");
@@ -469,6 +474,14 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   await spend.spendGCDice({ id: "promote", actor: guard });
   assert.equal(gcDiceStatus().value, 6);
   assert.ok(npc.npcIsSpecial(guard), "promoted for the current mission");
+  const promotedRow = () =>
+    state.getMission().antagonists.find(entry => entry.uuid === guard.uuid || entry.typeKey === guard.uuid);
+  assert.deepEqual([promotedRow().promoted, promotedRow().scenes], [true, 1], "its XP is counted per scene");
+  await mission.changeEntry("antagonists", promotedRow().id, "scenesUp");
+  assert.equal(promotedRow().scenes, 2);
+  await mission.changeEntry("antagonists", promotedRow().id, "scenesDown");
+  await mission.changeEntry("antagonists", promotedRow().id, "scenesDown");
+  assert.equal(promotedRow().scenes, 1, "never below one scene");
   await guard.update({ "system.promotion": null });
   await npc.npcDamageSave(guard, { damage: 9, kind: "lethal" }).catch(() => {});
   await spend.spendGCDice({ id: "dramaticScene" });
@@ -477,8 +490,14 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   await spend.spendGCDice({ id: "saveNpc", actor: boss });
   assert.match(warnings.at(-1), /dramatic scene cannot be saved/);
   dice(1, 12, 5);
-  result = await spend.spendGCDice({ id: "boostDC" });
+  await spend.spendGCDice({ id: "boostDC" });
+  assert.match(warnings.at(-1), /Name the check whose DC rises/);
+  result = await spend.spendGCDice({ id: "boostDC", dcCheck: "Vault door" });
   assert.equal(result.die.total, 18, "dramatic scene: a natural 1 explodes too");
+  assert.equal(state.getSceneState().dcBoostsByCheck["vault door"].count, 1, "counted against that check");
+  await state.setSceneState({ dcBoostsByCheck: { "vault door": { name: "Vault door", count: 3 } } });
+  await spend.spendGCDice({ id: "boostDC", dcCheck: "vault door" });
+  assert.match(warnings.at(-1), /Only 3 action dice may boost one DC/);
   await spend.spendGCDice({ id: "saveNpc", actor: boss, fromCapture: true });
   assert.match(warnings.at(-1), /costs 2 action dice; the GC has 1/);
   await spend.setDramaticScene(false);

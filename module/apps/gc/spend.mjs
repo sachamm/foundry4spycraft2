@@ -17,6 +17,7 @@ import {
   qualitiesInForce
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
+import { markAntagonistPromoted } from "./mission.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
@@ -84,6 +85,10 @@ export async function spendGCDice(input = {}) {
         "attack"
       )}</select></label>
       <label data-when="id=activateThreat|activateError">${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
+      <label data-when="id=boostDC">${loc`Check whose DC rises (each DC takes only so many dice)`} <input name="dcCheck" list="sc2-dc-checks" placeholder="${loc`e.g. the vault door's Security check`}" /></label>
+      <datalist id="sc2-dc-checks">${Object.values(scene.dcBoostsByCheck ?? {})
+        .map(entry => `<option value="${esc(entry.name)}"></option>`)
+        .join("")}</datalist>
       <label data-when="id=event">${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
       <label data-when="id=event">${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
       <label data-when="id=event"><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
@@ -101,6 +106,15 @@ export async function spendGCDice(input = {}) {
   const actor = spend.needsNpc ? input.actor : null;
   if (spend.needsNpc && actor?.type !== "npc") return refuse(loc`Choose the NPC this applies to.`);
   const quality = input.id === "campaignQuality" ? campaignQuality(input.qualityId) : null;
+  // DC boosts are counted per named check for this scene, so the limit of pp.397 and 424 holds (B-010).
+  const dcCheck = String(input.dcCheck ?? "").trim();
+  if (input.id === "boostDC" && !dcCheck && input.alreadyBoostedDC === undefined)
+    return refuse(loc`Name the check whose DC rises, so its earlier boosts are counted.`);
+  const dcKey = dcCheck.toLowerCase();
+  const earlierBoosts =
+    input.alreadyBoostedDC !== undefined
+      ? Number(input.alreadyBoostedDC) || 0
+      : Number(scene.dcBoostsByCheck?.[dcKey]?.count) || 0;
   let plan;
   try {
     if (quality) qualityAddition(quality.id, { scope: "spend", active: qualitiesInForce() });
@@ -109,7 +123,7 @@ export async function spendGCDice(input = {}) {
       dramatic,
       dice: Number(input.dice) || 1,
       checkKind: input.checkKind,
-      alreadyBoostedDC: input.id === "boostDC" ? Number(input.alreadyBoostedDC ?? 0) : 0,
+      alreadyBoostedDC: input.id === "boostDC" ? earlierBoosts : 0,
       eventCost: Number(input.eventCost) || 1,
       triggered: !!input.triggered,
       free: !!input.free,
@@ -166,6 +180,8 @@ export async function spendGCDice(input = {}) {
         await actor.update({
           "system.promotion": { mission: String(actor.system.usagePeriods?.mission ?? "initial") }
         });
+        // A promoted antagonist's XP is worked out as a full special NPC's, per scene (pp.398, 452).
+        lines.push(await markAntagonistPromoted(actor));
         break;
       case "healNpc": {
         if (npcIsSpecial(actor)) lines.push(loc`Restore ${die.total} vitality or 2 wounds on the sheet.`);
@@ -189,9 +205,21 @@ export async function spendGCDice(input = {}) {
       case "boostDefenseAfterHit":
         lines.push(loc`+${die.total} Defense against that attack only; it may now miss.`);
         break;
-      case "boostDC":
-        lines.push(loc`The DC rises by ${die.total}.`);
+      case "boostDC": {
+        lines.push(
+          dcCheck ? loc`The DC of ${esc(dcCheck)} rises by ${die.total}.` : loc`The DC rises by ${die.total}.`
+        );
+        if (dcKey) {
+          const now = getSceneState().dcBoostsByCheck ?? {};
+          await setSceneState({
+            dcBoostsByCheck: {
+              ...now,
+              [dcKey]: { name: dcCheck, count: (Number(now[dcKey]?.count) || 0) + 1 }
+            }
+          });
+        }
         break;
+      }
       case "event":
         if (event) lines.push(esc(event.summary));
         break;

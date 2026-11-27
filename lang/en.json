@@ -1434,8 +1434,6 @@
     "Remove": "Remove",
     "NoneYet": "Nothing recorded yet. Use the buttons above to add the first one.",
     "Antagonists": "Antagonists",
-    "FullSpecial300XP": "full special, 300 XP ×",
-    "SceneS": "scene(s)",
     "XP2": "XP",
     "NotFaced": "Mark not faced",
     "FacedAsAThreat": "Mark faced",
@@ -1456,7 +1454,6 @@
     "Of": "of",
     "Scripted": "scripted",
     "PerScenePlayed": "per scene played (",
-    "CountAScenePlayed": "Count a scene played",
     "XPReport": "XP report",
     "PlannedXP": "Planned XP",
     "RecordExposureInfraction": "Record exposure infraction",
@@ -1520,7 +1517,12 @@
     "RemoveOrganizationHint": "Delete this organization from the world.",
     "NoOrganizations": "No organizations. Use Add organization above to record the Agency and its rivals.",
     "Edit": "Edit",
-    "NpcKnowledge": "What an NPC knows"
+    "NpcKnowledge": "What an NPC knows",
+    "PromotedPerScene": "Promoted for this mission, so 300 XP for each of its {scenes} scene(s).",
+    "FullPerScene": "A full special NPC, so 300 XP for each of its {scenes} scene(s).",
+    "AddAScene": "Add a scene",
+    "RemoveAScene": "Remove a scene",
+    "CorrectTheSceneCount": "Correct the scene count"
    },
    "ItemItemArmor": {
     "DRMeleeUnarmedAndNonGrenade": "DR: melee, unarmed and non-grenade hurled attacks / all other attacks. Helmets with a Vision penalty apply it to Vision checks, not Reflex saves.",

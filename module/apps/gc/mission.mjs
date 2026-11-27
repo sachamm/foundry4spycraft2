@@ -159,6 +159,34 @@ export async function nextScene() {
   return true;
 }
 
+/** Correct the count of scenes played; Next scene and ending the mission keep it in step otherwise (p.440). */
+export async function correctSceneCount() {
+  requireGC();
+  const mission = getMission();
+  const input = await formDialog({
+    title: loc`Correct the scene count`,
+    intro: loc`Next scene counts each scene as it ends, and ending the mission can count the last one. Change the number only to fix a mistake.`,
+    fields: [{ number: "scenesPlayed", label: loc`Scenes played so far`, value: mission.scenesPlayed ?? 0, min: 0 }],
+    ok: loc`Save the scene count`
+  });
+  if (!input) return null;
+  const scenes = Math.max(0, Math.trunc(Number(input.scenesPlayed) || 0));
+  return updateMission({ scenesPlayed: scenes });
+}
+
+/** Mark a promoted NPC's antagonist row so its XP is worked out per scene; returns the line for the spend card. */
+export async function markAntagonistPromoted(actor) {
+  requireGC();
+  const mine = entry => entry.typeKey === actor.uuid || entry.uuid === actor.uuid;
+  if (!getMission().antagonists.some(mine)) await recordAntagonist(actor);
+  await updateMission(now => ({
+    antagonists: now.antagonists.map(entry =>
+      mine(entry) ? { ...entry, promoted: true, scenes: Math.max(1, Number(entry.scenes) || 1) } : entry
+    )
+  }));
+  return loc`${actor.name} is special until the mission ends; its XP counts 300 for each scene it appears in. Add scenes on the console's Antagonists list.`;
+}
+
 export async function startMission() {
   requireGC();
   const before = getMission();
@@ -209,15 +237,32 @@ export async function endMission({ clear = false } = {}) {
   const mission = getMission();
   if (clear) return setMission(defaultMission());
   const open = (mission.objectives ?? []).filter(objective => !objective.complete).length;
-  const ok = await confirmStep(loc`End the mission`, [
+  const lines = [
     loc`The mission stops being active: NPCs that follow the mission's Threat Level go back to their own.`,
     loc`The record is kept, so the XP report, each agent's XP settlement and the standing payout still work.`,
     ...(open ? [loc`${open} objective(s) are not marked complete.`] : []),
     loc`Resume mission reopens it with nothing changed.`
-  ]);
-  if (!ok) return null;
-  // Only the two flags are written: objectives ticked while the question was open are kept.
-  await updateMission({ active: false, ended: true });
+  ];
+  // Next scene counts the scene just finished, so the scene being played when the mission ends is still uncounted.
+  const input = await formDialog({
+    title: loc`End the mission`,
+    fields: [
+      raw(`<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>`),
+      {
+        check: "countFinalScene",
+        label: loc`Count the scene being played now as the mission's last (scene ${(mission.scenesPlayed ?? 0) + 1})`,
+        checked: true
+      }
+    ],
+    ok: loc`End the mission`
+  });
+  if (!input) return null;
+  // Only these fields are written: objectives ticked while the question was open are kept.
+  await updateMission(now => ({
+    active: false,
+    ended: true,
+    ...(input.countFinalScene === true ? { scenesPlayed: (now.scenesPlayed ?? 0) + 1 } : {})
+  }));
   await say(
     `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`
   );
@@ -447,6 +492,9 @@ export async function changeEntry(list, key, change) {
     [list]: (mission[list] ?? []).flatMap(entry => {
       if ((entry.key ?? entry.id) !== key) return [entry];
       if (change === "remove") return [];
+      // A full or promoted antagonist earns 300 XP for each scene it appears in (pp.398, 452).
+      if (change === "scenesUp") return [{ ...entry, scenes: Math.max(1, Number(entry.scenes) || 1) + 1 }];
+      if (change === "scenesDown") return [{ ...entry, scenes: Math.max(1, (Number(entry.scenes) || 1) - 1) }];
       return [{ ...entry, [change]: !entry[change] }];
     })
   }));
