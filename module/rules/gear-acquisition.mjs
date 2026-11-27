@@ -7,6 +7,7 @@ import { campaignGearCaliber } from "./campaign-rules.mjs";
 import { historicalCaliber } from "./gear-era.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
+const ROMAN = ["I", "II", "III", "IV", "V"];
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
 /** Delivery for a Request that is immediately available (Political Clout, Favors and Immunity). */
 export const IMMEDIATE_DELIVERY = Object.freeze({
@@ -58,6 +59,15 @@ export const hasProcure = system =>
 export const missionEpoch = system => String(system.usagePeriods?.mission ?? "initial");
 export function currentReserves(system) {
   return system.missionReserves?.epoch === missionEpoch(system) ? system.missionReserves : null;
+}
+/**
+ * A mission Caliber increase (p.398) applies to every gear acquisition for the rest of the mission, so it raises the
+ * Caliber on this mission's reserves. Returns the actor update, or null when there are none or they are already there.
+ */
+export function reserveCaliberIncrease(system, caliber) {
+  const record = currentReserves(system);
+  if (!record || !Number.isSafeInteger(caliber) || caliber > 5 || record.caliber >= caliber) return null;
+  return { "system.missionReserves.caliber": caliber };
 }
 /** A free Stash attempt needs a durable claim ledger but does not allocate mission resources. */
 export function provisionalReserves(system) {
@@ -112,7 +122,15 @@ export function reserveAllocations(system) {
 export function reserveInitialization(
   system,
   items,
-  { picks = {}, charismaPicks = {}, common = 0, caliber = 1, intelComplete = false, procureAtIntel = false } = {}
+  {
+    picks = {},
+    charismaPicks = {},
+    common = 0,
+    caliber = 1,
+    intelComplete = false,
+    procureAtIntel = false,
+    missionCaliber = null
+  } = {}
 ) {
   const provisional = currentReserves(system);
   if (provisional && provisional.initialized !== false)
@@ -122,6 +140,11 @@ export function reserveInitialization(
   if (provisional) validateProvisionalReserves(provisional);
   if (!intelComplete) throw new Error(loc`Choose reserves at the end of the Intel Phase.`);
   if (!Number.isSafeInteger(caliber) || caliber < 1 || caliber > 5) throw new Error(loc`Mission Caliber must be I–V.`);
+  // The GC sets the mission's Caliber (p.398); reserves take it from the mission record when there is one.
+  if (Number.isSafeInteger(missionCaliber) && caliber !== missionCaliber)
+    throw new Error(
+      loc`This mission is Caliber ${ROMAN[missionCaliber - 1]} in the GC’s mission record, so reserves use that Caliber.`
+    );
   if (items.some(i => ["weapon", "armor", "gear"].includes(i.type) && i.system.reserve))
     throw new Error(loc`Review legacy reserved-item checkboxes before allocating unassigned reserves.`);
   const selected = {};

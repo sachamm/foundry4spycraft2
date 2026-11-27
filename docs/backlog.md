@@ -283,6 +283,7 @@ own line on the card, and checked against the page first.
 | B-192 | Second delivery roll and the unchosen roll of a choose-twice check are not attached to the chat message. | J7 | S |
 | B-193 | Data semantics: feat summaries, class features, weapon and armor numbers have no recorded source-to-data audit (gear and vehicles were cross-checked); reference fixtures include invalid rank allocations. | RW (audit-2026-11) | L |
 | B-256 | Weapons now carry the year printed in the weapon tables (pp.250–271) instead of our date. World copies and agents' weapons that the version 6 migration dated earlier keep the old year; correcting them needs a migration, and so a system version bump. | R1 (council-rules-2026-11-27) | S |
+| B-257 | Mission Caliber (p.398): before an agent allocates reserves, the sheet does not check mission picks against the mission's Caliber, because the engine reads it only from the reserves record. The Undo left by a Caliber increase puts the team's reserves back but not the mission record or the GC's dice. | R4 (council-rules-2026-11-27) | S |
 
 ## Code health (code council, 2026-11-23)
 

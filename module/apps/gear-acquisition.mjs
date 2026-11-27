@@ -28,7 +28,7 @@ import {
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
 import { organizationSite, siteForRequest } from "../rules/gc/organization.mjs";
-import { agencyOrganization } from "./gc/state.mjs";
+import { agencyOrganization, getMission } from "./gc/state.mjs";
 import { loc } from "../i18n.mjs";
 import { campaignRules } from "../rules/campaign-rules.mjs";
 import { gearYearByName } from "../rules/gear-era.mjs";
@@ -41,6 +41,15 @@ function agencySiteSelect() {
     .map(site => `<option value="${esc(site.id)}">${esc(loc`${site.name}: ${site.request} (+4, half time)`)}</option>`)
     .join("")}</select></label>`;
 }
+/** The Caliber of the mission under way in the GC's record (p.398), or null when none is running. */
+function runningMissionCaliber() {
+  try {
+    const mission = getMission();
+    return mission.active && !mission.ended && Number.isSafeInteger(mission.caliber) ? mission.caliber : null;
+  } catch {
+    return null;
+  }
+}
 const chosenSite = id => (id ? siteForRequest(agencyOrganization(), id) : null);
 import { same } from "../rules/equal.mjs";
 import { postedReceipt } from "../services/message-lookup.mjs";
@@ -50,6 +59,7 @@ const owned = actor => actor?.type === "agent" && actor.isOwner;
 export async function allocateMissionReserves(actor, options = {}) {
   if (!owned(actor)) return null;
   let input = options;
+  const missionCaliber = runningMissionCaliber();
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Unassigned mission reserves` },
@@ -59,7 +69,11 @@ export async function allocateMissionReserves(actor, options = {}) {
    ${PICK_CATEGORIES.map(key => `<label>${loc`${key} picks (${actor.system.gearPicks?.[key]?.remaining ?? 0} unchosen)`} <input type="number" name="pick_${key}" min="0" value="0" /></label>`).join("")}
    <details><summary>${loc`Categories for reserved Charisma picks (set during Intel)`}</summary>${(actor.system.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"]).map(k => `<label>${loc`CHA → ${k}`} <input type="number" name="cha_${k}" min="0" value="0" /></label>`).join("")}</details>
    <label>${loc`Reserve Common Items`} <input type="number" name="common" min="0" value="0" /></label>
-   <label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
+   ${
+     missionCaliber
+       ? `<p>${loc`Mission Caliber: ${CONFIG.SPYCRAFT.calibers[missionCaliber]}, from the GC’s mission record.`}</p><input type="hidden" name="caliber" value="${missionCaliber}" />`
+       : `<label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>`
+   }
    <label><input type="checkbox" name="procureAtIntel" /> ${loc`Procure: Intel takes place in a city of 10,000+ people with quick contact; hold two additional reserves`}</label>
    <label><input type="checkbox" name="intelComplete" /> ${loc`The Intel Phase is complete; these are this mission’s unchosen reserves`}</label></div>`
     });
@@ -74,7 +88,12 @@ export async function allocateMissionReserves(actor, options = {}) {
     const record = reserveInitialization(
         actor.system,
         actor.items.filter(i => !isResourceLock(i)),
-        { ...input, common: Number(input.common ?? 0), caliber: Number(input.caliber ?? 1) }
+        {
+          ...input,
+          common: Number(input.common ?? 0),
+          caliber: Number(input.caliber ?? missionCaliber ?? 1),
+          missionCaliber
+        }
       ),
       before = actor.system.missionReserves;
     const changes = { "system.missionReserves": record };

@@ -10,7 +10,8 @@ import {
   gearAcquisitionPlan,
   acquisitionOutcome,
   reserveAllocations,
-  managedAcquisition
+  managedAcquisition,
+  reserveCaliberIncrease
 } from "../module/rules/gear-acquisition.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
@@ -2346,4 +2347,19 @@ test("Shoe-String Budget on a Caliber I mission loses the Reserve picks (p.408)"
   } finally {
     setCampaignRulesSource(() => ({}));
   }
+});
+
+test("reserves take the mission record's Caliber, and a GC increase raises them (p.398)", () => {
+  const sys = system();
+  assert.throws(
+    () => reserveInitialization(sys, [], { ...initialize, caliber: 3, missionCaliber: 2 }),
+    /Caliber II in the GC’s mission record/
+  );
+  sys.missionReserves = reserveInitialization(sys, [], { ...initialize, missionCaliber: 2 });
+  assert.equal(sys.missionReserves.caliber, 2);
+  assert.deepEqual(reserveCaliberIncrease(sys, 4), { "system.missionReserves.caliber": 4 });
+  assert.equal(reserveCaliberIncrease(sys, 2), null, "not an increase");
+  assert.equal(reserveCaliberIncrease(sys, 6), null);
+  sys.usagePeriods.mission = "next";
+  assert.equal(reserveCaliberIncrease(sys, 4), null, "an earlier mission's reserves are left alone");
 });

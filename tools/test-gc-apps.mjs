@@ -975,3 +975,30 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
     game.spycraft2.gc.console = null;
   }
 });
+
+test("a mission Caliber increase reaches the team's reserves, with an Undo, and reminds them of the swap (p.398)", async () => {
+  const saved = state.getMission(),
+    a1 = actors.get("a1"),
+    a2 = actors.get("a2"),
+    before = { a1: structuredClone(a1.system), a2: structuredClone(a2.system) };
+  try {
+    await state.setMission({ ...saved, active: true, ended: false, caliber: 1, team: ["a1", "a2"] });
+    a1.system.usagePeriods = { mission: "m1" };
+    a1.system.missionReserves = { epoch: "m1", caliber: 1, picks: { W: 1 }, spent: {}, common: 0 };
+    a2.system.usagePeriods = { mission: "m1" };
+    delete a2.system.missionReserves;
+    const start = messages.length;
+    assert.equal(await spend.recordCaliberIncrease(3), 2);
+    assert.equal(state.getMission().caliber, 3);
+    assert.equal(a1.system.missionReserves.caliber, 3);
+    assert.equal(a2.system.missionReserves, undefined, "no reserves yet: nothing to raise");
+    const posted = messages.slice(start);
+    const undo = posted.find(m => m.flags?.spycraft2?.undo);
+    assert.equal(undo?.flags.spycraft2.undo.entries.length, 1, "an Undo note for the one agent changed");
+    assert.ok(posted.some(m => /Mission Caliber is now III/.test(m.content) && /p\.398/.test(m.content)));
+  } finally {
+    await state.setMission(saved);
+    a1.system = before.a1;
+    a2.system = before.a2;
+  }
+});
