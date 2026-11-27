@@ -7,7 +7,7 @@
  * every gained die it improves under Fortune Favors the Bold. The GC grants it from the sheet, since the feat is a
  * request to the GC; the matching die goes to the GC pool or is noted for the chosen opponent.
  */
-import { actionDiceGain } from "./action-dice.mjs";
+import { actionDiceGain, allowsAdditionalActionDice } from "./action-dice.mjs";
 import { loc } from "../i18n.mjs";
 
 export const FORTUNATE = "Fortunate";
@@ -20,6 +20,7 @@ export function chanceFeatCount(system) {
 }
 
 export function fortunateSpec(system) {
+  if (!allowsAdditionalActionDice(system)) return null;
   if (!system.activeFeatNames?.includes(FORTUNATE)) return null;
   return {
     id: "fortunate",
@@ -32,6 +33,7 @@ export function fortunateSpec(system) {
 
 /** The scene-long d4 bonus pool the character gains. */
 export function fortunatePool(system, { id, periods = system.usagePeriods } = {}) {
+  if (!allowsAdditionalActionDice(system)) throw new Error(loc`This companion cannot gain additional action dice.`);
   if (!system.activeFeatNames?.includes(FORTUNATE)) throw Error(loc`Fortunate has not been earned.`);
   if (typeof id !== "string" || !/^[A-Za-z0-9_-]+$/.test(id) || system.bonusActionDice?.[id])
     throw Error(loc`Review the new Fortunate grant identifier.`);

@@ -1,7 +1,7 @@
 import { classFeatureLevels } from "./class-features.mjs";
 import { underminedSpendBlock } from "./taunt.mjs";
 import { shakenRules } from "./shaken.mjs";
-import { actionDiceGain, actionDieBoostPlan } from "./action-dice.mjs";
+import { actionDiceGain, actionDieBoostPlan, allowsAdditionalActionDice } from "./action-dice.mjs";
 import { validFortunatePool } from "./fortunate.mjs";
 import { loc } from "../i18n.mjs";
 import { favoredGearPoolStatus } from "./favored-gear-session.mjs";
@@ -10,6 +10,7 @@ const epoch = (periods, key) => String(periods?.[key] ?? "initial");
 export const UNRESTRICTED_POOL_SOURCES = Object.freeze(["masterPlan", "strut", "adrenalineJunkie", "fortunate"]);
 /** Stuntman 8, p.81: one compulsory d10, confined to its STR/DEX check, once per scene. */
 export function difficultSkillBonusPlan(system, result, { dc } = {}) {
+  if (!allowsAdditionalActionDice(system)) throw new Error(loc`This companion cannot gain additional action dice.`);
   if ((classFeatureLevels(system)?.stuntman ?? 0) < 8) throw new Error(loc`This bonus requires Stuntman level 8.`);
   if (result?.method !== "roll" || !["str", "dex"].includes(result.ability))
     throw new Error(loc`This bonus requires a rolled Strength- or Dexterity-based skill check.`);
@@ -28,6 +29,7 @@ export function checkBonusPool(
   gain,
   { id, messageUuid, skillKey, ability, periods = system.usagePeriods } = {}
 ) {
+  if (!allowsAdditionalActionDice(system)) throw new Error(loc`This companion cannot gain additional action dice.`);
   if (!/^[A-Za-z0-9_-]+$/.test(id) || !messageUuid || system.bonusActionDice?.[id])
     throw new Error(loc`A new bonus-pool identifier and its recorded check are required.`);
   return {
@@ -47,6 +49,13 @@ export function checkBonusPool(
   };
 }
 export function bonusPoolForCheck(system, id, message, { periods = system.usagePeriods } = {}) {
+  if (system.companionOf?.feat === "Personal Lieutenant")
+    return {
+      ...system.bonusActionDice?.[id],
+      id,
+      available: 0,
+      reason: loc`Personal Lieutenant cannot use additional action dice.`
+    };
   if (system.bonusActionDice?.[id]?.source === "favoredGear")
     return favoredGearPoolStatus({ ...system, usagePeriods: periods }, id, { check: message?.flags?.spycraft2 });
   if (UNRESTRICTED_POOL_SOURCES.includes(system.bonusActionDice?.[id]?.source))
@@ -120,6 +129,7 @@ export function availableThreatBonusPools(system, message, periods = system.usag
 
 /** Stuntman 8, p.81: one unrestricted session die per activated error, not per die spent. */
 export function hardKnocksGainPlan(system, check, { kind, careerDie = 4 } = {}) {
+  if (!allowsAdditionalActionDice(system)) return null;
   if (
     kind !== "failure" ||
     !check?.errorConfirmed ||
@@ -152,6 +162,7 @@ export function transferableCheckBonusPool(system, message, periods = system.usa
 
 /** Schemer 8, p.79: fixed d4 bonus dice, one mission use, lost at scene end. */
 export function masterPlanGainPlan(system) {
+  if (!allowsAdditionalActionDice(system)) throw new Error(loc`This companion cannot gain additional action dice.`);
   if ((classFeatureLevels(system)?.schemer ?? 0) < 8) throw new Error(loc`Master Plan requires Schemer level 8.`);
   const modifier = system.abilities?.int?.mod;
   if (!Number.isSafeInteger(modifier) || modifier < 1)
@@ -165,6 +176,7 @@ export function masterPlanGainPlan(system) {
   };
 }
 export function masterPlanPool(system, gain, { id, periods = system.usagePeriods } = {}) {
+  if (!allowsAdditionalActionDice(system)) throw new Error(loc`This companion cannot gain additional action dice.`);
   if (
     typeof id !== "string" ||
     !/^[A-Za-z0-9_-]+$/.test(id) ||
@@ -195,6 +207,14 @@ export function masterPlanPool(system, gain, { id, periods = system.usagePeriods
   };
 }
 export function unrestrictedBonusPoolStatus(system, id, { periods = system.usagePeriods } = {}) {
+  if (system.companionOf?.feat === "Personal Lieutenant")
+    return {
+      ...system.bonusActionDice?.[id],
+      id,
+      available: 0,
+      needsReview: false,
+      reason: loc`Personal Lieutenant cannot use additional action dice.`
+    };
   const pool = system.bonusActionDice?.[id];
   let reason = "",
     needsReview = false;
@@ -336,6 +356,11 @@ export function actionDiceFundingContext(
   system,
   { bonusPoolId = "", periods = system.usagePeriods, message = null, purpose = "" } = {}
 ) {
+  if (system.companionOf?.feat === "Personal Lieutenant" && (bonusPoolId || system.actionDice?.value > 1))
+    return {
+      blocked: true,
+      reason: loc`Personal Lieutenant: only the single starting die may be spent. The GC must review any extra saved dice.`
+    };
   if (system.actionDieAwardReview?.needsReview)
     return { blocked: true, reason: loc`The GC must review the interrupted award before spending more action dice.` };
   if (system.actionDiceSettlementReview?.needsReview)

@@ -713,12 +713,20 @@ async function completeDelivery(actor, message, record, attempt, receipt, { fres
 }
 export function finishGearAcquisition(actor, message, options = {}) {
   if (!owned(actor) || message.flags?.spycraft2?.actorUuid !== actor.uuid) return null;
+  if (actor.system.companionOf?.feat === "Personal Lieutenant")
+    return refuse(
+      loc`Personal Lieutenant: the GC must review this old delivery and supply equipment through the owner.`
+    );
   return queued(
     actor,
     async () => {
       requireSettledReserve(actor);
       if (!owned(actor) || message.flags?.spycraft2?.actorUuid !== actor.uuid)
         throw new Error(loc`The acquisition ownership changed.`);
+      if (actor.system.companionOf?.feat === "Personal Lieutenant")
+        throw new Error(
+          loc`Personal Lieutenant: the GC must review this old delivery and supply equipment through the owner.`
+        );
       if (message.blind && !game.user?.isGM) throw new Error(loc`The GC resolves secret acquisitions.`);
       const check = message.flags.spycraft2,
         record = currentReserves(actor.system),

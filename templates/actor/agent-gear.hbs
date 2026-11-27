@@ -79,6 +79,16 @@
   {{#if favoredGearSessionControl}}<p>{{#if canSettleFavoredGear}}<button type="button" class="sc2-action" data-action="settleFavoredGearSession">{{favoredGearSessionLabel}}</button>{{/if}} {{#if canRecordFavoredLevelChoices}}<button type="button" class="sc2-action" data-action="recordFavoredGearLevelChoices">{{favoredGearLevelLabel}}</button>{{/if}} <button type="button" class="sc2-action" data-action="reviewFavoredGearSession">{{favoredGearReviewLabel}}</button></p>{{/if}}
   <h3>{{localize "SPYCRAFT.Wealth"}} <span class="points {{#if (sc2lt system.wealth.remaining 0)}}bad{{/if}}">{{system.wealth.allocated}} / {{system.wealth.total}}</span></h3>
   <table class="wealth">
+    {{#if lieutenantProvisioning}}
+      <caption>
+        {{localize "SPYCRAFT.Lieutenant.Provisioning"}}
+        {{localize "SPYCRAFT.Lieutenant.Restrictions"}}
+        {{localize "SPYCRAFT.Lieutenant.ExistingAllocations"}}
+        <button type="button" class="sc2-action" data-action="openCompanion" data-uuid="{{lieutenantProvisioning.ownerUuid}}">
+          {{localize "SPYCRAFT.Lieutenant.OpenOwner"}}
+        </button>
+      </caption>
+    {{/if}}
     <thead><tr><th></th><th>{{localize "SPYCRAFT.Spent"}}</th><th>{{localize "SPYCRAFT.Rank"}}</th><th></th></tr></thead>
     <tbody>
       <tr><th>{{localize "SPYCRAFT.Lifestyle"}}</th><td><input class="w-2 edit-only" type="number" name="system.wealthAllocation.lifestyle" value="{{system.wealthAllocation.lifestyle}}" min="0" /></td>

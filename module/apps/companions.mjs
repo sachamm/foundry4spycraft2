@@ -43,7 +43,9 @@ export async function createCompanion(owner, feat) {
   if (feat === ANIMAL_PARTNER && !slots.animalPartner)
     return refuse(loc`Each Animal Partner selection grants one animal; all are linked.`);
   if (feat === PERSONAL_LIEUTENANT && !slots.personalLieutenant)
-    return refuse(loc`Personal Lieutenant needs the feat, career level 6+ and no lieutenant already linked.`);
+    return refuse(
+      loc`Personal Lieutenant requires an active feat, an owner with a Career Level, and no lieutenant already linked.`
+    );
   const ownership = { ...owner.ownership },
     companionOf = { ownerUuid: owner.uuid, feat };
   const data =

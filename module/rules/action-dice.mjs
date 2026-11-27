@@ -5,6 +5,10 @@ import { resolveSkillResult } from "./checks.mjs";
 import { trademarkBoost } from "./favored-gear.mjs";
 import { loc } from "../i18n.mjs";
 import { crossroadsMissionXPPolicy, crossroadsMissionXPBonus } from "./crossroads-xp.mjs";
+/** Companion exceptions concern newly gained dice, not refreshing their allowed starting balance (pp.201,204). */
+export const allowsAdditionalActionDice = system =>
+  !["Animal Partner", "Personal Lieutenant"].includes(system?.companionOf?.feat);
+
 /** Doubled-die abilities never exceed two dice per die spent (pp.29,62), including Card Shark p.202. */
 export function actionDieBoostPlan(
   system,
@@ -197,6 +201,8 @@ export function actionDieAwardPlan(
   system,
   { count = 1, careerDie = 4, reason = "", mission = "initial", session = "initial", id = "", at = 0 } = {}
 ) {
+  if (system.companionOf?.feat === "Personal Lieutenant")
+    throw new Error(loc`Personal Lieutenant cannot receive additional action dice.`);
   if (
     !Number.isSafeInteger(count) ||
     count < 1 ||

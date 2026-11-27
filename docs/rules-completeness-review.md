@@ -2139,3 +2139,26 @@ All **4,396** Node tests, **988** engine checks and **269** layout cases pass,
 alongside schema, lint, formatting, bundle and copy checks. Continue ongoing acid
 DR/source tracking, remaining secondary-effect/recovery rules, Drained and the
 creation-choice evidence before either requested 9.9 score.
+
+## Pass 72: Personal Lieutenant restrictions and original saved allocations
+
+Both areas remain **9.8/10**. Personal Lieutenants now exclude class core
+abilities, personal Wealth ranks and allowances, contacts, Interests, Subplots
+and mission picks. The user's ruling resolves the contradictory Wealth wording
+on p.204: the owner supplies all equipment. Gear Requests, free Resource benefits
+and old pending deliveries cannot bypass that restriction. Saved allocations
+remain available for GC correction, with explicit setup errors and owner access.
+Ordinary class progression remains intact.
+
+Lieutenants retain one starting action die. Ordinary awards, bonus pools and
+their producers cannot grant extra dice, and old additional balances require
+review before spending. Actual core-feature suppression also removes their core
+grant paths. Early Origin-granted Personal Lieutenant is now accepted; normal
+feat acquisition retains its prerequisite checks. A lieutenant cannot create
+another companion through a prohibited feat.
+
+The full pre-final-guard suite passed **4,397** tests and **988** engine checks;
+nine focused companion cases also verify the final producer guards. Lint and
+format checks pass. Advancement cadence, Career Level 0 readiness, companion
+death/replacement safety and native lieutenant creation still need completion;
+these remain reasons to withhold either requested 9.9 score.

@@ -92,17 +92,26 @@ export function lieutenantReview(system, ownerSystem) {
   if ((system.contacts ?? []).length) warnings.push(loc`Personal Lieutenant: has no contacts of their own.`);
   if ((system.subplots ?? []).length) warnings.push(loc`Personal Lieutenant: has no Subplots.`);
   if (String(system.interests ?? "").trim()) warnings.push(loc`Personal Lieutenant: has no Interests.`);
+  if (Object.values(system.wealthAllocation ?? {}).some(value => Number(value) > 0))
+    warnings.push(
+      loc`Personal Lieutenant: the owner supplies Wealth and equipment. Review the saved personal Wealth allocations with the GC.`
+    );
+  if (system.actionDice?.value > 1)
+    warnings.push(
+      loc`Personal Lieutenant: the GC must review extra saved action dice; only the single starting die is allowed.`
+    );
   return { warnings, level };
 }
 
 /** Whether the owner may add another companion of this kind, given those already linked. */
 export function companionSlots(ownerSystem, linked = []) {
+  if (ownerSystem?.companionOf?.feat === PERSONAL_LIEUTENANT) return { animalPartner: 0, personalLieutenant: 0 };
   const partners = linked.filter(c => c.feat === ANIMAL_PARTNER).length,
     lieutenants = linked.filter(c => c.feat === PERSONAL_LIEUTENANT).length;
   return {
     animalPartner: Math.max(0, count(ownerSystem, ANIMAL_PARTNER) - partners),
     personalLieutenant:
-      ownerSystem?.activeFeatNames?.includes(PERSONAL_LIEUTENANT) && (ownerSystem.level ?? 0) >= 6
+      ownerSystem?.activeFeatNames?.includes(PERSONAL_LIEUTENANT) && (ownerSystem.level ?? 0) >= 1
         ? Math.max(0, 1 - lieutenants)
         : 0
   };

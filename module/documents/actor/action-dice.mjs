@@ -909,6 +909,8 @@ export const ActorActionDice = Base =>
     async awardActionDice(options = {}) {
       if (!game.user?.isGM) throw new Error(loc`Only the GC can award action dice.`);
       if (this.type !== "agent" || !this.isOwner) return null;
+      if (this.system.companionOf?.feat === "Personal Lieutenant")
+        throw new Error(loc`Personal Lieutenant cannot receive additional action dice.`);
       if (this.flags?.spycraft2?.missionXPReview?.needsReview)
         throw new Error(loc`Review the interrupted mission XP settlement before recording more awards.`);
       if (this.flags?.spycraft2?.actionDieAwardReview?.needsReview)

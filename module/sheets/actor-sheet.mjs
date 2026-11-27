@@ -1281,6 +1281,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     context.gunslinger = uses.find(s => s.id === "gunslingersEye");
     context.fireTeamSupremacy = uses.find(s => s.id === "fireTeamSupremacy");
     context.companions = this.actor.type === "agent" ? companionsContext(this.actor) : null;
+    context.lieutenantProvisioning =
+      sys.companionOf?.feat === "Personal Lieutenant" ? { ownerUuid: sys.companionOf.ownerUuid } : null;
     context.flawlessIdentity = this.actor.system.activeFeatNames?.includes("Flawless Identity") === true;
     context.twoWeaponFinalAttack = uses.find(s => s.id === "twoWeaponFinalAttack");
     context.jinxUse = uses.find(s => s.id === "jinx");

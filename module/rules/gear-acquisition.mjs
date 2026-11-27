@@ -9,6 +9,7 @@ import {
 import { resourceUsePlan } from "./limited-uses.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import { loc } from "../i18n.mjs";
+import { PERSONAL_LIEUTENANT } from "./companions.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
@@ -216,6 +217,10 @@ export function gearAcquisitionPlan(
     usePersonalStash = false
   } = {}
 ) {
+  if (system.companionOf?.feat === PERSONAL_LIEUTENANT)
+    throw new Error(
+      loc`Personal Lieutenant: request equipment through the owner's picks; the lieutenant has no mission gear allowance.`
+    );
   const benefit =
     kind === "request" && requestAbility
       ? (system.limitedUses ?? []).find(s => s.id === requestAbility && s.workflow === "requestBenefit")

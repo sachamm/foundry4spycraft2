@@ -396,10 +396,12 @@ function deriveCareerLevels(state) {
         loc`${ci.name}: its class skills differ from the book (${[...extra.map(k => `+${cfg.skills[k]?.name ?? k}`), ...missing.map(k => `−${cfg.skills[k]?.name ?? k}`)].join(", ")}). Use Review catalog updates on the Bio tab to restore them.`
       );
   }
-  const coreItems = [
-    classAtLevel.find(item => item && !item.system.expert),
-    classAtLevel.find(item => item?.system.expert)
-  ].filter(item => item && !inactiveExpertClasses.has(item.system.identifier || item.name));
+  const coreItems =
+    sys.companionOf?.feat === PERSONAL_LIEUTENANT
+      ? []
+      : [classAtLevel.find(item => item && !item.system.expert), classAtLevel.find(item => item?.system.expert)].filter(
+          item => item && !inactiveExpertClasses.has(item.system.identifier || item.name)
+        );
   sys.coreClassIds = [...new Set(coreItems.map(item => item.system.identifier || item.name))];
   const inherited = inheritedClassFeatures(items, progression, cfg);
   sys.inheritedClassChoices = inherited.entries.filter(entry => !inactiveExpertClasses.has(entry.ownerClass));
@@ -1609,8 +1611,10 @@ function deriveFinalTotals(state) {
   };
   for (const key of ["fort", "ref", "will"]) sys.saves[key].bonusEntries = B.entries.get(`saves.${key}`) ?? [];
   sys.lifestyleAppearance =
-    (T.lifestyle[clamp(1 + B.get("lifestyle") + (sys.wealthAllocation?.lifestyle ?? 0), 1, 10) - 1]?.appearanceMod ??
-      0) + B.get("appearance");
+    (sys.companionOf?.feat === PERSONAL_LIEUTENANT
+      ? 0
+      : (T.lifestyle[clamp(1 + B.get("lifestyle") + (sys.wealthAllocation?.lifestyle ?? 0), 1, 10) - 1]
+          ?.appearanceMod ?? 0)) + B.get("appearance");
   sys.readiedMeleeWeapons = readiedMeleeWeapons(sys, items);
   sys.guardWeapons = readiedGuardWeapons(sys, items);
   // Whatever's Handy also helps Defense while an improvised weapon is in hand (module/rules/defense.mjs).
@@ -1953,8 +1957,13 @@ function deriveFinalTotals(state) {
   // Personal Lieutenant (p.204): always exactly 1 action die.
   if (sys.companionOf?.feat === PERSONAL_LIEUTENANT) {
     sys.actionDice.max = 1;
-    if (sys.lieutenantOwner) warnings.push(...lieutenantReview(sys, sys.lieutenantOwner).warnings);
-    else warnings.push(loc`Personal Lieutenant: the owner could not be found.`);
+    const review = sys.lieutenantOwner
+      ? lieutenantReview(sys, sys.lieutenantOwner).warnings
+      : [loc`Personal Lieutenant: the owner could not be found.`];
+    for (const text of review) {
+      warnings.push(text);
+      todo.push({ order: 11, tab: "training", error: true, always: true, text });
+    }
   }
   sys.adrenalineJunkieSource = adrenalineSource(sys);
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
@@ -2308,7 +2317,10 @@ function deriveProficiencies(state) {
     .map(s => s.trim())
     .filter(Boolean);
   sys.interestPicks = {
-    available: Math.max(0, tb.interestBase + B.get("interests") - (sys.relinquishedInterests ?? 0)),
+    available:
+      sys.companionOf?.feat === PERSONAL_LIEUTENANT
+        ? 0
+        : Math.max(0, tb.interestBase + B.get("interests") - (sys.relinquishedInterests ?? 0)),
     used: new Set(interestList.map(norm)).size
   };
   if (sys.interestPicks.used !== interestList.length) {
@@ -2326,7 +2338,13 @@ function deriveProficiencies(state) {
     todo.push({ order: 52, tab: "training", error: true, always: true, text });
   }
   sys.contactFeatBindings = items
-    .filter(i => i.type === "feat" && activeFeatIds.has(i.id) && Object.hasOwn(CONTACT_FEATS, i.name))
+    .filter(
+      i =>
+        sys.companionOf?.feat !== PERSONAL_LIEUTENANT &&
+        i.type === "feat" &&
+        activeFeatIds.has(i.id) &&
+        Object.hasOwn(CONTACT_FEATS, i.name)
+    )
     .map(i => ({
       id: i.id,
       name: i.name,
@@ -2339,16 +2357,19 @@ function deriveProficiencies(state) {
   sys.contactFeatGrants = contactFeatGrants(sys);
   const pendingContactGrants = sys.contactFeatGrants.filter(g => !g.valid);
   for (const g of pendingContactGrants) todo.push({ order: 53, tab: "feats", text: g.name + ": " + g.reason });
-  sys.networkingContactFeatGrants = networkingContactFeatGrants(sys);
+  sys.networkingContactFeatGrants =
+    sys.companionOf?.feat === PERSONAL_LIEUTENANT ? [] : networkingContactFeatGrants(sys);
   for (const g of sys.networkingContactFeatGrants.filter(g => !g.valid))
     warnings.push((g.name || loc`Networking contact`) + ": " + g.reason);
   const contactsAvail =
-    (level > 0 ? 1 : 0) +
-    B.get("contacts") -
-    2 * sys.contactFeatBindings.length +
-    sys.contactFeatGrants.reduce((n, g) => n + g.credit, 0) +
-    sys.networkingContactFeatGrants.filter(g => g.valid).length +
-    Math.floor((purchasedRanks.networking ?? 0) / 4);
+    sys.companionOf?.feat === PERSONAL_LIEUTENANT
+      ? 0
+      : (level > 0 ? 1 : 0) +
+        B.get("contacts") -
+        2 * sys.contactFeatBindings.length +
+        sys.contactFeatGrants.reduce((n, g) => n + g.credit, 0) +
+        sys.networkingContactFeatGrants.filter(g => g.valid).length +
+        Math.floor((purchasedRanks.networking ?? 0) / 4);
   const contactReview = contactChoices(sys.contacts ?? []),
     contactsUsed = contactReview.used;
   for (const text of contactReview.warnings) {
@@ -2369,7 +2390,8 @@ function deriveProficiencies(state) {
     });
 
   const unfinishedSubplots = (sys.subplots ?? []).filter(row => !row.complete),
-    minimumSubplots = sys.activeFeatNames.includes("Trouble Magnet") ? 1 : 0;
+    minimumSubplots =
+      sys.companionOf?.feat === PERSONAL_LIEUTENANT ? 0 : sys.activeFeatNames.includes("Trouble Magnet") ? 1 : 0;
   // A row counts once it names or describes its Subplot (p.53); a blank row is not a Subplot yet.
   const subplotsInPlay = unfinishedSubplots.filter(
     row => String(row.name ?? "").trim() || String(row.notes ?? "").trim()
@@ -2380,7 +2402,10 @@ function deriveProficiencies(state) {
     todo.push({ order: 54, tab: "training", error: true, always: true, text });
   }
   sys.subplotPicks = {
-    available: (lr?.subplots ?? 0) + B.get("subplots") + (sys.campaignEffects.extraSubplots ?? 0),
+    available:
+      sys.companionOf?.feat === PERSONAL_LIEUTENANT
+        ? 0
+        : (lr?.subplots ?? 0) + B.get("subplots") + (sys.campaignEffects.extraSubplots ?? 0),
     used: subplotsInPlay,
     minimum: minimumSubplots,
     inPlay: subplotValidation.active.length,
@@ -2401,11 +2426,13 @@ function deriveProficiencies(state) {
 function deriveWealthAndGear(state) {
   const { sys, allItems, items, T, warnings, todo, plural, base, gearBase, abil, B, misc } = state;
   const wealthTotal =
-    base.wealth +
-    B.get("wealth") +
-    Math.max(0, abil.cha.mod) +
-    (misc.wealth ?? 0) +
-    (sys.campaignEffects.startingWealth ?? 0);
+    sys.companionOf?.feat === PERSONAL_LIEUTENANT
+      ? 0
+      : base.wealth +
+        B.get("wealth") +
+        Math.max(0, abil.cha.mod) +
+        (misc.wealth ?? 0) +
+        (sys.campaignEffects.startingWealth ?? 0);
   const alloc = sys.wealthAllocation ?? {};
   const allocated = (alloc.lifestyle ?? 0) + (alloc.possessions ?? 0) + (alloc.spendingCash ?? 0);
   const lifestyleRaw = 1 + B.get("lifestyle") + (alloc.lifestyle ?? 0);
@@ -2435,15 +2462,26 @@ function deriveWealthAndGear(state) {
     possessions: { rank: possessions, picks: posRow?.picks },
     spendingCash: { rank: cash, amount: 100 * cash * cash }
   };
-  sys.wealth.possessions.budget = possessionBudget(items, posRow?.picks, sys);
+  if (sys.companionOf?.feat === PERSONAL_LIEUTENANT) {
+    sys.wealth.lifestyle = { rank: 0, appearanceMod: B.get("appearance"), appearanceFeatBonus: B.get("appearance") };
+    sys.wealth.possessions = { rank: 0, picks: "" };
+    sys.wealth.spendingCash = { rank: 0, amount: 0 };
+    sys.lifestyleAppearance = B.get("appearance");
+  }
+  sys.wealth.possessions.budget = possessionBudget(items, sys.wealth.possessions.picks, sys);
   warnings.push(...sys.wealth.possessions.budget.warnings);
   if (allocated > wealthTotal) warnings.push(loc`Wealth overspent by ${allocated - wealthTotal}.`);
   if (allocated < wealthTotal)
     todo.push({ order: 60, tab: "gear", text: loc`${plural(wealthTotal - allocated, "wealth point")} to allocate.` });
 
   const picks = {};
-  for (const g of GEAR) picks[g] = { available: gearBase[g] + B.get(`gear.${g}`) + (misc[`gear${g}`] ?? 0), spent: 0 };
-  picks.CHA = { available: Math.max(0, abil.cha.mod), spent: 0 };
+  for (const g of GEAR)
+    picks[g] = {
+      available:
+        sys.companionOf?.feat === PERSONAL_LIEUTENANT ? 0 : gearBase[g] + B.get(`gear.${g}`) + (misc[`gear${g}`] ?? 0),
+      spent: 0
+    };
+  picks.CHA = { available: sys.companionOf?.feat === PERSONAL_LIEUTENANT ? 0 : Math.max(0, abil.cha.mod), spent: 0 };
   for (const i of items) {
     const p = i.system?.pick;
     if (p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i)) picks[p].spent += i.system?.pickCount ?? 1;

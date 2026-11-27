@@ -1,4 +1,4 @@
-import { actionDiceGain } from "./action-dice.mjs";
+import { actionDiceGain, allowsAdditionalActionDice } from "./action-dice.mjs";
 import { loc } from "../i18n.mjs";
 
 export const favoredPeriodKey = value => encodeURIComponent(value).replaceAll(".", "%2E");
@@ -82,7 +82,7 @@ export function favoredGearSessionPlan(system, items, { id, actorUuid, missionCa
         entry.status = "forfeited";
         forfeits[favoredPeriodKey(row.itemUuid)] = { itemUuid: row.itemUuid, mission, receiptId: id };
       }
-    } else if (!row.unavailable && row.difference > 0) {
+    } else if (!row.unavailable && row.difference > 0 && allowsAdditionalActionDice(system)) {
       const poolId = `${id}_${index}`;
       if (system.bonusActionDice?.[poolId]) throw Error(loc`This Favored Gear bonus-die reference is already used.`);
       const gain = actionDiceGain(system, careerDie, row.difference);

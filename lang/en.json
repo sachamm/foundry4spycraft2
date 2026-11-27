@@ -92,6 +92,12 @@
    "Interrupted": "Review an interrupted action",
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
+  "Lieutenant": {
+   "Provisioning": "The owner supplies Wealth and all equipment. Record requests and personal gear against the owner's allowance.",
+   "Restrictions": "No class core abilities, Contacts, Interests or Subplots; no additional action dice or mission Caliber shifts.",
+   "ExistingAllocations": "Saved allocations are shown below for GC correction.",
+   "OpenOwner": "Open owner"
+  },
   "Hazards": {
    "FireSources": "Fire damage sources",
    "FireDamageTotal": "Fire damage suffered: {amount}.",

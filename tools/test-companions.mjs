@@ -14,6 +14,21 @@ import { computeAgent } from "../module/rules/engine.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { npcIsSpecial, spendProfile } from "../module/rules/gc/npc-state.mjs";
 import { evasionPlan } from "../module/rules/save-avoidance.mjs";
+import { gearAcquisitionPlan } from "../module/rules/gear-acquisition.mjs";
+import { actionDieAwardPlan } from "../module/rules/action-dice.mjs";
+import { fortunateSpec, fortunatePool } from "../module/rules/fortunate.mjs";
+import { hasStrut, strutPool } from "../module/rules/strut.mjs";
+import {
+  actionDiceFundingContext,
+  actionDicePaymentPlan,
+  checkBonusPool,
+  difficultSkillBonusPlan,
+  hardKnocksGainPlan,
+  masterPlanGainPlan,
+  masterPlanPool,
+  bonusPoolForCheck,
+  unrestrictedBonusPoolStatus
+} from "../module/rules/bonus-pools.mjs";
 
 test("Animal Partner grants its size benefit only to a declared partner of known size", () => {
   for (const size of ["Nuisance", "Fine", "Diminutive", "Tiny", "Small"]) {
@@ -84,11 +99,16 @@ test("Personal Lieutenant review, slots and the cost of losing a companion", () 
   ).warnings;
   assert.equal(bad.length, 3);
   assert.deepEqual(companionSlots(boss, [{ feat: "Animal Partner" }]), { animalPartner: 1, personalLieutenant: 1 });
-  assert.equal(companionSlots({ ...boss, level: 5 }, []).personalLieutenant, 0);
+  assert.equal(
+    companionSlots({ ...boss, level: 1 }, []).personalLieutenant,
+    1,
+    "an active Origin-granted feat bypasses its ordinary acquisition requirement"
+  );
+  assert.equal(companionSlots({ ...boss, level: 0 }, []).personalLieutenant, 0);
   assert.deepEqual(companionLoss(boss), { reputation: 9, netWorth: 450000 });
 });
 
-test("a Personal Lieutenant has exactly 1 action die", () => {
+test("a Personal Lieutenant retains class progression with one action die and no prohibited personal benefits", () => {
   const cls = {
     id: "test",
     type: "class",
@@ -121,6 +141,63 @@ test("a Personal Lieutenant has exactly 1 action die", () => {
     cfg
   );
   assert.equal(lieutenant.actionDice.max, 1);
+  assert.deepEqual(lieutenant.coreClassIds, []);
+  assert.deepEqual(lieutenant.coreAbilities, []);
+  assert.equal(lieutenant.interestPicks.available, 0);
+  assert.equal(lieutenant.contactPicks.available, 0);
+  assert.equal(lieutenant.subplotPicks.available, 0);
+  assert.equal(lieutenant.wealth.total, 0);
+  assert.equal(lieutenant.wealth.lifestyle.rank, 0);
+  assert.equal(lieutenant.wealth.spendingCash.amount, 0);
+  assert.ok(Object.values(lieutenant.wealth.possessions.budget.available).every(n => n === 0));
+  assert.ok(Object.values(lieutenant.gearPicks).every(row => row.available === 0));
+  assert.equal(lieutenant.classLevels.test, 1, "owned class progression is preserved");
+});
+
+test("lieutenants cannot request free gear, receive ordinary awards or spend extra saved dice", () => {
+  const system = {
+    companionOf: { feat: "Personal Lieutenant", ownerUuid: "Actor.owner" },
+    actionDice: { value: 1 },
+    bonusActionDice: { old: { id: "old", remaining: 5, source: "masterPlan" } }
+  };
+  assert.throws(
+    () => gearAcquisitionPlan(system, { kind: "request", name: "Free resource", requestAbility: "privilegedResource" }),
+    /owner's picks/
+  );
+  assert.throws(
+    () => actionDieAwardPlan(system, { count: 1, reason: "Roleplay", id: "award" }),
+    /cannot receive additional/
+  );
+  assert.equal(bonusPoolForCheck(system, "old", {}).available, 0);
+  assert.equal(unrestrictedBonusPoolStatus(system, "old").available, 0);
+  assert.equal(actionDiceFundingContext(system, { bonusPoolId: "old" }).blocked, true);
+  assert.equal(actionDicePaymentPlan(system, { count: 1, bonusPoolId: "old" }).blocked, true);
+  assert.equal(actionDicePaymentPlan(system, { count: 1 }).afterBalance, 0);
+  assert.equal(actionDicePaymentPlan({ ...system, actionDice: { value: 2 } }, { count: 1 }).blocked, true);
+  assert.equal(system.bonusActionDice.old.remaining, 5, "historical bonus balances are preserved for GC review");
+});
+
+test("companion extra-die restrictions apply before any bonus producer rolls or creates a pool", () => {
+  for (const feat of ["Animal Partner", "Personal Lieutenant"]) {
+    const system = {
+      companionOf: { feat },
+      activeFeatNames: ["Fortunate"],
+      classLevels: { brawler: 3, schemer: 8 },
+      classOptionSelections: [{ classId: "brawler", name: "Strut" }]
+    };
+    assert.equal(fortunateSpec(system), null);
+    assert.equal(hasStrut(system), false);
+    assert.equal(hardKnocksGainPlan(system, {}), null);
+    for (const produce of [
+      fortunatePool,
+      strutPool,
+      checkBonusPool,
+      difficultSkillBonusPlan,
+      masterPlanGainPlan,
+      masterPlanPool
+    ])
+      assert.throws(() => produce(system, {}), /cannot gain additional action dice/);
+  }
 });
 
 test("Flawless Identity: identities up to the starting action dice; the active one adds its Profession focus", async () => {
