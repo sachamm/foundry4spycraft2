@@ -16,9 +16,10 @@
   ],
   "skillPoints": [
    {
-    "athletics": 8,
+    "athletics": 4,
     "notice": 4,
-    "sneak": 4
+    "sneak": 4,
+    "intimidate": 4
    }
   ],
   "feats": []
@@ -77,10 +78,10 @@
     "cap": 15
    },
    "athletics": {
-    "ranks": 8,
+    "ranks": 4,
     "bonus": 0,
     "threat": 20,
-    "cap": 40
+    "cap": 30
    },
    "blend": {
     "ranks": 0,
@@ -137,10 +138,10 @@
     "cap": 15
    },
    "intimidate": {
-    "ranks": 0,
+    "ranks": 4,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 30
    },
    "investigation": {
     "ranks": 0,
@@ -244,6 +245,14 @@
     "threat": 20,
     "cap": 15
    }
-  }
+  },
+  "skillHistory": [
+   {
+    "athletics": 4,
+    "notice": 4,
+    "sneak": 2,
+    "intimidate": 4
+   }
+  ]
  }
 }

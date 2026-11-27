@@ -11,7 +11,8 @@ import { fileURLToPath } from "node:url";
 import { buildPacks } from "./lib/pack-docs.mjs";
 import { SKILLS, TABLES } from "../module/rules/tables.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
-import { computeAgent } from "../module/rules/engine.mjs";
+import { computeAgent, prerequisiteContext } from "../module/rules/engine.mjs";
+import { checkPrerequisites } from "../module/rules/prerequisites.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -169,6 +170,37 @@ for (const file of fixtures) {
   expect("Subplots", s.subplotPicks.available, e.subplots);
   expect("Max ranks", s.maxRanks, e.maxRanks);
   s.skillPoints.forEach((sp, i) => expect(`Skill points L${i + 1}`, sp.available, e.skillPoints[i]));
+  expect("skill purchase issues", s.skillPurchaseIssues.length, 0);
+  s.skillPoints.forEach((sp, i) => expect(`Unspent skill points L${i + 1}`, sp.remaining, 0));
+  expect("reference skill history length", e.skillHistory.length, fx.spec.classes.length);
+  for (const [i, expected] of e.skillHistory.entries()) {
+    const stage = build({
+      ...fx.spec,
+      classes: fx.spec.classes.slice(0, i + 1),
+      vitality: fx.spec.vitality?.slice(0, i + 1),
+      skillPoints: fx.spec.skillPoints.slice(0, i + 1)
+    });
+    for (const skill of SKILLS)
+      expect(
+        `L${i + 1} ${skill.key} purchased ranks`,
+        stage.skillTotals[skill.key].purchasedRanks,
+        expected[skill.key] ?? 0
+      );
+    const next = packs.classes[fx.spec.classes[i + 1]];
+    if (next?.system.expert && !fx.spec.classes.slice(0, i + 1).includes(next.name)) {
+      const trees = stage.activeFeatSelections.reduce((out, feat) => {
+        out[feat.tree] = (out[feat.tree] ?? 0) + 1;
+        return out;
+      }, {});
+      const context = prerequisiteContext(
+        stage,
+        new Set(stage.activeFeatNames.map(name => name.toLowerCase())),
+        trees,
+        Object.fromEntries(SKILLS.map(skill => [skill.key, stage.skillTotals[skill.key].purchasedRanks]))
+      );
+      expect(`${next.name} prerequisites before entry`, checkPrerequisites(next.system.requirements, context).ok, true);
+    }
+  }
   for (const [k, v] of Object.entries(e.skills)) {
     expect(`${k} ranks`, s.skillTotals[k].ranks, v.ranks);
     expect(`${k} bonus`, s.skillTotals[k].bonus, v.bonus);

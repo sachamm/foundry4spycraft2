@@ -32,28 +32,54 @@
   ],
   "skillPoints": [
    {
-    "bluff": 16,
-    "impress": 12,
-    "networking": 12,
+    "bluff": 4,
+    "impress": 4,
+    "networking": 4,
+    "blend": 4,
+    "bureaucracy": 4,
+    "cultures": 4,
+    "falsify": 4,
+    "notice": 4,
     "sneak": 8
    },
    {
-    "bluff": 4,
-    "networking": 4
+    "bluff": 1,
+    "impress": 1,
+    "networking": 1,
+    "blend": 1,
+    "bureaucracy": 1,
+    "cultures": 1,
+    "falsify": 1,
+    "notice": 1,
+    "athletics": 2
    },
    {
-    "bluff": 4,
-    "athletics": 4
+    "bluff": 1,
+    "impress": 1,
+    "networking": 1,
+    "blend": 1,
+    "bureaucracy": 1,
+    "cultures": 1,
+    "falsify": 1,
+    "notice": 1,
+    "athletics": 2
    },
    {
-    "athletics": 4
+    "athletics": 5,
+    "notice": 1,
+    "resolve": 2
    },
    {
-    "athletics": 4,
-    "notice": 2
+    "athletics": 1,
+    "notice": 1,
+    "resolve": 6
    },
    {
-    "notice": 6
+    "notice": 1,
+    "athletics": 2,
+    "networking": 2,
+    "cultures": 3,
+    "drive": 2
    }
   ],
   "feats": [
@@ -95,7 +121,7 @@
   "actionDice": 4,
   "actionDie": 6,
   "subplots": 2,
-  "contacts": 5,
+  "contacts": 2,
   "interests": 4,
   "maxRanks": 9,
   "skillPoints": [
@@ -120,28 +146,28 @@
     "cap": 15
    },
    "athletics": {
-    "ranks": 10,
+    "ranks": 9,
     "bonus": 0,
     "threat": 20,
-    "cap": 50
+    "cap": 40
    },
    "blend": {
-    "ranks": 0,
+    "ranks": 6,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 30
    },
    "bluff": {
-    "ranks": 24,
+    "ranks": 6,
     "bonus": 0,
     "threat": 20,
-    "cap": 60
+    "cap": 30
    },
    "bureaucracy": {
-    "ranks": 0,
+    "ranks": 6,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 30
    },
    "computers": {
     "ranks": 0,
@@ -150,16 +176,16 @@
     "cap": 15
    },
    "cultures": {
-    "ranks": 0,
+    "ranks": 9,
     "bonus": -2,
     "threat": 20,
-    "cap": 15
+    "cap": 40
    },
    "drive": {
-    "ranks": 0,
+    "ranks": 2,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 20
    },
    "electronics": {
     "ranks": 0,
@@ -168,16 +194,16 @@
     "cap": 15
    },
    "falsify": {
-    "ranks": 0,
+    "ranks": 6,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 30
    },
    "impress": {
-    "ranks": 12,
+    "ranks": 6,
     "bonus": -2,
     "threat": 20,
-    "cap": 50
+    "cap": 30
    },
    "intimidate": {
     "ranks": 0,
@@ -210,13 +236,13 @@
     "cap": 15
    },
    "networking": {
-    "ranks": 16,
+    "ranks": 7,
     "bonus": -2,
     "threat": 20,
-    "cap": 60
+    "cap": 40
    },
    "notice": {
-    "ranks": 8,
+    "ranks": 9,
     "bonus": 0,
     "threat": 20,
     "cap": 40
@@ -228,10 +254,10 @@
     "cap": 15
    },
    "resolve": {
-    "ranks": 0,
+    "ranks": 8,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 40
    },
    "science": {
     "ranks": 0,
@@ -287,6 +313,83 @@
     "threat": 20,
     "cap": 15
    }
-  }
+  },
+  "skillHistory": [
+   {
+    "bluff": 4,
+    "impress": 4,
+    "networking": 4,
+    "blend": 4,
+    "bureaucracy": 4,
+    "cultures": 4,
+    "falsify": 4,
+    "notice": 4,
+    "sneak": 4
+   },
+   {
+    "bluff": 5,
+    "impress": 5,
+    "networking": 5,
+    "blend": 5,
+    "bureaucracy": 5,
+    "cultures": 5,
+    "falsify": 5,
+    "notice": 5,
+    "sneak": 4,
+    "athletics": 1
+   },
+   {
+    "bluff": 6,
+    "impress": 6,
+    "networking": 6,
+    "blend": 6,
+    "bureaucracy": 6,
+    "cultures": 6,
+    "falsify": 6,
+    "notice": 6,
+    "sneak": 4,
+    "athletics": 2
+   },
+   {
+    "bluff": 6,
+    "impress": 6,
+    "networking": 6,
+    "blend": 6,
+    "bureaucracy": 6,
+    "cultures": 6,
+    "falsify": 6,
+    "notice": 7,
+    "sneak": 4,
+    "athletics": 7,
+    "resolve": 2
+   },
+   {
+    "bluff": 6,
+    "impress": 6,
+    "networking": 6,
+    "blend": 6,
+    "bureaucracy": 6,
+    "cultures": 6,
+    "falsify": 6,
+    "notice": 8,
+    "sneak": 4,
+    "athletics": 8,
+    "resolve": 8
+   },
+   {
+    "bluff": 6,
+    "impress": 6,
+    "networking": 7,
+    "blend": 6,
+    "bureaucracy": 6,
+    "cultures": 9,
+    "falsify": 6,
+    "notice": 9,
+    "sneak": 4,
+    "athletics": 9,
+    "resolve": 8,
+    "drive": 2
+   }
+  ]
  }
 }

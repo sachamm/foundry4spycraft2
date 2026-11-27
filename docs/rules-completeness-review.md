@@ -590,3 +590,14 @@ The large-cast side dialog is keyboard reachable at 720px, and all **230** layou
 tests pass. Creation remains **9.1/10**; combat rises to **9.3/10** for this
 connected play workflow. The larger source-data audit, remaining environment,
 campaign-quality and special-option gaps still prevent either area reaching 9.9.
+
+The reference-fixture audit corrects illegal skill purchases in all three
+numerical builds. Each now spends its actual level budget, stays within the
+purchase-time rank limits and records independently calculated purchased ranks
+at every career level. The Raptor fixture also has its required melee feat and
+proficiency, with prerequisites checked before entering the expert class.
+Networking contact awards and affected result caps follow the corrected ranks,
+including Fit's Athletics cap bonus. The fixture check grows from **482** to
+**988** assertions. These remain partial numerical builds with outstanding setup
+choices; they are not evidence of completed native PC creation. Scores remain
+**9.1/10** and **9.3/10** while that workflow and the larger B-193 audit continue.

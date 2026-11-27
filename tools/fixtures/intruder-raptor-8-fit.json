@@ -37,32 +37,84 @@
   ],
   "skillPoints": [
    {
-    "sneak": 20,
-    "acrobatics": 12
+    "acrobatics": 4,
+    "sneak": 4,
+    "athletics": 4,
+    "notice": 4,
+    "security": 4,
+    "sleightOfHand": 4,
+    "search": 4,
+    "tactics": 4
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1,
+    "search": 1,
+    "tactics": 1
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1,
+    "search": 1,
+    "tactics": 1
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1,
+    "search": 1,
+    "tactics": 1
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1
    },
    {
-    "sneak": 4
+    "acrobatics": 1,
+    "sneak": 1,
+    "athletics": 1,
+    "notice": 1,
+    "security": 1,
+    "sleightOfHand": 1
    }
   ],
-  "feats": []
+  "feats": [
+   "Knife Basics"
+  ],
+  "proficiencies": {
+   "edged": true
+  }
  },
  "expected": {
   "abilities": {
@@ -113,7 +165,7 @@
   ],
   "skills": {
    "acrobatics": {
-    "ranks": 12,
+    "ranks": 11,
     "bonus": 2,
     "threat": 19,
     "cap": 50
@@ -125,10 +177,10 @@
     "cap": 15
    },
    "athletics": {
-    "ranks": 0,
+    "ranks": 11,
     "bonus": 0,
     "threat": 20,
-    "cap": 20
+    "cap": 55
    },
    "blend": {
     "ranks": 0,
@@ -221,10 +273,10 @@
     "cap": 15
    },
    "notice": {
-    "ranks": 0,
+    "ranks": 11,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 50
    },
    "profession": {
     "ranks": 0,
@@ -245,16 +297,16 @@
     "cap": 15
    },
    "search": {
-    "ranks": 0,
+    "ranks": 7,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 40
    },
    "security": {
-    "ranks": 0,
+    "ranks": 11,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 50
    },
    "senseMotive": {
     "ranks": 0,
@@ -263,16 +315,16 @@
     "cap": 15
    },
    "sleightOfHand": {
-    "ranks": 0,
+    "ranks": 11,
     "bonus": 3,
     "threat": 20,
-    "cap": 15
+    "cap": 50
    },
    "sneak": {
-    "ranks": 48,
+    "ranks": 11,
     "bonus": 2,
     "threat": 19,
-    "cap": 60
+    "cap": 50
    },
    "streetwise": {
     "ranks": 0,
@@ -287,11 +339,93 @@
     "cap": 15
    },
    "tactics": {
-    "ranks": 0,
+    "ranks": 7,
     "bonus": 0,
     "threat": 20,
-    "cap": 15
+    "cap": 40
    }
-  }
+  },
+  "skillHistory": [
+   {
+    "acrobatics": 4,
+    "sneak": 4,
+    "athletics": 4,
+    "notice": 4,
+    "security": 4,
+    "sleightOfHand": 4,
+    "search": 4,
+    "tactics": 4
+   },
+   {
+    "acrobatics": 5,
+    "sneak": 5,
+    "athletics": 5,
+    "notice": 5,
+    "security": 5,
+    "sleightOfHand": 5,
+    "search": 5,
+    "tactics": 5
+   },
+   {
+    "acrobatics": 6,
+    "sneak": 6,
+    "athletics": 6,
+    "notice": 6,
+    "security": 6,
+    "sleightOfHand": 6,
+    "search": 6,
+    "tactics": 6
+   },
+   {
+    "acrobatics": 7,
+    "sneak": 7,
+    "athletics": 7,
+    "notice": 7,
+    "security": 7,
+    "sleightOfHand": 7,
+    "search": 7,
+    "tactics": 7
+   },
+   {
+    "acrobatics": 8,
+    "sneak": 8,
+    "athletics": 8,
+    "notice": 8,
+    "security": 8,
+    "sleightOfHand": 8,
+    "search": 7,
+    "tactics": 7
+   },
+   {
+    "acrobatics": 9,
+    "sneak": 9,
+    "athletics": 9,
+    "notice": 9,
+    "security": 9,
+    "sleightOfHand": 9,
+    "search": 7,
+    "tactics": 7
+   },
+   {
+    "acrobatics": 10,
+    "sneak": 10,
+    "athletics": 10,
+    "notice": 10,
+    "security": 10,
+    "sleightOfHand": 10,
+    "search": 7,
+    "tactics": 7
+   },
+   {
+    "acrobatics": 11,
+    "sneak": 11,
+    "athletics": 11,
+    "notice": 11,
+    "security": 11,
+    "sleightOfHand": 11,
+    "search": 7,
+    "tactics": 7
+   }
+  ]
  }
 }
