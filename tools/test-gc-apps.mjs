@@ -686,6 +686,31 @@ test("group initiative rolls NPCs only and names an agent nobody owns instead of
   assert.match(lastMessage(), /Not rolled, no player owns them: Absent/);
 });
 
+test("group initiative takes its d20 from the first member's own roll and holds back a member under Shaken review (F5)", async () => {
+  const twin = makeActor("guard-twin", "npc", npcSystem({ initiative: { total: 5 } }), { name: "Guard twin" });
+  const fight = makeCombat([
+    ["g1", guard, null, false],
+    ["g2", twin, null, false],
+    ["g3", twin, null, false]
+  ]);
+  let asked = 0;
+  // The first member's roll stands in for Combatant#getInitiativeRoll: a kept d20 of 14 (as Lightning Reflexes may
+  // choose), plus its own bonus.
+  fight.combatants.get("g1").getInitiativeRoll = () => ({
+    evaluate: async () => (asked++, { total: 14 + 3, dice: [{ total: 14 }] })
+  });
+  fight.combatants.get("g2").getInitiativeRoll = () => ({ evaluate: async () => ({ total: 0, dice: [] }) });
+  fight.combatants.get("g3").getInitiativeRoll = () => {
+    throw new Error("Review the Shaken sources before rolling Initiative.");
+  };
+  assert.equal(await combat.rollGroupInitiative(fight, { single: true }), 1);
+  assert.equal(asked, 1, "one roll for the group");
+  assert.equal(fight.combatants.get("g1").initiative, 14 + 3);
+  assert.equal(fight.combatants.get("g2").initiative, 14 + 5, "each member adds its own bonus");
+  assert.equal(fight.combatants.get("g3").initiative, null);
+  assert.match(lastMessage(), /Guard twin: not rolled \(Review the Shaken sources/);
+});
+
 test("the tracker menu entries use the Foundry 14 shape and act on the clicked row", async () => {
   const fight = makeCombat([
     ["c-a1", actors.get("a1"), 22, true],

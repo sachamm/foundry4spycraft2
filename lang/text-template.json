@@ -4750,6 +4750,7 @@
    "NotReturnedItsBonusDiceHave_1do2ie9": "Not returned (its bonus dice have expired): {0}.",
    "NotRolledNoPlayerOwnsThem_199z2ei": "Not rolled, no player owns them: {0}. Roll from the sheet or the tracker.",
    "NotRolled_0bq8mzs": "not rolled",
+   "NotRolled_1fkr8pw": "{0}: not rolled ({1})",
    "NotSavedEditAgainToRetry_16lww32": "Not saved — edit again to retry",
    "NotSetUp_16pvsq7": "not set up",
    "NotStandingNoRepositionThisRound_1ar30tz": "Not standing — no reposition this round",
