@@ -23,6 +23,7 @@ export function flatten(object, prefix = "", out = {}) {
 }
 
 const same = (a, b) => a === b || JSON.stringify(a) === JSON.stringify(b);
+const hasGCSession = record => typeof record?.gcDiceSession === "string" && record.gcDiceSession.trim().length > 0;
 
 const under = (map, path) => Object.keys(map).filter(key => key.startsWith(`${path}.`));
 /** The nested value at `path`, rebuilt from the flat paths below it. */
@@ -412,10 +413,16 @@ async function undoRecord(message, record) {
       await combatant.update(change);
     }
   }
-  if (
+  if (record.gcDice > 0 && game.user.isGM && !hasGCSession(record)) {
+    await message.update({
+      "flags.spycraft2.undo.gcDiceRefundReview": { version: 1, state: "needsReview", count: record.gcDice }
+    });
+    ui.notifications.warn(
+      loc`The character was restored. This old Undo note does not identify its GC session; review the original payment before crediting any dice.`
+    );
+  } else if (
     record.gcDice > 0 &&
     game.user.isGM &&
-    record.gcDiceSession !== undefined &&
     record.gcDiceSession !== String(readSetting("usagePeriods", {})?.session ?? "initial")
   ) {
     ui.notifications.warn(
@@ -441,6 +448,78 @@ async function undoRecord(message, record) {
   return targets.map(([entry]) => entry.name);
 }
 
+/** Review an old note after its actor changes were undone; the pool remembers its decision across lost responses. */
+export async function reviewLegacyGCRefund(message, input = {}) {
+  if (!game.user?.isGM) throw Error(loc`Only the GC reviews an old action-die refund.`);
+  const initial = message?.flags?.spycraft2?.undo;
+  if (!initial?.done || hasGCSession(initial) || !Number.isSafeInteger(initial.gcDice) || initial.gcDice < 1)
+    throw Error(loc`Choose an undone legacy note with an unscoped GC payment.`);
+  if (initial.gcDiceRefundReview?.state === "complete") return initial.gcDiceRefundReview;
+  const expected = JSON.stringify(initial.gcDiceRefundReview ?? null);
+  const session =
+    initial.gcDiceRefundReview?.state === "submitting"
+      ? initial.gcDiceRefundReview.session
+      : String(readSetting("usagePeriods", {})?.session ?? "initial");
+  if (initial.gcDiceRefundReview?.state !== "submitting" && input.confirmed !== true) {
+    input = await systemDialog.input({
+      window: { title: loc`Review old GC refund` },
+      rejectClose: false,
+      ok: { label: loc`Record refund review` },
+      content: `<p>${loc`The character changes are already undone. This note lacks the original GC session. Check that payment before returning ${initial.gcDice} dice; an earlier session's dice do not carry into the current pool.`}</p><label>${loc`Original payment`} <select name="outcome"><option value="earlier">${loc`Earlier session; do not credit this pool`}</option><option value="current">${loc`Current session; return the recorded dice`}</option></select></label><label>${loc`GC review note`} <input name="note" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC checked the original payment and session`}</label>`
+    });
+  }
+  if (!input) return null;
+  const { gcDiceController, reviewUndoGCDice } = await import("../services/gc-dice.mjs");
+  return queueResources(
+    [gcDiceController({ required: false })],
+    async () => {
+      const current = message.flags.spycraft2.undo;
+      if (current.gcDiceRefundReview?.state === "complete") return current.gcDiceRefundReview;
+      if (
+        !current.done ||
+        hasGCSession(current) ||
+        current.gcDice !== initial.gcDice ||
+        JSON.stringify(current.gcDiceRefundReview ?? null) !== expected
+      )
+        throw Error(loc`The old refund changed during review. Review the current note again.`);
+      let intent = current.gcDiceRefundReview;
+      if (intent?.state !== "submitting") {
+        if (
+          input.confirmed !== true ||
+          !["current", "earlier"].includes(input.outcome) ||
+          !String(input.note ?? "").trim()
+        )
+          throw Error(loc`Confirm the original session and give the GC's refund review note.`);
+        intent = {
+          version: 1,
+          state: "submitting",
+          session,
+          count: current.gcDice,
+          credit: input.outcome === "current",
+          note: String(input.note).trim(),
+          reviewerId: game.user.id
+        };
+        try {
+          await message.update({ "flags.spycraft2.undo.gcDiceRefundReview": intent });
+        } catch (error) {
+          if (!same(message.flags.spycraft2.undo.gcDiceRefundReview, intent)) throw error;
+        }
+      }
+      const receipt = await reviewUndoGCDice({
+        sourceUuid: message.uuid,
+        count: intent.count,
+        session: intent.session,
+        credit: intent.credit,
+        note: intent.note
+      });
+      const result = { ...intent, state: "complete", receipt };
+      await message.update({ "flags.spycraft2.undo.gcDiceRefundReview": result });
+      return result;
+    },
+    { messages: [message] }
+  );
+}
+
 /** The Undo button on a note (the `renderChatMessageHTML` hook). */
 export function renderUndo(message, html) {
   const record = message.flags?.spycraft2?.undo;
@@ -453,6 +532,32 @@ export function renderUndo(message, html) {
     note.setAttribute("role", "status");
     note.textContent = loc`Undone.`;
     row.append(note);
+    if (game.user?.isGM && record.gcDice > 0 && !hasGCSession(record)) {
+      if (record.gcDiceRefundReview?.state === "complete") {
+        const result = document.createElement("p");
+        result.className = "hint";
+        result.textContent = record.gcDiceRefundReview.receipt?.credit
+          ? loc`GC refund reviewed and credited.`
+          : loc`GC refund reviewed; this pool was not credited.`;
+        row.append(result);
+      } else {
+        const review = document.createElement("button");
+        review.type = "button";
+        review.className = "sc2-quiet-action";
+        review.textContent = loc`Review GC refund`;
+        review.addEventListener("click", async () => {
+          review.disabled = true;
+          try {
+            await reviewLegacyGCRefund(message);
+          } catch (error) {
+            ui.notifications.warn(error.message);
+          } finally {
+            review.disabled = false;
+          }
+        });
+        row.append(review);
+      }
+    }
   } else {
     const button = document.createElement("button");
     button.type = "button";

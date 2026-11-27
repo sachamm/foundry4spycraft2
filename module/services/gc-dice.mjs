@@ -138,7 +138,14 @@ export function initializeGCDice({ playersPresent, caliber, replaceExisting = fa
       );
     const value = startingGCDice(playersPresent, caliber),
       pool = withController(
-        { value, session: epoch(), playersPresent, caliber, lastReason: "Session start" },
+        {
+          value,
+          session: epoch(),
+          playersPresent,
+          caliber,
+          lastReason: "Session start",
+          ...(before.current && before.undoRefunds ? { undoRefunds: structuredClone(before.undoRefunds) } : {})
+        },
         controller
       );
     await game.settings.set("spycraft2", "gcActionDice", pool);
@@ -164,6 +171,50 @@ export function adjustGCDice(amount, reason) {
   });
 }
 const rawPool = () => game.settings.get("spycraft2", "gcActionDice") ?? {};
+/** A GC-reviewed legacy refund uses a durable receipt, including an explicit decision not to credit it. */
+export function reviewUndoGCDice({ sourceUuid, count, session, credit, note }) {
+  return guarded(async controller => {
+    if (
+      !String(sourceUuid ?? "").trim() ||
+      !Number.isSafeInteger(count) ||
+      count < 1 ||
+      !String(session ?? "").trim() ||
+      typeof credit !== "boolean" ||
+      !String(note ?? "").trim()
+    )
+      throw Error(loc`Confirm the original Undo receipt, session, amount and GC review note.`);
+    const before = gcDiceStatus();
+    requireValidBalance(before);
+    if (!before.current) throw Error(loc`Initialize the current GC pool before reviewing this refund.`);
+    if (session !== before.session) return { sourceUuid, count, session, credit: false, outcome: "earlierSession" };
+    const receipts = before.undoRefunds ?? [];
+    if (!Array.isArray(receipts)) throw Error(loc`Review the saved GC refund receipts before changing this pool.`);
+    const old = receipts.find(r => r.sourceUuid === sourceUuid);
+    if (old) {
+      if (old.count !== count || old.session !== session || old.credit !== credit)
+        throw Error(loc`This Undo refund already has a different GC decision. Review the actual pool.`);
+      return old;
+    }
+    const value = before.value + (credit ? count : 0);
+    if (!Number.isSafeInteger(value)) throw Error(loc`The GC balance exceeds a safe whole number.`);
+    const receipt = {
+      sourceUuid,
+      count,
+      session,
+      credit,
+      outcome: credit ? "credited" : "declined",
+      note: String(note).trim(),
+      reviewerId: game.user.id
+    };
+    const pool = withController(
+      { ...before, value, undoRefunds: [...receipts, receipt], lastReason: String(note).trim() },
+      controller
+    );
+    delete pool.current;
+    await writePool(pool);
+    return receipt;
+  });
+}
 async function writePool(pool) {
   try {
     await game.settings.set("spycraft2", "gcActionDice", pool);

@@ -9,7 +9,8 @@ import {
   withGCDicePool,
   reviewGCDiceSettlement,
   withGCPeriodLock,
-  recordGCHint
+  recordGCHint,
+  reviewUndoGCDice
 } from "../module/services/gc-dice.mjs";
 let settings = { usagePeriods: { session: "session1" }, gcActionDice: {} };
 globalThis.game = {
@@ -184,6 +185,30 @@ function fresh() {
     return value;
   };
 }
+
+test("GC-reviewed legacy refunds retain one atomic receipt and reject a conflicting decision", async () => {
+  fresh();
+  const input = {
+    sourceUuid: "ChatMessage.legacy",
+    count: 2,
+    session: "fault",
+    credit: true,
+    note: "Original current-session payment checked"
+  };
+  await Promise.all([reviewUndoGCDice(input), reviewUndoGCDice(input)]);
+  assert.equal(settings.gcActionDice.value, 7);
+  assert.equal(settings.gcActionDice.undoRefunds.length, 1);
+  await initializeGCDice({ playersPresent: 3, caliber: 1, replaceExisting: true });
+  assert.equal(settings.gcActionDice.value, 5);
+  await reviewUndoGCDice(input);
+  assert.equal(settings.gcActionDice.value, 5, "explicit same-session pool replacement retains the refund receipt");
+  await assert.rejects(reviewUndoGCDice({ ...input, credit: false }), /different GC decision/);
+  settings.usagePeriods.session = "next";
+  settings.gcActionDice = { session: "next", value: 4 };
+  const result = await reviewUndoGCDice(input);
+  assert.equal(result.outcome, "earlierSession");
+  assert.equal(settings.gcActionDice.value, 4);
+});
 test("GC reservation errors before commit apply no effect; committed reservations execute once", async () => {
   fresh();
   const set = game.settings.set;

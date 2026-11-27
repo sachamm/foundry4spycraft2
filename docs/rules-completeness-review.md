@@ -1231,3 +1231,24 @@ now scores **1.95/2** and conditions/resources **1.90/2**, with the other
 dimensions unchanged. Finalized Defense rerolls/corrections, legacy unscoped
 GC refunds, the remaining campaign mechanics and source-data audits still
 prevent a 9.9 score.
+
+## Review 42 — legacy GC refund history
+
+Undo no longer credits a GC payment when its note lacks a valid original
+session. Character restoration still occurs, and the note offers a GC review
+of the payment's actual session. A confirmed current-session refund records
+one durable pool receipt; an earlier-session payment records the decision
+without adding dice. Retries reconcile that receipt, including a failed final
+note write. Explicit replacement of a pool in the same session retains these
+decisions, while a later session cannot receive an earlier review's credit.
+
+Native Foundry exercised the real review button/dialog, both session choices
+and an injected final note-write failure. The pool gained each approved die
+once, the earlier payment added none, and recovery did not credit twice.
+Browser errors and diagnostics were empty. All **4,248** Node tests and
+**988** fixture assertions pass, as do the new 720px dialog check, lint,
+formatting, bundling and copy checks. Existing lint warnings remain.
+
+Scores remain **PC creation 9.4/10 and combat 9.6/10**. Remaining partial
+Undo failures and event-specific once guards stay in B-187; this closes the
+unscoped legacy-refund path without claiming that the wider audit is done.

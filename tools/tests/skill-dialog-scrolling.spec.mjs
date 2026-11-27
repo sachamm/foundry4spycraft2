@@ -30,6 +30,7 @@ import { reviewSkillPurchasePolicy } from "../../module/apps/skill-purchase-poli
 import { boostNpcDefense, recoverNpcDefense } from "../../module/apps/gc/npc-defense.mjs";
 import { reviewNpcHitDefense } from "../../module/apps/gc/post-hit-defense.mjs";
 import { declareSkillDC, recoverDeclaredDC, reviewDeclaredDCClaim } from "../../module/apps/gc/declared-skill-dc.mjs";
+import { reviewLegacyGCRefund } from "../../module/apps/undo.mjs";
 import {
   beginNpcHitDefense,
   addNpcHitDefenseDie,
@@ -288,6 +289,27 @@ for (const stage of ["boost", "rolling", "reserved", "postHit"])
       globalThis.game = oldGame;
     }
   });
+
+test("legacy GC refund review keeps its session choice and final control reachable at720px", async ({ page }) => {
+  const prior = content,
+    oldGame = globalThis.game;
+  try {
+    globalThis.game = { user: { id: "gc", isGM: true }, settings: { get: () => ({ session: "session" }) } };
+    await reviewLegacyGCRefund({ flags: { spycraft2: { undo: { done: true, gcDice: 2 } } } });
+    await render(page, 720);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByRole("combobox", { name: "Original payment", exact: true }).selectOption("current");
+    await page.getByLabel("GC review note", { exact: true }).fill("Original payment and session checked");
+    await page.locator('[name="confirmed"]').check();
+    await page.locator("#confirm").scrollIntoViewIfNeeded();
+    const rect = await page.locator("#confirm").boundingBox();
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+  } finally {
+    content = prior;
+    globalThis.game = oldGame;
+  }
+});
 
 for (const stage of ["declare", "recover", "claim"])
   test(`declared DC ${stage} controls remain reachable at720px`, async ({ page }) => {

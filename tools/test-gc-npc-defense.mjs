@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { npcDefensePlan, npcDefenseResult } from "../module/rules/gc/npc-defense.mjs";
 import { activeDefenseBoost } from "../module/rules/health.mjs";
 import { boostNpcDefense, recoverNpcDefense } from "../module/apps/gc/npc-defense.mjs";
-import { applyUndo } from "../module/apps/undo.mjs";
+import { applyUndo, reviewLegacyGCRefund } from "../module/apps/undo.mjs";
 
 let settings, values, rng, serial, applyFailure, saveFailure, warnings, afterRoll;
 function patch(doc, update) {
@@ -274,6 +274,63 @@ test("Undo restores the NPC but never credits an earlier session's die into a ne
   assert.equal(actor.system.defenseBoost, null);
   assert.equal(settings.gcActionDice.value, 9);
   assert.ok(warnings.some(w => w.includes("another session")));
+});
+
+test("legacy Undo restores the character but requires a GC session review before refunding", async () => {
+  const { actor, undo } = setup();
+  await boostNpcDefense(actor, { atStartOfRound: true });
+  delete undo().flags.spycraft2.undo.gcDiceSession;
+  await applyUndo(undo());
+  assert.equal(actor.system.defenseBoost, null);
+  assert.equal(settings.gcActionDice.value, 4);
+  assert.equal(undo().flags.spycraft2.undo.gcDiceRefundReview.state, "needsReview");
+  assert.ok(warnings.some(w => w.includes("does not identify its GC session")));
+  await reviewLegacyGCRefund(undo(), {
+    outcome: "current",
+    confirmed: true,
+    note: "Original same-session payment checked"
+  });
+  assert.equal(settings.gcActionDice.value, 5);
+  await reviewLegacyGCRefund(undo(), { outcome: "current", confirmed: true, note: "Repeated review" });
+  assert.equal(settings.gcActionDice.value, 5);
+});
+
+test("an earlier-session legacy refund is reviewed without changing the current pool", async () => {
+  const { actor, undo } = setup();
+  await boostNpcDefense(actor, { atStartOfRound: true });
+  delete undo().flags.spycraft2.undo.gcDiceSession;
+  await applyUndo(undo());
+  await reviewLegacyGCRefund(undo(), {
+    outcome: "earlier",
+    confirmed: true,
+    note: "Original payment belongs to last session"
+  });
+  assert.equal(settings.gcActionDice.value, 4);
+  assert.equal(undo().flags.spycraft2.undo.gcDiceRefundReview.receipt.credit, false);
+});
+
+test("a failed final review write can retry without refunding the same legacy note twice", async () => {
+  const { actor, undo } = setup();
+  await boostNpcDefense(actor, { atStartOfRound: true });
+  delete undo().flags.spycraft2.undo.gcDiceSession;
+  await applyUndo(undo());
+  const note = undo(),
+    update = note.update;
+  note.update = async changes => {
+    if (changes["flags.spycraft2.undo.gcDiceRefundReview"]?.state === "complete") throw Error("Review save failed");
+    return update.call(note, changes);
+  };
+  await assert.rejects(
+    reviewLegacyGCRefund(note, { outcome: "current", confirmed: true, note: "Same-session payment checked" }),
+    /Review save failed/
+  );
+  assert.equal(settings.gcActionDice.value, 5);
+  assert.equal(note.flags.spycraft2.undo.gcDiceRefundReview.state, "submitting");
+  note.update = update;
+  await reviewLegacyGCRefund(note);
+  assert.equal(settings.gcActionDice.value, 5);
+  assert.equal(settings.gcActionDice.undoRefunds.length, 1);
+  assert.equal(note.flags.spycraft2.undo.gcDiceRefundReview.state, "complete");
 });
 
 test("recovery preserves saved explosion prefixes and does not extend a boost into a later round", async () => {
