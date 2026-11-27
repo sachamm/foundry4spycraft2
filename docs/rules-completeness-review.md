@@ -286,7 +286,17 @@ checks, 13 pack checks, bundle, formatting and lint also pass; the allowed warni
 counts remain unchanged. The last full layout pass passed all 219 tests. This is
 standalone-harness evidence, not a native multiplayer session.
 
-The next implementation work is Feat Purchase and campaign gear Caliber handling.
+Feat Purchase subsequently gained an actual post-mission transaction: 1,000 XP
+per career level, a retained level minimum adjusted for Growth, one purchase per
+mission, and permanent additional choices with acquisition sources. Receipts
+survive the campaign quality ending. All 20 levels, duplicate/concurrent calls,
+rejected updates and committed updates with lost responses have regression
+coverage. A native Foundry actor source update also preserves the receipt and
+extra choice through schema cleaning. The complete Node run now passes **3,973**
+tests; all 219 layout checks pass again. Formatting and lint pass after correcting
+one file's formatting; the existing warnings remain unchanged.
+
+The next implementation work is campaign gear Caliber handling.
 Remaining requirements also include Cakewalk Intel selections, other campaign
 effects, the specialist combat options listed above, Grapple benefit settlement,
 falling stress, special NPC conditions/damage, cover, durable trigger receipts,

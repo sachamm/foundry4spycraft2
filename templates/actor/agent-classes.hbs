@@ -6,6 +6,7 @@
       {{#if progression.length}}<button type="button" class="sc2-action" data-action="removeLevel"><i class="fa-solid fa-minus" aria-hidden="true"></i> {{localize "SPYCRAFT.Class.RemoveLevel"}}</button>{{/if}}
     </span>
   </h3>
+  {{#if system.campaignEffects.featPurchase}}{{#unless system.companionOf.ownerUuid}}<p><button type="button" class="sc2-action" data-action="purchaseFeatChoice">{{localize "SPYCRAFT.Template.ActorAgentClasses.PurchaseFeatChoice"}}</button></p>{{/unless}}{{/if}}
   <table class="progression">
     <thead><tr><th>{{localize "SPYCRAFT.Level"}}</th><th>{{localize "SPYCRAFT.Class.Label"}}</th><th>{{localize "SPYCRAFT.Class.Level"}}</th><th>{{localize "SPYCRAFT.VitalityRoll"}}</th><th>{{localize "SPYCRAFT.SkillPoints"}}</th></tr></thead>
     <tbody>

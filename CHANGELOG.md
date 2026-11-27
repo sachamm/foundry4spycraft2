@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Feat Purchase now spends the required post-mission XP once per mission and grants a permanent extra feat
+  choice. It preserves the current career level's XP minimum, including Growth policy, records the purchase
+  durably, and retains purchase-level prerequisite/source checks when selecting the feat.
+
 - Skill cards with campaign DC changes now offer Resolve against campaign DC. The GC confirms the source's
   fixed DC; the system applies the recorded campaign modifiers, resolves the check, and shows both DC values.
   Opposed checks continue to use their opposing result.

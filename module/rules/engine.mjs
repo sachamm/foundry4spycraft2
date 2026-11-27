@@ -1,6 +1,7 @@
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { campaignCQBRange } from "./campaign-combat.mjs";
 import { campaignAffiliationProblem } from "./campaign-affiliation.mjs";
+import { purchasedFeatSources } from "./feat-purchase.mjs";
 import {
   campaignAttributeLevels,
   campaignFeatCount,
@@ -208,6 +209,10 @@ function startPass(state) {
   sys.shakenRules = shaken;
   const T = cfg.tables;
   sys.campaignEffects = { ...(options.campaignEffects ?? sys.campaignEffects ?? {}) };
+  if (Object.hasOwn(options, "featPurchases")) {
+    if (options.featPurchases && Object.keys(options.featPurchases).length) sys.featPurchases = options.featPurchases;
+    else delete sys.featPurchases;
+  }
   sys.abilityIncreaseLevels = campaignAttributeLevels(sys.campaignEffects, cfg.abilityIncreaseLevels);
   const warnings = [...shaken.warnings];
   for (const conflict of options.campaignConflicts ?? [])
@@ -337,7 +342,13 @@ function deriveCareerLevels(state) {
   sys.inheritedFeatureGrants = inherited.grants;
   warnings.push(...inherited.warnings);
   for (const text of inherited.pending) todo.push({ order: 21, tab: "classes", text });
-  sys.featAcquisitionSources = [...classFeatSources(items, progression), ...inherited.featSources];
+  const purchased = purchasedFeatSources(sys.featPurchases, sys.level, cfg);
+  warnings.push(...purchased.warnings);
+  sys.featAcquisitionSources = [
+    ...classFeatSources(items, progression),
+    ...inherited.featSources,
+    ...purchased.sources
+  ];
 
   const base = { bab: 0, fort: 0, ref: 0, will: 0, defense: 0, initiative: 0, wealth: 0 };
   const gearBase = Object.fromEntries(GEAR.map(g => [g, 0]));
@@ -1961,7 +1972,12 @@ function deriveSkillTotals(state) {
 function deriveFeatSlots(state) {
   const { sys, cfg, items, warnings, todo, plural, classItems, classLevels, inherited, lr, featItems, featTrees, B } =
     state;
-  const slots = { any: campaignFeatCount(sys.level, lr?.feats ?? 0, sys.campaignEffects) + B.get("featSlots.any") };
+  const slots = {
+    any:
+      campaignFeatCount(sys.level, lr?.feats ?? 0, sys.campaignEffects) +
+      B.get("featSlots.any") +
+      sys.featAcquisitionSources.filter(s => s.kind === "featPurchase").length
+  };
   for (const t of Object.keys(cfg.featTrees)) slots[t] = B.get(`featSlots.${t}`);
   const classGrantCounts = new Map();
   const originGrantNames = new Set(
@@ -2388,7 +2404,7 @@ function settlePrerequisites(state) {
         }),
         items.filter(item => item.type !== "feat" || item.system.featKind !== "temporary"),
         cfg,
-        { campaignEffects: sys.campaignEffects }
+        { campaignEffects: sys.campaignEffects, featPurchases: sys.featPurchases }
       )
     : sys;
   const permanentSkillRanks = Object.fromEntries(
@@ -2450,7 +2466,7 @@ function settlePrerequisites(state) {
         }),
         items.filter(item => item.type !== "feat" || !["temporary", "virtual"].includes(item.system.featKind)),
         cfg,
-        { campaignEffects: sys.campaignEffects }
+        { campaignEffects: sys.campaignEffects, featPurchases: sys.featPurchases }
       )
     : permanentSystem;
   const classQualificationRanks = Object.fromEntries(

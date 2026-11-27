@@ -153,6 +153,32 @@ try {
       assert.equal(actor.system.vitality.value, prepared.vitality.max);
       assert.equal(actor.system.wounds.value, prepared.wounds.max);
       assert.equal(actor.system.actionDice.value, prepared.actionDice.max);
+      if (original === sampleActors.find(sample => sample.type === "agent")) {
+        const { featPurchasePlan } = await import("../module/rules/feat-purchase.mjs");
+        const purchase = featPurchasePlan(
+          { ...prepared, xp: prepared.xp + 1000 * prepared.level },
+          {},
+          CONFIG.SPYCRAFT,
+          {
+            effects: { featPurchase: true },
+            mission: "native-purchase",
+            missionActive: false,
+            missionCompleteConfirmed: true
+          }
+        );
+        actor.updateSource({
+          "system.xp": purchase.record.afterXP,
+          [`flags.spycraft2.featPurchases.${purchase.key}`]: purchase.record
+        });
+        const paid = computeAgent(
+          actor.system.toObject(),
+          actor.items.map(item => ({ ...item.toObject(), id: item.id })),
+          CONFIG.SPYCRAFT,
+          { featPurchases: actor.flags.spycraft2.featPurchases }
+        );
+        assert.equal(paid.feats.any.slots, prepared.feats.any.slots + 1);
+        assert.equal(actor.toObject().flags.spycraft2.featPurchases[purchase.key].cost, 1000 * prepared.level);
+      }
     }
   }
   console.log("Validated native sample actor documents and complete preparation after schema cleaning.");

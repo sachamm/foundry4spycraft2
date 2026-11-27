@@ -10743,7 +10743,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "After each mission a player character may trade 1,000 XP x career level for 1 extra feat, but cannot drop below the XP minimum for his current career level.",
-   "effects": {}
+   "effects": {
+    "featPurchase": true
+   }
   },
   {
    "id": "fragile",

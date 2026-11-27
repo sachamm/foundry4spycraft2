@@ -39,20 +39,19 @@ export function featAcquisition(feat, sources, items, { preview = false, campaig
   if (!key || feat.system.granted) return { ok: true, levelAllowance: 0 };
   const source = sources.find(s => s.id === key),
     career = feat.system.acquiredAtLevel || 1;
-  if (!source)
-    return { ok: false, levelAllowance: 0, reason: loc`The selected class bonus-feat source is unavailable.` };
+  if (!source) return { ok: false, levelAllowance: 0, reason: loc`The selected bonus-feat source is unavailable.` };
   const replaced = campaignFeatReplacementAllowed(source.tree, feat.system.tree, campaignEffects);
   if (source.tree !== "any" && source.tree !== feat.system.tree && !replaced)
     return {
       ok: false,
       levelAllowance: 0,
-      reason: loc`The feat tree does not match its selected class bonus-feat source.`
+      reason: loc`The feat tree does not match its selected bonus-feat source.`
     };
   if (career < source.career)
     return {
       ok: false,
       levelAllowance: 0,
-      reason: loc`The selected class bonus feat had not been earned at acquisition.`
+      reason: loc`The selected bonus feat had not been earned at acquisition.`
     };
   const claimed = items.filter(i => i.type === "feat" && !i.system.granted && i.system.acquisitionSource === key);
   const winner = preview ? claimed.find(i => i.id !== feat.id) : claimed[0];
@@ -60,7 +59,7 @@ export function featAcquisition(feat, sources, items, { preview = false, campaig
     return {
       ok: false,
       levelAllowance: 0,
-      reason: loc`This class bonus-feat source is already assigned to another feat.`
+      reason: loc`This bonus-feat source is already assigned to another feat.`
     };
   const levelAllowance = source.levelAllowance;
   return { ok: true, source, levelAllowance, effectiveLevel: career + levelAllowance };

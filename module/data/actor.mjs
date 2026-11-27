@@ -763,7 +763,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     const campaign = currentCampaignRules();
     computeAgent(this, items, CONFIG.SPYCRAFT, {
       campaignEffects: campaign.effects,
-      campaignConflicts: campaign.conflicts
+      campaignConflicts: campaign.conflicts,
+      featPurchases: this.parent?.flags?.spycraft2?.featPurchases
     });
   }
 

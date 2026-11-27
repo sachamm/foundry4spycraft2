@@ -12,9 +12,60 @@ import { loc } from "../../i18n.mjs";
 import { esc } from "../../html.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { campaignVitalityDie } from "../../rules/campaign-creation.mjs";
+import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
+import { same } from "../../rules/equal.mjs";
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
+    /** One permanent extra choice bought from post-mission XP; the existing Feats workflow selects it. */
+    async purchaseFeatChoice(options = {}) {
+      if (this.type !== "agent" || !this.isOwner || this.system.companionOf?.ownerUuid) return null;
+      const context = () => ({
+        mission: String(this.usagePeriods.mission ?? "initial"),
+        missionActive: game.settings?.get("spycraft2", "mission")?.active === true,
+        level: this.system.level,
+        xp: this.system.xp,
+        effects: currentCampaignRules().effects,
+        receipts: this.flags?.spycraft2?.featPurchases ?? {},
+        xpReview: this.flags?.spycraft2?.missionXPReview?.needsReview === true
+      });
+      const expected = structuredClone(context());
+      if (expected.xpReview) throw new Error(loc`Review interrupted mission XP before purchasing a feat choice.`);
+      const quote = featPurchasePlan(this.system, expected.receipts, CONFIG.SPYCRAFT, {
+        ...expected,
+        missionCompleteConfirmed: true
+      });
+      let input = options;
+      if (input.missionCompleteConfirmed === undefined) {
+        input = await systemDialog.input({
+          window: { title: loc`Purchase a feat choice` },
+          rejectClose: false,
+          ok: { label: loc`Spend XP and gain choice` },
+          content: `<div class="spycraft2-roll-options"><p>${loc`Cost: ${quote.record.cost} XP. XP: ${quote.record.beforeXP} → ${quote.record.afterXP}. Required minimum: ${quote.record.minimumXP}.`}</p><p>${loc`One additional permanent feat choice, once for this mission. Choose a qualifying feat on the Feats tab after purchasing. Normal prerequisites and acquisition timing still apply.`}</p><label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The GC confirms this mission has ended and its XP settlement is complete`}</label></div>`
+        });
+        if (!input) return null;
+      }
+      return queueResources([this], async () => {
+        if (!same(context(), expected))
+          throw new Error(loc`Mission, XP, level or campaign rules changed. Review the feat purchase again.`);
+        const plan = featPurchasePlan(this.system, expected.receipts, CONFIG.SPYCRAFT, {
+          ...expected,
+          missionCompleteConfirmed: input.missionCompleteConfirmed === true,
+          at: Date.now()
+        });
+        const path = `flags.spycraft2.featPurchases.${plan.key}`;
+        try {
+          await this.update({ "system.xp": plan.record.afterXP, [path]: plan.record });
+        } catch (error) {
+          if (
+            this.system.xp !== plan.record.afterXP ||
+            !same(this.flags?.spycraft2?.featPurchases?.[plan.key], plan.record)
+          )
+            throw error;
+        }
+        return plan.record;
+      });
+    }
     /**
      * Add a career level in a class. Creates the class item on the actor if needed.
      * @param {Item|object} classData  a class Item (world/compendium/embedded) or its data
@@ -89,7 +140,7 @@ export const ActorProgression = Base =>
         preview,
         this.items.map(item => ({ id: item.id, name: item.name, type: item.type, system: item.system })),
         CONFIG.SPYCRAFT,
-        { campaignEffects: currentCampaignRules().effects }
+        { campaignEffects: currentCampaignRules().effects, featPurchases: this.flags?.spycraft2?.featPurchases }
       );
       progression.at(-1).intelligenceModifier = Math.floor(
         (preview.abilities.int.value -
@@ -317,7 +368,7 @@ export const ActorProgression = Base =>
             )
             .map(item => ({ id: item.id, name: item.name, type: item.type, system: item.system })),
           CONFIG.SPYCRAFT,
-          { campaignEffects: currentCampaignRules().effects }
+          { campaignEffects: currentCampaignRules().effects, featPurchases: this.flags?.spycraft2?.featPurchases }
         );
         featNames.clear();
         for (const key of Object.keys(featTrees)) delete featTrees[key];

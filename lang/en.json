@@ -501,6 +501,7 @@
     "GCActionDice": "GC action dice",
     "AwardRoleplayActionDice": "Award roleplay action dice",
     "SettleMissionXP": "Settle mission XP",
+    "PurchaseFeatChoice": "Purchase a feat choice with XP",
     "RecoverInterruptedResourceTransaction": "Recover interrupted resource transaction",
     "StartScene": "Start scene",
     "StartSession": "Start session",

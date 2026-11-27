@@ -309,6 +309,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         "claimGearAcquisition",
         "recoverResourceTransaction",
         "settleMissionXP",
+        "purchaseFeatChoice",
         "awardActionDice",
         "rollKnowledge",
         "configureFortuneTeammates",
