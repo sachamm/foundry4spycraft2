@@ -9,8 +9,26 @@
 {{#if companions}}
 <section class="companions" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.Companions'}}">
   <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.Companions"}}</h3>
-  <ul>{{#each companions.linked}}<li><button type="button" class="sc2-action" data-action="openCompanion" data-uuid="{{uuid}}">{{name}}</button> <span class="muted">({{feat}})</span>{{#each warnings}} <span class="bad">{{this}}</span>{{/each}}{{#if @root.isGM}} <button type="button" class="sc2-action" data-action="companionDied" data-uuid="{{uuid}}">{{localize "SPYCRAFT.Template.ActorAgentMain.CompanionDied"}}</button>{{/if}}</li>{{/each}}</ul>
+  {{#if companions.overLimit}}<p class="bad">{{localize "SPYCRAFT.CompanionLoss.OverLimit"}}</p>{{/if}}
+  {{#if companions.creationNeedsReview}}<p class="bad">{{localize "SPYCRAFT.CompanionLoss.CreationNeedsReview"}} {{#if isGM}}<button type="button" class="sc2-action" data-action="reviewCompanionCreation">{{localize "SPYCRAFT.CompanionLoss.ReviewCreation"}}</button>{{/if}}</p>{{/if}}
+  <ul>{{#each companions.linked}}
+    <li>
+      {{#if missing}}{{name}}{{else}}<button type="button" class="sc2-action" data-action="openCompanion" data-uuid="{{uuid}}">{{name}}</button>{{/if}}
+      <span class="muted">({{feat}})</span>
+      {{#each warnings}} <span class="bad">{{this}}</span>{{/each}}
+      {{#if lost}}
+        <span class="tag">{{localize "SPYCRAFT.CompanionLoss.Lost"}}</span>
+        {{#if needsReview}}<span class="bad">{{localize "SPYCRAFT.CompanionLoss.NeedsReview"}}</span>
+        {{else}}{{#if replacementRecorded}}<span class="muted">{{localize "SPYCRAFT.CompanionLoss.Replaced"}}</span>
+        {{else}}{{#if replacementAvailable}}<span class="muted">{{localize "SPYCRAFT.CompanionLoss.Available"}}</span>
+        {{else}}<span class="muted">{{localize "SPYCRAFT.CompanionLoss.Waiting"}}</span>{{/if}}{{/if}}{{/if}}
+        {{#if @root.isGM}}<button type="button" class="sc2-action" data-action="reviewCompanionLoss" data-uuid="{{uuid}}">{{localize "SPYCRAFT.CompanionLoss.Review"}}</button>{{/if}}
+      {{else}}
+        {{#if @root.isGM}}<button type="button" class="sc2-action" data-action="companionDied" data-uuid="{{uuid}}">{{localize "SPYCRAFT.Template.ActorAgentMain.CompanionDied"}}</button>{{/if}}
+      {{/if}}
+    </li>
+  {{/each}}</ul>
   {{#if companions.slots.animalPartner}}<p><button type="button" class="sc2-action" data-action="createCompanion" data-feat="Animal Partner">{{localize "SPYCRAFT.Template.ActorAgentMain.CreateAnimalPartner"}}</button> <span class="muted">{{localize "SPYCRAFT.Template.ActorAgentMain.XPCap"}} {{companions.partnerCap}}</span></p>{{/if}}
-  {{#if companions.slots.personalLieutenant}}<p><button type="button" class="sc2-action" data-action="createCompanion" data-feat="Personal Lieutenant">{{localize "SPYCRAFT.Template.ActorAgentMain.CreateLieutenant"}}</button> <span class="muted">{{localize "SPYCRAFT.Template.ActorAgentMain.LieutenantLevel"}} {{companions.lieutenantLevel}}</span></p>{{/if}}
+  {{#if companions.slots.personalLieutenant}}<p><button type="button" class="sc2-action" data-action="createCompanion" data-feat="Personal Lieutenant">{{localize "SPYCRAFT.Template.ActorAgentMain.CreateLieutenant"}}</button> <span class="muted">{{#if companions.lieutenantHistoryNeedsReview}}{{localize "SPYCRAFT.CompanionLoss.NeedsReview"}}{{else}}{{localize "SPYCRAFT.Lieutenant.CareerLevel"}} {{companions.lieutenantLevel}}{{/if}}</span></p>{{/if}}
 </section>
 {{/if}}

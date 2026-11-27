@@ -92,7 +92,19 @@
    "Interrupted": "Review an interrupted action",
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
+  "CompanionLoss": {
+   "Lost": "Lost",
+   "OverLimit": "Linked companions exceed the active feats' allowance. The GC must review surviving characters and replacements.",
+   "CreationNeedsReview": "Check the interrupted creation before adding another companion.",
+   "ReviewCreation": "Review companion creation",
+   "NeedsReview": "GC review needed before replacement",
+   "Available": "Replacement available",
+   "Replaced": "Replacement recorded",
+   "Waiting": "Replacement available next mission",
+   "Review": "Review companion loss"
+  },
   "Lieutenant": {
+   "CareerLevel": "Career Level",
    "Provisioning": "The owner supplies Wealth and all equipment. Record requests and personal gear against the owner's allowance.",
    "Restrictions": "No class core abilities, Contacts, Interests or Subplots; no additional action dice or mission Caliber shifts.",
    "ExistingAllocations": "Saved allocations are shown below for GC correction.",

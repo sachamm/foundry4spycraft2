@@ -102,6 +102,8 @@ import {
   companionsContext,
   createCompanion,
   recordCompanionDeath,
+  reviewCompanionLoss,
+  reviewCompanionCreation,
   reviewLieutenantHistory
 } from "../apps/companions.mjs";
 import { editIdentity, removeIdentity, enterIdentity, leaveIdentity } from "../apps/flawless-identity.mjs";
@@ -511,6 +513,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       },
       reviewLieutenantHistory() {
         return reviewLieutenantHistory(this.actor);
+      },
+      reviewCompanionLoss(event, target) {
+        return reviewCompanionLoss(this.actor, target.dataset.uuid);
+      },
+      reviewCompanionCreation() {
+        return reviewCompanionCreation(this.actor);
       },
       editIdentity(event, target) {
         return editIdentity(this.actor, target.dataset.id ?? "");

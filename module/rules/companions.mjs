@@ -121,8 +121,9 @@ export function lieutenantReview(system, ownerSystem) {
 /** Whether the owner may add another companion of this kind, given those already linked. */
 export function companionSlots(ownerSystem, linked = []) {
   if (ownerSystem?.companionOf?.feat === PERSONAL_LIEUTENANT) return { animalPartner: 0, personalLieutenant: 0 };
-  const partners = linked.filter(c => c.feat === ANIMAL_PARTNER).length,
-    lieutenants = linked.filter(c => c.feat === PERSONAL_LIEUTENANT).length;
+  const occupied = linked.filter(c => c.replacementAvailable !== true),
+    partners = occupied.filter(c => c.feat === ANIMAL_PARTNER).length,
+    lieutenants = occupied.filter(c => c.feat === PERSONAL_LIEUTENANT).length;
   return {
     animalPartner: Math.max(0, count(ownerSystem, ANIMAL_PARTNER) - partners),
     personalLieutenant:

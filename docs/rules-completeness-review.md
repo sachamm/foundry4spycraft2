@@ -2186,3 +2186,37 @@ Other early Origin feat/skill choices still need a separate review.
 All **4,403** Node tests, **988** engine checks and **269** layout cases pass.
 Continue companion death/replacement safety and the other recorded rules gaps
 before awarding either requested 9.9 score.
+
+## Pass 74: Companion loss, replacement and interrupted creation
+
+Both areas remain **9.8/10**. Companion deaths now retain the original actor
+and owner link. An owner-held intent precedes a single atomic balance/result
+write. Concurrent or repeated clicks cannot charge twice. An uncertain debit
+holds its slot across mission changes and actor deletion until the GC verifies
+the actual outcome. Known losses release their slot next mission; Animal Partner
+selections and the single lieutenant allowance still limit replacements.
+
+Creation is serialized per owner, records its intent before creating an actor,
+and binds a replacement to its original loss. Interrupted or missing responses
+block further creation. The GC must find that attempt's actual actor, or explicitly
+verify that none exists; a known candidate prevents a false cancellation.
+Replacement history also makes an old death Undo warn before restoring another
+surviving companion. Excess linked companions receive an explicit review notice.
+
+Losses and both recovery forms provide sparse GC Undo. A review records the
+verified present balance instead of replaying an uncertain debit. Stale forms
+cannot overwrite a changed balance, loss, creation or replacement record. Missing
+chat delivery preserves the durable result and does not charge or create again.
+
+Native Foundry verified the actual death confirmation, Reputation 30→29, repeated
+click protection, same-mission refusal, chat Undo to 30, then a replacement after
+a controlled mission-epoch change. Reload preserved the charge, both actor links
+and replacement receipt. A separate run injected creation-finalization and debit
+delivery failures. The actual GC forms bound the existing actor and resolved the
+pending charge; native Undo restored both original pending records, including
+removing later review fields. The loss-review final control ended at 619px in a
+720px viewport. Fourteen focused cases cover these workflows and freelance costs.
+
+All **4,417** Node tests, **988** engine checks and **269** layout cases pass,
+alongside schema, lint, formatting, bundle and copy checks. Continue Career Level
+0 owner/Origin-choice cases and the recorded combat gaps before awarding 9.9.
