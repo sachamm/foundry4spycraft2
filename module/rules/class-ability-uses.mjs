@@ -201,6 +201,14 @@ export const CLASS_ABILITY_USES = [
 
 const idOf = (classKey, name) => `classUse_${classKey}_${name.replace(/[^A-Za-z0-9]/g, "")}`;
 
+// The cross-class list sets its own Trap Door period (p.40); the native Hacker entry remains per mission (p.36).
+const INHERITED_USES = [
+  ["Faceman:Cold read (1/session)", "faceman", "Cold Read", "session", 2, 1],
+  ["Faceman:Quick change (2/session)", "faceman", "Quick Change", "session", 3, 2],
+  ["Hacker:Trap door (1/session)", "hacker", "Trap Door", "session", 3, 1],
+  ["Snoop:Intercept communication (1/session)", "snoop", "Intercept Communication", "session", 3, 1]
+];
+
 /** The counted class abilities a character has reached, as limited-use entries with the manual workflow. */
 export function classAbilityUseSpecs(system, table = CLASS_ABILITY_USES) {
   const out = [];
@@ -218,6 +226,22 @@ export function classAbilityUseSpecs(system, table = CLASS_ABILITY_USES) {
       workflow: "manual",
       ...(period === "combat" ? { combatScoped: true } : {})
     });
+  }
+  const present = new Set(out.map(spec => spec.id));
+  for (const entry of system.inheritedClassChoices ?? []) {
+    const definition = INHERITED_USES.find(([abilityId]) => abilityId === entry.abilityId);
+    if (!definition) continue;
+    const [, classKey, name, period, assumedLevel, limit] = definition;
+    if (
+      entry.emulatedClass !== classKey ||
+      entry.assumedLevel !== assumedLevel ||
+      (system.classLevels?.[classKey] ?? 0) >= assumedLevel
+    )
+      continue;
+    const id = idOf(classKey, name);
+    if (present.has(id)) continue;
+    present.add(id);
+    out.push({ id, name, period, limit, cost: 0, workflow: "manual" });
   }
   return out;
 }

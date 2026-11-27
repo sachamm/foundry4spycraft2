@@ -43,6 +43,7 @@ export function inheritedClassFeatures(items, progression, cfg) {
         classLevel: slot.level,
         career: careers[slot.level - 1],
         name: option.name,
+        abilityId: option.abilityId,
         emulatedClass: option.classId,
         assumedLevel: option.assumedClassLevel
       };

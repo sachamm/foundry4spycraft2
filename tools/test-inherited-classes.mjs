@@ -57,6 +57,55 @@ test("RAW pp.40–41: each of 42 inherited choices resolves for both Pointman an
     }
 });
 
+test("inherited limited abilities reach actual use counters with only their own entitlement and printed period", () => {
+  for (const ownerKey of ["pointman", "schemer"])
+    for (const [choice, id, limit] of [
+      ["Faceman: Cold read (1/session)", "classUse_faceman_ColdRead", 1],
+      ["Faceman: Quick change (2/session)", "classUse_faceman_QuickChange", 2],
+      ["Hacker: Trap door (1/session)", "classUse_hacker_TrapDoor", 1],
+      ["Snoop: Intercept communication (1/session)", "classUse_snoop_InterceptCommunication", 1]
+    ]) {
+      const owner = doc(ownerKey),
+        slot = select(owner, choice);
+      const before = compute([owner], sequence(ownerKey, slot.level - 1));
+      assert.equal(
+        before.limitedUses.some(s => s.id === id),
+        false
+      );
+      const system = compute([owner], sequence(ownerKey, slot.level));
+      const spec = system.limitedUses.find(s => s.id === id);
+      assert.ok(spec, ownerKey + "/" + choice);
+      assert.equal(spec.limit, limit);
+      assert.equal(spec.period, "session");
+      assert.equal(spec.workflow, "manual");
+      assert.equal(
+        system.limitedUses.filter(s => s.id.startsWith("classUse_")).length,
+        1,
+        "borrowing one ability does not grant the entire emulated class"
+      );
+    }
+});
+
+test("duplicate inherited sources share one allowance and actual class takeover retains the counter identity", () => {
+  const pointman = doc("pointman"),
+    schemer = doc("schemer");
+  const p = select(pointman, "Faceman: Cold read (1/session)"),
+    s = select(schemer, "Faceman: Cold read (1/session)");
+  const progression = [...sequence("pointman", p.level), ...sequence("schemer", s.level)];
+  const system = compute([pointman, schemer], progression);
+  const id = "classUse_faceman_ColdRead";
+  assert.equal(system.limitedUses.filter(spec => spec.id === id).length, 1);
+  assert.equal(system.limitedUses.find(spec => spec.id === id).limit, 1);
+  const faceman = doc("faceman");
+  const native = compute([pointman, schemer, faceman], [...progression, ...sequence("faceman", 2)]);
+  assert.equal(
+    native.inheritedClassChoices.some(entry => entry.abilityId === "Faceman:Cold read (1/session)"),
+    false
+  );
+  assert.equal(native.limitedUses.filter(spec => spec.id === id).length, 1);
+  assert.equal(native.limitedUses.find(spec => spec.id === id).limit, 1);
+});
+
 test("inherited menus retain every original option, apply its bonuses and expose their bonus-feat sources", () => {
   const owner = doc("pointman"),
     list = owner.system.choiceLists.find(l => l.kind === "crossClass");

@@ -505,3 +505,16 @@ All **4,042** Node tests and **227** layout tests pass, along with native schema
 lint, formatting, bundling and the text-copy check. Creation rises to **9.1/10**;
 combat remains **9.2/10**. Inherited feature effects and the source-data audit are
 next; both scores remain below the requested target.
+
+The inherited-feature audit connected four omitted allowances to the actual
+limited-use service: borrowed Cold Read, Quick Change, Trap Door and Intercept
+Communication. Pointman and Schemer receive only the chosen ability's allowance;
+duplicate borrowed sources share it, and actual class takeover retains the
+counter identity. The p.40 cross-class Trap Door entry explicitly uses a session
+period, while the native Hacker class table uses a mission period (p.36); each
+context keeps its printed period. The effects still use the established manual
+class-ability workflow and require their stated circumstances at the table.
+All **4,044** tests pass. Native Foundry posts the first borrowed Cold Read use,
+refuses a second, retains exactly one use and one receipt, and reports no page
+errors or transaction diagnostics. Scores remain **9.1/10** and **9.2/10** while
+the remaining inherited effects and source-data coverage are reviewed.
