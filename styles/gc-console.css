@@ -131,6 +131,7 @@
   padding: 0 0.6rem 0.75rem;
   /* The sticky turn bar never covers the control that keyboard focus moves to. */
   scroll-padding-top: 104px;
+  container-type: inline-size;
 }
 .gc-console-body .controls button {
   max-width: 100%;
@@ -564,7 +565,7 @@
 }
 .gc-console-body ul.gc-combat-rows .gc-row-button {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 8px;
   align-items: baseline;
   color: var(--sc2-ink);
@@ -695,6 +696,9 @@
 .gc-console-body[data-drop-action="place"]::before {
   content: attr(data-drop-place);
 }
+.gc-console-body[data-drop-action="link"]::before {
+  content: attr(data-drop-link);
+}
 
 /* A combatant's token beside its name, as in Foundry's tracker. */
 .gc-console-body .gc-row-img {
@@ -712,14 +716,76 @@
   grid-column: 1 / -1;
   font-weight: 700;
 }
+.gc-console-body .gc-acting h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+}
 .gc-console-body .gc-next-up {
-  margin: 0 0 4px;
+  font-size: var(--sc2-text-s);
+  font-weight: normal;
 }
 /* The acting name opens the sheet but reads as a heading, not a field. */
 .gc-console-body .gc-acting h3 .gc-row-button {
+  width: auto;
   background: none;
   border-color: transparent;
 }
 .gc-console-body .gc-acting h3 .gc-row-button:hover {
   text-decoration: underline;
+}
+
+/* Combat row states as short coloured tags between the name and the Count. */
+.gc-console-body .gc-row-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 4px;
+}
+.gc-console-body ul.gc-combat-rows .gc-row-count {
+  grid-column: 3;
+}
+.gc-console-body .gc-tag-bad {
+  color: var(--sc2-bad);
+}
+.gc-console-body .gc-tag-warn {
+  color: var(--sc2-warn);
+}
+.gc-console-body .gc-tag-muted {
+  color: var(--sc2-ink-muted);
+}
+/* During a fight End combat closes the Combat section; the session row below it starts a group of its own. */
+.gc-console-body .gc-fight-end {
+  margin-bottom: 16px;
+}
+/* The quickstart opens in the browser; it reads as a button, like the console's other actions. */
+.gc-console-body .gc-quickstart a.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  text-decoration: none;
+}
+/* At sidebar width the session time moves into the dice value's tooltip (still read out), so the strip keeps to one
+   line per row; each Wrap-up fact sits under its button, all three alike. */
+@container (max-width: 360px) {
+  .gc-console-body .gc-now .gc-session-note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .gc-console-body .gc-wrap li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+/* With damage waiting the card button leads; the mob attack then takes a full row so Delay and Ready pair up. */
+.gc-console-body details.gc-section .controls .gc-apply-first ~ [data-action="mobAttack"] {
+  grid-column: 1 / -1;
 }

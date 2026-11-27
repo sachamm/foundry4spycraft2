@@ -102,6 +102,24 @@ function actingCombatant(target) {
   return now;
 }
 
+/** The tooltip of the NPC Initiative buttons: the NPCs they roll, then the characters left to roll themselves. */
+function initiativeTip(combat) {
+  const waiting = combat.turns.filter(c => !Number.isFinite(c.initiative) && c.actor && !c.isDefeated),
+    count = names => {
+      const tally = new Map();
+      for (const name of names) tally.set(name, (tally.get(name) ?? 0) + 1);
+      return [...tally].map(([name, n]) => (n > 1 ? `${name} ×${n}` : name)).join(", ");
+    };
+  const npcs = waiting.filter(c => c.actor.type === "npc" && !c.hasPlayerOwner).map(c => c.actor.name),
+    others = waiting.filter(c => !(c.actor.type === "npc" && !c.hasPlayerOwner)).map(c => c.name);
+  return [
+    npcs.length ? loc`Rolls for ${count(npcs)}.` : loc`No NPC is waiting to roll.`,
+    others.length ? loc`Rolling from their own sheets: ${count(others)}.` : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
 
@@ -146,7 +164,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       addNpcToScene: guard(() => addNpcToScene()),
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
       previousTurn: guard(() => combat.stepBackTurn(game.combat)),
-      nextTurn: guard(() => (game.combat?.started ? game.combat.nextTurn() : game.combat?.startCombat())),
+      nextTurn: guard(() => {
+        if (!game.combat?.started) return game.combat?.startCombat();
+        return turn.nextTurnAllowed(game.combat) ? game.combat.nextTurn() : null;
+      }),
       consoleWindow: guard(() => openGCConsole({ window: true })),
       addComplication: guard(() => mission.addComplication()),
       entry: guard((event, target) =>
@@ -255,6 +276,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       editOrganization: guard((event, target) => organizations.editOrganization(target.dataset.id)),
       organizationCard: guard((event, target) => organizations.organizationCard(target.dataset.id)),
       removeOrganization: guard((event, target) => organizations.removeOrganization(target.dataset.id)),
+      openOrganizationNpc: guard(async (event, target) => (await fromUuid(target.dataset.uuid))?.sheet?.render(true)),
+      unlinkOrganizationNpc: guard((event, target) =>
+        organizations.unlinkOrganizationNpc(target.dataset.id, target.dataset.uuid)
+      ),
       advanceConflict: guard((event, target) => conflicts.advanceConflict(target.dataset.id)),
       manageConflict: guard((event, target) => conflicts.manageConflict(target.dataset.id)),
       clockStep: guard((event, target) => advanceClock(Number(target.dataset.seconds))),
@@ -381,7 +406,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     // While something is dragged over the console, the place it would go says what a drop there does.
     const mark = target => {
       const section = target?.closest?.("details[data-section]")?.dataset.section;
-      body.dataset.dropAction = section === "antagonists" ? "record" : "place";
+      body.dataset.dropAction =
+        section === "antagonists"
+          ? "record"
+          : section === "organizations" && target.closest?.("[data-organization]")
+            ? "link"
+            : "place";
     };
     body.addEventListener("dragover", event => {
       if (![...(event.dataTransfer?.types ?? [])].includes("text/plain")) return;
@@ -403,9 +433,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       event.preventDefault();
       const actor = await fromUuid(data.uuid);
       if (actor?.type !== "npc") return refuse(loc`Only an NPC can be dropped on the GC Console.`);
-      const section = event.target?.closest?.("details[data-section]")?.dataset.section;
+      const section = event.target?.closest?.("details[data-section]")?.dataset.section,
+        organization = event.target?.closest?.("[data-organization]")?.dataset.organization;
       try {
         if (section === "antagonists") await mission.addAntagonist({ uuid: actor.uuid, dropped: actor });
+        else if (section === "organizations" && organization)
+          await organizations.linkOrganizationNpc(organization, actor);
         else await addNpcToScene({ uuid: actor.uuid });
       } catch (error) {
         ui.notifications.warn(error.message);
@@ -797,10 +830,13 @@ export function consoleContext() {
                 .filter(group => group.members.some(member => member.id === combatNow.combatant?.id))
                 .map(group => ({
                   key: group.key,
-                  label: loc`Mob attack: ${group.name} ×${group.count}`
+                  label: loc`Mob attack: ${group.name} ×${group.count}`,
+                  short: loc`Mob: ${group.name} ×${group.count}`
                 }))
             : [],
           unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
+          // Who the NPC Initiative buttons roll for, and who rolls on their own sheet, named before the press.
+          initiativeTip: initiativeTip(combatNow),
           unrolledNames: combatNow.turns
             .filter(c => !Number.isFinite(c.initiative))
             .map(c => c.name)

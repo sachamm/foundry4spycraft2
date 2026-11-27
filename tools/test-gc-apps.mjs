@@ -1530,3 +1530,41 @@ test("Begin session sets the GC pool from the player characters present, not the
   assert.equal(gcDiceStatus().playersPresent, 1);
   assert.equal(gcDiceStatus().value, 1 + 2 * state.getMission().caliber);
 });
+
+test("Previous turn passes over a defeated combatant", async () => {
+  const { stepBackTurn } = await import("../module/apps/gc/combat.mjs");
+  const calls = [];
+  const fight = {
+    started: true,
+    round: 2,
+    turn: 2,
+    turns: [{ isDefeated: false }, { isDefeated: true }, { isDefeated: false }],
+    update: async (change, options) => calls.push(["update", change, options]),
+    previousTurn: async () => calls.push(["previous"])
+  };
+  await stepBackTurn(fight);
+  assert.deepEqual(calls, [["update", { turn: 0 }, { direction: -1 }]]);
+  fight.turn = 0;
+  await stepBackTurn(fight);
+  assert.deepEqual(calls.at(-1), ["previous"]);
+});
+
+test("an NPC dropped on an organization row is linked once and can be unlinked", async () => {
+  const orgs = await import("../module/apps/gc/organizations.mjs");
+  const id = await (async () => {
+    const all = state.getOrganizations();
+    const key = "orgLinkTest";
+    await state.saveOrganization(key, { ...(Object.values(all)[0] ?? {}), name: "Directorate", npcs: [] });
+    return key;
+  })();
+  const npc = { type: "npc", uuid: "Actor.linkme", name: "Handler" };
+  assert.equal(await orgs.linkOrganizationNpc(id, npc), "Actor.linkme");
+  assert.equal(await orgs.linkOrganizationNpc(id, npc), null);
+  assert.deepEqual(state.getOrganizations()[id].npcs, [{ uuid: "Actor.linkme", name: "Handler" }]);
+  assert.deepEqual(orgs.organizationRows().find(row => row.id === id).npcs, [
+    { uuid: "Actor.linkme", name: "Handler" }
+  ]);
+  await orgs.unlinkOrganizationNpc(id, "Actor.linkme");
+  assert.deepEqual(state.getOrganizations()[id].npcs, []);
+  await state.saveOrganization(id, null);
+});

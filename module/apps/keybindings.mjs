@@ -70,9 +70,22 @@ function showPressed(button) {
 export function pressNextStep(selector) {
   const acting = globalThis.game?.combat?.started ? game.combat.combatant : null;
   if (acting && pressActorCard(acting, selector, { quiet: true })) return true;
-  // During a fight a player's card is never pressed in place of the acting combatant's: only one this user posted.
-  return pressNewestCard(selector, { notify: true, mineOnly: !!acting });
+  if (!acting) return pressNewestCard(selector, { notify: true });
+  // During a fight the acting combatant has nothing waiting: say so first, so another NPC's card is never pressed by
+  // surprise. A second press within three seconds takes this user's own newest card.
+  const key = `${game.combat.id}:${acting.id}:${game.combat.round}`;
+  if (fallbackArmed?.key !== key || Date.now() - fallbackArmed.at > FALLBACK_CONFIRM_MS) {
+    fallbackArmed = { key, at: Date.now() };
+    ui.notifications.info(
+      loc`No card of ${acting.name} is waiting for a next step. Press again within 3 seconds for your own newest card.`
+    );
+    return true;
+  }
+  fallbackArmed = null;
+  return pressNewestCard(selector, { notify: true, mineOnly: true });
 }
+const FALLBACK_CONFIRM_MS = 3000;
+let fallbackArmed = null;
 
 /**
  * Press the next step on the newest card about this combatant: its actor posted it, or the card is about its token.
@@ -176,9 +189,15 @@ let boostArmed = null;
 let turnChange = null;
 const changeTurn = step => {
   if (!game.combat?.started) return false;
-  turnChange = Promise.resolve(step === "previousTurn" ? stepBackTurn(game.combat) : game.combat[step]()).catch(
-    () => null
-  );
+  const fight = game.combat;
+  // Next turn checks first for damage still waiting on the acting combatant's card, as the console's button does.
+  const run =
+    step === "previousTurn"
+      ? Promise.resolve(stepBackTurn(fight))
+      : step === "nextTurn"
+        ? import("./gc/console-turn.mjs").then(module => (module.nextTurnAllowed(fight) ? fight.nextTurn() : null))
+        : Promise.resolve(fight[step]());
+  turnChange = run.catch(() => null);
   return true;
 };
 let shortcutSheet = null;
@@ -277,7 +296,7 @@ const bindings = ({ openConsole }) => [
   [
     "cardPrimary",
     locKey`Press the next step on the newest card`,
-    locKey`During a fight, presses the main button of the acting combatant's newest card, else of your own newest card; outside a fight, of the newest card that has one.`,
+    locKey`During a fight, presses the main button of the acting combatant's newest card (a second press within three seconds takes your own newest card when they have none); outside a fight, of the newest card that has one.`,
     [{ key: "Enter", modifiers: ["Alt"] }],
     false,
     () => (pressNextStep("button.sc2-primary-action[data-roll-control]"), true)

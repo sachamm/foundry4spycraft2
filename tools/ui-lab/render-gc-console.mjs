@@ -71,14 +71,14 @@ function withState(context, { view, active, ended, combat = null, firstSession =
 const names = [
   ["Agent Morrow", 22, ""],
   ["Agent Vasquez", 19, ""],
-  ["Guard (Rook) #1", 17, "wounded"],
+  ["Guard (Rook) #1", 17, "wounded", "warn"],
   ["Guard (Rook) #2", 17, ""],
   ["Guard (Rook) #3", 14, ""],
   ["Colonel Dragan", 12, ""],
-  ["Agent Okafor", 9, "readied action"],
+  ["Agent Okafor", 9, "readied", "muted"],
   ["Driver", 5, ""]
 ];
-function fight(context, { started = true } = {}) {
+function fight(context, { started = true, applyTarget = "" } = {}) {
   context.combat = {
     round: 2,
     started,
@@ -94,6 +94,8 @@ function fight(context, { started = true } = {}) {
           health: "Wound points 0 of 12",
           conditions: "flat-footed",
           halfActions: "2 half actions left",
+          next: "Guard (Rook) #2 · count 17",
+          applyTarget,
           weapons: [
             {
               id: "w1",
@@ -110,16 +112,18 @@ function fight(context, { started = true } = {}) {
           }))
         }
       : null,
-    combatants: names.map(([name, count, notes], index) => ({
+    combatants: names.map(([name, count, notes, tone], index) => ({
       id: `c${index + 1}`,
       name,
       current: started && index === 2,
       defeated: false,
       count: `Count ${count}`,
       countValue: started || index < 5 ? String(count) : "—",
-      notes
+      notes,
+      tags: notes ? [{ text: notes, tone }] : []
     })),
-    mobs: started ? [{ key: "guard", label: "Mob attack: Guard (Rook) ×3" }] : [],
+    mobs: started ? [{ key: "guard", label: "Mob attack: Guard (Rook) ×3", short: "Mob: Guard (Rook) ×3" }] : [],
+    initiativeTip: "Rolls for Guard (Rook) ×3, Colonel Dragan, Driver. Rolling from their own sheets: Agent Okafor.",
     unrolled: started ? 0 : 3,
     unrolledNames: started ? "" : "Colonel Dragan, Agent Okafor, Driver",
     scene: "Embassy",
@@ -148,6 +152,12 @@ const scenarios = {
     fight(
       withState(clone(base), { view: "play", active: true, ended: false, combat: { started: true, unrolled: 0 } }),
       { started: true }
+    ),
+  // Damage rolled on the acting NPC's card and not applied yet: the card button leads the row.
+  "play-fight-damage": () =>
+    fight(
+      withState(clone(base), { view: "play", active: true, ended: false, combat: { started: true, unrolled: 0 } }),
+      { started: true, applyTarget: "Agent Morrow" }
     ),
   "wrap-active": () => withState(clone(base), { view: "wrap", active: true, ended: false }),
   wrap: () => withState(clone(base), { view: "wrap", active: false, ended: true })

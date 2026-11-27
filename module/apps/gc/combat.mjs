@@ -767,6 +767,10 @@ export function stepBackTurn(combat) {
     ui.notifications.info(loc`This is the first turn of the fight.`);
     return null;
   }
+  // A defeated combatant takes no turn, so stepping back passes over it to the one who acted before.
+  const turns = combat.turns ?? [];
+  for (let index = (combat.turn ?? 0) - 1; index >= 0; index--)
+    if (!turns[index]?.isDefeated) return combat.update({ turn: index }, { direction: -1 });
   return combat.previousTurn();
 }
 

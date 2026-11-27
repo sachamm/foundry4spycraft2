@@ -56,8 +56,9 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
    **Card: next step**, which presses the main button of that combatant's newest card and says which one, and
    **Delay** and **Ready**. Spending actions and the Damage save are under **Turn actions**. A player's turn is rolled
    from their own sheet; the card's top line names its state and its main button is the next step. During a fight
-   Alt+Enter presses the acting combatant's newest card, or your own newest card when that combatant has none waiting,
-   and marks the card it pressed.
+   Alt+Enter presses the acting combatant's newest card and marks the card it pressed. When that combatant has none
+   waiting it says so; a second press within three seconds takes your own newest card. Next turn warns the same way
+   when the acting combatant's damage has not been applied yet.
 5. For an NPC's result, **GC boost** on its card spends a GC action die. Alt+B does the same: the first press marks
    the card it would boost, a second press within three seconds spends the die.
 6. Click a name in the order to select its token and centre the map on it; double-click to open its sheet.

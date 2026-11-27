@@ -76,6 +76,11 @@ export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatS
     steps: steps.map(step => ({ ...step, next: step === next })),
     done: steps.filter(step => step.done).length,
     total: steps.length,
+    // The done steps by their short names, so the count in the heading says which ones.
+    doneNames: steps
+      .filter(step => step.done)
+      .map(step => step.label.split(/[:(]/)[0].trim())
+      .join(", "),
     complete: !next,
     // The Mission section's own Start mission button steps aside while the list offers it.
     startIsNext: next?.id === "start"

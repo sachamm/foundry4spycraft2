@@ -138,22 +138,20 @@ export async function beginSession() {
     loc`GC action dice: player characters at the table + 2 × Caliber ${caliber}.`,
     loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
   ];
-  const gcDiceTotal = (present, cal) => loc`GC action dice: ${present} + 2 × ${cal} = ${present + 2 * cal}.`;
+  // A guest agent not on the mission's team still counts; more than the team is allowed, with a note so a typo shows.
+  const gcDiceTotal = (present, cal) =>
+    loc`GC action dice: ${present} + 2 × ${cal} = ${present + 2 * cal}.` +
+    (players && present > players ? ` ${loc`That is more than the team's ${players} agents: count guests only.`}` : "");
   // The GC's pool counts the player characters present this session, which can be fewer than the team (p.397).
   const input = await formDialog({
     title: loc`Begin a session`,
     ok: loc`Begin session`,
     fields: [
       raw(`<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>
-    <label>${loc`Player characters present`} <input type="number" name="present" min="1"${players ? ` max="${players}"` : ""} value="${Math.max(1, players)}" /></label>
+    <label>${loc`Player characters present`} <input type="number" name="present" min="1" value="${Math.max(1, players)}" /></label>
     <p class="hint" data-gc-dice-total aria-live="polite">${esc(gcDiceTotal(players, caliber))}</p>`)
     ],
-    validate: values =>
-      !(Number(values.present) >= 1)
-        ? loc`At least one player character must be present.`
-        : players && Number(values.present) > players
-          ? loc`The team has ${players} agents: no more than that can be present.`
-          : "",
+    validate: values => (!(Number(values.present) >= 1) ? loc`At least one player character must be present.` : ""),
     dialog: {
       // The total follows the number typed, so the GC sees the pool before beginning.
       render: (event, app) => {

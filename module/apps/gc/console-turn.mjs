@@ -149,6 +149,31 @@ function nextUp(combat) {
 }
 
 /** The target named on this combatant's newest card when that card is damage nobody has applied yet; else "". */
+const SKIP_CONFIRM_MS = 3000;
+let skipArmed = null;
+/**
+ * Next turn while the acting combatant's newest card still has damage nobody applied: the first press says so and
+ * stays, a second press within three seconds moves on. Returns whether the turn may change.
+ */
+export function nextTurnAllowed(combat = globalThis.game?.combat) {
+  const acting = combat?.started ? combat.combatant : null,
+    target = acting && !acting.isDefeated ? pendingDamageTarget(acting) : "";
+  if (!target) {
+    skipArmed = null;
+    return true;
+  }
+  const key = `${combat.id}:${acting.id}:${combat.round}`;
+  if (skipArmed?.key === key && Date.now() - skipArmed.at < SKIP_CONFIRM_MS) {
+    skipArmed = null;
+    return true;
+  }
+  skipArmed = { key, at: Date.now() };
+  ui.notifications.warn(
+    loc`Damage to ${target} is not applied yet. Press Next turn again within 3 seconds to move on anyway.`
+  );
+  return false;
+}
+
 export function pendingDamageTarget(combatant) {
   const tokenId = combatant?.tokenId ?? combatant?.token?.id,
     actorId = combatant?.actor?.id;
@@ -190,12 +215,14 @@ export function combatRows(combat) {
     const fluid = combatant.flags?.spycraft2?.fluid,
       pending = fluid?.round === combat.round ? fluid.modifiers.reduce((sum, entry) => sum + entry.amount, 0) : 0,
       current = combat.started && combat.combatant?.id === combatant.id;
-    const notes = [];
-    if (combatant.isDefeated) notes.push(loc`defeated`);
-    if (combatant.flags?.spycraft2?.readied) notes.push(loc`readied action`);
-    notes.push(...trackerRowStates(combatant.actor, { health: true }));
-    if (pending) notes.push(loc`${signed(pending)} at round end`);
-    if (combatant.flags?.spycraft2?.mustPress) notes.push(loc`must Press`);
+    // Short tags, coloured by what they mean: out of the fight, hurt, or a plain reminder.
+    const tags = [];
+    if (combatant.isDefeated) tags.push({ text: loc`defeated`, tone: "bad" });
+    tags.push(...trackerRowStates(combatant.actor, { health: true }).map(text => ({ text, tone: "warn" })));
+    if (combatant.flags?.spycraft2?.readied) tags.push({ text: loc`readied`, tone: "muted" });
+    if (pending) tags.push({ text: loc`${signed(pending)} at round end`, tone: "muted" });
+    if (combatant.flags?.spycraft2?.mustPress) tags.push({ text: loc`must Press`, tone: "warn" });
+    const notes = tags.map(tag => tag.text);
     return {
       id: combatant.id,
       name: labels.get(combatant.id) ?? combatant.name,
@@ -212,6 +239,7 @@ export function combatRows(combat) {
       // The number alone, for the list's Count column; "—" until rolled.
       countValue: Number.isFinite(combatant.initiative) ? String(combatant.initiative) : "—",
       notes: notes.join(", "),
+      tags,
       // Kept for callers that read the older fields.
       pending: pending ? signed(pending) : "",
       mustPress: !!combatant.flags?.spycraft2?.mustPress

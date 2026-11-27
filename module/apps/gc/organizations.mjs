@@ -35,7 +35,9 @@ export function organizationRows() {
           : review.unspent.length
             ? loc`${review.unspent.length} choice(s) left`
             : loc`complete`,
-        bad: review.problems.length > 0
+        bad: review.problems.length > 0,
+        // NPCs the GC linked by dropping them on the row: its known people, one click from their sheets.
+        npcs: (org.npcs ?? []).map(entry => ({ uuid: entry.uuid, name: entry.name }))
       };
     })
     .sort((a, b) => Number(b.agency) - Number(a.agency) || a.name.localeCompare(b.name));
@@ -140,6 +142,31 @@ export async function editOrganization(id = null) {
   const review = reviewOrganization(org);
   if (review.problems.length) ui.notifications.warn(loc`${org.name} saved with problems: ${review.problems.join(" ")}`);
   return key;
+}
+
+/** Link an NPC to an organization, as one of its people. Dropping the same NPC twice links it once. */
+export async function linkOrganizationNpc(id, actor) {
+  requireGC();
+  const org = getOrganizations()[id];
+  if (!org) return refuse(loc`That organization is no longer recorded. Add it again from the console.`);
+  if (actor?.type !== "npc") return refuse(loc`Only an NPC can be linked to an organization.`);
+  const npcs = org.npcs ?? [];
+  if (npcs.some(entry => entry.uuid === actor.uuid)) {
+    ui.notifications.info(loc`${actor.name} is already linked to ${org.name}.`);
+    return null;
+  }
+  await saveOrganization(id, { ...org, npcs: [...npcs, { uuid: actor.uuid, name: actor.name }] });
+  ui.notifications.info(loc`${actor.name} is linked to ${org.name}.`);
+  return actor.uuid;
+}
+
+/** Take one linked NPC off an organization; the NPC itself is not touched. */
+export async function unlinkOrganizationNpc(id, uuid) {
+  requireGC();
+  const org = getOrganizations()[id];
+  if (!org) return null;
+  await saveOrganization(id, { ...org, npcs: (org.npcs ?? []).filter(entry => entry.uuid !== uuid) });
+  return uuid;
 }
 
 export async function removeOrganization(id) {
