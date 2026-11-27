@@ -2,6 +2,7 @@ import { loc } from "../i18n.mjs";
 
 /** Campaign affiliation constrains gear rules and the currency used for standing (p.407). */
 export function campaignAffiliationProblem(system = {}, effects = {}) {
+  if (system.companionOf?.ownerUuid) return null;
   const rules = effects.gearRules;
   if (!["faction", "freelance", "hybrid"].includes(rules)) return null;
   if (!["faction", "freelance"].includes(system.affiliationType))
@@ -12,6 +13,7 @@ export function campaignAffiliationProblem(system = {}, effects = {}) {
 }
 
 export function campaignStandingCurrency(system, effects = {}, fallback = "reputation") {
+  if (system?.companionOf?.ownerUuid) throw new Error(loc`PC standing rewards do not apply to a companion.`);
   const problem = campaignAffiliationProblem(system, effects);
   if (problem) throw new Error(problem);
   if (["faction", "freelance", "hybrid"].includes(effects.gearRules))

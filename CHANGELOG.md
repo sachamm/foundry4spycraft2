@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Agent-based companions no longer enter PC mission teams, Threat Level averages, starting GC-dice counts
+  or standing payouts. An invalid explicit team stays empty instead of selecting other PCs automatically.
+  PC-only affiliation restrictions, Fast/Slow advancement cadences and alternate feat-tree choices no longer apply to companions;
+  global special-character effects such as Fragile and Big Budget remain active.
+
 - Big Budget mission overflow now links each extra Caliber I item to a funded source pick, including
   class-raised picks and Armor Use. Reserves reduce the available source budget; duplicate, oversized,
   wrong-category or simultaneously paid claims remain setup errors.

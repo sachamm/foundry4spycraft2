@@ -18,6 +18,32 @@ const agent = level => ({
   abilityIncreases: { l3: "int", l4: "str", l5: "wis", l6: "dex" },
   misc: {}
 });
+
+test("agent-built companions retain normal PC-only advancement cadences while global special-character effects remain", () => {
+  const source = agent(8);
+  source.companionOf = { ownerUuid: "Actor.owner" };
+  const effects = {
+    attributeInterval: 3,
+    featInterval: 2,
+    proficiencyInterval: 1,
+    interestInterval: 3,
+    startingWealth: 4,
+    fixedVitalityByDie: { 8: 2 },
+    bonusFeatTrees: ["Chase"],
+    skillDC: 5
+  };
+  const normal = computeAgent(structuredClone(source), items, cfg);
+  const companion = computeAgent(structuredClone(source), items, cfg, { campaignEffects: effects });
+  assert.deepEqual(companion.abilityIncreaseLevels, normal.abilityIncreaseLevels);
+  assert.equal(companion.feats.any.slots, normal.feats.any.slots);
+  assert.equal(companion.proficiencyPicks.available, normal.proficiencyPicks.available);
+  assert.equal(companion.interestPicks.available, normal.interestPicks.available);
+  assert.equal(companion.wealth.total, normal.wealth.total + 4);
+  assert.equal(companion.campaignEffects.fixedVitalityByDie[8], 2);
+  assert.equal(companion.campaignEffects.skillDC, 5);
+  assert.equal(companion.campaignEffects.bonusFeatTrees, undefined);
+  assert.equal(effects.attributeInterval, 3, "World policy is not mutated");
+});
 test("campaign attribute cadence changes earned scores and historical Intelligence without moving saved normal choices", () => {
   const s = agent(6);
   computeAgent(s, items, cfg, { campaignEffects: { attributeInterval: 3 } });

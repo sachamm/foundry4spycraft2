@@ -11,7 +11,7 @@ import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
 import { esc } from "../../html.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
-import { campaignVitalityDie } from "../../rules/campaign-creation.mjs";
+import { campaignVitalityDie, campaignCharacterEffects } from "../../rules/campaign-creation.mjs";
 import { featPurchasePlan } from "../../rules/feat-purchase.mjs";
 import { same } from "../../rules/equal.mjs";
 
@@ -418,7 +418,7 @@ export const ActorProgression = Base =>
           },
           this.system.featAcquisitionSources ?? [],
           this.items.filter(() => true),
-          { preview: true, campaignEffects: currentCampaignRules().effects }
+          { preview: true, campaignEffects: campaignCharacterEffects(this.system, currentCampaignRules().effects) }
         );
         if (!acquisition.ok) return { ok: false, unmet: [acquisition.reason] };
         ctx.prerequisiteLevel = acquisition.effectiveLevel;

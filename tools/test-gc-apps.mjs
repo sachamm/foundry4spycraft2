@@ -331,6 +331,25 @@ test("the standing award pays each agent once per mission; a correction pays aga
   for (const id of ["a2", "a3", "a4"]) await actors.get(id).update({ "system.reputation": 14 });
 });
 
+test("mission teams exclude agent-built companions and an invalid explicit list never substitutes unlisted PCs", () => {
+  const companion = makeActor("team-companion", "agent", { level: 10, companionOf: { ownerUuid: "Actor.a1" } });
+  actors.set(companion.id, companion);
+  try {
+    assert.equal(
+      state.teamActors({ team: [] }).some(a => a.id === companion.id),
+      false
+    );
+    assert.deepEqual(state.teamActors({ team: [companion.id] }), []);
+    assert.deepEqual(state.teamActors({ team: ["missing"] }), []);
+    assert.deepEqual(
+      state.teamActors({ team: ["a1", companion.id] }).map(a => a.id),
+      ["a1"]
+    );
+  } finally {
+    actors.delete(companion.id);
+  }
+});
+
 test("Hybrid standing pays each affiliation's currency and conflicting Faction selections stop the whole payout", async () => {
   const savedMission = structuredClone(state.getMission()),
     savedCampaign = structuredClone(state.getCampaign());

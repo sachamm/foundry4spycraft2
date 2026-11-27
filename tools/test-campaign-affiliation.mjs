@@ -46,3 +46,9 @@ test("gear initialization and field acquisition refuse a conflicting campaign af
   assert.equal(campaignStandingCurrency(system, {}, "netWorth"), "netWorth");
   assert.throws(() => campaignStandingCurrency(system, {}, "other"), /Choose/);
 });
+
+test("PC affiliation restrictions and standing awards do not treat agent-built companions as player characters", () => {
+  const companion = { companionOf: { ownerUuid: "Actor.owner" }, affiliationType: "faction" };
+  assert.equal(campaignAffiliationProblem(companion, { gearRules: "freelance" }), null);
+  assert.throws(() => campaignStandingCurrency(companion, { gearRules: "freelance" }), /do not apply to a companion/);
+});

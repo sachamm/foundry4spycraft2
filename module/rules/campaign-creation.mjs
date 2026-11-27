@@ -1,4 +1,21 @@
 /** Numeric creation changes from campaign qualities (pp.407–408). No world reads or document writes. */
+export function campaignCharacterEffects(system, effects = {}) {
+  const result = { ...effects };
+  if (system.companionOf?.ownerUuid)
+    for (const key of [
+      "attributeInterval",
+      "featInterval",
+      "interestInterval",
+      "proficiencyInterval",
+      "gearRules",
+      "featPurchase",
+      "bonusFeatTree",
+      "bonusFeatTrees"
+    ])
+      delete result[key];
+  return result;
+}
+
 export function campaignAttributeLevels(effects = {}, standard = [4, 8, 12, 16, 20]) {
   const interval = effects.attributeInterval;
   return Number.isSafeInteger(interval) && interval >= 2 && interval <= 20

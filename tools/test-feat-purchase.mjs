@@ -35,7 +35,7 @@ test("Feat Purchase costs 1000 XP per career level, once per completed mission, 
 });
 
 test("growth policy changes the retained XP minimum; corrupt receipts grant nothing and block later purchases", () => {
-  for (const xpToLevelFraction of [0.5, 1.5]) {
+  for (const xpToLevelFraction of [0.5, 2]) {
     const level = 4,
       minimum = Math.floor(cfg.tables.levels[level].xp * xpToLevelFraction);
     const p = featPurchasePlan({ level, xp: minimum + 4000 }, {}, cfg, {

@@ -98,9 +98,11 @@ export const updateMission = change =>
 
 /** The team: the mission's listed agents, or every player-owned agent when none are listed. */
 export function teamActors(mission = getMission()) {
-  const actors = [...(game.actors ?? [])].filter(actor => actor.type === "agent");
+  const actors = [...(game.actors ?? [])].filter(
+    actor => actor.type === "agent" && !actor.system?.companionOf?.ownerUuid
+  );
   const listed = (mission.team ?? []).map(id => actors.find(actor => actor.id === id)).filter(Boolean);
-  return listed.length ? listed : actors.filter(actor => actor.hasPlayerOwner);
+  return (mission.team ?? []).length ? listed : actors.filter(actor => actor.hasPlayerOwner);
 }
 export const teamLevels = mission =>
   teamActors(mission)

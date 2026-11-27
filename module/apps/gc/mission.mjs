@@ -53,7 +53,7 @@ const warn = error => ui.notifications.warn(error.message);
 export async function editMission() {
   requireGC();
   const mission = getMission(),
-    agents = [...game.actors].filter(actor => actor.type === "agent");
+    agents = [...game.actors].filter(actor => actor.type === "agent" && !actor.system?.companionOf?.ownerUuid);
   const team = agents
     .map(
       actor =>

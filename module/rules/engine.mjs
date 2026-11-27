@@ -5,6 +5,7 @@ import { purchasedFeatSources } from "./feat-purchase.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
 import {
   campaignAttributeLevels,
+  campaignCharacterEffects,
   campaignFeatCount,
   campaignProficiencyCount,
   campaignInterestCount,
@@ -209,7 +210,7 @@ function startPass(state) {
   const shaken = shakenRules(sys);
   sys.shakenRules = shaken;
   const T = cfg.tables;
-  sys.campaignEffects = { ...(options.campaignEffects ?? sys.campaignEffects ?? {}) };
+  sys.campaignEffects = campaignCharacterEffects(sys, options.campaignEffects ?? sys.campaignEffects ?? {});
   if (Object.hasOwn(options, "featPurchases")) {
     if (options.featPurchases && Object.keys(options.featPurchases).length) sys.featPurchases = options.featPurchases;
     else delete sys.featPurchases;
