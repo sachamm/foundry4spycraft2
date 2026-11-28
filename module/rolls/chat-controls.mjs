@@ -140,6 +140,23 @@ core("removeFlankingControl", 9105, ctx => {
   ];
 });
 
+// "Not flanking" pressed by mistake: the bonus goes back while the attack is still open.
+core("restoreFlankingControl", 9106, ctx => {
+  const { message, check, actor } = ctx,
+    flanking = check.flankingRestore?.check?.attackContext?.flanking;
+  if (!open(ctx) || check.checkKind !== "attack" || !check.attackContext?.flanking?.removed || !flanking) return null;
+  if (typeof check.successConfirmed === "boolean" || check.attackResolution) return null;
+  return [
+    {
+      label: loc`Flanking after all (+${flanking.attackBonus})`,
+      hint: loc`Flanking after all (+${flanking.attackBonus}): put the flanking bonus back on this attack`,
+      run: () => actor.restoreFlanking(message),
+      placement: "card",
+      emphasis: "quiet"
+    }
+  ];
+});
+
 core("manualAdjustmentControl", 9110, ctx => {
   const { message, check, actor } = ctx;
   if (!open(ctx) || !manualAdjustment(ctx)) return null;

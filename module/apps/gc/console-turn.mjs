@@ -419,6 +419,8 @@ export async function mobAttackDialog(combat, key = null) {
   const attackers = mobAttackers(combat, group),
     weapons = mobWeapons(attackers),
     foes = mobFoes(combat, group);
+  // The group check counts every member's weapons; those acting on this Count may carry none of them.
+  if (!weapons.length) return refuse(loc`None of ${group.name} acting on this Count has a weapon on its sheet.`);
   const down = combatant => ["dead", "dying", "unconscious"].some(state => combatant.actor.statuses?.has?.(state));
   // The GC's own targets come first; otherwise the standing agents.
   const targeted = new Set([...(game.user?.targets ?? [])].map(token => token.id));

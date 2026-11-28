@@ -1235,7 +1235,9 @@ export const ActorActionDice = Base =>
           });
         } catch (error) {
           if (!same(current(), record)) {
-            if (current() !== null || this.system.xp !== beforeXP) await markReview(error);
+            // Nothing written leaves the earlier record of a reopened mission (or none) and the XP as they were.
+            const earlier = JSON.parse(expectedContext).reward ?? null;
+            if (!same(current(), earlier) || this.system.xp !== beforeXP) await markReview(error);
             throw error;
           }
         }

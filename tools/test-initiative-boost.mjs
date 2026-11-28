@@ -49,3 +49,18 @@ test("only an agent with a die to spend gets a plan", () => {
   assert.equal(plan.rolls, 1);
   assert.equal(initiativeBoostPlan({ ...agent, system: { actionDice: { value: 0, die: 6 } } }).blocked, true);
 });
+
+test("Shaken II adds its surcharge to the first boost of a roll only", () => {
+  const agent = {
+    type: "agent",
+    system: { actionDice: { value: 3, die: 6 }, activeFeatNames: [], conditionContext: { shakenGrade: 2 } }
+  };
+  const first = initiativeBoostPlan(agent);
+  assert.equal(first.cost, 2);
+  assert.equal(first.surcharge, 1);
+  assert.equal(first.surchargePaid, 1);
+  const second = initiativeBoostPlan(agent, { surchargePaid: first.surchargePaid });
+  assert.equal(second.cost, 1);
+  assert.equal(second.surcharge, 0);
+  assert.equal(initiativeBoostPlan({ ...agent, system: { ...agent.system, conditionContext: {} } }).cost, 1);
+});

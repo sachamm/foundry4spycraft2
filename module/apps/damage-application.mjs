@@ -219,7 +219,7 @@ export async function resolveAttack(message, options = {}) {
           const defense = actor.isOwner || game.user?.isGM || defenseVisibleToPlayers() ? defenseOf(actor) : null;
           return defense === null ? targetLabel(actor) : loc`${targetLabel(actor)} — Defense ${defense}`;
         }
-      )}</select></label><label>${loc`Cover between attacker and target`}${Number.isSafeInteger(mapCover) ? ` <span class="hint">${loc`(measured from the map)`}</span>` : ""} <select name="cover">${COVER_GRADES.slice(
+      )}</select></label><label>${loc`Cover between attacker and target`}${Number.isSafeInteger(mapCover) ? ` <span class="hint">${mapCover >= 4 ? loc`(the map shows total cover)` : loc`(measured from the map)`}</span>` : ""} <select name="cover">${COVER_GRADES.slice(
         0,
         4
       )
@@ -232,6 +232,10 @@ export async function resolveAttack(message, options = {}) {
         )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Cover adds to the Defense used, and a miss that only the cover caused hits the cover (p.345). Enter a different Defense for a declared defense or another circumstance; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
     });
     if (!input) return null;
+    // The cover shown was measured for the target first selected: when another target is chosen and the cover was
+    // left as shown, it is measured again for the new one.
+    if (input.targetUuid !== (selected || "") && Number(input.cover) === Math.min(3, mapCover ?? 0))
+      input = { ...input, cover: undefined };
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (target && target.uuid === attacker.uuid)
@@ -248,7 +252,15 @@ export async function resolveAttack(message, options = {}) {
     } catch {
       measured = null;
     }
-  const cover = coverOnResolution(input.cover ?? (measured > 0 ? Math.min(3, measured) : undefined));
+  // Total cover blocks the attack outright (p.345). The map is not the last word, so the dialog opens for the cover to
+  // be chosen by hand; each pass needs a press of Resolve, so this cannot loop on its own.
+  if (measured >= 4) {
+    ui.notifications.info(
+      loc`The map shows total cover between ${attacker.name} and ${target.name}. Choose the cover.`
+    );
+    return resolveAttack(message, { ask: true });
+  }
+  const cover = coverOnResolution(input.cover ?? (measured > 0 ? measured : undefined));
   if (cover && input.cover === undefined) cover.measured = true;
   // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies, on top of the sheet's Defense.
   const foibles = entered && target ? specialistDefense(target.system, check.weaponProficiency).dodge : 0;

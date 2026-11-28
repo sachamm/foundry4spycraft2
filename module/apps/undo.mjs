@@ -91,6 +91,9 @@ export function differences(before, after) {
   return { restore, unset: [...new Set(unset)], expect, whole };
 }
 
+const COMBATANT_FLAGS = ["fluid", "actions", "readied", "initiativeBoost", "defeatedByDamageSave"];
+const COMBATANT_FIELDS = ["defeated", "initiative", ...COMBATANT_FLAGS];
+
 const combatantsOf = actor =>
   [...(globalThis.game?.combats ?? [])].flatMap(combat =>
     [...combat.combatants].filter(combatant => combatant.actor?.uuid === actor.uuid)
@@ -107,16 +110,15 @@ export function snapshot(actor) {
       id: combatant.id,
       defeated: !!combatant.defeated,
       initiative: combatant.initiative ?? null,
-      // Damage can record a fluid initiative event on the combatant; Undo takes that back too.
-      fluid: structuredClone(combatant.flags?.spycraft2?.fluid ?? null),
-      // The turn's half actions and a readied action, so a mistaken Spend, Ready or Delay can be taken back.
-      actions: structuredClone(combatant.flags?.spycraft2?.actions ?? null),
-      readied: structuredClone(combatant.flags?.spycraft2?.readied ?? null)
+      // The combatant's own flags a step may write: a fluid initiative event from damage, the turn's half actions and a
+      // readied action, an action die spent on the Count, and a defeat a damage save marked.
+      ...Object.fromEntries(
+        COMBATANT_FLAGS.map(key => [key, structuredClone(combatant.flags?.spycraft2?.[key] ?? null)])
+      )
     }))
   };
 }
 
-const COMBATANT_FIELDS = ["defeated", "initiative", "fluid", "actions", "readied"];
 const combatantNow = (combatant, key) =>
   key === "defeated"
     ? !!combatant.defeated
@@ -132,14 +134,7 @@ export function undoEntry(actor, before, after) {
   const combatants = before.combatants
     .filter(was => {
       const now = after.combatants.find(entry => entry.id === was.id && entry.combat === was.combat);
-      return (
-        now &&
-        (now.defeated !== was.defeated ||
-          now.initiative !== was.initiative ||
-          !same(now.fluid, was.fluid) ||
-          !same(now.actions ?? null, was.actions ?? null) ||
-          !same(now.readied ?? null, was.readied ?? null))
-      );
+      return now && COMBATANT_FIELDS.some(key => !same(now[key] ?? null, was[key] ?? null));
     })
     // Only the fields this step changed are kept, with what it left them at: Undo puts back those alone, and only while
     // nothing changed them since, so a later Spend, Count change or defeat stays.

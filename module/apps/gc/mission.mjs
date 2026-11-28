@@ -381,13 +381,14 @@ export async function startMission() {
       refund = answer === true;
     }
   }
+  // The mission record and the mission's usage period begin together: mission uses come back. The period starts
+  // first, since it can refuse (an interrupted start to review): a refused start must not have paid the refunds.
+  await startUsagePeriod("mission");
   if (refund)
     for (const entry of owed) {
       const actor = game.actors.get(entry.actor);
       if (actor) await actor.update(refundUpdate(actor, entry));
     }
-  // The mission record and the mission's usage period begin together: mission uses come back.
-  await startUsagePeriod("mission");
   await updateMission(mission => ({
     active: true,
     settlementFigures: null,

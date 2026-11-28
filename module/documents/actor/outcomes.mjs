@@ -1166,8 +1166,30 @@ export const ActorOutcomes = Base =>
           } catch (error) {
             return refuseStep(error.message);
           }
-          await message.update({ "flags.spycraft2": next, flavor: checkFlavor(next) });
-          return next;
+          // The card as it was rides along, so "Flanking after all" can put it back while nothing else has changed.
+          const marked = { ...next, flankingRestore: { check: current, evidence: rollEvidence(next) } };
+          await message.update({ "flags.spycraft2": marked, flavor: checkFlavor(next) });
+          return marked;
+        },
+        { messages: [message] }
+      );
+    }
+
+    /** Put back a flanking bonus "Not flanking" took off, while the attack is still open and otherwise unchanged. */
+    async restoreFlanking(message) {
+      const check = message.flags?.spycraft2;
+      if (!check || check.actorUuid !== this.uuid || !(message.isAuthor || game.user?.isGM))
+        return refuse(loc`Only the roller or the GC can change this attack.`);
+      return queueResources(
+        [this],
+        async () => {
+          const { flankingRestore: saved, ...current } = message.flags.spycraft2 ?? {};
+          if (!saved?.check || rollEvidence(current) !== saved.evidence)
+            return refuseStep(loc`This attack changed after flanking was taken off. Review the card.`);
+          if (typeof current.successConfirmed === "boolean" || current.attackResolution || current.resolved)
+            return refuseStep(loc`The attack has been resolved, so its flanking bonus stays off.`);
+          await message.update({ "flags.==spycraft2": saved.check, flavor: checkFlavor(saved.check) });
+          return saved.check;
         },
         { messages: [message] }
       );

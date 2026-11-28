@@ -7,6 +7,8 @@
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 import { actionDieBoostPlan } from "../rules/action-dice.mjs";
+import { shakenActionDieCost } from "../rules/shaken.mjs";
+import { withUndo } from "./undo.mjs";
 
 /** Whether a chat message is Foundry's Initiative roll. */
 export const isInitiativeMessage = message =>
@@ -28,18 +30,32 @@ export function boostableInitiative(message, combats = []) {
       const same = token ? combatant.tokenId === token : actor && combatant.actorId === actor;
       if (!same || combatant.defeated) continue;
       const boost = combatant.flags?.spycraft2?.initiativeBoost;
-      const count = boost?.messageId === message.id ? Number(boost.count) : rolled;
+      const mine = boost?.messageId === message.id,
+        count = mine ? Number(boost.count) : rolled;
       if (combatant.initiative === count)
-        return { combat, combatant, count, spent: boost?.messageId === message.id ? Number(boost.spent) || 0 : 0 };
+        return {
+          combat,
+          combatant,
+          count,
+          spent: mine ? Number(boost.spent) || 0 : 0,
+          surchargePaid: mine ? Number(boost.surchargePaid) || 0 : 0
+        };
     }
   }
   return null;
 }
 
-/** The boost's plan, or the reason none can be spent. */
-export function initiativeBoostPlan(actor) {
+/**
+ * The boost's plan, or the reason none can be spent. Shaken II and III add their surcharge once per Initiative check
+ * (p.342), so a second boost of the same roll pays only the one die; `cost` is what the press takes.
+ */
+export function initiativeBoostPlan(actor, { surchargePaid = 0 } = {}) {
   if (actor?.type !== "agent") return { blocked: true, reason: loc`Only agents spend action dice.` };
-  return actionDieBoostPlan(actor.actionDiceFundingSystem ?? actor.system ?? {}, { checkKind: "initiative" }, {});
+  const plan = actionDieBoostPlan(actor.actionDiceFundingSystem ?? actor.system ?? {}, { checkKind: "initiative" }, {});
+  if (plan.blocked) return plan;
+  const fee = shakenActionDieCost(actor.system ?? {}, { baseCost: 1, surchargePaid });
+  if (fee.blocked) return fee;
+  return { ...plan, cost: fee.cost, surcharge: fee.surcharge, surchargePaid: surchargePaid + fee.surcharge };
 }
 
 async function boost(message) {
@@ -48,23 +64,40 @@ async function boost(message) {
   const { combatant, count, spent } = target,
     actor = combatant.actor;
   if (!actor?.isOwner) return refuse(loc`Only the agent's owner can spend its action dice.`);
-  const plan = initiativeBoostPlan(actor);
+  const plan = initiativeBoostPlan(actor, { surchargePaid: target.surchargePaid });
   if (plan.blocked) return refuse(plan.reason);
-  return actor.spendActionDice(1, async () => {
-    const roll = await new Roll(plan.formula).evaluate();
-    const added = roll.total + plan.bonusEach * plan.rolls,
-      after = count + added;
-    if (combatant.initiative !== count) throw new Error(loc`That Initiative Count has changed since this roll.`);
-    await combatant.update({
-      initiative: after,
-      "flags.spycraft2.initiativeBoost": { messageId: message.id, count: after, spent: spent + 1 }
-    });
-    await roll.toMessage({
+  let report = null;
+  // The Undo note puts back the dice, the Count and the boost record together.
+  const after = await withUndo([actor], loc`Action die on Initiative: ${actor.name}`, () =>
+    actor.spendActionDice(plan.cost, async () => {
+      const roll = await new Roll(plan.formula).evaluate();
+      const added = roll.total + plan.bonusEach * plan.rolls,
+        next = count + added;
+      if (combatant.initiative !== count) throw new Error(loc`That Initiative Count has changed since this roll.`);
+      await combatant.update({
+        initiative: next,
+        "flags.spycraft2.initiativeBoost": {
+          messageId: message.id,
+          count: next,
+          spent: spent + 1,
+          surchargePaid: plan.surchargePaid
+        }
+      });
+      report = { roll, added, next };
+      return next;
+    })
+  );
+  // The report is posted after the payment settles: once the Count has moved, a chat failure must not refund the die.
+  const surcharge = plan.surcharge ? loc` (${plan.surcharge} Shaken surcharge)` : "";
+  try {
+    await report.roll.toMessage({
       speaker: message.speaker,
-      flavor: loc`Action die on Initiative: +${added}, Count ${count} → ${after}`
+      flavor: loc`Action die on Initiative${surcharge}: +${report.added}, Count ${count} → ${report.next}`
     });
-    return after;
-  });
+  } catch {
+    ui.notifications.warn(loc`The Count was raised to ${report.next}, but its chat report could not be posted.`);
+  }
+  return after;
 }
 
 /** The button under an Initiative roll (the `renderChatMessageHTML` hook). */
@@ -75,13 +108,16 @@ export function renderInitiativeBoost(message, html) {
   if (!content || content.querySelector("[data-spycraft2-initiative-boost]")) return;
   const target = boostableInitiative(message, globalThis.game?.combats?.contents ?? []);
   const actor = target?.combatant.actor;
-  if (!actor?.isOwner || actor.type !== "agent" || (actor.system?.actionDice?.value ?? 0) < 1) return;
-  const plan = initiativeBoostPlan(actor);
-  if (plan.blocked) return;
+  if (!actor?.isOwner || actor.type !== "agent") return;
+  const plan = initiativeBoostPlan(actor, { surchargePaid: target.surchargePaid });
+  if (plan.blocked || (actor.system?.actionDice?.value ?? 0) < plan.cost) return;
   const button = document.createElement("button");
   button.type = "button";
   button.dataset.spycraft2InitiativeBoost = "";
-  button.textContent = loc`Spend 1 action die (+${plan.rolls}d${plan.die})`;
+  button.textContent =
+    plan.cost === 1
+      ? loc`Spend 1 action die (+${plan.rolls}d${plan.die})`
+      : loc`Spend ${plan.cost} action dice (+${plan.rolls}d${plan.die}, Shaken surcharge)`;
   button.title = loc`Raise this Initiative Count with an action die (p.61)`;
   button.addEventListener("click", async event => {
     event.preventDefault();
