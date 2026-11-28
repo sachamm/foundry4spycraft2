@@ -172,6 +172,18 @@ export function appliedDamageEntries(check = {}) {
 }
 
 /**
+ * An old card's "damage applied" array without its newest record for one target, or null when it holds none. Old
+ * cards kept every record in one array; Undo of such an application frees the card this way.
+ * @param {object} check       the card's flags.spycraft2
+ * @param {string} targetUuid
+ */
+export function withoutLegacyDamageMark(check = {}, targetUuid) {
+  const list = Array.isArray(check?.damageApplied) ? check.damageApplied : [];
+  const index = list.findLastIndex(entry => entry?.targetUuid === targetUuid);
+  return index < 0 || typeof targetUuid !== "string" ? null : list.filter((_, at) => at !== index);
+}
+
+/**
  * The condition a wound total puts a special character in (p.331), or "" while above 0.
  * @param {number} wounds
  * @param {number} [death]  the wound total at which this character dies: -10, or another value for its Size (p.349)

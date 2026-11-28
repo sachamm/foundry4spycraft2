@@ -302,12 +302,27 @@ export async function nextScene() {
         : []),
       ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
     ],
-    loc`Next scene`,
-    carrying.length ? { warning: loc`The cleared damage cannot be put back.` } : {}
+    loc`Next scene`
   );
   if (!ok) return null;
-  await startUsagePeriod("scene");
-  if (mission.active) await updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }));
+  const periodsBefore = game.settings.get("spycraft2", "usagePeriods") ?? {},
+    sceneStateBefore = structuredClone(game.settings.get("spycraft2", "sceneState") ?? null),
+    counted = !!mission.active;
+  const periodsAfter = await startUsagePeriod("scene");
+  if (counted) await updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }));
+  // The scene's records are kept under its own period, so going back to that period brings them back as they were:
+  // scene uses, the dramatic state and standard NPCs' accumulated damage.
+  await Promise.resolve(
+    postUndo(loc`Next scene`, [], {
+      nextScene: {
+        before: { scene: periodsBefore.scene ?? null, sceneSequence: periodsBefore.sceneSequence ?? null },
+        after: periodsAfter?.scene ?? null,
+        counted,
+        period: missionEpoch(),
+        sceneState: sceneStateBefore
+      }
+    })
+  ).catch(error => console.warn("Field Agent's Handbook | No Undo note could be left for Next scene.", error));
   return true;
 }
 

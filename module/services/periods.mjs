@@ -242,6 +242,41 @@ export async function startUsagePeriod(period) {
     })
   );
 }
+/**
+ * What taking back a "Next scene" would write, or the reason it cannot be taken back. Pure, so it can be tested.
+ * @param {object} periods  the stored usage periods now
+ * @param {object} change   { before: {scene, sceneSequence}, after: scene id the step set }
+ */
+export function scenePeriodRevert(periods = {}, change = {}) {
+  if (!change?.after || String(periods?.scene ?? "initial") !== String(change.after))
+    return { reason: loc`A later scene has begun since, so that Next scene can no longer be taken back.` };
+  const target = { ...periods };
+  if (change.before?.scene === undefined || change.before.scene === null) delete target.scene;
+  else target.scene = change.before.scene;
+  if (Number.isSafeInteger(change.before?.sceneSequence)) target.sceneSequence = change.before.sceneSequence;
+  else delete target.sceneSequence;
+  return { target };
+}
+/** Take back a "Next scene": the scene period returns to the scene before it, so that scene's records read again. */
+export async function revertScenePeriod(change) {
+  if (!game.user?.isGM) throw new Error(loc`Only the GC can start a new usage period.`);
+  if (getUsagePeriodReview().needsReview)
+    throw new Error(loc`Review the interrupted start before starting another scene or session.`);
+  const actors = tracked();
+  return queueResources(actors, () =>
+    withGCPeriodLock(async () => {
+      const { target, reason } = scenePeriodRevert(periodState(), change);
+      if (reason) throw new Error(reason);
+      try {
+        await game.settings.set("spycraft2", "usagePeriods", target);
+      } catch (error) {
+        if (!same(periodState(), target)) throw error;
+      }
+      refreshUsagePeriodActors();
+      return target;
+    })
+  );
+}
 export async function reviewUsagePeriod(options = {}) {
   if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted start.`);
   const saved = clone(getUsagePeriodReview());

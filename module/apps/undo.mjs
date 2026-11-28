@@ -286,7 +286,8 @@ export function postUndo(
     placedTokens = null,
     combatSurprise = null,
     closeSaves = null,
-    missionCaliber = null
+    missionCaliber = null,
+    nextScene = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -322,7 +323,8 @@ export function postUndo(
           placedTokens,
           combatSurprise,
           closeSaves,
-          missionCaliber
+          missionCaliber,
+          nextScene
         }
       }
     }
@@ -500,6 +502,12 @@ async function undoRecord(message, record) {
         loc`Only the latest Defense die on this still-pending attack can be undone. Undo later dice first; completed outcomes need GC review.`
       );
   }
+  // A Next scene is checked before anything is marked: once a later scene has begun it cannot be taken back.
+  if (record.nextScene && game.user.isGM) {
+    const { scenePeriodRevert } = await import("../services/periods.mjs");
+    const { reason } = scenePeriodRevert(readSetting("usagePeriods", {}), record.nextScene);
+    if (reason) throw Error(reason);
+  }
   const targets = [];
   for (const entry of record.entries ?? []) {
     const actor = await fromUuid(entry.uuid);
@@ -671,6 +679,26 @@ async function undoRecord(message, record) {
       }
     }
   }
+  // Next scene: the scene period goes back to the scene before, which brings back that scene's uses, its dramatic
+  // state and the damage its standard NPCs carried; the scene comes off the mission's count within the same mission.
+  const scene = record.nextScene;
+  if (scene && game.user.isGM) {
+    const { revertScenePeriod } = await import("../services/periods.mjs");
+    const { getMission, updateMission, missionEpoch } = await import("./gc/state.mjs");
+    await revertScenePeriod(scene);
+    if (scene.sceneState && scene.sceneState.scene === (scene.before?.scene ?? "initial"))
+      await game.settings
+        .set("spycraft2", "sceneState", scene.sceneState)
+        .catch(error => ui.notifications.warn(loc`The dramatic scene state was not put back: ${error.message}`));
+    if (scene.counted) {
+      if (scene.period !== missionEpoch())
+        ui.notifications.warn(loc`A later mission has begun, so its scene count was left as it is.`);
+      else if ((getMission().scenesPlayed ?? 0) > 0)
+        await updateMission(now => ({ scenesPlayed: Math.max(0, (now.scenesPlayed ?? 0) - 1) })).catch(error =>
+          ui.notifications.warn(loc`The scene count was not put back: ${error.message}`)
+        );
+    }
+  }
   // A surprise round set from the console: the fight's mark goes back to what it was.
   const surprise = record.combatSurprise;
   if (surprise?.combat && game.user.isGM) {
@@ -740,12 +768,15 @@ async function undoRecord(message, record) {
     // application of the same card stays recorded either way.
     const own = record.damageCard.entryId && applied[record.damageCard.entryId] ? record.damageCard.entryId : null,
       key = own ?? marks.at(-1)?.[0];
-    // A player's own damage was marked on the GC's card through the GC, and is cleared the same way.
-    if (key) {
+    // A player's own damage was marked on the GC's card through the GC, and is cleared the same way. A card from
+    // before marks were keyed holds them in one array: its newest record for this target comes off instead.
+    const legacy =
+      !key && (card.flags?.spycraft2?.damageApplied ?? []).some?.(e => e?.targetUuid === record.damageCard.targetUuid);
+    if (key || legacy) {
       const { unmarkDamage } = await import("./gc-relay.mjs");
-      await Promise.resolve(unmarkDamage(card, key)).catch(error =>
-        ui.notifications.warn(loc`The damage card still reads as applied: ${error.message}`)
-      );
+      await Promise.resolve(
+        unmarkDamage(card, key, legacy ? { legacyTargetUuid: record.damageCard.targetUuid } : {})
+      ).catch(error => ui.notifications.warn(loc`The damage card still reads as applied: ${error.message}`));
     }
   }
   return targets.map(([entry]) => entry.name);

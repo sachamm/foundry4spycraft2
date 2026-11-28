@@ -43,8 +43,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-222 | **Undo and old cards.** Marks on cards older than the Undo note's own are not freed when the chat log is trimmed. (Each mark now records the value its step left, and Undo clears it only while no later step has set it again.) | CX2-U05, CU-08 | S | live |
-| B-237 | **Next scene has no way back.** The status strip says when the session began, Begin session stops being the main button once it has and states what the Threat Level gives, and Next scene names every standard NPC whose damage it clears. Still open: an Undo for Next scene (the scene period, the scene count and the dramatic state). | NG2-04, NG2-05, NG2-25 | M | live |
 
 ## P1: running the game
 
@@ -261,6 +259,16 @@ Short passes in a running world. Delete a line when it has been seen working, or
   Next scene and End mission in a one-GC world, since four GCs shared this one.
 - Still untested live in any review: vehicles, chases with vehicles, social and intrusion subsystems, more than one GC
   by design, touch devices, a screen reader, Foundry's mobile layout.
+
+## Closed on 2026-11-28, with notes
+
+Every row that left the tables above in the 2026-11-28 pass, and why. "Done" rows landed in code; "Dropped" rows
+were judged not worth doing, with the reason.
+
+| ID | Was | Outcome | Notes |
+| --- | --- | --- | --- |
+| B-222 | Undo and old cards | Done | Undo of damage applied from a card made before marks were keyed now takes that target's newest record off the card's old array (through the GC for a player), so the card can be applied again. |
+| B-237 | Next scene has no way back | Done | Next scene leaves an Undo note. It returns the scene period to the scene before, which brings back that scene's uses, dramatic state and standard NPCs' damage, and takes the scene off the mission's count. It refuses once a later scene has begun. |
 
 ## Parked, with the reason
 

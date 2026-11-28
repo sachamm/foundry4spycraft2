@@ -361,3 +361,21 @@ test("a step that fails part way still leaves a note for what it wrote, then rep
   assert.equal(posted.length, 1);
   assert.match(posted[0].flags.spycraft2.undo.label, /stopped part way/);
 });
+
+test("Next scene can be taken back until a later scene begins", async () => {
+  const { scenePeriodRevert } = await import("../module/services/periods.mjs");
+  const change = { before: { scene: "s1", sceneSequence: 3 }, after: "s2" };
+  assert.deepEqual(scenePeriodRevert({ scene: "s2", sceneSequence: 4, session: "x" }, change).target, {
+    scene: "s1",
+    sceneSequence: 3,
+    session: "x"
+  });
+  // The very first scene had no period of its own.
+  assert.deepEqual(
+    scenePeriodRevert({ scene: "s2", sceneSequence: 1 }, { before: { scene: null, sceneSequence: null }, after: "s2" })
+      .target,
+    {}
+  );
+  assert.ok(scenePeriodRevert({ scene: "s3", sceneSequence: 5 }, change).reason);
+  assert.ok(scenePeriodRevert({}, {}).reason);
+});
