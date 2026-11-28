@@ -92,9 +92,9 @@ The agent sheet calculates:
 
 Build problems are shown as warnings. Executable workflows also reject invalid actions, unavailable gear and insufficient resources. The [RAW review and residual implementation ledger](docs/archive/raw-character-review.md) distinguish verified mechanics from remaining manual rules. Personal gear classification, field acquisition, measured attacks and class resource controls are documented there; catalog presence alone does not establish complete automation.
 
-The [November 26 rules-completeness review](docs/rules-completeness-review.md) includes the original 8/10 pass and
-an expanded checkpoint scoring PC creation at 8.7/10 and combat play at 8.5/10. The requested 9.9 target remains
-unmet; the report lists implemented fixes, scoring criteria, regression evidence and required remaining work.
+The [rules-completeness review](docs/rules-completeness-review.md) records the completed 9.9/10 assessment for both
+PC creation and combat play under its assisted-core-play rubric. It preserves earlier reviews, implemented fixes,
+regression and native Foundry evidence, and the exceptional cases that still require GC adjudication.
 
 Classes also provides ordinary GC action-die awards and once-per-mission XP settlement using the user-selected p.440 formula. Gear records Armor Use armor and reviewed higher-Caliber mission picks; Caliber V upgrades remain separate. Soldier 14 can declare One in a Million before an eligible roll. See the ledger for each workflow’s limits.
 
