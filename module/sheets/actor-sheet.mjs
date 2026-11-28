@@ -1349,6 +1349,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }));
     for (const row of context.weapons) {
       row.untrained = row.attack?.trained === false;
+      // Said before the click: the attack goes ahead, with a notice, from a weapon not in hand.
+      row.notEquipped = row.item.system?.equipped === false;
       row.attackTip = weaponAttackTip(row.attack);
       row.facts = weaponFacts(row.attack);
       row.threatLabel = formatRange("threat", row.attack?.threat);

@@ -9,7 +9,11 @@
     class="sc2-untrained"
     data-tooltip="{{localize 'SPYCRAFT.Weapon.UntrainedHint'}}"><i
     class="fa-solid fa-triangle-exclamation"
-    aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}</span>
+    aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}{{#if notEquipped}}<span
+    class="sc2-untrained"
+    data-tooltip="{{localize 'SPYCRAFT.Weapon.NotEquippedHint'}}"><i
+    class="fa-solid fa-hand"
+    aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.NotEquippedWord"}}</span>{{/if}}</span>
   <button type="button" data-action="rollDamage" class="sc2-roll sc2-action" aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}}">{{item.system.damage}}</button>
   {{#if shots}}<span
     class="ammo {{#if shots.empty}}bad{{else}}muted{{/if}}">{{shots.loaded}}/{{shots.capacity}}</span><button type="button"

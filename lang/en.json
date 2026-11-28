@@ -434,6 +434,8 @@
   "Weapon": {
    "Untrained": "untrained (penalty applied, error +2)",
    "UntrainedWord": "untrained",
+   "NotEquippedWord": "not equipped",
+   "NotEquippedHint": "Not in hand. The attack still goes ahead; equip it on the Gear tab if it should be.",
    "ErrorRange": "Error range",
    "ThreatRange": "Threat range",
    "UntrainedHint": "Not trained with this weapon: the attack total already includes the penalty, and the error range is 2 wider.",
