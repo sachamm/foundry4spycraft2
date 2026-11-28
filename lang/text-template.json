@@ -1230,7 +1230,7 @@
    "CalculateTheIncludedStockpileForOne_0ewwhm2": "Calculate the included stockpile for one weapon (including a conversion if needed)",
    "CalculateThisFallSDamageDistance_1e3kybe": "Calculate this fall’s damage distance",
    "CalculatesTheSelectedCheckMethodAnd_1eubvmp": "Calculates the selected check method and includes supported modifiers from the sheet and selected options.",
-   "CaliberBaseStandingRewardReputationOr_0tendvh": "{0}, Caliber {1}.{2} Base standing reward: Reputation {3} or Net Worth {4}. GC starting dice: {5} + {6}.",
+   "CaliberBaseStandingRewardReputationOr_0mtjs7s": "{0}, Caliber {1}.{2} Base standing reward: Reputation {3} or Net Worth {4}. The GC's action dice come with each session, not the mission: {5} + {6} at the next Begin session (p.396).",
    "CaliberExceedsThisMissionSRecorded_10c2z9b": "{0}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.",
    "CaliberPossessionsPickSExceedThe_1749pm6": "{0}: {1} Caliber-{2} Possessions pick(s) exceed the available Wealth allowance.",
    "CaliberRaise_1e6ze5v": "caliber raise",

@@ -102,6 +102,10 @@ test("p.423 Threat Level examples and limits", () => {
   });
   assert.equal(threatLevel({ threatAdjust: 3 }, [5, 5, 5, 5, 5]).value, 5, "adjustments beyond ±2 are ignored");
   assert.equal(threatLevel({ threatAdjust: -2 }, [1]).value, 1);
+  // A level held at 1 or 20 counts only the change actually made, so the standing reward does not drop or rise.
+  assert.equal(threatLevel({ threatAdjust: -2 }, [1]).adjust, 0);
+  assert.equal(threatLevel({ threatAdjust: -2 }, [5, 5]).adjust, -1);
+  assert.equal(threatLevel({ threatAdjust: 2 }, [100]).adjust, 0);
   assert.equal(threatLevel({ threatOverride: 14 }, [1]).value, 14);
 });
 test("p.61 bonus starting dice when the Threat Level exceeds the average career level", () => {
@@ -120,6 +124,8 @@ test("Table 7.10 and Table 7.5 standing rewards", () => {
     10
   );
   assert.deepEqual(missionStanding({ caliber: 3, threatAdjust: -1 }), { reputation: 9, netWorth: 450000 });
+  assert.equal(missionStanding({ caliber: 3, threatAdjust: -2, threatBase: 1 }).reputation, 10);
+  assert.equal(missionStanding({ caliber: 3, threatAdjust: -2, threatBase: 2 }).reputation, 9);
   assert.equal(missionStanding({ caliber: 6 }), null);
 });
 test("mission base XP: objectives, complications, bundle and antagonists", () => {
