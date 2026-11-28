@@ -184,7 +184,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       <details><summary>${loc`Grapple circumstances`}</summary>${grappleCircumstancesContent(actor)}</details>
       ${cooperativeContent(null, actor)}
       <details><summary>${loc`Skill tags and senses`}</summary><p>${loc`Current actor conditions apply automatically. Declare only additional circumstances of this named check.`}</p><label><input name="oneHanded" type="checkbox" /> ${loc`This Hands-On check uses one hand`}</label><label><input name="noSharedLanguage" type="checkbox" /> ${loc`No shared language or relevant local tongue`}</label><label><input name="conveyingMessage" type="checkbox" /> ${loc`I am transmitting Innuendo`}</label><label><input name="blinded" type="checkbox" /> ${loc`Additionally blinded for this check`}</label><label><input name="deafened" type="checkbox" /> ${loc`Additionally deafened for this check`}</label><label><input name="requiresEyesight" type="checkbox" /> ${loc`This task requires eyesight or eye-hand coordination`}</label><label><input name="requiresHearing" type="checkbox" /> ${loc`This task requires hearing`}</label><label><input name="targetDeafened" type="checkbox" /> ${loc`The actual target is deafened`}</label><label><input name="targetCharacter" type="checkbox" /> ${loc`The target is a character`}</label><label>${loc`Actual distance to that character (ft.)`} <input name="distanceFeet" type="number" min="0" step="any" /></label></details>
-      ${actor.system.conditionContext?.held || actor.system.conditionContext?.pinned ? `<fieldset><legend>${loc`Opposed Grapple escape`}</legend><label>${loc`Applicable proficiency`} <select name="grappleProficient"><option value="">${loc`Confirm for this escape`}</option><option value="true">${loc`Proficient`}</option><option value="false">${loc`Not proficient: two full actions, error +2`}</option></select></label><label>${loc`My Size categories minus opponent Size categories`} <input name="grappleSizeDifference" type="number" value="0" step="1" min="-20" max="20" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`The GC confirms this escape's actual participants, proficiency and Size difference`}</label><label><input name="grappleAllSourcesConfirmed" type="checkbox" /> ${loc`All current Held/Pinned sources belong to this same grapple; otherwise review them separately`}</label></fieldset>` : ""}
+      <details><summary>${loc`Grapple proficiency and Size`}</summary><fieldset><legend>${loc`Opposed Athletics (pp.347,357)`}</legend><label>${loc`Applicable proficiency`} <select name="grappleProficient"><option value="">${loc`Confirm for this escape`}</option><option value="true">${loc`Proficient`}</option><option value="false">${loc`Not proficient: two full actions, error +2`}</option></select></label><label>${loc`My Size categories minus opponent Size categories`} <input name="grappleSizeDifference" type="number" value="0" step="1" min="-20" max="20" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`The GC confirms the actual participants, proficiency and Size difference`}</label><label><input name="grappleAllSourcesConfirmed" type="checkbox" /> ${loc`All current Held/Pinned sources belong to this same grapple; otherwise review them separately`}</label></fieldset></details>
       ${actor.system.conditionContext?.paralyzed ? `<label><input name="purelyMentalConfirmed" type="checkbox" /> ${loc`The GC confirms this is a purely mental action`}</label>` : ""}
       ${actor.system.campaignEffects?.socialCheckMorale ? `<label><input type="checkbox" name="surprise" /> ${loc`Paranoid: Blend/Stealth or Sneak/Hide to determine surprise`}</label><label><input type="checkbox" name="shiftingDisposition" /> ${loc`Paranoid: this check shifts a target's disposition`}</label><label><input type="checkbox" name="persuadingAction" /> ${loc`Paranoid: this check persuades a target to take an action`}</label>` : ""}
       ${context.combatPersuasion ? "" : dispositionTargetContent("impress")}
@@ -328,7 +328,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     adjustedNamedPenalties = skillPenaltyEntries(actor.system, namedPenalties),
     namedPenalty = adjustedNamedPenalties.reduce((n, row) => n + row.value, 0);
   const grapplePlan = () =>
-      grappleCheckPlan(actor.system, skill.key, namedCheck, {
+      grappleCheckPlan(actor.system, skill.key, action.restraint.check, {
         ...input,
         grappleConversionWeapon: actor.items?.get?.(input.grappleConversionWeaponId)
       }),
@@ -385,7 +385,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
           ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap ?? loc`No cap`}`
           : loc`${skill.name} (${ability.toUpperCase()})`) +
         (namedCheck ? ` / ${esc(namedCheck.name)}` : "") +
-        (action.restraint.escape ? ` — ${action.restraint.timeLocked ? 2 : 1} ${loc`full action(s)`}` : "") +
+        (action.restraint.escape || action.restraint.grapple
+          ? ` — ${action.restraint.timeLocked ? 2 : 1} ${loc`full action(s)`}`
+          : "") +
         (input.secret && disposition.evidence ? `<br><small>${esc(disposition.notes.join(" "))}</small>` : "") +
         (input.secret && (quality.rows.length || quality.errorIncrease)
           ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`

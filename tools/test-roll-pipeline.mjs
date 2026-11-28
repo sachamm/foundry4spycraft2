@@ -856,6 +856,9 @@ test("the real skill workflow records grapple penalties and conversion on the po
   actor.rollCheck = async (formula, data, options) => ({ formula, data, flags: { spycraft2: options } });
   const options = {
       check: "grapple",
+      grappleProficient: true,
+      grappleContextConfirmed: true,
+      grappleSizeDifference: 0,
       askContext: false,
       method: "roll",
       gearStatus: "available",

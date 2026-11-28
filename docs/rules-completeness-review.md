@@ -2931,3 +2931,31 @@ identified the remaining Proficiency-tag omission on ordinary Grapple checks:
 untrained actions need doubled time which cannot be reduced and error range +2
 (p.347). Escape checks already handle it. Extend that reviewed proficiency/Size
 workflow to the ordinary check before completing the scoring review.
+
+## Pass 93: Proficiency-tag timing, error and Size on ordinary Grapple
+
+PC creation remains **9.9/10**; combat remains **9.8/10** until the final
+recipient check below is fixed. Ordinary Grapple now uses the same reviewed
+proficiency and Size context as an opposed escape. An untrained participant
+takes two full actions, receives error range +2 and cannot shorten the action
+with a time-reducing ability. Each larger participant adds four per Size category
+to their own Athletics check. Saved context is checked again before posting;
+missing review refuses the roll. A normal Grapple check remains distinct from
+an escape and cannot automatically release a hold.
+
+PC and NPC forms expose one proficiency/Size section without duplicate fields.
+NPC action-time text and canonical timing evidence match the actual action;
+stronger incapacity remains the first refusal rather than an unanswered context
+question. Native Non-Combatant Actor.r9PCw1kv6d6cpcuc actually lacks unarmed
+proficiency. Its reviewed check ChatMessage.3v9tdk61Opnp7sG2 rolled two, recorded
+error range three, two full actions and the untrained adjustment. The proficient
+PC check ChatMessage.HD3gxBE4eQeZALzZ recorded one full action and error range one.
+Unreviewed NPC Grapple was refused before new dice or a card. Both forms fit both
+themes at 1280×720 (primary-control bottom 669.5px); context and error range
+survived reload. No browser errors occurred.
+
+Validation: **4,543 Node tests**, **988 engine fixtures**, **307 layout checks**,
+schemas, lint, formatting, bundle and copied-text checks pass. The next review
+caught an over-restrictive recipient assumption in the new benefit prerequisites:
+Break Pin and Escape Hold may assist another participant. Add that explicit GC
+recipient choice and preserve Held after breaking a pin before the final score.

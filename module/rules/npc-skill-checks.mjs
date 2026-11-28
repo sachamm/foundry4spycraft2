@@ -17,6 +17,12 @@ export function npcSkillActionPlan(system, key, check, ability, input = {}, { pr
     mode = !preserveMode && campaignSkillPolicy(system)?.active ? "Active" : (check?.mode ?? "Active"),
     passive = mode.includes("Passive"),
     blockedReason =
+      attributeActionBlock(system, {
+        kind: "skill",
+        ability,
+        passiveAction: passive,
+        purelyMentalConfirmed: input.purelyMentalConfirmed === true
+      }) ||
       restraint.blockedReason ||
       tags.blockedReason ||
       senses.blockedReason ||
@@ -29,12 +35,6 @@ export function npcSkillActionPlan(system, key, check, ability, input = {}, { pr
           named.id === "grapple" &&
           ability === "str" &&
           input.grappleParticipantConfirmed === true
-      }) ||
-      attributeActionBlock(system, {
-        kind: "skill",
-        ability,
-        passiveAction: passive,
-        purelyMentalConfirmed: input.purelyMentalConfirmed === true
       }) ||
       (system.baffledApplicationReview?.needsReview
         ? loc`The GC must review the interrupted Baffled event before skill checks.`
@@ -52,7 +52,9 @@ export function npcSkillActionPlan(system, key, check, ability, input = {}, { pr
     tags,
     senses,
     capAdjustment: tags.capAdjustment + senses.capAdjustment,
-    ...(restraint.escape ? { skillTiming: skillTimingPlan({ method: "roll", time: restraint.check.time }) } : {}),
+    ...(restraint.escape || restraint.grapple
+      ? { skillTiming: skillTimingPlan({ method: "roll", time: restraint.check.time }).skillTiming }
+      : {}),
     actionDiceAllowed: !passive,
     ...(passive || mode === "Secret" || (mode.includes("Secret") && input.secret === true)
       ? { rollMode: "blindroll" }

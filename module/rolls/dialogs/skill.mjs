@@ -19,8 +19,8 @@ const parts = [
   [
     20,
     ({ actor, key }) =>
-      key === "athletics" && (actor.system.conditionContext?.held || actor.system.conditionContext?.pinned)
-        ? `<fieldset><legend>${loc`Opposed Grapple escape`}</legend><label>${loc`Applicable proficiency`} <select name="grappleProficient"><option value="">${loc`Choose for this Grapple`}</option><option value="true">${loc`Proficient`}</option><option value="false">${loc`Not proficient: two full actions, error +2`}</option></select></label><label>${loc`My Size categories minus opponent Size categories`} <input name="grappleSizeDifference" type="number" step="1" min="-20" max="20" value="0" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`The GC confirms the participants, applicable proficiency and Size difference`}</label><p>${loc`Each larger participant gains +4 per Size category on their own check. This check uses Grasp and Armor Check Penalty; static-restraint Escape has separate rules.`}</p></fieldset>`
+      key === "athletics"
+        ? `<details><summary>${loc`Grapple proficiency and Size`}</summary><fieldset><legend>${loc`Opposed Athletics (pp.347,357)`}</legend><label>${loc`Applicable proficiency`} <select name="grappleProficient"><option value="">${loc`Choose for this Grapple`}</option><option value="true">${loc`Proficient`}</option><option value="false">${loc`Not proficient: two full actions, error +2`}</option></select></label><label>${loc`My Size categories minus opponent Size categories`} <input name="grappleSizeDifference" type="number" step="1" min="-20" max="20" value="0" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`The GC confirms the participants, applicable proficiency and Size difference`}</label><p>${loc`Each larger participant gains +4 per Size category on their own check. This check uses Grasp and Armor Check Penalty; static-restraint Escape has separate rules.`}</p></fieldset></details>`
         : ""
   ],
   [

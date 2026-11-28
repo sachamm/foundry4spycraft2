@@ -41,8 +41,9 @@ export function restraintSkillContext(
   { grappleProficient = null, grappleSizeDifference = null, grappleContextConfirmed = false } = {}
 ) {
   const state = restraintState(system),
-    escape = !!state && key === "athletics" && check?.id === "restraint-escape";
-  if (!escape)
+    escape = !!state && key === "athletics" && check?.id === "restraint-escape",
+    grapple = key === "athletics" && check?.id === "grapple";
+  if (!escape && !grapple)
     return { state, escape: false, check, sizeBonus: 0, errorIncrease: 0, timeLocked: false, blockedReason: "" };
   const valid =
       typeof grappleProficient === "boolean" &&
@@ -52,7 +53,8 @@ export function restraintSkillContext(
     untrained = valid && grappleProficient === false;
   return {
     state,
-    escape: true,
+    escape,
+    ...(grapple ? { grapple: true } : {}),
     sizeDifference: valid ? grappleSizeDifference : null,
     sizeBonus: valid ? 4 * Math.max(0, grappleSizeDifference) : 0,
     proficient: valid ? grappleProficient : null,
@@ -61,7 +63,20 @@ export function restraintSkillContext(
     blockedReason: valid
       ? ""
       : loc`Confirm the opposed Grapple participants, applicable proficiency and Size difference with the GC.`,
-    check: { ...restraintSkillChecks(system, key).at(-1), time: untrained ? "2 Full Actions" : "1 Full Action" }
+    check: {
+      ...(escape ? restraintSkillChecks(system, key).at(-1) : check),
+      time: untrained ? "2 Full Actions" : "1 Full Action",
+      ...(grapple
+        ? {
+            grappleProficiency: {
+              proficient: valid ? grappleProficient : null,
+              sizeDifference: valid ? grappleSizeDifference : null,
+              fullActions: untrained ? 2 : 1,
+              errorIncrease: untrained ? 2 : 0
+            }
+          }
+        : {})
+    }
   };
 }
 

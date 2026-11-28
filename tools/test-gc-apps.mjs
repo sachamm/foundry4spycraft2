@@ -525,11 +525,27 @@ test("NPC skill check uses Competence or the skilled bonus plus the attribute", 
   assert.equal(roll.options.rollMode, "gmroll");
 });
 
+test("NPC ordinary Grapple records actual proficiency time, error and Size without inventing an attack penalty", async () => {
+  const base = { key: "athletics/grapple", ability: "str", grappleContextConfirmed: true, grappleSizeDifference: 0 };
+  const trained = await npc.rollNpcSkill(guard, { ...base, grappleProficient: true });
+  const untrained = await npc.rollNpcSkill(guard, { ...base, grappleProficient: false, grappleSizeDifference: 2 });
+  assert.equal(untrained.options.error, trained.options.error + 2);
+  assert.equal(untrained.data.total, trained.data.total + 8);
+  assert.equal(untrained.options.grappleFeats.proficiency.fullActions, 2);
+  assert.equal(untrained.options.npcSkillContext.restraint.proficient, false);
+  assert.equal(untrained.options.restraintEscape, null);
+  assert.equal(untrained.options.skillTiming.multiplier, 1);
+  assert.equal(untrained.options.skillTiming.policy, "additive-one-reduction");
+});
+
 test("NPC named Grapple applies second-hold, Mute, conversion and armor penalties with recorded evidence", async () => {
   const oldArmor = guard.system.armor;
   guard.system.armor = { check: -3 };
   const roll = await npc.rollNpcSkill(guard, {
     key: "athletics/grapple",
+    grappleProficient: true,
+    grappleContextConfirmed: true,
+    grappleSizeDifference: 0,
     ability: "str",
     grappleHoldingTwo: true,
     grappleSecondOpponent: true,
@@ -562,6 +578,9 @@ test("NPC named Vision checks use armor penalties and Omni-Competent halves each
   guard.system.campaignEffects = { ...effects, skillPenaltyDivisor: 2 };
   const grapple = await npc.rollNpcSkill(guard, {
     key: "athletics/grapple",
+    grappleProficient: true,
+    grappleContextConfirmed: true,
+    grappleSizeDifference: 0,
     ability: "str",
     grappleHoldingTwo: true,
     grappleMuting: true,
@@ -598,9 +617,27 @@ test("actual NPC incapacity guards refuse before the roll and an escape keeps pr
     statuses = guard.statuses,
     effects = guard.effects;
   guard.system.conditionContext = { unconscious: true };
-  await assert.rejects(npc.rollNpcSkill(guard, { key: "athletics/grapple", ability: "str" }), /Unconscious/);
+  await assert.rejects(
+    npc.rollNpcSkill(guard, {
+      key: "athletics/grapple",
+      grappleProficient: true,
+      grappleContextConfirmed: true,
+      grappleSizeDifference: 0,
+      ability: "str"
+    }),
+    /Unconscious/
+  );
   guard.system.conditionContext = { held: true };
-  await assert.rejects(npc.rollNpcSkill(guard, { key: "athletics/grapple", ability: "str" }), /Held/);
+  await assert.rejects(
+    npc.rollNpcSkill(guard, {
+      key: "athletics/grapple",
+      grappleProficient: true,
+      grappleContextConfirmed: true,
+      grappleSizeDifference: 0,
+      ability: "str"
+    }),
+    /Held/
+  );
   guard.statuses = new Set(["held"]);
   guard.effects = [{ id: "hold", statuses: new Set(["held"]), active: true }];
   const roll = await npc.rollNpcSkill(guard, {

@@ -98,6 +98,14 @@ export function grappleCheckPlan(
         : [])
     ],
     notes = [
+      ...(typeof check?.grappleProficiency?.proficient === "boolean"
+        ? [
+            check.grappleProficiency.proficient
+              ? loc`Grapple: one full action (pp.347,357).`
+              : loc`Untrained Grapple: two full actions, time reduction unavailable, error range +2 (p.347).`,
+            loc`Grapple Size bonus: +${4 * Math.max(0, check.grappleProficiency.sizeDifference ?? 0)} on this participant's Athletics check.`
+          ]
+        : []),
       ...(proneStance ? [loc`Prone Stance: +1 on this Grapple check (p.188).`] : []),
       ...(horde ? [loc`Horde Mastery: +1 morale with a 2-to-1 or greater advantage (p.174).`] : []),
       ...(garrote
@@ -119,7 +127,11 @@ export function grappleCheckPlan(
   return {
     ...empty,
     evidence:
-      bonuses.length || garrote || conversion || (inGrapple && grappleParticipantConfirmed === true)
+      bonuses.length ||
+      garrote ||
+      conversion ||
+      check?.grappleProficiency ||
+      (inGrapple && grappleParticipantConfirmed === true)
         ? {
             version: 1,
             proneStance,
@@ -129,6 +141,7 @@ export function grappleCheckPlan(
             second,
             muting,
             ...(grappleParticipantConfirmed === true ? { participantConfirmed: true } : {}),
+            ...(check?.grappleProficiency ? { proficiency: structuredClone(check.grappleProficiency) } : {}),
             conversion,
             conversionWeaponId: grappleConversionWeaponId,
             checkId: check?.id ?? ""

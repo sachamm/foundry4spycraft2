@@ -11,7 +11,18 @@ test("an actual held or pinned grapple participant can oppose Athletics while ot
     const s = { conditionContext: { [condition]: true } };
     assert.ok(plan(s, {}, check("Active", "grapple"), "str", "athletics").blockedReason);
     assert.equal(
-      plan(s, { grappleParticipantConfirmed: true }, check("Active", "grapple"), "str", "athletics").blockedReason,
+      plan(
+        s,
+        {
+          grappleParticipantConfirmed: true,
+          grappleProficient: true,
+          grappleContextConfirmed: true,
+          grappleSizeDifference: 0
+        },
+        check("Active", "grapple"),
+        "str",
+        "athletics"
+      ).blockedReason,
       ""
     );
     assert.ok(

@@ -1106,7 +1106,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [800, loc`${listedTime}. ${mode}. ${check.tags || loc`No tags`}. Rules p.${check.page}.`],
     [
       840,
-      restraint.escape
+      restraint.escape || restraint.grapple
         ? loc` Opposed Grapple: Size bonus +${restraint.sizeBonus}; ${restraint.timeLocked ? loc`untrained Proficiency: error +2, two full actions, no time reduction.` : loc`proficient: one full action.`}`
         : ""
     ]

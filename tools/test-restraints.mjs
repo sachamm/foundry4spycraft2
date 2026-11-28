@@ -1,4 +1,5 @@
 import test from "node:test";
+import { GRAPPLE_CHECK } from "../module/rules/grapple-check.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { isolatedClassAbilityCalculation as computeAgent } from "./lib/class-ability-fixture.mjs";
@@ -234,4 +235,28 @@ test("untrained Grapple doubles its action time and raises error by two; no time
   assert.equal(solution.timeMultiplier, 1);
   assert.equal(solution.timeReduction, "none");
   assert.equal(solution.restraintEscape.fullActions, 2);
+});
+
+test("ordinary Grapple uses reviewed proficiency and Size, doubles untrained time without a reduction and adds two error", () => {
+  const s = compute({});
+  s.classLevels.scientist = s.activeClassLevels.scientist = 14;
+  s.classLevels.schemer = s.activeClassLevels.schemer = 4;
+  const trained = resolveSkillCheck(s, "athletics", GRAPPLE_CHECK, { ability: "str" });
+  const untrained = resolveSkillCheck(s, "athletics", GRAPPLE_CHECK, {
+    ability: "str",
+    grappleProficient: false,
+    allAccordingToPlan: true,
+    tenSecondSolution: true,
+    standaloneCheckConfirmed: true
+  });
+  assert.equal(untrained.error, trained.error + 2);
+  assert.equal(untrained.timeReduction, "none");
+  assert.equal(untrained.timeMultiplier, 1);
+  assert.match(untrained.notes, /2 Full Actions/);
+  assert.equal(untrained.grappleFeats.proficiency.fullActions, 2);
+  assert.equal(untrained.grappleFeats.proficiency.errorIncrease, 2);
+  assert.equal(untrained.restraintEscape, null, "winning a normal Grapple check does not masquerade as a release");
+  const bigger = resolveSkillCheck(s, "athletics", GRAPPLE_CHECK, { ability: "str", grappleSizeDifference: 2 });
+  assert.equal(bigger.total, trained.total + 8);
+  assert.equal(resolveSkillCheck(s, "athletics", GRAPPLE_CHECK, { grappleContextConfirmed: false }).blocked, true);
 });

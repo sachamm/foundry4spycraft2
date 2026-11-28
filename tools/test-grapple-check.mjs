@@ -18,7 +18,14 @@ const state = (feats, extra = {}) => ({
   ...extra
 });
 const roll = (system, input = {}) =>
-  resolveSkillCheck(system, "athletics", GRAPPLE_CHECK, { synergySkill: "none", gearStatus: "available", ...input });
+  resolveSkillCheck(system, "athletics", GRAPPLE_CHECK, {
+    synergySkill: "none",
+    gearStatus: "available",
+    grappleProficient: true,
+    grappleContextConfirmed: true,
+    grappleSizeDifference: 0,
+    ...input
+  });
 
 test("held and pinned participants may make their confirmed ongoing Grapple check without opening unrelated actions", () => {
   for (const condition of ["held", "pinned"]) {
