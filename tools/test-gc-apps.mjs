@@ -1525,6 +1525,20 @@ test("an agent's Triumph since the mission began ticks the settlement's Triumph 
     assert.equal(missionSettlementDefaults().triumph, false, "a1 is not on this team");
     await state.updateMission({ team: ["a1", "a2"] });
     assert.equal(missionSettlementDefaults().triumph, true);
+    // One the GC's client recorded counts though this client cannot read its card (a whispered or blind roll).
+    game.messages = Object.assign([], { get: () => undefined });
+    assert.equal(missionSettlementDefaults().triumph, false);
+    await state.updateMission({ triumphMessageId: "hidden" });
+    assert.equal(missionSettlementDefaults().triumph, true, "recorded on the mission");
+    // A recorded card this client can read, whose Triumph was taken back, no longer counts.
+    const undone = {
+      id: "hidden",
+      timestamp: 2000,
+      speaker: { actor: "a1" },
+      flags: { spycraft2: { triumphed: false } }
+    };
+    game.messages = Object.assign([undone], { get: id => (id === "hidden" ? undone : undefined) });
+    assert.equal(missionSettlementDefaults().triumph, false);
   } finally {
     delete game.messages;
     await state.setMission(saved);

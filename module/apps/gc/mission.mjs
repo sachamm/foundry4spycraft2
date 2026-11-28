@@ -391,6 +391,7 @@ export async function startMission() {
   await updateMission(mission => ({
     active: true,
     settlementFigures: null,
+    triumphMessageId: null,
     // When this run began: a Triumph on a card after it counts for the team's XP (p.331).
     startedAt: Date.now(),
     ended: false,

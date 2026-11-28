@@ -19,8 +19,10 @@ import {
   getSceneState,
   qualitiesInForce,
   currentCampaignEffects,
-  fixThreatLevel
+  fixThreatLevel,
+  updateMission
 } from "./state.mjs";
+import { teamTriumph } from "./mission-defaults.mjs";
 import * as mission from "./mission.mjs";
 import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
@@ -1057,6 +1059,14 @@ export function registerGCConsoleTab() {
   // Another scene's fight, run by another GC, does not redraw this console under the pointer.
   const viewed = fight => !game.combat || !fight || fight.id === game.combat.id;
   Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());
+  // The team's first Triumph of the mission is kept on the mission record, where every client can read it.
+  for (const hook of ["createChatMessage", "updateChatMessage"])
+    Hooks.on(hook, message => {
+      if (!isLeadGM() || !message?.flags?.spycraft2?.triumphed) return;
+      const mission = getMission();
+      if (!mission.active || mission.triumphMessageId || !teamTriumph(message, mission)) return;
+      updateMission({ triumphMessageId: message.id }).catch(() => {});
+    });
   Hooks.on("updateCombat", (fight, changed) => {
     if (changed?.round >= 1 && isLeadGM() && !readSetting("gcFirstCombatSeen", false))
       Promise.resolve(game.settings.set("spycraft2", "gcFirstCombatSeen", true)).catch(() => {});
