@@ -144,7 +144,7 @@
       placeholder="{{localize 'SPYCRAFT.Console.QuickObjectivePlaceholder'}}" data-tooltip="{{localize 'SPYCRAFT.Console.QuickObjectiveHint'}}" />
       <button type="button" class="sc2-action" data-action="quickObjective">{{localize "SPYCRAFT.Console.QuickAdd"}}</button></p>{{/if}}
     <ul class="gc-rows">{{#each mission.objectives}}
-      <li class="gc-row"><span class="gc-row-text">{{#if complete}}✔{{else}}○{{/if}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Grade"}} {{grade}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{#if critical}} · <b>{{localize "SPYCRAFT.Template.AppsGcConsole.Critical"}}</b>{{/if}}</span>
+      <li class="gc-row"><span class="gc-row-text">{{name}} <span class="gc-note">{{localize "SPYCRAFT.Console.ObjectiveGradeXP" grade=grade xp=xp}}</span>{{#if critical}} <span class="tag">{{localize "SPYCRAFT.Console.CriticalToggle"}}</span>{{/if}}</span>
     <span class="gc-row-actions">
       <button type="button" class="sc2-action" data-action="entry" data-list="objectives" data-key="{{id}}"
         data-change="complete" aria-pressed="{{#if complete}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Console.DoneNamed' name=name}}"

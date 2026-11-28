@@ -281,7 +281,7 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
     return [
       combatant.id,
-      `${labels.get(combatant.id) ?? combatant.name} — Count ${combatant.initiative ?? "—"}${pending ? ` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
+      `${labels.get(combatant.id) ?? combatant.name}: ${combatant.initiative ?? loc`not rolled`}${pending ? loc` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
     ];
   });
   const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
@@ -295,7 +295,7 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     loc`Fluid initiative — Table 5.2`,
     `
     <p>${loc`Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.`}</p>
-    <label>${loc`Combatant`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
+    <label>${loc`Combatant and Initiative Count`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
     <label>${loc`Event`} <select name="id">${eventOptions}</select></label>
     <label data-when="id!=press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup">${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
     <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>

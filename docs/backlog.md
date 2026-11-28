@@ -160,7 +160,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
 | B-120 | Console type scale has seven sizes, two off-token; icons on buttons follow no rule; vague or mismatched labels; the search field is styled by Foundry. | DES-10, DES-11, DES-13, DES-20 |S |
-| B-121 | Mission facts stack as full-width tiles (564px); list rows are run-on sentences with a double marker; "— Count" and "· grade" fragments. Say "Initiative Count" once and "objective grade". | DES-06, DES-07, SGI-rules-expert D22 | S |
+| B-121 | Mission facts were measured stacking as full-width tiles (564px). `.gc-facts` is an auto-fill grid now; confirm in a live console and find what overrides it if they still stack. | DES-06 | S |
 | B-122 | Raw `COMBAT.RollAll` / `COMBAT.RollNPC` tooltips on the tracker: probably Foundry core with a missing translation; confirm in a live world before working around it. | LR-30 | S |
 | B-124 | `game.spycraft2.gc` functions open dialogs and take no arguments; GC tools cannot be dropped on the hotbar; the token HUD and token right-click add nothing. | XGC-36, XGC-37, XGC-38 | M |
 | B-125 | No way to ask a player for a skill check from the GC side. | NGC-38 | M |

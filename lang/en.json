@@ -182,6 +182,7 @@
    "XPValue": "{earned} of {planned} scripted",
    "XPPerScene": "XP per scene played",
    "XPPerSceneValue": "{xp} ({scenes} played so far)",
+   "ObjectiveGradeXP": "objective grade {grade}, {xp} XP",
    "GCActionDice": "GC action dice",
    "NotSetUp": "Not set up this session",
    "StartingNumber": "Starting number",
