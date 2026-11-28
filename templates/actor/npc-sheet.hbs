@@ -175,6 +175,9 @@
     <h3>{{localize "SPYCRAFT.Template.ActorNpcSheet.QualitiesInPlay"}}</h3>
     <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>
     <ul>{{#each system.qualityEffects.notes}}<li><b>{{name}}</b> — {{text}} <small>(p.{{page}})</small></li>{{/each}}</ul>
+    {{#if commanderMark}}<p>{{#if commanderMark.token}}<label class="sc2-check"><input type="checkbox" name="system.commander"
+      {{checked system.commander}} {{#unless editable}}disabled{{/unless}} /> {{localize "SPYCRAFT.Npc.CommanderMark"}}</label>{{else}}<span
+      class="muted">{{localize "SPYCRAFT.Npc.CommanderLinked"}}</span>{{/if}}</p>{{/if}}
     {{#each system.qualityEffects.saveCalls}}<p><button type="button" class="sc2-action" data-action="callQualitySave"
       data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorNpcSheet.CallForTheSave"}}: {{name}} ({{localize "SPYCRAFT.Template.ActorNpcSheet.WillDC"}} {{dc}})</button></p>{{/each}}
   </div>{{/if}}

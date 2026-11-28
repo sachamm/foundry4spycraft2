@@ -1954,6 +1954,11 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       isGM: game.user.isGM,
       config: CONFIG.SPYCRAFT,
       editable: this.isEditable,
+      // Commander (p.447) marks one token of a Minion squad; a linked NPC is one character for every token.
+      commanderMark:
+        sys.npcProfile?.enabled && (sys.npcProfile.qualities ?? []).some(entry => entry?.id === "commander")
+          ? { token: !!this.actor.isToken }
+          : null,
       abilities: Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => ({
         key,
         label: game.i18n.localize(label),

@@ -95,6 +95,8 @@
    "ShakenInitiative": "{name}: Initiative Count {count} needs a Shaken review. {reason}"
   },
   "Npc": {
+   "CommanderMark": "This token is the squad's Commander",
+   "CommanderLinked": "Open an unlinked token's sheet to mark it as the squad's Commander.",
    "DamageHeading": "Damage",
    "ActionsHeading": "Actions",
    "ItemsAndNotes": "Items and notes",
