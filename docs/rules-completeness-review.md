@@ -2619,7 +2619,7 @@ ordinary active NPC card remains boostable. No browser errors occurred.
 Validation: 4,499 Node tests, 988 engine fixtures and 303 layout checks, plus
 schemas, lint, formatting, bundle and copied-text checks. The broader source
 review identified the remaining NPC proficiency/conditional Defense questions
-recorded in B-216. Continue that work and the remaining B-186/B-190 cases before
+recorded in B-256. Continue that work and the remaining B-186/B-190 cases before
 raising the combat score; the newly shared context is not itself evidence that
 all NPC derived statistics already incorporate every condition.
 Continue implementing and reviewing combat before completing this goal.
