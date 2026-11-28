@@ -803,3 +803,9 @@
   min-width: 0;
   min-height: var(--sc2-control);
 }
+
+/* A console step still running: the pressed button shows it until the step settles. */
+.gc-console-body button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.7;
+}

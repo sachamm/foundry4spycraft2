@@ -87,6 +87,8 @@ export async function editMission() {
   const input = await formDialog({
     title: loc`Mission record`,
     ok: loc`Save mission`,
+    // A mission with no name cannot be told apart in the console, the chat or the filed records.
+    validate: values => (String(values.name ?? "").trim() ? null : loc`Name the mission.`),
     fields: [
       raw(`
     <p class="hint">${loc`A name, the team and the Caliber are all Start mission needs; the rest can wait.`}</p>
@@ -1348,8 +1350,11 @@ export async function awardStanding() {
     // Read again on submit: another GC may have paid while this dialog was open.
     validate: values => {
       const now = getMission().standingPaid ?? {};
+      // The dialog has the correction box only if someone was paid when it opened.
       return !values.again && team.length && team.every(actor => now[actor.id])
-        ? loc`Everyone on the team has been paid. Tick the correction box to pay again.`
+        ? anyPaid
+          ? loc`Everyone on the team has been paid. Tick the correction box to pay again.`
+          : loc`Everyone on the team was paid while this was open. Cancel, then open Award standing again to correct it.`
         : "";
     }
   });

@@ -78,7 +78,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | --- | --- | --- | --- | --- |
 | B-037 | **Undo for a GC boost on a card, and an outcome override.** Alt+B now asks for a second press, but a GC boost still cannot be taken back once spent, because it changes the roll's own record; and the GC cannot yet override an outcome on the card and have that recorded. | DES-45, XGC-15, UX-05, CX-U12, SG-C10, SGI-expert-gc R13 | L | live |
 | B-246 | **Undo notes, live pass.** (A GC's note now goes to that GC only, and a player's note names its author.) The note sits apart from the card it undoes, and names the raw damage and the actor's old name; after "Undone." its line still reads "applied" and the save card the damage caused still reads as current; the button's border is 1.48:1. | DS2-30, DS2-31, DS2-32, UX2-16, UX2-17, UX2-18, XG2-25, XG2-26 | M | live |
-| B-247 | Quiet waits and refusals: state flickers for a few seconds after mission buttons with no sign of progress; one raw database error reached the GC; a stale standing dialog refuses with advice it cannot follow; a blank mission name is accepted; the Alt+B refusal guesses at its reason. | NG2-12, NG2-18, NG2-19, NG2-23, NG2-24, UX2-19, UX2-21 | S | live |
 
 ### Dialogs opened from the console
 

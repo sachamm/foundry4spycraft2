@@ -93,12 +93,15 @@ const guard = work => {
     if (busy) return;
     busy = true;
     if (event?.detail === 0 && this?.element) this._pressed = controlKey(target, this.element);
+    // The pressed button says it is working until the step settles, so a slow save does not look like nothing.
+    target?.setAttribute?.("aria-busy", "true");
     try {
       await work.call(this, event, target);
     } catch (error) {
-      ui.notifications.warn(error.message);
+      refuse(error.message);
     } finally {
       busy = false;
+      target?.removeAttribute?.("aria-busy");
     }
     this.render();
   };

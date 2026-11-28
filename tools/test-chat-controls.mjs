@@ -452,6 +452,16 @@ test("the GC boost shortcut takes the card under the pointer, else the newest ca
     boostCardButton(root(), () => false),
     null
   );
+  const { boostRefusal } = await import("../module/apps/keybindings.mjs");
+  const pointed = button => ({
+    querySelector: selector => (selector.includes("message-id") ? { querySelector: () => button } : null)
+  });
+  assert.match(boostRefusal(pointed(null)), /has no GC boost/);
+  assert.match(
+    boostRefusal(pointed({ dataset: { tooltip: "Already boosted." } })),
+    /cannot be boosted: Already boosted\./
+  );
+  assert.match(boostRefusal({ querySelector: () => null }), /None of your cards/);
 });
 
 test("a mouse click lets go of a button so shortcuts keep working; a keyboard press keeps its focus", async () => {

@@ -153,6 +153,20 @@ export function boostCardButton(root, mine, selector = 'button[data-roll-key="gc
   return null;
 }
 
+/** Why the shortcut found nothing, from what is actually on screen, not a guess. */
+export function boostRefusal(root, selector = 'button[data-roll-key="gcBoost"]', pointRoot = root) {
+  const pointed = pointRoot?.querySelector?.("[data-message-id]:hover");
+  if (pointed) {
+    const button = pointed.querySelector?.(selector);
+    if (!button) return loc`The card under the pointer has no GC boost.`;
+    const reason = button.dataset?.tooltip || button.getAttribute?.("aria-description") || "";
+    return reason
+      ? loc`The card under the pointer cannot be boosted: ${reason}`
+      : loc`The card under the pointer cannot be boosted now.`;
+  }
+  return loc`None of your cards can be boosted now. Point at a card to boost that one.`;
+}
+
 function gcBoostShortcut() {
   const messages = game.messages,
     mine = id => {
@@ -161,9 +175,7 @@ function gcBoostShortcut() {
     };
   const button = boostCardButton(document.querySelector("#chat") ?? document, mine, undefined, document);
   if (!button) {
-    ui.notifications.info(
-      loc`Nothing to boost: the card under the pointer cannot be boosted, or none of your cards can. Point at a card to boost that one.`
-    );
+    ui.notifications.info(boostRefusal(document.querySelector("#chat") ?? document, undefined, document));
     return true;
   }
   const id = button.closest("[data-message-id]")?.dataset.messageId,
