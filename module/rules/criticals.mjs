@@ -1,6 +1,6 @@
 import { classFeatureLevels } from "./class-features.mjs";
 import { triumphAt } from "./check-candidates.mjs";
-import { campaignRules, criticalInjuryCostShift } from "./campaign-rules.mjs";
+import { campaignRules, criticalInjuryCostShift, threatsAutoActivate } from "./campaign-rules.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { cleaveCriticalPlan } from "./cleave.mjs";
 import { finesseCriticalEligible } from "./finesse.mjs";
@@ -149,9 +149,24 @@ export function criticalPlan(
       adjustment--;
       sources.push(loc`Most Lethal (vehicle-mounted weapon) –1`);
     }
-    if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= triumphAt(check)) {
+    const triumphIncluded =
+      check.triumphed && check.successConfirmed === true && check.effectiveTotal >= triumphAt(check);
+    if (triumphIncluded) {
       adjustment--;
       sources.push(loc`Attack Triumph: one-die critical hit included`);
+    }
+    // Bloodbath (p.406): a player or special character's threat on a hit is a critical hit without paying its one
+    // die; a dearer effect still costs the difference, and a Triumph's included critical is the same die.
+    const standardNpc =
+      typeof system.npcType === "string" &&
+      !["special", "villain"].includes(system.npcType) &&
+      !system.promoted &&
+      !system.animalPartner;
+    if (!triumphIncluded && !standardNpc && threatsAutoActivate(campaignEffects)) {
+      adjustment--;
+      sources.push(
+        loc`Bloodbath: one-die critical hit included; the attacker spends 1 action die to decline it (p.406)`
+      );
     }
     if (
       system.activeFeatNames?.includes("Sharpshooter Supremacy") &&
@@ -182,8 +197,6 @@ export function criticalPlan(
       adjustment--;
       sources.push("Overkill –1");
     }
-    // Bloodbath (p.406): a player or special character's threat on a hit is a critical hit outright, whatever its
-    // usual price; it is the attacker who must pay 1 die to stop it. Its cost is set to 0 below.
   }
   if (kind === "failure") {
     if (check.cleanAndPolished) {
