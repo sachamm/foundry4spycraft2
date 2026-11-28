@@ -46,8 +46,9 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
 
 1. Select the tokens on the map and press **Start a fight with the selected tokens** in the console's Combat
    section (**Add selected tokens** brings in late arrivals). Players roll Initiative from their sheets.
-2. Press **Roll NPC Initiative by type**, then **Begin combat**. Until everyone has rolled, the button says how many
-   have not.
+2. Press **Roll NPC Initiative by type**, then **Begin combat**. It rolls only the NPCs that have no Count yet, one roll
+   per kind; an NPC added later joins the Count its kind already has. Until everyone has rolled, the button says how
+   many have not.
 3. The **turn bar** at the top of the fight holds **Next turn** (Alt+N), **Previous turn** (Alt+P) and **Spend GC
    dice** with the acting NPC already chosen (Alt+D).
 4. On an NPC's turn, the acting block under it has an **Attack** button for each weapon, with its bonus and damage

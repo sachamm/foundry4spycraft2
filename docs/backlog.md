@@ -218,8 +218,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-170 | GC and maintainer content are mixed in `npc-creation.md` and `gc-tools.md`. Split them. | SG-O3 | S |
-| B-171 | Docs and UI disagree: "Suffer damage" against "Roll Damage save…", who NPC initiative rolls for, Begin session and Start mission order, "the main button is the next step". | NGC-41, NGC-42 | S |
 | B-172 | Document: the persisted `acquiredAtLevel` and `expertEntry` fields; which open steps a chat flush discards; that feats with no acquisition level default to level 1; that action dice always add above the result cap (p.88), or add a setting. | RW (audit-2026-11), WEB-07, R-11 | S |
 
 ## Rules gaps and steps still left to the GC
