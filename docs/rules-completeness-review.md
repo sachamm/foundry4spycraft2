@@ -2781,3 +2781,18 @@ Validation: 4,526 Node tests, 988 engine fixtures, native schemas, lint,
 formatting, bundle and copied-text checks. The existing 307 layout checks were
 last run in Pass 86; this pass's changed NPC reaction form was verified natively
 in light and dark at 1280×720. Continue B-190 and B-186 before completing the goal.
+
+## Pass 88: Critical scope for intercepted attacks
+
+Scores remain PC creation **9.9/10**, combat **9.8/10**. The user's further
+ruling makes an intercepted would-hit shot a successful attack before damage,
+allowing threat/error activation against its actual cover. Critical pricing now
+uses that first contact's character type and role, preserving the protected
+target's original context. Villain NPCs are correctly classified as special
+characters by the shared target classifier. A cover critical is recorded on the
+activation and original damage claim; delivery to another target cannot inherit
+its critical damage or injury. Changing that scope invalidates open decisions.
+
+Validation: 4,528 Node tests, 988 engine fixtures, lint, formatting, bundle and
+copied-text checks passed. Connected cover controls remain the next B-190 work;
+the new scope is not yet credited as a complete playable workflow.

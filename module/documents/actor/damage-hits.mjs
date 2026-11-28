@@ -56,6 +56,16 @@ export function acquireDamageHit(ctx) {
           criticalSource: {
             criticalSuccess: check.criticalSuccess === true,
             criticalActivation: structuredClone(check.criticalActivation ?? null),
+            ...(check.coverAwaiting && check.coverAwaiting.basis.directHits === 0
+              ? {
+                  coverCriticalScope: {
+                    kind: "cover",
+                    id: check.coverAwaiting.id,
+                    actorUuid:
+                      check.coverAwaiting.criticalTarget?.actorUuid ?? check.coverAwaiting.criticalActorUuid ?? null
+                  }
+                }
+              : {}),
             attackResolution: { hits: basis.hits }
           }
         };

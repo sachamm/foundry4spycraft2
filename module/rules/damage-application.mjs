@@ -113,9 +113,11 @@ const OUCH_PRESETS = new Set(["hit.ouch", "hit.ouchAtZero"]);
  * @param {string} [damageMessageId] the damage card being applied
  * @returns {{critical: boolean, criticalDice: number, ouch: boolean, laterShot: boolean}}
  */
-export function criticalDamageDefaults(attack, damageMessageId = "", { hitIndex = null } = {}) {
+export function criticalDamageDefaults(attack, damageMessageId = "", { hitIndex = null, targetUuid = null } = {}) {
   const none = { critical: false, criticalDice: 0, ouch: false, laterShot: false };
   if (attack?.criticalSuccess !== true) return none;
+  const scope = attack.coverCriticalScope ?? attack.criticalActivation?.scope;
+  if (scope?.kind === "cover" && (!targetUuid || targetUuid !== scope.actorUuid)) return none;
   const activation = attack.criticalActivation ?? {},
     dice = Math.max(1, Math.trunc(Number(activation.baseCost ?? activation.cost) || 1)),
     taken = attack.criticalShotApplied?.damageMessageId;

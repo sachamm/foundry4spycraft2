@@ -826,8 +826,9 @@ export async function applyDamage(message, options = {}) {
   if (attack?.coverAwaiting && attack.coverInterception?.state !== "complete")
     return refuse(loc`Finish the original cover-save review before applying this damage to the protected target.`);
   let input = options;
-  const crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
-    hitIndex: check.sourceAttack?.hitIndex
+  let crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
+    hitIndex: check.sourceAttack?.hitIndex,
+    targetUuid: input.targetUuid ?? check.sourceAttack?.targetUuid
   });
   if (input.targetUuid === undefined) {
     const choices = targetChoices(),
@@ -853,6 +854,10 @@ export async function applyDamage(message, options = {}) {
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (!target || !TARGET_TYPES.includes(target.type)) return refuse(loc`Choose a target.`);
+  crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
+    hitIndex: check.sourceAttack?.hitIndex,
+    targetUuid: target.uuid
+  });
   if (!target.isOwner) {
     // Someone else's character: the GC's client applies it.
     const { reviewType: _review, ...fields } = input;
@@ -1398,7 +1403,8 @@ export function quickApplyInput(message, targetUuid, damage = null) {
     armorPiercingAll: false,
     ...(({ critical, criticalDice }) => ({ critical, criticalDice }))(
       criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
-        hitIndex: check.sourceAttack?.hitIndex
+        hitIndex: check.sourceAttack?.hitIndex,
+        targetUuid
       })
     ),
     blast: profile.blast === true,

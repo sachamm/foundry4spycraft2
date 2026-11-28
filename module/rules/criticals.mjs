@@ -6,6 +6,7 @@ import { homeTurfSkillPlan } from "./terrain.mjs";
 import { appliesToSkill } from "./limited-uses.mjs";
 import { specialistApplies } from "./weapon-specialist.mjs";
 import { loc } from "../i18n.mjs";
+import { coverCriticalContext } from "./cover-interception.mjs";
 /** Activation resources, pp.62,96–97,329–330. Effect and its table cost are adjudicated by the GC. */
 export function criticalPlan(
   system,
@@ -28,6 +29,16 @@ export function criticalPlan(
   } = {}
 ) {
   const reject = reason => ({ blocked: true, reason });
+  let coverScope = null;
+  if (kind === "success" && check?.coverAwaiting) {
+    try {
+      const scoped = coverCriticalContext(check);
+      check = scoped.check;
+      coverScope = scoped.scope;
+    } catch (error) {
+      return reject(error.message);
+    }
+  }
   if (!check || check.resolved || check.superseded || check.criticalSuccess || check.criticalFailure)
     return reject(loc`This result has already been resolved, replaced or activated.`);
   if (
@@ -242,6 +253,7 @@ export function criticalPlan(
     baseCost,
     effect: String(effect).trim(),
     sources,
+    ...(coverScope ? { coverScope } : {}),
     ...(maximumCost !== null ? { maximumCost } : {}),
     vehicleMounted,
     vehicleMountDeclared,

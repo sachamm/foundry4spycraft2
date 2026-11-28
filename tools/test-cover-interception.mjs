@@ -6,6 +6,11 @@ import {
   coveredAttackOutcome,
   validateCoverAttack
 } from "../module/rules/cover-interception.mjs";
+import { coverCriticalContext } from "../module/rules/cover-interception.mjs";
+import { characterTargetPlan } from "../module/rules/character-target.mjs";
+import { criticalPlan } from "../module/rules/criticals.mjs";
+import { criticalDamageDefaults } from "../module/rules/damage-application.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
 import {
   attackDamageBasis,
   newDamageHitLedger,
@@ -46,6 +51,69 @@ const row = (index, result = "penetrated", originalDamage = 10, remainingDamage 
 });
 const plan = (b, rows) => coverInterceptionPlan(b, rows, { id: "cover-review", confirmed: true });
 
+test("cover critical pricing, evidence and damage remain attached to the first actual contact", () => {
+  const c = { ...attack(80), successConfirmed: true, threatConfirmed: true, triumphed: true };
+  c.attackContext.targetRole = { label: "Mastermind", extraDiceToActivate: 2 };
+  c.coverAwaiting = {
+    version: 1,
+    id: "cover-review",
+    basis: basis(c, 4),
+    criticalName: "Wall",
+    criticalTarget: characterTargetPlan(null, { targetCharacterType: "object", targetName: "Wall" })
+  };
+  const before = structuredClone(c);
+  const scoped = coverCriticalContext(c);
+  assert.equal(scoped.check.attackContext.targetRole, null);
+  const paid = criticalPlan({}, c, {
+    baseCost: 1,
+    effect: "Cover damage",
+    effectConfirmed: true,
+    beforeDamage: true,
+    available: 0
+  });
+  assert.equal(paid.blocked, false);
+  assert.equal(paid.cost, 0);
+  assert.equal(paid.coverScope.kind, "cover");
+  assert.deepEqual(c, before, "original target context is preserved");
+  const receipt = {
+    criticalSuccess: true,
+    criticalActivation: { baseCost: 1, scope: { ...paid.coverScope, actorUuid: "Actor.cover" } }
+  };
+  assert.equal(criticalDamageDefaults(receipt, "damage", { targetUuid: "Actor.target" }).critical, false);
+  assert.equal(criticalDamageDefaults(receipt, "damage", { targetUuid: "Actor.cover" }).critical, true);
+  assert.equal(criticalDamageDefaults(receipt).critical, false, "unknown targets cannot inherit a cover critical");
+  const evidence = rollEvidence(c);
+  c.coverAwaiting.criticalName = "Different cover";
+  assert.equal(rollEvidenceMatches(evidence, c), false);
+  delete c.coverAwaiting.criticalTarget;
+  assert.equal(criticalPlan({}, c, { available: 4 }).blocked, true);
+});
+
+test("villains are special characters and intercepted body cover uses its own critical surcharge", () => {
+  const cover = characterTargetPlan({ uuid: "Actor.cover", type: "npc", npcType: "villain" });
+  assert.equal(cover.characterType, "special");
+  const c = { ...attack(), threatConfirmed: true };
+  c.coverAwaiting = {
+    version: 1,
+    id: "body",
+    basis: basis(c, 4),
+    criticalName: "Body cover",
+    criticalTarget: cover,
+    criticalRole: { label: "Henchman", extraDiceToActivate: 1 }
+  };
+  const paid = criticalPlan({}, c, {
+    baseCost: 1,
+    effect: "Body cover damage",
+    effectConfirmed: true,
+    beforeDamage: true,
+    available: 4
+  });
+  assert.equal(paid.cost, 2);
+  assert.equal(paid.coverScope.actorUuid, "Actor.cover");
+  c.coverAwaiting.basis.directHits = 1;
+  assert.equal(coverCriticalContext(c).scope, null, "a direct first shot retains the protected target critical");
+});
+
 test("partial cover intercepts an otherwise successful shot and total cover intercepts even a covered-Defense hit", () => {
   assert.equal(basis().interceptedHits, 1);
   const total = basis(attack(30), 4);
@@ -53,6 +121,7 @@ test("partial cover intercepts an otherwise successful shot and total cover inte
   assert.equal(total.interceptedHits, 1);
   const held = coveredAttackOutcome(plan(total, [row(1, "held", 10, 0)]));
   assert.equal(held.hit, false);
+  assert.equal(held.checkSucceeded, true, "hitting ordinary cover counts as a successful attack before damage");
   assert.equal(held.damage.length, 0);
   const through = coveredAttackOutcome(plan(total, [row(1)]));
   assert.equal(through.hit, true);

@@ -944,6 +944,7 @@ export const ActorOutcomes = Base =>
               // The ready-made effect chosen, if any: damage application reads it to set its defaults.
               ...(typeof input.preset === "string" && input.preset ? { preset: input.preset } : {}),
               sources: paidPlan.sources,
+              ...(paidPlan.coverScope ? { scope: structuredClone(paidPlan.coverScope) } : {}),
               paymentReceiptId,
               funding: payment
                 ? {

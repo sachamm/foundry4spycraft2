@@ -1,6 +1,7 @@
 import { attackOutcome } from "./damage-application.mjs";
 import { sameValues, stable } from "./equal.mjs";
 import { loc } from "../i18n.mjs";
+import { validCharacterTarget } from "./character-target.mjs";
 
 const identity = value => typeof value === "string" && !!value.trim() && value === value.trim() && value.length <= 2048;
 const integer = value => Number.isSafeInteger(value) && value >= 0;
@@ -156,7 +157,7 @@ export function coveredAttackOutcome(record, { defense = record?.basis?.baseDefe
     potentialHits: raw.hits,
     needsCoverReview,
     damage,
-    checkSucceeded: (basis.total >= 75 && direct === 0) || damage.length > 0,
+    checkSucceeded: raw.hits > 0,
     coverCritical: basis.total >= 75 && direct === 0,
     targetCriticalAllowed: direct > 0
   };
@@ -174,4 +175,39 @@ export function validateCoverAttackBasis(check, basis) {
   if (!sameValues(coverInterceptionBasis(check, basis), basis))
     throw Error(loc`Review the original cover Defense and intercepted hits.`);
   return true;
+}
+
+/** Critical pricing uses the first struck cover, while the original attack continues to name its protected target. */
+export function coverCriticalContext(check) {
+  const pending = check?.coverAwaiting;
+  if (!pending || pending.basis?.directHits > 0) return { check, scope: null };
+  if (
+    pending.version !== 1 ||
+    !identity(pending.id) ||
+    !validCharacterTarget(pending.criticalTarget) ||
+    !identity(pending.criticalName) ||
+    pending.criticalName.length > 200 ||
+    (pending.criticalRole &&
+      (!Number.isSafeInteger(pending.criticalRole.extraDiceToActivate) || pending.criticalRole.extraDiceToActivate < 0))
+  )
+    throw Error(loc`The GC must identify the actual cover struck before activating its critical.`);
+  const actorUuid = pending.criticalTarget.actorUuid ?? pending.criticalActorUuid ?? null;
+  if (
+    pending.criticalTarget.actorUuid &&
+    pending.criticalActorUuid &&
+    pending.criticalTarget.actorUuid !== pending.criticalActorUuid
+  )
+    throw Error(loc`Review the actual cover character before paying for this critical.`);
+  const role = pending.criticalTarget.characterType === "object" ? null : (pending.criticalRole ?? null);
+  return {
+    check: {
+      ...check,
+      attackContext: {
+        ...check.attackContext,
+        characterTarget: structuredClone(pending.criticalTarget),
+        targetRole: structuredClone(role)
+      }
+    },
+    scope: { kind: "cover", id: pending.id, actorUuid, name: pending.criticalName }
+  };
 }

@@ -84,6 +84,12 @@ export function checkFlavor(check) {
   if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
   notes.push(...cooperativeNotes(check).map(esc));
   if (attackResolutionNote(check)) notes.push(esc(attackResolutionNote(check)));
+  if (check.coverAwaiting)
+    notes.push(
+      esc(
+        loc`Cover review: ${check.coverAwaiting.criticalName}. Critical activation precedes damage; a cover critical does not transfer through to the protected character.`
+      )
+    );
   if (check.npcDefenseReroll)
     notes.push(
       esc(
@@ -401,6 +407,7 @@ export function rollEvidence(check) {
       : []),
     ...(check.damageSave ? [check.damageSave] : []),
     ...(check.coverSave ? [check.coverSave] : []),
+    ...(check.coverAwaiting ? [check.coverAwaiting] : []),
     ...(check.attackContext?.meleeFire ? [check.attackContext.meleeFire] : []),
     ...(check.cqbRange ? [check.cqbRange] : []),
     ...(check.attackContext?.cqbRange ? [check.attackContext.cqbRange] : []),
@@ -420,6 +427,7 @@ export function rollEvidenceMatches(evidence, check) {
   if (evidence === rollEvidence(check)) return true;
   if (
     check.npcDefenseReroll ||
+    check.coverAwaiting ||
     check.declaredSkillDC ||
     check.gcPostHitDefense ||
     check.attackContext?.reach ||
