@@ -120,6 +120,17 @@ import { loc } from "../i18n.mjs";
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const GEAR = ["R", "T", "V", "S", "G", "W", "E"];
+/** The categories' names, for messages a player reads (a letter alone means nothing to them). */
+const gearName = key =>
+  ({
+    R: loc`Resources`,
+    T: loc`Tradecraft`,
+    V: loc`Vehicles`,
+    S: loc`Security`,
+    G: loc`Gadgets`,
+    W: loc`Weapons`,
+    E: loc`Electronics`
+  })[key] ?? key;
 const mod = score => Math.floor((score - 10) / 2);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const miscActionDice = sys => sys.misc?.actionDice ?? 0;
@@ -2295,13 +2306,18 @@ function deriveWealthAndGear(state) {
   const lost = sys.gearPickLosses ?? {};
   const lostTotal = GEAR.reduce((n, key) => n + (lost[key] ?? 0), 0);
   if (lostTotal !== penalty)
-    warnings.push(loc`Charisma requires removing ${penalty} mission gear pick(s); currently ${lostTotal} assigned.`);
+    warnings.push(
+      loc`Charisma ${abil.cha.mod} costs ${penalty} mission gear pick(s); ${lostTotal} chosen so far. Choose which on the Gear tab.`
+    );
   for (const key of GEAR) {
-    const value = lost[key] ?? 0;
-    if (value > gearBase[key]) warnings.push(loc`Charisma pick loss: ${key} may only lose class-granted picks.`);
+    const value = lost[key] ?? 0,
+      name = gearName(key);
+    if (value > gearBase[key])
+      warnings.push(loc`Charisma loss: only class-granted ${name} picks can be given up. Choose another category.`);
     picks[key].available = Math.max(0, picks[key].available - value);
     picks[key].remaining = picks[key].available - picks[key].spent;
-    if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
+    if (picks[key].remaining < 0)
+      warnings.push(loc`After the Charisma loss, more ${name} picks are spent than remain. Return one ${name} item.`);
   }
   // Negative standing (p.440): a burned agent keeps only personal Possessions, so no mission gear may be held.
   sys.standingStatus = standingStatus(sys);
