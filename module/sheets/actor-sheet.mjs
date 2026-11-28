@@ -34,6 +34,7 @@ import { takeStrikingAttack, reviewStrikingAttack } from "../apps/striking-stanc
 import { recordFendMovement } from "../apps/fend.mjs";
 import { takeCounterTrip, reviewCounterTrip, counterTripCandidates } from "../apps/counter-trip.mjs";
 import { pointmanLevel } from "../rules/action-dice.mjs";
+import { announceChanges } from "./change-announcer.mjs";
 import { takeTripFinalAttack, reviewTripFinalAttack, tripFinalAttackCandidates } from "../apps/trip-final-attack.mjs";
 import { manageTripOutcomes } from "../apps/trip-outcomes.mjs";
 import { managePowerStanceInitiative } from "../apps/power-stance.mjs";
@@ -2031,6 +2032,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         this._open[key] = details.open;
       });
     }
+    // The pinned figures are redrawn whole; only the ones that changed are said.
+    announceChanges(this, this.element, this.element.querySelector(".npc-pinned"));
     enableHotbarDrag(this.element, this.actor);
   }
 

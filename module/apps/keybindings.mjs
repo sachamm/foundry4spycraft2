@@ -267,7 +267,8 @@ export function releaseFocusAfterClick(event, active = globalThis.document?.acti
   if (!event || event.detail === 0) return false;
   const button = event.target?.closest?.("button, a[data-action]");
   if (!button || button !== active) return false;
-  if (!button.closest?.(".spycraft2, .chat-message, #chat, #combat, #sidebar")) return false;
+  // This system's own surfaces only: Foundry's sidebar tabs and chat controls keep their usual focus.
+  if (!button.closest?.(".spycraft2, .chat-message .message-content, .spycraft2-row-state")) return false;
   if (button.closest?.("dialog, .dialog, .application.dialog")) return false;
   button.blur?.();
   return true;

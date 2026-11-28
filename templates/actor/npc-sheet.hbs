@@ -36,7 +36,7 @@
   </header>
   {{#if editMode}}
   {{!-- While editing, the numbers the choices produce stay in sight and the builder comes first. --}}
-  <div class="npc-pinned" role="status" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
+  <div class="npc-pinned" role="group" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.ThreatLevel"}}</span><b class="sc2-value">{{system.effectiveThreatLevel}}</b></div>
     <div class="sc2-field" data-tooltip="{{localize 'SPYCRAFT.Npc.AttackBaseHint'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Template.ActorNpcBuilder.AttackBase"}}</span><b class="sc2-value">{{signed system.bab}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value">{{system.defense.total}}</b></div>
