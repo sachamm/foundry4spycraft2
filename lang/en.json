@@ -53,6 +53,24 @@
    "WarningsLeft": "Build warnings: {count}",
    "WarningsHint": "This character has character-building warnings. Press to switch to Edit and read them."
   },
+  "BioField": {
+   "faction": "Faction",
+   "gender": "Gender",
+   "age": "Age",
+   "height": "Height",
+   "weight": "Weight",
+   "eyes": "Eyes",
+   "hair": "Hair"
+  },
+  "BioExample": {
+   "faction": "e.g. a small private agency",
+   "gender": "e.g. woman",
+   "age": "e.g. 34",
+   "height": "e.g. 5 ft. 8 in.",
+   "weight": "e.g. 150 lb.",
+   "eyes": "e.g. grey",
+   "hair": "e.g. short, black"
+  },
   "Track": {
    "Title": "Character creation steps",
    "Start": "Start here",
