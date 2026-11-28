@@ -119,6 +119,27 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
   assert.deepEqual(note.changed, { "flags.spycraft2.undo.done": true });
   note.flags.spycraft2.undo.done = true;
   assert.equal(await applyUndo(note), null, "a note undoes once");
+  // A note that recorded its own mark takes that one off, not the newest mark for the same target.
+  await actor.update({ "system.vitality.value": 0 });
+  card.updates = [];
+  card.flags.spycraft2.damageAppliedBy = {
+    first00001: { targetUuid: "Actor.g" },
+    later00002: { targetUuid: "Actor.g" }
+  };
+  const own = {
+    flags: {
+      spycraft2: {
+        undo: {
+          label: "7 lethal",
+          entries: [undoEntry(actor, before, snapshot(actor))],
+          damageCard: { messageId: "m", targetUuid: "Actor.g", entryId: "first00001" }
+        }
+      }
+    },
+    async update() {}
+  };
+  await applyUndo(own);
+  assert.deepEqual(card.updates, [{ "flags.spycraft2.damageAppliedBy.-=first00001": null }]);
 });
 
 test("Undo notices a value that moved again after the step", () => {

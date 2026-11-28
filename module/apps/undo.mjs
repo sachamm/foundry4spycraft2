@@ -482,13 +482,20 @@ async function undoRecord(message, record) {
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;
-  if (card && (card.isAuthor || game.user.isGM)) {
-    const marks = Object.entries(card.flags?.spycraft2?.damageAppliedBy ?? {}).filter(
-      ([, entry]) => entry?.targetUuid === record.damageCard.targetUuid
-    );
-    // Only the newest mark for that target goes: an earlier application of the same card stays recorded.
-    const last = marks.at(-1);
-    if (last) await card.update({ [`flags.spycraft2.damageAppliedBy.-=${last[0]}`]: null }).catch(() => null);
+  if (card) {
+    const applied = card.flags?.spycraft2?.damageAppliedBy ?? {},
+      marks = Object.entries(applied).filter(([, entry]) => entry?.targetUuid === record.damageCard.targetUuid);
+    // This step's own mark; an older note without one takes the newest mark for that target. An earlier
+    // application of the same card stays recorded either way.
+    const own = record.damageCard.entryId && applied[record.damageCard.entryId] ? record.damageCard.entryId : null,
+      key = own ?? marks.at(-1)?.[0];
+    // A player's own damage was marked on the GC's card through the GC, and is cleared the same way.
+    if (key) {
+      const { unmarkDamage } = await import("./gc-relay.mjs");
+      await Promise.resolve(unmarkDamage(card, key)).catch(error =>
+        ui.notifications.warn(loc`The damage card still reads as applied: ${error.message}`)
+      );
+    }
   }
   return targets.map(([entry]) => entry.name);
 }

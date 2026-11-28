@@ -302,6 +302,28 @@ export function damageSaveState(actor) {
   };
 }
 
+/** The Damage save dialog: what the injury was. Null when the GC closes it. */
+export function askDamageSaveInput(actor, state = damageSaveState(actor)) {
+  return ask(
+    loc`${actor.name}: Damage save`,
+    `
+    <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.`}</p>
+    <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
+    <label>${loc`Type`} <select name="kind">${options(
+      [
+        ["lethal", loc`Lethal`],
+        ["subdual", loc`Subdual`],
+        ["stress", loc`Stress`]
+      ],
+      "lethal"
+    )}</select></label>
+    <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
+    <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
+    <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
+    loc`Roll Damage save`
+  );
+}
+
 const DAMAGE_SAVE_DEFEAT = "flags.spycraft2.defeatedByDamageSave";
 
 /** Roll a standard NPC's Damage save for one injury and record the result. */
@@ -317,24 +339,7 @@ export async function npcDamageSave(actor, input = null) {
       loc`${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
     );
   if (!input) {
-    input = await ask(
-      loc`${actor.name}: Damage save`,
-      `
-      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.`}</p>
-      <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
-      <label>${loc`Type`} <select name="kind">${options(
-        [
-          ["lethal", loc`Lethal`],
-          ["subdual", loc`Subdual`],
-          ["stress", loc`Stress`]
-        ],
-        "lethal"
-      )}</select></label>
-      <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
-      <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
-      <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
-      loc`Roll Damage save`
-    );
+    input = await askDamageSaveInput(actor, state);
     if (!input) return null;
   }
   // The card's large number is the save's total, the one compared with the DC; the die is in the formula beside it.
@@ -387,8 +392,15 @@ export async function npcDamageSave(actor, input = null) {
 }
 
 /** The same save, from a sheet or the console, leaving an Undo note for what it changed. */
-export const npcDamageSaveWithUndo = (actor, input = null) =>
-  withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
+export async function npcDamageSaveWithUndo(actor, input = null) {
+  // The dialog is answered before the "before" picture is taken, so Undo does not also take back whatever else
+  // changed while it was open (an Initiative roll, a new condition).
+  if (!input && actor?.isOwner && !npcIsSpecial(actor) && damageSaveState(actor).track.state === "active") {
+    input = await askDamageSaveInput(actor);
+    if (!input) return null;
+  }
+  return withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
+}
 
 export async function resetDamageTrack(actor, { heal = null } = {}) {
   if (!actor.isOwner) return null;

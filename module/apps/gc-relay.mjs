@@ -184,13 +184,17 @@ const MARKS = {
 
 // Each damage record gets its own key, so two applies close together both survive: rewriting one array from a stale
 // copy could drop the first (read them with appliedDamageEntries).
-const markUpdate = (message, key, value) =>
+const ENTRY_ID = /^[A-Za-z0-9]{8,32}$/;
+const markUpdate = (message, key, value, entryId = null) =>
   key === "damageAppliedEntry"
-    ? { [`flags.spycraft2.damageAppliedBy.${foundry.utils.randomID()}`]: value }
+    ? {
+        [`flags.spycraft2.damageAppliedBy.${entryId && ENTRY_ID.test(entryId) ? entryId : foundry.utils.randomID()}`]:
+          value
+      }
     : { [`flags.spycraft2.${key}`]: value };
 
 registerRelay("markCard", {
-  async run({ messageId, key, value }, user) {
+  async run({ messageId, key, value, entryId = null }, user) {
     const message = game.messages.get(messageId),
       check = message?.flags?.spycraft2,
       actor = check?.actorUuid ? await fromUuid(check.actorUuid) : null;
@@ -212,19 +216,42 @@ registerRelay("markCard", {
     }
     if (!user.isGM && !actor?.testUserPermission(user, "OWNER") && !damaged?.testUserPermission?.(user, "OWNER"))
       throw new Error(loc`Only the character's own player can mark that card.`);
-    await message.update(markUpdate(message, key, value));
+    await message.update(markUpdate(message, key, value, entryId));
     return true;
   }
 });
+
+// Undo of applied damage takes its own mark off the card: the player who owns the damaged character may do that
+// through the GC, as they may set it.
+registerRelay("unmarkDamage", {
+  async run({ messageId, entryId }, user) {
+    const message = game.messages.get(messageId),
+      entry = message?.flags?.spycraft2?.damageAppliedBy?.[entryId];
+    if (!entry || typeof entryId !== "string" || !ENTRY_ID.test(entryId))
+      throw new Error(loc`That card has no such damage mark.`);
+    const target = typeof entry.targetUuid === "string" ? await fromUuid(entry.targetUuid) : null;
+    if (!user.isGM && !target?.testUserPermission?.(user, "OWNER"))
+      throw new Error(loc`Only the character's own player can clear that mark.`);
+    await message.update({ [`flags.spycraft2.damageAppliedBy.-=${entryId}`]: null });
+    return true;
+  }
+});
+
+/** Take one applied-damage mark off a card, through the GC when the card is someone else's. */
+export async function unmarkDamage(message, entryId) {
+  if (message.isAuthor || game.user.isGM)
+    return message.update({ [`flags.spycraft2.damageAppliedBy.-=${entryId}`]: null });
+  return askGC("unmarkDamage", { messageId: message.id, entryId });
+}
 
 /**
  * Record on a chat card that one of its steps is done, through the GC when the card is someone else's.
  * Returns false, with a warning unless `quiet`, when it could not be recorded.
  */
-export async function markCard(message, key, value = true, { quiet = false } = {}) {
+export async function markCard(message, key, value = true, { quiet = false, entryId = null } = {}) {
   try {
-    if (message.isAuthor || game.user.isGM) await message.update(markUpdate(message, key, value));
-    else await askGC("markCard", { messageId: message.id, key, value });
+    if (message.isAuthor || game.user.isGM) await message.update(markUpdate(message, key, value, entryId));
+    else await askGC("markCard", { messageId: message.id, key, value, entryId });
     return true;
   } catch (error) {
     if (quiet) return false;

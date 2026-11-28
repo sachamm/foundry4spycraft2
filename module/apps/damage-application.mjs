@@ -808,6 +808,8 @@ export async function applyDamage(message, options = {}) {
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
   if (failed) return null;
   // When the card cannot be marked the report above is the record; an outcome meant for the card is posted instead.
+  // The mark's own key goes on the Undo note, so Undo takes off this mark and not a later one.
+  const entryId = foundry.utils.randomID();
   const marked = await markCard(
     message,
     "damageAppliedEntry",
@@ -819,7 +821,7 @@ export async function applyDamage(message, options = {}) {
       ...(ouch ? { ouch: true, net: result.net } : {}),
       ...(inline ? { report } : {})
     },
-    { quiet: true }
+    { quiet: true, entryId }
   );
   if (inline && !marked) await postDamageReport(target, lines, { pendingSave, rolls });
   // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
@@ -836,7 +838,7 @@ export async function applyDamage(message, options = {}) {
     const entry = undoEntry(target, beforeDamage, snapshot(target));
     if (entry)
       await postUndo(loc`${damage} ${kind} damage applied to ${target.name}`, [entry], {
-        damageCard: { messageId: message.id, targetUuid: target.uuid }
+        damageCard: { messageId: message.id, targetUuid: target.uuid, ...(marked ? { entryId } : {}) }
       });
   } catch (error) {
     console.warn("Field Agent's Handbook | No Undo note could be left for this damage.", error);
