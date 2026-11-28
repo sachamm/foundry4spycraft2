@@ -138,6 +138,18 @@ test("new/imported agent creation records empty pools, preserves other flags and
   assert.deepEqual(a.source.flags, data.flags);
 });
 
+test("a duplicate of an NPC spent to 0 vitality keeps its recorded maximums instead of filling", async () => {
+  const a = new SpycraftActor(),
+    data = {
+      type: "npc",
+      _stats: { duplicateSource: "Actor.original" },
+      system: { vitality: { value: 0 }, wounds: { value: 12 } },
+      flags: { spycraft2: { poolMax: { vitality: 30, wounds: 12 } } }
+    };
+  await a._preCreate(data, {}, {});
+  assert.deepEqual(data.flags.spycraft2.poolMax, { vitality: 30, wounds: 12 });
+});
+
 test("a new or imported agent starts with a zero stress and subdual ledger, and keeps one it already has", async () => {
   const a = new SpycraftActor();
   a.system.accumulatedDamage = null;

@@ -58,11 +58,17 @@ export class SpycraftActor extends ActorRolls(
       // A new agent starts with full vitality, wounds and action dice, and a new NPC with full vitality and wounds
       // once it is a special character: empty maximums are recorded here, and the pool-max hooks
       // (module/apps/pool-max.mjs) then raise each empty pool to its maximum.
+      // A duplicate of a character already in play (Foundry marks it with its source) keeps the recorded
+      // maximums, so a pool it had spent to 0 stays at 0 instead of being filled as if new. An import starts fresh.
+      const carried = (data.flags?.spycraft2 ?? this.flags?.spycraft2 ?? {})[POOL_MAX_FLAG];
+      const duplicate = !!(data._stats?.duplicateSource ?? this._source?._stats?.duplicateSource);
+      const recorded =
+        duplicate && carried && Object.values(carried).some(value => Number(value) > 0) ? carried : null;
       const flags = {
         ...(data.flags ?? this.flags ?? {}),
         spycraft2: {
           ...(data.flags?.spycraft2 ?? this.flags?.spycraft2 ?? {}),
-          [POOL_MAX_FLAG]: newAgentPoolMax(this._source?.system ?? data.system, poolRules(type).pools)
+          [POOL_MAX_FLAG]: recorded ?? newAgentPoolMax(this._source?.system ?? data.system, poolRules(type).pools)
         }
       };
       data.flags = flags;
