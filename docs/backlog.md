@@ -43,8 +43,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-014 | **An NPC attack stopped half-resolved and showed a raw database error** (`_id [sc2ResourceLock1] already exists…`) with two GM clients connected. Catch the collision and retry once; never show the internal id; leave the normal Resolve button on the card. | XGC-06, LR-28 | M | live |
-| B-016 | **Next turn can advance the wrong fight.** The console follows whichever combat is viewed and names neither it nor its scene; a combat with no scene shows on every scene. Name the encounter and its scene in the Combat header and warn when it is not this scene's. | UX-02, NGC-43 | S | live |
 | B-217 | **Mob attack picks each member's weapon by name** and passes over a member who lacks it without saying so; the dialog can tick more targets than there are attackers and does not preview who attacks whom. Match by item, list the members left out, and show the pairing before the roll. | CX2-D03, CX2-D14 | S | code |
 | B-219 | **Resume after an agent has settled XP leaves that agent shut out** of later awards and of a second settlement. Reopen the agent's settlement, or settle only the difference. | CX2-N05 | M | code |
 | B-221 | **An ended mission's XP defaults are worked out again from the season's current qualities**, and a settlement dialog left open shows stale figures. Keep the figures with the mission when it ends and re-read them when the dialog confirms. | CX2-N10 | M | code |

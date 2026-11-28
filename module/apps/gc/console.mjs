@@ -894,6 +894,14 @@ export function consoleContext() {
             .map(c => c.name)
             .join(", "),
           scene: combatNow.scene?.name ?? loc`no scene`,
+          // Which fight this is, when the world holds more than one, so the header names the one Next turn moves.
+          encounter: (() => {
+            const all = [...(game.combats ?? [])],
+              index = all.findIndex(fight => fight.id === combatNow.id);
+            return all.length > 1 && index >= 0 ? loc`Fight ${index + 1} of ${all.length}` : "";
+          })(),
+          // A fight with no scene is shown on every scene, so it is named as such.
+          unscened: !combatNow.scene,
           // The fight the console runs is named when it is not this scene's, so Next turn is not pressed on another.
           elsewhere: !!(combatNow.scene && globalThis.canvas?.scene && combatNow.scene.id !== canvas.scene.id)
         }

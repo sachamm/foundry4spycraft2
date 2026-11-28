@@ -188,6 +188,14 @@ export function registerLockRecovery() {
 }
 /** Pauses before a held lock is reported, in milliseconds. */
 const LOCK_RETRY_MS = [100, 250, 500];
+/** Wait for a lock another client just took to be released; true once it has gone. */
+async function lockCleared(actor, scope) {
+  for (const delay of [...LOCK_RETRY_MS, 1000]) {
+    await new Promise(resolve => setTimeout(resolve, delay));
+    if (!actor.items.get(scope)) return true;
+  }
+  return false;
+}
 async function acquire(actor, scope = RESOURCE_LOCK_ID, { background = false } = {}) {
   if (!actor.isOwner) throw new Error(loc`You must own each character whose resources are being used.`);
   let existing = actor.items.get(scope);
@@ -240,15 +248,19 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID, { background = false } =
       }
     };
   let docs;
-  try {
-    docs = await actor.createEmbeddedDocuments("Item", [data], { keepId: true, render: false });
-  } catch (error) {
-    if (/already exists/.test(error.message))
-      throw new ResourceLockedError(
-        loc`${actor.name}: another client started a resource transaction. Retry after it finishes.`
-      );
-    throw error;
-  }
+  // Two clients can both see no lock and both ask for it; the server admits one. The other waits for that
+  // transaction to end and asks once more, so a GC with a second GM connected is not stopped half way.
+  for (let attempt = 0; ; attempt++)
+    try {
+      docs = await actor.createEmbeddedDocuments("Item", [data], { keepId: true, render: false });
+      break;
+    } catch (error) {
+      if (!/already exists/.test(String(error?.message ?? error))) throw error;
+      if (attempt >= 1 || !(await lockCleared(actor, scope)))
+        throw new ResourceLockedError(
+          loc`${actor.name}: another client started a resource transaction. Retry after it finishes.`
+        );
+    }
   const lock = docs[0];
   if (docs.length !== 1 || lock.id !== scope || lock.flags.spycraft2.resourceLock.token !== token)
     throw new Error(loc`The server did not create the expected resource transaction lock.`);

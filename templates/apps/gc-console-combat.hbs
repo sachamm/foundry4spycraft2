@@ -1,9 +1,11 @@
   <details class="gc-section" data-section="combat" data-view-hidden="{{hiddenSections.combat}}" data-state="{{sections.combat.state}}" {{#if sections.combat.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Combat"}}</span>{{#unless combat}}<span
       class="gc-note">{{localize "SPYCRAFT.Console.NoFightNote"}}</span>{{/unless}}{{#if combat}}<span
-      class="gc-note">{{#if combat.started}}{{localize "SPYCRAFT.Template.AppsGcConsole.Round"}} {{combat.round}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}{{/if}}</span>{{/if}}</summary>
+      class="gc-note">{{#if combat.started}}{{localize "SPYCRAFT.Template.AppsGcConsole.Round"}} {{combat.round}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}{{/if}}
+      · {{#if combat.encounter}}{{combat.encounter}}, {{/if}}{{combat.scene}}</span>{{/if}}</summary>
     {{#if combat}}
     {{#if combat.elsewhere}}<p class="bad">{{localize "SPYCRAFT.Console.Elsewhere" scene=combat.scene}}</p>{{/if}}
+    {{#if combat.unscened}}<p class="bad">{{localize "SPYCRAFT.Console.Unscened"}}</p>{{/if}}
     {{#if combat.started}}
     {{!-- The turn bar comes first and stays in view while the section scrolls: Next turn never moves. --}}
     <div class="gc-turn-bar" role="group" aria-label="{{localize 'SPYCRAFT.Console.Round'}}">

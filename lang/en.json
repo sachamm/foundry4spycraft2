@@ -200,6 +200,7 @@
    "CountHeading": "Count",
    "UnrolledNamed": "Not rolled yet: {names}.",
    "Elsewhere": "This fight is on {scene}, not the scene in view. Next turn moves it.",
+   "Unscened": "This fight belongs to no scene, so it shows on every scene. Next turn moves it.",
    "SessionBegun": "Session begun",
    "BeginNewSession": "Begin a new session…",
    "MarkDone": "Mark done",
