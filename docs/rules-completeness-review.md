@@ -1,9 +1,11 @@
 # PC creation and combat rules review
 
-**Continuing review, 27 November 2026:** PC creation **9.9/10**;
-combat play **9.8/10**. Implementation continues toward the requested **9.9/10**
-in both areas. Earlier reviews are preserved below; the latest pass follows them.
-Current branch: `codex/rules-completeness-99`, based on `475afa5`.
+**Final review, 27 November 2026:** PC creation **9.9/10**;
+combat play **9.9/10** under the assisted-core-play rubric below.
+Both meet the requested threshold. Earlier reviews remain as history; the final
+scorecard and evidence are in Pass 98.
+Current branch: `codex/rules-completeness-99`, initially based on `475afa5`;
+upstream main integrated through `dd9539b` (system 0.8.8).
 
 Reviewed 26 November 2026 on `codex/rules-completeness`, starting from `cf911e2`
 (v0.8.7). An upstream fetch confirmed that revision was current on `origin/main`.
@@ -3096,3 +3098,68 @@ Validation: **4,781 Node tests**, **988 independent engine fixtures**,
 checks pass. The focused rules checks include the higher-Intelligence/Augmented
 negative cases, valid animal benefits and an unchanged ordinary-character path.
 The final scoring review follows after the explanatory animal form is rechecked.
+
+## Pass 98: Final review and scorecard
+
+### PC creation: 9.9/10
+
+| Dimension | Score /2 | Final assessment |
+| --- | ---: | --- |
+| Attributes and health | 2.00 | Point-buy limits, origin adjustments, level-local gains, class vitality, Constitution and campaign creation policies have source comparisons and executable validation. |
+| Origins and classes | 2.00 | Origin sweeps, all 30 class progression tables, acquisition choices, base/expert entry and later eligibility loss have regression and native build evidence. |
+| Skill purchases | 2.00 | Historical budgets, class/cross-class prices, rank limits, Training and conditional mastery grants remain consistent across actual advancement and reload. |
+| Feats and training | 1.95 | Prerequisites, grants, payment receipts, proficiencies, focuses, contacts and Interests execute; exceptional source choices and uncertain imported acquisitions retain explicit GC review. |
+| Gear and finalization | 1.95 | Wealth, Possessions, mission allowances and funded exceptions validate, and complete PCs reach Play; rare equipment exceptions and unknown legacy history retain GC review. |
+| **Total** | **9.90/10** | **The requested creation threshold is met.** |
+
+The integrated native Snoop/Field Analyst remains complete after reload, with
+36/36 attribute points, 96/96 career skill points and valid expert entry. Earlier
+complete Soldier, Scientist, Advocate and companion-owner builds and their
+negative acquisition/advancement cases remain supporting evidence. No creation
+regression was accepted to accommodate the upstream merge.
+
+### Combat play: 9.9/10
+
+| Dimension | Score /2 | Final assessment |
+| --- | ---: | --- |
+| Initiative, actions and movement | 2.00 | Count changes, Delay limits, action timing, readiness and declared movement have executable boundaries and saved context. Ordinary and cooperative Grapple now share actual proficiency, Size and timing evidence. |
+| Attacks and Defense | 2.00 | Attack declarations, proficiency, firing options, reactive Defense, physical cover contact and protected-target resolution remain distinct and connected. Critical activation before cover damage uses its actual scope and payer. |
+| Damage and recovery | 2.00 | Original attack/benefit dice, penetration, lethal/subdual/stress, massive damage, armor/DR, secondary effects and recovery use tracked results with duplicate prevention and guarded Undo. Corrected unarmed types and Throw order have actual native dice and health proof. |
+| Conditions and resources | 2.00 | Conditions, Drained recovery, timed consequences, action dice, limited uses and interrupted/deleted-card recovery have executable workflows, source records and persistence checks. |
+| Conditional options and environments | 1.90 | Source-reviewed class/feat/campaign/environment effects and animal Grapple exceptions execute. Complex geometry, broader animal action-list adjudication and rare exceptional combinations retain explicit GC review and future assistance. |
+| **Total** | **9.90/10** | **The requested combat threshold is met.** |
+
+The final native animal form explains the unarmed-only limit and excludes the
+four prohibited benefits from both its picker and result summary. Direct invalid
+choices and the second opening changed no conditions or dice. An owned-weapon
+Injure attempt consumed no claim or RNG; legal unarmed Injure then posted
+ChatMessage.LH1GVN872ry7pHEN with one subdual damage. Both themes were visually
+inspected at 1280×720; Take ended at 400.69px. No browser errors occurred.
+This supplements the zero/positive cover, paid defense, shared critical,
+massive-damage, recipient and proficiency checks recorded in Pass 96.
+
+### Recommendations implemented and remaining maintenance
+
+The gaps holding the prior score at 9.8 are closed: connected cover activation
+and penetration, original benefit damage, cooperative Grapple, ordinary
+Proficiency-tag handling, assisted recipients, current-main integration and
+animal equipment/second-opponent exceptions. Commits preserve the changes in
+reviewable intervals, including 39501eb, 991bc9e and c3ec5ec.
+
+The remaining 0.1 in each area represents stated limits of assisted core play,
+not a claim that every option is fully automated. Keep actual geometry, unusual
+body/equipment permissions and uncertain imported histories under GC review.
+Further map/menu assistance and exceptional source audits remain in B-186,
+B-190 and B-193 of the existing backlog. No further blocking core rules gap was
+found in this final review. Continue running the independent fixtures and
+native boundary scenarios when these paths change.
+
+Final evidence: **4,781 passing Node tests**, **988 independent engine fixtures**,
+**308 passing layout checks**, **13 passing built-pack checks**, native schemas,
+lint at unchanged warning caps, formatting, bundle and copied-text checks.
+After the explanatory form/report adjustment, another **108 focused rules checks**
+and **107 actual damage/Grapple workflow checks** passed, followed by the native
+form and original-damage check above. Test worlds, ports and runtime output
+remained isolated from campaign data. The task branch includes upstream main
+through dd9539b; no task changes were pushed, published or merged into the
+integration checkout.
