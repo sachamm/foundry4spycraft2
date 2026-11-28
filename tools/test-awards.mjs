@@ -566,8 +566,7 @@ test("a failed XP post preserves unrelated later XP and reconciles committed rol
         a.system.xp += 7;
         throw Error("post rejected");
       };
-    }
-    else {
+    } else {
       failPost = true;
       a.update = async patch => {
         await update(patch);

@@ -666,7 +666,6 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-
 /* An NPC dragged over the console: the body is outlined and says what a drop here does. */
 .gc-console-body[data-drop-action] {
   outline: 2px dashed var(--sc2-action);
