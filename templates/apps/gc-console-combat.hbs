@@ -49,8 +49,8 @@
       {{#unless defeated}}<details class="gc-more">
         <summary>{{localize "SPYCRAFT.Console.TurnActions"}}</summary>
         <p class="controls"><button type="button" data-action="actingSpend" data-kind="half" data-combatant="{{id}}"
-          data-tooltip="{{localize 'SPYCRAFT.Console.SpendHalfHint'}}">{{localize "SPYCRAFT.Console.SpendHalf"}}</button>
-          <button type="button" data-action="actingSpend" data-kind="full" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.SpendFullHint'}}">{{localize "SPYCRAFT.Console.SpendFull"}}</button>
+          {{#if spentOut}}disabled data-tooltip="{{spentOut}}"{{else}}data-tooltip="{{localize 'SPYCRAFT.Console.SpendHalfHint'}}"{{/if}}>{{localize "SPYCRAFT.Console.SpendHalf"}}</button>
+          <button type="button" data-action="actingSpend" data-kind="full" data-combatant="{{id}}" {{#if spentOut}}disabled data-tooltip="{{spentOut}}"{{else}}data-tooltip="{{localize 'SPYCRAFT.Console.SpendFullHint'}}"{{/if}}>{{localize "SPYCRAFT.Console.SpendFull"}}</button>
           <button type="button" data-action="actingSpend" data-kind="reset" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.GiveBackHint'}}">{{localize "SPYCRAFT.Console.GiveBack"}}</button>{{#if standard}}
           <button type="button" data-action="actingDamageSave" data-combatant="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.DamageSaveHint'}}">{{localize "SPYCRAFT.Console.DamageSave"}}</button>{{/if}}</p>
       </details>

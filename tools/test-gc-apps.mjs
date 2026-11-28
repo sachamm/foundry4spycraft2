@@ -904,8 +904,9 @@ test("the tracker menu entries use the Foundry 14 shape and act on the clicked r
   assert.equal(mook.flags.spycraft2?.readied, undefined);
   fight.turn = 1;
   assert.equal(fight.combatant, mook);
+  answer({ trigger: "the door opens", endTurn: false });
   await find("Ready an action").onClick(null, row);
-  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round });
+  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round, trigger: "the door opens" });
   assert.equal(combat.halfActionsLeft(mook), 1);
   assert.equal(find("Ready an action").visible(row), false);
   assert.equal(find("Readied action triggered").visible(row), true);

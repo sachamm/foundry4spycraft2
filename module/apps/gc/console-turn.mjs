@@ -115,6 +115,8 @@ export function actingBlock(combat) {
     defense: actor.system?.defense?.total ?? null,
     health: healthLine(actor),
     conditions: conditionNames(actor).join(", "),
+    // At no half actions left the spend buttons are off, with the reason; Give back stays.
+    spentOut: !defeated && left <= 0 ? loc`No half actions left this turn.` : "",
     halfActions: defeated
       ? loc`Defeated: pass the turn`
       : left === 1
@@ -226,7 +228,8 @@ export function combatRows(combat) {
     const tags = [];
     if (combatant.isDefeated) tags.push({ text: loc`defeated`, tone: "bad" });
     tags.push(...trackerRowStates(combatant.actor, { health: true }).map(text => ({ text, tone: "warn" })));
-    if (combatant.flags?.spycraft2?.readied) tags.push({ text: loc`readied`, tone: "muted" });
+    const readied = combatant.flags?.spycraft2?.readied;
+    if (readied) tags.push({ text: readied.trigger ? loc`readied: ${readied.trigger}` : loc`readied`, tone: "muted" });
     if (pending) tags.push({ text: loc`${signed(pending)} at round end`, tone: "muted" });
     if (combatant.flags?.spycraft2?.mustPress) tags.push({ text: loc`must Press`, tone: "warn" });
     const notes = tags.map(tag => tag.text);
@@ -242,7 +245,12 @@ export function combatRows(combat) {
       hidden: !!combatant.hidden,
       current,
       defeated: !!combatant.isDefeated,
-      count: Number.isFinite(combatant.initiative) ? loc`Count ${combatant.initiative}` : loc`not rolled`,
+      // A defeated combatant needs no roll, so it is not counted as waiting for one.
+      count: Number.isFinite(combatant.initiative)
+        ? loc`Count ${combatant.initiative}`
+        : combatant.isDefeated
+          ? loc`defeated`
+          : loc`not rolled`,
       // The number alone, for the list's Count column; "—" until rolled.
       countValue: Number.isFinite(combatant.initiative) ? String(combatant.initiative) : "—",
       notes: notes.join(", "),
@@ -311,9 +319,21 @@ export async function attackWith(actor, itemId, event = null, combatant = null) 
   const item = actor?.items?.get(itemId);
   if (!item) return refuse(loc`That weapon is no longer on the sheet.`);
   // Range and flanking are measured from the selected token: with several tokens of one actor, the acting one.
-  combatant?.token?.object?.control?.({ releaseOthers: true });
+  // The GC's own selection comes back afterwards, so the map does not stay on that token's vision.
+  const selected = [...(globalThis.canvas?.tokens?.controlled ?? [])].map(token => token.id),
+    token = combatant?.token?.object;
+  const switched = !!token && !(selected.length === 1 && selected[0] === token.id);
+  if (switched) token.control?.({ releaseOthers: true });
+  let message;
   const quick = skipDialog(event) && quickAttackHasTarget(actor);
-  const message = await actor.rollAttack(item, quick ? quickAttackOptions(actor, item) : { askContext: true });
+  try {
+    message = await actor.rollAttack(item, quick ? quickAttackOptions(actor, item) : { askContext: true });
+  } finally {
+    if (switched) {
+      canvas?.tokens?.releaseAll?.();
+      for (const id of selected) canvas?.tokens?.get?.(id)?.control?.({ releaseOthers: false });
+    }
+  }
   return attackMade(actor, message, quick);
 }
 

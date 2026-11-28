@@ -695,7 +695,7 @@ export function consoleContext() {
       diceCurrent: !!dice.current,
       settled: !!m.reportPosted && team.length > 0 && paid >= team.length,
       combat: combatNow
-        ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length }
+        ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative) && !c.isDefeated).length }
         : null
     }),
     session: {
@@ -894,7 +894,7 @@ export function consoleContext() {
                   };
                 })
             : [],
-          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
+          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative) && !c.isDefeated).length,
           // The NPC Initiative buttons are off, with the reason, when no NPC is waiting for a roll.
           npcRollBlocked: combatNow.turns.some(
             c => !Number.isFinite(c.initiative) && c.actor?.type === "npc" && !c.hasPlayerOwner && !c.isDefeated
@@ -904,7 +904,7 @@ export function consoleContext() {
           // Who the NPC Initiative buttons roll for, and who rolls on their own sheet, named before the press.
           initiativeTip: initiativeTip(combatNow),
           unrolledNames: combatNow.turns
-            .filter(c => !Number.isFinite(c.initiative))
+            .filter(c => !Number.isFinite(c.initiative) && !c.isDefeated)
             .map(c => c.name)
             .join(", "),
           scene: combatNow.scene?.name ?? loc`no scene`,

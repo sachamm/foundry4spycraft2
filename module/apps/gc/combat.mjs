@@ -348,7 +348,13 @@ export async function spendTurnAction(combatant, kind, { quiet = false } = {}) {
   if (kind === "reset") return combatant.update({ "flags.spycraft2.actions": resetActions(state) });
   const result = spendAction(state, kind, { extra: extraHalfActions(combatant) });
   if (!result.ok) {
-    if (!quiet) ui.notifications.warn(loc`${combatant.name} has ${result.left} half action(s) left this turn.`);
+    // As with an attack that goes over: what is left is used up and the GC is told, rather than nothing recorded.
+    if (!quiet)
+      ui.notifications.warn(
+        loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
+      );
+    if (result.left > 0)
+      await combatant.update({ "flags.spycraft2.actions": { ...state, used: state.used + result.left } });
     return null;
   }
   await combatant.update({ "flags.spycraft2.actions": result.state });
@@ -369,8 +375,11 @@ export async function markActionSpent(actor, kind) {
   if (!combatant || combatant.actor?.uuid !== actor.uuid || !combatant.isOwner) return null;
   const result = spendAction(actionsOf(combatant), kind, { extra: extraHalfActions(combatant) });
   if (!result.ok) {
+    // The action stands, as the GC ruled by taking it; the turn is recorded as used up (the same as a Spend).
     ui.notifications.warn(
-      loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. Check with the GC.`
+      game.user?.isGM
+        ? loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
+        : loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. The GC decides whether it stands.`
     );
     // The turn is recorded as used up, so anything further this turn warns as well.
     if (result.left > 0)
@@ -840,17 +849,33 @@ export async function delayCombatant(combatant, counts = null) {
     );
   let times = counts;
   if (times === null) {
+    // The GC names the Count to act on; the ones still to come this round are listed to choose from.
+    const now = combatant.initiative ?? 0,
+      later = (combatant.parent?.turns ?? []).filter(
+        other => other.id !== combatant.id && Number.isFinite(other.initiative) && other.initiative < now
+      ),
+      suggested = later.length ? later[0].initiative - 1 : now - 1;
+    const stepsFor = values => now - Math.trunc(Number(values.count));
     const input = await formDialog({
-      title: loc`Delay — ${combatant.name}`,
-      ok: loc`Delay`,
+      title: loc`Delay: ${combatant.name}`,
+      ok: loc`Delay to this Count`,
       fields: [
         raw(
-          `<label>${loc`Counts to step down (now at ${combatant.initiative ?? "—"})`} <input type="number" name="times" min="1" value="1" /></label>`
+          `<label>${loc`Act on Count (now ${now})`} <input type="number" name="count" max="${now - 1}" value="${suggested}" /></label>${
+            later.length
+              ? `<p class="hint">${esc(loc`Still to act this round: ${later.map(other => `${other.name} ${other.initiative}`).join(", ")}. One below a Count acts after that character.`)}</p>`
+              : ""
+          }`
         )
-      ]
+      ],
+      validate: values => {
+        const steps = stepsFor(values);
+        if (!Number.isSafeInteger(steps) || steps < 1) return loc`Choose a Count below ${now}.`;
+        return fluidEventRefusal(combatant, "delay", { times: steps });
+      }
     });
     if (!input) return null;
-    times = Number(input.times) || 1;
+    times = stepsFor(input);
   }
   return quickFluidEvent(combatant, "delay", { times }, loc`Delay`);
 }
@@ -883,15 +908,31 @@ export async function readyCombatant(combatant) {
     return refuse(loc`${combatant.name} can ready an action only on its own turn.`);
   const spend = spendAction(actionsOf(combatant), "half", { extra: extraHalfActions(combatant) });
   if (!spend.ok) return refuse(loc`${combatant.name} has no half action left this turn to ready with.`);
+  // What sets it off and what it does are written down, so the trigger can be recognised when it comes.
+  const input = await formDialog({
+    title: loc`Ready an action: ${combatant.name}`,
+    ok: loc`Ready the action`,
+    fields: [
+      raw(`<label>${loc`Trigger and action`} <input type="text" name="trigger" placeholder="${esc(loc`e.g. fire at the first guard through the door`)}" /></label>
+      <label><input type="checkbox" name="endTurn" checked /> ${loc`Then end the turn`}</label>`)
+    ]
+  });
+  if (!input) return null;
+  const trigger = String(input.trigger ?? "")
+    .trim()
+    .slice(0, 200);
   // One write for the half action and the readied mark, so a second press finds the mark already there.
   await combatant.update({
     "flags.spycraft2.actions": spend.state,
-    "flags.spycraft2.readied": { round: combat.round }
+    "flags.spycraft2.readied": { round: combat.round, ...(trigger ? { trigger } : {}) }
   });
   await say(
-    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
+    trigger
+      ? loc`${esc(combatant.name)} readies an action: ${esc(trigger)}. When it happens, use Readied action triggered on its tracker row.`
+      : loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
     gcOnly(combatant)
   );
+  if (input.endTurn && combat.combatant?.id === combatant.id) await combat.nextTurn();
   return true;
 }
 
