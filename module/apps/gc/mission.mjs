@@ -38,6 +38,7 @@ import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
+import { missionSettlementDefaults } from "./mission-defaults.mjs";
 import { qualityHandling } from "./console-view.mjs";
 
 const T = GC_DATA.tables;
@@ -385,6 +386,7 @@ export async function startMission() {
   await startUsagePeriod("mission");
   await updateMission(mission => ({
     active: true,
+    settlementFigures: null,
     // When this run began: a Triumph on a card after it counts for the team's XP (p.331).
     startedAt: Date.now(),
     ended: false,
@@ -595,6 +597,8 @@ export async function endMission({ clear = false } = {}) {
     ended: true,
     ...(input.countFinalScene === true ? { scenesPlayed: (now.scenesPlayed ?? 0) + 1 } : {})
   }));
+  // The settlement's figures are kept with the ended mission, so a season quality changed later does not move them.
+  await updateMission({ settlementFigures: { ...missionSettlementDefaults(), at: Date.now() } });
   if (input.recordCritical === true && pendingCritical) {
     // Each agent pays in their own affiliation's currency; the Undo note gives the standing back. What is due is
     // worked out again from the record as it is now, so an objective ticked while the dialog was open is not charged.
@@ -640,8 +644,20 @@ export async function resumeMission() {
   requireGC();
   const mission = getMission();
   if (mission.active) return decline(loc`The mission is already active.`);
-  await updateMission({ active: true, ended: false });
-  await say(`<b>${loc`Mission ${esc(mission.name || "")} resumed.`}</b>`);
+  await updateMission({ active: true, ended: false, settlementFigures: null });
+  // An agent already settled for this mission takes awards again; settling again pays only the difference.
+  const period = String(game.settings.get("spycraft2", "usagePeriods")?.mission ?? "initial"),
+    key = encodeURIComponent(period).replaceAll(".", "%2E"),
+    reopened = [];
+  for (const actor of teamActors(getMission())) {
+    const reward = actor.system?.missionXPRewards?.[key];
+    if (!reward || reward.reopened) continue;
+    await actor.update({ [`system.missionXPRewards.${key}.reopened`]: true });
+    reopened.push(actor.name);
+  }
+  await say(
+    `<b>${loc`Mission ${esc(mission.name || "")} resumed.`}</b>${reopened.length ? ` ${esc(loc`XP settlement reopened for ${reopened.join(", ")}: settling again adds only the difference.`)}` : ""}`
+  );
   // Threat Level dice taken back by an adjustment made while the mission was ended are returned.
   if (sessionStarted()) await applySessionDiceAdjustments({ quiet: true });
   return true;

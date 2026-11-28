@@ -37,6 +37,14 @@ export function missionSettlementDefaults() {
     const mission = globalThis.game?.settings?.get("spycraft2", "mission");
     // An ended mission still settles: its record is kept until the next one starts.
     if (!mission?.active && !mission?.ended) return { baseXP: 0, threatLevel: null, triumph: false };
+    // An ended mission settles on the figures it had when it ended.
+    const kept = mission.ended ? mission.settlementFigures : null;
+    if (kept && Number.isSafeInteger(kept.baseXP))
+      return {
+        baseXP: kept.baseXP,
+        threatLevel: Number.isSafeInteger(kept.threatLevel) ? kept.threatLevel : null,
+        triumph: kept.triumph === true
+      };
     const season = (globalThis.game.settings.get("spycraft2", "campaign")?.qualities ?? []).map(id => ({
       id,
       scripted: true

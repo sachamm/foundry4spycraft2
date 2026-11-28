@@ -311,8 +311,14 @@ test("exposure infractions reduce standing at once; standing award pays the Cali
   assert.match(lastMessage(), /Negative standing/);
   // A row can be taken off again, and the agent gets back what it cost.
   const rows = state.getMission().infractions;
-  assert.ok(rows.every(row => row.id), "each row has its own id");
-  assert.ok(messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions), "an Undo note");
+  assert.ok(
+    rows.every(row => row.id),
+    "each row has its own id"
+  );
+  assert.ok(
+    messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions),
+    "an Undo note"
+  );
   await mission.removeInfraction(rows.at(-1).id);
   assert.equal(actors.get("a1").system.reputation, 0);
   assert.equal(state.getMission().infractions.length, rows.length - 1);
@@ -362,6 +368,18 @@ test("End mission asks first, keeps the record for settlement, and Resume reopen
     { baseXP: 325, threatLevel: 6, triumph: false },
     "settlement still has the totals"
   );
+  // The figures are kept with the ended mission: a season quality added later does not move them.
+  const season = game.settings.get("spycraft2", "campaign");
+  await game.settings.set("spycraft2", "campaign", {
+    ...season,
+    qualities: [...(season?.qualities ?? []), "cakewalk"]
+  });
+  assert.equal(missionSettlementDefaults().baseXP, 325);
+  const kept = state.getMission().settlementFigures;
+  await state.updateMission({ settlementFigures: null });
+  assert.notEqual(missionSettlementDefaults().baseXP, 325, "without the kept figures the quality would count");
+  await state.updateMission({ settlementFigures: kept });
+  await game.settings.set("spycraft2", "campaign", season);
   assert.equal(consoleContext().mission.ended, true);
   await mission.resumeMission();
   m = state.getMission();
