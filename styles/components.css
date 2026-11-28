@@ -1028,3 +1028,15 @@
 .spycraft2-roll-options [data-when][hidden] {
   display: none;
 }
+
+/* The Actors tab's line for a new agent: the GC's button, or a player's note when nothing is theirs yet. */
+.sc2-directory-help {
+  margin: 4px 8px;
+}
+.sc2-directory-help button {
+  width: 100%;
+}
+.sc2-directory-help p {
+  margin: 0;
+  font-size: var(--font-size-13, 13px);
+}

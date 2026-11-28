@@ -88,7 +88,7 @@ import { registerFastPathSetting } from "./module/apps/remembered-choices.mjs";
 import { registerQuickResolveSetting } from "./module/apps/damage-application.mjs";
 import { installTurnCue } from "./module/apps/turn-cue.mjs";
 import { installHotbar, rollFromMacro } from "./module/apps/hotbar.mjs";
-import { installCharacterOwnership } from "./module/apps/character-ownership.mjs";
+import { installCharacterOwnership, newAgentForPlayer } from "./module/apps/character-ownership.mjs";
 import { installTokenLinks } from "./module/apps/token-links.mjs";
 
 /** Conditions this system adds to the token HUD: [id, label, icon]. Labels are read once the language is known. */
@@ -276,7 +276,8 @@ Hooks.once("init", () => {
         disposition: manageDisposition
       },
       campaign: { qualities: qualitiesInForce, effects: currentCampaignEffects },
-      tables: gcTables
+      tables: gcTables,
+      newAgentForPlayer
     },
     resourceLocks: nativeResourceLocks,
     SpycraftBrowser,
