@@ -64,9 +64,9 @@
     {{else}}
     {{!-- Before the fight: roll first, then begin. --}}
     <p class="controls gc-initiative-first">
-      <button type="button" class="{{#if (eq @root.primary "groupInitiative")}}gc-primary{{/if}}" data-action="groupInitiative" data-tooltip="{{@root.combat.initiativeTip}}"
+      <button type="button" class="{{#if (eq @root.primary "groupInitiative")}}gc-primary{{/if}}" data-action="groupInitiative"{{#if @root.combat.npcRollBlocked}} disabled data-tooltip="{{@root.combat.npcRollBlocked}}"{{else}} data-tooltip="{{@root.combat.initiativeTip}}"{{/if}}
         data-single="false">{{localize "SPYCRAFT.Template.AppsGcConsole.RollNPCInitiativeByType"}}</button>
-      <button type="button" data-action="groupInitiative" data-tooltip="{{@root.combat.initiativeTip}}" data-single="true">{{localize "SPYCRAFT.Template.AppsGcConsole.OneRollForAllNPCs"}}</button>
+      <button type="button" data-action="groupInitiative"{{#if @root.combat.npcRollBlocked}} disabled data-tooltip="{{@root.combat.npcRollBlocked}}"{{else}} data-tooltip="{{@root.combat.initiativeTip}}"{{/if}} data-single="true">{{localize "SPYCRAFT.Template.AppsGcConsole.OneRollForAllNPCs"}}</button>
       <button type="button" data-action="surprise">{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound2"}}</button></p>
     {{#if combat.unrolled}}<p class="gc-note">{{localize "SPYCRAFT.Console.UnrolledNamed" names=combat.unrolledNames}}</p>{{/if}}
     {{/if}}
@@ -83,9 +83,9 @@
     {{#if combat.started}}
     <details class="gc-more">
       <summary>{{localize "SPYCRAFT.Console.InitiativeTools"}}</summary>
-      <p class="controls"><button type="button" data-action="groupInitiative" data-tooltip="{{@root.combat.initiativeTip}}"
+      <p class="controls"><button type="button" data-action="groupInitiative"{{#if @root.combat.npcRollBlocked}} disabled data-tooltip="{{@root.combat.npcRollBlocked}}"{{else}} data-tooltip="{{@root.combat.initiativeTip}}"{{/if}}
         data-single="false">{{localize "SPYCRAFT.Template.AppsGcConsole.RollNPCInitiativeByType"}}</button>
-        <button type="button" data-action="groupInitiative" data-tooltip="{{@root.combat.initiativeTip}}" data-single="true">{{localize "SPYCRAFT.Template.AppsGcConsole.OneRollForAllNPCs"}}</button>
+        <button type="button" data-action="groupInitiative"{{#if @root.combat.npcRollBlocked}} disabled data-tooltip="{{@root.combat.npcRollBlocked}}"{{else}} data-tooltip="{{@root.combat.initiativeTip}}"{{/if}} data-single="true">{{localize "SPYCRAFT.Template.AppsGcConsole.OneRollForAllNPCs"}}</button>
         <button type="button" data-action="surprise">{{localize "SPYCRAFT.Template.AppsGcConsole.SurpriseRound2"}}</button>
         <button type="button" data-action="fluidEvent">{{localize "SPYCRAFT.Template.AppsGcConsole.FluidInitiativeEvent"}}</button>
         <button type="button" data-action="combatReference">{{localize "SPYCRAFT.Template.AppsGcConsole.CombatReferences"}}</button>

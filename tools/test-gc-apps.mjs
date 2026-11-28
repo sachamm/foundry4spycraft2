@@ -761,6 +761,7 @@ const makeCombat = list => {
     combatants: {
       get: id => combatants.get(id),
       set: (id, combatant) => combatants.set(id, combatant),
+      delete: id => combatants.delete(id),
       find: fn => [...combatants.values()].find(fn),
       filter: fn => [...combatants.values()].filter(fn),
       [Symbol.iterator]: () => combatants.values()
@@ -929,6 +930,20 @@ test("group initiative makes one roll per NPC type; tie-breaks are stored", asyn
     ["g1", "g2", "b", "h"].map(id => fight.combatants.get(id).initiative),
     [13, 13, 18, null]
   );
+  assert.match(lastMessage(), /Guard Count 13/);
+  // A late guard joins the guards' Count without a roll.
+  const late = makeActor("g9", "combatant", null, {
+    name: "Guard",
+    actor: guard,
+    initiative: null,
+    parent: fight,
+    actorId: guard.id
+  });
+  fight.combatants.set("g9", late);
+  assert.equal(await combat.rollGroupInitiative(fight), 1);
+  assert.equal(late.initiative, 13);
+  assert.match(lastMessage(), /joins/);
+  fight.combatants.delete?.("g9");
   dice(4, 17);
   assert.equal(await combat.rollTiebreaks(fight), 2);
   const sorted = [fight.combatants.get("g1"), fight.combatants.get("g2")].sort(

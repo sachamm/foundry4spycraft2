@@ -895,6 +895,12 @@ export function consoleContext() {
                 })
             : [],
           unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
+          // The NPC Initiative buttons are off, with the reason, when no NPC is waiting for a roll.
+          npcRollBlocked: combatNow.turns.some(
+            c => !Number.isFinite(c.initiative) && c.actor?.type === "npc" && !c.hasPlayerOwner && !c.isDefeated
+          )
+            ? ""
+            : loc`Every NPC in this fight already has an Initiative Count.`,
           // Who the NPC Initiative buttons roll for, and who rolls on their own sheet, named before the press.
           initiativeTip: initiativeTip(combatNow),
           unrolledNames: combatNow.turns

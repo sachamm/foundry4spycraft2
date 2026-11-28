@@ -468,6 +468,8 @@ async function rollTiebreaksNow(combat) {
 }
 
 /** One Initiative check for a set of NPCs (p.323): by default every unrolled non-player combatant, grouped by actor. */
+const combatantsOf = combat => [...(combat?.combatants ?? [])];
+
 export async function rollGroupInitiative(combat = game.combat, { single = false } = {}) {
   if (!game.user.isGM) return null;
   if (!combat) return refuse(loc`There is no active combat.`);
@@ -490,7 +492,23 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
   }
   const lines = [];
   let rolled = 0;
-  for (const group of groups.values()) {
+  const keyOf = combatant =>
+    combatant.actor?.isToken ? (combatant.token?.baseActor?.id ?? combatant.actorId) : combatant.actorId;
+  for (const [key, group] of groups) {
+    // A late arrival of a kind already rolled joins that kind's Count instead of rolling its own (p.323).
+    const rolledKin = single
+      ? null
+      : combatantsOf(combat).find(
+          other => Number.isFinite(other.initiative) && other.actor?.type === "npc" && keyOf(other) === key
+        );
+    if (rolledKin) {
+      for (const combatant of group) await combatant.update({ initiative: rolledKin.initiative });
+      lines.push(
+        loc`${esc(group.map(member => member.name).join(", "))}: joins ${esc(rolledKin.name)} on Count ${rolledKin.initiative}`
+      );
+      rolled += 1;
+      continue;
+    }
     // Each member's own Initiative roll is asked for first, so a Shaken source waiting for review holds that member
     // back, as it would on a roll of its own.
     const members = [],
@@ -515,7 +533,10 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     }
     const d20 = Number.isFinite(roll.dice?.[0]?.total) ? roll.dice[0].total : roll.total - bonusOf(members[0]);
     for (const combatant of members) await combatant.update({ initiative: d20 + bonusOf(combatant) });
-    lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${d20}`);
+    // The card gives each member's Count, with the shared die beside it.
+    lines.push(
+      loc`d20 ${d20}: ${esc(members.map(member => loc`${member.name} Count ${member.initiative}`).join(", "))}`
+    );
     rolled += 1;
   }
   if (left.length)
@@ -1066,7 +1087,9 @@ export async function addSelectedToFight() {
     fresh.map(token => ({ tokenId: token.id, sceneId: scene.id, actorId: token.actorId, hidden: token.hidden }))
   );
   ui.notifications.info(
-    fresh.length === 1 ? loc`${fresh[0].name} joins the fight.` : loc`${fresh.length} tokens join the fight.`
+    fresh.length === 1
+      ? loc`${fresh[0].name} joins the fight.`
+      : loc`${fresh.length} join the fight: ${fresh.map(token => token.name).join(", ")}.`
   );
   return fight;
 }
