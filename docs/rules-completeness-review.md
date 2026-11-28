@@ -1,6 +1,6 @@
 # PC creation and combat rules review
 
-**Continuing review, 27 November 2026:** PC creation **9.8/10**;
+**Continuing review, 27 November 2026:** PC creation **9.9/10**;
 combat play **9.8/10**. Implementation continues toward the requested **9.9/10**
 in both areas. Earlier reviews are preserved below; the latest pass follows them.
 Current branch: `codex/rules-completeness-99`, based on `475afa5`.
@@ -2370,3 +2370,58 @@ All **4,455** Node tests, **988** engine checks and **283** layout cases pass,
 alongside schema, lint, formatting, bundle and copy checks. Standard NPC quality/
 grade forfeiture, grade-built special characters and further conditional creation
 cases remain before another score increase.
+
+## Pass 79: Complete conditional skill build and fresh creation review
+
+### PC creation: 9.9/10
+
+The creation score increases under the existing assisted-core-play rubric. The
+mandatory creation paths now have source comparisons, executable validation and
+native complete-build evidence across attributes, Origins, base/expert classes,
+purchased and bonus ranks, feats, training, Wealth, contacts and equipment.
+The small remaining deduction covers unusual imported histories and exceptional
+option/gear adjudication. It does not mean every feat's later use is automated.
+
+A new native Gifted/Student Snoop 4 / Field Analyst 1 used the actual level-gain
+API, actual vitality rolls and real feat creation at each acquisition. All five
+career budgets are spent: 48 + 12 + 12 + 12 + 12 = 96 points, plus five separately
+allocated Training points at Career Level 3. Its 36-point attribute purchase,
+four flexible focus selections, proficiencies, Interests, contacts and Wealth
+allocations leave no setup tasks or warnings. The actual Play control and reload
+preserve that completed state.
+
+Gifted's selected Athletics remains a class skill in every purchase row; its five
+Training ranks have result cap 35. Analysis has eight ranks and threat 16 at
+Career Level 5, matching Advanced Skill Mastery's base 18 and Gifted's two-point
+threat adjustment. Field Analyst entry retains actual eligibility evidence. Its
+Advanced Skill Mastery (Examiner) grant is active at Career Level 5, as its first
+class feature explicitly provides, despite that feat's ordinary Career Level 6
+prerequisite. Student's I Can Swim grant and all three chosen feats retain their
+actual acquisition levels and the Snoop bonus-feat source.
+
+The source review independently checked Gifted (p.19), Training (p.201),
+I Can Swim (p.200), Advanced Skill Mastery (p.199), Field Analyst's first grant
+(p.70), and the first-base/first-expert core-ability rule (p.28). Training's
+one-point-per-rank exception also applies to cross-class skills; no extra cost
+was introduced. I Can Swim explicitly requires spending the old balance before
+another level; the implementation's deadline is correct.
+
+Two native negative cases verify the actual advancement boundary. A Snoop 4
+without Examiner cannot enter Field Analyst and gains no class item or level.
+An I Can Swim character with one unspent point from level 1 cannot advance;
+all original entries remain unchanged. These incomplete control clones are not
+counted as complete PCs. An initially overspent attribute purchase and unassigned
+flexible focuses also remained explicit setup tasks until corrected.
+
+### Combat play: 9.8/10
+
+Combat still needs its remaining Drained NPC handling and the recorded grapple,
+cover and secondary-effect cases. Automatic advancement during Drained remains
+held for GC review rather than rewriting the owned career. Recovery's category
+remains the documented provisional Passive assumption pending a table ruling.
+Continue implementing and reviewing combat before completing this goal.
+
+No product code changed during this pass. The existing **4,455** Node tests,
+**988** engine checks, **283** layouts and native schema/lint/format/bundle/copy
+checks remain applicable. The additional native creation, persistence and
+negative advancement cases passed without unexpected runtime errors.
