@@ -23,7 +23,7 @@ export function tumblePathPlan(
   if (tumbleCircumstances !== true || key !== "acrobatics" || check?.id !== "tumble")
     return reject(loc`Declare this movement path only for Acrobatics/Tumble.`);
   if (method !== "roll")
-    return reject(loc`Use a rolled Tumble check for this path; this entry does not grant taking10/20 (p.109).`);
+    return reject(loc`Use a rolled Tumble check for this path; this entry does not grant taking 10/20 (p.109).`);
   if (
     tumbleRouteConfirmed !== true ||
     typeof tumbleDistanceFeet !== "number" ||

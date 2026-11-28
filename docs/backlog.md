@@ -201,7 +201,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-157 | First person in labels: 71 strings start "I ", 27 contain "I am". | SG-L11 | M |
 | B-158 | 46 strings over 300 characters, 335 over 160. | SG-L12 | M |
 | B-159 | A developer error shown to users; four refusals without the fix or in internal language; the Charisma gear-pick warning shows a letter, not the category or the fix. | SG-L13, SG-L14, LR-40c | S |
-| B-160 | At least 20 strings still have numbers glued to words ("adds1 damage", "lost5vitality or1wound"). | SGI-rules-expert D18 | S |
 | B-161 | Abbreviation leftovers: "Current VP", "Current WP", "DR", "Codename", "VP · SP" in the class browser; the formula hint under Bonuses shows to every owner. | SGI-novice-gc D17, LR-40b, LR-39b | S |
 | B-162 | English literals in context builders; hard-coded English in attributes; raw schema keys as labels; text localised at load time stays English (migration labels, the console tab tooltip). | HBS-11, H6, WEB-09 | S |
 | B-236 | Console and undo wording, second pass: "record" and "settlement" in the end-mission texts and "{count} recorded" on the wrap-up strip; plurals glued from pieces in the undo tooltip and the GC dice spend label; the scene status glued from two parts; the Add NPC summary joined with "; " and reading "1 × Guard"; `h3` headings in the console with no `h2` above; and Undo still lives on its own whispered note instead of on the card that made the change (7.5, 8.3). | CU-16, CU-17 | S |

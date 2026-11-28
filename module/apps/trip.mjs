@@ -6,7 +6,7 @@ export function tripDefenseContent(key, actor) {
   if (key !== "acrobatics") return "";
   const esc = foundry.utils.escapeHTML;
   return (
-    `<details><summary>${loc`Resist Trip (ordinary incoming action)`}</summary><p>${loc`Choose Resist Trip above: Acrobatics/DEX, Armor Check Penalty and action error+1. Equilibrium Mastery adds its current Covert-count dodge bonus unless you are vulnerable. Only the larger participant gains+4per Size category. Other character options replacing the response require their separate rules.`}</p><p>${loc`My current Size:`} ` +
+    `<details><summary>${loc`Resist Trip (ordinary incoming action)`}</summary><p>${loc`Choose Resist Trip above: Acrobatics/DEX, Armor Check Penalty and action error+1. Equilibrium Mastery adds its current Covert-count dodge bonus unless you are vulnerable. Only the larger participant gains +4 per Size category. Other character options replacing the response require their separate rules.`}</p><p>${loc`My current Size:`} ` +
     esc(responseOwnSize(actor?.system) ?? loc`GC review`) +
     `</p><label>${loc`Actual attacking character`} <select name="tripOpponentUuid"><option value="">${loc`Unrecorded attacker (manual outcomes)`}</option>` +
     attackCharacterTargetChoices()

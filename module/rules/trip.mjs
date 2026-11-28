@@ -68,7 +68,7 @@ export function tripDefensePlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (key !== "acrobatics" || check?.id !== "resist-trip") return empty;
   if (method !== "roll")
-    return reject(loc`Trip is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).`);
+    return reject(loc`Trip is opposed and part of a combat action; taking 10/20 is unavailable (pp.91,352).`);
   if (
     typeof tripOpponentName !== "string" ||
     !tripOpponentName.trim() ||

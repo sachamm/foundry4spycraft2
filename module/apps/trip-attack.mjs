@@ -6,7 +6,7 @@ export function tripAttackContent(key, actor) {
   if (key !== "acrobatics") return "";
   const esc = foundry.utils.escapeHTML;
   return (
-    `<details><summary>${loc`Trip action (attacking)`}</summary><p>${loc`Choose Trip Action above: one half action on your Initiative Count, opposed Acrobatics/DEX, Armor Check Penalty and action error+1. Only the larger participant gains+4per Size category; the target may be at most one category larger. Earned readied Axe/Spear/Whip skill bonuses apply automatically and gear bonuses do not stack.`}</p><p>${loc`My current Size:`} ` +
+    `<details><summary>${loc`Trip action (attacking)`}</summary><p>${loc`Choose Trip Action above: one half action on your Initiative Count, opposed Acrobatics/DEX, Armor Check Penalty and action error+1. Only the larger participant gains +4 per Size category; the target may be at most one category larger. Earned readied Axe/Spear/Whip skill bonuses apply automatically and gear bonuses do not stack.`}</p><p>${loc`My current Size:`} ` +
     esc(responseOwnSize(actor?.system) ?? loc`GC review`) +
     `</p><label>${loc`Actual opposing character`} <select name="tripAttackOpponentUuid"><option value="">${loc`Unrecorded character (manual outcomes)`}</option>` +
     attackCharacterTargetChoices()

@@ -5,7 +5,7 @@ export function analysisChallengeCount(system, base, { forensics = false } = {})
   const raw = typeof base === "string" && base.trim() ? Number(base) : base;
   if (!Number.isSafeInteger(raw) || raw < 2)
     throw new Error(
-      loc`Enter the GC’s whole unmodified Complex Analysis Task Challenge count: at least 2 (pp.99–100). Feat reductions may lower the required count to1.`
+      loc`Enter the GC’s whole unmodified Complex Analysis Task Challenge count: at least 2 (pp.99–100). Feat reductions may lower the required count to 1.`
     );
   const forensicGenius = system.activeFeatNames?.includes("Forensic Genius") === true,
     trackingMastery = forensics === true && system.activeFeatNames?.includes("Tracking Mastery") === true,
