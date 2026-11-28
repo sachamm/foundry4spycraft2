@@ -60,6 +60,33 @@ async function whisperTargetRole(role, threat) {
   }
 }
 
+/** The beyond-Reach line for a GC's melee attack, measured from the map when its dialog opens, or "". */
+function beyondReachAtOpen(actor, item, options) {
+  if (
+    !game.user?.isGM ||
+    options.freeFinalAttack ||
+    options.reachConfirmed === true ||
+    !item.system?.isMelee ||
+    cqbRangedWeapon(item.system)
+  )
+    return "";
+  let extra = 0;
+  try {
+    extra = reachIncreaseFeet(item.system.qualities ?? "");
+  } catch {
+    /* a Reach quality that needs review adds nothing here */
+  }
+  const reach = meleeReach(actor, 5 + extra);
+  return reach && !reach.within
+    ? loc`${reach.targetName} is ${reach.distanceFeet} ft. away, beyond the ${reach.reachFeet} ft. Reach of ${item.name} (p.327).`
+    : "";
+}
+const targetKey = () =>
+  [...(game.user?.targets ?? [])]
+    .map(token => token.id)
+    .sort()
+    .join(",");
+
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
     async rollAttack(item, options = {}) {
@@ -131,11 +158,15 @@ export const ActorAttackRolls = Base =>
             (initialCQB.mastery && initialCQB.within && typeof options.targetOpponentConfirmed !== "boolean")))
       ) {
         const needsCQB = cqbRangePlan(this.system, item.system, options).active;
+        // A GC's melee attack on a target beyond Reach is settled here, in the same dialog, not by a second one after.
+        const beyond = beyondReachAtOpen(this, item, options),
+          targetsAtOpen = targetKey();
         const input = await systemDialog.input({
-          window: { title: loc`Attack circumstances` },
+          // The dialog names the attack it rolls, in its title and on its main button.
+          window: { title: loc`${this.name}: ${item.name} attack` },
           position: { width: 560 },
           rejectClose: false,
-          ok: { label: loc`Roll attack` },
+          ok: { label: loc`Roll ${item.name} attack` },
           render: (event, dialog) => {
             restoreChoices(choiceKey("attack", this, item.id), dialog?.element ?? event?.target);
             measureInto(this, {
@@ -144,15 +175,28 @@ export const ActorAttackRolls = Base =>
             })(event, dialog);
             enhanceAttackDialog(event, dialog);
           },
-          content: rollPipeline.dialog({
-            dialog: "attack",
-            actor: this,
-            item,
-            needsCQB,
-            options: { attackAction: "standard", ...options }
-          })
+          content:
+            rollPipeline.dialog({
+              dialog: "attack",
+              actor: this,
+              item,
+              needsCQB,
+              options: { attackAction: "standard", ...options }
+            }) +
+            (beyond
+              ? `<label class="sc2-check"><input type="checkbox" name="beyondReach" checked /> ${foundry.utils.escapeHTML(beyond)} ${loc`Attack anyway.`}</label>`
+              : "")
         });
         if (!input) return null;
+        if (beyond) {
+          if (input.beyondReach !== true) return null;
+          options = { ...options, reachConfirmed: true };
+        }
+        // The dialog's own target choice stands; a target changed on the map while it was open is said, not used.
+        if (targetKey() !== targetsAtOpen)
+          ui.notifications?.info?.(
+            loc`Your map target changed while the attack dialog was open; the attack uses the target chosen in the dialog.`
+          );
         rememberChoices(choiceKey("attack", this, item.id), input);
         // What was entered, as roll options: each group of fields is read by the rule that owns it.
         options = {
