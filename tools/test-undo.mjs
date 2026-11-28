@@ -311,3 +311,53 @@ test("undoing an action spend leaves a later Count change and fluid event in pla
   assert.deepEqual(combatant.updates, [{ "flags.spycraft2.==actions": { half: 2 } }]);
   game.combats = [];
 });
+
+test("a player's note restores only that player's characters and character paths, never mission-wide parts", async () => {
+  const { trustedRecord } = await import("../module/apps/undo.mjs");
+  const player = { id: "p", isGM: false };
+  globalThis.fromUuidSync = uuid => ({
+    testUserPermission: (user, level) => uuid === "Actor.mine" && level === "OWNER"
+  });
+  const record = {
+    label: "x",
+    gcDice: 3,
+    placedTokens: { ids: ["t"] },
+    entries: [
+      {
+        uuid: "Actor.mine",
+        restore: [
+          ["system.vitality.value", 5],
+          ["ownership.default", 3]
+        ],
+        expect: [],
+        unset: ["name"]
+      },
+      { uuid: "Actor.theirs", restore: [["system.vitality.value", 5]], expect: [] }
+    ]
+  };
+  const kept = trustedRecord(record, player);
+  assert.equal(kept.gcDice, undefined);
+  assert.equal(kept.placedTokens, undefined);
+  assert.deepEqual(
+    kept.entries.map(entry => [entry.uuid, entry.restore, entry.unset]),
+    [["Actor.mine", [["system.vitality.value", 5]], []]]
+  );
+  assert.equal(trustedRecord(record, { isGM: true }), record, "a GC's own note is taken as written");
+  delete globalThis.fromUuidSync;
+});
+
+test("a step that fails part way still leaves a note for what it wrote, then reports the failure", async () => {
+  const { withUndo } = await import("../module/apps/undo.mjs");
+  const actor = makeActor({ vitality: { value: 10 } });
+  const posted = [];
+  globalThis.ChatMessage = { create: async data => (posted.push(data), data), getWhisperRecipients: () => [] };
+  await assert.rejects(
+    withUndo([actor], "Spend", async () => {
+      actor.system.vitality.value = 4;
+      throw new Error("second write refused");
+    }),
+    /second write refused/
+  );
+  assert.equal(posted.length, 1);
+  assert.match(posted[0].flags.spycraft2.undo.label, /stopped part way/);
+});

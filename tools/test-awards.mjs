@@ -558,11 +558,15 @@ test("a failed XP post preserves unrelated later XP and reconciles committed rol
     const a = new SpycraftActor(),
       create = ChatMessage.create,
       update = a.update.bind(a);
-    if (variant === "laterXP")
-      ChatMessage.create = async () => {
+    if (variant === "laterXP") {
+      // Only the XP post itself: the Undo note a failed step still leaves is posted after it.
+      let posts = 0;
+      ChatMessage.create = async data => {
+        if (posts++) return data;
         a.system.xp += 7;
         throw Error("post rejected");
       };
+    }
     else {
       failPost = true;
       a.update = async patch => {

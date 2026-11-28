@@ -229,14 +229,23 @@ export function restoreUpdate(entry) {
 export async function withUndo(actors, label, work, extra = {}) {
   const list = (actors ?? []).filter(actor => actor?.uuid);
   const before = list.map(snapshot);
-  const result = await work();
+  let result,
+    failure = null;
+  try {
+    result = await work();
+  } catch (error) {
+    failure = error;
+  }
   try {
     const entries = list.map((actor, index) => undoEntry(actor, before[index], snapshot(actor))).filter(Boolean);
-    const more = typeof extra === "function" ? extra(result) : extra;
-    if (entries.length || more?.gcDice) await postUndo(label, entries, more ?? {});
+    // A step that failed part way still leaves a note for what it did write, without the extras it never reached.
+    const more = failure ? {} : typeof extra === "function" ? extra(result) : extra;
+    const named = failure ? loc`${label} (stopped part way)` : label;
+    if (entries.length || more?.gcDice) await postUndo(named, entries, more ?? {});
   } catch (error) {
     console.warn("Field Agent's Handbook | No Undo note could be left for this step.", error);
   }
+  if (failure) throw failure;
   return result;
 }
 // A document step (a mission XP settlement) leaves its Undo note through this.
@@ -256,7 +265,8 @@ export function postUndo(
     addedInfractions = null,
     missionRow = null,
     placedTokens = null,
-    combatSurprise = null
+    combatSurprise = null,
+    closeSaves = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -282,6 +292,7 @@ export function postUndo(
           missionRow,
           placedTokens,
           combatSurprise,
+          closeSaves,
           done: false
         }
       }
@@ -305,7 +316,39 @@ export async function applyUndo(message) {
   }
 }
 
+/** Paths a snapshot can hold: anything else on a note was not written by withUndo. */
+const restorable = path =>
+  typeof path === "string" && (path.startsWith("system.") || path.startsWith("flags.spycraft2."));
+/**
+ * What a note may ask a GC's client to restore. A note a player posted is only that player's claim: it is held to
+ * the characters that player owns and to the character paths a snapshot records, and its mission-wide parts (GC
+ * dice, mission rows, placed tokens, scene counts) are left out. A GC's own note is trusted as written.
+ */
+export function trustedRecord(record, author) {
+  if (!author || author.isGM) return record;
+  const owned = uuid => {
+    const actor = globalThis.fromUuidSync?.(uuid);
+    return !!actor?.testUserPermission?.(author, "OWNER");
+  };
+  const clean = entry => ({
+    ...entry,
+    restore: pairs(entry.restore).filter(([path]) => restorable(path)),
+    expect: pairs(entry.expect).filter(([path]) => restorable(path)),
+    unset: (entry.unset ?? []).filter(restorable),
+    whole: (entry.whole ?? []).filter(restorable)
+  });
+  return {
+    label: record.label,
+    done: record.done,
+    entries: (record.entries ?? []).filter(entry => owned(entry.uuid)).map(clean),
+    damageCard: record.damageCard ?? null,
+    cardMarks: record.cardMarks ?? null,
+    closeSaves: record.closeSaves ?? null
+  };
+}
+
 async function undoRecord(message, record) {
+  record = trustedRecord(record, message.author);
   const targets = [];
   for (const entry of record.entries ?? []) {
     const actor = await fromUuid(entry.uuid);
@@ -333,6 +376,14 @@ async function undoRecord(message, record) {
   }
   // Marked first, so a failure half way cannot lead to dice being given back twice on a retry.
   await message.update({ "flags.spycraft2.undo.done": true });
+  // The GC's dice come back first and on their own: a character that is gone or fails to restore does not keep them.
+  if (record.gcDice > 0 && game.user.isGM) {
+    const { adjustGCDice } = await import("../services/gc-dice.mjs");
+    // A new session has its own pool: the characters are still put back, and the GC is told about the dice.
+    await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>
+      ui.notifications.warn(loc`The GC action dice were not given back: ${error.message}`)
+    );
+  }
   for (const [entry, actor] of targets) {
     const update = restoreUpdate(entry);
     Object.assign(update, poolsGivenBack(entry, actor));
@@ -362,13 +413,6 @@ async function undoRecord(message, record) {
         );
       if (Object.keys(change).length) await combatant.update(change);
     }
-  }
-  if (record.gcDice > 0 && game.user.isGM) {
-    const { adjustGCDice } = await import("../services/gc-dice.mjs");
-    // A new session has its own pool: the characters are still put back, and the GC is told about the dice.
-    await adjustGCDice(record.gcDice, loc`Undo: ${record.label}`).catch(error =>
-      ui.notifications.warn(loc`The GC action dice were not given back: ${error.message}`)
-    );
   }
   // A promotion's antagonist row goes back to what it was; the rest of the mission's list is left alone.
   // Only within the run of the mission that promoted: a later run keeps its own row as it is.
@@ -479,6 +523,13 @@ async function undoRecord(message, record) {
       holder = keys.reduce((value, key) => value?.[key], marked.flags?.spycraft2);
     if (holder?.[last] !== undefined)
       await marked.update({ [`flags.spycraft2.${[...keys, `-=${last}`].join(".")}`]: null }).catch(() => null);
+  }
+  // A save the step called for is closed: the damage it would follow from has been taken back.
+  for (const id of record.closeSaves ?? []) {
+    const pending = game.messages?.get(id);
+    if (!pending?.flags?.spycraft2?.pendingSave || pending.flags.spycraft2.pendingSave.rolled) continue;
+    const { markCard } = await import("./gc-relay.mjs");
+    await Promise.resolve(markCard(pending, "pendingSave.rolled", true, { quiet: true })).catch(() => null);
   }
   // The damage card may be applied to that target again.
   const card = record.damageCard ? game.messages?.get(record.damageCard.messageId) : null;

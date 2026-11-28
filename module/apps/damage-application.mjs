@@ -823,7 +823,9 @@ export async function applyDamage(message, options = {}) {
   const report = reportText(lines),
     inline =
       !failed && !pendingSave && !rolls.length && report.length > 0 && !message.blind && !message.whisper?.length;
-  if (!inline && lines.filter(Boolean).length) await postDamageReport(target, lines, { pendingSave, rolls });
+  let reportCard = null;
+  if (!inline && lines.filter(Boolean).length)
+    reportCard = await postDamageReport(target, lines, { pendingSave, rolls });
   // Nothing was written, so the card is not marked: its Apply button stays for another try.
   if (failed) return null;
   // When the card cannot be marked the report above is the record; an outcome meant for the card is posted instead.
@@ -842,22 +844,29 @@ export async function applyDamage(message, options = {}) {
     },
     { quiet: true, entryId }
   );
-  if (inline && !marked) await postDamageReport(target, lines, { pendingSave, rolls });
+  if (inline && !marked) reportCard = await postDamageReport(target, lines, { pendingSave, rolls });
   // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
   // become normal hits.
   const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
+  const cardMarks = [];
   if (
     (critical || crit.ouch) &&
     attackMessage &&
     (Number(attack?.attackResolution?.hits) || 1) > 1 &&
     !attack.criticalShotApplied
-  )
+  ) {
     await markCard(attackMessage, "criticalShotApplied", { damageMessageId: message.id }, { quiet: true });
+    // Undo takes the critical shot back too, so the attack's next damage card can be the critical one again.
+    cardMarks.push({ messageId: attackMessage.id, key: "criticalShotApplied" });
+  }
   try {
     const entry = undoEntry(target, beforeDamage, snapshot(target));
     if (entry)
       await postUndo(loc`${damage} ${kind} damage applied to ${target.name}`, [entry], {
-        damageCard: { messageId: message.id, targetUuid: target.uuid, ...(marked ? { entryId } : {}) }
+        damageCard: { messageId: message.id, targetUuid: target.uuid, ...(marked ? { entryId } : {}) },
+        ...(cardMarks.length ? { cardMarks } : {}),
+        // A save this damage called for (massive damage, a threshold) is closed by Undo, not left to be rolled.
+        ...(pendingSave && reportCard?.id ? { closeSaves: [reportCard.id] } : {})
       });
   } catch (error) {
     console.warn("Field Agent's Handbook | No Undo note could be left for this damage.", error);
