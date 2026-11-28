@@ -302,3 +302,24 @@ test("a maximum that falls and comes back restores the damage taken instead of h
   );
   assert.equal(healed["system.vitality.value"], 18);
 });
+
+test("an unlinked token gets its own copy of the recorded maximums, once", async () => {
+  const { ownPoolRecord } = await import("../module/apps/pool-max.mjs");
+  globalThis.foundry ??= {};
+  globalThis.foundry.utils ??= {};
+  globalThis.foundry.utils.deepClone ??= value => structuredClone(value);
+  const actor = { type: "npc", flags: { spycraft2: { poolMax: { vitality: 20, wounds: 10 } } } };
+  assert.deepEqual(ownPoolRecord({ actorLink: false, actor, delta: { _source: { flags: {} } } }), {
+    "flags.spycraft2.poolMax": { vitality: 20, wounds: 10 }
+  });
+  assert.equal(ownPoolRecord({ actorLink: true, actor }), null, "a linked token is the actor itself");
+  assert.equal(
+    ownPoolRecord({
+      actorLink: false,
+      actor,
+      delta: { _source: { flags: { spycraft2: { poolMax: { vitality: 5 } } } } }
+    }),
+    null,
+    "already has its own"
+  );
+});

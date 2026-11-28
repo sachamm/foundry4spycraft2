@@ -57,7 +57,26 @@ export function schedulePoolMax(actor) {
     .finally(() => pending.delete(actor));
 }
 
+/**
+ * An unlinked token reads its base actor's recorded maximums until it writes its own, so two tokens of one NPC could
+ * follow a change differently (one wounded, one not). Each such token gets its own record as soon as it exists.
+ */
+export function ownPoolRecord(token) {
+  const actor = token?.actor;
+  if (!token || token.actorLink || !followed(actor)) return null;
+  const own = token.delta?._source?.flags?.spycraft2?.[POOL_MAX_FLAG] ?? token.delta?.flags?.spycraft2?.[POOL_MAX_FLAG];
+  const inherited = actor.flags?.spycraft2?.[POOL_MAX_FLAG];
+  if (own || !inherited) return null;
+  return { [`flags.spycraft2.${POOL_MAX_FLAG}`]: foundry.utils.deepClone(inherited) };
+}
+function recordOwnPools(token) {
+  const patch = ownPoolRecord(token);
+  if (!patch || primaryWriterFor(token.actor)?.id !== game.user?.id) return;
+  token.actor.update(patch, { spycraft2PoolMax: true }).catch(() => null);
+}
+
 export function installPoolMaxHooks() {
+  Hooks.on("createToken", recordOwnPools);
   Hooks.on("spycraft2.agentPrepared", schedulePoolMax);
   // Every preparation after the world is ready schedules a check (actor.mjs prepareData). Agents prepared before
   // then, or while the start-up migration ran, are checked here once; agents made before this was added get their
@@ -67,5 +86,6 @@ export function installPoolMaxHooks() {
     const all = [...(game.actors ?? [])];
     for (const actor of [...all.filter(a => a.type === "agent"), ...all.filter(a => a.type !== "agent")])
       schedulePoolMax(actor);
+    for (const scene of game.scenes ?? []) for (const token of scene.tokens ?? []) recordOwnPools(token);
   });
 }
