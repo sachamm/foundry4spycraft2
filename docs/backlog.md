@@ -179,7 +179,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-141 | Weapon row shows no "not readied" state before the click. | LR-22b, SGI-seasoned-player D12 | S |
 | B-142 | Wounds help does not name the bands; thresholds on the Play reference grid are unexplained; no line saying what two half actions buy. | LR-23b, SGI-rules-expert D3, SGI-novice-player D10 | S |
 | B-143 | Sheets cover the map: the agent sheet opens 860 wide; no compact Play width; tablet width untested. | LR-15a, SGI-seasoned-player D24 | M |
-| B-144 | Prone sits four actions deep; the Dying button is duplicated; the Play tab's button count needs a recount. | LR-38d, SGI-seasoned-player D10, LR-38c | S |
+| B-144 | Prone sits four actions deep; the Play tab's button count needs a recount. | LR-38d, SGI-seasoned-player D10, LR-38c | S |
 | B-145 | Skills on Play: let a player pin an untrained skill; show a widened error range on skill rows. | SGI-seasoned-player D1, SGI-rules-expert D2 | S |
 | B-146 | One format for limited uses everywhere: combat groups, the round counter and the Feats tab still write their own sentences (eight abilities are hand-written). | SGI-seasoned-player D5, HBS-06, H8 | M |
 | B-148 | Example placeholders for the class key focus and profession focus fields and the subplot name (the Bio fields now have named labels and examples). | SGI-novice-player R21 | S |
