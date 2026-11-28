@@ -6,6 +6,7 @@
  * The record lives on the combat (flags.spycraft2.late = { round, ids, resume }), so whoever presses Next turn, GC or
  * player, reads the same state.
  */
+import { isLeadGM } from "../../writers.mjs";
 
 /**
  * Where a forward turn change should go instead, or null to let it stand.
@@ -48,7 +49,6 @@ export function lateEntry(late, { round, id }) {
 }
 
 export function installLateInitiative() {
-  const isLeadGM = () => game.users?.activeGM?.id === game.user.id;
   const unrolled = new Set();
   Hooks.on("preUpdateCombatant", (combatant, changed) => {
     if (combatant.initiative === null && Number.isFinite(changed?.initiative) && combatant.parent?.started)

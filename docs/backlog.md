@@ -256,7 +256,7 @@ Do these when touching the area. The council's conditions still apply: equality 
 | B-207 | Actor mixins mix persistence, rollback and dialog HTML. | JS-12 | L |
 | B-208 | Derived data: mission and campaign changes reset every actor; `prepareDerivedData` scans combats and actors repeatedly; engine hot path re-sorts bonuses on every add. | JS-14, JS-15, W4 | M |
 | B-209 | Layering: documents and rolls import from apps (62 and 60 edges); two services import `dialog-theme`; the sheet has 105 imports and no per-feature manifest. | WEB-06, WEB-04, W9, JS-11 | L |
-| B-210 | Reconcile hooks let every owner client write; `isLeadGM` and the scheduler are copied. | WEB-11, W12 | S |
+| B-210 | Reconcile hooks let every owner client write; the scheduler is copied. (Every module now uses the one `isLeadGM` in `writers.mjs`.) | WEB-11, W12 | S |
 | B-211 | Settings registered in 19 files with no key list; rule code still keyed on display names in places; test-only rule exports are unmarked. | WEB-10, JS-09, JS-16 | S |
 | B-212 | Templates: play mode renders all edit markup and hides it; acquisition block copied into three item templates; review notices duplicated; disclosure memory and search implemented three times; selectors passed through the translation tag; 43 hand-written `<option selected>`; `signed` helper unprefixed; `enrichHTML` options differ; decoration pass walks the whole app. | HBS-03, HBS-08, HBS-09, HBS-10, HBS-12, HBS-14, HBS-15, H3, H7, H9, H13 | M each |
 | B-213 | Templates are unformatted and outside the formatter (439 lines over 200 characters). Do last, one file per PR. | HBS-13 | M |

@@ -40,6 +40,7 @@ import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
 import { markAntagonistsFaced } from "./mission.mjs";
 import { postUndo, withUndo } from "../undo.mjs";
+import { isLeadGM } from "../../writers.mjs";
 
 const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -58,7 +59,6 @@ const fluidForRound = (combatant, round) => {
   return saved.round === round ? saved : { round, modifiers: [], delayed: 0, pressed: false };
 };
 const bonusOf = combatant => combatant.actor?.system?.initiative?.total ?? 0;
-const isLeadGM = () => game.users?.activeGM?.id === game.user.id;
 const say = (content, { whisper = false } = {}) =>
   ChatMessage.create({
     speaker: { alias: loc`Game Control` },

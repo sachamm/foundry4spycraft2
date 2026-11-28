@@ -15,11 +15,11 @@ import { rollDying } from "./healing.mjs";
 import { burningRound } from "./hazards.mjs";
 import { fluidRoundSettled } from "./gc/combat.mjs";
 import { loc } from "../i18n.mjs";
+import { isLeadGM } from "../writers.mjs";
 
 const enabled = () => {
   return readSetting("roundReminders", true) !== false;
 };
-const isLeadGM = () => game.users?.activeGM?.id === game.user?.id;
 const special = actor => actor?.type === "agent" || (actor?.type === "npc" && npcIsSpecial(actor));
 
 const TEXT = {
