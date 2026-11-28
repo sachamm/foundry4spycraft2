@@ -379,7 +379,7 @@ test("Next scene can be taken back until a later scene begins", async () => {
   assert.ok(scenePeriodRevert({ scene: "s3", sceneSequence: 5 }, change).reason);
   assert.match(
     scenePeriodRevert({ scene: "s2", sceneSequence: 4 }, change, { damaged: ["Guard"] }).reason,
-    /Guard took damage in the new scene/
+    /recorded in the new scene for Guard/
   );
   assert.ok(scenePeriodRevert({}, {}).reason);
 });
@@ -393,4 +393,20 @@ test("a GC boost comes off its card only while the card stands as the boost left
   assert.match(cardBoostRefusal(card({ attackResolution: { hit: true } }), boost), /settled/);
   assert.match(cardBoostRefusal(card({ resolved: true }), boost), /settled/);
   assert.match(cardBoostRefusal(card({ boostTotal: 9, gcBoosts: [5, 4] }), boost), /later boost/);
+});
+
+test("a record written in the new scene is found on a sidebar actor or a token's actor", async () => {
+  const { actorsRecordedInScene } = await import("../module/services/periods.mjs");
+  const keep = { actors: game.actors, scenes: game.scenes };
+  try {
+    game.actors = [
+      { name: "Sniper", system: { eagleEyeBoost: { scene: "s2" } } },
+      { name: "Idle", system: { eagleEyeBoost: { scene: "s1" } } }
+    ];
+    game.scenes = [{ tokens: [{ actor: { name: "Guard", system: { damageTrack: { scene: "s2" } } } }] }];
+    assert.deepEqual(actorsRecordedInScene("s2"), ["Sniper", "Guard"]);
+    assert.deepEqual(actorsRecordedInScene("s9"), []);
+  } finally {
+    Object.assign(game, keep);
+  }
 });

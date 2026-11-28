@@ -292,6 +292,8 @@ export function combatantLabels(combat) {
   );
 }
 
+/** Whether two recorded events are the same entry: every stored field equal. */
+export const sameFluidEvent = (a, b) => !!a && !!b && JSON.stringify(a) === JSON.stringify(b);
 /** The recorded event a "combatantId:index" choice names, or null when it is no longer there. */
 function removalOf(combat, choice) {
   const [id, at] = String(choice ?? "").split(":"),
@@ -373,6 +375,13 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
       `${labels.get(combatant.id) ?? combatant.name}: ${entry.label} (${signedCount(entry.amount)})`
     ])
   );
+  // What each choice named when the dialog opened: a list changed meanwhile must not shift the choice to another event.
+  const offered = new Map(
+      mine.flatMap(combatant =>
+        fluidForRound(combatant, combat.round).modifiers.map((entry, index) => [`${combatant.id}:${index}`, entry])
+      )
+    ),
+    offeredRound = combat.round;
   const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
   const eventOptions =
     groups
@@ -432,8 +441,13 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
   );
   if (!input) return null;
   if (input.id === "remove") {
-    const removal = removalOf(combat, input.removal);
+    const removal = removalOf(combat, input.removal),
+      shown = offered.get(input.removal);
     if (!removal) return refuse(loc`That event is no longer recorded.`);
+    if (combat.round !== offeredRound || !shown || !sameFluidEvent(shown, removal.entry))
+      return refuse(
+        loc`The recorded events changed while this was open. Open Fluid initiative event again and choose.`
+      );
     try {
       await withUndo(
         [removal.combatant.actor],

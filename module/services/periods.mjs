@@ -242,17 +242,25 @@ export async function startUsagePeriod(period) {
     })
   );
 }
-/** Names of the NPCs, in the sidebar or on a scene, whose damage record belongs to this scene period. */
-export function npcsDamagedInScene(scene) {
+/**
+ * Names of the characters, in the sidebar or on a scene, whose stored data mentions this scene period: a use, a
+ * damage record or an ability record written since the scene began. Such a record replaced the one from the scene
+ * before, so that scene can no longer be read back.
+ */
+export function actorsRecordedInScene(scene) {
   if (!scene || !globalThis.game?.actors) return [];
-  const actors = new Set(game.actors);
+  const id = JSON.stringify(String(scene)),
+    actors = new Set(game.actors);
   for (const place of game.scenes ?? [])
     for (const token of place.tokens ?? []) if (token.actor) actors.add(token.actor);
   return [...actors]
-    .filter(actor => actor.type === "npc" && String(actor.system?.damageTrack?.scene ?? "") === String(scene))
     .filter(actor => {
-      const track = actor.system.damageTrack;
-      return track.accumulated > 0 || track.failures > 0 || track.ignored > 0 || !!track.last;
+      try {
+        const source = actor.toObject?.() ?? actor;
+        return JSON.stringify([source.system ?? {}, source.flags?.spycraft2 ?? {}]).includes(id);
+      } catch {
+        return false;
+      }
     })
     .map(actor => actor.name);
 }
@@ -261,13 +269,14 @@ export function npcsDamagedInScene(scene) {
  * @param {object} periods  the stored usage periods now
  * @param {object} change   { before: {scene, sceneSequence}, after: scene id the step set }
  */
-export function scenePeriodRevert(periods = {}, change = {}, { damaged = npcsDamagedInScene(change?.after) } = {}) {
+export function scenePeriodRevert(periods = {}, change = {}, { damaged = actorsRecordedInScene(change?.after) } = {}) {
   if (!change?.after || String(periods?.scene ?? "initial") !== String(change.after))
     return { reason: loc`A later scene has begun since, so that Next scene can no longer be taken back.` };
-  // A standard NPC keeps one damage record; damage in the new scene has replaced the earlier scene's.
+  // A character keeps one record per kind (damage taken, a paid ability, a use); one written in the new scene has
+  // replaced the earlier scene's.
   if (damaged.length)
     return {
-      reason: loc`${damaged.slice(0, 3).join(", ")} took damage in the new scene, which replaced the record from the scene before. That Next scene can no longer be taken back.`
+      reason: loc`Something was recorded in the new scene for ${damaged.slice(0, 3).join(", ")}${damaged.length > 3 ? loc` and ${damaged.length - 3} more` : ""}, which replaced the record from the scene before. That Next scene can no longer be taken back.`
     };
   const target = { ...periods };
   if (change.before?.scene === undefined || change.before.scene === null) delete target.scene;
