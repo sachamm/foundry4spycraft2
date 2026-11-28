@@ -23,6 +23,29 @@ export const VIEW_SECTIONS = {
 };
 
 /**
+ * Search phrases for the tools another view holds, each with a line naming that view: a search only looks through
+ * the sections on screen, so a miss says where to look instead of "no matching tools".
+ */
+export function searchOtherViews(view) {
+  const here = new Set(VIEW_SECTIONS[view] ?? []);
+  const away = [
+    ["mission", loc`mission caliber threat level team start mission`, loc`Mission tools are in the Prep view.`],
+    ["complications", loc`complication complications`, loc`Complications are in the Prep view.`],
+    ["organizations", loc`organization organizations faction`, loc`Organizations are in the Prep view.`],
+    ["campaign", loc`campaign quality qualities season`, loc`Campaign tools are in the Prep and Wrap-up views.`],
+    ["combat", loc`combat fight initiative turn round surprise`, loc`Combat tools are in the Play view.`],
+    ["dice", loc`action dice die spend`, loc`The GC's action dice are in the Play view.`],
+    ["conflicts", loc`chase conflict dramatic conflicts`, loc`Dramatic Conflicts are in the Play view.`],
+    ["clock", loc`clock time hour day`, loc`The clock is in the Play view.`]
+  ];
+  const lines = Object.fromEntries(
+    away.filter(([section]) => !here.has(section)).map(([, words, line]) => [words, line])
+  );
+  if (view !== "wrap") lines[loc`end mission xp report wrap up`] = loc`Ending the mission is in the Wrap-up view.`;
+  return lines;
+}
+
+/**
  * The first-session steps, ticked from what the world already holds. Shown in the Prep view until all are done.
  */
 export function firstSessionChecklist({ mission, diceCurrent, npcActors, combatSeen }) {

@@ -465,7 +465,7 @@
    "CrossClass": "cross-class",
    "NeedLevel": "Add a class level to start buying skill ranks.",
    "ClassOverrideHint": "Tick to make this a class skill (talents, class abilities, etc.).",
-   "Hint": "Choose a named check to use its RAW attribute, tags, base error range and visibility. Untrained checks add +2 error; armor check penalties apply only to checks carrying the ACP tag. Situational modifiers and effects still require adjudication."
+   "Hint": "Choose a named check to use its printed attribute, tags, base error range and visibility. Untrained checks add +2 error; armor check penalties apply only to checks carrying the ACP tag. Situational modifiers and effects still require adjudication."
   },
   "Feat": {
    "Slots": "Feat slots",

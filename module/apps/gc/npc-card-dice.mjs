@@ -14,6 +14,7 @@ import { gcDieType } from "../../rules/gc/gc-spend.mjs";
 import { spendProfile } from "./npc-play.mjs";
 
 import { spendGCDice } from "./spend.mjs";
+import { postUndo } from "../undo.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
 import { criticalHitChoices } from "../../rules/critical-effects.mjs";
@@ -79,6 +80,14 @@ export async function gcBoostCard(message, actor) {
   const result = await spendGCDice({ id: "boostRoll", actor, onCard: true });
   if (!result?.die) return null;
   const check = message.flags.spycraft2,
+    before = {
+      effectiveTotal: check.effectiveTotal,
+      boostTotal: check.boostTotal ?? 0,
+      capped: check.capped ?? false,
+      potentialTriumph: check.potentialTriumph ?? false,
+      gcBoosts: [...(check.gcBoosts ?? [])],
+      flavor: message.flavor
+    },
     boostTotal = (check.boostTotal ?? 0) + result.die.total,
     resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
       cap: check.cap ?? null,
@@ -101,6 +110,19 @@ export async function gcBoostCard(message, actor) {
       gcBoosts: [...(check.gcBoosts ?? []), result.die.total]
     })
   });
+  // The die goes back to the pool and the card to its earlier total, while the roll is still unsettled.
+  try {
+    await postUndo(loc`GC boost on ${actor.name}'s roll: +${result.die.total}`, [], {
+      gcDice: result.plan?.cost ?? 1,
+      cardBoost: {
+        messageId: message.id,
+        before,
+        after: { boostTotal, count: (check.gcBoosts ?? []).length + 1 }
+      }
+    });
+  } catch (error) {
+    console.warn("Field Agent's Handbook | No Undo note could be left for this boost.", error);
+  }
   return resolved.total;
 }
 
@@ -134,7 +156,7 @@ export async function gcActivateThreat(message, actor, options = {}) {
       window: { title: loc`Activate NPC critical result` },
       rejectClose: false,
       ok: { label: loc`Activate chosen effect` },
-      content: `<div class="spycraft2-roll-options">${check.coverAwaiting?.basis.directHits === 0 ? `<p>${loc`Critical target: ${check.coverAwaiting.criticalName}. This critical does not transfer to the protected character.`}</p>` : ""}${choices.length ? `<label>${loc`GC-confirmed critical effect`} <select name="preset" required><option value="">${loc`Choose…`}</option>${choices.map(c => `<option value="${esc(c.id)}">${esc(c.label)} (${c.cost})</option>`).join("")}</select></label>` : `<label>${loc`GC-confirmed effect`} <textarea name="effect" required></textarea></label><label>${loc`Base cost in action dice`} <input name="baseCost" type="number" min="1" step="1" value="1" required /></label>`}<p class="hint">${loc`The GC pool pays the final cost after applicable discounts and target-role adjustments. An attack Triumph includes a one-die critical; activate it before rolling damage.`}</p></div>`
+      content: `<div class="spycraft2-roll-options">${check.coverAwaiting?.basis.directHits === 0 ? `<p>${loc`Critical target: ${check.coverAwaiting.criticalName}. This critical does not transfer to the protected character.`}</p>` : ""}${choices.length ? `<label>${loc`GC-confirmed critical effect`} <select name="preset" required><option value="">${loc`Choose…`}</option>${choices.map(c => `<option value="${esc(c.id)}">${esc(c.label)} (${c.cost})</option>`).join("")}</select></label>` : `<label>${loc`GC-confirmed effect`} <textarea name="effect" required></textarea></label><label>${loc`Base cost in action dice`} <input name="baseCost" type="number" min="1" step="1" value="1" required /></label>`}<p class="hint">${loc`The GC's action dice pay the final cost after applicable discounts and target-role adjustments. An attack Triumph includes a one-die critical; activate it before rolling damage.`}</p></div>`
     });
     if (!input) return null;
   }

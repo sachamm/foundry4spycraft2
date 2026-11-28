@@ -55,28 +55,16 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-035 | **The console and the chat log share one sidebar slot**, so the GC cannot see a tool and its result together. The pop-out is hidden, opens 720×800 over the map and uses the width for nothing. Make the pop-out obvious, give it a two-column layout and a remembered place; echo results (XP report, Planned XP, Begin session done) where the GC is looking. | UX-16, DES-25, DES-24, NGC-29, NGC-40, XGC-41 | M | live |
-| B-244 | **First-session list, live pass.** A remembered view comes back in a later run of the same kind; search does not reach the view buttons. | NG2-02, NG2-03, NG2-13, NG2-14, NG2-22, NG2-28, DS2-09, DS2-10, DS2-11, DS2-12 | M | live |
-| B-245 | **Pickers, the rest.** Spend dice, the Fluid event dialog and the target lists now start on the fight in view, skip other scenes' fights and number shared names. Sidebar actors are still listed beside token copies in the Apply damage list when no token is on the scene. | UX2-08, UX2-09, UX2-10, UX2-22, XG2-30 | M | live |
 
 ### Safety: confirm, undo, feedback
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-037 | **Undo for a GC boost on a card, and an outcome override.** Alt+B now asks for a second press, but a GC boost still cannot be taken back once spent, because it changes the roll's own record; and the GC cannot yet override an outcome on the card and have that recorded. | DES-45, XGC-15, UX-05, CX-U12, SG-C10, SGI-expert-gc R13 | L | live |
-| B-246 | **Undo notes, live pass.** (A GC's note now goes to that GC only, and a player's note names its author.) The note sits apart from the card it undoes, and names the raw damage and the actor's old name; after "Undone." its line still reads "applied" and the save card the damage caused still reads as current; the button's border is 1.48:1. | DS2-30, DS2-31, DS2-32, UX2-16, UX2-17, UX2-18, XG2-25, XG2-26 | M | live |
 
 ### Dialogs opened from the console
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-040 | **Dialog sizing and focus ring.** Dialogs built with the shared kit now have Cancel, a named main button on the console's dialogs and the keyboard in the first field. Still to do: inputs are 22px under the 36px token, the focus ring is Foundry's 1px one, every dialog is 400px wide whatever it holds, and the dialogs outside the GC tools still say "Confirm". | DES-28, DES-31, DES-36, UX-03, UX-23 | M | live |
-| B-042 | **Spend dice does not state the cost before Confirm**, mixes daily spends with rare recovery tools, and some spends are bookkeeping only. One intent at a time with cost, pool before and after, and what the system then does or leaves to the GC. Explain once what GC action dice are for; there are two different ways to spend one. | DES-30, NGC-30, NGC-31, XGC-30, CX-D13, CX-N8 | M | live |
-| B-043 | **Pickers list the whole world, not the scene**, and duplicate names cannot be told apart (the world has two each of several sample agents). Scene or combat first, then the rest; show folder or source beside the name. | UX-25, NGC-19, NGC-08, XGC-34, XGC-16 | S | live |
-| B-044 | **Select options are sentences in narrow selects; dialog titles follow four patterns; internal identifiers and banned terms appear in GC dialogs.** Short labels with a detail line; one title pattern; plain words. | DES-33, DES-35, UX-26, UX-27, UX-07, DES-13 | S | live |
-| B-045 | **Disposition**: the default action changes nothing; the dialog offers everything and the GC cannot overrule. Task-specific fields, the current grade shown, a GC override. (Refusals now show inside the dialog.) | NGC-37, UX-06, CX-D16, CX-E15 | M | live |
-| B-046 | **Dramatic Conflicts** start easily and then need the book open: step two of a chase is 33 controls in an 867px form, steps are a generic "Next step", totals are typed by hand, an irreversible step hides behind "Confirm", and two fields share one name. Named steps with Back, fields grouped per side, links to the source rolls, private strategy choice for players. Advantage effects other than Lead, Swap, Victory and Halt are reported, not applied; chained pairs and crashes are not modelled. | NGC-39, UX-07, CX-D17, CX-E16, CX-U3, RW-54 | L | live |
-| B-248 | **Dialogs, live pass.** the attack and apply-damage dialogs skip the shared kit, so they have no Cancel and focus the main button; kit dialogs are 400px wide with 32px inputs; closing a dialog does not return focus to its opener; main buttons do not name their object; titles and option wording vary; tooltips stay up after a dialog closes and cover the next control. | XG2-08, XG2-19, DS2-19, DS2-20, DS2-21, DS2-22, DS2-37, UX2-24 | M | live |
 
 ### Mission and campaign
 
@@ -160,13 +148,8 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-155 | About 156 strings start or end with a separator or bracket (fragment keys); sentences split into fragments. | SG-L9, H5 | M |
-| B-156 | Internal vocabulary: "actual" (487), "recorded" (335), "receipt" (111), "RAW", a "Health" section that does not exist. | SG-L10 | M |
-| B-157 | First person in labels: 71 strings start "I ", 27 contain "I am". | SG-L11 | M |
-| B-158 | 46 strings over 300 characters, 335 over 160. | SG-L12 | M |
 | B-161 | The formula hint under Bonuses shows to every owner (not found in the current templates; recheck live). (The VP, WP, DR, Qty and Codename labels and the class browser's "VP · SP" are now words.) | SGI-novice-gc D17, LR-40b, LR-39b | S |
 | B-162 | English literals in context builders; hard-coded English in attributes; raw schema keys as labels; text localised at load time stays English (migration labels, the console tab tooltip). | HBS-11, H6, WEB-09 | S |
-| B-236 | Undo still lives on its own whispered note instead of on the card that made the change (7.5, 8.3). (The end-mission texts, the wrap-up strip, the Undo tooltip, the GC dice cost, the Add NPC summary and the console's heading levels are reworded.) | CU-16, CU-17 | M | live |
 | B-254 | Words a new GC cannot place ("Caliber", "faced", "standing", "usage period" and others listed in the report), tooltips that repeat their label, and the status strip's wording. | NG2-20, NG2-26, NG2-27, NG2-30 | S |
 
 ### Visual system
@@ -223,7 +206,6 @@ Do these when touching the area. The council's conditions still apply: equality 
 | B-212 | Templates: play mode renders all edit markup and hides it; acquisition block copied into three item templates; review notices duplicated; disclosure memory and search implemented three times; selectors passed through the translation tag; 43 hand-written `<option selected>`; `signed` helper unprefixed; `enrichHTML` options differ; decoration pass walks the whole app. | HBS-03, HBS-08, HBS-09, HBS-10, HBS-12, HBS-14, HBS-15, H3, H7, H9, H13 | M each |
 | B-213 | Templates are unformatted and outside the formatter (439 lines over 200 characters). Do last, one file per PR. | HBS-13 | M |
 | B-214 | Tests and tooling: 164 test files build their own Foundry stub; no automated test inside Foundry; five layout specs not on `systemCss()`; no `checkJs`; 28 unused-variable warnings capped, not cleared; chat cards skinned only when flagged (111 `ChatMessage.create` calls, no helper); sheet submit guard checks flat keys only. | WEB-08, CSS-05, W13, C4, J5 | M |
-| B-215 | The CI lints of style guide 11.2 (banned terms, glued numbers, fragment keys, first person, hint length, ranges, template and CSS checks, one primary). None is written. | SGI-rules-expert Part C | M |
 
 ## Live checks owed
 
@@ -234,6 +216,10 @@ Short passes in a running world. Delete a line when it has been seen working, or
   figure shown, that the tooltip does not cover the button being pressed, and that a player sees no parts on an
   NPC's card. (B-255)
 - The console keeps its scroll position across a redraw when it is docked in a live sidebar. (B-030)
+- Dialogs after the 2026-11-28 pass: Cancel on the attack and apply-damage dialogs, focus back on the opener after
+  closing, the main button's name, and the Spend dice cost line. (B-248, B-042)
+- Undo of a GC boost on an NPC's card, the GC ruling from a card's right-click menu, and Show the card on an Undo
+  note. (B-037, B-246)
 - The five from the old to-do file: the clock hidden when "Show the clock to players" is off; First Aid on another
   player's agent from the medic's own client; the save dialog from the player's button; a blast across a wall and its
   outline; a player without "Query users" getting a clear message. (RW-404 to RW-408)
@@ -270,6 +256,24 @@ were judged not worth doing, with the reason.
 | B-034 | Tooltips | Done | Each console button has a written one-line tip on what it changes; a generated tooltip that repeats or abbreviates a button's visible words is no longer added (sheet-wide); tooltips close on press and on console redraw. |
 | B-031 | Prep, Play and Wrap-up views exist; finish the tidy-up inside them | Done | Already on main: each section has one primary button, the session block moves below Combat during a fight, and the explainer paragraph is gone. Checked 2026-11-28. |
 | B-030 | The console redraws whole on every action | Dropped | Scroll, focus, search text and open lists already survive a redraw, so a partial redraw would buy nothing a GC can see for a large rewrite. The live scroll check moved to Live checks owed. |
+| B-035 | The console and the chat log share one sidebar slot | Done | Already on main: the console opens in its own window by default, beside the chat log, with a labelled button in the sidebar copy and a remembered place. This pass: the window opens 480 wide, not 720, since its single column used the extra width for nothing. A two-column layout was dropped: the sticky turn bar and the long sections do not split cleanly. |
+| B-244 | First-session list, live pass | Done | A view choice made outside a fight now belongs to its mission, so it no longer comes back in the next mission's planning or wrap-up. A search that finds nothing on the current view names the view that holds the tool. Seeing both in a live console stays under Live checks owed. |
+| B-245 | Pickers, the rest | Done | A sidebar actor is no longer listed beside its own unlinked token copies in the target lists (Apply damage, Resolve attack); the rest of the row was already on main. |
+| B-037 | Undo for a GC boost on a card, and an outcome override | Done | A GC boost on an NPC's card now leaves an Undo note: while the roll is unsettled and not boosted again, Undo returns the die to the pool and the card to its earlier total. The GC can also record a ruling on any roll card from its right-click menu in the chat log (counts as a success or a failure, with a reason); it is shown on the card and is a record only, so settled damage is corrected by hand. |
+| B-246 | Undo notes, live pass | Done | An Undo note for a step that changed a card has a Show the card button that scrolls to it and outlines it; once undone, the note's own line is struck through; the quiet button's outline takes the action colour (was 1.48:1). The save card a damage step caused was already closed on undo. Left as is: the note's wording of raw damage and of a since-renamed actor. |
+| B-236 | Undo still lives on its own whispered note instead of on the card that | Dropped | Moving Undo onto the card that made the change would mean every card searching the chat log for its notes. The note now links to its card instead (see B-246). |
+| B-040 | Dialog sizing and focus ring | Done | Dialog text boxes and lists take the 36px control height; a main button still carrying the stock Confirm now takes its dialog's title, in every system dialog. Already on main: kit dialogs are 560px wide and the system's own focus ring applies in dialogs. |
+| B-043 | Pickers list the whole world, not the scene | Done | Already on main (see B-245): target and spend pickers start on the fight in view, skip other scenes' fights, number shared names and, from this pass, leave out a sidebar actor whose token copies are listed. |
+| B-042 | Spend dice does not state the cost before Confirm | Done | The Spend dice dialog opens with one line on what the GC's dice are for and shows, before the button is pressed, the cost, the pool before and after, the die rolled and what the rules attach to the spend; the line follows every change to the entry. Splitting the list into daily and rare uses was dropped: one list with page numbers is quicker to scan than two. |
+| B-045 | Disposition | Done | Already on main: each target shows its current grade, fields appear only for the chosen action, refusals show inside the dialog and Set a grade is the GC's override. This pass: the dialog opens on Shift by grades, so its default action changes something. |
+| B-046 | Dramatic Conflicts | Parked | Each step's dialog is already titled with the conflict, the side and the step; this pass names each step's main button (Lock in this Strategy, Compare the results, Apply these Advantages). The larger redesign (Back, per-side field groups, private Strategy choice on a player's client, the other Advantage effects, chained pairs and crashes) is a feature of its own: it needs a design Sacha agrees to and a live chase to test against. |
+| B-215 | The CI lints of style guide 11.2 (banned terms, glued numbers, fragmen | Done | Written as tools/test-style-lints.mjs and run by npm test. Hard rules (count nought): banned terms, glued numbers, hyphen ranges, developer words, template anchors, authored title attributes, name branches, text under 13px. Ratchets that may fall but not rise: fragment keys, receipt, actual, recorded, first person, strings over 160 and over 300 characters, literal colours. Fixing the hits found 17 glued numbers, 3 uses of a banned term, 2 of RAW and 5 authored titles. |
+| B-155 | About 156 strings start or end with a separator or bracket (fragment k | Parked | 159 fragment strings remain. The count is now a ratchet in tools/test-style-lints.mjs, so it cannot grow; reword them when their surface is touched and lower the cap. |
+| B-156 | Internal vocabulary: "actual" (487), "recorded" (335), "receipt" (111) | Parked | The internal words are now ratchets in tools/test-style-lints.mjs (actual 742, recorded 454, receipt 132) and RAW is banned outright. Rewording 1,300 strings blind would change wording the rule tests depend on; do it surface by surface. |
+| B-157 | First person in labels: 71 strings start "I ", 27 contain "I am" | Parked | 90 first-person strings remain, most of them player declarations the guide allows. The count is a ratchet in tools/test-style-lints.mjs. |
+| B-158 | 46 strings over 300 characters, 335 over 160 | Parked | 410 strings over 160 characters and 51 over 300 remain; both counts are ratchets in tools/test-style-lints.mjs. Shorten them when their dialog is next reworked (see B-202). |
+| B-044 | Select options are sentences in narrow selects; dialog titles follow four patterns; int… | Parked | The checks that can be automated are now lints (B-215): banned terms and developer words fail the build, and long strings cannot grow in number. Shortening the existing select options and settling one title pattern is a wording pass over about 30 GC dialogs that should be read on screen; do it with B-248's live pass. |
+| B-248 | Dialogs, live pass | Done | Every system option dialog now has a Cancel button that answers like closing it; a stock Confirm takes the dialog's title; closing a dialog hands the keyboard back to the control that opened it and takes down any tooltip left up; inputs are 36px and kit dialogs 560px wide. Wording of titles and options is parked with B-044. A look at these in a live world is under Live checks owed. |
 
 ## Parked, with the reason
 

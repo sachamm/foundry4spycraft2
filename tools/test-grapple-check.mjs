@@ -190,7 +190,7 @@ test("One Warning lets a Spirit Moves character Threaten an uninjured target", a
   const check = { id: "threaten" };
   assert.match(
     threatenCheckPlan(sys([]), "intimidate", check, input({ threatenOneWarning: true })).blockedReason,
-    /lost5vitality/
+    /lost 5 vitality/
   );
   const plan = threatenCheckPlan(sys(["Spirit Moves"]), "intimidate", check, input({ threatenOneWarning: true }));
   assert.equal(plan.blockedReason, "");

@@ -4785,7 +4785,7 @@ for (const height of [768, 1000])
       await render(page, height);
       await page.locator("[name=attackAction]").selectOption("standard");
       await page.locator("[name=meleeTrick]").selectOption("fend");
-      await expect(page.locator("[name=meleeTrick]")).toContainText("optional5ft move after hit or miss");
+      await expect(page.locator("[name=meleeTrick]")).toContainText("optional 5 ft move after hit or miss");
       await expect(page.locator("[name=meleeTrickFullActionConfirmed]")).not.toBeChecked();
       await page.locator("[name=meleeTrickOnlyConfirmed]").scrollIntoViewIfNeeded();
       await page.locator("[name=meleeTrickOnlyConfirmed]").check();

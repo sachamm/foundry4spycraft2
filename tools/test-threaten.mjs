@@ -43,7 +43,7 @@ test("Threaten creates two distinct Wisdom-only combat checks with exact tags, h
   assert.equal(threatenSkillChecks("bluff", untouched), untouched);
   assert.equal(threatenCheckPlan(sys(), "intimidate", { id: "coercion" }, input()).evidence, null);
 });
-test("the ordinary Threaten injury requirement includes exactly5vitality or1wound caused by your own attacks, within inclusive CQB range", () => {
+test("the ordinary Threaten injury requirement includes exactly5vitality or 1 wound caused by your own attacks, within inclusive CQB range", () => {
   for (const vp of [0, 4, 5, 6])
     for (const wp of [0, 1, 2])
       for (const confirmed of [false, true])

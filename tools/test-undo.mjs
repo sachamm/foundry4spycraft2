@@ -379,3 +379,14 @@ test("Next scene can be taken back until a later scene begins", async () => {
   assert.ok(scenePeriodRevert({ scene: "s3", sceneSequence: 5 }, change).reason);
   assert.ok(scenePeriodRevert({}, {}).reason);
 });
+
+test("a GC boost comes off its card only while the card stands as the boost left it (B-037)", async () => {
+  const { cardBoostRefusal } = await import("../module/apps/undo.mjs");
+  const boost = { messageId: "m", after: { boostTotal: 5, count: 1 } };
+  const card = flags => ({ flags: { spycraft2: { boostTotal: 5, gcBoosts: [5], ...flags } } });
+  assert.equal(cardBoostRefusal(card({}), boost), "");
+  assert.match(cardBoostRefusal(null, boost), /gone/);
+  assert.match(cardBoostRefusal(card({ attackResolution: { hit: true } }), boost), /settled/);
+  assert.match(cardBoostRefusal(card({ resolved: true }), boost), /settled/);
+  assert.match(cardBoostRefusal(card({ boostTotal: 9, gcBoosts: [5, 4] }), boost), /later boost/);
+});

@@ -88,10 +88,20 @@
   font-size: var(--sc2-text-s);
   color: var(--sc2-action);
   background: transparent;
-  border: 1px solid var(--sc2-rule);
+  /* The outline is the only edge a quiet button has, so it takes the action colour to be seen (3:1). */
+  border: 1px solid var(--sc2-action);
   border-radius: var(--sc2-radius);
   text-decoration: none;
   box-shadow: none;
+}
+/* A step that was undone reads as taken back; the card an Undo note points at is outlined for a moment. */
+.sc2-undo-note.sc2-undone > p {
+  color: var(--sc2-ink-muted);
+  text-decoration: line-through;
+}
+.chat-message.sc2-card-shown {
+  outline: 2px solid var(--sc2-action);
+  outline-offset: -2px;
 }
 
 .spycraft2.sc2-result-guide {

@@ -56,6 +56,7 @@ import {
   missionXP
 } from "./module/apps/gc/state.mjs";
 import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
+import { installGCRulingMenu } from "./module/apps/gc/card-ruling.mjs";
 import { installDramaticInitiative } from "./module/apps/gc/spend.mjs";
 import { installLateInitiative } from "./module/apps/gc/late-initiative.mjs";
 import { registerKeybindings } from "./module/apps/keybindings.mjs";
@@ -238,6 +239,7 @@ Hooks.once("init", () => {
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
+  installGCRulingMenu();
   installLateInitiative();
   installDramaticInitiative();
   installRoundReminders();

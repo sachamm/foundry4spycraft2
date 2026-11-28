@@ -69,7 +69,7 @@
     </p>
   {{/each}}
   <p><button type="button" class="sc2-action" data-action="trackFall"
-    {{#if fallTiming}}disabled title="{{localize 'SPYCRAFT.Hazards.FinishFallFirst'}}"{{/if}}
+    {{#if fallTiming}}disabled data-tooltip="{{localize 'SPYCRAFT.Hazards.FinishFallFirst'}}"{{/if}}
     >{{localize "SPYCRAFT.Hazards.TrackFall"}}</button></p>
   {{#if fallTiming}}
     <p class="hazard{{#if fallTiming.due}} due{{/if}}">{{fallTiming.feet}} ft. — {{fallTiming.text}}

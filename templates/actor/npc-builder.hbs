@@ -36,7 +36,7 @@
     {{#each npc.skills}}<div class="npc-row">
       <select aria-label="{{localize 'SPYCRAFT.Template.ActorNpcBuilder.ListedSkill'}}" name="npcSkill.{{index}}.key">{{selectOptions ../npc.skillOptions selected=key}}</select>
       <select aria-label="{{localize 'SPYCRAFT.Template.ActorNpcBuilder.SkillGrade'}}" name="npcSkill.{{index}}.grade" data-dtype="Number">{{selectOptions ../npc.gradeOptions selected=grade}}</select>
-      <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Bonus"}} <b title="{{localize 'SPYCRAFT.Action.StandardValue' value=(signed resolved.normalBonus) state=resolved.skillCondition.state}}">{{signed resolved.bonus}}</b> {{localize "SPYCRAFT.Template.ActorNpcBuilder.Cap"}} {{resolved.cap}} · {{grade}} {{localize "SPYCRAFT.Template.ActorNpcBuilder.XP"}}</span>
+      <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Bonus"}} <b data-tooltip="{{localize 'SPYCRAFT.Action.StandardValue' value=(signed resolved.normalBonus) state=resolved.skillCondition.state}}">{{signed resolved.bonus}}</b> {{localize "SPYCRAFT.Template.ActorNpcBuilder.Cap"}} {{resolved.cap}} · {{grade}} {{localize "SPYCRAFT.Template.ActorNpcBuilder.XP"}}</span>
       <button type="button" data-action="npcRemoveRow" data-list="skills" data-index="{{index}}" aria-label="{{localize 'SPYCRAFT.Template.ActorNpcBuilder.RemoveListedSkill'}}">{{localize "SPYCRAFT.Template.ActorNpcBuilder.Remove"}}</button>
     </div>{{/each}}
     <div class="npc-section-title"><h3>{{localize "SPYCRAFT.Template.ActorNpcBuilder.EquipmentAllowances"}}</h3></div>

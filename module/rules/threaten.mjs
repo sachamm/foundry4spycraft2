@@ -96,7 +96,7 @@ export function threatenCheckPlan(
       injuryWaived = glint || oneWarning || (mastery && !!weapon);
     if (!injuryQualified && !injuryWaived)
       return reject(
-        loc`The target must have lost5vitality or1wound to your attacks, or have Glint of Madness, or hold a readied ranged weapon with CQB Mastery.`
+        loc`The target must have lost 5 vitality or 1 wound to your attacks, or have Glint of Madness, or hold a readied ranged weapon with CQB Mastery.`
       );
     target = {
       distanceFeet: threatenDistanceFeet,

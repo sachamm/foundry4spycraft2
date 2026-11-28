@@ -2719,7 +2719,7 @@ function deriveExperience(state) {
   sys.burrowCapabilities = burrowCapabilities(sys);
   sys.assistantGroupStatuses = (sys.assistantGroups ?? []).map(group => assistantGroupStatus(sys, group));
   sys.recoveryRates = level <= 20 ? recoveryRatePlan(sys) : null;
-  if (level > 20) warnings.push(loc`Review Career Level: recovery rates require a RAW level of 20 or lower.`);
+  if (level > 20) warnings.push(loc`Review Career Level: recovery rates require a printed level of 20 or lower.`);
 }
 
 /** Step 14: core abilities. */

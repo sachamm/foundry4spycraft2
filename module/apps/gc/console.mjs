@@ -14,6 +14,7 @@ import { standingStatus } from "../../rules/standing.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
+  missionEpoch,
   teamActors,
   teamLevels,
   missionXP,
@@ -41,7 +42,8 @@ import {
   effectLabel,
   firstSessionChecklist,
   primaryAction,
-  qualityHandling
+  qualityHandling,
+  searchOtherViews
 } from "./console-view.mjs";
 import { npcDamageSaveWithUndo } from "./npc-play.mjs";
 import { withUndo } from "../undo.mjs";
@@ -168,7 +170,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "gc-console"],
-    position: { width: 720, height: 800 },
+    // One column of controls needs no more width than this, and a narrower window leaves the map in view.
+    position: { width: 480, height: 800 },
     window: {
       get title() {
         return loc`GC Console`;
@@ -462,7 +465,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       (this._search[context.view ?? "all"] ??= {}),
       {
         terms: SEARCH_TERMS(),
-        elsewhere: SEARCH_ELSEWHERE()
+        elsewhere: { ...SEARCH_ELSEWHERE(), ...searchOtherViews(context.view) }
       }
     );
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
@@ -694,8 +697,8 @@ const viewState = () => {
   const m = getMission();
   return game.combat ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning";
 };
-/** What the choice was made in: this fight, or outside a fight. A choice made in one fight does not hold in the next. */
-const viewKey = () => game.combat?.id ?? null;
+/** What the choice was made in: this fight, or this mission outside a fight. It does not hold in the next one. */
+const viewKey = () => game.combat?.id ?? missionEpoch();
 function rememberView(view, state) {
   if (!VIEWS.includes(view)) return null;
   return game.settings.set("spycraft2", VIEW_SETTING, { view, state, key: viewKey() });

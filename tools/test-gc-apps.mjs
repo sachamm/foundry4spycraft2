@@ -2267,3 +2267,54 @@ test("the console's live line says who is still to roll Initiative, then whose t
   assert.equal(say({ started: true, round: 1, acting: { name: "Ana" } }), "Round 1: Ana's turn.");
   assert.equal(say(null), "");
 });
+
+test("a search that finds nothing names the view that holds the tool (B-244)", async () => {
+  const { searchOtherViews } = await import("../module/apps/gc/console-view.mjs");
+  const play = Object.entries(searchOtherViews("play"));
+  assert.ok(play.some(([words, line]) => /caliber/.test(words) && /Prep/.test(line)));
+  assert.ok(!play.some(([words]) => /initiative/.test(words)));
+  assert.ok(Object.values(searchOtherViews("prep")).some(line => /Play/.test(line)));
+  assert.ok(!Object.values(searchOtherViews("wrap")).some(line => /Wrap-up view\.$/.test(line) && /Ending/.test(line)));
+});
+
+test("a GC ruling is written on the roll card with its reason and can be taken off (B-037)", async () => {
+  const { withGCRuling } = await import("../module/apps/gc/card-ruling.mjs");
+  const { checkFlavor } = await import("../module/rules/outcomes.mjs");
+  const check = { checkKind: "skill", rawTotal: 12, effectiveTotal: 12, naturalDie: 9 };
+  const ruled = withGCRuling(check, { outcome: "success", note: "The guard was <asleep>" }, "GC");
+  assert.deepEqual(ruled.gcRuling, { outcome: "success", note: "The guard was <asleep>", by: "GC" });
+  assert.match(checkFlavor(ruled), /GC ruling: this roll counts as a success\. The guard was &lt;asleep&gt;/);
+  assert.equal(withGCRuling(ruled, { outcome: "" }).gcRuling, undefined);
+  assert.equal(withGCRuling(check, { outcome: "maybe" }), null);
+  assert.doesNotMatch(checkFlavor(check), /GC ruling/);
+});
+
+test("the spend dialog states the cost and the pool before and after (B-042)", () => {
+  const context = { dramatic: false, status: { value: 5, current: true } };
+  const line = spend.spendCostLine({ id: "boostDC", dcCheck: "vault door" }, context);
+  assert.match(line, /Costs 1 die: the pool goes from 5 to 4\./);
+  assert.match(line, /Rolls a d12\./);
+  // An incomplete entry shows no cost: the refusal beside the button says what is missing.
+  assert.equal(spend.spendCostLine({ id: "boostDC", dcCheck: "" }, context), "");
+  assert.equal(spend.spendCostLine({ id: "boostRoll", actorId: "" }, context), "");
+});
+
+test("the chat log's right-click menu offers the ruling to the GC on a roll card only", async () => {
+  const { rulingMenuEntry } = await import("../module/apps/gc/card-ruling.mjs");
+  const before = { messages: game.messages, isGM: game.user.isGM };
+  try {
+    game.messages = new Map([
+      ["roll", { flags: { spycraft2: { rawTotal: 14 } } }],
+      ["note", { flags: { spycraft2: {} } }]
+    ]);
+    game.user.isGM = true;
+    const entry = rulingMenuEntry();
+    assert.equal(entry.visible({ dataset: { messageId: "roll" } }), true);
+    assert.equal(entry.visible({ dataset: { messageId: "note" } }), false);
+    game.user.isGM = false;
+    assert.equal(entry.visible({ dataset: { messageId: "roll" } }), false);
+  } finally {
+    game.messages = before.messages;
+    game.user.isGM = before.isGM;
+  }
+});

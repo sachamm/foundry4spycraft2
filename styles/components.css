@@ -650,6 +650,13 @@
   text-transform: none;
   color: var(--sc2-ink);
 }
+/* A dialog's text boxes and lists are as tall as its buttons (the control token), not Foundry's compact height. */
+.spycraft2.application.sc2-dialog
+  .dialog-content
+  label
+  > :is(input:not([type="checkbox"], [type="radio"], [type="range"]), select:not([multiple], [size])) {
+  min-height: var(--sc2-control);
+}
 .spycraft2.application.sc2-dialog .dialog-content label > :is(input, select, textarea) {
   font: 400 var(--sc2-text-m)/1.3 var(--font-primary, sans-serif);
   letter-spacing: 0;

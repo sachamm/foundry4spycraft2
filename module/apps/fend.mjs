@@ -153,7 +153,7 @@ async function recordReceipt(actor, row) {
         speaker: ChatMessage.getSpeaker({ actor }),
         blind: row.proof.visibility.blind,
         whisper: row.proof.visibility.whisper,
-        content: loc`Fend (p.179): confirmed completed5ft movement immediately after the recorded Standard Attack. The completed round movement total is recorded once. This receipt does not move a token or grant another action.`,
+        content: loc`Fend (p.179): confirmed completed 5 ft movement immediately after the recorded Standard Attack. The completed round movement total is recorded once. This receipt does not move a token or grant another action.`,
         flags: {
           spycraft2: {
             actorUuid: actor.uuid,
@@ -200,7 +200,7 @@ export async function recordFendMovement(actor, input = {}) {
       window: { title: loc`Record Fend movement` },
       rejectClose: false,
       content:
-        `<div class="spycraft2-roll-options"><p>${loc`Finish the actual Standard Attack declared with Fend, hit or miss. Confirm its legal5ft move completed immediately afterward. First use Record round movement for all earlier movement this round. Resolve the route and move the token at the table first; this control records completed movement and does not grant an action or move again. Respect all current conditions and stance round limits. A Recorded source is review only: do not move again.`}</p><label>${loc`Recorded Fend attack`} <select name="sourceMessage">` +
+        `<div class="spycraft2-roll-options"><p>${loc`Finish the actual Standard Attack declared with Fend, hit or miss. Confirm its legal 5 ft move completed immediately afterward. First use Record round movement for all earlier movement this round. Resolve the route and move the token at the table first; this control records completed movement and does not grant an action or move again. Respect all current conditions and stance round limits. A Recorded source is review only: do not move again.`}</p><label>${loc`Recorded Fend attack`} <select name="sourceMessage">` +
         choices
           .map(({ m, s }, i) => {
             const old = history.find(r => r.proof.rootAttackUuid === s.facts.rootAttackUuid),
@@ -225,7 +225,7 @@ export async function recordFendMovement(actor, input = {}) {
         state.feet +
         `${loc`ft.`}</p><label>${loc`New total completed movement this round, including Fend (ft.)`} <input name="totalFeet" type="number" min="0" step="any" value="` +
         (state.feet + 5) +
-        `" /></label><label><input name="routeConfirmed" type="checkbox" /> ${loc`The GC confirms this legal5ft route and its actual destination, terrain and posture`}</label><label><input name="movementCompleted" type="checkbox" /> ${loc`This5ft move was completed exactly once as part of Fend`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`It immediately followed that Standard Attack with no intervening action; a previously recorded move is only being reviewed`}</label></div>`
+        `" /></label><label><input name="routeConfirmed" type="checkbox" /> ${loc`The GC confirms this legal 5 ft route and its actual destination, terrain and posture`}</label><label><input name="movementCompleted" type="checkbox" /> ${loc`This 5 ft move was completed exactly once as part of Fend`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`It immediately followed that Standard Attack with no intervening action; a previously recorded move is only being reviewed`}</label></div>`
     });
     if (!input) return null;
   }

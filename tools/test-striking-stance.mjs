@@ -77,7 +77,7 @@ test("one use persists through a miss, stance exit/re-entry and additional sourc
   assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
 });
 
-test("Striking stance entry uses the shared5ft cap including earlier movement and does not require a held polearm; a different actual melee weapon can react", async () => {
+test("Striking stance entry uses the shared 5 ft cap including earlier movement and does not require a held polearm; a different actual melee weapon can react", async () => {
   const a = actor();
   const own = { ...a.mentalLeapCombatContext(), turn: 0 };
   assert.equal(
@@ -169,7 +169,7 @@ test("live stance, actual weapon, opponent identity, acting statistics, movement
     assert.ok(strikingRows(a).every(r => r.state === "closed"));
   }
 });
-test("same active participant survives legitimate Count reordering, preserves original indices and can finish a declared Fend within the5ft cap", async () => {
+test("same active participant survives legitimate Count reordering, preserves original indices and can finish a declared Fend within the 5 ft cap", async () => {
   const a = actor();
   controls.draw = async () => {
     a.participatingCombat.turns.reverse();
@@ -352,7 +352,7 @@ test("actual reaction dialog distinguishes read-only past reactions and can retu
   }
 });
 
-test("actual stance entry rejects prior movement over5ft, preserves a legal prior5ft, and an earned reaction cannot refund itself when Fend exceeds that cap", async () => {
+test("actual stance entry rejects prior movement over 5 ft, preserves a legal prior 5 ft, and an earned reaction cannot refund itself when Fend exceeds that cap", async () => {
   const { declareCombatStance } = await import("../module/apps/combat-stance.mjs"),
     { recordFendMovement } = await import("../module/apps/fend.mjs");
   let a = actor();

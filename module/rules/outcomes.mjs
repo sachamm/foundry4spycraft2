@@ -119,6 +119,14 @@ export function checkFlavor(check) {
   if (check.attackContext?.flanking?.removed)
     notes.push(loc`Flanking taken off: −${check.attackContext.flanking.removed.attackBonus} attack.`);
   if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);
+  if (check.gcRuling?.outcome)
+    notes.push(
+      esc(
+        check.gcRuling.outcome === "success"
+          ? loc`GC ruling: this roll counts as a success.`
+          : loc`GC ruling: this roll counts as a failure.`
+      ) + (check.gcRuling.note ? ` ${esc(check.gcRuling.note)}` : "")
+    );
   if (check.campaignDC)
     notes.push(
       loc`Campaign DC: ${Number(check.campaignDC.baseDC)} before campaign modifiers, ${Number(check.campaignDC.dc)} after them; final result ${Number(check.campaignDC.total)}.`

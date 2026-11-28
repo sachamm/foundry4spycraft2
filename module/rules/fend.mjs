@@ -47,7 +47,7 @@ export function sameFendTiming(original, current) {
     original.activeCombatantId === current.activeCombatantId
   );
 }
-/** Record a GC-confirmed completed5ft move once; do not move tokens or invent a Standard Move action. */
+/** Record a GC-confirmed completed 5 ft move once; do not move tokens or invent a Standard Move action. */
 export function fendMovementPlan(
   system,
   {
@@ -66,7 +66,7 @@ export function fendMovementPlan(
     !sameFendTiming(originalTiming, timing)
   )
     throw Error(
-      loc`Confirm Fend’s legal5ft move completed immediately after this actual Standard Attack, during the same active participant’s Count.`
+      loc`Confirm Fend’s legal 5 ft move completed immediately after this actual Standard Attack, during the same active participant’s Count.`
     );
   const block = attributeActionBlock(system, { purelyMental: false }) || restraintActionBlock(system);
   if (
@@ -80,7 +80,7 @@ export function fendMovementPlan(
   const state = stanceMovementState({ ...system, worldTime: timing.worldTime }, timing.combat);
   if (!Number.isFinite(totalFeet) || totalFeet !== state.feet + 5)
     throw Error(
-      loc`The new completed round total must add exactly5ft to its current recorded total; do not repeat the move.`
+      loc`The new completed round total must add exactly 5 ft to its current recorded total; do not repeat the move.`
     );
   const record = stanceMovementReviewPlan(
     { ...system, worldTime: timing.worldTime },

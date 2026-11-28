@@ -135,7 +135,13 @@ export function targetChoices({ exclude = "", offScene = "always" } = {}) {
       for (const turn of combat.turns ?? []) add(turn.actor);
   // Tokens on the scene in view, then characters with no token there, which are marked as not on the scene.
   for (const token of values(globalThis.canvas?.scene?.tokens)) add(token.actor);
-  if (offScene === "always" || !actors.size) for (const actor of values(game.actors)) add(actor);
+  // A sidebar actor whose unlinked token copies are already listed is the template for those copies, not another
+  // character in play, so it is not offered beside them.
+  const copied = new Set(
+    [...actors.values()].filter(actor => actor.isToken).map(actor => actor.token?.actorId ?? actor.baseActor?.id)
+  );
+  if (offScene === "always" || !actors.size)
+    for (const actor of values(game.actors)) if (!copied.has(actor.id)) add(actor);
   return { actors: [...actors.values()], selected: targeted.length === 1 ? targeted[0].actor.uuid : "" };
 }
 
@@ -1583,7 +1589,7 @@ async function postBatchSummary(message, done, missed, { blocked = [] } = {}) {
 /** A line above the critical fields when the defaults differ from a plain critical hit. */
 function criticalHint(crit) {
   if (crit.laterShot)
-    return `<p class="hint">${loc`Another shot of this attack was already applied as the critical hit; only the first shot of a Burst or Autofire is critical (pp.354-355).`}</p>`;
+    return `<p class="hint">${loc`Another shot of this attack was already applied as the critical hit; only the first shot of a Burst or Autofire is critical (pp.354–355).`}</p>`;
   if (crit.ouch)
     return `<p class="hint">${loc`A Table of Ouch injury was chosen for this critical hit, so the damage is applied normally; roll the injury from the button on this card afterwards (p.329).`}</p>`;
   return "";

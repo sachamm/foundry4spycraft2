@@ -22,12 +22,13 @@ import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from ".
 import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
 import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc } from "../../i18n.mjs";
-import { formDialog, raw } from "../dialog-kit.mjs";
+import { formDialog, formValues, raw } from "../dialog-kit.mjs";
 import { boostNpcDefense } from "./npc-defense.mjs";
 import { spendPostHitDefenseForNPC } from "./post-hit-defense.mjs";
 import { declareSkillDC } from "./declared-skill-dc.mjs";
 
-const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null, dialog = {}) =>
+  formDialog({ title, ok, validate, dialog, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -77,14 +78,14 @@ export function npcChoices(preferActor = null) {
   return [...rows.values()];
 }
 
-/** Why a spend dialog's entry would be refused, or "" when it can go ahead. Read before the dialog closes. */
-function spendRefusal(values, { dramatic, status }) {
+/** The plan a spend dialog's entry would pay for, or why it would be refused: { plan } or { refusal }. */
+function spendQuote(values, { dramatic, status }) {
   const spend = GC_SPENDS.find(entry => entry.id === values.id);
-  if (!spend) return loc`Choose a use for the action dice.`;
+  if (!spend) return { refusal: loc`Choose a use for the action dice.` };
   const actor = spend.needsNpc && values.actorId ? globalThis.fromUuidSync?.(values.actorId) : null;
-  if (spend.needsNpc && actor?.type !== "npc") return loc`Choose the NPC this applies to.`;
+  if (spend.needsNpc && actor?.type !== "npc") return { refusal: loc`Choose the NPC this applies to.` };
   if (values.id === "boostDC" && !String(values.dcCheck ?? "").trim())
-    return loc`Name the check whose DC rises, so its earlier boosts are counted.`;
+    return { refusal: loc`Name the check whose DC rises, so its earlier boosts are counted.` };
   try {
     const quality = values.id === "campaignQuality" ? campaignQuality(values.qualityId) : null;
     const plan = planSpend(values.id, {
@@ -103,11 +104,32 @@ function spendRefusal(values, { dramatic, status }) {
       fromDeath: !values.fromCapture,
       inCombat: !!game.combat?.started
     });
-    if (plan.cost > status.value) return loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`;
+    if (plan.cost > status.value)
+      return { refusal: loc`That costs ${plan.cost} action dice; the GC has ${status.value}.` };
+    return { plan };
   } catch (error) {
-    return error.message;
+    return { refusal: error.message };
   }
-  return "";
+}
+
+/** Why a spend dialog's entry would be refused, or "" when it can go ahead. Read before the dialog closes. */
+const spendRefusal = (values, context) => spendQuote(values, context).refusal ?? "";
+
+/**
+ * The line a spend dialog shows before its button is pressed: the cost, the pool before and after, the die rolled
+ * and what the rules attach to the spend. Empty while the entry is incomplete, since the refusal says why.
+ */
+export function spendCostLine(values, context) {
+  const { plan } = spendQuote(values, context);
+  if (!plan) return "";
+  const left = context.status.value - plan.cost;
+  const cost =
+    plan.cost === 0
+      ? loc`No dice spent: the pool stays at ${context.status.value}.`
+      : plan.cost === 1
+        ? loc`Costs 1 die: the pool goes from ${context.status.value} to ${left}.`
+        : loc`Costs ${plan.cost} dice: the pool goes from ${context.status.value} to ${left}.`;
+  return [cost, plan.die ? loc`Rolls a d${plan.die}.` : "", ...(plan.notes ?? [])].filter(Boolean).join(" ");
 }
 
 /**
@@ -133,6 +155,7 @@ export async function spendGCDice(input = {}) {
     const picked = await ask(
       loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
+      <p>${loc`The GC's action dice raise NPC rolls, Defense and DCs, pay for NPC criticals and agents' errors, and buy events. Pick one use; its cost shows below before anything is spent.`}</p>
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
       <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(([uuid, label]) => [uuid, label])], actors[0]?.[0] ?? "")}</select></label>
       <label data-when="id=activateThreat|activateError">${loc`Threat or error scored with`} <select name="checkKind">${options(
@@ -157,10 +180,24 @@ export async function spendGCDice(input = {}) {
         ["wounds", loc`2 wounds`]
       ])}</select></label>
       <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
-      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
+      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>
+      <p class="hint" data-spend-cost role="status"></p>`,
       loc`Spend dice`,
       // A spend that would be refused keeps the dialog open with the reason, so nothing typed is lost.
-      values => spendRefusal(values, { dramatic, status })
+      values => spendRefusal(values, { dramatic, status }),
+      {
+        // The cost is stated before the button is pressed, and follows each change to the entry.
+        render: (event, app) => {
+          const root = app?.element ?? event?.target,
+            form = root?.querySelector?.("form"),
+            line = root?.querySelector?.("[data-spend-cost]");
+          if (!form || !line) return;
+          const show = () => (line.textContent = spendCostLine(formValues(form), { dramatic, status }));
+          form.addEventListener("input", show);
+          form.addEventListener("change", show);
+          show();
+        }
+      }
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };
