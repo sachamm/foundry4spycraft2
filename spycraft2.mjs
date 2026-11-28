@@ -21,6 +21,7 @@ import { registerGmLocks } from "./module/rules/gm-locks.mjs";
 import { registerMapSettings } from "./module/apps/map.mjs";
 import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs";
 import { installRoundReminders } from "./module/apps/round-reminders.mjs";
+import { installInitiativeBoost } from "./module/apps/initiative-boost.mjs";
 import { installTargetNotices } from "./module/apps/target-response.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import { compactChatCard } from "./module/rolls/chat-compact.mjs";
@@ -236,6 +237,7 @@ Hooks.once("init", () => {
   installLateInitiative();
   installDramaticInitiative();
   installRoundReminders();
+  installInitiativeBoost();
   installTargetNotices();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();
