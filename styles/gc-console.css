@@ -182,14 +182,18 @@
   flex-direction: column;
   gap: 6px;
 }
+/* The clock is a system window like the dialogs: section heads, muted text and header buttons use the same roles. */
 .sc2-game-clock-body h3 {
   margin: 6px 0 0;
-  border-bottom: 1px solid currentColor;
-  font-size: 1.05em;
 }
 .sc2-game-clock-body .muted {
-  opacity: 0.65;
+  color: var(--sc2-ink-muted);
   margin: 0;
+}
+.spycraft2.application.sc2-game-clock .window-header button {
+  color: var(--sc2-on-bar);
+  background: transparent;
+  border-color: transparent;
 }
 .sc2-clock-now {
   margin: 0;
