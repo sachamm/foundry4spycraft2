@@ -1,4 +1,5 @@
 import { attackOutcome } from "../damage-application.mjs";
+import { coveredAttackOutcome, validateCoverAttack } from "../cover-interception.mjs";
 import { rollEvidence } from "../outcomes.mjs";
 import { actionDieTotal } from "./gc-spend.mjs";
 import { loc } from "../../i18n.mjs";
@@ -103,12 +104,20 @@ export function npcHitDefenseOutcome(review, check) {
   const boost = review.boosts.reduce((sum, row) => sum + row.total, 0),
     defense = review.original.defense + boost;
   if (!Number.isSafeInteger(defense)) throw Error(loc`The combined NPC Defense exceeds the supported range.`);
-  const result = attackOutcome({
+  let result = attackOutcome({
     total: check.effectiveTotal,
     defense,
     fireAction: check.attackContext?.fireAction ?? null,
     feats: review.feats
   });
+  if (check.coverAwaiting && !check.coverAwaiting.npcDefenseReviewId) {
+    validateCoverAttack(check, check.coverInterception?.record);
+    result = coveredAttackOutcome(check.coverInterception.record, { defense });
+    if (result.needsCoverReview.length)
+      throw Error(
+        loc`The raised Defense requires additional actual cover saves. Keep the original damage for GC review.`
+      );
+  }
   const baseDefense = review.original.defense - (review.original.cover?.bonus ?? 0);
   return {
     ...structuredClone(review.original),

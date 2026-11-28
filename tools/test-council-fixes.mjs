@@ -296,7 +296,12 @@ test("cover chosen at Resolve raises the Defense and a miss it alone caused hits
   const { coverOnResolution } = await import("../module/apps/damage-application.mjs");
   assert.equal(coverOnResolution("0"), null);
   assert.deepEqual(coverOnResolution("2"), { grade: 2, label: "One-half (1/2)", bonus: 4 });
-  assert.equal(coverOnResolution("4"), null, "total cover is not an attackable Defense");
+  assert.deepEqual(
+    coverOnResolution("4"),
+    { grade: 4, label: "Total", bonus: 8 },
+    "total cover uses mandatory interception and penetration"
+  );
+  assert.equal(coverOnResolution("5"), null);
   // Resolving again without cover clears the earlier cover, since updates merge.
   const again = { attackResolution: { hit: false, margin: -1, defense: 14, cover: null, hitsCover: false } };
   assert.equal(attackResolutionNote(again), "Against Defense 14: a miss by 1.");

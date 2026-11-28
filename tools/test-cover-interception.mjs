@@ -7,6 +7,7 @@ import {
   validateCoverAttack
 } from "../module/rules/cover-interception.mjs";
 import { coverCriticalContext } from "../module/rules/cover-interception.mjs";
+import { coverDamageDelivery } from "../module/rules/cover-interception.mjs";
 import { characterTargetPlan } from "../module/rules/character-target.mjs";
 import { criticalPlan } from "../module/rules/criticals.mjs";
 import { criticalDamageDefaults } from "../module/rules/damage-application.mjs";
@@ -50,6 +51,59 @@ const row = (index, result = "penetrated", originalDamage = 10, remainingDamage 
   note: "GC reviewed original cover selection and save"
 });
 const plan = (b, rows) => coverInterceptionPlan(b, rows, { id: "cover-review", confirmed: true });
+
+test("cover delivery uses original per-shot amounts and final NPC Defense without passing cover criticals through", () => {
+  const c = attack(23, { action: "burst" }),
+    b = basis(c, 4);
+  const record = plan(b, [row(1, "held", 10, 0), row(2, "penetrated", 12, 5), row(3, "penetrated", 8, 2)]);
+  c.coverAwaiting = { version: 1, id: record.id, basis: b, criticalActorUuid: "Actor.cover" };
+  c.coverInterception = { state: "complete", record };
+  c.attackResolution = { defense: 12 };
+  assert.throws(() => coverDamageDelivery(c, "ChatMessage.damage1", 10, "Actor.target"), /stopped/);
+  assert.equal(coverDamageDelivery(c, "ChatMessage.damage1", 10, "Actor.cover").amount, 10);
+  assert.equal(coverDamageDelivery(c, "ChatMessage.damage2", 12, "Actor.target").amount, 5);
+  assert.throws(() => coverDamageDelivery(c, "ChatMessage.damage2", 99, "Actor.target"), /original frozen/);
+  assert.throws(() => coverDamageDelivery(c, "ChatMessage.damage2", 12, "Actor.other"), /does not record/);
+  c.attackResolution.defense = 24;
+  assert.throws(() => coverDamageDelivery(c, "ChatMessage.damage2", 12, "Actor.target"), /stopped/);
+  c.coverInterception.state = "reviewed";
+  assert.throws(() => coverDamageDelivery(c, "ChatMessage.damage1", 10, "Actor.cover"), /Finish/);
+});
+
+test("a post-penetration NPC reaction removes target hits while retaining the successful cover contact and original dice", () => {
+  const c = attack(16),
+    b = basis(c, 4),
+    record = plan(b, [row(1)]);
+  c.coverAwaiting = { version: 1, id: record.id, basis: b, npcDefenseReviewId: "" };
+  c.coverInterception = { state: "reviewed", record };
+  c.successConfirmed = true;
+  const initial = {
+    targetUuid: b.targetUuid,
+    targetName: "Protected NPC",
+    total: c.effectiveTotal,
+    defense: 12,
+    cover: null,
+    ...coveredAttackOutcome(record)
+  };
+  const review = beginNpcHitDefense(c, initial, {
+    id: "reaction",
+    attackerUuid: c.actorUuid,
+    targetUuid: b.targetUuid,
+    session: "s",
+    scene: "s"
+  });
+  const boosted = addNpcHitDefenseDie(review, c, {
+    id: "paid",
+    sourceUuid: "ChatMessage.paid",
+    die: 6,
+    rolls: [5],
+    total: 5
+  });
+  const final = npcHitDefenseOutcome(boosted, c);
+  assert.equal(final.hit, false);
+  assert.equal(final.checkSucceeded, true, "the already successful cover contact stays successful");
+  assert.deepEqual(c.coverInterception.record.rows[0], record.rows[0]);
+});
 
 test("cover critical pricing, evidence and damage remain attached to the first actual contact", () => {
   const c = { ...attack(80), successConfirmed: true, threatConfirmed: true, triumphed: true };
@@ -190,13 +244,14 @@ test("all four cover grades preserve the uncovered-hit boundary and total-cover 
 test("pending cover uses one reserved damage result per potential shot and retains its ledger after adjudication", () => {
   const check = attack(23, { action: "burst" }),
     b = basis(check, 3);
+  check.successConfirmed = true;
   check.coverAwaiting = { version: 1, id: "original-cover", basis: b };
   const original = attackDamageBasis(check, { actorUuid: check.actorUuid, weaponUuid: check.weaponUuid });
   let ledger = newDamageHitLedger(original);
   for (let i = 1; i <= 3; i++) ledger = reserveDamageHit(ledger, original, "actual-shot-" + i);
   assert.throws(() => reserveDamageHit(ledger, original, "replacement"), /Every hit/);
   check.resolved = true;
-  check.successConfirmed = false;
+  check.successConfirmed = true;
   check.attackResolution = { hit: false, hits: 0 };
   check.coverInterception = { state: "complete" };
   const after = attackDamageBasis(check, { actorUuid: check.actorUuid, weaponUuid: check.weaponUuid });

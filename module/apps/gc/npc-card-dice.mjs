@@ -46,6 +46,8 @@ export const gcBoostable = check =>
   !check.resolved &&
   !check.superseded &&
   !check.criticalFailure &&
+  !check.coverAwaiting &&
+  !check.coverDamageFrozen &&
   !check.gcPostHitDefense &&
   !check.npcDefensePending;
 const npcOpen = ({ check, actor, user }) =>

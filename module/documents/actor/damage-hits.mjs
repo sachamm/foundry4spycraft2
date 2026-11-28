@@ -131,8 +131,10 @@ export function damageHitCount(actor, attack) {
   return ledger ? ledger.legacyUsed + ledger.slots.filter(r => r.state !== "cancelled").length : null;
 }
 
-export function assertDamageNotStarted(actor, message) {
+export function assertDamageNotStarted(actor, message, { allowCover = false } = {}) {
   const check = flags(message);
+  if (check?.coverAwaiting && !allowCover)
+    throw Error(loc`The original attack is fixed for cover review. Activate any critical before rolling its damage.`);
   if (
     (check?.checkKind === "attack" && damageHitCount(actor, message) > 0) ||
     check?.damageApplicationStarted ||

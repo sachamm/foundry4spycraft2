@@ -157,7 +157,7 @@ export function coveredAttackOutcome(record, { defense = record?.basis?.baseDefe
     potentialHits: raw.hits,
     needsCoverReview,
     damage,
-    checkSucceeded: raw.hits > 0,
+    checkSucceeded: basis.potentialHits > 0,
     coverCritical: basis.total >= 75 && direct === 0,
     targetCriticalAllowed: direct > 0
   };
@@ -175,6 +175,30 @@ export function validateCoverAttackBasis(check, basis) {
   if (!sameValues(coverInterceptionBasis(check, basis), basis))
     throw Error(loc`Review the original cover Defense and intercepted hits.`);
   return true;
+}
+
+/** Frozen damage may reach the protected target only in the amount surviving its actual cover review. */
+export function coverDamageDelivery(attack, damageUuid, originalDamage, targetUuid) {
+  if (!attack?.coverAwaiting) return null;
+  if (attack.coverInterception?.state !== "complete")
+    throw Error(loc`Finish the original cover-save review before applying its damage.`);
+  const record = attack.coverInterception.record;
+  validateCoverAttack(attack, record);
+  const row = record.rows.find(r => r.damageUuid === damageUuid);
+  if (!row || row.originalDamage !== originalDamage)
+    throw Error(loc`Use the original frozen damage card from this cover review.`);
+  if (targetUuid === record.basis.targetUuid) {
+    const outcome = coveredAttackOutcome(record, { defense: attack.attackResolution?.defense });
+    const delivered = outcome.damage.find(r => r.damageUuid === damageUuid);
+    if (!delivered)
+      throw Error(loc`This shot was stopped by cover or the final Defense; no damage reaches the protected target.`);
+    return { amount: delivered.amount, protectedTarget: true };
+  }
+  if (targetUuid === attack.coverAwaiting.criticalActorUuid && row.index > record.basis.directHits)
+    return { amount: Math.max(0, originalDamage), protectedTarget: false };
+  throw Error(
+    loc`This cover review does not record that damage target. Use the actual cover's separate damage controls for other contacts.`
+  );
 }
 
 /** Critical pricing uses the first struck cover, while the original attack continues to name its protected target. */

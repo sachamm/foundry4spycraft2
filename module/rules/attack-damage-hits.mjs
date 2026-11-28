@@ -14,6 +14,7 @@ export function attackDamageBasis(check, { actorUuid, weaponUuid } = {}) {
       !identity(pending.id) ||
       check.superseded ||
       check.criticalFailure ||
+      check.successConfirmed !== true ||
       check.npcDefensePending ||
       check.actorUuid !== actorUuid ||
       check.weaponUuid !== weaponUuid ||

@@ -408,6 +408,8 @@ export function rollEvidence(check) {
     ...(check.damageSave ? [check.damageSave] : []),
     ...(check.coverSave ? [check.coverSave] : []),
     ...(check.coverAwaiting ? [check.coverAwaiting] : []),
+    ...(check.coverInterception?.record ? [check.coverInterception.record] : []),
+    ...(check.coverDamageFrozen ? [check.coverDamageFrozen] : []),
     ...(check.attackContext?.meleeFire ? [check.attackContext.meleeFire] : []),
     ...(check.cqbRange ? [check.cqbRange] : []),
     ...(check.attackContext?.cqbRange ? [check.attackContext.cqbRange] : []),
@@ -428,6 +430,8 @@ export function rollEvidenceMatches(evidence, check) {
   if (
     check.npcDefenseReroll ||
     check.coverAwaiting ||
+    check.coverInterception?.record ||
+    check.coverDamageFrozen ||
     check.declaredSkillDC ||
     check.gcPostHitDefense ||
     check.attackContext?.reach ||

@@ -35,6 +35,8 @@ import {
 } from "../rules/damage-application.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { blastExposurePlan } from "../rules/blast-exposure.mjs";
+import { interceptedBasis, prepareCoverAttack, confirmPreparedCover, reviewCoverSaves } from "./cover-interception.mjs";
+import { coveredAttackOutcome, validateCoverAttack, coverDamageDelivery } from "../rules/cover-interception.mjs";
 import { blastTargetRows, blastGeometryFields, measuredBlastActors } from "./blast-dialog.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { damageResistancePlan } from "../rules/resistances.mjs";
@@ -212,12 +214,16 @@ export async function resolveAttack(message, options = {}) {
   const check = message.flags?.spycraft2,
     attacker = check?.actorUuid ? fromUuidSync(check.actorUuid) : null;
   if (!attacker?.isOwner || check.checkKind !== "attack" || !Number.isFinite(check.effectiveTotal)) return null;
-  assertDamageNotStarted(attacker, message);
   if (check.npcDefensePending)
     return reviewNpcHitDefense(message, {
       finalize: (resolution, target, id) =>
-        settleAttackResolution(message, attacker, target, resolution, { npcDefenseReviewId: id })
+        settleAttackResolution(message, attacker, target, resolution, {
+          npcDefenseReviewId: id,
+          ...(check.coverAwaiting ? { coverReviewId: check.coverAwaiting.id } : {})
+        })
     });
+  if (check.coverAwaiting) return resolveCoverAttack(message, attacker, options);
+  assertDamageNotStarted(attacker, message);
   if (check.gcPostHitDefense) return refuse(loc`This attack already has a finalized GC Defense decision.`);
   if (check.resolved || check.superseded) return refuse(loc`This attack has already been resolved or replaced.`);
   if (check.npcDefenseReroll) {
@@ -257,14 +263,11 @@ export async function resolveAttack(message, options = {}) {
           const defense = actor.isOwner || game.user?.isGM || defenseVisibleToPlayers() ? defenseOf(actor) : null;
           return defense === null ? targetLabel(actor) : loc`${targetLabel(actor)} — Defense ${defense}`;
         }
-      )}</select></label><label>${loc`Cover between attacker and target`} <select name="cover">${COVER_GRADES.slice(
-        0,
-        4
-      )
-        .map((label, grade) => `<option value="${grade}">${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`)
-        .join(
-          ""
-        )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Cover adds to the Defense used, and a miss that only the cover caused hits the cover (p.345). Enter a different Defense for a declared defense or another circumstance; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
+      )}</select></label><label>${loc`Cover between attacker and target`} <select name="cover">${COVER_GRADES.map(
+        (label, grade) => `<option value="${grade}">${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`
+      ).join(
+        ""
+      )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Cover adds to the Defense used, and a miss that only the cover caused hits the cover (p.345). Enter a different Defense for a declared defense or another circumstance; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -277,6 +280,8 @@ export async function resolveAttack(message, options = {}) {
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
   const cover = coverOnResolution(input.cover);
+  if (cover && !target)
+    return refuse(loc`Choose the actual protected target so its original cover damage can be tracked.`);
   const defense = baseDefense + (cover?.bonus ?? 0);
   let outcome;
   try {
@@ -305,19 +310,46 @@ export async function resolveAttack(message, options = {}) {
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
   };
+  if (cover?.grade === 4) Object.assign(resolution, { hit: false, hits: 0 });
+  if (cover && interceptedBasis(message, attacker, resolution) && !game.user?.isGM)
+    return askGC("resolveCoverAttack", {
+      messageId: message.id,
+      input: { targetUuid: target?.uuid ?? "", defense: baseDefense, cover: cover.grade }
+    });
   const review = await beginNpcDefenseReview(message, attacker, target, resolution);
   if (review) return review;
   return settleAttackResolution(message, attacker, target, resolution);
 }
 
-export async function settleAttackResolution(message, attacker, target, resolution, { npcDefenseReviewId = "" } = {}) {
-  assertDamageNotStarted(attacker, message);
+export async function settleAttackResolution(
+  message,
+  attacker,
+  target,
+  resolution,
+  { npcDefenseReviewId = "", coverReviewId = "" } = {}
+) {
   const check = message.flags.spycraft2,
     pending = check.npcDefensePending,
     outcome = resolution,
     defense = resolution.defense,
     before = check.attackResolution ?? null,
     beforeBoost = check.gcPostHitDefense;
+  const completingCover =
+    !!coverReviewId &&
+    game.user?.isGM &&
+    check.coverAwaiting?.id === coverReviewId &&
+    check.coverInterception?.state === "reviewed";
+  if (completingCover) {
+    validateCoverAttack(check, check.coverInterception.record);
+    const expected = coveredAttackOutcome(check.coverInterception.record, { defense: resolution.defense });
+    if (
+      expected.needsCoverReview.length ||
+      expected.hit !== resolution.hit ||
+      expected.hits !== resolution.hits ||
+      target?.uuid !== check.coverAwaiting.basis.targetUuid
+    )
+      return refuse(loc`Review the original cover saves and final target hits before settlement.`);
+  } else assertDamageNotStarted(attacker, message);
   if (
     pending &&
     (!game.user?.isGM ||
@@ -333,17 +365,20 @@ export async function settleAttackResolution(message, attacker, target, resoluti
     check.gcPostHitDefense?.reviewId === npcDefenseReviewId &&
     JSON.stringify(check.attackResolution) === JSON.stringify(resolution);
   if (check.resolved && !alreadySettled) return refuse(loc`This attack has already been settled.`);
+  if (!check.coverAwaiting && interceptedBasis(message, attacker, resolution))
+    return prepareCoverAttack(message, attacker, resolution, { npcDefenseReviewId });
   if (!alreadySettled) {
     await message.update({
       "flags.spycraft2.attackResolution": resolution,
       ...(npcDefenseReviewId ? { "flags.spycraft2.gcPostHitDefense": resolution.gcDefenseBoost } : {})
     });
     try {
-      await attacker.confirmCheckOutcome(message, {
-        succeeded: outcome.hit,
-        difficultyClass: defense,
-        ...(npcDefenseReviewId ? { npcDefenseReviewId } : {})
-      });
+      if (!completingCover)
+        await attacker.confirmCheckOutcome(message, {
+          succeeded: outcome.hit,
+          difficultyClass: defense,
+          ...(npcDefenseReviewId ? { npcDefenseReviewId } : {})
+        });
     } catch (error) {
       await message.update({
         ...(before ? { "flags.spycraft2.attackResolution": before } : { "flags.spycraft2.-=attackResolution": null }),
@@ -355,7 +390,7 @@ export async function settleAttackResolution(message, attacker, target, resoluti
       });
       return refuse(error.message);
     }
-    if (npcDefenseReviewId && message.flags.spycraft2.successConfirmed !== outcome.hit) return null;
+    if (!completingCover && npcDefenseReviewId && message.flags.spycraft2.successConfirmed !== outcome.hit) return null;
   }
   // Gunplay: each handgun hit moves the triggerman up the order, once per attack card.
   const gunplay = gunplayCountGain(attacker.system, check.weaponProficiency, outcome.hits);
@@ -373,16 +408,50 @@ export async function settleAttackResolution(message, attacker, target, resoluti
       /* supplied by another source: left for the GC */
     }
   if (npcDefenseReviewId) await message.update({ "flags.spycraft2.-=npcDefensePending": null });
+  if (completingCover) await message.update({ "flags.spycraft2.coverInterception.state": "complete" });
   return resolution;
 }
 
+async function resolveCoverAttack(message, attacker, options = {}) {
+  if (!game.user?.isGM) return refuse(loc`The GC finishes the actual cover-save review.`);
+  if (message.flags.spycraft2.coverInterception?.state === "complete") return null;
+  if (!(await confirmPreparedCover(message, attacker))) return null;
+  let record = message.flags.spycraft2.coverInterception?.record;
+  if (!record) record = await reviewCoverSaves(message, attacker, options);
+  if (!record) return null;
+  const pending = message.flags.spycraft2.coverAwaiting,
+    outcome = coveredAttackOutcome(record);
+  const target = await fromUuid(pending.basis.targetUuid);
+  const resolution = {
+    ...message.flags.spycraft2.attackResolution,
+    ...outcome,
+    defense: pending.basis.baseDefense,
+    cover: null,
+    hitsCover: true
+  };
+  if (!pending.npcDefenseReviewId && outcome.hit) {
+    const review = await beginNpcDefenseReview(message, attacker, target, resolution);
+    if (review) return review;
+  }
+  return settleAttackResolution(message, attacker, target, resolution, { coverReviewId: pending.id });
+}
+
+registerRelay("resolveCoverAttack", {
+  question: ({ messageId }, user) => loc`${user.name} asks the GC to resolve cover on attack ${messageId}.`,
+  async run({ messageId, input }) {
+    const message = game.messages.get(messageId);
+    if (!message) throw Error(loc`The original attack is unavailable.`);
+    return !!(await resolveAttack(message, input));
+  }
+});
+
 /**
  * The cover chosen when resolving an attack (Table 5.10, p.345): its grade, name and Defense bonus, or null for none.
- * Total cover is not offered: a target behind it cannot be attacked directly.
+ * Total cover is resolved through actual interception and penetration.
  */
 export function coverOnResolution(value) {
   const grade = Number(value);
-  if (!Number.isSafeInteger(grade) || grade < 1 || grade > 3) return null;
+  if (!Number.isSafeInteger(grade) || grade < 1 || grade > 4) return null;
   return { grade, label: COVER_GRADES[grade], bonus: 2 * grade };
 }
 
@@ -469,6 +538,43 @@ rollPipeline.register({
           ]
         : [];
     const controls = [];
+    if (check.coverAwaiting) {
+      const pending = check.coverAwaiting,
+        complete = check.coverInterception?.state === "complete";
+      const rolled = damageHitCount(actor, message) ?? 0;
+      if (user?.isGM && !complete) {
+        controls.push({
+          label: loc`GC: review original cover damage`,
+          placement: "card",
+          run: () => reviewDamageHitDialog(actor, message)
+        });
+        controls.push({
+          label:
+            check.successConfirmed !== true
+              ? loc`GC: confirm cover contact`
+              : loc`GC: finish cover saves and target hits`,
+          placement: "card",
+          ...(rolled >= pending.basis.potentialHits || check.successConfirmed !== true ? { emphasis: "primary" } : {}),
+          run: () => resolveAttack(message)
+        });
+      }
+      const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
+      if (!complete && check.successConfirmed === true && weapon && rolled < pending.basis.potentialHits)
+        controls.push({
+          label: loc`Roll original damage (shot ${rolled + 1} of ${pending.basis.potentialHits})`,
+          placement: "card",
+          emphasis: "primary",
+          run: () =>
+            actor.rollDamage(weapon, {
+              sourceAttack: {
+                uuid: message.uuid,
+                targetUuid: pending.basis.targetUuid,
+                ranged: check.attackContext?.ranged === true
+              }
+            })
+        });
+      return controls.length ? controls : null;
+    }
     if (user?.isGM && check.attackResolution?.hit)
       controls.push({
         label: loc`GC: review damage hits`,
@@ -826,6 +932,12 @@ export async function applyDamage(message, options = {}) {
   if (attack?.coverAwaiting && attack.coverInterception?.state !== "complete")
     return refuse(loc`Finish the original cover-save review before applying this damage to the protected target.`);
   let input = options;
+  const coverDefault =
+    attack?.coverAwaiting && attack.coverInterception?.state === "complete"
+      ? (coveredAttackOutcome(attack.coverInterception.record, {
+          defense: attack.attackResolution.defense
+        }).damage.find(r => r.damageUuid === message.uuid)?.amount ?? 0)
+      : Math.max(0, Math.trunc(rolled));
   let crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
     hitIndex: check.sourceAttack?.hitIndex,
     targetUuid: input.targetUuid ?? check.sourceAttack?.targetUuid
@@ -847,13 +959,20 @@ export async function applyDamage(message, options = {}) {
         choices.actors.filter(actor => actor.isOwner || gcAvailable()),
         selected,
         actor => (actor.isOwner ? targetLabel(actor) : loc`${targetLabel(actor)} (sent to the GC)`)
-      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}${criticalHint(crit)}<label><input type="checkbox" name="critical"${crit.critical ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Size of the critical hit in action dice, before any discount (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${crit.criticalDice}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label>${choices.actors.some(actor => juggernautConversion(actor.system, 2) > 0) ? `<label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label>` : ""}<p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. Special damage types use their hazard rules for agents and special NPCs.`}</p></div>`
+      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${coverDefault}" required /></label>${sharedFields(profile, kindOfAttack)}${criticalHint(crit)}<label><input type="checkbox" name="critical"${crit.critical ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Size of the critical hit in action dice, before any discount (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${crit.criticalDice}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label>${choices.actors.some(actor => juggernautConversion(actor.system, 2) > 0) ? `<label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label>` : ""}<p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. Special damage types use their hazard rules for agents and special NPCs.`}</p>${attack?.coverAwaiting ? `<p class="hint">${loc`The protected target is limited to the reviewed damage remaining after cover. A cover critical applies only to its recorded first contact.`}</p>` : ""}</div>`
     });
     if (!input) return null;
     input = { ...input, reviewType: true };
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (!target || !TARGET_TYPES.includes(target.type)) return refuse(loc`Choose a target.`);
+  try {
+    const delivery = coverDamageDelivery(attack, message.uuid, rolled, target.uuid);
+    if (delivery && Number(input.damage) > delivery.amount)
+      return refuse(loc`Only ${delivery.amount} original damage reaches this target after the cover review.`);
+  } catch (error) {
+    return refuse(error.message);
+  }
   crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
     hitIndex: check.sourceAttack?.hitIndex,
     targetUuid: target.uuid
@@ -1393,9 +1512,10 @@ function criticalHint(crit) {
 
 export function quickApplyInput(message, targetUuid, damage = null) {
   const { check, rolled, profile, attack, attackKind } = damageFacts(message);
+  const delivery = coverDamageDelivery(attack, message.uuid, rolled, targetUuid);
   return {
     targetUuid,
-    damage: damage ?? Math.max(0, Math.trunc(rolled)),
+    damage: damage ?? delivery?.amount ?? Math.max(0, Math.trunc(rolled)),
     kind: profile.kind,
     type: profile.type ?? "",
     attackKind,

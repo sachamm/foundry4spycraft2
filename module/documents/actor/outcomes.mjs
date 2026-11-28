@@ -590,16 +590,28 @@ export const ActorOutcomes = Base =>
       const work = async () => {
         const check = message.flags?.spycraft2;
         if (!Number.isFinite(check?.rawTotal)) return refuseStep(loc`Choose a recorded check result.`);
-        if (check.checkKind === "attack" && succeeded !== check.successConfirmed) assertDamageNotStarted(this, message);
+        const coverContact =
+          game.user?.isGM &&
+          options.coverReviewId === check.coverAwaiting?.id &&
+          !!check.coverAwaiting &&
+          succeeded === true;
+        if (check.checkKind === "attack" && succeeded !== check.successConfirmed)
+          assertDamageNotStarted(this, message, {
+            allowCover: game.user?.isGM && options.coverReviewId === check.coverAwaiting?.id
+          });
         if (check.declaredSkillDC) {
           const declared = declaredDCOutcome(check);
           if (succeeded !== declared.succeeded || (difficultyClass !== undefined && difficultyClass !== declared.dc))
             return refuseStep(loc`The outcome must match the check's recorded declared DC.`);
           difficultyClass = declared.dc;
         }
-        if (check.gcPostHitDefense && succeeded !== check.attackResolution?.hit)
+        if (!coverContact && check.gcPostHitDefense && succeeded !== check.attackResolution?.hit)
           return refuseStep(loc`The outcome must match the finalized GC Defense decision.`);
-        if (check.npcDefenseReroll && (!check.attackResolution || succeeded !== check.attackResolution.hit))
+        if (
+          !coverContact &&
+          check.npcDefenseReroll &&
+          (!check.attackResolution || succeeded !== check.attackResolution.hit)
+        )
           return refuseStep(
             loc`Resolve this replacement against its recorded NPC Defense before confirming its outcome.`
           );
@@ -683,7 +695,7 @@ export const ActorOutcomes = Base =>
 
     /** The GC can resolve an owned opponent's payment; cross-client authority remains a separate workflow. */
     async activateCritical(message, options = {}) {
-      assertDamageNotStarted(this, message);
+      assertDamageNotStarted(this, message, { allowCover: true });
       if (message.flags?.spycraft2?.npcDefensePending)
         return refuse(loc`Finish the NPC Defense decision before critical activation.`);
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
@@ -833,7 +845,7 @@ export const ActorOutcomes = Base =>
           return refuseStep(
             loc`Review this character’s interrupted action-die settlement before activating another critical result.`
           );
-        assertDamageNotStarted(this, message);
+        assertDamageNotStarted(this, message, { allowCover: true });
         if (rollEvidence(message.flags.spycraft2) !== expected)
           return refuseStep(
             loc`This result changed while its critical activation was being prepared. Review the current result.`
@@ -1097,6 +1109,8 @@ export const ActorOutcomes = Base =>
       if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const check = message.flags.spycraft2;
       if (check.gearAttempt) return finishGearAcquisition(this, message, options);
+      if (check.coverAwaiting && check.coverInterception?.state !== "complete")
+        return refuse(loc`Finish the original cover-save review and target settlement before resolving this attack.`);
       if (
         check.requiredBonusPoolId &&
         bonusPoolForCheck(this.system, check.requiredBonusPoolId, message, { periods: this.usagePeriods }).available

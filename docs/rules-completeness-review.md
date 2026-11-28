@@ -2796,3 +2796,35 @@ its critical damage or injury. Changing that scope invalidates open decisions.
 Validation: 4,528 Node tests, 988 engine fixtures, lint, formatting, bundle and
 copied-text checks passed. Connected cover controls remain the next B-190 work;
 the new scope is not yet credited as a complete playable workflow.
+
+## Pass 89: Connected cover choices, original damage and delivery
+
+Scores remain PC creation **9.9/10**, combat **9.8/10** while the remaining
+NPC critical and grapple paths are reviewed. The resolver now offers total cover
+and routes intercepted shots through GC identification of the actual first
+contact. It confirms physical success before critical activation, corrects
+target-dependent threat adjustments, then exposes one original damage roll per
+potential shot. Actual damage is frozen before the GC records cover contacts,
+save results and remaining damage. Direct burst shots retain their full amount.
+Stopped shots cannot reach the protected target; penetrating damage cannot exceed
+its reviewed amount. Existing per-target receipts and Undo guard delivery.
+
+The source attack cannot be boosted, replaced, re-resolved or finished during
+this review. Interrupted original damage uses existing recovery controls.
+Dramatic NPC reactions precede damage when direct shots already hit; an NPC
+reached only by penetration gets its reaction afterward, preserving the original
+cover contact and dice. GC requests from players use the existing request channel.
+Cover critical pricing and delivery continue to use the first contact.
+
+Native Foundry exercised the actual first-contact and cover-save forms at
+1280×720 in both themes (the primary control ended at 669.5px). Attack
+ChatMessage.4BmCKu9UZ2BOHOVX rolled 116, struck total cover, activated its included
+critical for no additional die, and rolled original damage 1 on
+ChatMessage.ExsqRQzcbCOZOXRq. An actual separate scenery-save fixture failed;
+the GC recorded zero remaining damage. Target vitality remained 100, the critical
+did not transfer, repeated delivery and new damage were blocked, and reload
+preserved both the review and original dice. No browser errors occurred.
+Nonzero native penetration and the paid NPC reaction remain the next checks.
+
+Validation: **4,532 Node tests**, **988 engine fixtures**, **307 layout checks**,
+native schemas, lint, formatting, bundle and copied-text checks passed.

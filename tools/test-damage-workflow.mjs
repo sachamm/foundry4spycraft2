@@ -717,6 +717,186 @@ test("original cover damage cannot reach the protected target before its cover-s
   assert.equal(posted.length, 0);
 });
 
+test("the connected cover review freezes original burst damage, keeps direct shots and caps penetrating delivery", async () => {
+  reset();
+  const { prepareCoverAttack, reviewCoverSaves } = await import("../module/apps/cover-interception.mjs");
+  const { attackDamageBasis, newDamageHitLedger, reserveDamageHit } =
+    await import("../module/rules/attack-damage-hits.mjs");
+  const shooter = character(
+    "CoverWorkflowShooter",
+    { activeFeatNames: [] },
+    {
+      async confirmCheckOutcome(message, opts) {
+        await message.update({ "flags.spycraft2.successConfirmed": opts.succeeded });
+        return message.flags.spycraft2;
+      }
+    }
+  );
+  const target = character("CoverWorkflowTarget", {
+    defense: { total: 12 },
+    vitality: { value: 40, max: 40 },
+    wounds: { value: 12, max: 12 }
+  });
+  const source = card("cover-workflow-source", {
+    checkKind: "attack",
+    actorUuid: shooter.uuid,
+    weaponUuid: shooter.uuid + ".Item.weapon",
+    rawTotal: 23,
+    effectiveTotal: 23,
+    naturalDie: 10,
+    threat: 20,
+    error: 1,
+    damageHitsVersion: 1,
+    attackContext: { fireAction: { action: "burst" }, ranged: true }
+  });
+  const pending = await prepareCoverAttack(source, shooter, {
+    targetUuid: target.uuid,
+    targetName: target.name,
+    total: 23,
+    defense: 18,
+    cover: { grade: 3, bonus: 6 },
+    hit: true,
+    hits: 2
+  });
+  assert.equal(pending.basis.potentialHits, 3);
+  assert.equal(source.flags.spycraft2.successConfirmed, true);
+  const basis = attackDamageBasis(source.flags.spycraft2, {
+    actorUuid: shooter.uuid,
+    weaponUuid: source.flags.spycraft2.weaponUuid
+  });
+  let ledger = newDamageHitLedger(basis);
+  const damage = [];
+  for (let i = 1; i <= 3; i++) {
+    ledger = reserveDamageHit(ledger, basis, "coverShot" + i);
+    const slot = ledger.slots.at(-1);
+    const message = card("cover-workflow-damage" + i, {
+      checkKind: "damage",
+      actorUuid: shooter.uuid,
+      effectiveTotal: 10 + i,
+      sourceAttack: { uuid: source.uuid, targetUuid: target.uuid, claimId: slot.claimId, hitIndex: i },
+      damageProfile: { kind: "lethal" }
+    });
+    slot.state = "posted";
+    slot.messageUuid = message.uuid;
+    slot.actualCheck = structuredClone(message.flags.spycraft2);
+    slot.actualRolls = [];
+    damage.push(message);
+  }
+  shooter.flags.spycraft2 = { attackDamageHits: { [source.id]: ledger } };
+  await assert.rejects(
+    () =>
+      reviewCoverSaves(source, shooter, {
+        input: { confirmed: true, result3: "penetrated", remaining3: 99, note3: "Actual save failed" }
+      }),
+    /Review each/
+  );
+  assert.equal(target.system.vitality.value, 40);
+  assert.equal(source.flags.spycraft2.coverInterception, undefined);
+  await reviewCoverSaves(source, shooter, {
+    input: {
+      confirmed: true,
+      result3: "penetrated",
+      remaining3: 4,
+      note3: "Scenery failed its actual Damage save; GC confirmed four remaining damage"
+    }
+  });
+  const result = await resolveAttack(source);
+  assert.equal(result.hits, 3);
+  assert.equal(source.flags.spycraft2.coverInterception.state, "complete");
+  assert.equal(damage[2].flags.spycraft2.effectiveTotal, 13, "original dice retained");
+  assert.equal(await applyDamage(damage[2], { targetUuid: target.uuid, damage: 13, kind: "lethal" }), false);
+  assert.equal(target.system.vitality.value, 40);
+  await applyDamage(damage[2], { targetUuid: target.uuid, damage: 4, kind: "lethal" });
+  assert.equal(target.system.vitality.value, 36);
+  await assert.rejects(
+    () => applyDamage(damage[2], { targetUuid: target.uuid, damage: 4, kind: "lethal" }),
+    /already reached/
+  );
+  assert.equal(target.system.vitality.value, 36, "original hit receipt prevents repeated delivery");
+  assert.deepEqual(
+    damage.map(m => m.flags.spycraft2.effectiveTotal),
+    [11, 12, 13]
+  );
+});
+
+test("total cover identifies actual first contact before threat confirmation and a stopped shot leaves target untouched", async () => {
+  reset();
+  const { prepareCoverAttack, reviewCoverSaves } = await import("../module/apps/cover-interception.mjs");
+  const { adjudicateCheck } = await import("../module/rules/outcomes.mjs");
+  const { attackDamageBasis, newDamageHitLedger, reserveDamageHit } =
+    await import("../module/rules/attack-damage-hits.mjs");
+  const shooter = character(
+    "TotalCoverShooter",
+    { activeFeatNames: [] },
+    {
+      async confirmCheckOutcome(message, opts) {
+        Object.assign(message.flags.spycraft2, adjudicateCheck(message.flags.spycraft2, opts.succeeded));
+        return message.flags.spycraft2;
+      }
+    }
+  );
+  const target = character("TotalCoverTarget", {
+    defense: { total: 12 },
+    vitality: { value: 40, max: 40 },
+    wounds: { value: 12, max: 12 }
+  });
+  const source = card("total-cover-workflow", {
+    checkKind: "attack",
+    actorUuid: shooter.uuid,
+    weaponUuid: shooter.uuid + ".Item.weapon",
+    rawTotal: 20,
+    effectiveTotal: 20,
+    naturalDie: 19,
+    threat: 21,
+    error: 1,
+    successConfirmed: true,
+    threatConfirmed: false,
+    damageHitsVersion: 1,
+    attackContext: { targetRole: { threatRangeReduction: 2 }, ranged: true }
+  });
+  await prepareCoverAttack(
+    source,
+    shooter,
+    {
+      targetUuid: target.uuid,
+      targetName: target.name,
+      defense: 20,
+      cover: { grade: 4, bonus: 8 },
+      total: 20,
+      hit: false,
+      hits: 0
+    },
+    { input: { name: "Concrete barrier", characterType: "object" } }
+  );
+  assert.equal(source.flags.spycraft2.threat, 19);
+  assert.equal(
+    source.flags.spycraft2.threatConfirmed,
+    true,
+    "the cover contact is confirmed even when a prior target outcome existed"
+  );
+  const basis = attackDamageBasis(source.flags.spycraft2, {
+    actorUuid: shooter.uuid,
+    weaponUuid: source.flags.spycraft2.weaponUuid
+  });
+  const ledger = reserveDamageHit(newDamageHitLedger(basis), basis, "totalCoverShot");
+  const damage = card("total-cover-damage", {
+    checkKind: "damage",
+    actorUuid: shooter.uuid,
+    effectiveTotal: 9,
+    sourceAttack: { uuid: source.uuid, targetUuid: target.uuid, claimId: "totalCoverShot", hitIndex: 1 }
+  });
+  Object.assign(ledger.slots[0], { state: "posted", messageUuid: damage.uuid });
+  shooter.flags.spycraft2 = { attackDamageHits: { [source.id]: ledger } };
+  await reviewCoverSaves(source, shooter, {
+    input: { confirmed: true, result1: "held", remaining1: 0, note1: "Concrete save succeeded; shot stopped" }
+  });
+  const result = await resolveAttack(source);
+  assert.equal(result.hit, false);
+  assert.equal(source.flags.spycraft2.successConfirmed, true);
+  assert.equal(await applyDamage(damage, { targetUuid: target.uuid, damage: 0, kind: "lethal" }), false);
+  assert.equal(target.system.vitality.value, 40);
+});
+
 test("blast cover decisions preserve full ring damage after a failed cover save and exclude intact cover", async () => {
   reset();
   const open = character("BlastOpen", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
