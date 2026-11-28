@@ -63,6 +63,9 @@ export function installPoolMaxHooks() {
   // then, or while the start-up migration ran, are checked here once; agents made before this was added get their
   // current maximums recorded with their values untouched.
   Hooks.once("spycraft2.ready", () => {
-    for (const actor of game.actors ?? []) schedulePoolMax(actor);
+    // Agents first: an Animal Partner's maximums are read from its owner, so the owner is settled before it.
+    const all = [...(game.actors ?? [])];
+    for (const actor of [...all.filter(a => a.type === "agent"), ...all.filter(a => a.type !== "agent")])
+      schedulePoolMax(actor);
   });
 }
