@@ -23,7 +23,7 @@
     <h3>{{localize "SPYCRAFT.Console.FirstSession"}} <span class="gc-note">{{localize "SPYCRAFT.Console.StepsDone" done=checklist.done total=checklist.total}}</span></h3>
     {{!-- Done steps fold into the count in the heading, so the list holds only what is left. --}}
     <ol>{{#each checklist.steps}}{{#unless done}}<li data-done="{{done}}"{{#if next}} aria-current="step"{{/if}}><span
-      class="gc-check" role="img" aria-label="{{#if done}}{{localize 'SPYCRAFT.Console.StepDone'}}{{else}}{{localize 'SPYCRAFT.Console.StepToDo'}}{{/if}}">{{#if done}}✔{{else}}○{{/if}}</span> <span>{{label}}</span>{{#if next}}{{#if action}} 
+      class="gc-check" role="img" aria-label="{{#if done}}{{localize 'SPYCRAFT.Console.StepDone'}}{{else}}{{localize 'SPYCRAFT.Console.StepToDo'}}{{/if}}">{{#if done}}✔{{else}}○{{/if}}</span> <span>{{label}}</span>{{#if next}}{{#if action}}
       <button type="button" class="gc-primary" data-action="{{action}}"{{#if view}} data-view="{{view}}"{{/if}}>{{#if button}}{{button}}{{else}}{{localize "SPYCRAFT.Console.DoThis"}}{{/if}}</button>{{/if}}{{/if}}</li>{{/unless}}{{/each}}</ol>
     {{#if checklist.doneNames}}<p class="gc-note">{{localize "SPYCRAFT.Console.StepsDoneList" names=checklist.doneNames}}</p>{{/if}}
     <p class="controls gc-quickstart"><a class="button" href="https://github.com/sachamm/foundry4spycraft2/blob/main/docs/gc-quickstart.md"
@@ -164,7 +164,7 @@
   </details>
   <details class="gc-section" data-section="antagonists" data-view-hidden="{{hiddenSections.antagonists}}" data-state="{{sections.antagonists.state}}" {{#if sections.antagonists.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Antagonists"}}</span><span class="gc-note">{{counts.antagonists}}</span></summary>
-    {{#if shown.prep}}<p class="controls"><button type="button" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button> 
+    {{#if shown.prep}}<p class="controls"><button type="button" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button>
       <button type="button" data-action="addAntagonist" data-tooltip="{{localize 'SPYCRAFT.Template.AppsGcConsole.RecordForXPHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordForXP"}}</button>
       </p>{{/if}}
     <ul class="gc-rows">{{#each mission.antagonists}}
@@ -191,30 +191,30 @@
     <p class="controls"><button type="button" data-action="addComplication">{{localize "SPYCRAFT.Console.AddComplication"}}</button></p>
     <ul data-sc2-display="icon">
     <li>{{localize "SPYCRAFT.Template.AppsGcConsole.ScriptedDramaticScenes"}} {{mission.dramaticScenes}}{{#if mission.timeLimit}} {{localize "SPYCRAFT.Template.AppsGcConsole.TimeLimit"}}{{/if}}{{#if mission.bundleCommonItems}} · {{mission.bundleCommonItems}} {{localize "SPYCRAFT.Template.AppsGcConsole.CommonItemsInTheBundle"}}{{/if}}</li>
-    {{#each mission.qualities}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQuality"}} {{name}} {{#if added}}{{localize "SPYCRAFT.Template.AppsGcConsole.AddedInPlayNoXP"}}{{else}}({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{/if}} 
+    {{#each mission.qualities}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQuality"}} {{name}} {{#if added}}{{localize "SPYCRAFT.Template.AppsGcConsole.AddedInPlayNoXP"}}{{else}}({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP"}}{{/if}}
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="qualities" data-key="{{key}}"
         data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.security}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Security"}} {{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}}) 
+    {{#each mission.security}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Security"}} {{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}})
       <button type="button" class="sc2-action" data-action="entry" data-list="security" data-key="{{key}}" data-change="ignored" aria-pressed="{{#if ignored}}true{{else}}false{{/if}}"
-        aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button> 
+        aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="security" data-key="{{key}}"
         data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.gearRestrictions}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.GearRestriction"}} {{name}} 
+    {{#each mission.gearRestrictions}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.GearRestriction"}} {{name}}
       <button type="button" class="sc2-action" data-action="entry" data-list="gearRestrictions" data-key="{{key}}"
         data-change="ignored" aria-pressed="{{#if ignored}}true{{else}}false{{/if}}"
-        aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button> 
+        aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="gearRestrictions"
         data-key="{{key}}" data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.exposure}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Exposure"}} {{name}} 
+    {{#each mission.exposure}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Exposure"}} {{name}}
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="exposure" data-key="{{key}}"
         data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.bundle}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Bundle"}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Caliber2"}} {{caliber}}) 
+    {{#each mission.bundle}}<li>{{localize "SPYCRAFT.Template.AppsGcConsole.Bundle"}} {{name}} {{localize "SPYCRAFT.Template.AppsGcConsole.Caliber2"}} {{caliber}})
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="bundle" data-key="{{key}}"
         data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
-    {{#each mission.otherComplications}}<li>{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}}) 
+    {{#each mission.otherComplications}}<li>{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP2"}}{{#if ignored}}{{localize "SPYCRAFT.Template.AppsGcConsole.IgnoredHalf"}}{{/if}})
       <button type="button" class="sc2-action" data-action="entry" data-list="otherComplications" data-key="{{key}}"
         data-change="ignored" aria-pressed="{{#if ignored}}true{{else}}false{{/if}}"
-        aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button> 
+        aria-label="{{localize 'SPYCRAFT.Console.IgnoredNamed' name=name}}">{{localize "SPYCRAFT.Console.IgnoredToggle"}}</button>
       <button type="button" class="sc2-action" data-action="editOtherComplication" data-key="{{key}}"
         aria-label="{{localize 'SPYCRAFT.Console.EditNamed' name=name}}">{{localize "SPYCRAFT.Console.EditRow"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="otherComplications"

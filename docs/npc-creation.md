@@ -83,6 +83,6 @@ The preview is checked again before application. A changed NPC or mission TL req
 
 ## Template artwork
 
-All twenty core templates include an original AI-generated painted portrait and a matching circular token. 
+All twenty core templates include an original AI-generated painted portrait and a matching circular token.
 
 These are illustrative appearances for reusable roles, not required identities. The GC can replace either image on an imported actor. Applying a TL package preserves the actor portrait and token settings. Existing world actors keep their current artwork; import a fresh template to use these defaults.
