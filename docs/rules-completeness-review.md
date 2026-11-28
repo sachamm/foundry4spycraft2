@@ -2894,3 +2894,40 @@ themes at 1280×720. The continuing native sequence has passed Injure delivery,
 deleted-card recovery, duplicate refusal, Undo and reapplication, and is checking
 Sprawl/Throw and reload. Final native results and cooperative grapple handling
 follow in the next pass before crediting the goal.
+
+## Pass 92: Cooperative grapples and completed native benefit verification
+
+Scores remain PC creation **9.9/10**, combat **9.8/10**. Dynamic named checks
+now participate in cooperative controls and validation. Grapple leaders record
+the actual Size-based maximum of 1/3/7 helpers, excluding the leader. Opening
+together requires the same Count and an adjacent target; helpers who already
+joined with the required full action have a distinct recorded mode. Independent
+participants remain subject to Initiative order rather than helper bonuses.
+GC declarations retain the physical circumstances. PC and NPC forms use these
+same rules; a helper takes its DC, mode and limit from its actual listed leader.
+Self-help, mismatched checks, excess helpers and closed/replaced leaders are
+refused. Re-tallying replaces the previous bonus instead of stacking it.
+
+Native PC leader ChatMessage.wciiQ30D5aiB3bmL rolled eight. NPC helper
+ChatMessage.rhsBBbmmplr6sHHD rolled 116 against DC 15, adding one synergy to
+produce nine. Re-tallying stayed at nine. An invalid four-helper declaration was
+refused before dice or a new card. Both real forms fit 1280×720 in both themes
+(primary-control bottoms 682.78px and 669.5px); roles, limit and tally survived
+reload. These were GC-declared participation/position circumstances, not automatic
+map or Initiative discovery. No browser errors occurred.
+
+The Pass-91 native benefit sequence also finished. Actual Athletics checks
+114 vs 13 produced ChatMessage.cxG0nxYgsGfbGFqM. Injure rolled 12 damage,
+reducing the NPC's vitality 29→17. Deleted-card recovery preserved its original
+dice and application identity, duplicate damage was refused, and guarded Undo
+and reapplication worked. Sprawl rolled zero from 1d4−1; Throw rolled one from
+standard unarmed damage with its minimum additional Strength bonus. Throw cleared
+Held, kept the loser sprawled and the winner prone. Health, original damage and
+release survived reload. The benefit form's primary control ended at 582.08px.
+
+Validation: **4,541 Node tests**, **988 engine fixtures**, **307 layout checks**,
+schemas, lint, formatting, bundle and copied-text checks passed. The next review
+identified the remaining Proficiency-tag omission on ordinary Grapple checks:
+untrained actions need doubled time which cannot be reduced and error range +2
+(p.347). Escape checks already handle it. Extend that reviewed proficiency/Size
+workflow to the ordinary check before completing the scoring review.

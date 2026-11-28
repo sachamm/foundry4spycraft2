@@ -36,6 +36,7 @@ import { manageCombatPersuasion } from "./combat-persuasion.mjs";
 import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
 import { drainedRecoveryCheck, drainedNpcCheckOptions } from "../../rules/drained.mjs";
 import { grappleSkillChecks, grappleCheckPlan, grappleCircumstancesContent } from "../../rules/grapple-check.mjs";
+import { cooperativeContent, cooperativeInput } from "../cooperative.mjs";
 import { restraintSkillChecks, restraintSourceSnapshot } from "../../rules/restraints.mjs";
 import { npcSkillActionPlan } from "../../rules/npc-skill-checks.mjs";
 
@@ -181,6 +182,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       <label>${loc`Error range (blank uses the named check's range)`} <input type="number" name="error" min="0" max="19" value="" /></label>
       ${qualityCheckContent(actor.system.qualityEffects)}
       <details><summary>${loc`Grapple circumstances`}</summary>${grappleCircumstancesContent(actor)}</details>
+      ${cooperativeContent(null, actor)}
       <details><summary>${loc`Skill tags and senses`}</summary><p>${loc`Current actor conditions apply automatically. Declare only additional circumstances of this named check.`}</p><label><input name="oneHanded" type="checkbox" /> ${loc`This Hands-On check uses one hand`}</label><label><input name="noSharedLanguage" type="checkbox" /> ${loc`No shared language or relevant local tongue`}</label><label><input name="conveyingMessage" type="checkbox" /> ${loc`I am transmitting Innuendo`}</label><label><input name="blinded" type="checkbox" /> ${loc`Additionally blinded for this check`}</label><label><input name="deafened" type="checkbox" /> ${loc`Additionally deafened for this check`}</label><label><input name="requiresEyesight" type="checkbox" /> ${loc`This task requires eyesight or eye-hand coordination`}</label><label><input name="requiresHearing" type="checkbox" /> ${loc`This task requires hearing`}</label><label><input name="targetDeafened" type="checkbox" /> ${loc`The actual target is deafened`}</label><label><input name="targetCharacter" type="checkbox" /> ${loc`The target is a character`}</label><label>${loc`Actual distance to that character (ft.)`} <input name="distanceFeet" type="number" min="0" step="any" /></label></details>
       ${actor.system.conditionContext?.held || actor.system.conditionContext?.pinned ? `<fieldset><legend>${loc`Opposed Grapple escape`}</legend><label>${loc`Applicable proficiency`} <select name="grappleProficient"><option value="">${loc`Confirm for this escape`}</option><option value="true">${loc`Proficient`}</option><option value="false">${loc`Not proficient: two full actions, error +2`}</option></select></label><label>${loc`My Size categories minus opponent Size categories`} <input name="grappleSizeDifference" type="number" value="0" step="1" min="-20" max="20" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`The GC confirms this escape's actual participants, proficiency and Size difference`}</label><label><input name="grappleAllSourcesConfirmed" type="checkbox" /> ${loc`All current Held/Pinned sources belong to this same grapple; otherwise review them separately`}</label></fieldset>` : ""}
       ${actor.system.conditionContext?.paralyzed ? `<label><input name="purelyMentalConfirmed" type="checkbox" /> ${loc`The GC confirms this is a purely mental action`}</label>` : ""}
@@ -246,6 +248,10 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     sourceSnapshot = action.restraint.escape ? restraintSourceSnapshot(actor) : null,
     originalSkill = graded ? npcSkillPlan(actor, skill.key) : null;
   if (action.blockedReason) throw Error(action.blockedReason);
+  const cooperative =
+    input.cooperative ??
+    cooperativeInput({ ...input, check: namedCheck?.id ?? "" }, { actor, key: skill.key })?.cooperative ??
+    null;
   if (plan.cap !== null) plan.cap = Math.max(0, plan.cap + action.capAdjustment);
   if (action.rollMode === "blindroll" && !game.user.isGM)
     throw Error(loc`The GC rolls this passive or secret NPC check.`);
@@ -414,6 +420,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       campaignSkillChecks: campaignChecks.evidence,
       dispositionSkill: disposition.evidence,
       grappleFeats: grapple.evidence,
+      cooperative,
       npcSkillContext: action.evidence,
       skillTags: action.tags,
       sensoryConditions: action.senses,

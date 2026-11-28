@@ -13,6 +13,14 @@ import { loc } from "../i18n.mjs";
 export const HELPER_BASE_DC = 15;
 export const HELPER_SYNERGY_LIMIT = 5;
 
+/** Dynamic named checks participate in the same cooperation rules as catalog checks. */
+export function cooperativeChecks(skillKey, actor) {
+  return rollPipeline.skillChecks(
+    { actor: actor?.system ? actor : { system: {} }, checkKind: "skill", skillKey, options: {}, optionalRules: [] },
+    globalThis.CONFIG?.SPYCRAFT?.skills?.[skillKey]?.checks ?? []
+  );
+}
+
 /**
  * How many helpers a named check allows.
  * @param {object} check  a named check with its `cooperative` entry: { max: n | "cha" | null, smallItem?, special? }
@@ -127,6 +135,16 @@ export function validateCooperative(cooperative, { check, checkMethod = "roll", 
   if (!cooperative) return;
   if (!["leader", "helper"].includes(cooperative.role)) throw new Error(loc`Choose leader or helper.`);
   if (checkMethod !== "roll") throw new Error(loc`Nobody takes 10 or 20 in a cooperative check (p.91).`);
+  if (
+    check?.id === "grapple" &&
+    (cooperative.grappleConfirmed !== true ||
+      !["opening", "joined"].includes(cooperative.grappleMode) ||
+      ![1, 3, 7].includes(cooperative.max) ||
+      cooperative.setDC === true)
+  )
+    throw Error(
+      loc`Confirm a simultaneous opening or a group already joined with the required action, actual positions and the Size limit. Use 1, 3 or 7 helpers and an opposed check.`
+    );
   const limit = helperLimit(check, { charismaMod });
   if (cooperative.role === "leader" && !limit.allowed)
     throw new Error(
@@ -147,7 +165,7 @@ rollPipeline.register({
   order: 9700,
   validate({ actor, options, checkMethod, skillKey, checkId, phase }) {
     if (!options.cooperative || phase !== "before") return;
-    const check = (globalThis.CONFIG?.SPYCRAFT?.skills?.[skillKey]?.checks ?? []).find(c => c.id === checkId);
+    const check = cooperativeChecks(skillKey, actor).find(c => c.id === checkId);
     validateCooperative(options.cooperative, {
       check,
       checkMethod,

@@ -11,6 +11,7 @@ import {
   helperResult,
   validateCooperative
 } from "../module/rules/cooperative.mjs";
+import { cooperativeChecks } from "../module/rules/cooperative.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 
 globalThis.CONFIG = { SPYCRAFT: cfg };
@@ -233,6 +234,124 @@ const helperMessage = (id, actor, total, extra = {}) =>
     cooperative: { role: "helper", leaderId: "L1", leaderName: "Kim", dc: 17 },
     ...extra
   });
+
+test("dynamic Grapple cooperation records actual opening/joined participation and Size-based helper limits", () => {
+  const actor = { uuid: "Actor.leader", system: {} };
+  const named = cooperativeChecks("athletics", actor).find(c => c.id === "grapple");
+  assert.equal(helperLimit(named).max, 7);
+  const fields = {
+    check: "grapple",
+    cooperativeRole: "leader",
+    cooperativeGrappleMax: "3",
+    cooperativeGrappleMode: "opening",
+    cooperativeGrappleConfirmed: true
+  };
+  const leader = cooperativeInput(fields, { actor, key: "athletics" }).cooperative;
+  assert.equal(leader.max, 3);
+  assert.equal(leader.setDC, false);
+  for (const [field, value] of [
+    ["cooperativeGrappleMax", "4"],
+    ["cooperativeGrappleConfirmed", false],
+    ["cooperativeSetDC", true],
+    ["cooperativeGrappleMode", "independent"]
+  ])
+    assert.throws(
+      () => cooperativeInput({ ...fields, [field]: value }, { actor, key: "athletics" }),
+      /Confirm a simultaneous/
+    );
+  for (const max of [1, 3, 7])
+    for (const grappleMode of ["opening", "joined"])
+      assert.doesNotThrow(() =>
+        validateCooperative({ role: "leader", max, grappleMode, grappleConfirmed: true }, { check: named })
+      );
+  const source = message("GL", "Leader", {
+    actorUuid: actor.uuid,
+    checkKind: "skill",
+    skillKey: "athletics",
+    checkId: "grapple",
+    effectiveTotal: 30,
+    cooperative: { ...leader, grappleMode: "joined" }
+  });
+  globalThis.game = { messages: Object.assign([source], { get: id => (id === "GL" ? source : null) }) };
+  const helper = cooperativeInput(
+    { check: "grapple", cooperativeRole: "helper", cooperativeLeader: "GL", cooperativeGrappleConfirmed: true },
+    { actor: { uuid: "Actor.helper", system: {} }, key: "athletics" }
+  ).cooperative;
+  assert.equal(helper.max, 3);
+  assert.equal(helper.grappleMode, "joined");
+  assert.equal(helper.dc, 20);
+  assert.throws(
+    () =>
+      cooperativeInput(
+        { check: "grapple", cooperativeRole: "helper", cooperativeLeader: "GL", cooperativeGrappleConfirmed: true },
+        { actor, key: "athletics" }
+      ),
+    /own helper/
+  );
+  assert.match(cooperativeContent("athletics", actor), /cooperativeGrappleMax/);
+});
+
+test("the actual grapple tally counts each helper once and refuses an over-cap or mismatched group", async () => {
+  const actor = { uuid: "Actor.leader", system: {} },
+    coop = { role: "leader", setDC: false, max: 1, grappleConfirmed: true, grappleMode: "joined", priorSynergy: 0 };
+  const source = message("GL", "Leader", {
+    actorUuid: actor.uuid,
+    checkKind: "skill",
+    skillKey: "athletics",
+    checkId: "grapple",
+    rawTotal: 20,
+    effectiveTotal: 20,
+    naturalDie: 10,
+    cap: 40,
+    threat: 20,
+    cooperative: coop
+  });
+  const helper = message("GH", "Helper", {
+    actorUuid: "Actor.helper",
+    checkKind: "skill",
+    skillKey: "athletics",
+    checkId: "grapple",
+    effectiveTotal: 20,
+    cooperative: { role: "helper", leaderId: "GL", dc: 15, max: 1, grappleMode: "joined", grappleConfirmed: true }
+  });
+  const warnings = [],
+    priorUI = globalThis.ui;
+  globalThis.ui = { notifications: { warn: text => warnings.push(text) } };
+  globalThis.fromUuidSync = () => actor;
+  game.messages = [source, helper];
+  try {
+    await applyHelpers(source);
+    assert.equal(source.flags.spycraft2.effectiveTotal, 21);
+    await applyHelpers(source);
+    assert.equal(source.flags.spycraft2.effectiveTotal, 21, "re-tally replaces the previous helper bonus");
+    game.messages.push(message("GH2", "Extra", { ...helper.flags.spycraft2, actorUuid: "Actor.extra" }));
+    await applyHelpers(source);
+    assert.equal(source.flags.spycraft2.effectiveTotal, 21);
+    assert.match(warnings.at(-1), /Size limit/);
+    game.messages.pop();
+    helper.flags.spycraft2.checkId = "climb";
+    await applyHelpers(source);
+    assert.equal(source.flags.spycraft2.effectiveTotal, 21);
+    assert.match(warnings.at(-1), /Size limit/);
+    source.flags.spycraft2.resolved = true;
+    helper.flags.spycraft2.checkId = "grapple";
+    await applyHelpers(source);
+    assert.equal(source.flags.spycraft2.effectiveTotal, 21);
+    assert.match(warnings.at(-1), /finished/);
+    assert.deepEqual(openLeaderChecks("athletics"), []);
+    game.messages.get = id => (id === "GL" ? source : null);
+    assert.throws(
+      () =>
+        cooperativeInput(
+          { check: "grapple", cooperativeRole: "helper", cooperativeLeader: "GL", cooperativeGrappleConfirmed: true },
+          { actor: { uuid: "Actor.new", system: {} }, key: "athletics" }
+        ),
+      /no longer available/
+    );
+  } finally {
+    globalThis.ui = priorUI;
+  }
+});
 
 test("the skill dialog offers the section only for skills with a cooperative check, and lists open leaders", () => {
   const leader = leaderMessage();

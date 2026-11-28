@@ -22,6 +22,7 @@ export const GRAPPLE_CHECK = Object.freeze({
   error: 1,
   page: 357,
   synergies: [],
+  cooperative: { max: 7 },
   synergyText: ""
 });
 
