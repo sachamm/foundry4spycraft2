@@ -27,10 +27,12 @@
             name="system.followMission" {{checked system.followMission}} /> {{localize "SPYCRAFT.Template.ActorNpcSheet.FollowMissionTL"}}{{#if system.usesMissionThreatLevel}} ({{system.effectiveThreatLevel}}){{/if}}</label>
       </div>
       {{#unless system.npcProfile.enabled}}{{#if gcPlay.special}}<div class="resources">
-        <label>{{localize "SPYCRAFT.Vitality"}} <input name="system.vitality.value" type="number" value="{{system.vitality.value}}"
-          /> / <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" /></label>
-        <label>{{localize "SPYCRAFT.Wounds"}} <input name="system.wounds.value" type="number" value="{{system.wounds.value}}"
-          /> / <input name="system.wounds.max" type="number" value="{{system.wounds.max}}" /></label>
+        <span class="sc2-pair" role="group" aria-label="{{localize 'SPYCRAFT.Vitality'}}">{{localize "SPYCRAFT.Vitality"}}
+          <input name="system.vitality.value" type="number" value="{{system.vitality.value}}" aria-label="{{localize 'SPYCRAFT.Npc.VitalityNow'}}" />
+          / <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" aria-label="{{localize 'SPYCRAFT.Npc.VitalityMax'}}" /></span>
+        <span class="sc2-pair" role="group" aria-label="{{localize 'SPYCRAFT.Wounds'}}">{{localize "SPYCRAFT.Wounds"}}
+          <input name="system.wounds.value" type="number" value="{{system.wounds.value}}" aria-label="{{localize 'SPYCRAFT.Npc.WoundsNow'}}" />
+          / <input name="system.wounds.max" type="number" value="{{system.wounds.max}}" aria-label="{{localize 'SPYCRAFT.Npc.WoundsMax'}}" /></span>
       </div>{{/if}}{{/unless}}
     </div>
   </header>

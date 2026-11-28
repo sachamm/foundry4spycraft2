@@ -76,7 +76,8 @@
         <button type="button" class="gc-row-button" data-action="openCombatant" data-id="{{id}}" data-tooltip="{{localize 'SPYCRAFT.Console.RowHint'}}"><span
           class="gc-row-name">{{#if img}}<img class="gc-row-img" src="{{img}}" alt="" width="20" height="20" loading="lazy" />{{/if}}{{#if hidden}}<i
           class="fa-solid fa-eye-slash" role="img" aria-label="{{localize 'SPYCRAFT.Console.HiddenCombatant'}}"
-          data-tooltip="{{localize 'SPYCRAFT.Console.HiddenCombatant'}}"></i> {{/if}}{{name}}</span>{{#if tags.length}}<span class="gc-row-tags">{{#each tags}}<span
+          data-tooltip="{{localize 'SPYCRAFT.Console.HiddenCombatant'}}"></i> {{/if}}{{name}}{{#if defeated}}
+          <span class="tag gc-tag-muted">{{localize "SPYCRAFT.Console.Defeated"}}</span>{{/if}}</span>{{#if tags.length}}<span class="gc-row-tags">{{#each tags}}<span
           class="tag gc-tag-{{tone}}">{{text}}</span>{{/each}}</span>{{/if}}<span
           class="gc-row-count" aria-label="{{count}}">{{countValue}}</span></button></li>{{/each}}
     </ul>

@@ -101,6 +101,10 @@
    "PinnedResults": "What these choices give",
    "GCOnlyRolls": "GC only",
    "GCOnlyRollsHint": "This NPC's attacks, damage and saves go to the GC only, until unticked. A roll's own visibility choice still wins.",
+   "VitalityNow": "Vitality now",
+   "VitalityMax": "Vitality maximum",
+   "WoundsNow": "Wounds now",
+   "WoundsMax": "Wounds maximum",
    "AttackBaseHint": "Before the weapon: each weapon's Attack button adds its own bonuses and shows the full figure.",
    "FollowingMission": "Set by the mission's Threat Level ({value}) while Follow mission TL is ticked.",
    "PinnedXP": "XP reward",
@@ -289,6 +293,7 @@
    "DoneHint": "Marks the objective met, or clears the mark",
    "FightTools": "Fight tools",
    "HiddenCombatant": "Hidden from the players",
+   "Defeated": "defeated",
    "OpenControls": "Configure Controls…",
    "ApplyDamageTo": "Apply damage: {target}",
    "NextUp": "Next: {name}",
@@ -300,6 +305,9 @@
    "UnlinkNamed": "Unlink {name} from this organization",
    "DropLink": "Drop an NPC here to link it to this organization",
    "EditRow": "Edit…",
+   "NextStepNamed": "Next step: {name}",
+   "ManageNamed": "Manage {name}",
+   "PostSummaryNamed": "Post a summary of {name}",
    "EditNamed": "Edit {name}"
   },
   "Ability": {

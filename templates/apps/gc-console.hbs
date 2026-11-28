@@ -224,8 +224,10 @@
       class="gc-note">{{counts.conflicts}}</span>{{/if}}</summary>
     <p class="controls"><button type="button" data-action="startConflict">{{localize "SPYCRAFT.Template.AppsGcConsole.Start"}}</button></p>
     <ul data-sc2-display="icon">{{#each conflicts}}<li><b>{{name}}</b> ({{type}}{{localize "SPYCRAFT.Template.AppsGcConsole.Round2"}} {{round}}{{localize "SPYCRAFT.Template.AppsGcConsole.Lead"}} <b>{{lead}}</b>, {{predator}} {{localize "SPYCRAFT.Template.AppsGcConsole.Vs"}} {{prey}} · {{#if winner}}{{localize "SPYCRAFT.Template.AppsGcConsole.Ended"}} {{winner}} {{localize "SPYCRAFT.Template.AppsGcConsole.Wins"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.Step"}} {{step}}{{/if}}
-    {{#unless winner}}<button type="button" class="sc2-action" data-action="advanceConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.NextStep"}}</button> · {{/unless}}
-      <button type="button" class="sc2-action" data-action="manageConflict" data-id="{{id}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Manage"}}</button></li>{{else}}<li
+    {{#unless winner}}<button type="button" class="sc2-action" data-action="advanceConflict" data-id="{{id}}"
+      aria-label="{{localize 'SPYCRAFT.Console.NextStepNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.NextStep"}}</button> · {{/unless}}
+      <button type="button" class="sc2-action" data-action="manageConflict" data-id="{{id}}"
+        aria-label="{{localize 'SPYCRAFT.Console.ManageNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Manage"}}</button></li>{{else}}<li
         class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoneRunning"}}</li>{{/each}}</ul>
   </details>
   <details class="gc-section" data-section="organizations"
@@ -250,10 +252,10 @@
           class="sc2-action" data-action="openOrganizationNpc" data-uuid="{{uuid}}">{{name}}</button><button type="button"
           class="sc2-action" data-action="unlinkOrganizationNpc" data-id="{{../id}}" data-uuid="{{uuid}}"
           aria-label="{{localize 'SPYCRAFT.Console.UnlinkNamed' name=name}}" data-tooltip="{{localize 'SPYCRAFT.Console.UnlinkNamed' name=name}}">×</button>{{/each}}</span>{{/if}}
-        <button type="button" class="sc2-action" data-action="organizationCard" data-id="{{id}}"
+        <button type="button" class="sc2-action" data-action="organizationCard" data-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Console.PostSummaryNamed' name=name}}"
           data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.OrganizationCardHint"}}">
           {{localize "SPYCRAFT.Template.AppsGcConsole.PostSummary"}}</button>
-        <button type="button" class="sc2-action" data-action="editOrganization" data-id="{{id}}">
+        <button type="button" class="sc2-action" data-action="editOrganization" data-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Console.EditNamed' name=name}}">
           {{localize "SPYCRAFT.Template.AppsGcConsole.Edit"}}</button>
         <button type="button" class="sc2-action gc-danger" data-action="removeOrganization" data-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}"
           data-tooltip="{{localize "SPYCRAFT.Template.AppsGcConsole.RemoveOrganizationHint"}}">

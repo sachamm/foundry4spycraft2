@@ -18,13 +18,14 @@
           data-action="rollAttack"
           class="sc2-primary-action sc2-action"
           aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith'
-          name=item.name}}" {{sc2tip attackTip}}>{{localize "SPYCRAFT.Template.ActorAgentGear.Attack"}} {{signed attack.total}}</button>
+          name=item.name}} {{signed attack.total}}" {{sc2tip attackTip}}>{{localize "SPYCRAFT.Template.ActorAgentGear.Attack"}} {{signed attack.total}}</button>
         {{#if untrained}}<span
           class="sc2-untrained"
           data-tooltip="{{localize 'SPYCRAFT.Weapon.UntrainedHint'}}"><i
           class="fa-solid fa-triangle-exclamation"
           aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}
-        <button type="button" class="sc2-action" data-action="rollDamage" aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}}">{{item.system.damage}}</button>
+        <button type="button" class="sc2-action" data-action="rollDamage"
+          aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}} {{item.system.damage}}">{{item.system.damage}}</button>
         {{#if attack.range}}<button type="button" class="sc2-action" data-action="rollRangedAttack" aria-label="{{localize 'SPYCRAFT.Action.MeasuredAttackWith' name=item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.MeasuredAttack"}}</button>{{/if}}
       </div>
       <dl class="inventory-stats">
