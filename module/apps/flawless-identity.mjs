@@ -59,3 +59,20 @@ export async function leaveIdentity(actor) {
     content: esc(loc`${actor.name} drops the act and is themself again.`)
   });
 }
+
+/** The speaker line of a message from an agent in a cover identity: "Name (as Cover)". */
+export function identitySpeakerAlias(alias, actor) {
+  const cover = actor?.type === "agent" ? actor.system?.activeIdentityState?.name : "";
+  if (!cover) return null;
+  const base = alias || actor.name;
+  return String(base).includes(cover) ? null : loc`${base} (as ${cover})`;
+}
+
+/** Cards the agent posts while in character say so in their header, so the table sees whose face is on show. */
+export function installIdentitySpeaker() {
+  Hooks.on("preCreateChatMessage", message => {
+    const actor = message.speaker?.actor ? globalThis.game?.actors?.get(message.speaker.actor) : null;
+    const alias = identitySpeakerAlias(message.speaker?.alias, actor);
+    if (alias) message.updateSource({ "speaker.alias": alias });
+  });
+}

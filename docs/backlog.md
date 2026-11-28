@@ -160,7 +160,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-138 | Cover identity only mid-page; not on the rail or cards. | SG-A23 | S |
 | B-139 | Browser rows about 61px; preview empty until a pick; the browser stays open after adding (except talents and specialties); a row click redraws list and preview; prerequisites recomputed on every draw. | SG-I6, LR-24b, LR-24f, HBS-04 | M |
 | B-140 | Stepper and sheet tabs are two navigations; steps may open browsers inconsistently (live check). | LR-21e, LR-21f | M |
 | B-255 | **Breakdown tooltips, the rest.** Roll buttons and roll cards now list the parts of their bonus. Still without one: the NPC graded tiles (Initiative, attack base, saves, Damage save), skill error range, the vehicle sheet's figures, and initiative cards (Foundry posts those without the system's check record). A damage card lists its flat bonus but not where each extra die came from. Action dice added after the roll show as "16 → 25" on the card, not as tooltip rows. | PR for bonus tooltips, 2026-11-25 | S |
