@@ -60,6 +60,7 @@ import { COVER_GRADES } from "../rules/cover.mjs";
 import { specialistDefense } from "../rules/weapon-specialist.mjs";
 import { currentInjuryEffects, currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { applyShaken } from "./shaken-application.mjs";
+import { applyNpcStressDrained } from "./stress-drained.mjs";
 import { beginNpcDefenseReview, reviewNpcHitDefense } from "./gc/post-hit-defense.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { damageApplicationKey } from "../rules/attack-damage-hits.mjs";
@@ -733,6 +734,10 @@ hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded,
       if (!application)
         throw new Error(loc`Shaken was not recorded. Review ownership and the stress event before retrying.`);
       return post(actor, [loc`${esc(actor.name)} fails the stress save: Shaken grade ${grade} recorded.`]);
+    }
+    if (actor.type === "npc" && (save.stressTier === 5 || save.failureOutcome === "Drained")) {
+      await applyNpcStressDrained(actor, message, save);
+      return post(actor, [loc`${esc(actor.name)} fails the stress save: the reviewed Drained loss is recorded.`]);
     }
     return post(actor, [
       save.failureOutcome

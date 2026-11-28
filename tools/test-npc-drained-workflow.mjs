@@ -6,6 +6,7 @@ import { defaultNpcProfile, NPC_STATS } from "../module/rules/npcs.mjs";
 import { applyUndo } from "../module/apps/undo.mjs";
 import { rollDrainedRecovery, settleDrainedRecoveryCheck, reviewDrainedRecovery } from "../module/apps/drained.mjs";
 import { SPYCRAFT } from "../module/config.mjs";
+import { applyNpcStressDrained } from "../module/apps/stress-drained.mjs";
 let serial = 0;
 function fixture(npcType = "standard") {
   const notes = [],
@@ -147,6 +148,63 @@ test("NPC context cancellation releases only an unused claim; owners without GC 
   assert.equal(await rollDrainedRecovery(actor, { confirmed: true }), null);
   assert.equal(npcDrainedView(actor).canRoll, false);
   await assert.rejects(reviewDrainedRecovery(actor), /owning GC/);
+});
+
+test("an original failed fifth-tier NPC stress save records one reviewed loss and cannot replay it", async () => {
+  const { actor } = fixture("special"),
+    save = { damageKind: "stress", stressTier: 5, eventId: "original_event", dc: 30 },
+    message = {
+      id: "original_message",
+      uuid: "ChatMessage.original_message",
+      flags: {
+        spycraft2: {
+          actorUuid: actor.uuid,
+          resolved: true,
+          successConfirmed: false,
+          effectiveTotal: 5,
+          hazardSave: save
+        }
+      }
+    };
+  let forms = 0;
+  foundry.applications.api.DialogV2.input = async () => {
+    forms++;
+    return { source: "Actual original stress save", levels: 1, confirmed: true };
+  };
+  await applyNpcStressDrained(actor, message, save);
+  assert.equal(actor.flags.spycraft2.drained.levels, 1);
+  assert.equal(actor.system.effectiveThreatLevel, 9);
+  await applyNpcStressDrained(actor, message, save);
+  assert.equal(actor.flags.spycraft2.drained.levels, 1);
+  assert.equal(forms, 1);
+  message.flags.spycraft2.successConfirmed = true;
+  await assert.rejects(applyNpcStressDrained(actor, message, save), /original NPC stress save changed/);
+});
+
+test("cancelled or stale NPC stress reviews cannot record a loss or silently complete the effect", async () => {
+  const { actor } = fixture("special"),
+    save = { damageKind: "stress", failureOutcome: "Drained", eventId: "legacy_event", dc: 30 },
+    message = {
+      id: "original_message",
+      uuid: "ChatMessage.original_message",
+      flags: {
+        spycraft2: {
+          actorUuid: actor.uuid,
+          resolved: true,
+          successConfirmed: false,
+          effectiveTotal: 5,
+          hazardSave: save
+        }
+      }
+    };
+  await assert.rejects(applyNpcStressDrained(actor, message, save), /not recorded/);
+  assert.equal(actor.flags.spycraft2?.drained, undefined);
+  foundry.applications.api.DialogV2.input = async () => {
+    message.flags.spycraft2.effectiveTotal = 10;
+    return { source: "Stale original stress save", levels: 1, confirmed: true };
+  };
+  await assert.rejects(applyNpcStressDrained(actor, message, save), /original NPC stress save changed/);
+  assert.equal(actor.flags.spycraft2?.drained, undefined);
 });
 
 test("the real NPC application preserves original grades/qualities and Undo preserves unrelated benefits", async () => {

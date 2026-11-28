@@ -162,6 +162,7 @@ export async function applyNpcDrained(actor, options = {}) {
   return queueResources([actor], async () => {
     requireGC(actor);
     unchanged(actor, expected);
+    await options.validateSource?.();
     const seen = new Set(),
       ids = original.qualities.map(q => {
         let id =

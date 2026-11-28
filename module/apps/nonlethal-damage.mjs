@@ -127,6 +127,7 @@ export async function nonLethalDamage(target, kind, amount, facts) {
       dc: plan.dc,
       label: kind === "stress" ? loc`Stress damage` : loc`Subdual damage`,
       damageKind: kind,
+      ...(kind === "stress" ? { stressTier: plan.tier } : {}),
       failureOutcome: plan.failureOutcome,
       eventId: foundry.utils.randomID(),
       stressGrade: kind === "stress" && plan.tier >= 1 && plan.tier <= 4 ? plan.tier : null,

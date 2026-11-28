@@ -2480,6 +2480,36 @@ at their existing caps. Combat stays at 9.8 pending the remaining NPC damage
 handoffs, grapple limits/benefits, cover and secondary-effect cases. Automatic
 advancement during Drained and manual item/timed benefits remain explicit GC
 reviews rather than guessed changes to owned history.
+
+## Pass 81: Special-NPC stress-to-Drained handoff
+
+### PC creation: 9.9/10
+
+The creation assessment remains supported by Pass 79's complete native builds.
+
+### Combat play: 9.8/10
+
+The special-NPC stress report now records its numerical tier and routes a failed
+fifth-tier save into the actual NPC Drained review. Legacy reports with the
+Drained outcome label use the same path. The handoff verifies the finished
+original save again after the GC form, rejecting changed totals, sources,
+ownership or outcomes. A cancelled review cannot silently complete the effect;
+the existing interrupted-hazard review retains its original dice. The saved
+source identity makes duplicate application harmless.
+
+Native Foundry created an actual special NPC and posted 100 stress damage. Its
+real Will result, 15 against DC 28, entered the GC Drained form. Completing that
+form lowered actor-specific effective level 10→9 and Health-table vitality
+60→54, while preserving all 100 stress, the original grade-VII profile and the
+shared mission. Repeated settlement retained one application. Reload preserved
+the loss and completed original save. The final form control was at 583.36px
+within 1280×720. A separate active standard NPC's editor continued to expose its
+original grade VII while its prepared current grade was VI.
+
+Validation: 4,478 Node tests and 988 engine fixtures; lint, formatting, bundle
+and copied-text checks pass. The prior 291 layout cases remain unchanged. No new
+browser errors occurred. Continue the remaining grapple, cover and broader
+secondary-effect review before increasing the combat score.
 Continue implementing and reviewing combat before completing this goal.
 
 No product code changed during this pass. The existing **4,455** Node tests,
