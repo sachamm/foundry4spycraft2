@@ -45,6 +45,46 @@ test("opening grapples use recorded PC and NPC Sizes, including large origin lab
   assert.equal(grappleOpeningContext({}, {}, confirmed).recorded, false);
 });
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+test("opening crowd limits use the target's Size relative to the acting grappler and reject overflow or unknown counts", () => {
+  const options = { grappleContextConfirmed: true };
+  for (const [size, otherSize, limit] of [
+    ["Large", "Medium", 2],
+    ["Medium", "Medium", 4],
+    ["Small", "Medium", 8]
+  ]) {
+    const plan = grappleOpeningContext({ size }, { size: otherSize }, { ...options, otherGrapplers: limit - 1 });
+    assert.equal(plan.limit, limit);
+    assert.equal(plan.grapplers, limit);
+    assert.throws(
+      () => grappleOpeningContext({ size }, { size: otherSize }, { ...options, otherGrapplers: limit }),
+      /maximum/
+    );
+  }
+  for (const otherGrapplers of [-1, NaN, "1", 1.5])
+    assert.throws(
+      () => grappleOpeningContext({ size: "Medium" }, { size: "Medium" }, { ...options, otherGrapplers }),
+      /actual number/
+    );
+  for (const difference of [undefined, NaN, "1", 0.5]) assert.throws(() => grapplerLimit(difference), /whole Size/);
+});
+
+test("a second new hold requires its earned benefit and an existing held opponent; a third new hold is refused", () => {
+  const context = { grappleContextConfirmed: true },
+    system = { size: "Medium" },
+    target = { size: "Medium" };
+  assert.equal(
+    grappleOpeningContext(system, target, { ...context, heldOpponents: 1, secondOpponentBenefit: true }).secondOpponent,
+    true
+  );
+  for (const patch of [
+    { heldOpponents: 1 },
+    { heldOpponents: 2, secondOpponentBenefit: true },
+    { secondOpponentBenefit: true },
+    { heldOpponents: -1 },
+    { heldOpponents: "1" }
+  ])
+    assert.throws(() => grappleOpeningContext(system, target, { ...context, ...patch }), /never a third target/);
+});
 import { weaponAttack } from "../module/rules/gear.mjs";
 import { coverFireTargetLabel, fireActionInput } from "../module/apps/combat-actions.mjs";
 

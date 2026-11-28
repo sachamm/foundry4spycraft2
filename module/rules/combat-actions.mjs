@@ -304,7 +304,13 @@ export function grappleAllowed(difference) {
 export function grappleOpeningContext(
   system,
   opponentSystem,
-  { sizeDifference: declared, grappleContextConfirmed = false } = {}
+  {
+    sizeDifference: declared,
+    grappleContextConfirmed = false,
+    otherGrapplers = 0,
+    heldOpponents = 0,
+    secondOpponentBenefit = false
+  } = {}
 ) {
   const knownSize = source => {
     const value = source?.size ?? source?.qualityEffects?.size;
@@ -321,12 +327,38 @@ export function grappleOpeningContext(
     throw new Error(loc`Record a valid Size difference for the grapple participants.`);
   if (!grappleAllowed(difference))
     throw new Error(loc`The target is more than one Size category larger; this opening grapple is not allowed.`);
-  return { difference, size, otherSize, recorded };
+  if (
+    !Number.isSafeInteger(heldOpponents) ||
+    heldOpponents < 0 ||
+    heldOpponents > 2 ||
+    heldOpponents >= 2 ||
+    (heldOpponents === 1 && secondOpponentBenefit !== true) ||
+    (secondOpponentBenefit === true && heldOpponents !== 1)
+  )
+    throw new Error(
+      loc`A new hold requires no held opponent, or exactly one held (not pinned) opponent and the earned second-opponent benefit; never a third target.`
+    );
+  const limit = grapplerLimit(-difference);
+  if (!Number.isSafeInteger(otherGrapplers) || otherGrapplers < 0)
+    throw new Error(loc`Enter the actual number of other characters grappling this target.`);
+  if (otherGrapplers + 1 > limit)
+    throw new Error(loc`This target already has the maximum ${limit} grapplers for the acting character's Size.`);
+  return {
+    difference,
+    size,
+    otherSize,
+    recorded,
+    grapplers: otherGrapplers + 1,
+    limit,
+    secondOpponent: heldOpponents === 1
+  };
 }
 
 /** The most characters who may grapple one target, by the target's Size relative to theirs (p.357). */
 export function grapplerLimit(targetDifference) {
-  const d = Math.trunc(Number(targetDifference) || 0);
+  if (!Number.isSafeInteger(targetDifference))
+    throw new Error(loc`Record a whole Size difference for the grappler limit.`);
+  const d = targetDifference;
   return d < 0 ? 2 : d === 0 ? 4 : d === 1 ? 8 : 0;
 }
 
@@ -388,7 +420,10 @@ export function grappleBenefitText(id) {
     mute: [loc`Mute`, loc`Silence the opponent, at –2 to your own Athletics checks while it lasts.`],
     pin: [loc`Pin`, loc`A held opponent becomes pinned.`],
     sprawl: [loc`Sprawl Opponent`, loc`The opponent is sprawled and takes 1d4 + Str subdual; you end prone.`],
-    throw: [loc`Throw`, loc`Throw the opponent into an adjacent square: unarmed damage + Str, sprawled, released.`],
+    throw: [
+      loc`Throw`,
+      loc`Empty adjacent square; standard unarmed damage + Str bonus (min +1); sprawled and released.`
+    ],
     useWeapon: [loc`Use Opponent's Weapon`, loc`Turn a pinned opponent's one-handed weapon on its wielder.`]
   }[id];
 }

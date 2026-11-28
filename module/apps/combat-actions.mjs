@@ -385,6 +385,8 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     chosen = Array.from({ length: outcome.benefits }, (_, index) => picked[`benefit${index}`]).filter(Boolean);
   }
   if (!chosen.length) return [];
+  if (chosen.length > outcome.benefits || chosen.some(id => !GRAPPLE_BENEFITS.some(b => b.id === id)))
+    throw new Error(loc`Choose only the number of listed grapple benefits actually earned.`);
   const labels = CONDITION_LABELS(),
     lines = [
       loc`${esc(winner?.name ?? loc`The opponent`)} takes: ${chosen.map(id => esc(grappleBenefitText(id)[0])).join(", ")}.`
@@ -396,9 +398,25 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     if (!change.active && who && !who.statuses?.has(change.id)) continue;
     lines.push(await changeGrappleCondition(who, change.id, change.active, label));
   }
-  if (chosen.includes("sprawl")) lines.push(loc`Sprawl Opponent: roll 1d4 + Strength subdual damage and apply it.`);
-  if (chosen.some(id => ["injure", "throw", "useWeapon"].includes(id)))
-    lines.push(loc`Roll the damage from the weapon's card and apply it to the opponent.`);
+  const strength = winner?.system?.abilities?.str?.mod;
+  for (const id of chosen) {
+    if (id === "sprawl")
+      lines.push(
+        Number.isFinite(strength)
+          ? loc`Sprawl Opponent damage: 1d4 + (${strength}) subdual, before defenses; roll and apply this benefit once.`
+          : loc`Sprawl Opponent: verify Strength, then roll 1d4 + Strength subdual damage before defenses.`
+      );
+    else if (id === "throw")
+      lines.push(
+        Number.isFinite(strength)
+          ? loc`Throw damage: standard unarmed damage + ${Math.max(1, strength)} additional damage before defenses. The extra Strength bonus has a minimum of +1; use an empty adjacent destination.`
+          : loc`Throw: verify standard unarmed damage and add the Strength bonus again, at least +1, before defenses. Use an empty adjacent destination.`
+      );
+    else if (["injure", "useWeapon"].includes(id))
+      lines.push(
+        loc`Roll the selected legal weapon or unarmed damage once for this benefit and apply it before defenses. Any lethal/subdual conversion penalty belongs on the opposed Athletics check, with the actual feat waiver.`
+      );
+  }
   return lines;
 }
 
@@ -419,14 +437,16 @@ export async function settleGrapple(actor, options = {}) {
         )
         .join(
           ""
-        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size difference when a participant has no recorded Size (negative when smaller)`} <input type="number" name="sizeDifference" value="0" min="-9" max="9" step="1" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`For an opening grapple, the GC confirms adjacency and current Sizes; recorded character Sizes take precedence over the manual difference`}</label></div>`
+        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size difference when a participant has no recorded Size (negative when smaller)`} <input type="number" name="sizeDifference" value="0" min="-9" max="9" step="1" /></label><label>${loc`Opponents I already hold`} <input name="heldOpponents" type="number" value="0" min="0" max="2" step="1" /></label><label><input name="secondOpponentBenefit" type="checkbox" /> ${loc`This opening uses an earned second-opponent benefit; my current opponent is held, not pinned, and my result includes the −4 Athletics penalty`}</label><label>${loc`Other characters already grappling this target`} <input name="otherGrapplers" type="number" value="0" min="0" max="7" step="1" /></label><p>${loc`Target smaller than you: at most 2 grapplers; same Size: 4; one Size larger: 8. The GC checks every participant when Sizes differ.`}</p><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`For an opening grapple, the GC confirms adjacency, current Sizes and the actual other-grappler count; recorded character Sizes take precedence`}</label></div>`
     });
     if (!input) return null;
     input = {
       ...input,
       total: Number(input.total),
       opponentTotal: Number(input.opponentTotal),
-      sizeDifference: Number(input.sizeDifference)
+      sizeDifference: Number(input.sizeDifference),
+      otherGrapplers: Number(input.otherGrapplers ?? 0),
+      heldOpponents: Number(input.heldOpponents ?? 0)
     };
   }
   let outcome, openingContext;
@@ -442,6 +462,11 @@ export async function settleGrapple(actor, options = {}) {
       input = { ...input, sizeDifference: openingContext.difference };
     }
     outcome = grappleOutcome(input);
+    if (
+      Array.isArray(input.benefits) &&
+      (input.benefits.length > outcome.benefits || input.benefits.some(id => !GRAPPLE_BENEFITS.some(b => b.id === id)))
+    )
+      throw new Error(loc`Choose only the number of listed grapple benefits actually earned.`);
   } catch (error) {
     return refuse(error.message);
   }
@@ -463,6 +488,12 @@ export async function settleGrapple(actor, options = {}) {
       ? openingContext.recorded
         ? loc`Opening Sizes: ${openingContext.size} against ${openingContext.otherSize}; adjacency confirmed.`
         : loc`Opening Size difference: ${openingContext.difference}; the GC confirmed unrecorded Sizes and adjacency.`
+      : "",
+    openingContext
+      ? loc`This target has ${openingContext.grapplers} grappler(s), including this character, against a Size-based limit of ${openingContext.limit}.`
+      : "",
+    openingContext?.secondOpponent
+      ? loc`Second-opponent benefit: the current opponent was held, not pinned, and the opposed Athletics result includes the −4 penalty.`
       : "",
     ...outcome.effects.map(esc),
     sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",

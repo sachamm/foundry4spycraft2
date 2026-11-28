@@ -25,6 +25,57 @@ test("Grapple is a named Athletics check", () => {
   assert.deepEqual(grappleSkillChecks("notice", []), []);
 });
 
+test("second-opponent, Mute and converted-damage penalties reach actual skill planning without double-counting a second hold", () => {
+  const system = state([]),
+    base = roll(system).total;
+  assert.equal(roll(system, { grappleSecondOpponent: true }).total, base - 4);
+  assert.equal(roll(system, { grappleHoldingTwo: true, grappleSecondOpponent: true }).total, base - 4);
+  const plan = roll(system, { grappleHoldingTwo: true, grappleMuting: true, grappleDamageConversion: true });
+  assert.equal(plan.total, base - 10);
+  assert.equal(plan.grappleFeats.second, true);
+  assert.equal(plan.grappleFeats.muting, true);
+  assert.equal(plan.grappleFeats.conversion.attackPenalty, -4);
+  const climb = cfg.skills.athletics.checks.find(c => c.id === "climb");
+  assert.equal(
+    resolveSkillCheck(system, "athletics", climb, { grappleHoldingTwo: true }).total,
+    resolveSkillCheck(system, "athletics", climb).total - 4
+  );
+  assert.equal(grappleCheckPlan(system, "notice", { id: "awareness" }, { grappleHoldingTwo: true }).bonuses.length, 0);
+});
+
+test("grapple conversion uses actual Bludgeon or readied Club Basics waivers and rejects missing or two-handed weapons", () => {
+  const plain = state([]),
+    bludgeon = state(["Bludgeon"]),
+    input = { grappleDamageConversion: true };
+  assert.equal(roll(bludgeon, input).total, roll(bludgeon).total);
+  assert.equal(roll(bludgeon, input).grappleFeats.conversion.waivedBy, "Bludgeon");
+  const club = {
+      id: "club",
+      type: "weapon",
+      name: "Club",
+      system: { proficiency: "blunt", damage: "1d6 lethal", equipped: true, sizeHands: "Small/1h" }
+    },
+    system = state(["Club Basics"], {
+      readiedMeleeWeapons: [
+        { id: "club", name: "Club", family: "club", proficiency: "blunt", hands: 1, requiredHands: 1 }
+      ]
+    }),
+    plan = options =>
+      grappleCheckPlan(system, "athletics", GRAPPLE_CHECK, {
+        ...input,
+        grappleConversionWeaponId: "club",
+        grappleConversionWeapon: club,
+        ...options
+      });
+  assert.equal(plan().evidence.conversion.waivedBy, "Club Basics");
+  assert.equal(plan().evidence.conversion.from, "lethal");
+  assert.equal(plan().evidence.conversion.attackPenalty, 0);
+  assert.ok(plan({ grappleConversionWeapon: null }).blockedReason);
+  club.system.sizeHands = "Medium/2h";
+  assert.ok(plan().blockedReason);
+  assert.equal(roll(plain, { ...input, grappleConversionFrom: "lethal" }).grappleFeats.conversion.to, "subdual");
+});
+
 test("Prone Stance +1, Horde Mastery +1 morale and Garrote Basics threat +2 apply to Grapple checks", () => {
   const plain = roll(state([]));
   const prone = roll(state(["Submission Basics"], { combatStance: { version: 1, id: "p", key: "prone" } }));

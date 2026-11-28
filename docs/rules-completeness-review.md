@@ -2510,6 +2510,57 @@ Validation: 4,478 Node tests and 988 engine fixtures; lint, formatting, bundle
 and copied-text checks pass. The prior 291 layout cases remain unchanged. No new
 browser errors occurred. Continue the remaining grapple, cover and broader
 secondary-effect review before increasing the combat score.
+
+## Pass 82: Grapple limits, modifiers and NPC named-check penalties
+
+### PC creation: 9.9/10
+
+The completed creation evidence remains unchanged.
+
+### Combat play: 9.8/10
+
+The source comparison checked the crowd/benefit rules on pp.357–358 and the
+damage-conversion rule on p.345. Opening settlement now validates the actual
+other-grappler count against the acting character's Size-based limit: two on a
+smaller target, four on an equal target, eight on a target one category larger.
+Mixed Sizes still require the GC to check every participant. Existing hold counts
+also matter: a second new hold requires the earned benefit and an existing held,
+not pinned, opponent; a third new hold is refused before conditions or chat.
+
+PC and NPC Athletics now apply the declared second-opponent penalty once, the
+remaining Mute penalty, and the damage-conversion penalty. Holding two applies
+to every Athletics use. Bludgeon and an actual available readied Club Basics
+weapon use their existing conversion waivers. Missing, unavailable or illegally
+gripped conversion weapons cannot supply a waiver. The posted roll retains the
+applied circumstances and conversion direction, and checks for changed sources.
+NPC named checks now apply the same armor/encumbrance and armor-vision penalties
+as PCs. Omni-Competent adjusts each negative modifier separately.
+
+The native review found a UI relevance bug: without Horde Mastery or Garrote
+Basics, the escape-only Joint Lock field hid the entire grapple section. The
+Athletics-wide holding-two context now takes precedence. New light/dark tests
+verify that the section is visible for an ordinary grappler and stays available
+when switching to Climb. Excess or unknown benefit selections are rejected
+before an opening changes conditions. Damage guidance is per selected benefit;
+Throw now adds at least +1 beyond standard unarmed damage even with negative
+Strength, and requires an empty adjacent destination.
+
+Native Foundry verified the actual PC skill dialog: base modifier 4 became −6
+with the three declared penalties. An armored special NPC's named Grapple went
+from 14 to 4 with the same penalties, including its actual −3 armor check
+penalty. Both saved their original applied metadata across reload. The actual
+opening form refused a fifth equal-Size grappler before Held changed, then
+accepted a legal fourth grappler using the second-opponent benefit. With
+Strength modifier −1, the actual Throw report showed +1 additional damage and
+the opponent became sprawled and ceased being held. Final controls were at
+682.78px and 669.5px within 1280×720. No browser errors occurred.
+
+Validation: 4,487 Node tests, 988 engine fixtures and 293 layout checks, with
+schemas, lint, formatting, bundle and copied-text checks passing. Continue NPC
+named-check categories/condition restrictions, benefit damage execution, cover
+penetration/blast routing and the broader secondary-effect cases before raising
+combat to the requested score. Counts and manual grapple circumstances remain
+GC declarations; no unseen combat relationship is inferred from a token alone.
 Continue implementing and reviewing combat before completing this goal.
 
 No product code changed during this pass. The existing **4,455** Node tests,

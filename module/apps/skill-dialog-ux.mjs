@@ -21,6 +21,8 @@ const CHECK_SECTIONS = {
   tauntOpponentUuid: ["taunt", "resist-taunt"],
   diversionOpponentUuid: ["diversion", "resist-diversion"],
   skillTrick: ["trip", "bull-rush", "feint", "grapple"],
+  // This section is generated only for Athletics; holding two opponents affects every use of that skill.
+  grappleHoldingTwo: ["*"],
   grappleAdvantageConfirmed: ["grapple", "restraint-escape"],
   grappleJointLock: ["restraint-escape"],
   grappleGarrote: ["grapple", "restraint-escape"],
@@ -73,6 +75,7 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
     for (const section of sections) {
       const rule = Object.entries(CHECK_SECTIONS).find(([name]) => section.querySelector(`[name="${name}"]`));
       const relevant =
+        rule?.[1].includes("*") ||
         rule?.[1].includes(check.value) ||
         (section.querySelector('[name="dispositionTargetUuid"]') && /Disposition/.test(selected?.tags ?? "")) ||
         (section.querySelector('[name="gearStatus"]') && /Gear/.test(selected?.tags ?? ""));

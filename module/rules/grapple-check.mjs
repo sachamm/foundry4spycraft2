@@ -8,6 +8,9 @@
  */
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { damageConversionPlan } from "./damage-conversion.mjs";
+import { weaponGrip, weaponUnavailable } from "./weapon-use.mjs";
+import { esc } from "../html.mjs";
 
 export const GRAPPLE_CHECK = Object.freeze({
   id: "grapple",
@@ -30,20 +33,67 @@ export function grappleCheckPlan(
   system,
   key,
   check,
-  { grappleAdvantageConfirmed = false, grappleGarrote = false, grappleJointLock = false } = {}
+  {
+    grappleAdvantageConfirmed = false,
+    grappleGarrote = false,
+    grappleJointLock = false,
+    grappleSecondOpponent = false,
+    grappleHoldingTwo = false,
+    grappleMuting = false,
+    grappleDamageConversion = false,
+    grappleConversionWeaponId = "",
+    grappleConversionWeapon = null,
+    grappleConversionFrom = "subdual"
+  } = {}
 ) {
   const empty = { evidence: null, bonuses: [], blockedReason: "", notes: [], threatIncrease: 0 };
-  if (key !== "athletics" || !["grapple", "restraint-escape"].includes(check?.id)) return empty;
+  if (key !== "athletics") return empty;
+  const inGrapple = ["grapple", "restraint-escape"].includes(check?.id);
+  if (!inGrapple && !grappleHoldingTwo) return empty;
+  const second = grappleHoldingTwo === true || (inGrapple && grappleSecondOpponent === true),
+    muting = inGrapple && grappleMuting === true;
+  let conversion = null;
+  if (inGrapple && grappleDamageConversion === true) {
+    if (!["lethal", "subdual"].includes(grappleConversionFrom))
+      return { ...empty, blockedReason: loc`Confirm the original lethal or subdual damage before converting it.` };
+    const weapon = grappleConversionWeapon?.system;
+    if (
+      grappleConversionWeaponId &&
+      (!weapon ||
+        grappleConversionWeapon.type !== "weapon" ||
+        grappleConversionWeapon.id !== grappleConversionWeaponId ||
+        weapon.equipped !== true ||
+        weaponUnavailable(weapon) ||
+        (weapon.proficiency !== "unarmed" &&
+          (weaponGrip(system, weapon).hands !== 1 || weaponGrip(system, weapon).blocked)))
+    )
+      return {
+        ...empty,
+        blockedReason: loc`Choose the actual available one-handed weapon in hand, or unarmed damage, for this grapple conversion.`
+      };
+    conversion = damageConversionPlan(
+      system,
+      weapon ?? { proficiency: "unarmed", damage: `1 ${grappleConversionFrom}` },
+      grappleConversionWeapon,
+      { convert: true }
+    );
+    if (conversion.blocked) return { ...empty, blockedReason: conversion.reason };
+  }
   const feats = system?.activeFeatNames ?? [],
-    proneStance = system.combatStance?.key === "prone" && feats.includes("Submission Basics"),
-    horde = feats.includes("Horde Mastery") && grappleAdvantageConfirmed === true,
-    garrote = feats.includes("Garrote Basics") && grappleGarrote === true,
+    proneStance = inGrapple && system.combatStance?.key === "prone" && feats.includes("Submission Basics"),
+    horde = inGrapple && feats.includes("Horde Mastery") && grappleAdvantageConfirmed === true,
+    garrote = inGrapple && feats.includes("Garrote Basics") && grappleGarrote === true,
     // Joint Lock (Submission Moves, p.188): the grappler's trick gives −4 to this character's escape checks.
-    jointLock = check.id === "restraint-escape" && grappleJointLock === true;
+    jointLock = check?.id === "restraint-escape" && grappleJointLock === true;
   const bonuses = [
       ...(proneStance ? [{ source: "Prone Stance (Grapple)", value: 1 }] : []),
       ...(horde ? [{ source: "Horde Mastery (Grapple)", type: "morale", value: 1 }] : []),
-      ...(jointLock ? [{ source: "Joint Lock", value: -4 }] : [])
+      ...(jointLock ? [{ source: "Joint Lock", value: -4 }] : []),
+      ...(second ? [{ source: loc`Second grapple opponent`, value: -4 }] : []),
+      ...(muting ? [{ source: loc`Mute grapple benefit`, value: -2 }] : []),
+      ...(conversion?.attackPenalty
+        ? [{ source: loc`Grapple damage conversion`, value: conversion.attackPenalty }]
+        : [])
     ],
     notes = [
       ...(proneStance ? [loc`Prone Stance: +1 on this Grapple check (p.188).`] : []),
@@ -51,12 +101,36 @@ export function grappleCheckPlan(
       ...(garrote
         ? [loc`Garrote Basics: threat range +2 with the readied garrote; an opponent you hold becomes mute (p.178).`]
         : []),
-      ...(jointLock ? [loc`Joint Lock: −4 on this escape check (p.188).`] : [])
+      ...(jointLock ? [loc`Joint Lock: −4 on this escape check (p.188).`] : []),
+      ...(second
+        ? [loc`Attempting a second hold or holding two opponents: −4 to Athletics, applied once (p.357).`]
+        : []),
+      ...(muting
+        ? [loc`Your Mute benefit: −2 during its remaining grapple scope; the opponent's winning check ends it (p.358).`]
+        : []),
+      ...(conversion
+        ? [
+            loc`Grapple conversion: ${conversion.from} to ${conversion.to}; Athletics penalty ${conversion.attackPenalty}${conversion.waivedBy ? ` (${conversion.waivedBy})` : ""} (pp.345,357–358).`
+          ]
+        : [])
     ];
   return {
     ...empty,
     evidence:
-      bonuses.length || garrote ? { version: 1, proneStance, horde, garrote, jointLock, checkId: check.id } : null,
+      bonuses.length || garrote || conversion
+        ? {
+            version: 1,
+            proneStance,
+            horde,
+            garrote,
+            jointLock,
+            second,
+            muting,
+            conversion,
+            conversionWeaponId: grappleConversionWeaponId,
+            checkId: check?.id ?? ""
+          }
+        : null,
     bonuses,
     notes,
     threatIncrease: garrote ? 2 : 0
@@ -70,6 +144,11 @@ rollPipeline.register({
   skillChecks: ({ skillKey }, checks) => grappleSkillChecks(skillKey, checks)
 });
 
+export function grappleCircumstancesContent(actor) {
+  const weapons = [...(actor?.items ?? [])].filter(i => i.type === "weapon" && i.system.equipped === true);
+  return `<fieldset><legend>${loc`Grapple circumstances (Athletics)`}</legend><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`This Grapple attempts a second opponent (−4)`}</label><label><input name="grappleHoldingTwo" type="checkbox" /> ${loc`I currently hold two opponents (−4 to Athletics; does not stack with the attempt penalty)`}</label><label><input name="grappleMuting" type="checkbox" /> ${loc`My Mute benefit still applies to this grapple check (−2)`}</label><label><input name="grappleDamageConversion" type="checkbox" /> ${loc`Convert damage for Injure or Use Opponent's Weapon (−4 unless an actual waiver applies)`}</label><label>${loc`My readied weapon for that conversion`} <select name="grappleConversionWeaponId"><option value="">${loc`Unarmed, or another participant's weapon (only my Bludgeon waiver)`}</option>${weapons.map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`).join("")}</select></label><label>${loc`Original damage type when no own weapon is selected`} <select name="grappleConversionFrom"><option value="subdual">${loc`Subdual`}</option><option value="lethal">${loc`Lethal`}</option></select></label><p>${loc`Confirm legal holds and the selected benefit at the table. Two opponents is the maximum; the second-opponent and Mute declarations describe the actual current situation.`}</p></fieldset>`;
+}
+
 rollPipeline.register({
   id: "grappleContent:skill",
   dialogs: ["skill"],
@@ -79,7 +158,7 @@ rollPipeline.register({
     return [
       {
         at: 207,
-        html: `<details><summary>${loc`Grapple feats`}</summary><label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
+        html: `<details><summary>${loc`Grapple circumstances and feats`}</summary>${grappleCircumstancesContent(actor)}<label><input name="grappleJointLock" type="checkbox" /> ${loc`Escaping: my grappler used Joint Lock on me (−4)`}</label>${feats.includes("Horde Mastery") ? `<label><input name="grappleAdvantageConfirmed" type="checkbox" /> ${loc`Horde Mastery: the GC confirms a 2-to-1 or greater advantage`}</label>` : ""}${feats.includes("Garrote Basics") ? `<label><input name="grappleGarrote" type="checkbox" /> ${loc`Garrote Basics: I hold a readied garrote`}</label>` : ""}</details>`
       }
     ];
   }
@@ -87,6 +166,7 @@ rollPipeline.register({
 
 rollPipeline.register({
   id: "grappleSkillTerm",
+  record: ["grappleFeats"],
   kinds: ["skill"],
   order: 9237,
   terms({ system, skillKey, check, input }) {

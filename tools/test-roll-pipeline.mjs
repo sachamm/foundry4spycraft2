@@ -847,6 +847,31 @@ test("the real skill workflow hands the reserved Drained identity to the final r
   assert.deepEqual(message.flags.spycraft2.drainedRecovery, recovery);
 });
 
+test("the real skill workflow records grapple penalties and conversion on the posted check", async () => {
+  const actor = new SpycraftActor();
+  actor.rollCheck = async (formula, data, options) => ({ formula, data, flags: { spycraft2: options } });
+  const options = {
+      check: "grapple",
+      askContext: false,
+      method: "roll",
+      gearStatus: "available",
+      synergySkill: "none"
+    },
+    baseline = await actor.rollSkill("athletics", "str", options),
+    adjusted = await actor.rollSkill("athletics", "str", {
+      ...options,
+      grappleHoldingTwo: true,
+      grappleMuting: true,
+      grappleDamageConversion: true
+    });
+  assert.equal(adjusted.data.total, baseline.data.total - 10);
+  assert.equal(adjusted.flags.spycraft2.grappleFeats.second, true);
+  assert.equal(adjusted.flags.spycraft2.grappleFeats.muting, true);
+  assert.equal(adjusted.flags.spycraft2.grappleFeats.conversion.attackPenalty, -4);
+  actor.system.activeFeatNames = [...(actor.system.activeFeatNames ?? []), "Bludgeon"];
+  assert.throws(() => adjusted.flags.spycraft2.validateSkillContext(), /changed/);
+});
+
 test("named skill checks match the original fixed composition for every skill", () => {
   const actor = new SpycraftActor();
   const legacy = (key, options, optionalRules) => {

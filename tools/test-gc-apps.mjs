@@ -525,6 +525,53 @@ test("NPC skill check uses Competence or the skilled bonus plus the attribute", 
   assert.equal(roll.options.rollMode, "gmroll");
 });
 
+test("NPC named Grapple applies second-hold, Mute, conversion and armor penalties with recorded evidence", async () => {
+  const oldArmor = guard.system.armor;
+  guard.system.armor = { check: -3 };
+  const roll = await npc.rollNpcSkill(guard, {
+    key: "athletics/grapple",
+    ability: "str",
+    grappleHoldingTwo: true,
+    grappleSecondOpponent: true,
+    grappleMuting: true,
+    grappleDamageConversion: true
+  });
+  assert.equal(roll.data.total, 4 - 4 - 2 - 4 - 3);
+  assert.equal(roll.options.grappleFeats.second, true);
+  assert.equal(roll.options.grappleFeats.conversion.attackPenalty, -4);
+  const general = await npc.rollNpcSkill(guard, { key: "athletics", ability: "str", grappleHoldingTwo: true });
+  assert.equal(
+    general.data.total,
+    0,
+    "all Athletics checks take the holding-two penalty, without guessing unnamed armor tags"
+  );
+  assert.ok(roll.options.breakdown.some(row => row.label === "Armor/encumbrance check penalty" && row.value === -3));
+  guard.system.armor.check = -4;
+  assert.throws(() => roll.options.validateSkillContext(), /armor or encumbrance changed/);
+  guard.system.armor = oldArmor;
+});
+
+test("NPC named Vision checks use armor penalties and Omni-Competent halves each grapple penalty separately", async () => {
+  const armor = guard.system.armor,
+    effects = guard.system.campaignEffects;
+  const check = SPYCRAFT.skills.notice.checks.find(c => c.tags.includes("Vision"));
+  assert.ok(check);
+  guard.system.armor = { visionCheck: -3, check: -3 };
+  const vision = await npc.rollNpcSkill(guard, { key: `notice/${check.id}`, ability: "wis" });
+  assert.equal(vision.data.total, 9 + 2 - 3);
+  guard.system.campaignEffects = { ...effects, skillPenaltyDivisor: 2 };
+  const grapple = await npc.rollNpcSkill(guard, {
+    key: "athletics/grapple",
+    ability: "str",
+    grappleHoldingTwo: true,
+    grappleMuting: true,
+    grappleDamageConversion: true
+  });
+  assert.equal(grapple.data.total, 4 - 2 - 1 - 2 - 1);
+  guard.system.armor = armor;
+  guard.system.campaignEffects = effects;
+});
+
 test("standard NPC Damage saves accumulate, kill and reset; special NPCs are refused", async () => {
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });

@@ -35,6 +35,7 @@ import { formDialog, raw } from "../dialog-kit.mjs";
 import { manageCombatPersuasion } from "./combat-persuasion.mjs";
 import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
 import { drainedRecoveryCheck, drainedNpcCheckOptions } from "../../rules/drained.mjs";
+import { grappleSkillChecks, grappleCheckPlan, grappleCircumstancesContent } from "../../rules/grapple-check.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -64,7 +65,7 @@ export function npcSkillPlan(actor, key) {
   };
 }
 const npcNamedChecks = skill =>
-  skill.checks.filter(
+  grappleSkillChecks(skill.key, skill.checks).filter(
     check => !check.optionalRule || (check.optionalRule === "linguistics" && readSetting("linguistics", false) === true)
   );
 
@@ -170,6 +171,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
       <label>${loc`Error range (blank uses the named check's range)`} <input type="number" name="error" min="0" max="19" value="" /></label>
       ${qualityCheckContent(actor.system.qualityEffects)}
+      <details><summary>${loc`Grapple circumstances`}</summary>${grappleCircumstancesContent(actor)}</details>
       ${actor.system.campaignEffects?.socialCheckMorale ? `<label><input type="checkbox" name="surprise" /> ${loc`Paranoid: Blend/Stealth or Sneak/Hide to determine surprise`}</label><label><input type="checkbox" name="shiftingDisposition" /> ${loc`Paranoid: this check shifts a target's disposition`}</label><label><input type="checkbox" name="persuadingAction" /> ${loc`Paranoid: this check persuades a target to take an action`}</label>` : ""}
       ${context.combatPersuasion ? "" : dispositionTargetContent("impress")}
       <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`,
@@ -263,13 +265,43 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     });
   const abilityModifier = skillPenaltyValue(actor.system, actor.system.abilities[ability]?.mod ?? 0),
     situationalModifier = skillPenaltyValue(actor.system, Number(input.modifier) || 0);
+  const namedPenaltyRows = () => [
+      ...((namedCheck?.tags ?? "").includes("Armor Check Penalty")
+        ? [
+            {
+              label: loc`Armor/encumbrance check penalty`,
+              value: Math.min(0, actor.system.armor?.check ?? 0, actor.system.encumbrance?.check ?? 0)
+            }
+          ]
+        : []),
+      ...((namedCheck?.tags ?? "").includes("Vision")
+        ? [{ label: loc`Armor vision penalty`, value: actor.system.armor?.visionCheck ?? 0 }]
+        : [])
+    ],
+    namedPenalties = namedPenaltyRows(),
+    adjustedNamedPenalties = skillPenaltyEntries(actor.system, namedPenalties),
+    namedPenalty = adjustedNamedPenalties.reduce((n, row) => n + row.value, 0);
+  const grapplePlan = () =>
+      grappleCheckPlan(actor.system, skill.key, namedCheck, {
+        ...input,
+        grappleConversionWeapon: actor.items?.get?.(input.grappleConversionWeaponId)
+      }),
+    grapple = grapplePlan(),
+    grappleRows = skillPenaltyEntries(
+      actor.system,
+      grapple.bonuses.map(row => ({ label: row.source, value: row.value }))
+    ),
+    grappleModifier = grappleRows.reduce((n, row) => n + row.value, 0);
+  if (grapple.blockedReason) throw Error(grapple.blockedReason);
+  quality.rows.push(...grappleRows, ...adjustedNamedPenalties);
   plan.bonus = skillPenaltyValue(actor.system, plan.bonus);
   const penaltyNote = skillPenaltyNotes(actor.system, [
     ...rawQualityRows,
     { label: loc`Attribute modifier`, value: actor.system.abilities[ability]?.mod ?? 0 },
     { label: loc`Situational modifier`, value: Number(input.modifier) || 0 },
     { label: loc`Morale penalty`, value: moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty) },
-    { label: loc`Target disposition`, value: disposition.penalty }
+    { label: loc`Target disposition`, value: disposition.penalty },
+    ...namedPenalties
   ]);
   const total =
     plan.bonus +
@@ -280,7 +312,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     campaignModifier +
     moralePenalty +
     disposition.bonus +
-    skillPenaltyValue(actor.system, disposition.penalty);
+    skillPenaltyValue(actor.system, disposition.penalty) +
+    grappleModifier +
+    namedPenalty;
   const checkError =
       (input.error == null || input.error === "" ? (namedCheck?.error ?? 1) : Math.max(0, Number(input.error) || 0)) +
       quality.errorIncrease +
@@ -319,14 +353,21 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       ...(recoveryPlan
         ? { ...recoveryPlan, difficultyClass: context.difficultyClass, drainedRecovery: context.drainedRecovery }
         : {}),
-      ...(disposition.threatIncrease ? { threat: Math.max(1, 20 - disposition.threatIncrease) } : {}),
+      ...(disposition.threatIncrease || grapple.threatIncrease
+        ? { threat: Math.max(1, 20 - disposition.threatIncrease - grapple.threatIncrease) }
+        : {}),
       npcSkill: skill.key,
       checkKind: "skill",
       skillKey: skill.key,
       ...(checkId ? { checkId } : {}),
       campaignSkillChecks: campaignChecks.evidence,
       dispositionSkill: disposition.evidence,
+      grappleFeats: grapple.evidence,
       validateSkillContext: () => {
+        if (JSON.stringify(namedPenaltyRows()) !== JSON.stringify(namedPenalties))
+          throw Error(loc`The NPC's armor or encumbrance changed before posting this named skill check.`);
+        if (JSON.stringify(grapplePlan()) !== JSON.stringify(grapple))
+          throw Error(loc`Grapple benefits or the actual conversion weapon changed before posting this NPC check.`);
         if (
           context.drainedRecovery &&
           JSON.stringify(drainedNpcCheckOptions(actor.system, context.drainedRecovery, input, checkError)) !==

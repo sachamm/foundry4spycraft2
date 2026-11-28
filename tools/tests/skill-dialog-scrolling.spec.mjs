@@ -630,6 +630,11 @@ test("Paranoid NPC skill circumstances and roll confirmation remain reachable at
     await page.locator('[name="persuadingAction"]').check();
     await page.locator('[name="dispositionTargetUuid"]').selectOption("Actor.npc-target");
     await page.locator('[name="dispositionTargetConfirmed"]').check();
+    await page.locator('select[name="key"]').selectOption("athletics/grapple");
+    await expect(page.locator('[name="grappleHoldingTwo"]')).toBeVisible();
+    await page.locator('[name="grappleHoldingTwo"]').check();
+    await page.locator('[name="grappleDamageConversion"]').check();
+    await page.locator('[name="grappleConversionFrom"]').selectOption("lethal");
     await page.locator("#confirm").scrollIntoViewIfNeeded();
     const rect = await page.locator("#confirm").boundingBox();
     expect(rect.y).toBeGreaterThanOrEqual(0);
@@ -821,6 +826,9 @@ test("the actual Grapple settlement exposes opening Size context and keeps confi
     await render(page, 720);
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.locator('[name="sizeDifference"]').fill("-1");
+    await page.locator('[name="otherGrapplers"]').fill("7");
+    await page.locator('[name="heldOpponents"]').fill("1");
+    await page.locator('[name="secondOpponentBenefit"]').check();
     await page.locator('[name="grappleContextConfirmed"]').check();
     await expect(page.locator("body")).toContainText("recorded character Sizes take precedence");
     await page.locator("#confirm").scrollIntoViewIfNeeded();

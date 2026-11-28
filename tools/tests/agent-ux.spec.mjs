@@ -6,9 +6,36 @@ import { systemCss } from "../lib/system-css.mjs";
 import { readFileSync } from "node:fs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 import { createEnvironment } from "../lib/hbs-harness.mjs";
+import { grappleCircumstancesContent } from "../../module/rules/grapple-check.mjs";
 const sheetUX = readFileSync(new URL("../../module/sheets/agent-ux.mjs", import.meta.url), "utf8");
 const skillUX = readFileSync(new URL("../../module/apps/skill-dialog-ux.mjs", import.meta.url), "utf8");
 const css = systemCss();
+
+for (const theme of ["light", "dark"])
+  test(`the actual Athletics grapple section remains visible for ordinary grapplers and other Athletics uses in ${theme}`, async ({
+    page
+  }) => {
+    await page.setContent(`<style>${css}</style><form class="spycraft2 theme-${theme}"><div class="spycraft2-roll-options">
+      <select name="check"><option value="grapple">Grapple</option><option value="climb">Climb</option></select>
+      <select name="ability"><option value="str">STR</option></select>
+      <details><summary>Grapple circumstances and feats</summary>${grappleCircumstancesContent({ items: [] })}<input name="grappleJointLock" type="checkbox" /></details>
+      </div><button type="button" data-action="ok">Roll</button></form>`);
+    await load(page, skillUX, "enhanceSkillDialog");
+    await page.evaluate(() =>
+      window.enhanceSkillDialog(null, { element: document.querySelector("form") }, [
+        { id: "grapple", attributes: ["str"], tags: "Grasp" },
+        { id: "climb", attributes: ["str"], tags: "Grasp" }
+      ])
+    );
+    await expect(page.getByText("Grapple circumstances and feats", { exact: true })).toBeVisible();
+    await page.getByText("Grapple circumstances and feats", { exact: true }).click();
+    await expect(page.locator('[name="grappleHoldingTwo"]')).toBeEnabled();
+    await page.locator('[name="grappleHoldingTwo"]').check();
+    await page.locator('[name="check"]').selectOption("climb");
+    await expect(page.locator('[name="grappleHoldingTwo"]')).toBeVisible();
+    await expect(page.locator('[name="grappleHoldingTwo"]')).toBeEnabled();
+    expect(await page.locator("form").evaluate(form => new FormData(form).get("grappleHoldingTwo"))).toBe("on");
+  });
 
 // The modules import the translation tag; a page script cannot resolve that path, so it is inlined.
 const i18n = readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8").replace(/^export /gm, "");

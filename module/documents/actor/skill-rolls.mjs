@@ -35,6 +35,7 @@ import { knowledgeCheckBreakdown, skillCheckBreakdown } from "../../rules/bonus-
 /** Plan fields a skill check records as the rules returned them. */
 const SKILL_PLAN_FIELDS = [
   "skillTiming",
+  "grappleFeats",
   "dispositionSkill",
   "campaignSkillChecks",
   "campaignSkillDCPolicy",
@@ -110,6 +111,7 @@ const SKILL_PLAN_FIELDS = [
 
 /** Plan fields whose sources have to be the same when the check is posted as when it was planned. */
 const GUARDED_SKILL_FIELDS = [
+  "grappleFeats",
   "skillTiming",
   "dispositionSkill",
   "campaignSkillChecks",
@@ -273,6 +275,7 @@ export const ActorSkillRolls = Base =>
           ...detectionObserverContext(input),
           gearItem: gear,
           weaponWorkItem: workTarget(),
+          grappleConversionWeapon: this.items?.get?.(input.grappleConversionWeaponId),
           gearCategory: equipmentCategory(gear),
           optionalRules,
           ability: input.ability ?? ability

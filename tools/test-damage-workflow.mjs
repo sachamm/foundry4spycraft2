@@ -2194,6 +2194,40 @@ test("actual opening grapple settlement rejects oversized, missing, self or unco
   assert.equal(foe.statuses.has("held"), true);
 });
 
+test("actual opening crowd overflow and unearned benefits refuse before any grapple condition or report", async () => {
+  reset();
+  const grappler = character("Crowd grappler", { size: "Large" }),
+    foe = character("Crowd target", { size: "Medium" }),
+    input = {
+      opening: true,
+      total: 30,
+      opponentTotal: 1,
+      opponentUuid: foe.uuid,
+      grappleContextConfirmed: true,
+      benefits: [],
+      otherGrapplers: 2
+    };
+  assert.equal(await settleGrapple(grappler, input), false);
+  assert.equal(posted.length, 0);
+  assert.equal(foe.statuses.size, 0);
+  assert.equal(await settleGrapple(grappler, { ...input, otherGrapplers: 0, benefits: ["pin"] }), false);
+  assert.equal(posted.length, 0);
+  assert.equal(foe.statuses.size, 0);
+  const result = await settleGrapple(grappler, { ...input, otherGrapplers: 1 });
+  assert.equal(result.winner, "actor");
+  assert.match(posted.at(-1).content, /2 grappler\(s\).*limit of 2/);
+});
+
+test("Throw's actual benefit report adds at least one extra damage even when Strength is negative", async () => {
+  reset();
+  const grappler = character("Thrower", { abilities: { str: { mod: -2 } } }),
+    foe = character("Thrown", {});
+  await settleGrapple(grappler, { total: 30, opponentTotal: 1, opponentUuid: foe.uuid, benefits: ["throw"] });
+  assert.match(posted.at(-1).content, /standard unarmed damage \+ 1 additional/);
+  assert.equal(foe.statuses.has("held"), false);
+  assert.equal(foe.statuses.has("sprawled"), true);
+});
+
 test("rest wears off a special NPC's stress and subdual damage", async () => {
   reset();
   const boss = character("Rester", {
