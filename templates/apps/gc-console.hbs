@@ -127,8 +127,13 @@
       <button type="button" data-action="sessionDice">{{localize "SPYCRAFT.Template.AppsGcConsole.ApplyStartingDiceAdjustments"}}</button>
       </p>
     </details>
-    {{#if mission.infractions.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.Infractions"}} {{#each mission.infractions}}{{actorName}} — {{name}} ({{penalty}} {{currency}}){{#unless @last}}; {{/unless}}{{/each}}
-      </p>{{/if}}
+    {{#if mission.infractions.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.Infractions"}}</p>
+    <ul class="gc-rows">{{#each mission.infractions}}
+      <li><span>{{actorName}}: {{name}} ({{penalty}} {{currencyLabel}})</span>
+        <button type="button" class="sc2-action gc-danger" data-action="removeInfraction" data-id="{{key}}"
+          aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}"
+          data-tooltip="{{localize 'SPYCRAFT.Console.RemoveInfractionHint'}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    </ul>{{/if}}
   </details>
   <details class="gc-section" data-section="objectives" data-view-hidden="{{hiddenSections.objectives}}" data-state="{{sections.objectives.state}}" {{#if sections.objectives.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.Objectives"}}</span><span class="gc-note">{{counts.objectives}}</span></summary>

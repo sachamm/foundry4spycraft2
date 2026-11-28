@@ -309,6 +309,17 @@ test("exposure infractions reduce standing at once; standing award pays the Cali
   await mission.recordInfraction();
   assert.equal(actors.get("a1").system.reputation, -2);
   assert.match(lastMessage(), /Negative standing/);
+  // A row can be taken off again, and the agent gets back what it cost.
+  const rows = state.getMission().infractions;
+  assert.ok(rows.every(row => row.id), "each row has its own id");
+  assert.ok(messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions), "an Undo note");
+  await mission.removeInfraction(rows.at(-1).id);
+  assert.equal(actors.get("a1").system.reputation, 0);
+  assert.equal(state.getMission().infractions.length, rows.length - 1);
+  assert.equal(await mission.removeInfraction("gone"), false);
+  answer({ actor: "a1", infraction: "adhere-to-honor-code|1", currency: "reputation", preventing: true, honor: false });
+  await mission.recordInfraction();
+  assert.equal(actors.get("a1").system.reputation, -2);
   answer({ currency: "reputation" });
   assert.equal(await mission.awardStanding(), 12, "Caliber III is 10, +2 for a Threat Level raised by 2");
   assert.equal(actors.get("a2").system.reputation, 14);
@@ -384,7 +395,11 @@ test("starting an ended mission again asks, then clears the last run's results",
   confirmAnswers.push(false);
   assert.equal(await mission.startMission(), null);
   assert.equal(state.getMission().objectives[0].complete, true, "cancelled: nothing cleared");
+  // Asked about the exposure losses: kept.
+  const reputation = actors.get("a1").system.reputation;
+  confirmAnswers.push(true, false);
   await mission.startMission();
+  assert.equal(actors.get("a1").system.reputation, reputation, "the losses stay when the GC keeps them");
   const m = state.getMission();
   assert.deepEqual([m.active, m.ended, m.infractions.length, m.scenesPlayed], [true, false, 0, 0]);
   assert.equal(m.objectives[0].complete, false);

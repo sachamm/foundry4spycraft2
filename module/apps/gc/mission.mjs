@@ -285,6 +285,8 @@ export async function startMission() {
       (before.infractions ?? []).length > 0 ||
       (before.scenesPlayed ?? 0) > 0 ||
       Object.keys(before.standingPaid ?? {}).length > 0);
+  const owed = (before.infractions ?? []).filter(entry => game.actors.get(entry.actor));
+  let refund = false;
   if (hadResults) {
     const ok = await confirmStep(
       loc`Start the mission again`,
@@ -298,7 +300,28 @@ export async function startMission() {
       { warning: loc`This clears the last run's results and cannot be undone.` }
     );
     if (!ok) return null;
+    // The exposure rows go, but what they cost the agents stays unless the GC gives it back now.
+    if (owed.length) {
+      const answer = await systemDialog.confirm({
+        window: { title: loc`Exposure from the last run` },
+        rejectClose: false,
+        content: `<p>${esc(
+          loc`The last run recorded ${owed.length} exposure row(s): ${owed
+            .map(entry => `${game.actors.get(entry.actor)?.name}, ${entry.name} (${entry.penalty})`)
+            .join("; ")}.`
+        )}</p><p>${loc`Give the agents back what those rows cost before the record is cleared?`}</p>`,
+        yes: { label: loc`Give it back` },
+        no: { label: loc`Keep the losses` }
+      });
+      if (answer === null) return null;
+      refund = answer === true;
+    }
   }
+  if (refund)
+    for (const entry of owed) {
+      const actor = game.actors.get(entry.actor);
+      if (actor) await actor.update(refundUpdate(actor, entry));
+    }
   // The mission record and the mission's usage period begin together: mission uses come back.
   await startUsagePeriod("mission");
   await updateMission(mission => ({
@@ -1039,20 +1062,66 @@ export async function recordInfraction() {
     honorMultiplier: input.honor ? honorMultiplier : 1
   })[input.currency];
   const path = `system.${input.currency}`,
-    before = actor.system[input.currency] ?? 0;
-  await actor.update({ [path]: before + penalty });
-  await updateMission(m => ({
-    infractions: [
-      ...(m.infractions ?? []),
-      { actor: actor.id, name: infraction.name, currency: input.currency, penalty, at: Date.now() }
-    ]
-  }));
+    before = actor.system[input.currency] ?? 0,
+    row = {
+      id: foundry.utils.randomID(),
+      actor: actor.id,
+      name: infraction.name,
+      currency: input.currency,
+      penalty,
+      at: Date.now()
+    };
+  // The loss and its row go on one Undo note, so a mistaken infraction can be taken back whole.
+  await withUndo(
+    [actor],
+    loc`Exposure: ${actor.name}, ${infraction.name}`,
+    async () => {
+      await actor.update({ [path]: before + penalty });
+      await updateMission(m => ({ infractions: [...(m.infractions ?? []), row] }));
+    },
+    () => ({ addedInfractions: { period: missionEpoch(), ids: [row.id] } })
+  );
   const after = before + penalty,
     burned = after < 0;
   await say(
     `<b>${loc`Exposure:`}</b> ${esc(actor.name)} — ${esc(infraction.name)}. ${input.currency === "reputation" ? `${loc`Reputation ${before} →`} <b>${after}</b>` : `${loc`Net Worth ${money(before)} →`} <b>${after < 0 ? "−" : ""}${money(after)}</b>`}.${burned ? ` <b>${loc`Negative standing: see p.439 for the consequences.`}</b>` : ""}`
   );
   return penalty;
+}
+
+/** Paying back an exposure row: what the agent lost goes back (a penalty is negative, so the refund adds). */
+const refundUpdate = (actor, entry) => ({
+  [`system.${entry.currency}`]: (actor.system?.[entry.currency] ?? 0) - (Number(entry.penalty) || 0)
+});
+
+/**
+ * Take one exposure row off the mission and give the agent back what it cost, with an Undo note. A row recorded
+ * before rows had ids is found by its position.
+ */
+export async function removeInfraction(key) {
+  requireGC();
+  const rows = getMission().infractions ?? [],
+    index = rows.findIndex((entry, i) => (entry.id ?? `row-${i}`) === key);
+  if (index < 0) return refuse(loc`That exposure row is no longer on the mission.`);
+  const entry = rows[index],
+    actor = game.actors.get(entry.actor);
+  await withUndo(
+    actor ? [actor] : [],
+    loc`Exposure removed: ${actor?.name ?? entry.actor}, ${entry.name}`,
+    async () => {
+      if (actor) await actor.update(refundUpdate(actor, entry));
+      await updateMission(now => ({ infractions: (now.infractions ?? []).filter((_, i) => i !== index) }));
+    },
+    () => ({
+      missionRow: { list: "infractions", key: entry.id ?? `row-${index}`, entry, index, period: missionEpoch() }
+    })
+  );
+  ui.notifications.info(
+    actor
+      ? loc`Removed ${entry.name} and gave ${actor.name} back ${Math.abs(Number(entry.penalty) || 0)} ${entry.currency === "netWorth" ? loc`Net Worth` : loc`Reputation`}.`
+      : loc`Removed ${entry.name}; its character is no longer in this world, so nothing was given back.`
+  );
+  return entry;
 }
 
 /**

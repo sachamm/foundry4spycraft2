@@ -210,6 +210,7 @@
    "CriticalToggle": "Critical",
    "CriticalNamed": "{name} is critical",
    "RemoveNamed": "Remove {name}",
+   "RemoveInfractionHint": "Take this exposure off the mission and give the agent back what it cost. The Undo note puts it back.",
    "AddObjective": "Add objective",
    "PasteObjectives": "Paste several",
    "QuickObjective": "New objective",

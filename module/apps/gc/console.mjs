@@ -208,6 +208,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change, { notify: true })
       ),
       recordInfraction: guard(() => mission.recordInfraction()),
+      removeInfraction: guard((event, target) => mission.removeInfraction(target.dataset.id)),
       sessionDice: guard(() => mission.applySessionDiceAdjustments()),
       missionReport: guard((event, target) => mission.missionReport({ planned: target.dataset.planned === "true" })),
       awardStanding: guard(() => mission.awardStanding()),
@@ -825,8 +826,10 @@ export function consoleContext() {
       exposure: named(m.exposure, id => T.exposure.find(row => row.id === id)?.objective),
       bundle: named(m.bundle),
       otherComplications: named(m.otherComplications),
-      infractions: (m.infractions ?? []).map(entry => ({
+      infractions: (m.infractions ?? []).map((entry, index) => ({
         ...entry,
+        key: entry.id ?? `row-${index}`,
+        currencyLabel: entry.currency === "netWorth" ? loc`Net Worth` : loc`Reputation`,
         actorName: game.actors.get(entry.actor)?.name ?? entry.actor
       }))
     },
