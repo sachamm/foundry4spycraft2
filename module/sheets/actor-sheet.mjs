@@ -1358,6 +1358,10 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         };
       })
       .sort((a, b) => a.treeLabel.localeCompare(b.treeLabel) || a.item.name.localeCompare(b.item.name));
+    // The same buttons on the Play tab, under "Abilities in play", so a feat is used where the turn is played.
+    context.featPlayActions = context.feats.flatMap(row =>
+      row.actions.map(entry => ({ ...entry, feat: row.item.name }))
+    );
     // Hover help shows to anyone who can open the sheet, so it is rendered with every secret block left out.
     await Promise.all(
       context.feats.map(async feat => {
@@ -1834,10 +1838,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
   }
 
   static #onRollAbility(event, target) {
-    return this.actor.rollAbility(target.dataset.ability);
+    return this.actor.rollAbility(target.dataset.ability, { askContext: !skipDialog(event) });
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
+    return this.actor.rollSave(target.dataset.save, {
+      askContext: !skipDialog(event),
+      askModifier: !skipDialog(event)
+    });
   }
   static #onRollSkill(event, target) {
     return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null, {
@@ -1891,9 +1898,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true);
   }
   /** Another level in a class the character already has, without opening the class browser. */
-  static #onAddLevelInClass(event, target) {
+  static async #onAddLevelInClass(event, target) {
     const cls = this._item(target);
-    return cls?.type === "class" ? this.actor.addClassLevel(cls) : null;
+    if (cls?.type !== "class") return null;
+    const added = await this.actor.addClassLevel(cls);
+    // The level brings choices (skill points, perhaps a feat): the sheet turns to Edit with the list of what is
+    // left open, so the level-up carries on from one place instead of being hunted for tab by tab.
+    if (added !== null && added !== false && this.isEditable) {
+      this._editMode = true;
+      this._open.todo = true;
+      await this.render();
+    }
+    return added;
   }
   static async #onRemoveLevel() {
     const ok = await systemDialog.confirm({
@@ -2536,10 +2552,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     return this.actor.items.get(target.closest("[data-item-id]")?.dataset.itemId);
   }
   static #onRollAbility(event, target) {
-    return this.actor.rollAbility(target.dataset.ability);
+    return this.actor.rollAbility(target.dataset.ability, { askContext: !skipDialog(event) });
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
+    return this.actor.rollSave(target.dataset.save, {
+      askContext: !skipDialog(event),
+      askModifier: !skipDialog(event)
+    });
   }
   static async #onRollAttack(event, target) {
     const item = this._item(target);

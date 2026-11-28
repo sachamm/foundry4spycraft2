@@ -538,8 +538,20 @@ export const ActorRolls = Base =>
           purelyMentalConfirmed: options.purelyMentalConfirmed
         });
       if (blocked) return refuse(blocked);
+      // A click asks for the GC's modifier first; a Shift-click rolls at once (style guide 7.4).
+      let situational = Math.trunc(Number(options.situationalModifier)) || 0;
+      if (options.askContext) {
+        const input = await systemDialog.input({
+          window: { title: game.i18n.localize(CONFIG.SPYCRAFT.abilities[key]) },
+          rejectClose: false,
+          ok: { label: loc`Roll the check` },
+          content: `<div class="spycraft2-roll-options"><label>${loc`Modifier the GC set for this check (0 for none)`} <input type="number" name="situationalModifier" step="1" value="0" autofocus /></label></div>`
+        });
+        if (!input) return null;
+        situational = Math.trunc(Number(input.situationalModifier)) || 0;
+      }
       const conditionAbilityAdjustment = conditionAbilityPenalty(this.system, key),
-        mod = (this.system.abilities[key]?.mod ?? 0) + conditionAbilityAdjustment;
+        mod = (this.system.abilities[key]?.mod ?? 0) + conditionAbilityAdjustment + situational;
       return this.rollCheck(
         "1d20 + @mod",
         { mod },
@@ -551,7 +563,8 @@ export const ActorRolls = Base =>
           conditionAbilityAdjustment,
           breakdown: breakdownRows([
             { label: key.toUpperCase(), value: this.system.abilities[key]?.mod, keep: true },
-            { label: loc`Drunk`, value: conditionAbilityAdjustment }
+            { label: loc`Drunk`, value: conditionAbilityAdjustment },
+            { label: loc`GC's modifier`, value: situational }
           ]),
           ...(Object.hasOwn(options, "oldSchool") ? { oldSchool: options.oldSchool } : {})
         }
@@ -569,17 +582,21 @@ export const ActorRolls = Base =>
           options.takedown && manualStandingContent
             ? `<p>${loc`This recorded Fortitude save resists takedown. Earned Still Standing applies automatically.`}</p>`
             : manualStandingContent;
+      // A click opens the save's dialog, which always has the GC's modifier and whatever this save can choose;
+      // a Shift-click rolls at once (style guide 7.4).
+      // A step that rolls the save for the player (a hazard, a damage event) asks only when the save has a choice.
       if (
-        input.askContext &&
-        (key === "ref" ||
-          feats.has("Swamp Training") ||
-          feats.has("Firefighter Training") ||
-          feats.has("Disease Basics") ||
-          feats.has("Poison Basics") ||
-          this.system.mentalLeapState?.fatigueSaveBonus ||
-          this.system.conditionContext?.baffled === true ||
-          !!stillStandingContent ||
-          characterReminders(this, { kind: "save", saveKey: key }).length > 0)
+        input.askModifier ||
+        (input.askContext &&
+          (key === "ref" ||
+            feats.has("Swamp Training") ||
+            feats.has("Firefighter Training") ||
+            feats.has("Disease Basics") ||
+            feats.has("Poison Basics") ||
+            this.system.mentalLeapState?.fatigueSaveBonus ||
+            this.system.conditionContext?.baffled === true ||
+            !!stillStandingContent ||
+            characterReminders(this, { kind: "save", saveKey: key }).length > 0))
       ) {
         input = await systemDialog.input({
           window: { title: game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) },
@@ -608,11 +625,15 @@ export const ActorRolls = Base =>
               reflexReducesDamage: input.reflexReducesDamage === true
             })
           : null;
-      const saveBonusLabel = loc`Save bonus`;
+      const saveBonusLabel = loc`Save bonus`,
+        situational = Math.trunc(Number(input.situationalModifier)) || 0;
       const { total, planModifiers, modifiers } = planTotal(
         "save",
         { actor: this, system: this.system, saveKey: key, input },
-        terms.merge("rows", [[10, [saveBonusLabel, this.system.saves?.[key]?.total ?? 0]]])
+        terms.merge("rows", [
+          [10, [saveBonusLabel, this.system.saves?.[key]?.total ?? 0]],
+          ...(situational ? [[900, [loc`GC's modifier`, situational]]] : [])
+        ])
       );
       // The card's tooltip lists the save's own parts in place of the one "Save bonus" row.
       const savePartRows = saveBreakdown(this.system, key, CONFIG.SPYCRAFT.saves[key].ability);

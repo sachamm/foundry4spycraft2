@@ -36,6 +36,11 @@
         data-name="{{name}}"{{#unless remaining}} disabled
         data-tooltip="{{localize 'SPYCRAFT.Uses.Spent' period=period}}"{{/unless}}>{{localize "SPYCRAFT.Template.ActorAgentClasses.Use"}}</button>{{/if}}</li>{{/each}}</ul>
     </div>{{/if}}
+    {{#if featPlayActions.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Play.FeatActions'}}">
+      {{#unless limitedUses.length}}<h3>{{localize "SPYCRAFT.Play.AbilitiesInPlay"}}</h3>{{/unless}}
+      <p class="tool-actions">{{#each featPlayActions}}<button type="button" class="sc2-action" data-action="{{action}}"{{#if resource}}
+        data-resource="{{resource}}"{{/if}} data-tooltip="{{feat}}">{{localize label}}</button> {{/each}}</p>
+    </div>{{/if}}
     <div class="quick-actions" role="group" aria-label="{{localize 'SPYCRAFT.Play.YourTurn'}}">
       <h3>{{localize "SPYCRAFT.Play.YourTurn"}}</h3>
       <p

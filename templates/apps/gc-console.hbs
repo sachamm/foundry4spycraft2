@@ -86,11 +86,11 @@
       class="tag">{{localize "SPYCRAFT.Template.AppsGcConsole.Active"}}</span>{{else if mission.ended}}<span
       class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span>{{/if}}</span></summary>
     <div class="gc-facts">
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b
+      <div class="sc2-field" data-tooltip="{{terms.threatLevel}}"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b
         class="sc2-value">{{mission.threatLevel}}</b>{{#if mission.threatNote}}<span class="gc-note">{{mission.threatNote}}</span>{{/if}}</div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
+      <div class="sc2-field" data-tooltip="{{terms.caliber}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
       <div class="sc2-field"><span class="sc2-caption">{{xp.label}}</span><span class="sc2-value">{{#if xp.started}}{{localize "SPYCRAFT.Console.XPValue" earned=xp.earned planned=xp.planned}}{{else}}{{xp.planned}}{{/if}}</span></div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span
+      <div class="sc2-field" data-tooltip="{{terms.standing}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span
         class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorthLabel}}</span></div>
       {{#if mission.bonusDice}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingDice"}}</span><span
         class="sc2-value">{{localize "SPYCRAFT.Console.StartingDiceValue" dice=mission.bonusDice}}</span></div>{{/if}}
@@ -297,6 +297,7 @@
     <button type="button" data-action="npcKnowledge">{{localize "SPYCRAFT.Template.AppsGcConsole.NpcKnowledge"}}</button></p>
     <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole mob=shortcuts.mobAttack weapon1=shortcuts.actingWeapon1 weapon2=shortcuts.actingWeapon2}}
       </p>
-    <p class="controls"><button type="button" data-action="openControls">{{localize "SPYCRAFT.Console.OpenControls"}}</button></p>
+    <p class="controls"><button type="button" data-action="openControls">{{localize "SPYCRAFT.Console.OpenControls"}}</button>
+      <button type="button" data-action="openGlossary" data-tooltip="{{localize 'SPYCRAFT.Console.GlossaryHint'}}">{{localize "SPYCRAFT.Console.Glossary"}}</button></p>
   </details>
 </section>

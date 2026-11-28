@@ -47,6 +47,7 @@ import {
 } from "./console-view.mjs";
 import { npcDamageSaveWithUndo } from "./npc-play.mjs";
 import { withUndo } from "../undo.mjs";
+import { openGlossary, termMeans } from "../glossary.mjs";
 import { pressActorCard, shortcutLabel } from "../keybindings.mjs";
 import {
   advanceClock,
@@ -365,6 +366,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return pressActorCard(acting, "button.sc2-primary-action[data-roll-control]");
       }),
       mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
+      openGlossary: guard(() => openGlossary()),
       openSystemSettings: guard(() => game.settings.sheet?.render?.(true)),
       consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
       startConflict: guard(() => conflicts.startConflictDialog()),
@@ -862,6 +864,12 @@ export function consoleContext() {
             ? loc`${dice.value} (started with ${starting})`
             : loc`${dice.value} left of ${starting}`,
       session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
+    },
+    // One-line meanings of the terms the mission facts use, from the shared list.
+    terms: {
+      threatLevel: termMeans(loc`Threat Level`),
+      caliber: termMeans(loc`Caliber`),
+      standing: termMeans(loc`Standing`)
     },
     wrap: {
       // What is still open is said first, since ending the mission settles XP on what is ticked now.

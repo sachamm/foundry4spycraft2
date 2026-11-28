@@ -2333,3 +2333,13 @@ test("an attack card's first line names its target (B-077)", async () => {
   assert.match(checkFlavor(settled), /^Pistol attack · at Sentry &lt;2&gt;<br>/);
   assert.equal(attackTargetName({ ...settled, checkKind: "skill" }), "");
 });
+
+test("game terms are worded once and found by name (B-110)", async () => {
+  const { glossary, termMeans } = await import("../module/apps/glossary.mjs");
+  const terms = glossary();
+  assert.ok(terms.length >= 15);
+  assert.equal(new Set(terms.map(entry => entry.term)).size, terms.length);
+  assert.ok(terms.every(entry => entry.means.length <= 200 && /\.$/.test(entry.means)));
+  assert.match(termMeans("threat level"), /1 to 20/);
+  assert.equal(termMeans("no such term"), null);
+});

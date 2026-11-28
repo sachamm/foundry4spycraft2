@@ -1086,3 +1086,16 @@
 .sc2-round-reminders li + li {
   margin-top: 4px;
 }
+
+/* The list of game terms: each term over its one-line meaning. */
+.spycraft2 .sc2-glossary {
+  margin: 0;
+}
+.spycraft2 .sc2-glossary dt {
+  margin-top: var(--sc2-space-2);
+  font-weight: 700;
+  color: var(--sc2-ink-strong);
+}
+.spycraft2 .sc2-glossary dd {
+  margin: 0;
+}

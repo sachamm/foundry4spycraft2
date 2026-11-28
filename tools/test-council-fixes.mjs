@@ -651,3 +651,17 @@ test("an unlinked copy's own actor carries the token's name, at placement and af
   assert.equal(unlinkedRename({ ...token, actorLink: true }, { name: "Sergeant" }), null);
   assert.equal(unlinkedRename(token, { x: 5 }), null);
 });
+
+test("the save dialog always offers the GC's modifier (B-102)", async () => {
+  await import("../module/rolls/dialogs/save.mjs");
+  const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+  const content = rollPipeline.dialog({
+    dialog: "save",
+    actor: { system: {} },
+    feats: new Set(),
+    key: "fort",
+    stillStandingContent: "",
+    options: {}
+  });
+  assert.match(content, /name="situationalModifier"/);
+});
