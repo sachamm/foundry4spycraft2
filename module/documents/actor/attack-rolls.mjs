@@ -147,16 +147,13 @@ export const ActorAttackRolls = Base =>
         // Shift-click: the remembered and measured choices are read as if entered in the dialog.
         const { quickEntered, ...rest } = options;
         try {
+          const quickCQB = cqbRangePlan(this.system, item.system, rest).active;
           options = {
             ...rest,
+            // The light, fog and mount choices of the last dialog travel with the quick roll too.
+            ...measuredShotInput(this, item, quickCQB, quickEntered),
             ...rollPipeline.read(
-              {
-                dialog: "attack",
-                actor: this,
-                item,
-                needsCQB: cqbRangePlan(this.system, item.system, rest).active,
-                entered: { ...quickEntered }
-              },
+              { dialog: "attack", actor: this, item, needsCQB: quickCQB, entered: { ...quickEntered } },
               {}
             )
           };

@@ -2355,6 +2355,11 @@ test("a console tool that needs only its own press can go to the hotbar and be r
   const { hotbarTool, runConsoleTool } = await import("../module/apps/gc/console.mjs");
   assert.equal(hotbarTool({ dataset: { action: "spendDice", tooltip: "x" } }), true);
   assert.equal(hotbarTool({ dataset: { action: "cardNextStep", combatant: "c1" } }), false);
+  assert.equal(
+    hotbarTool({ dataset: { action: "quickObjective" }, closest: () => ({}) }),
+    false,
+    "reads a field beside it"
+  );
   assert.equal(hotbarTool({ dataset: { action: "consoleView", view: "prep" } }), false);
   assert.equal(hotbarTool({ dataset: { action: "spendDice" }, disabled: true }), false);
   const { onHotbarDrop } = await import("../module/apps/hotbar.mjs");

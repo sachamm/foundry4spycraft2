@@ -167,11 +167,13 @@ const QUALITY_HANDLING = {
 };
 
 export const GC_TOOL_DRAG = "spycraft2.gcTool";
-/** Whether a console button works from its action alone: one that names a combatant, a row or a view does not. */
+/** Whether a console button works from its action alone: one that names a combatant, a row, a view or a field does not. */
 export function hotbarTool(button) {
   const data = Object.keys(button?.dataset ?? {}).filter(
     key => !["action", "tooltip", "tooltipDirection"].includes(key)
   );
+  // A button that reads a field beside it (the quick Add) has nothing to read from the hotbar.
+  if (button?.closest?.(".gc-quick-add")) return false;
   return !!button?.dataset?.action && data.every(key => /^sc2|^search/.test(key)) && !button.disabled;
 }
 
