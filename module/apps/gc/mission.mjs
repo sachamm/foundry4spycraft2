@@ -414,7 +414,7 @@ export async function startMission() {
     mission = getMission(),
     standing = missionStanding(mission);
   await say(
-    `<b>${loc`Mission ${esc(mission.name || "")} begins.`}</b> ${loc`Threat Level`} <b>${tl.value}</b>${loc`${tl.override ? " (fixed)" : ` (${tl.base}${tl.adjust ? ` ${signed(tl.adjust)}` : ""})`}, Caliber ${mission.caliber}.${tl.bonusDice ? loc` Each player character starts each session with ${tl.bonusDice} extra action di${tl.bonusDice === 1 ? "e" : "ce"} (p.61).` : ""} Base standing reward: Reputation ${standing.reputation} or Net Worth ${money(standing.netWorth)}. GC starting dice: ${teamActors(mission).length} + ${2 * mission.caliber}.`}`
+    `<b>${loc`Mission ${esc(mission.name || "")} begins.`}</b> ${loc`Threat Level`} <b>${tl.value}</b>${loc`${tl.override ? " (fixed)" : ` (${tl.base}${tl.adjust ? ` ${signed(tl.adjust)}` : ""})`}, Caliber ${mission.caliber}.${tl.bonusDice ? loc` Each player character starts each session with ${tl.bonusDice} extra action di${tl.bonusDice === 1 ? "e" : "ce"} (p.61).` : ""} Base standing reward: Reputation ${standing.reputation} or Net Worth ${money(standing.netWorth)}. The GC's action dice come with each session, not the mission: ${teamActors(mission).length} + ${2 * mission.caliber} at the next Begin session (p.396).`}`
   );
   await rollLiquidations(teamActors(mission));
   // A session already under way began without this mission's Threat Level, so its bonus dice are given now (p.61).

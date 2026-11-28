@@ -74,13 +74,16 @@ export function threatLevel(mission, levels) {
   const adjust = whole(mission?.threatAdjust, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust)
     ? mission.threatAdjust
     : 0;
-  return {
-    base,
-    adjust,
-    value: Math.min(M.threatLevel.maximum, Math.max(M.threatLevel.minimum, base + adjust)),
-    override: false
-  };
+  const value = Math.min(M.threatLevel.maximum, Math.max(M.threatLevel.minimum, base + adjust));
+  // The adjustment counted is the change actually made: a level held at 1 or 20 is not "decreased" or "increased"
+  // by the part that could not apply, so Table 7.5 changes the reward only by that much (p.423; house reading, the
+  // book does not say).
+  return { base, adjust: value - base, value, override: false };
 }
+
+/** The part of an adjustment a base Threat Level can take, within 1 to 20. */
+export const effectiveThreatAdjust = (base, adjust) =>
+  Math.min(M.threatLevel.maximum, Math.max(M.threatLevel.minimum, base + adjust)) - base;
 
 /** p.61: +1 starting action die per 2 full points the mission TL exceeds the team's average career level. */
 export function threatBonusActionDice(tl, levels) {
@@ -102,7 +105,9 @@ export function missionStanding(mission) {
     ? mission.threatAdjustApplied
     : whole(mission?.threatAdjust, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust) &&
         !whole(mission?.threatOverride, 1, 20)
-      ? mission.threatAdjust
+      ? whole(mission?.threatBase, 1, 20)
+        ? effectiveThreatAdjust(mission.threatBase, mission.threatAdjust)
+        : mission.threatAdjust
       : 0;
   return {
     reputation: row.reputation + adjust * M.threatLevel.reputationPerStep,
