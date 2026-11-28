@@ -645,6 +645,42 @@ test("Paranoid NPC skill circumstances and roll confirmation remain reachable at
   }
 });
 
+for (const theme of ["light", "dark"])
+  test(`actual NPC pinned escape selects its opposed check and keeps declarations and confirmation reachable in ${theme}`, async ({
+    page
+  }) => {
+    const prior = content,
+      oldGame = game;
+    try {
+      globalThis.game = { ...oldGame, i18n: { localize: String } };
+      await rollNpcSkill(
+        {
+          name: "Pinned NPC",
+          isOwner: true,
+          system: { npcType: "special", npcProfile: { enabled: false }, conditionContext: { pinned: true } }
+        },
+        null,
+        { initialSkill: "athletics/restraint-escape" }
+      );
+      await render(page, 720);
+      await page.setViewportSize({ width: 1280, height: 720 });
+      await page
+        .locator("dialog")
+        .evaluate((dialog, theme) => dialog.classList.add("spycraft2", `theme-${theme}`), theme);
+      await expect(page.locator('[name="key"]')).toHaveValue("athletics/restraint-escape");
+      await page.locator('[name="grappleProficient"]').selectOption("false");
+      await page.locator('[name="grappleSizeDifference"]').fill("1");
+      await page.locator('[name="grappleContextConfirmed"]').check();
+      await page.locator('[name="grappleAllSourcesConfirmed"]').check();
+      await page.locator("#confirm").scrollIntoViewIfNeeded();
+      const rect = await page.locator("#confirm").boundingBox();
+      expect(rect.y + rect.height).toBeLessThanOrEqual(720);
+    } finally {
+      content = prior;
+      globalThis.game = oldGame;
+    }
+  });
+
 test("reserved combat persuasion shows its fixed target guidance and no unrelated disposition selector at720px", async ({
   page
 }) => {

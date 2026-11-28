@@ -1955,6 +1955,15 @@
    "NPCManual": "The GC separately handles manual statistics and their restoration.",
    "NPCReview": "GC: correct Drained history",
    "NPCBuild": "Build inputs retain the original grades and qualities. Prepared bonuses include Drained."
+  },
+  "NPCRestraints": {
+   "Title": "Grapple",
+   "Held": "Held/Pinned limits actions. Use the opposed Athletics escape check to earn release benefits.",
+   "Escape": "Roll Athletics escape",
+   "NeedsReview": "The interrupted release needs GC review before further actions.",
+   "Review": "Review original release",
+   "PendingMove": "Escape Hold requires the immediate Standard Move: at least 5 ft., up to the recorded maximum.",
+   "ConfirmMove": "Confirm actual Escape Hold move"
   }
  }
 }

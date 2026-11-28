@@ -41,6 +41,8 @@ rollPipeline.register({
 /** An activated critical failure can no longer be boosted (the same rule as an agent's boost). */
 export const gcBoostable = check =>
   Number.isFinite(check?.rawTotal) &&
+  check.actionDiceAllowed !== false &&
+  (check.checkMethod ?? "roll") === "roll" &&
   !check.resolved &&
   !check.superseded &&
   !check.criticalFailure &&

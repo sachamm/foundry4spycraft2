@@ -2001,6 +2001,18 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       applyNpcDrained() {
         return applyNpcDrained(this.actor);
       },
+      escapeRestraint() {
+        return rollNpcSkill(this.actor, null, { initialSkill: "athletics/restraint-escape" });
+      },
+      reviewRestraintRelease() {
+        return this.actor.reviewRestraintRelease();
+      },
+      async confirmRestraintEscapeMove(event, target) {
+        const message = await fromUuid(target.dataset.messageUuid);
+        if (!message)
+          return refuse(loc`The original grapple message is unavailable. Review its saved movement with the GC.`);
+        return this.actor.confirmRestraintEscapeMove(message);
+      },
       rollDrainedRecovery() {
         return rollDrainedRecovery(this.actor);
       },
@@ -2132,6 +2144,20 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       },
       hazards: hazardsView(this.actor),
       npcDrained: npcDrainedView(this.actor),
+      npcRestraints: {
+        held: !!sys.conditionContext?.held || !!sys.conditionContext?.pinned,
+        canEscape: this.actor.isOwner && (!!sys.conditionContext?.held || !!sys.conditionContext?.pinned),
+        needsReview: sys.restraintReleaseReview?.needsReview,
+        canReview: this.actor.isOwner && game.user.isGM && sys.restraintReleaseReview?.needsReview,
+        pending: this.actor.isOwner
+          ? (sys.pendingRestraintMoves ?? []).map(row => ({
+              id: row.id,
+              messageUuid: row.messageUuid,
+              minimum: row.movement.minimum,
+              maximum: row.movement.maximum
+            }))
+          : []
+      },
       nonLethal: nonLethalTotals(this.actor),
       dying: woundState(Number(this.actor.system.wounds?.value), this.actor.system.deathThreshold) === "dying",
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),

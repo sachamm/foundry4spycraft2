@@ -572,6 +572,90 @@ test("NPC named Vision checks use armor penalties and Omni-Competent halves each
   guard.system.campaignEffects = effects;
 });
 
+test("actual NPC passive checks keep blind visibility and deny action dice; active campaign conversion records the new category", async () => {
+  const effects = guard.system.campaignEffects;
+  guard.system.campaignEffects = {};
+  const check = SPYCRAFT.skills.notice.checks.find(c => c.mode.includes("Passive"));
+  assert.ok(check);
+  const passive = await npc.rollNpcSkill(guard, { key: `notice/${check.id}`, ability: "wis", secret: true });
+  assert.equal(passive.options.rollMode, "blindroll");
+  assert.equal(passive.options.actionDiceAllowed, false);
+  assert.match(passive.options.npcSkillContext.mode, /Passive/);
+  game.user.isGM = false;
+  await assert.rejects(npc.rollNpcSkill(guard, { key: `notice/${check.id}`, ability: "wis" }), /GC rolls/);
+  game.user.isGM = true;
+  guard.system.campaignEffects = { activeSkillChecks: 1 };
+  const active = await npc.rollNpcSkill(guard, { key: `notice/${check.id}`, ability: "wis" });
+  assert.equal(active.options.rollMode, undefined);
+  assert.equal(active.options.actionDiceAllowed, true);
+  assert.equal(active.options.npcSkillContext.mode, "Active");
+  assert.throws(() => passive.options.validateSkillContext(), /category, conditions/);
+  guard.system.campaignEffects = effects;
+});
+
+test("actual NPC incapacity guards refuse before the roll and an escape keeps proficiency, Size and original source evidence", async () => {
+  const context = guard.system.conditionContext,
+    statuses = guard.statuses,
+    effects = guard.effects;
+  guard.system.conditionContext = { unconscious: true };
+  await assert.rejects(npc.rollNpcSkill(guard, { key: "athletics/grapple", ability: "str" }), /Unconscious/);
+  guard.system.conditionContext = { held: true };
+  await assert.rejects(npc.rollNpcSkill(guard, { key: "athletics/grapple", ability: "str" }), /Held/);
+  guard.statuses = new Set(["held"]);
+  guard.effects = [{ id: "hold", statuses: new Set(["held"]), active: true }];
+  const roll = await npc.rollNpcSkill(guard, {
+    key: "athletics/restraint-escape",
+    ability: "str",
+    grappleProficient: "false",
+    grappleSizeDifference: "1",
+    grappleContextConfirmed: true
+  });
+  assert.equal(roll.data.total, 8);
+  assert.equal(roll.options.error, 3);
+  assert.equal(roll.options.restraintEscape.fullActions, 2);
+  assert.equal(roll.options.restraintEscape.sourceSnapshot.sources[0].id, "hold");
+  guard.statuses.clear();
+  assert.throws(() => roll.options.validateSkillContext(), /grapple sources changed/);
+  guard.statuses = statuses;
+  guard.effects = effects;
+  guard.system.conditionContext = context;
+});
+
+test("actual NPC tagged sense checks apply blindness to their modifier and cap, and refuse tasks requiring sight", async () => {
+  const context = guard.system.conditionContext;
+  guard.system.conditionContext = { blinded: true };
+  const named = SPYCRAFT.skills.notice.checks.find(c => c.tags.includes("Vision"));
+  const result = await npc.rollNpcSkill(guard, { key: `notice/${named.id}`, ability: "wis" });
+  assert.equal(result.data.total, 9 + 2 - 8);
+  assert.equal(result.options.cap, 20);
+  assert.equal(result.options.sensoryConditions.blinded, true);
+  await assert.rejects(
+    npc.rollNpcSkill(guard, { key: `notice/${named.id}`, ability: "wis", requiresEyesight: true }),
+    /requires eyesight/
+  );
+  guard.system.conditionContext = context;
+});
+
+test("the actual GC boost API refuses passive and fixed-result NPC cards before payment or RNG", async () => {
+  const { gcBoostable, gcBoostCard } = await import("../module/apps/gc/npc-card-dice.mjs"),
+    base = { rawTotal: 20, checkMethod: "roll", actionDiceAllowed: true };
+  assert.equal(gcBoostable(base), true);
+  for (const patch of [{ actionDiceAllowed: false }, { checkMethod: "take10" }, { checkMethod: "take20" }]) {
+    const before = structuredClone([...settings]),
+      queued = diceQueue.length;
+    const message = {
+      flags: { spycraft2: { ...base, ...patch } },
+      update: () => {
+        throw Error("Blocked boost must not update the card");
+      }
+    };
+    assert.equal(gcBoostable(message.flags.spycraft2), false);
+    assert.equal(await gcBoostCard(message, guard), null);
+    assert.equal(diceQueue.length, queued);
+    assert.deepEqual([...settings], before);
+  }
+});
+
 test("standard NPC Damage saves accumulate, kill and reset; special NPCs are refused", async () => {
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });

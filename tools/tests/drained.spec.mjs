@@ -3,6 +3,42 @@ import { systemCss } from "../lib/system-css.mjs";
 import { createEnvironment } from "../lib/hbs-harness.mjs";
 const css = systemCss(),
   environment = createEnvironment();
+
+for (const theme of ["light", "dark"])
+  for (const state of ["held", "pending", "review", "observer"])
+    test(`NPC grapple ${state} controls respect ownership and fit in ${theme}`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 });
+      const owner = state !== "observer",
+        html = environment.render("systems/spycraft2/templates/actor/parts/hazards.hbs", {
+          hazards: {},
+          npcRestraints: {
+            held: state === "held" || state === "observer",
+            canEscape: owner && state === "held",
+            needsReview: state === "review",
+            canReview: owner && state === "review",
+            pending: state === "pending" ? [{ messageUuid: "ChatMessage.original", maximum: 30 }] : []
+          }
+        });
+      await page.setContent(
+        `<style>${css} main.application { width: 560px; height: 660px; display: flex; flex-direction: column; overflow: hidden; } .window-content { overflow: auto; padding: 12px; }</style><main class="application spycraft2 sheet actor npc theme-${theme}"><div class="window-content">${html}</div></main>`
+      );
+      await expect(page.locator('[data-action="escapeRestraint"]')).toHaveCount(state === "held" ? 1 : 0);
+      await expect(page.locator('[data-action="reviewRestraintRelease"]')).toHaveCount(state === "review" ? 1 : 0);
+      await expect(page.locator('[data-action="confirmRestraintEscapeMove"]')).toHaveCount(state === "pending" ? 1 : 0);
+      if (state === "pending")
+        await expect(page.locator('[data-action="confirmRestraintEscapeMove"]')).toHaveAttribute(
+          "data-message-uuid",
+          "ChatMessage.original"
+        );
+      const button = page.locator(".hazard button").last();
+      if (owner) {
+        await button.scrollIntoViewIfNeeded();
+        await button.focus();
+        await expect(button).toBeFocused();
+        const rect = await button.boundingBox();
+        expect(rect.y + rect.height).toBeLessThanOrEqual(680);
+      } else await expect(page.locator(".hazard button")).toHaveCount(0);
+    });
 for (const theme of ["light", "dark"])
   for (const state of ["current", "review", "pending", "player"]) {
     test(`Drained ${state} controls respect ownership and remain reachable in ${theme}`, async ({ page }) => {

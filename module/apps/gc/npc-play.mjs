@@ -36,6 +36,8 @@ import { manageCombatPersuasion } from "./combat-persuasion.mjs";
 import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
 import { drainedRecoveryCheck, drainedNpcCheckOptions } from "../../rules/drained.mjs";
 import { grappleSkillChecks, grappleCheckPlan, grappleCircumstancesContent } from "../../rules/grapple-check.mjs";
+import { restraintSkillChecks, restraintSourceSnapshot } from "../../rules/restraints.mjs";
+import { npcSkillActionPlan } from "../../rules/npc-skill-checks.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -64,8 +66,8 @@ export function npcSkillPlan(actor, key) {
     cap: campaignSkillPolicy(system)?.uncapped ? null : stepLookup(TABLES.skillCap, bonus)
   };
 }
-const npcNamedChecks = skill =>
-  grappleSkillChecks(skill.key, skill.checks).filter(
+const npcNamedChecks = (skill, system = {}) =>
+  restraintSkillChecks(system, skill.key, grappleSkillChecks(skill.key, skill.checks)).filter(
     check => !check.optionalRule || (check.optionalRule === "linguistics" && readSetting("linguistics", false) === true)
   );
 
@@ -132,6 +134,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
             ]
           : []),
         raw(qualityCheckContent(actor.system.qualityEffects)),
+        ...(actor.system.conditionContext?.paralyzed
+          ? [{ check: "purelyMentalConfirmed", label: loc`The GC confirms this recovery is a purely mental action` }]
+          : []),
         { check: "secret", label: loc`Secret (GC only)` }
       ]
     });
@@ -160,9 +165,13 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
           : SKILLS.map(
               skill =>
                 `<optgroup label="${esc(skillRows.find(row => row[0] === skill.key)[1])}"><option value="${skill.key}">${esc(skill.name)} — ${loc`General skill check`}</option>${npcNamedChecks(
-                  skill
+                  skill,
+                  actor.system
                 )
-                  .map(check => `<option value="${skill.key}/${check.id}">${esc(check.name)}</option>`)
+                  .map(
+                    check =>
+                      `<option value="${skill.key}/${check.id}"${context.initialSkill === `${skill.key}/${check.id}` ? " selected" : ""}>${esc(check.name)}</option>`
+                  )
                   .join("")}</optgroup>`
             ).join("")
       }</select></label>
@@ -172,6 +181,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       <label>${loc`Error range (blank uses the named check's range)`} <input type="number" name="error" min="0" max="19" value="" /></label>
       ${qualityCheckContent(actor.system.qualityEffects)}
       <details><summary>${loc`Grapple circumstances`}</summary>${grappleCircumstancesContent(actor)}</details>
+      <details><summary>${loc`Skill tags and senses`}</summary><p>${loc`Current actor conditions apply automatically. Declare only additional circumstances of this named check.`}</p><label><input name="oneHanded" type="checkbox" /> ${loc`This Hands-On check uses one hand`}</label><label><input name="noSharedLanguage" type="checkbox" /> ${loc`No shared language or relevant local tongue`}</label><label><input name="conveyingMessage" type="checkbox" /> ${loc`I am transmitting Innuendo`}</label><label><input name="blinded" type="checkbox" /> ${loc`Additionally blinded for this check`}</label><label><input name="deafened" type="checkbox" /> ${loc`Additionally deafened for this check`}</label><label><input name="requiresEyesight" type="checkbox" /> ${loc`This task requires eyesight or eye-hand coordination`}</label><label><input name="requiresHearing" type="checkbox" /> ${loc`This task requires hearing`}</label><label><input name="targetDeafened" type="checkbox" /> ${loc`The actual target is deafened`}</label><label><input name="targetCharacter" type="checkbox" /> ${loc`The target is a character`}</label><label>${loc`Actual distance to that character (ft.)`} <input name="distanceFeet" type="number" min="0" step="any" /></label></details>
+      ${actor.system.conditionContext?.held || actor.system.conditionContext?.pinned ? `<fieldset><legend>${loc`Opposed Grapple escape`}</legend><label>${loc`Applicable proficiency`} <select name="grappleProficient"><option value="">${loc`Confirm for this escape`}</option><option value="true">${loc`Proficient`}</option><option value="false">${loc`Not proficient: two full actions, error +2`}</option></select></label><label>${loc`My Size categories minus opponent Size categories`} <input name="grappleSizeDifference" type="number" value="0" step="1" min="-20" max="20" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`The GC confirms this escape's actual participants, proficiency and Size difference`}</label><label><input name="grappleAllSourcesConfirmed" type="checkbox" /> ${loc`All current Held/Pinned sources belong to this same grapple; otherwise review them separately`}</label></fieldset>` : ""}
+      ${actor.system.conditionContext?.paralyzed ? `<label><input name="purelyMentalConfirmed" type="checkbox" /> ${loc`The GC confirms this is a purely mental action`}</label>` : ""}
       ${actor.system.campaignEffects?.socialCheckMorale ? `<label><input type="checkbox" name="surprise" /> ${loc`Paranoid: Blend/Stealth or Sneak/Hide to determine surprise`}</label><label><input type="checkbox" name="shiftingDisposition" /> ${loc`Paranoid: this check shifts a target's disposition`}</label><label><input type="checkbox" name="persuadingAction" /> ${loc`Paranoid: this check persuades a target to take an action`}</label>` : ""}
       ${context.combatPersuasion ? "" : dispositionTargetContent("impress")}
       <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`,
@@ -179,6 +191,21 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     );
     if (!input) return null;
   }
+  input = {
+    ...input,
+    grappleProficient:
+      input.grappleProficient === "true" ? true : input.grappleProficient === "false" ? false : input.grappleProficient,
+    grappleSizeDifference:
+      typeof input.grappleSizeDifference === "string" && input.grappleSizeDifference.trim()
+        ? Number(input.grappleSizeDifference)
+        : input.grappleSizeDifference,
+    distanceFeet:
+      typeof input.distanceFeet === "string"
+        ? input.distanceFeet.trim()
+          ? Number(input.distanceFeet)
+          : null
+        : input.distanceFeet
+  };
   const [skillKey, chosenCheck] = typeof input.key === "string" ? input.key.split("/") : [],
     skill = SKILLS.find(entry => entry.key === skillKey);
   if (!skill) return refuse(loc`Choose a skill.`);
@@ -188,7 +215,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     : context.combatPersuasion
       ? skill.checks.find(c => c.id === "persuasion")
       : chosenCheck
-        ? npcNamedChecks(skill).find(c => c.id === chosenCheck)
+        ? npcNamedChecks(skill, actor.system).find(c => c.id === chosenCheck)
         : null;
   if ((chosenCheck && !namedCheck) || (context.combatPersuasion && chosenCheck && chosenCheck !== "persuasion"))
     throw Error(loc`Choose a valid named check for this skill and combat attempt.`);
@@ -211,6 +238,19 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     : skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
       ? input.ability
       : (namedCheck?.attributes[0] ?? skill.abilities[0]);
+  const actionPlan = () =>
+      npcSkillActionPlan(actor.system, skill.key, namedCheck, ability, input, {
+        preserveMode: !!context.drainedRecovery
+      }),
+    action = actionPlan(),
+    sourceSnapshot = action.restraint.escape ? restraintSourceSnapshot(actor) : null,
+    originalSkill = graded ? npcSkillPlan(actor, skill.key) : null;
+  if (action.blockedReason) throw Error(action.blockedReason);
+  if (plan.cap !== null) plan.cap = Math.max(0, plan.cap + action.capAdjustment);
+  if (action.rollMode === "blindroll" && !game.user.isGM)
+    throw Error(loc`The GC rolls this passive or secret NPC check.`);
+  if (sourceSnapshot?.sources.length > 1 && input.grappleAllSourcesConfirmed !== true)
+    throw Error(loc`Confirm that all current restraint sources belong to this same grapple before rolling.`);
   // Qualities: Fearless, Meek and Strong-Minded by the kind of check, the rest by the boxes ticked.
   const quality = npcSkillQualityPlan(actor.system.qualityEffects ?? { skillOptions: [] }, {
     skillKey: skill.key,
@@ -293,7 +333,10 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     ),
     grappleModifier = grappleRows.reduce((n, row) => n + row.value, 0);
   if (grapple.blockedReason) throw Error(grapple.blockedReason);
-  quality.rows.push(...grappleRows, ...adjustedNamedPenalties);
+  const conditionRows = skillPenaltyEntries(actor.system, action.penalties).filter(row => row.value),
+    conditionModifier = conditionRows.reduce((n, row) => n + row.value, 0);
+  quality.rows.push(...grappleRows, ...adjustedNamedPenalties, ...conditionRows);
+  if (action.restraint.sizeBonus) quality.rows.push({ label: loc`Size (Grapple)`, value: action.restraint.sizeBonus });
   plan.bonus = skillPenaltyValue(actor.system, plan.bonus);
   const penaltyNote = skillPenaltyNotes(actor.system, [
     ...rawQualityRows,
@@ -301,7 +344,8 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     { label: loc`Situational modifier`, value: Number(input.modifier) || 0 },
     { label: loc`Morale penalty`, value: moraleSkillPenalty(campaignChecks.bonuses, shakenPenalty) },
     { label: loc`Target disposition`, value: disposition.penalty },
-    ...namedPenalties
+    ...namedPenalties,
+    ...action.penalties
   ]);
   const total =
     plan.bonus +
@@ -314,11 +358,14 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     disposition.bonus +
     skillPenaltyValue(actor.system, disposition.penalty) +
     grappleModifier +
-    namedPenalty;
+    namedPenalty +
+    conditionModifier +
+    action.restraint.sizeBonus;
   const checkError =
       (input.error == null || input.error === "" ? (namedCheck?.error ?? 1) : Math.max(0, Number(input.error) || 0)) +
       quality.errorIncrease +
-      disposition.errorIncrease,
+      disposition.errorIncrease +
+      action.restraint.errorIncrease,
     recoveryPlan = context.drainedRecovery
       ? drainedNpcCheckOptions(actor.system, context.drainedRecovery, input, checkError)
       : null;
@@ -332,6 +379,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
           ? loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap ?? loc`No cap`}`
           : loc`${skill.name} (${ability.toUpperCase()})`) +
         (namedCheck ? ` / ${esc(namedCheck.name)}` : "") +
+        (action.restraint.escape ? ` — ${action.restraint.timeLocked ? 2 : 1} ${loc`full action(s)`}` : "") +
         (input.secret && disposition.evidence ? `<br><small>${esc(disposition.notes.join(" "))}</small>` : "") +
         (input.secret && (quality.rows.length || quality.errorIncrease)
           ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
@@ -349,6 +397,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
         total
       ),
       cap: plan.cap,
+      checkMethod: "roll",
+      actionDiceAllowed: action.actionDiceAllowed,
+      ...(action.skillTiming ? { skillTiming: action.skillTiming } : {}),
       error: checkError,
       ...(recoveryPlan
         ? { ...recoveryPlan, difficultyClass: context.difficultyClass, drainedRecovery: context.drainedRecovery }
@@ -363,7 +414,33 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       campaignSkillChecks: campaignChecks.evidence,
       dispositionSkill: disposition.evidence,
       grappleFeats: grapple.evidence,
+      npcSkillContext: action.evidence,
+      skillTags: action.tags,
+      sensoryConditions: action.senses,
+      restraintEscape: action.restraint.escape
+        ? {
+            condition: action.restraint.state,
+            kind: "opposedGrapple",
+            fullActions: action.restraint.timeLocked ? 2 : 1,
+            armorCheckPenalty: true,
+            grasp: true,
+            proficient: action.restraint.proficient,
+            sizeDifference: action.restraint.sizeDifference,
+            sizeBonus: action.restraint.sizeBonus,
+            timeLocked: action.restraint.timeLocked,
+            sourceSnapshot,
+            sourceScopeConfirmed: sourceSnapshot.sources.length === 1 || input.grappleAllSourcesConfirmed === true
+          }
+        : null,
       validateSkillContext: () => {
+        if (
+          JSON.stringify(actionPlan()) !== JSON.stringify(action) ||
+          (sourceSnapshot && JSON.stringify(restraintSourceSnapshot(actor)) !== JSON.stringify(sourceSnapshot)) ||
+          (graded && JSON.stringify(npcSkillPlan(actor, skill.key)) !== JSON.stringify(originalSkill))
+        )
+          throw Error(
+            loc`The NPC's check category, conditions, skill bonus or grapple sources changed before posting.`
+          );
         if (JSON.stringify(namedPenaltyRows()) !== JSON.stringify(namedPenalties))
           throw Error(loc`The NPC's armor or encumbrance changed before posting this named skill check.`);
         if (JSON.stringify(grapplePlan()) !== JSON.stringify(grapple))
@@ -378,7 +455,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
         if (
           JSON.stringify(live.evidence) !== JSON.stringify(campaignChecks.evidence) ||
           shakenSkillPenalty(actor.system, ability) !== shakenPenalty ||
-          (namedCheck?.optionalRule && !npcNamedChecks(skill).some(c => c.id === namedCheck.id)) ||
+          (namedCheck?.optionalRule && !npcNamedChecks(skill, actor.system).some(c => c.id === namedCheck.id)) ||
           JSON.stringify(
             dispositionSkillPlan(actor.system, skill.key, namedCheck ?? { id: checkId }, targetContext()).evidence
           ) !== JSON.stringify(disposition.evidence)
@@ -396,7 +473,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
             campaignSkillDCPolicy: campaignSkillDCPolicy(actor.system.campaignEffects)
           }
         : {}),
-      ...(input.secret ? { rollMode: "gmroll" } : {})
+      ...(action.rollMode ? { rollMode: action.rollMode } : input.secret ? { rollMode: "gmroll" } : {})
     }
   );
 }

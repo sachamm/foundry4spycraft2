@@ -1,5 +1,17 @@
 {{!-- Contagions, fire and the other damage types at work on a character; shared by the agent and NPC sheets. --}}
 <div class="hazards">
+    {{#if npcRestraints}}
+      {{#if npcRestraints.held}}<section class="hazard npc-restraints"><h4>{{localize "SPYCRAFT.NPCRestraints.Title"}}</h4>
+        <p>{{localize "SPYCRAFT.NPCRestraints.Held"}}</p>
+        {{#if npcRestraints.canEscape}}<button type="button" class="sc2-action" data-action="escapeRestraint">{{localize "SPYCRAFT.NPCRestraints.Escape"}}</button>{{/if}}
+      </section>{{/if}}
+      {{#if npcRestraints.needsReview}}<section class="hazard npc-restraint-review"><p>{{localize "SPYCRAFT.NPCRestraints.NeedsReview"}}</p>
+        {{#if npcRestraints.canReview}}<button type="button" class="sc2-action" data-action="reviewRestraintRelease">{{localize "SPYCRAFT.NPCRestraints.Review"}}</button>{{/if}}
+      </section>{{/if}}
+      {{#each npcRestraints.pending}}<section class="hazard npc-restraint-move"><p>{{localize "SPYCRAFT.NPCRestraints.PendingMove"}}{{#if maximum}} {{maximum}} ft.{{/if}}</p>
+        <button type="button" class="sc2-action" data-action="confirmRestraintEscapeMove" data-message-uuid="{{messageUuid}}">{{localize "SPYCRAFT.NPCRestraints.ConfirmMove"}}</button>
+      </section>{{/each}}
+    {{/if}}
   {{#if npcDrained}}
     <section class="hazard npc-drained">
       <h4>{{localize "SPYCRAFT.Drained.Title"}}</h4>

@@ -649,6 +649,7 @@ const EXPECTED_ORDER = [
   "requestsRecord",
   "fallingDamageControl",
   "restraintsRecord",
+  "npcSkillContextRecord",
   "sensesRecord",
   "fireActionContent:rangedAttack",
   "damageConversionContent:rangedAttack",

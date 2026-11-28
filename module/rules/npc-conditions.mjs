@@ -34,5 +34,4 @@ export function conditionNpcProfile(result, conditionContext = {}) {
     skills: result.skills.map(row => conditionNpcSkillBonus(row, conditionContext))
   };
 }
-export const npcSkillConditionContext = actor =>
-  Object.fromEntries(["baffled", "incompetent"].map(key => [key, actor?.statuses?.has(key) === true]));
+export { actorConditionContext as npcSkillConditionContext } from "./condition-context.mjs";

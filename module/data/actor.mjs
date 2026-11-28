@@ -70,6 +70,8 @@ import {
   vehicleSignatures
 } from "../rules/vehicle-environment.mjs";
 
+import { actorConditionContext } from "../rules/condition-context.mjs";
+
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 const int = (initial = 0, opts = {}) =>
@@ -201,6 +203,8 @@ export class NpcData extends BaseActorData {
     this.worldTime = globalThis.game?.time?.worldTime;
     this.usagePeriods = globalThis.game?.settings?.get("spycraft2", "usagePeriods") ?? {};
     this.conditionContext = npcSkillConditionContext(this.parent);
+    this.restraintReleaseReview = this.parent ? getRestraintReleaseReview(this.parent) : {};
+    this.pendingRestraintMoves = this.parent ? getPendingRestraintMoves(this.parent) : [];
     // The feats an NPC holds, by rule name, so the attack, damage and Defense rules that look for a feat by name
     // (Sharpshooter, Two-Weapon, Combat Expertise and the rest) treat an NPC's feat as they treat an agent's.
     this.activeFeatNames = [
@@ -868,37 +872,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     this.actionDieAwardReview = this.parent.flags?.spycraft2?.actionDieAwardReview ?? null;
     this.actionDiceSettlementReview = getActionDieSettlementReview(this.parent);
     this.worldTime = globalThis.game?.time?.worldTime;
-    const statuses = this.parent.statuses ?? new Set();
-    this.conditionContext = Object.fromEntries(
-      Object.entries({
-        nauseated: ["nauseated"],
-        dazed: ["dazed"],
-        stunned: ["stunned", "stun"],
-        dead: ["dead"],
-        paralyzed: ["paralyzed", "paralysis"],
-        fatigued: ["fatigued"],
-        exhausted: ["exhausted"],
-        unconscious: ["unconscious"],
-        helpless: ["helpless"],
-        vulnerable: ["vulnerable"],
-        sickened: ["sickened"],
-        drunk: ["drunk"],
-        crouched: ["crouched", "crouching"],
-        mute: ["mute"],
-        baffled: ["baffled"],
-        incompetent: ["incompetent"],
-        entangled: ["entangled"],
-        bound: ["bound"],
-        blinded: ["blinded", "blind"],
-        deafened: ["deafened", "deaf"],
-        flatFooted: ["flat-footed", "flatFooted"],
-        sprawled: ["sprawled"],
-        prone: ["prone"],
-        held: ["held"],
-        pinned: ["pinned"],
-        sleeping: ["sleeping", "sleep", "asleep"]
-      }).map(([key, ids]) => [key, ids.some(id => statuses.has(id))])
-    );
+    this.conditionContext = actorConditionContext(this.parent);
     this.bonusPoolChecks = {};
     for (const pool of Object.values(this.bonusActionDice ?? {})) {
       if (!pool?.messageUuid) continue;

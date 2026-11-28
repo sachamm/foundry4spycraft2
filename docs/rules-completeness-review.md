@@ -2561,6 +2561,67 @@ named-check categories/condition restrictions, benefit damage execution, cover
 penetration/blast routing and the broader secondary-effect cases before raising
 combat to the requested score. Counts and manual grapple circumstances remain
 GC declarations; no unseen combat relationship is inferred from a token alone.
+
+## Pass 83: NPC check categories, conditions and original escape sources
+
+### PC creation: 9.9/10
+
+PC creation retains its completed-build evidence. The PC status aliases now
+come from the same pure mapping as NPCs, preserving their previous meanings.
+
+### Combat play: 9.8/10
+
+The review found that NPC preparation exposed only Baffled and Incompetent to
+shared condition rules. NPCs now expose the complete existing PC alias set,
+including Held/Pinned, sleeping, paralysis, incapacity, senses and posture.
+Standard-NPC elimination also exposes its dead/unconscious state. Original
+effects and NPC profiles stay saved; repeated preparation does not alter them.
+
+Named NPC checks now retain their actual Active/Passive/Secret category. Passive
+checks are blind, GC-only and ineligible for action-die boosts. The active-check
+campaign rule is honored, while a previously reserved Drained attempt keeps its
+saved category. The NPC-specific GC boost path also checks action-die permission
+and the rolled method before payment or RNG; its earlier bypass is closed.
+
+Shared rules now enforce legal actions and skill tags before rolling: sleeping,
+incapacity, purely mental actions during paralysis, Held/Pinned escape limits,
+Bound/Hands-On/Grasp, Mute/Language and Nauseated/Concentration. NPC checks apply
+the existing Sickened, Drunk, entanglement, style and related check penalties,
+with Shaken combined once through morale handling. Named sight/hearing checks
+use the shared blinded/deafened modifiers and result caps, including a sleeping
+NPC's Vision checks. Explicit one-hand, language and sensory declarations use
+the same existing rule helpers as PCs. Changing relevant conditions, category,
+skill bonus or restraint sources invalidates the pending context.
+
+Held/Pinned NPCs now receive the actual opposed Athletics escape choice. Its
+proficiency, Size difference, error range, required full actions and current
+effect sources are recorded on the roll. The existing release workflow removes
+only those original sources and records the immediate Escape Hold move. NPC
+preparation preserves interrupted-release review and pending-move guards, and
+the NPC sheet exposes escape, movement confirmation and GC review controls.
+
+Native Foundry verified that Held blocks an ordinary NPC Grapple and weapon
+attack before a roll. The actual escape form recorded a +4 Size bonus, one full
+action and its single original hold source. Its real result, 35, earned the
+confirmed escape benefit. Release cleared Held and recorded a required 5–30-ft.
+move; another active check was blocked until the actual movement confirmation.
+Reload preserved the completed move and no remaining hold or pending movement.
+Both final controls fit 1280×720, at 669.5px and 559.19px.
+
+A sleeping NPC's actual Notice/Awareness card remained Passive and blind, with
+action-die permission false, the −8 sight modifier and −20 cap adjustment. Active
+checks were blocked while asleep; Stunned also blocked the passive check. A
+separate native review verified that the saved passive card exposes no GC boost
+control and its actual boost API refuses without changing the original result,
+messages or GC pool. A legacy open take-20 context is also refused, while an
+ordinary active NPC card remains boostable. No browser errors occurred.
+
+Validation: 4,499 Node tests, 988 engine fixtures and 303 layout checks, plus
+schemas, lint, formatting, bundle and copied-text checks. The broader source
+review identified the remaining NPC proficiency/conditional Defense questions
+recorded in B-216. Continue that work and the remaining B-186/B-190 cases before
+raising the combat score; the newly shared context is not itself evidence that
+all NPC derived statistics already incorporate every condition.
 Continue implementing and reviewing combat before completing this goal.
 
 No product code changed during this pass. The existing **4,455** Node tests,

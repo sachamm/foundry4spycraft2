@@ -13,6 +13,7 @@ import "../apps/counter-trip.mjs";
 import "../apps/damage-target.mjs";
 import "../apps/damage-types.mjs";
 import "./drained.mjs";
+import "../rules/npc-skill-checks.mjs";
 import "../apps/detection-observer.mjs";
 import "../apps/diversion.mjs";
 import "../apps/driving-stance.mjs";

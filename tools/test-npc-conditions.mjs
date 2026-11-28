@@ -59,10 +59,12 @@ test("listed and unlisted bonuses use the higher original bonus; NPC effective r
     assert.equal(conditionNpcSkillBonus(r, { incompetent: true }).bonus, 0);
     assert.deepEqual(conditionNpcSkillBonus(r, {}), conditionNpcSkillBonus(row, {}));
   }
-  assert.deepEqual(npcSkillConditionContext({ statuses: new Set(["baffled", "bound"]) }), {
-    baffled: true,
-    incompetent: false
-  });
+  const context = npcSkillConditionContext({ statuses: new Set(["baffled", "bound", "paralysis", "asleep"]) });
+  assert.equal(context.baffled, true);
+  assert.equal(context.bound, true);
+  assert.equal(context.paralyzed, true);
+  assert.equal(context.sleeping, true);
+  assert.equal(context.incompetent, false);
 });
 class StubSheet {
   constructor(actor) {
@@ -120,10 +122,9 @@ test("the actual graded data model and NPC sheet agree after apply, coexistence,
     assert.equal(result.competence, m.competence);
     assert.deepEqual(result.skills, m.npcBuild.skills);
     assert.deepEqual(m.npcProfile, before);
-    assert.deepEqual(m.conditionContext, {
-      baffled: statuses.includes("baffled"),
-      incompetent: statuses.includes("incompetent")
-    });
+    assert.equal(m.conditionContext.baffled, statuses.includes("baffled"));
+    assert.equal(m.conditionContext.incompetent, statuses.includes("incompetent"));
+    assert.equal(m.conditionContext.pinned, false);
   }
   const normal = computeNpcProfile(m.npcProfile, m.npcType, m.threatLevel, m.abilities);
   assert.equal(m.competence, Math.ceil(normal.competence / 2));
@@ -136,6 +137,32 @@ test("manual NPCs expose actual skill-condition/save context without replacing t
   m.prepareDerivedData();
   assert.equal(m.bab, 7);
   assert.equal(m.conditionContext.baffled, true);
+});
+
+test("the NPC data model exposes action-limiting statuses and saved release/movement receipts on repeated preparation", () => {
+  const m = model();
+  m.parent.type = "npc";
+  m.parent.system = m;
+  m.parent.statuses = new Set(["pinned", "stun", "blind", "sickened"]);
+  m.parent.flags = {
+    spycraft2: {
+      restraintReleaseReview: { id: "review", needsReview: true },
+      restraintReleases: {
+        original: {
+          id: "original",
+          state: "applied",
+          messageUuid: "ChatMessage.original",
+          movement: { state: "required", minimum: 5, maximum: 30 }
+        }
+      }
+    }
+  };
+  for (let n = 0; n < 2; n++) {
+    m.prepareDerivedData();
+    for (const key of ["pinned", "stunned", "blinded", "sickened"]) assert.equal(m.conditionContext[key], true, key);
+    assert.equal(m.restraintReleaseReview.needsReview, true);
+    assert.equal(m.pendingRestraintMoves[0].messageUuid, "ChatMessage.original");
+  }
 });
 
 test("a minimal legacy manual profile can render its sheet without inventing missing builder choices", () => {
