@@ -54,7 +54,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | --- | --- | --- | --- | --- |
 | B-025 | **Fluid initiative**: show only the chosen event's fields (31 events in one flat list today), preview immediate against round-end movement, show the capped ±10 beside the raw sum, let the GC remove a mistaken event, clear a fulfilled Press, and do not offer the tool before combat starts. Check that automatic events are recorded when the combat is not the active one. (p.324) | UX-39, XGC-22, CX-D14, CX-N9, CX-E13, CX-U10, SG-D10 | M | live |
 | B-026 | **Half actions**: count skill checks and movement, or say on the strip which actions are counted; warn before going over, not after; a pip says on hover what marked it; undo from the card. | LR-8, SGI-rules-expert D15, SGI-seasoned-player R11, XGC-06 | M | earlier |
-| B-028 | **NPC attacks cannot use Burst, Autofire or Suppressive Fire**: the NPC sheet never opens the ranged-attack dialog that has them. Same gap on the agent's Play tab. One attack control with the fire actions. | LR-17, SG-A17, UX-41 | M | earlier |
+| B-028 | **NPC attacks cannot use Burst, Autofire or Suppressive Fire**: the NPC sheet never opens the ranged-attack dialog that has them. Same gap on the agent's Play tab. One attack control with the fire actions, which also retires the weapon row's second "Measured attack" button (SG-A17). | LR-17, SG-A17, UX-41 | M | earlier |
 | B-029 | **Dramatic scene**: starting one is silent; scripted (free) and paid entries sit apart; doubling the Counts already rolled is a separate action (Counts rolled later are now doubled as they come in). One place, a visible "Dramatic" state, and a preview of who will be doubled. (p.424) | UX-10, CX-D13, CX-N8, CX-E14 | M | live |
 | B-241 | **Mob attack posts one card per member.** The group now asks about Reach once, names who attacked whom and who was left out, attacks only with members on the acting Count, offers only the other side as targets and charges each member its action. Still open: one card for the group's attacks. | XG2-13 | M | live |
 | B-242 | **Tracker and turn details.** A readied trigger gives no way to run the action from the console; the tracker menu and the console name the same action differently. | XG2-17, XG2-29, UX2-23 | S | live |
@@ -170,7 +170,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-135 | Two attack buttons (Attack, Measured attack); untrained styled as bad; Error/Threat as bare bounds. | SG-A17 | S |
 | B-136 | Gear picks, Caliber and gear check buried in a closed panel below inventory. "Mission loadout" at the top of Gear. | SG-A18 | S |
 | B-137 | Request and Gear check are values, not rolls. | SG-A19 | S |
 | B-138 | Cover identity only mid-page; not on the rail or cards. | SG-A23 | S |
