@@ -183,7 +183,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-159 | A developer error shown to users; four refusals without the fix or in internal language. (The Charisma gear-pick warnings now name the category and the fix.) | SG-L13, SG-L14, LR-40c | S |
 | B-161 | The formula hint under Bonuses shows to every owner (not found in the current templates; recheck live). (The VP, WP, DR, Qty and Codename labels and the class browser's "VP · SP" are now words.) | SGI-novice-gc D17, LR-40b, LR-39b | S |
 | B-162 | English literals in context builders; hard-coded English in attributes; raw schema keys as labels; text localised at load time stays English (migration labels, the console tab tooltip). | HBS-11, H6, WEB-09 | S |
-| B-236 | Console and undo wording, second pass: "record" and "settlement" in the end-mission texts and "{count} recorded" on the wrap-up strip; plurals glued from pieces in the undo tooltip and the GC dice spend label; the scene status glued from two parts; the Add NPC summary joined with "; " and reading "1 × Guard"; `h3` headings in the console with no `h2` above; and Undo still lives on its own whispered note instead of on the card that made the change (7.5, 8.3). | CU-16, CU-17 | S |
+| B-236 | Undo still lives on its own whispered note instead of on the card that made the change (7.5, 8.3). (The end-mission texts, the wrap-up strip, the Undo tooltip, the GC dice cost, the Add NPC summary and the console's heading levels are reworded.) | CU-16, CU-17 | M | live |
 | B-254 | Words a new GC cannot place ("Caliber", "faced", "standing", "usage period" and others listed in the report), tooltips that repeat their label, and the status strip's wording. | NG2-20, NG2-26, NG2-27, NG2-30 | S |
 
 ### Visual system

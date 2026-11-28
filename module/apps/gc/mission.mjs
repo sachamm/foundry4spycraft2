@@ -528,7 +528,8 @@ export function missionRecordHtml(mission, { xp = null, team = [] } = {}) {
 export async function planNextMission() {
   requireGC();
   const mission = getMission();
-  if (mission.active) return refuse(loc`End the mission first; its record is kept for the XP report until then.`);
+  if (mission.active)
+    return refuse(loc`End the mission first. Its details stay for the XP report until you plan the next one.`);
   const name = mission.name || loc`Unnamed mission`;
   const team = teamActors(mission),
     unpaid = team.filter(actor => !mission.standingPaid?.[actor.id]).length;
@@ -628,7 +629,7 @@ export async function endMission({ clear = false } = {}) {
       recorded = [];
     await withUndo(
       team,
-      loc`Critical objectives: exposure recorded`,
+      loc`Critical objectives: exposure charged`,
       async () => {
         for (const actor of team) {
           const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation",
@@ -654,7 +655,7 @@ export async function endMission({ clear = false } = {}) {
     );
   }
   await say(
-    `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`
+    `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its details stay for the XP report, each agent's XP and standing until you plan the next mission. Resume mission reopens it.`}`
   );
   return true;
 }

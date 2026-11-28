@@ -849,7 +849,9 @@ export function consoleContext() {
         team.length && paid >= team.length
           ? loc`Standing: everyone paid`
           : loc`Standing: ${Math.min(paid, team.length)} of ${team.length} paid`,
-      infractions: (m.infractions ?? []).length
+      infractions: (count => (!count ? loc`None yet` : count === 1 ? loc`1 infraction` : loc`${count} infractions`))(
+        (m.infractions ?? []).length
+      )
     },
     isGM: game.user.isGM,
     sections: consoleSections(

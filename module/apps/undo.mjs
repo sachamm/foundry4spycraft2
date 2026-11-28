@@ -609,7 +609,11 @@ export function renderUndo(message, html) {
     button.textContent = loc`Undo`;
     // Several notes each carry a button: its name says which step it takes back.
     button.setAttribute("aria-label", loc`Undo: ${record.label}`);
-    button.dataset.tooltip = loc`Puts back what this step changed${record.gcDice ? loc` and returns ${record.gcDice} GC action di${record.gcDice === 1 ? "e" : "ce"}` : ""}`;
+    button.dataset.tooltip = !record.gcDice
+      ? loc`Puts back what this step changed`
+      : record.gcDice === 1
+        ? loc`Puts back what this step changed and returns 1 GC action die`
+        : loc`Puts back what this step changed and returns ${record.gcDice} GC action dice`;
     button.addEventListener("click", async () => {
       button.disabled = true;
       try {

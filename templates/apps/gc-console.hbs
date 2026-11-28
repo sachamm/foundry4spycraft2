@@ -1,5 +1,7 @@
 <section class="spycraft2 gc-console-body" data-drop-record="{{localize 'SPYCRAFT.Console.DropRecord'}}" data-drop-place="{{localize 'SPYCRAFT.Console.DropPlace'}}"
   data-drop-link="{{localize 'SPYCRAFT.Console.DropLink'}}">
+  {{!-- The console's own heading, for screen readers: its h3 headings sit under it. --}}
+  <h2 class="sc2-visually-hidden">{{localize "SPYCRAFT.Console.Heading"}}</h2>
   {{!-- One line each, caption beside value: the mission, the scene and the GC's dice. The turn is in the turn bar and the
        Threat Level in the Mission section, so neither is repeated here. --}}
   <div class="gc-now">
@@ -43,7 +45,7 @@
           class="gc-note">{{localize "SPYCRAFT.Console.WrapXP" earned=xp.earned}}</span></li>
       <li>
         <button type="button" data-action="recordInfraction">{{localize "SPYCRAFT.Template.AppsGcConsole.RecordExposureInfraction"}}</button> <span
-          class="gc-note">{{localize "SPYCRAFT.Console.WrapInfractions" count=wrap.infractions}}</span></li>
+          class="gc-note">{{wrap.infractions}}</span></li>
       <li><button type="button" data-action="awardStanding">{{localize "SPYCRAFT.Template.AppsGcConsole.AwardReputationNetWorth"}}</button> <span class="gc-note">{{wrap.standing}}</span></li>
       <li>{{#if mission.active}}
         <button type="button" class="{{#if (eq @root.primary "endMission")}} gc-primary{{/if}}" data-action="endMission"

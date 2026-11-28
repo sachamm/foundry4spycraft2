@@ -1154,7 +1154,7 @@ test("Undo after Add NPC takes the placed tokens and their combatants off, and n
     const flags = {
       spycraft2: {
         undo: {
-          label: "Placed 2 × Guard",
+          label: "Placed 2 copies of Guard",
           entries: [],
           placedTokens: { scene: "s1", ids: ["t1", "t2", "gone"], combat: "f1", combatants: ["c1", "c9"] }
         }

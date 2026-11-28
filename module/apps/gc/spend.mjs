@@ -217,7 +217,9 @@ export async function spendGCDice(input = {}) {
   const die = plan.die ? await rollGCDie(plan.die, { explodeLow: plan.explodeLow }) : null;
   const lines = [
     `<b>${esc(reason)}</b>`,
-    loc`Cost: ${plan.cost} GC action di${plan.cost === 1 ? "e" : "ce"} (p.${plan.page}).`
+    plan.cost === 1
+      ? loc`Cost: 1 GC action die (p.${plan.page}).`
+      : loc`Cost: ${plan.cost} GC action dice (p.${plan.page}).`
   ];
   if (die)
     lines.push(

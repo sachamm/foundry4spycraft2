@@ -333,14 +333,16 @@ export async function addNpcToScene({ uuid = null } = {}) {
   );
   // Named as the map shows them: the tokens' own names, which can differ from the actor's.
   const placedNames = tokens.map(token => token.name).filter(Boolean);
+  // Whole sentences, one after another: each part says one thing the placing did.
   const done = [
     placedNames.length && placedNames.length <= 3
-      ? loc`${placedNames.join(", ")} added to ${scene.name}`
-      : loc`${tokens.length} × ${placedNames[0] ?? actor.name} added to ${scene.name}`
+      ? loc`Added ${placedNames.join(", ")} to ${scene.name}.`
+      : loc`Added ${tokens.length} copies of ${placedNames[0] ?? actor.name} to ${scene.name}.`
   ];
-  if (!typed && squad) done.push(loc`a Minion squad the team's size`);
-  else if (!typed) done.push(loc`How many was blank, so one was placed`);
-  if (squad?.commander && corners.length > 1) done.push(loc`led by its Commander at Threat Level +2`);
+  if (!typed && squad) done.push(loc`They are a Minion squad the size of the team.`);
+  else if (!typed) done.push(loc`How many was left blank, so one was placed.`);
+  if (squad?.commander && corners.length > 1)
+    done.push(loc`The first token is the squad's Commander, at Threat Level +2.`);
   let joined = false,
     combatants = null,
     recorded = null;
@@ -348,33 +350,41 @@ export async function addNpcToScene({ uuid = null } = {}) {
     // A fight deleted meanwhile leaves the tokens placed; the notice says they did not join.
     combatants = game.combats?.get?.(fight.id) ? await joinFight(fight, tokens).catch(() => null) : null;
     joined = !!combatants;
-    done.push(joined ? loc`joined the fight` : loc`the fight is gone, so they did not join it`);
+    done.push(joined ? loc`They joined the fight.` : loc`The fight has ended, so they did not join it.`);
   }
   if (input.record && !antagonistRecorded(actor)) {
     // An NPC that walks straight into a fight has been faced.
     recorded = await recordAntagonist(actor, { encountered: joined });
     const entry = recorded;
-    done.push(entry?.xp ? loc`recorded for mission XP` : loc`recorded for mission XP with 0 XP: enter its reward`);
+    done.push(
+      entry?.xp
+        ? loc`It counts toward mission XP.`
+        : loc`It counts toward mission XP, at 0 XP until you enter its reward.`
+    );
   }
   // A type already on the list is faced once it walks into a fight; Undo takes that mark back with the tokens.
   const rowBefore = !recorded && joined ? antagonistRowFor(actor) : null,
     wasOpen = rowBefore && !rowBefore.encountered ? structuredClone(rowBefore) : null;
   if (joined) await markAntagonistsFaced([actor]).catch(() => 0);
-  ui.notifications.info(`${done.join("; ")}.`);
+  ui.notifications.info(done.join(" "));
   // A slip (the wrong NPC, too many) is taken back from the note: the tokens go, and their combatants with them.
-  await postUndo(loc`Placed ${tokens.length} × ${actor.name}`, [], {
-    // The antagonist row this placing recorded goes too; a row that was there before stays.
-    ...(recorded ? { antagonist: { id: recorded.id, entry: null, period: missionEpoch() } } : {}),
-    // A row that was there before stays, but loses the faced mark this placing gave it.
-    ...(wasOpen && antagonistRowFor(actor)?.encountered
-      ? { antagonist: { id: wasOpen.id, entry: wasOpen, period: missionEpoch() } }
-      : {}),
-    placedTokens: {
-      scene: scene.id,
-      ids: tokens.map(token => token.id),
-      combat: joined ? fight.id : null,
-      combatants: (combatants ?? []).map(combatant => combatant.id)
+  await postUndo(
+    tokens.length === 1 ? loc`Placed ${actor.name}` : loc`Placed ${tokens.length} copies of ${actor.name}`,
+    [],
+    {
+      // The antagonist row this placing recorded goes too; a row that was there before stays.
+      ...(recorded ? { antagonist: { id: recorded.id, entry: null, period: missionEpoch() } } : {}),
+      // A row that was there before stays, but loses the faced mark this placing gave it.
+      ...(wasOpen && antagonistRowFor(actor)?.encountered
+        ? { antagonist: { id: wasOpen.id, entry: wasOpen, period: missionEpoch() } }
+        : {}),
+      placedTokens: {
+        scene: scene.id,
+        ids: tokens.map(token => token.id),
+        combat: joined ? fight.id : null,
+        combatants: (combatants ?? []).map(combatant => combatant.id)
+      }
     }
-  }).catch(() => null);
+  ).catch(() => null);
   return tokens.length === 1 ? tokens[0] : tokens;
 }

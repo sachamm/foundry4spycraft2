@@ -153,6 +153,7 @@
    "free": "Free"
   },
   "Console": {
+   "Heading": "Game Control console",
    "ScriptedEvent": "GC event:",
    "Time": "Time",
    "MissionEnded": "ended",
@@ -167,7 +168,6 @@
    "QuickstartPointer": "The GC quickstart explains each step. This list goes away once every step is done.",
    "WrapUp": "Wrap up the mission",
    "WrapXP": "{earned} base XP earned",
-   "WrapInfractions": "{count} recorded",
    "WrapSettle": "Each agent settles XP from its own sheet; the report gives the numbers.",
    "Acting": "Acting now",
    "OpenCombatantHint": "Opens the sheet",
