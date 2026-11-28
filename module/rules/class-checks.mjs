@@ -1,5 +1,6 @@
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { resolveSkillResult } from "./checks.mjs";
 
 /** Timing notes that the skill check shows through its own timing line; exported so they can be recognised exactly. */
 export const intelligenceAnalysisNote = () =>
@@ -458,3 +459,62 @@ rollPipeline.register({
 
 // Recorded on the posted check as the roll was given them.
 rollPipeline.register({ id: "classChecksRecord", order: 9635, record: ["attributeSubstitution"] });
+
+/**
+ * The same attack with its flanking bonus taken off: the GC rules the attacker was not flanking after all (p.341).
+ * Only while the attack is still open; the result, threat and triumph are worked out again from the rolled die.
+ */
+export function withoutFlanking(check) {
+  const flanking = check?.attackContext?.flanking;
+  if (check?.checkKind !== "attack" || !flanking?.declared || flanking.blocked || flanking.removed)
+    throw new Error(loc`This attack has no flanking bonus to take off.`);
+  if (
+    typeof check.successConfirmed === "boolean" ||
+    check.attackResolution ||
+    check.resolved ||
+    check.criticalSuccess ||
+    check.criticalFailure
+  )
+    throw new Error(loc`Take flanking off before the attack is resolved.`);
+  const bonus = Number(flanking.attackBonus) || 0,
+    threatDrop = Number(flanking.threatIncrease) || 0,
+    label = loc`Flanking`,
+    rawTotal = check.rawTotal - bonus,
+    threat = check.forcedThreat || !check.threat ? check.threat : Math.min(20, check.threat + threatDrop),
+    triumphLine = Number.isFinite(check.triumphAt) ? check.triumphAt : undefined;
+  const result = resolveSkillResult(rawTotal, check.naturalDie, {
+    cap: Object.hasOwn(check, "boostCap") ? check.boostCap : check.cap,
+    threat,
+    actionDieBonus: check.boostTotal ?? 0,
+    ...(triumphLine === undefined ? {} : { triumphAt: triumphLine }),
+    ceiling: check.resultCeiling ?? null
+  });
+  const baseThreat = check.attackContext.baseThreat,
+    escape = text => String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    // The flanking lines the dialog wrote into the card's heading go with the bonus.
+    baseFlavor = (flanking.notes ?? []).reduce(
+      (flavor, note) => flavor.replace(` ${escape(note)}`, "").replace(escape(note), ""),
+      check.baseFlavor ?? ""
+    );
+  return {
+    ...check,
+    ...(check.baseFlavor === undefined ? {} : { baseFlavor }),
+    rawTotal,
+    rolledTotal: Number.isFinite(check.rolledTotal) ? check.rolledTotal - bonus : check.rolledTotal,
+    effectiveTotal: result.total,
+    capped: result.limited,
+    threat,
+    ...(Array.isArray(check.breakdown) ? { breakdown: check.breakdown.filter(row => row.label !== label) } : {}),
+    attackContext: {
+      ...check.attackContext,
+      targetFlanked: false,
+      ...(Number.isFinite(baseThreat) && threatDrop ? { baseThreat: Math.min(20, baseThreat + threatDrop) } : {}),
+      flanking: {
+        ...flanking,
+        removed: { attackBonus: bonus, threatIncrease: threatDrop },
+        attackBonus: 0,
+        threatIncrease: 0
+      }
+    }
+  };
+}

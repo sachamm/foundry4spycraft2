@@ -66,7 +66,7 @@ export const FOLLOW_UP_DIALOGS = {
       [
         10,
         () =>
-          `<div class="spycraft2-roll-options"><p>${loc`CQB Basics adds1 damage against targets within current CQB Range. Enter the actual target distance for this damage; this does not take another attack or spend dice.`}</p>`
+          `<div class="spycraft2-roll-options"><p>${loc`CQB Basics adds 1 damage against targets within current CQB Range. Enter the actual target distance for this damage; this does not take another attack or spend dice.`}</p>`
       ],
       [
         20,

@@ -36,6 +36,17 @@ const missionThreatLevelSetting = () => {
     return null;
   }
 };
+/** The Caliber of the mission under way in the GC's record (p.398), or null when none is running. */
+const missionCaliberSetting = () => {
+  try {
+    const m = globalThis.game?.settings?.get("spycraft2", "mission");
+    return m?.active && !m.ended && Number.isSafeInteger(m.caliber) && m.caliber >= 1 && m.caliber <= 5
+      ? m.caliber
+      : null;
+  } catch {
+    return null;
+  }
+};
 import { computeAgent } from "../rules/engine.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { record, recordList } from "./record-field.mjs";
@@ -490,6 +501,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       careerAgentRewards: record("careerAgentRewards", { initial: {} }),
       reputation: int(2),
       netWorth: int(0),
+      // Set while the standing the character pays in has gone below 0; cleared once it is above 0 again (p.440).
+      standingBurned: new BooleanField({ initial: false }),
 
       skills: new SchemaField(skills),
       proficiencies: new SchemaField(profs),
@@ -571,6 +584,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     const participatingCombat = () =>
       foundCombat === undefined ? (foundCombat = this.parent.participatingCombat ?? null) : foundCombat;
     this.actorUuid = this.parent.uuid;
+    // Picks are checked against the running mission's Caliber even before the agent allocates reserves.
+    this.missionCaliber = missionCaliberSetting();
     this.shakenState = shakenStateFromActor(this.parent);
     this.restraintReleaseReview = getRestraintReleaseReview(this.parent);
     this.pendingRestraintMoves = getPendingRestraintMoves(this.parent);

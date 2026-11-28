@@ -71,7 +71,7 @@ export function combatMovementPlan(
       loc`Stop upon entering adjacency with a threatening opponent (p.326); Combat Mobility does not remove this stopping rule.`
     );
   if (action === "run" && system.canRun !== true)
-    throw new Error(loc`This character cannot Run in the current condition.`);
+    throw new Error(loc`A condition stops this character from running (see Conditions). Use Standard Move instead.`);
   if (
     (action === "standardMove" || (distanceFeet > 0 && action === "totalDefense")) &&
     system.postureMovement?.standardMove === false

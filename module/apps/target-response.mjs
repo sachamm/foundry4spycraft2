@@ -15,7 +15,8 @@ import {
   targetLabel
 } from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
-import { appliedDamageEntries } from "../rules/damage-application.mjs";
+import { coverBetween } from "./map.mjs";
+import { appliedDamageEntries, attackResolutionNote } from "../rules/damage-application.mjs";
 
 /** Whether a player who owns this agent is connected: the GC then leaves the response to that player. */
 const playerPresent = actor =>
@@ -50,9 +51,18 @@ function respondent(uuid, check, user) {
 export function targetResponseControls({ message, check, user }) {
   if (!check || check.superseded) return [];
   if (check.checkKind === "attack") {
-    if (check.resolved || check.attackResolution) return [];
     const target = respondent(check.attackContext?.targetActorUuid, check, user);
     if (!target) return [];
+    // Once settled, the target's row stays and says how it went, rather than vanishing from the card.
+    if (check.resolved || check.attackResolution)
+      return [
+        {
+          id: "targetResolved",
+          label: loc`Attack on ${target.name}: resolved`,
+          disabled: attackResolutionNote(check) || loc`The attacker has settled this attack.`,
+          run: () => null
+        }
+      ];
     // Whoever also owns the attacker has Resolve as the card's main step; Check Defense then stays a plain button,
     // so the card keeps one filled button.
     const ownsAttacker = !!(check.actorUuid && fromUuidSync(check.actorUuid)?.isOwner);
@@ -64,7 +74,20 @@ export function targetResponseControls({ message, check, user }) {
         label: loc`Check Defense for ${target.name}`,
         hint: loc`${target.name} is the target: work out Defense against this attack`,
         ...(ownsAttacker ? {} : { emphasis: "primary" }),
-        run: () => checkIncomingDefense(target, incomingFacts(check))
+        run: () => {
+          // The walls the map shows between the two tokens start as the scenery cover (p.345).
+          let sceneryCover = null;
+          try {
+            const attacker = check.actorUuid ? fromUuidSync(check.actorUuid) : null;
+            sceneryCover = coverBetween(attacker, target, { tokenId: message.speaker?.token });
+          } catch {
+            sceneryCover = null;
+          }
+          return checkIncomingDefense(target, {
+            ...incomingFacts(check),
+            ...(Number.isSafeInteger(sceneryCover) ? { sceneryCover } : {})
+          });
+        }
       }
     ];
   }

@@ -217,7 +217,9 @@ export async function spendGCDice(input = {}) {
   const die = plan.die ? await rollGCDie(plan.die, { explodeLow: plan.explodeLow }) : null;
   const lines = [
     `<b>${esc(reason)}</b>`,
-    loc`Cost: ${plan.cost} GC action di${plan.cost === 1 ? "e" : "ce"} (p.${plan.page}).`
+    plan.cost === 1
+      ? loc`Cost: 1 GC action die (p.${plan.page}).`
+      : loc`Cost: ${plan.cost} GC action dice (p.${plan.page}).`
   ];
   if (die)
     lines.push(
@@ -396,18 +398,25 @@ export async function recordCaliberIncrease(caliber) {
   const mission = getMission();
   if (!Number.isSafeInteger(caliber) || caliber <= mission.caliber || caliber > 5)
     return refuse(loc`Choose a higher Caliber, up to V.`);
-  const steps = caliber - mission.caliber;
-  if (gcDiceStatus().current) await adjustGCDice(2 * steps, `Mission Caliber increased to ${caliber}`);
-  await updateMission({ caliber });
+  const steps = caliber - mission.caliber,
+    was = mission.caliber,
+    gained = gcDiceStatus().current ? 2 * steps : 0;
   // The raised Caliber caps every pick and Request for the rest of the mission, so it reaches the team's reserves.
   // Loaded here, not at the top, so the console does not change the order the roll contributors register in.
   const { reserveCaliberIncrease } = await import("../../rules/gear-acquisition.mjs");
   const roman = CONFIG.SPYCRAFT.calibers[caliber],
     team = teamActors().filter(actor => reserveCaliberIncrease(actor.system, caliber));
-  if (team.length)
-    await withUndo(team, loc`Team reserves raised to mission Caliber ${roman}`, () =>
-      Promise.all(team.map(actor => actor.update(reserveCaliberIncrease(actor.system, caliber))))
-    );
+  // One Undo puts back the team's reserves, the mission's Caliber and the GC dice it gave.
+  await withUndo(
+    team,
+    loc`Mission Caliber raised to ${roman}`,
+    async () => {
+      if (gained) await adjustGCDice(gained, `Mission Caliber increased to ${caliber}`);
+      await updateMission({ caliber });
+      await Promise.all(team.map(actor => actor.update(reserveCaliberIncrease(actor.system, caliber))));
+    },
+    () => ({ missionCaliber: { was, now: caliber, gained, period: missionEpoch() } })
+  );
   await ChatMessage.create({
     speaker: { alias: loc`Game Control` },
     content: esc(

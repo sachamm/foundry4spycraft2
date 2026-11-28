@@ -211,7 +211,8 @@ export function actionDieAwardPlan(
   if (!Number.isSafeInteger(value)) throw new Error(loc`The awarded action-die balance exceeds a safe whole number.`);
   const key = encodeURIComponent(String(mission)).replaceAll(".", "%2E"),
     before = system.actionDieAwards?.[key];
-  if (system.missionXPRewards?.[key])
+  // A settlement reopened by Resume mission takes further awards; the next settlement pays the difference.
+  if (system.missionXPRewards?.[key] && !system.missionXPRewards[key].reopened)
     throw new Error(
       loc`This mission’s XP was already settled. Start the next mission before recording further awards.`
     );
@@ -247,7 +248,7 @@ export function actionDieAwardSummary(system) {
     count,
     events: record?.events?.length ?? 0,
     baseXP: reward?.awardBaseBonus ?? 25 * Math.min(count, system.level ?? 0),
-    settled: !!reward,
+    settled: !!reward && !reward.reopened,
     totalXP: reward?.totalXP ?? 0
   };
 }
@@ -281,7 +282,8 @@ export function missionXPPlan(
   if (additionalXP && !String(modifierReason).trim())
     throw new Error(loc`Record the source of additional post-multiplier XP.`);
   const key = encodeURIComponent(String(mission)).replaceAll(".", "%2E");
-  if (system.missionXPRewards?.[key]) throw new Error(loc`This mission’s XP was already settled.`);
+  const previous = system.missionXPRewards?.[key] ?? null;
+  if (previous && !previous.reopened) throw new Error(loc`This mission’s XP was already settled.`);
   const count = system.actionDieAwards?.[key]?.count ?? 0;
   if (!Number.isSafeInteger(count) || count < 0) throw new Error(loc`Review the mission’s action-die award ledger.`);
   const awardBaseBonus = 25 * Math.min(count, level),
@@ -295,7 +297,10 @@ export function missionXPPlan(
     crossroadsPercent = crossroads ? Math.max(0, Number(system.crossroads?.xpPercent) || 0) : 0,
     crossroadsXP = Math.ceil((coreXP * crossroadsPercent) / 100),
     totalXP = coreXP + triumphXP + crossroadsXP + additionalXP,
-    xp = (system.xp ?? 0) + totalXP;
+    // Settling a reopened mission again pays only what it now gives beyond the earlier settlement.
+    previousTotalXP = previous ? Math.max(0, Number(previous.totalXP) || 0) : 0,
+    gainedXP = totalXP - previousTotalXP,
+    xp = (system.xp ?? 0) + gainedXP;
   if (![combinedBase, coreXP, totalXP, xp].every(Number.isSafeInteger))
     throw new Error(loc`The mission reward exceeds a safe whole number.`);
   return {
@@ -318,6 +323,7 @@ export function missionXPPlan(
       additionalXP,
       modifierReason: String(modifierReason).trim(),
       totalXP,
+      ...(previous ? { previousTotalXP, gainedXP } : {}),
       at,
       source: "p.440 (user-confirmed)"
     }

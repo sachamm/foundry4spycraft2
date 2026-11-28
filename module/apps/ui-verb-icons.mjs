@@ -8,6 +8,7 @@ export const VERB_ICONS = {
   add: "fa-plus",
   addAntagonist: "fa-plus",
   addNpcToScene: "fa-user-plus",
+  requestCheck: "fa-dice-d20",
   addBonus: "fa-plus",
   addComplication: "fa-plus",
   addLevel: "fa-plus",

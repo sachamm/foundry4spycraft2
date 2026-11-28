@@ -246,8 +246,10 @@ export class RollPipeline {
     for (const c of this.#active("flags", ctx)) {
       const result = c.flags(ctx);
       if (result === undefined || result === null) continue;
+      // A contributor's mistake is for the console, not the table: its flags are left off and the roll goes on.
       if (typeof result !== "object" || Array.isArray(result)) {
-        throw new TypeError(loc`Roll contributor "${c.id}": flags must return an object.`);
+        console.warn(`Field Agent's Handbook | Roll contributor "${c.id}": flags must return an object.`);
+        continue;
       }
       Object.assign(merged, result);
     }

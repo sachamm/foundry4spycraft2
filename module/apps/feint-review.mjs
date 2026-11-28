@@ -60,7 +60,7 @@ export async function reviewFeintBenefits(actor, input = {}) {
         },
         {
           check: "confirmed",
-          label: loc`No client is still executing this result; I reviewed its receipts and current resources`
+          label: loc`Nobody is still running this result, and its record and the current resources have been checked`
         }
       ]
     });

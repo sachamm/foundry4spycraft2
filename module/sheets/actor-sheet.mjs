@@ -32,8 +32,10 @@ import { COMBAT_STANCES } from "../rules/combat-stance.mjs";
 import { manageThreadNeedle } from "../apps/thread-needle.mjs";
 import { takeStrikingAttack, reviewStrikingAttack } from "../apps/striking-stance.mjs";
 import { recordFendMovement } from "../apps/fend.mjs";
-import { takeCounterTrip, reviewCounterTrip } from "../apps/counter-trip.mjs";
-import { takeTripFinalAttack, reviewTripFinalAttack } from "../apps/trip-final-attack.mjs";
+import { takeCounterTrip, reviewCounterTrip, counterTripCandidates } from "../apps/counter-trip.mjs";
+import { pointmanLevel } from "../rules/action-dice.mjs";
+import { announceChanges } from "./change-announcer.mjs";
+import { takeTripFinalAttack, reviewTripFinalAttack, tripFinalAttackCandidates } from "../apps/trip-final-attack.mjs";
 import { manageTripOutcomes } from "../apps/trip-outcomes.mjs";
 import { managePowerStanceInitiative } from "../apps/power-stance.mjs";
 import { manageDrivingStance } from "../apps/driving-stance.mjs";
@@ -640,6 +642,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       }),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
+      pinPlaySkill: SpycraftAgentSheet.#onPinPlaySkill,
       rollVitality: SpycraftAgentSheet.#onRollVitality,
       reviewVitality(event, target) {
         return this.actor.reviewVitality(Number(target.dataset.index));
@@ -850,7 +853,17 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ),
       nonLethalMeters: nonLethalMeters(sys),
       showAllTools: game.user.isGM && this._showAllTools,
-      combatTools: combatToolVisibility(sys, COMBAT_STANCES, { showAll: game.user.isGM && this._showAllTools })
+      combatTools: combatToolVisibility(sys, COMBAT_STANCES, {
+        showAll: game.user.isGM && this._showAllTools,
+        earned: {
+          counterTrip: counterTripCandidates(this.actor).length > 0,
+          tripFinalAttack: tripFinalAttackCandidates(this.actor).length > 0,
+          // Picking teammates matters only when another agent in the world has Improved Fortune, or some are picked.
+          fortuneTeammates:
+            (sys.fortuneTeammateIds?.length ?? 0) > 0 ||
+            [...(game.actors ?? [])].some(actor => actor.id !== this.actor.id && pointmanLevel(actor) >= 10)
+        }
+      })
     });
 
     // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
@@ -1338,6 +1351,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }));
     for (const row of context.weapons) {
       row.untrained = row.attack?.trained === false;
+      // Said before the click: the attack goes ahead, with a notice, from a weapon not in hand.
+      row.notEquipped = row.item.system?.equipped === false;
       row.attackTip = weaponAttackTip(row.attack);
       row.facts = weaponFacts(row.attack);
       row.threatLabel = formatRange("threat", row.attack?.threat);
@@ -1345,7 +1360,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }
     // Play: the skills the character is trained in, one click from a roll.
     context.miscLabels = miscModifierLabels(cfg);
-    context.playSkills = context.skills.filter(skill => skill.ranks > 0);
+    // An untrained skill the player pinned from the Skills tab joins them.
+    const pinned = new Set(actor.getFlag?.("spycraft2", "playSkills") ?? []);
+    for (const skill of context.skills) skill.pinned = pinned.has(skill.key);
+    context.playSkills = context.skills
+      .filter(skill => skill.ranks > 0 || skill.pinned)
+      .map(skill => ({
+        ...skill,
+        // A widened error range is said on the button, before the roll.
+        errorLabel: skill.errorFloor > 1 ? loc`error ${formatRange("error", skill.errorFloor)}` : ""
+      }));
     context.activeEffects = activeEffectLines(sys);
     context.ownTurn =
       actor.participatingCombat?.started === true && actor.participatingCombat.combatant?.actor?.uuid === actor.uuid;
@@ -1601,10 +1625,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     );
   }
   static #onRollDamage(event, target) {
-    return this.actor.rollDamage(this._item(target));
+    return this.actor.rollDamage(this._item(target), skipDialog(event) ? { quick: true } : {});
   }
   static #onRollInitiative() {
     return this.actor.rollInitiative({ createCombatants: true });
+  }
+  /** Pin an untrained skill to the Play tab, or take it off again. */
+  static #onPinPlaySkill(event, target) {
+    const key = target.dataset.skill,
+      pinned = new Set(this.actor.getFlag("spycraft2", "playSkills") ?? []);
+    if (pinned.has(key)) pinned.delete(key);
+    else pinned.add(key);
+    return this.actor.setFlag("spycraft2", "playSkills", [...pinned]);
   }
   static #onRollVitality(event, target) {
     return this.actor.rollVitality(Number(target.dataset.index));
@@ -1940,6 +1972,11 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       isGM: game.user.isGM,
       config: CONFIG.SPYCRAFT,
       editable: this.isEditable,
+      // Commander (p.447) marks one token of a Minion squad; a linked NPC is one character for every token.
+      commanderMark:
+        sys.npcProfile?.enabled && (sys.npcProfile.qualities ?? []).some(entry => entry?.id === "commander")
+          ? { token: !!this.actor.isToken }
+          : null,
       abilities: Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => ({
         key,
         label: game.i18n.localize(label),
@@ -2018,6 +2055,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         this._open[key] = details.open;
       });
     }
+    // The pinned figures are redrawn whole; only the ones that changed are said.
+    announceChanges(this, this.element, this.element.querySelector(".npc-pinned"));
     enableHotbarDrag(this.element, this.actor);
   }
 
@@ -2188,7 +2227,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     return resolveQuickAttack(await this.actor.rollAttack(item, quickAttackOptions(this.actor, item)));
   }
   static #onRollDamage(event, target) {
-    return this.actor.rollDamage(this._item(target));
+    return this.actor.rollDamage(this._item(target), skipDialog(event) ? { quick: true } : {});
   }
   static #onItemEdit(event, target) {
     return this._item(target)?.sheet.render(true);

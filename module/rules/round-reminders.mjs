@@ -40,3 +40,19 @@ export function roundReminders({
   }
   return out;
 }
+
+/**
+ * Reminders that go to the same people share one card, a line each: a round ending with three dying NPCs posts one
+ * card to the GC, not three. `ownersOf(reminder)` lists the user ids that may see it; the order of the reminders is
+ * kept within each card.
+ */
+export function groupReminders(reminders = [], ownersOf = () => []) {
+  const groups = new Map();
+  for (const reminder of reminders) {
+    const owners = [...new Set(ownersOf(reminder) ?? [])].sort();
+    const key = owners.join(",");
+    if (!groups.has(key)) groups.set(key, { owners, reminders: [] });
+    groups.get(key).reminders.push(reminder);
+  }
+  return [...groups.values()];
+}

@@ -22,7 +22,8 @@
         class="sc2-roll sc2-action"
         data-action="rollSkill"
         data-skill="{{key}}"
-        aria-label="{{rollLabel}}" {{sc2tip playTip}}>{{name}} <b>{{totalsLabel}}</b></button>{{/each}}</div>{{else}}<p
+        aria-label="{{rollLabel}}" {{sc2tip playTip}}>{{name}} <b>{{totalsLabel}}</b>{{#if errorLabel}} <small
+        class="bad">{{errorLabel}}</small>{{/if}}</button>{{/each}}</div>{{else}}<p
         class="sc2-empty muted">{{localize "SPYCRAFT.Play.NoTrainedSkills"}}</p>{{/if}}
     </div>
     {{#if limitedUses.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Play.AbilitiesInPlay'}}">

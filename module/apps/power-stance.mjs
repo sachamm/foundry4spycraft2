@@ -1,5 +1,5 @@
 import { worldMigrating } from "../migrations/index.mjs";
-import { primaryWriterFor } from "../writers.mjs";
+import { primaryWriterFor, writerQueue } from "../writers.mjs";
 import {
   stablePower as stable,
   powerStanceBonus,
@@ -269,14 +269,14 @@ export async function managePowerStanceInitiative(actor, input = {}) {
       window: { title: loc`Review Power Stance Count` },
       rejectClose: false,
       content:
-        `<div class="spycraft2-roll-options"><label>${loc`Combatant Count`} <select name="combatant">` +
+        `<div class="spycraft2-roll-options"><label>${loc`Fight and Initiative Count`} <select name="combatant">` +
         pending
           .map(
             p =>
               '<option value="' +
               esc(p.combatId + "|" + p.combatantId) +
               '">' +
-              esc(p.name + " — Count " + p.count) +
+              esc(`${p.name}: ${p.count}`) +
               "</option>"
           )
           .join("") +
@@ -285,7 +285,8 @@ export async function managePowerStanceInitiative(actor, input = {}) {
     if (!input) return null;
   }
   const [combatId, combatantId, ...extra] = String(input.combatant).split("|");
-  if (extra.length) throw Error(loc`Choose a listed combatant.`);
+  if (extra.length)
+    throw Error(loc`That combatant could not be read. Open the dialog again and pick one from its list.`);
   return reviewPowerStanceInitiative(actor, combatId, combatantId, input);
 }
 export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
@@ -347,27 +348,14 @@ export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
   };
 }
 export function installPowerStanceInitiativeHooks() {
-  const pending = new WeakMap();
+  const queue = writerQueue(reconcilePowerStanceInitiative, error =>
+    ui.notifications.warn(loc`Power Stance Count needs review: ${error.message}`)
+  );
   const schedule = actor => {
     if (!actor || actor.type !== "agent" || !actor.isOwner || !combatants(actor).length) return;
     if (primaryWriterFor(actor)?.id !== game.user.id) return;
     if (worldMigrating()) return;
-    const old = pending.get(actor);
-    if (old) {
-      old.again = true;
-      return;
-    }
-    const state = { again: true };
-    pending.set(actor, state);
-    state.promise = Promise.resolve()
-      .then(async () => {
-        do {
-          state.again = false;
-          await reconcilePowerStanceInitiative(actor);
-        } while (state.again);
-      })
-      .catch(error => ui.notifications.warn(loc`Power Stance Count needs review: ${error.message}`))
-      .finally(() => pending.delete(actor));
+    queue(actor);
   };
   Hooks.on("preCreateCombatant", c => {
     try {

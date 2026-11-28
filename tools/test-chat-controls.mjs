@@ -128,6 +128,13 @@ test("confirmation, critical activation and a required bonus die appear in their
     after.some(label => label.startsWith("card:Activate critical")),
     false
   );
+  // An agent's error is the GC's to activate and pay for: the player who rolled is not offered it.
+  const error = message({ naturalDie: 1, errorConfirmed: true });
+  assert.equal(
+    labels(error).some(label => label.startsWith("card:Activate critical")),
+    false
+  );
+  assert.equal(labels(error, { isGM: true }).includes("card:Activate critical failure… (an opponent pays)"), true);
   assert.equal(after.includes("card:Spend required class bonus die"), false);
 });
 
@@ -452,6 +459,16 @@ test("the GC boost shortcut takes the card under the pointer, else the newest ca
     boostCardButton(root(), () => false),
     null
   );
+  const { boostRefusal } = await import("../module/apps/keybindings.mjs");
+  const pointed = button => ({
+    querySelector: selector => (selector.includes("message-id") ? { querySelector: () => button } : null)
+  });
+  assert.match(boostRefusal(pointed(null)), /has no GC boost/);
+  assert.match(
+    boostRefusal(pointed({ dataset: { tooltip: "Already boosted." } })),
+    /cannot be boosted: Already boosted\./
+  );
+  assert.match(boostRefusal({ querySelector: () => null }), /None of your cards/);
 });
 
 test("a mouse click lets go of a button so shortcuts keep working; a keyboard press keeps its focus", async () => {
@@ -475,6 +492,15 @@ test("a mouse click lets go of a button so shortcuts keep working; a keyboard pr
   assert.equal(releaseFocusAfterClick({ detail: 1, target: inDialog }, inDialog), false, "dialogs keep focus");
   assert.equal(releaseFocusAfterClick({ detail: 1, target: sheetButton }, {}), false, "focus already moved");
   assert.equal(blurred, 1);
+});
+
+test("the focus release leaves Foundry's own sidebar buttons alone", async () => {
+  const { releaseFocusAfterClick } = await import("../module/apps/keybindings.mjs");
+  const tab = {
+    blur() {},
+    closest: selector => (selector.startsWith("button") ? tab : selector.includes("#sidebar") ? {} : null)
+  };
+  assert.equal(releaseFocusAfterClick({ detail: 1, target: tab }, tab), false);
 });
 
 test("a damage card shows what applying it did, as text, one line per outcome", async () => {

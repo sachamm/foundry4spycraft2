@@ -24,8 +24,10 @@ Foundry already supplies scenes, tokens, journals, roll tables and the combat tr
 - Until the GC action dice are set up the console offers **Set up GC action dice**, pre-filled with the players present and the Caliber.
 - On an open NPC card the GC gets **GC boost** and **Activate threat (GC dice)**, paid from the GC pool.
 - A player's request to change something they do not own (damage to an NPC, treating a teammate) arrives as a card in
-  the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. Unanswered requests are declined
-  after about two minutes.
+  the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. The card says when it runs out
+  (the *Time to answer a player's request* setting, 110 seconds by default), and ends by saying whether the change was
+  applied or failed. The console's status strip counts the requests waiting. A request open when the GC's client
+  reloads is marked lost, and the player asks again.
 
 World settings that change the flow:
 
@@ -68,11 +70,15 @@ A **dramatic scene** lasts until the next scene starts. While it lasts, GC dice 
 - Combatants start flat-footed (world setting).
 - Order is Count, then Initiative bonus, then a stored d20 roll-off.
 - **Fluid initiative event** (console, or the combatant's context menu) records a Table 5.2 modifier. When the round advances the recorded modifiers are applied, limited to ±10; a Count of 0 or less causes reeling and flat-footed and gains 20; 50 or more flags a forced Press. Delay, Press and a triggered Ready change the Count at once.
-- **Roll NPC Initiative** makes one roll per NPC type, or one for all. It rolls NPCs only; an agent no player owns
-  is named in the report so it can be rolled from its sheet.
+- **Roll NPC Initiative** makes one roll per NPC type, or one for all. It rolls NPCs only, and only those with no
+  Count yet; an NPC of a kind already rolled joins that kind's Count. An agent no player owns is named in the report so
+  it can be rolled from its sheet. A combatant whose Initiative is rolled after the round has passed its Count takes
+  its turn next, then the order carries on.
 - The tracker's right-click menu has **Spend a half action**, **Spend a full action**, **Give back this round's
   actions**, **Delay 1 Count**, **Delay…**, **Ready an action**, **Readied action triggered** and **Fluid initiative
-  event…**. A readied combatant is marked on its row until the action goes off or its next turn comes. Delay is
+  event…**. Delay asks for the Count to move to and lists who is still to act; Ready asks for the trigger, which shows on the
+  combatant's row, and ends the turn unless unticked. A readied combatant is marked on its row until the action goes
+  off or its next turn comes. Delay is
   refused for a combatant whose turn has already passed this round; a readied action that goes off after the
   combatant's turn uses up the turn it would get at the new Count. Delay and Ready lines for an NPC no player
   runs are whispered to the GCs.
@@ -179,6 +185,4 @@ Security devices at any Power Rating with sensor and trap rolls (Table 7.9), haz
 - Initiative boosts for the dramatic-scene spend change the Count; Defense and DC boosts are reported for the GC to apply.
 - Some printed cells are garbled or inconsistent in the source text; each is listed under `anomalies` in `src/data/gc-tables.json` and `src/data/conflicts.json` and kept as printed.
 
-## Data and tests
-
-`src/data/gc-core.json`, `gc-tables.json`, `conflicts.json` and `campaign-qualities.json` are the editable sources; `npm run build` generates `module/rules/gc-tables.mjs` and the roll-table pack. Names and numbers are as printed; descriptive text is original summary. Rules live in `module/rules/gc/` and are covered by `tools/test-gc-rules.mjs`; the Foundry-facing layer in `module/apps/gc/` is exercised through stubs in `tools/test-gc-apps.mjs`. Neither replaces a live Foundry playtest.
+Where the data lives and how it is tested: [maintaining-gc-data.md](maintaining-gc-data.md).

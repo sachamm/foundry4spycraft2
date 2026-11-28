@@ -1,11 +1,13 @@
 /**
  * Round reminders on the combat tracker (module/rules/round-reminders.mjs): when a round ends the GC's client posts
- * a card for each dying character, and when a burning character's turn begins a card for it. The card's button
+ * the round's reminders, one card for each set of people who may see them with a line per character (dying
+ * characters at the end of a round, a burning character as its turn begins). The card's button
  * makes the same roll as the sheet's, for whoever owns the character. World setting "Round reminders".
  */
 import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
-import { roundReminders } from "../rules/round-reminders.mjs";
+import { roundReminders, groupReminders } from "../rules/round-reminders.mjs";
+import { refuse } from "../error-notices.mjs";
 import { stratagemCountGain } from "../rules/class-combat.mjs";
 import { hazardState } from "../rules/hazards.mjs";
 import { npcIsSpecial } from "./gc/npc-play.mjs";
@@ -13,11 +15,11 @@ import { rollDying } from "./healing.mjs";
 import { burningRound } from "./hazards.mjs";
 import { fluidRoundSettled } from "./gc/combat.mjs";
 import { loc } from "../i18n.mjs";
+import { isLeadGM } from "../writers.mjs";
 
 const enabled = () => {
   return readSetting("roundReminders", true) !== false;
 };
-const isLeadGM = () => game.users?.activeGM?.id === game.user?.id;
 const special = actor => actor?.type === "agent" || (actor?.type === "npc" && npcIsSpecial(actor));
 
 const TEXT = {
@@ -77,60 +79,105 @@ function combatantsOf(combat) {
   });
 }
 
-async function post(reminder, combat) {
-  const actor = await fromUuid(reminder.actorUuid);
-  if (!actor) return;
-  const owners = game.users.filter(user => user.isGM || actor.testUserPermission(user, "OWNER")).map(user => user.id);
-  await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor }),
-    whisper: owners,
-    content: `<p>${esc(TEXT[reminder.kind](actor.name))}</p>`,
-    flags: {
-      spycraft2: {
-        roundReminder: {
-          kind: reminder.kind,
-          actorUuid: reminder.actorUuid,
-          combatId: combat?.id ?? null,
-          round: combat?.round ?? null
+/** Post the step's reminders: one card for each set of people who may see them, a line per character. */
+async function postAll(reminders, combat) {
+  const found = [];
+  for (const reminder of reminders) {
+    const actor = await fromUuid(reminder.actorUuid);
+    if (actor) found.push({ ...reminder, actor });
+  }
+  const ownersOf = ({ actor }) =>
+    game.users.filter(user => user.isGM || actor.testUserPermission(user, "OWNER")).map(user => user.id);
+  for (const group of groupReminders(found, ownersOf)) {
+    const single = group.reminders.length === 1;
+    const lines = group.reminders.map(
+      (reminder, index) => `<li data-sc2-reminder="${index}">${esc(TEXT[reminder.kind](reminder.actor.name))}</li>`
+    );
+    await ChatMessage.create({
+      speaker: single ? ChatMessage.getSpeaker({ actor: group.reminders[0].actor }) : { alias: loc`Round reminders` },
+      whisper: group.owners,
+      content: `<ul class="sc2-round-reminders">${lines.join("")}</ul>`,
+      flags: {
+        spycraft2: {
+          roundReminders: {
+            combatId: combat?.id ?? null,
+            round: combat?.round ?? null,
+            items: group.reminders.map(({ kind, actorUuid }) => ({ kind, actorUuid, done: false }))
+          }
         }
       }
-    }
-  });
+    });
+  }
 }
 
-/** Add the card's button for whoever owns the character. */
+/** What a card asks for, a line each. A card from before reminders were grouped holds a single reminder. */
+const cardReminders = message => {
+  const flags = message.flags?.spycraft2 ?? {};
+  if (flags.roundReminders) return { ...flags.roundReminders, grouped: true };
+  const one = flags.roundReminder;
+  return one ? { combatId: one.combatId, round: one.round, items: [one], grouped: false } : null;
+};
+
+const cardWrites = new Map();
+/** Run one write to a card after any earlier one on the same card has settled. */
+function queueCardWrite(id, write) {
+  const next = (cardWrites.get(id) ?? Promise.resolve()).catch(() => {}).then(write);
+  cardWrites.set(id, next);
+  next.finally(() => cardWrites.get(id) === next && cardWrites.delete(id)).catch(() => {});
+  return next;
+}
+
+/** Add each line's button for whoever owns that character. */
 async function renderButton(message, html) {
-  const reminder = message.flags?.spycraft2?.roundReminder;
-  if (!reminder || reminder.done || !Object.hasOwn(BUTTON, reminder.kind)) return;
-  const actor = globalThis.fromUuidSync?.(reminder.actorUuid);
-  if (!actor?.isOwner || (reminder.kind === "stratagem" && !game.user?.isGM)) return;
+  const card = cardReminders(message);
+  if (!card) return;
   const root = html instanceof HTMLElement ? html : html?.[0];
   const content = root?.querySelector(".message-content");
-  if (!content || content.querySelector("[data-spycraft2-round-reminder]")) return;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.dataset.spycraft2RoundReminder = reminder.kind;
-  button.textContent = BUTTON[reminder.kind]();
-  button.addEventListener("click", async event => {
-    event.preventDefault();
-    button.disabled = true;
-    try {
-      if (reminder.kind === "dying") await rollDying(actor);
-      else if (reminder.kind === "stratagem") {
-        // Once per card: the Count is raised a single time each round.
-        // A card left over from an earlier round or another fight no longer applies.
-        const combat = game.combats?.get?.(reminder.combatId);
-        if (reminder.combatId && (!combat?.started || combat.round !== reminder.round)) {
-          ui.notifications.warn(loc`That Stratagem card is from an earlier round.`);
-          return;
-        }
-        if (await applyStratagem(actor)) await message.update({ "flags.spycraft2.roundReminder.done": true });
-      } else await burningRound(actor);
-    } finally {
-      button.disabled = false;
-    }
+  if (!content) return;
+  card.items.forEach((reminder, index) => {
+    if (reminder.done || !Object.hasOwn(BUTTON, reminder.kind)) return;
+    const actor = globalThis.fromUuidSync?.(reminder.actorUuid);
+    if (!actor?.isOwner || (reminder.kind === "stratagem" && !game.user?.isGM)) return;
+    const line = card.grouped ? content.querySelector(`[data-sc2-reminder="${index}"]`) : content;
+    if (!line || line.querySelector("[data-spycraft2-round-reminder]")) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.spycraft2RoundReminder = reminder.kind;
+    button.textContent = BUTTON[reminder.kind]();
+    if (card.grouped) button.setAttribute("aria-label", `${BUTTON[reminder.kind]()}: ${actor.name}`);
+    // Writes to one card go one after another, each from the card as it is then, so two buttons pressed together
+    // do not undo each other's mark.
+    const markDone = () =>
+      card.grouped
+        ? queueCardWrite(message.id, () =>
+            message.update({
+              "flags.spycraft2.roundReminders.items": (cardReminders(message)?.items ?? card.items).map((item, at) =>
+                at === index ? { ...item, done: true } : item
+              )
+            })
+          )
+        : message.update({ "flags.spycraft2.roundReminder.done": true });
+    const doneNow = () => !!cardReminders(message)?.items?.[index]?.done;
+    button.addEventListener("click", async event => {
+      event.preventDefault();
+      button.disabled = true;
+      try {
+        if (reminder.kind === "dying") await rollDying(actor);
+        else if (reminder.kind === "stratagem") {
+          // Once per card: the Count is raised a single time each round.
+          // A card left over from an earlier round or another fight no longer applies.
+          const combat = game.combats?.get?.(card.combatId);
+          if (card.combatId && (!combat?.started || combat.round !== card.round))
+            return refuse(loc`That Stratagem card is from an earlier round.`);
+          if (doneNow()) return refuse(loc`That Stratagem was already applied this round.`);
+          if (await applyStratagem(actor)) await markDone();
+        } else await burningRound(actor);
+      } finally {
+        button.disabled = false;
+      }
+    });
+    line.append(" ", button);
   });
-  content.append(button);
 }
 
 const posted = new Set();
@@ -155,16 +202,18 @@ export function installRoundReminders() {
       roundStarted: Object.hasOwn(changed, "round") && combat.round >= 1 && combat.round > previousRound,
       turnActorUuid: combat.combatant?.actor?.uuid ?? null
     });
-    for (const reminder of reminders) {
+    const fresh = reminders.filter(reminder => {
       // A reorder at the start of a round updates the turn again; remind each character once per turn.
       const key = `${combat.id}:${combat.round}:${reminder.kind}:${reminder.actorUuid}`;
-      if (posted.has(key)) continue;
+      if (posted.has(key)) return false;
       posted.add(key);
       if (posted.size > 200) posted.delete(posted.values().next().value);
-      await post(reminder, combat).catch(error =>
+      return true;
+    });
+    if (fresh.length)
+      await postAll(fresh, combat).catch(error =>
         console.warn(loc`Field Agent's Handbook | round reminder not posted`, error)
       );
-    }
   });
   Hooks.on("renderChatMessageHTML", renderButton);
 }

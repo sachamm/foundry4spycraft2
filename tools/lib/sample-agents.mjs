@@ -303,12 +303,13 @@ export function buildSampleAgents(data, packs, { id, stats, commonCatalog, ammoC
     ].join("");
     const actor = {
       _id: id(PACK, "agent", spec.id),
-      name: `${spec.name} — ${cls.name} 1 (${spec.role})`,
+      // One person, one name: the sheet carries the person's name and the token (and so each card) the code name with it.
+      name: spec.name,
       type: "agent",
       img: spec.portrait,
       system: state,
       prototypeToken: {
-        name: spec.codename,
+        name: `${spec.codename} (${spec.name})`,
         actorLink: true,
         disposition: 1,
         sight: { enabled: true },

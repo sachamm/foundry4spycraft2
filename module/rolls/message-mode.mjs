@@ -13,3 +13,17 @@ export function messageModeOption(rollMode, config = globalThis.CONFIG) {
     modes = config?.ChatMessage?.modes;
   return modes && typeof modes === "object" && Object.hasOwn(modes, mode) ? { messageMode: mode } : { rollMode };
 }
+
+/**
+ * The visibility of an NPC's roll: one the GC marked "GC only" keeps its attacks, damage and saves to the GC, unless the
+ * roll chose its own visibility. Players' rolls and every other check are left as they are.
+ */
+export function npcRollMode(actor, checkKind, rollMode, user = globalThis.game?.user) {
+  if (rollMode !== undefined && rollMode !== null && rollMode !== "") return rollMode;
+  return actor?.type === "npc" &&
+    user?.isGM &&
+    actor.flags?.spycraft2?.gcOnlyRolls === true &&
+    ["attack", "damage", "save"].includes(checkKind)
+    ? "gmroll"
+    : rollMode;
+}

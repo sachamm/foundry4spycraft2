@@ -1165,12 +1165,19 @@ export const ActorActionDice = Base =>
         expectedContext = settlementContext();
       let input = options;
       if (!Object.keys(input).length) {
+        const offered = missionSettlementDefaults();
         input = await systemDialog.input({
           window: { title: loc`Settle mission XP — p.440` },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options"><p>${loc`Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.`}</p><label>${loc`Base mission XP before action-die awards`} <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>${loc`Team Threat Level`} <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label><input type="checkbox" name="triumph" ${missionSettlementDefaults().triumph ? "checked" : ""} /> ${loc`Someone on the team scored a Triumph this mission (+${campaignTriumphXPPercent()}%, once per mission)`}</label>${(this.system.crossroads?.xpPercent ?? 0) > 0 ? `<label><input type="checkbox" name="crossroads" checked /> ${loc`Crossroads Title held before this mission began (+${this.system.crossroads.xpPercent}%)`}</label>` : ""}<label>${loc`Additional post-multiplier XP`} <input type="number" name="additionalXP" min="0" value="0" /></label><label>${loc`Source of additional XP`} <input name="modifierReason" placeholder="${loc`GC-awarded bonus`}" /></label><p>${loc`The Triumph and Crossroads shares are worked out on the multiplied reward and rounded up. A Crossroads Title first earned this mission starts its benefits next mission.`}</p><label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The mission has ended; all post-multiplier modifiers were reviewed and included`}</label></div>`
         });
         if (!input) return null;
+        // The mission's figures are read again: a dialog left open while the record changed shows old ones.
+        const now = missionSettlementDefaults();
+        if (now.baseXP !== offered.baseXP || now.threatLevel !== offered.threatLevel)
+          throw new Error(
+            loc`The mission's figures changed while this dialog was open (base XP ${offered.baseXP} → ${now.baseXP}, Threat Level ${offered.threatLevel ?? "—"} → ${now.threatLevel ?? "—"}). Open the settlement again.`
+          );
       }
       // Undo takes the XP and this mission's reward record back off, so a wrong settlement can be settled again.
       return undoHook.run([this], loc`Mission XP settled: ${this.name}`, () =>
@@ -1228,14 +1235,16 @@ export const ActorActionDice = Base =>
           });
         } catch (error) {
           if (!same(current(), record)) {
-            if (current() !== null || this.system.xp !== beforeXP) await markReview(error);
+            // Nothing written leaves the earlier record of a reopened mission (or none) and the XP as they were.
+            const earlier = JSON.parse(expectedContext).reward ?? null;
+            if (!same(current(), earlier) || this.system.xp !== beforeXP) await markReview(error);
             throw error;
           }
         }
         try {
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier}${plan.record.triumphXP ? loc` + ${plan.record.triumphXP} Triumph (${plan.record.triumphPercent}%)` : ""}${plan.record.crossroadsXP ? loc` + ${plan.record.crossroadsXP} Crossroads (${plan.record.crossroadsPercent}%)` : ""} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
+            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier}${plan.record.triumphXP ? loc` + ${plan.record.triumphXP} Triumph (${plan.record.triumphPercent}%)` : ""}${plan.record.crossroadsXP ? loc` + ${plan.record.crossroadsXP} Crossroads (${plan.record.crossroadsPercent}%)` : ""} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP.${Number.isSafeInteger(plan.record.gainedXP) ? ` ${loc`${plan.record.previousTotalXP} XP was settled before the mission was resumed, so ${plan.record.gainedXP} XP is added now.`}` : ""} ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
             flags: { spycraft2: { actorUuid: this.uuid, checkKind: "missionXP", ...record, actionDiceAllowed: false } }
           });
         } catch (error) {
@@ -1248,15 +1257,27 @@ export const ActorActionDice = Base =>
             )
           )
             return record;
-          if (!same(current(), record) || !Number.isSafeInteger(this.system.xp) || this.system.xp < record.totalXP) {
+          if (
+            !same(current(), record) ||
+            !Number.isSafeInteger(this.system.xp) ||
+            this.system.xp < (Number.isSafeInteger(record.gainedXP) ? record.gainedXP : record.totalXP)
+          ) {
             await markReview(error);
             throw error;
           }
-          const restoredXP = this.system.xp - record.totalXP;
+          // A second settlement of a reopened mission put back the earlier record; a first one removes its own.
+          const gained = Number.isSafeInteger(record.gainedXP) ? record.gainedXP : record.totalXP,
+            restoredXP = this.system.xp - gained,
+            earlier = JSON.parse(expectedContext).reward;
           try {
-            await this.update({ "system.xp": restoredXP, [`system.missionXPRewards.-=${plan.key}`]: null });
+            await this.update({
+              "system.xp": restoredXP,
+              ...(earlier
+                ? this.actorRecordRestorePatch("system.missionXPRewards." + plan.key, earlier)
+                : { [`system.missionXPRewards.-=${plan.key}`]: null })
+            });
           } catch (rollback) {
-            if (this.system.xp !== restoredXP || current() !== null) {
+            if (this.system.xp !== restoredXP || !same(current(), earlier ?? null)) {
               await markReview(rollback);
               throw new AggregateError([error, rollback], loc`The mission XP could not be safely restored.`);
             }

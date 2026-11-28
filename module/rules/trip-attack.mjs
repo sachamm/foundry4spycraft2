@@ -66,7 +66,7 @@ export function tripAttackPlan(
     )
       return reject(loc`An actual earned counter-Trip source and its original opponent are required.`);
   } else if (tripCounter) return reject(loc`Use the earned Counter-Trip control for that free action.`);
-  if (method !== "roll") return reject(loc`Trip is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
+  if (method !== "roll") return reject(loc`Trip is an opposed combat action; taking 10/20 is unavailable (pp.91,352).`);
   if (!validOwnCountClock(tripAttackCombat) || (!counter && tripAttackCombat.turn !== tripAttackCombat.ownTurnIndex))
     return reject(
       counter
@@ -134,7 +134,7 @@ export function tripAttackPlan(
     evidence,
     sizeBonus,
     notes: [
-      loc`${counter ? loc`Earned free counter-Trip` : loc`Trip`} against ${tripAttackOpponentName.trim()}: ${counter ? loc`one earned free action` : loc`one half action`}, opposed Acrobatics(DEX), Armor Check Penalty, base error1 plus action error+1; only the larger participant gains+4per Size category. Your Size bonus +${sizeBonus} (pp.352,361).`,
+      loc`${counter ? loc`Earned free counter-Trip` : loc`Trip`} against ${tripAttackOpponentName.trim()}: ${counter ? loc`one earned free action` : loc`one half action`}, opposed Acrobatics(DEX), Armor Check Penalty, base error 1 plus action error+1; only the larger participant gains +4 per Size category. Your Size bonus +${sizeBonus} (pp.352,361).`,
       loc`For reciprocal recorded characters, finish both checks in chat and use Main’s Trip outcomes, then Trip final attack for an earned winning critical follow-up at−4. An original critical defensive win earns Main’s Counter-Trip; the second Trip never grants a third. Unrecorded opponents and weapon-quality variants remain separate.`
     ]
   };

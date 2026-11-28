@@ -3,7 +3,7 @@
  * The actions that move a combat or spend GC action dice are for the GC only.
  */
 import { loc, locKey } from "../i18n.mjs";
-import { stepBackTurn } from "./gc/combat.mjs";
+import { fluidRoundSettled, stepBackTurn } from "./gc/combat.mjs";
 
 /** The newest chat card on screen that holds a button matching the selector, and that button. */
 export function newestCardButton(root, selector, keep = () => true) {
@@ -153,6 +153,20 @@ export function boostCardButton(root, mine, selector = 'button[data-roll-key="gc
   return null;
 }
 
+/** Why the shortcut found nothing, from what is actually on screen, not a guess. */
+export function boostRefusal(root, selector = 'button[data-roll-key="gcBoost"]', pointRoot = root) {
+  const pointed = pointRoot?.querySelector?.("[data-message-id]:hover");
+  if (pointed) {
+    const button = pointed.querySelector?.(selector);
+    if (!button) return loc`The card under the pointer has no GC boost.`;
+    const reason = button.dataset?.tooltip || button.getAttribute?.("aria-description") || "";
+    return reason
+      ? loc`The card under the pointer cannot be boosted: ${reason}`
+      : loc`The card under the pointer cannot be boosted now.`;
+  }
+  return loc`None of your cards can be boosted now. Point at a card to boost that one.`;
+}
+
 function gcBoostShortcut() {
   const messages = game.messages,
     mine = id => {
@@ -161,9 +175,7 @@ function gcBoostShortcut() {
     };
   const button = boostCardButton(document.querySelector("#chat") ?? document, mine, undefined, document);
   if (!button) {
-    ui.notifications.info(
-      loc`Nothing to boost: the card under the pointer cannot be boosted, or none of your cards can. Point at a card to boost that one.`
-    );
+    ui.notifications.info(boostRefusal(document.querySelector("#chat") ?? document, undefined, document));
     return true;
   }
   const id = button.closest("[data-message-id]")?.dataset.messageId,
@@ -229,15 +241,20 @@ function actingWeapon(index) {
 
 function openActingSheet() {
   if (!game.combat?.combatant) return false;
-  Promise.resolve(turnChange).then(() => {
-    const sheet = game.combat?.combatant?.actor?.sheet;
-    if (!sheet) return;
-    // One sheet follows the turn: the one this shortcut opened last is closed when the turn has moved on.
-    if (shortcutSheet && shortcutSheet !== sheet && shortcutSheet.rendered) shortcutSheet.close();
-    // A sheet the GC already had open is theirs: the shortcut does not close it later.
-    shortcutSheet = sheet.rendered ? null : sheet;
-    sheet.render(true);
-  });
+  // At a round change the end-of-round reorder lands after the turn does: wait for it, so the sheet is the new
+  // order's first combatant and not the old one's.
+  Promise.resolve(turnChange)
+    .then(() => fluidRoundSettled())
+    .catch(() => null)
+    .then(() => {
+      const sheet = game.combat?.combatant?.actor?.sheet;
+      if (!sheet) return;
+      // One sheet follows the turn: the one this shortcut opened last is closed when the turn has moved on.
+      if (shortcutSheet && shortcutSheet !== sheet && shortcutSheet.rendered) shortcutSheet.close();
+      // A sheet the GC already had open is theirs: the shortcut does not close it later.
+      shortcutSheet = sheet.rendered ? null : sheet;
+      sheet.render(true);
+    });
   return true;
 }
 
@@ -250,7 +267,8 @@ export function releaseFocusAfterClick(event, active = globalThis.document?.acti
   if (!event || event.detail === 0) return false;
   const button = event.target?.closest?.("button, a[data-action]");
   if (!button || button !== active) return false;
-  if (!button.closest?.(".spycraft2, .chat-message, #chat, #combat, #sidebar")) return false;
+  // This system's own surfaces only: Foundry's sidebar tabs and chat controls keep their usual focus.
+  if (!button.closest?.(".spycraft2, .chat-message .message-content, .spycraft2-row-state")) return false;
   if (button.closest?.("dialog, .dialog, .application.dialog")) return false;
   button.blur?.();
   return true;

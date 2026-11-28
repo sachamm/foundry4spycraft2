@@ -1,7 +1,7 @@
-import { loc } from "../i18n.mjs";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+import { loc } from "../i18n.mjs";
 
 /** Group repeated reminders without changing the engine's build validation. */
 export function groupBuildTasks(tasks = []) {
@@ -100,7 +100,10 @@ export function buildCreationTrack(tasks = []) {
     const key = trackStepOf(task);
     if (!waiting.has(key)) waiting.set(key, { count: 0, first: task });
     waiting.get(key).count += task.weight ?? task.count;
-    if (task.error) waiting.get(key).error = true;
+    if (task.error) {
+      waiting.get(key).error = true;
+      waiting.get(key).over = (waiting.get(key).over ?? 0) + (Number(task.over) || 0);
+    }
   }
   let started = false;
   const steps = TRACK_STEPS.map((step, index) => {
@@ -115,6 +118,8 @@ export function buildCreationTrack(tasks = []) {
       automatic: !step.tab,
       count: open?.count ?? 0,
       error: !!open?.error,
+      // An overspent step says so in words, with the amount when the engine knows it, not by colour alone.
+      overLabel: open?.error ? (open.over ? loc`over by ${open.over}` : loc`over budget`) : "",
       start,
       tab: target.tab ?? step.tab,
       order: target.order ?? step.order,
@@ -126,7 +131,7 @@ export function buildCreationTrack(tasks = []) {
 }
 
 /** These flags choose shortcuts only. The action controllers still decide legality. */
-export function combatToolVisibility(system = {}, stances = {}, { showAll = false } = {}) {
+export function combatToolVisibility(system = {}, stances = {}, { showAll = false, earned = {} } = {}) {
   const feats = new Set(system.activeFeatNames ?? []);
   const stanceKey = system.combatStance?.key;
   const earnedStances = Object.values(stances).filter(stance => feats.has(stance.feat));
@@ -148,7 +153,11 @@ export function combatToolVisibility(system = {}, stances = {}, { showAll = fals
     threadNeedle: feats.has("Staff Basics"),
     stanceDamage: feats.has("Flail Basics") || feats.has("Axe Basics") || ["punishing", "menacing"].includes(stanceKey),
     drivingStance: feats.has("Hammer Basics") || stanceKey === "driving",
-    powerStance: feats.has("Great Sword Basics") || stanceKey === "power"
+    powerStance: feats.has("Great Sword Basics") || stanceKey === "power",
+    // Earned by a critical result, so shown only while one is waiting to be used.
+    counterTrip: !!earned.counterTrip,
+    tripFinalAttack: !!earned.tripFinalAttack,
+    fortuneTeammates: !!earned.fortuneTeammates
   };
   // The GC can reveal every shortcut, for example to settle a record left by a feat the character has lost.
   if (showAll) for (const key of Object.keys(tools)) tools[key] = true;

@@ -12,7 +12,7 @@ export async function rollCheapShot(actor, options = {}) {
     const esc = foundry.utils.escapeHTML;
     input = await formDialog({
       title: loc`Cheap Shot Standard Attack`,
-      intro: loc`Choose the opponent and attribute or Speed before this Standard Attack. Cheap Shot costs a free action, attack−4 and error+1. Flail Basics grants+2gear on a melee check while a reviewed readied flail is held.`,
+      intro: loc`Choose the opponent and attribute or Speed before this Standard Attack. Cheap Shot costs a free action, attack−4 and error+1. Flail Basics grants +2 gear on a melee check while a reviewed readied flail is held.`,
       fields: [
         {
           select: "weaponId",

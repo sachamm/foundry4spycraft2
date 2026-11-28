@@ -3,6 +3,7 @@
  * which is the figure on the button (style guide 4.7 and 6.2). The `sc2tip` helper prints the rows.
  */
 import { loc } from "../i18n.mjs";
+import { readSetting } from "../settings.mjs";
 import { signed } from "../handlebars-helpers.mjs";
 import {
   abilityBreakdown,
@@ -38,9 +39,22 @@ export function abilityTip(system, key, name) {
   ];
 }
 
+/**
+ * The last line of a roll button's tooltip: what Shift does on it, as the player's "Roll without the dialog" setting
+ * has it (module/apps/remembered-choices.mjs).
+ */
+export function shiftLine(kind = "roll", swapped = readSetting("skipRollDialogs", false) === true) {
+  if (swapped) return [loc`Shift-click opens the dialog`, null, "plain"];
+  return kind === "attack"
+    ? [loc`Shift-click: attack at once, with one token targeted`, null, "plain"]
+    : [loc`Shift-click: roll at once with your last choices`, null, "plain"];
+}
+
 /** A weapon's Attack button: the parts the attack plan lists (module/rules/gear.mjs, weaponAttack). */
 export const weaponAttackTip = attack =>
-  Number.isFinite(attack?.total) ? bonusTip(weaponAttackBreakdown(attack), attack.total) : null;
+  Number.isFinite(attack?.total)
+    ? [...bonusTip(weaponAttackBreakdown(attack), attack.total), shiftLine("attack")]
+    : null;
 
 /** A skill button that shows several totals (one per attribute): each total with its parts, one after another. */
 export function skillTip(system, key, abilities) {

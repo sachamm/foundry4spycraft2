@@ -2,7 +2,7 @@
 import { withUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
-import { messageModeOption } from "../../rolls/message-mode.mjs";
+import { messageModeOption, npcRollMode } from "../../rolls/message-mode.mjs";
 import { TABLES, SKILLS } from "../../rules/tables.mjs";
 import { stepLookup } from "../../rules/formula.mjs";
 import { currentDamageTrack, resolveDamageSave, healDamageTrack, damageSaveDC } from "../../rules/gc/npc-damage.mjs";
@@ -23,12 +23,12 @@ import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { campaignRules, campaignSkillPlan, omniPenalty } from "../../rules/campaign-rules.mjs";
 import { skillConditionCheckPenalty } from "../../rules/skill-conditions.mjs";
-import { isHideCheck } from "../../rules/check-identity.mjs";
+import { sizeStealthCheck } from "../../rules/check-identity.mjs";
 import { formatRange } from "../../rules/outcome-labels.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -91,9 +91,6 @@ export function npcSkillCheck(skillKey, checkId = "") {
 }
 
 /** Whether a check's result takes the Size table's Stealth/Hide modifier (p.349). */
-const sizeStealthCheck = (skillKey, check) =>
-  (skillKey === "blend" && check?.id === "stealth") || isHideCheck(skillKey, check);
-
 /**
  * The parts of an NPC skill check that come from its conditions, its Size and the campaign's qualities: labelled rows
  * and an error range change (pp.340–342, 349, 406–408). Omni-Competent halves the penalties.
@@ -302,6 +299,30 @@ export function damageSaveState(actor) {
   };
 }
 
+/** The Damage save dialog: what the injury was. Null when the GC closes it. */
+export function askDamageSaveInput(actor, state = damageSaveState(actor)) {
+  return ask(
+    loc`${actor.name}: Damage save`,
+    `
+    <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.`}</p>
+    <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
+    <label>${loc`Type`} <select name="kind">${options(
+      [
+        ["lethal", loc`Lethal`],
+        ["subdual", loc`Subdual`],
+        ["stress", loc`Stress`]
+      ],
+      "lethal"
+    )}</select></label>
+    <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
+    <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
+    <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
+    loc`Roll Damage save`
+  );
+}
+
+const DAMAGE_SAVE_DEFEAT = "flags.spycraft2.defeatedByDamageSave";
+
 /** Roll a standard NPC's Damage save for one injury and record the result. */
 export async function npcDamageSave(actor, input = null) {
   if (!actor.isOwner) return null;
@@ -315,24 +336,7 @@ export async function npcDamageSave(actor, input = null) {
       loc`${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
     );
   if (!input) {
-    input = await ask(
-      loc`${actor.name}: Damage save`,
-      `
-      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.`}</p>
-      <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
-      <label>${loc`Type`} <select name="kind">${options(
-        [
-          ["lethal", loc`Lethal`],
-          ["subdual", loc`Subdual`],
-          ["stress", loc`Stress`]
-        ],
-        "lethal"
-      )}</select></label>
-      <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
-      <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
-      <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
-      loc`Roll Damage save`
-    );
+    input = await askDamageSaveInput(actor, state);
     if (!input) return null;
   }
   // The card's large number is the save's total, the one compared with the DC; the die is in the formula beside it.
@@ -362,10 +366,14 @@ export async function npcDamageSave(actor, input = null) {
         : result.failures
           ? loc`fails ${result.failures} save(s), all ignored by tough`
           : loc`succeeds: no mechanical effect, the damage lingers`;
-  await roll.toMessage({
-    speaker: ChatMessage.getSpeaker({ actor }),
-    flavor: `${loc`Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} →`} <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
-  });
+  // A "GC only" NPC keeps its Damage saves to the GC, like its other saves.
+  await roll.toMessage(
+    {
+      speaker: ChatMessage.getSpeaker({ actor }),
+      flavor: `${loc`Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} →`} <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
+    },
+    messageModeOption(npcRollMode(actor, "save"))
+  );
   if (result.state !== "active") {
     try {
       await actor.toggleStatusEffect(result.state === "dead" ? "dead" : "unconscious", {
@@ -377,20 +385,35 @@ export async function npcDamageSave(actor, input = null) {
     }
     for (const combat of game.combats ?? [])
       for (const combatant of combat.combatants)
-        if (combatant.actor === actor && !combatant.defeated) await combatant.update({ defeated: true });
+        if (combatant.actor === actor && !combatant.defeated)
+          // The mark lets Reset clear this defeat and leave one the GC set by hand.
+          await combatant.update({ defeated: true, [DAMAGE_SAVE_DEFEAT]: true });
   }
   return result;
 }
 
 /** The same save, from a sheet or the console, leaving an Undo note for what it changed. */
-export const npcDamageSaveWithUndo = (actor, input = null) =>
-  withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
+export async function npcDamageSaveWithUndo(actor, input = null) {
+  // The dialog is answered before the "before" picture is taken, so Undo does not also take back whatever else
+  // changed while it was open (an Initiative roll, a new condition).
+  if (!input && actor?.isOwner && !npcIsSpecial(actor) && damageSaveState(actor).track.state === "active") {
+    input = await askDamageSaveInput(actor);
+    if (!input) return null;
+  }
+  return withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
+}
 
 export async function resetDamageTrack(actor, { heal = null } = {}) {
   if (!actor.isOwner) return null;
   const state = damageSaveState(actor);
   const track = heal === null ? { ...currentDamageTrack(null, sceneEpoch()) } : healDamageTrack(state.track, heal);
   await actor.update({ "system.damageTrack": track });
+  if (track.state === "active")
+    // Clear only the defeat a failed Damage save set; a defeat the GC marked by hand stays.
+    for (const combat of game.combats ?? [])
+      for (const combatant of combat.combatants ?? [])
+        if (combatant.actor === actor && combatant.defeated && combatant.flags?.spycraft2?.defeatedByDamageSave)
+          await combatant.update({ defeated: false, "flags.spycraft2.-=defeatedByDamageSave": null });
   if (heal === null)
     for (const id of ["dead", "unconscious"])
       if (actor.statuses?.has(id)) {
@@ -458,7 +481,28 @@ export async function manageDisposition(actor) {
     <label data-when="action=persuade">${loc`That side's Impress/Persuasion result (standard or cooperative)`} <input type="number" name="persuasion" min="0" /></label>
     <label data-when="action=persuade"><input type="checkbox" name="triumph" /> ${loc`The check was a Triumph (an Adversarial NPC needs one)`}</label>
     <label data-when="action=loyalty|combat">${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`,
-    loc`Apply`
+    loc`Apply`,
+    // Refused inside the dialog, so the target and the figures typed stay.
+    values => {
+      if (values.action === "shift" && !(Number.isInteger(Number(values.steps)) && Number(values.steps) !== 0))
+        return loc`Enter a whole number of grades to shift, other than 0.`;
+      if (["loyalty", "combat"].includes(values.action)) {
+        const foil = Number(values.foil);
+        if (!Number.isInteger(foil) || foil < -5 || foil > 5) return loc`The Foil modifier runs from −5 to +5.`;
+      }
+      if (values.action === "persuade") {
+        const side = values.target || "",
+          plan = persuadeJoinPlan(actor.flags?.spycraft2?.persuadedJoin ?? null, {
+            combatId: game.combat?.started ? game.combat.id : "",
+            side,
+            gradeId: side ? dispositionToward(record, side) : record.base,
+            result: values.persuasion === "" || values.persuasion === null ? NaN : Number(values.persuasion),
+            triumph: values.triumph === true
+          });
+        if (!plan.allowed) return plan.reason;
+      }
+      return null;
+    }
   );
   if (!input) return null;
   const targetId = input.target || "",

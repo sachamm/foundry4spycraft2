@@ -1,10 +1,11 @@
+import { requestSkillCheck } from "./request-check.mjs";
 import { readSetting } from "../../settings.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { installToolSearch } from "../tool-search.mjs";
 import { installResolutionGuide } from "../resolution-guide.mjs";
 /** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
-import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
+import { gcDiceStatus, initializeGCDice, manageGCDice } from "../../services/gc-dice.mjs";
 import { antagonistReward, threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
@@ -19,8 +20,10 @@ import {
   getSceneState,
   qualitiesInForce,
   currentCampaignEffects,
-  fixThreatLevel
+  fixThreatLevel,
+  updateMission
 } from "./state.mjs";
+import { teamTriumph } from "./mission-defaults.mjs";
 import * as mission from "./mission.mjs";
 import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
@@ -51,10 +54,38 @@ import {
   setClockDateDialog
 } from "../game-clock.mjs";
 import { loc } from "../../i18n.mjs";
+import { pendingRequests } from "../gc-relay.mjs";
+import { isLeadGM } from "../../writers.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
 const ROMAN = ["I", "II", "III", "IV", "V"];
+/** The words a GC types for a console tool that its label does not contain. */
+const SEARCH_TERMS = () => ({
+  missionReport: loc`xp report experience award earned planned`,
+  awardStanding: loc`standing reputation net worth payout reward`,
+  recordInfraction: loc`exposure infraction penalty`,
+  spendDice: loc`gc dice action dice spend buy`,
+  gcDice: loc`gc dice pool starting reset`,
+  addNpcToScene: loc`npc place token opponent enemy`,
+  startMission: loc`begin mission threat level`,
+  beginSession: loc`session start reset dice`,
+  nextScene: loc`scene new standard npc damage`,
+  dramaticOn: loc`dramatic scene`,
+  doubleInitiative: loc`dramatic initiative double`,
+  mobAttack: loc`mob group attack minions`,
+  groupInitiative: loc`initiative roll npc`,
+  clockAdvance: loc`time clock date`,
+  seasonQualities: loc`season campaign qualities`,
+  caliberIncrease: loc`caliber raise`,
+  hazards: loc`hazard fire falling poison`,
+  npcKnowledge: loc`npc knowledge information`
+});
+/** Tools a GC looks for here that live somewhere else. */
+const SEARCH_ELSEWHERE = () => ({
+  [loc`player request requests approve allow`]: loc`Player requests arrive as chat cards with Allow and Refuse.`,
+  [loc`disposition attitude`]: loc`Disposition changes come from a social skill check with the NPC targeted.`
+});
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 /**
  * A console action runs once at a time: a second press while it is still working, or its dialog is open, is dropped.
@@ -67,12 +98,15 @@ const guard = work => {
     if (busy) return;
     busy = true;
     if (event?.detail === 0 && this?.element) this._pressed = controlKey(target, this.element);
+    // The pressed button says it is working until the step settles, so a slow save does not look like nothing.
+    target?.setAttribute?.("aria-busy", "true");
     try {
       await work.call(this, event, target);
     } catch (error) {
-      ui.notifications.warn(error.message);
+      refuse(error.message);
     } finally {
       busy = false;
+      target?.removeAttribute?.("aria-busy");
     }
     this.render();
   };
@@ -193,6 +227,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       }),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
+      requestCheck: guard(() => requestSkillCheck()),
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
       previousTurn: guard(() => combat.stepBackTurn(game.combat)),
       nextTurn: guard(() => {
@@ -208,6 +243,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change, { notify: true })
       ),
       recordInfraction: guard(() => mission.recordInfraction()),
+      removeInfraction: guard((event, target) => mission.removeInfraction(target.dataset.id)),
       sessionDice: guard(() => mission.applySessionDiceAdjustments()),
       missionReport: guard((event, target) => mission.missionReport({ planned: target.dataset.planned === "true" })),
       awardStanding: guard(() => mission.awardStanding()),
@@ -233,6 +269,18 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
             ? loc`Scene ${(m.scenesPlayed ?? 0) + 1} begun: scene abilities are back and standard NPCs' damage is cleared.`
             : loc`New scene begun: scene abilities are back and standard NPCs' damage is cleared.`
         );
+      }),
+      refitDice: guard(async () => {
+        const status = gcDiceStatus(),
+          m = getMission();
+        if (status.lastReason !== "Session start")
+          return refuse(loc`A die has moved since the session began. Use Adjust pool instead.`);
+        const pool = await initializeGCDice({
+          playersPresent: status.playersPresent,
+          caliber: m.caliber,
+          replaceExisting: true
+        });
+        ui.notifications.info(loc`GC action dice reset to ${pool.value} for Caliber ${m.caliber}.`);
       }),
       spendDice: guard(() => spend.spendGCDice()),
       actingSpendDice: guard((event, target) => {
@@ -361,6 +409,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
   _onRender(context, options) {
     super._onRender(context, options);
+    // The main button leads its row on screen, so it leads in the markup too and the keyboard reaches it first.
+    for (const primary of this.element.querySelectorAll(".controls > button.gc-primary"))
+      if (primary.parentElement.firstElementChild !== primary) primary.parentElement.prepend(primary);
     for (const details of this.element.querySelectorAll("details.gc-section[data-section]")) {
       const key = details.dataset.section,
         initial = context.sections?.[key]?.open;
@@ -389,7 +440,18 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     });
     this._wireActorDrops();
     this._announceTurn(context);
-    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
+    // Each view keeps its own open and closed sections: a search ends on the view's own state, not another's.
+    this._search ??= {};
+    installToolSearch(
+      this.element,
+      "details.gc-section",
+      loc`Find a GC tool`,
+      (this._search[context.view ?? "all"] ??= {}),
+      {
+        terms: SEARCH_TERMS(),
+        elsewhere: SEARCH_ELSEWHERE()
+      }
+    );
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
     restoreConsoleState(this.element, this._kept);
     this._kept = null;
@@ -418,7 +480,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   }
 
   /**
-   * Say a new turn once, politely, from a region the redraw leaves in place: the status strip is drawn afresh each
+   * Say a new turn, or a change in who is still to roll Initiative, once, politely, from a region the redraw leaves in place: the status strip is drawn afresh each
    * time, so a screen reader would hear all of it, or nothing, on every redraw.
    */
   _announceTurn(context) {
@@ -431,8 +493,21 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     }
     // With the console both in the sidebar and in its own window, only the window speaks.
     const speaks = this.isPopout || !this.popout?.rendered;
-    const acting = speaks && context.combat?.started ? context.combat.acting : null;
-    const text = acting ? loc`Round ${context.combat.round}: ${acting.name}'s turn.` : "";
+    const combat = speaks ? context.combat : null;
+    const acting = combat?.started ? combat.acting : null;
+    // Before the fight begins, the Initiative rolls are what changes: say who is still to roll, and when all have.
+    const waiting = combat && !combat.started && Number.isFinite(combat.unrolled) ? combat.unrolled : null;
+    const turn = acting
+      ? loc`Round ${combat.round}: ${acting.name}'s turn.`
+      : waiting === null
+        ? ""
+        : waiting
+          ? loc`Still to roll Initiative: ${combat.unrolledNames}.`
+          : loc`Every combatant has an Initiative Count.`;
+    const requests = speaks ? (context.status?.requests ?? 0) : 0,
+      asking =
+        requests === 1 ? loc`1 player request waiting.` : requests ? loc`${requests} player requests waiting.` : "";
+    const text = [turn, asking].filter(Boolean).join(" ");
     if (live.textContent !== text) live.textContent = text;
   }
 
@@ -670,9 +745,16 @@ export function consoleContext() {
   const checklist = firstSessionChecklist({
     mission: m,
     diceCurrent: dice.current,
-    npcActors: [...(game.actors ?? [])].filter(actor => actor.type === "npc").length,
-    // Read from the world, not from the combat this client happens to view: another GC's fight does not count.
-    combatSeen: (m.scenesPlayed ?? 0) > 0 || (m.active && [...(game.combats ?? [])].some(c => c.started))
+    // Made and placed: an NPC's token on some scene, not only an NPC in the Actors list.
+    npcActors: [...(game.scenes ?? [])].some(scene =>
+      [...(scene.tokens ?? [])].some(
+        token => token.actor?.type === "npc" || game.actors?.get?.(token.actorId)?.type === "npc"
+      )
+    )
+      ? 1
+      : 0,
+    // A fight that has begun, read from the world (another GC's counts too); a played scene alone is not a fight.
+    combatSeen: readSetting("gcFirstCombatSeen", false) === true || [...(game.combats ?? [])].some(c => c.started)
   });
   // Done once is done for good: a new mission or session does not bring the list back.
   // The checklist's own Start mission button stands in for the plain one only while the checklist is shown.
@@ -694,7 +776,7 @@ export function consoleContext() {
       diceCurrent: !!dice.current,
       settled: !!m.reportPosted && team.length > 0 && paid >= team.length,
       combat: combatNow
-        ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length }
+        ? { started, unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative) && !c.isDefeated).length }
         : null
     }),
     session: {
@@ -742,6 +824,8 @@ export function consoleContext() {
     ),
     checklist,
     status: {
+      // Player requests waiting for this GC's Allow, so none sits unseen in a busy chat log.
+      requests: game.user?.isGM ? pendingRequests() : 0,
       mission: m.name || loc`No mission recorded`,
       missionState: m.active ? loc`active` : m.ended ? loc`ended` : loc`not started`,
       // The scene's kind, not the campaign's era: "period" reads as the decade in a Historical campaign.
@@ -758,7 +842,7 @@ export function consoleContext() {
         : !dice.current
           ? loc`none until Begin session`
           : dice.value > starting
-            ? loc`${dice.value} left`
+            ? loc`${dice.value} (started with ${starting})`
             : loc`${dice.value} left of ${starting}`,
       session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
     },
@@ -767,7 +851,9 @@ export function consoleContext() {
         team.length && paid >= team.length
           ? loc`Standing: everyone paid`
           : loc`Standing: ${Math.min(paid, team.length)} of ${team.length} paid`,
-      infractions: (m.infractions ?? []).length
+      infractions: (count => (!count ? loc`None yet` : count === 1 ? loc`1 infraction` : loc`${count} infractions`))(
+        (m.infractions ?? []).length
+      )
     },
     isGM: game.user.isGM,
     sections: consoleSections(
@@ -825,8 +911,11 @@ export function consoleContext() {
       exposure: named(m.exposure, id => T.exposure.find(row => row.id === id)?.objective),
       bundle: named(m.bundle),
       otherComplications: named(m.otherComplications),
-      infractions: (m.infractions ?? []).map(entry => ({
+      scriptedEvents: named(m.scriptedEvents),
+      infractions: (m.infractions ?? []).map((entry, index) => ({
         ...entry,
+        key: entry.id ?? `row-${index}`,
+        currencyLabel: entry.currency === "netWorth" ? loc`Net Worth` : loc`Reputation`,
         actorName: game.actors.get(entry.actor)?.name ?? entry.actor
       }))
     },
@@ -845,7 +934,18 @@ export function consoleContext() {
       formula:
         dice.current && Number.isSafeInteger(dice.playersPresent)
           ? loc`${dice.playersPresent} players present + 2 × Caliber ${ROMAN[(Number(dice.caliber) || m.caliber) - 1] ?? m.caliber}`
-          : loc`${team.length} agents on the team + 2 × Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`
+          : loc`${team.length} agents on the team + 2 × Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`,
+      // Set up for another Caliber and untouched since: one line and the button that brings it in step.
+      stale:
+        dice.current &&
+        dice.lastReason === "Session start" &&
+        Number.isSafeInteger(dice.playersPresent) &&
+        Number(dice.caliber) !== m.caliber
+          ? {
+              line: loc`The pool was set up for Caliber ${ROMAN[Number(dice.caliber) - 1] ?? dice.caliber}; the mission is now Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}.`,
+              button: loc`Reset to ${dice.playersPresent + 2 * m.caliber} dice`
+            }
+          : null
     },
     scene,
     season: qualities
@@ -880,20 +980,39 @@ export function consoleContext() {
             ? turn
                 .mobGroups(combatNow)
                 .filter(group => group.members.some(member => member.id === combatNow.combatant?.id))
-                .map(group => ({
-                  key: group.key,
-                  label: loc`Mob attack: ${group.name} ×${group.count}`,
-                  short: loc`Mob: ${group.name} ×${group.count}`
-                }))
+                .map(group => {
+                  // The button counts the members who attack now, and says why when it cannot run.
+                  const count = turn.mobAttackers(combatNow, group).length;
+                  return {
+                    key: group.key,
+                    label: loc`Mob attack: ${group.name} ×${count}`,
+                    short: loc`Mob: ${group.name} ×${count}`,
+                    blocked: turn.mobAttackBlocked(combatNow, group)
+                  };
+                })
             : [],
-          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
+          unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative) && !c.isDefeated).length,
+          // The NPC Initiative buttons are off, with the reason, when no NPC is waiting for a roll.
+          npcRollBlocked: combatNow.turns.some(
+            c => !Number.isFinite(c.initiative) && c.actor?.type === "npc" && !c.hasPlayerOwner && !c.isDefeated
+          )
+            ? ""
+            : loc`Every NPC in this fight already has an Initiative Count.`,
           // Who the NPC Initiative buttons roll for, and who rolls on their own sheet, named before the press.
           initiativeTip: initiativeTip(combatNow),
           unrolledNames: combatNow.turns
-            .filter(c => !Number.isFinite(c.initiative))
+            .filter(c => !Number.isFinite(c.initiative) && !c.isDefeated)
             .map(c => c.name)
             .join(", "),
           scene: combatNow.scene?.name ?? loc`no scene`,
+          // Which fight this is, when the world holds more than one, so the header names the one Next turn moves.
+          encounter: (() => {
+            const all = [...(game.combats ?? [])],
+              index = all.findIndex(fight => fight.id === combatNow.id);
+            return all.length > 1 && index >= 0 ? loc`Fight ${index + 1} of ${all.length}` : "";
+          })(),
+          // A fight with no scene is shown on every scene, so it is named as such.
+          unscened: !combatNow.scene,
           // The fight the console runs is named when it is not this scene's, so Next turn is not pressed on another.
           elsewhere: !!(combatNow.scene && globalThis.canvas?.scene && combatNow.scene.id !== canvas.scene.id)
         }
@@ -941,9 +1060,22 @@ const inFight = actor =>
 /** Register before Foundry constructs its sidebar applications. */
 export function registerGCConsoleTab() {
   for (const hook of ["createCombat", "deleteCombat"]) Hooks.on(hook, refreshSoon);
+  Hooks.on("spycraft2.relayPending", refreshSoon);
   // Another scene's fight, run by another GC, does not redraw this console under the pointer.
   const viewed = fight => !game.combat || !fight || fight.id === game.combat.id;
   Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());
+  // The team's first Triumph of the mission is kept on the mission record, where every client can read it.
+  for (const hook of ["createChatMessage", "updateChatMessage"])
+    Hooks.on(hook, message => {
+      if (!isLeadGM() || !message?.flags?.spycraft2?.triumphed) return;
+      const mission = getMission();
+      if (!mission.active || mission.triumphMessageId || !teamTriumph(message, mission)) return;
+      updateMission({ triumphMessageId: message.id }).catch(() => {});
+    });
+  Hooks.on("updateCombat", (fight, changed) => {
+    if (changed?.round >= 1 && isLeadGM() && !readSetting("gcFirstCombatSeen", false))
+      Promise.resolve(game.settings.set("spycraft2", "gcFirstCombatSeen", true)).catch(() => {});
+  });
   for (const hook of ["createCombatant", "deleteCombatant", "updateCombatant"])
     Hooks.on(hook, combatant => viewed(combatant?.parent) && refreshSoon());
   // A card about the acting combatant changes what its next-step button says (Apply damage to …).

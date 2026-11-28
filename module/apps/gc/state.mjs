@@ -73,6 +73,13 @@ export function registerGCSettings() {
     type: Boolean,
     default: false
   });
+  // Set once a fight in this world has begun, so the first-session list can tick its last step for good.
+  game.settings.register(SYSTEM, "gcFirstCombatSeen", {
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: false
+  });
   game.settings.register(SYSTEM, "fluidInitiative", {
     name: locKey`Fluid initiative`,
     hint: locKey`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,
@@ -149,7 +156,15 @@ export async function fixThreatLevel() {
   const mission = getMission(),
     levels = teamLevels(mission),
     tl = threatLevel(mission, levels);
-  await setMission({ ...mission, threatLevel: tl.value, threatBase: tl.base, teamLevels: levels });
+  // The adjustment in the fixed level is kept beside it: the standing reward follows the level applied, not one
+  // typed into the record later and not yet applied.
+  await setMission({
+    ...mission,
+    threatLevel: tl.value,
+    threatBase: tl.base,
+    teamLevels: levels,
+    threatAdjustApplied: tl.override ? 0 : tl.adjust
+  });
   return { ...tl, bonusDice: threatBonusActionDice(tl.value, levels) };
 }
 

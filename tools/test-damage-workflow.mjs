@@ -661,10 +661,20 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     false,
     "not offered twice for one target"
   );
-  // With several tokens targeted, one button applies the damage to each and posts a summary.
+  // With several tokens targeted, one button applies the damage to each and posts a summary. A card resolved
+  // against one target keeps it: the map's targets do not override it.
   const second = character("Guard2", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
   game.user.targets = [{ actor: guard }, { actor: second }];
-  const each = controls(damage).find(c => c.label === "Apply 7 to 2 targets");
+  assert.equal(
+    controls(damage).find(c => c.label === "Apply 7 to 2 targets"),
+    undefined,
+    "the resolved target stays"
+  );
+  const loose = card("q3", { actorUuid: attacker.uuid, checkKind: "damage", effectiveTotal: 7 });
+  const each = controls(loose).find(c => c.label === "Apply 7 to 2 targets");
+  assert.match(each.hint, /Guard \(not on the scene\), Guard2/, "the recipients are named");
+  // Targets changed after the card was drawn do not join the batch.
+  game.user.targets = [];
   await each.run();
   assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
   assert.match(posted.at(-1).content, /Damage applied to 2 targets/);
@@ -783,9 +793,11 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
     distanceFeet: 40
   });
   assert.equal(incomingFacts({ attackContext: { distanceFeet: null } }).distanceFeet, null);
-  // Once the attack is settled there is nothing left to answer on it.
-  attack.flags.spycraft2.attackResolution = { hit: true };
-  assert.deepEqual(ids(attack), []);
+  // Once the attack is settled, the target's row stays, disabled, and says how it went.
+  attack.flags.spycraft2.attackResolution = { hit: true, defense: 12, margin: 7, targetName: "Latch" };
+  assert.deepEqual(ids(attack), ["targetResolved"]);
+  const [settled] = targetResponseControls({ message: attack, check: attack.flags.spycraft2, user: player });
+  assert.match(settled.disabled, /Latch's Defense 12/);
   // Someone else's agent, or an attack that names itself, offers nothing.
   const other = character("Vector", {}, { isOwner: false });
   const elsewhere = card("t2", {
@@ -857,7 +869,12 @@ test("rest, a dying roll, Stabilize, a hazard save's result and a grapple each l
   assert.equal(dying.system.wounds.value, 0);
   assert.ok(medic.flags.spycraft2.stabilized);
   const stabilize = undoNotes.at(-1);
-  assert.deepEqual(stabilize.flags.spycraft2.undo.cardMarks, [{ messageId: "st1", key: "stabilized" }]);
+  assert.deepEqual(
+    stabilize.flags.spycraft2.undo.cardMarks.map(({ messageId, key }) => ({ messageId, key })),
+    [{ messageId: "st1", key: "stabilized" }]
+  );
+  // The note keeps what the step left, so a later step's mark is not cleared.
+  assert.equal(stabilize.flags.spycraft2.undo.cardMarks[0].left.name, "Faller");
   await applyUndo(noteOf(stabilize));
   assert.equal(dying.system.wounds.value, -4);
   assert.equal(medic.flags.spycraft2.stabilized, undefined, "the card can be used again");

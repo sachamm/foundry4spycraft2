@@ -118,7 +118,7 @@ export function coverPlan({
       ...(terrainCover
         ? terrainCover.sources
             .filter(s => s.increase)
-            .map(s => loc`${s.source}: +1quarter ${s.kind} cover before attacker reductions.`)
+            .map(s => loc`${s.source}: +1 quarter ${s.kind} cover before attacker reductions.`)
         : []),
       ...(safeAttackReduction
         ? [

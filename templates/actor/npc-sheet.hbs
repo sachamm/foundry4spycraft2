@@ -14,9 +14,12 @@
         class="sc2-chip">{{lookup npcTypes system.npcType}}</span><span
         class="sc2-chip">{{localize "SPYCRAFT.Defense"}} {{system.defense.total}}</span><span
         class="sc2-chip">{{healthChip}}</span>{{#each conditionStamps}}<span
-        class="sc2-stamp">{{this}}</span>{{/each}}</div>
+        class="sc2-stamp">{{this}}</span>{{/each}}{{#if isGM}}<label class="npc-gc-only"
+        data-tooltip="{{localize 'SPYCRAFT.Npc.GCOnlyRollsHint'}}"><input type="checkbox" name="flags.spycraft2.gcOnlyRolls" {{checked actor.flags.spycraft2.gcOnlyRolls}} />
+        {{localize "SPYCRAFT.Npc.GCOnlyRolls"}}</label>{{/if}}</div>
       <div class="summary edit-only">
-        <label>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{system.threatLevel}}" class="w-2" /></label>
+        {{!-- While the mission sets it, the typed number is greyed out and shows the one in force. --}}
+        <label{{#if system.usesMissionThreatLevel}} data-tooltip="{{localize 'SPYCRAFT.Npc.FollowingMission' value=system.effectiveThreatLevel}}"{{/if}}>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{#if system.usesMissionThreatLevel}}{{system.effectiveThreatLevel}}{{else}}{{system.threatLevel}}{{/if}}" class="w-2"{{#if system.usesMissionThreatLevel}} disabled{{/if}} /></label>
         <select name="system.npcType" aria-label="{{localize 'SPYCRAFT.Action.NpcType'}}">{{selectOptions npcTypes selected=system.npcType}}</select>
         <label
           data-tooltip="{{localize 'SPYCRAFT.Template.ActorNpcSheet.UseTheActiveMissionSThreat'}}"><input type="checkbox"
@@ -24,18 +27,21 @@
             name="system.followMission" {{checked system.followMission}} /> {{localize "SPYCRAFT.Template.ActorNpcSheet.FollowMissionTL"}}{{#if system.usesMissionThreatLevel}} ({{system.effectiveThreatLevel}}){{/if}}</label>
       </div>
       {{#unless system.npcProfile.enabled}}{{#if gcPlay.special}}<div class="resources">
-        <label>{{localize "SPYCRAFT.Vitality"}} <input name="system.vitality.value" type="number" value="{{system.vitality.value}}"
-          /> / <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" /></label>
-        <label>{{localize "SPYCRAFT.Wounds"}} <input name="system.wounds.value" type="number" value="{{system.wounds.value}}"
-          /> / <input name="system.wounds.max" type="number" value="{{system.wounds.max}}" /></label>
+        <span class="sc2-pair" role="group" aria-label="{{localize 'SPYCRAFT.Vitality'}}">{{localize "SPYCRAFT.Vitality"}}
+          <input name="system.vitality.value" type="number" value="{{system.vitality.value}}" aria-label="{{localize 'SPYCRAFT.Npc.VitalityNow'}}" />
+          / <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" aria-label="{{localize 'SPYCRAFT.Npc.VitalityMax'}}" /></span>
+        <span class="sc2-pair" role="group" aria-label="{{localize 'SPYCRAFT.Wounds'}}">{{localize "SPYCRAFT.Wounds"}}
+          <input name="system.wounds.value" type="number" value="{{system.wounds.value}}" aria-label="{{localize 'SPYCRAFT.Npc.WoundsNow'}}" />
+          / <input name="system.wounds.max" type="number" value="{{system.wounds.max}}" aria-label="{{localize 'SPYCRAFT.Npc.WoundsMax'}}" /></span>
       </div>{{/if}}{{/unless}}
     </div>
   </header>
+  {{#unless editMode}}<h2 class="sc2-visually-hidden">{{localize "SPYCRAFT.Tab.Play"}}</h2>{{/unless}}
   {{#if editMode}}
   {{!-- While editing, the numbers the choices produce stay in sight and the builder comes first. --}}
-  <div class="npc-pinned" role="status" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
+  <div class="npc-pinned" role="group" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.ThreatLevel"}}</span><b class="sc2-value">{{system.effectiveThreatLevel}}</b></div>
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Attack"}}</span><b class="sc2-value">{{signed system.bab}}</b></div>
+    <div class="sc2-field" data-tooltip="{{localize 'SPYCRAFT.Npc.AttackBaseHint'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Template.ActorNpcBuilder.AttackBase"}}</span><b class="sc2-value">{{signed system.bab}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value">{{system.defense.total}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value">{{signed system.initiative.total}}</b></div>
     {{#each saves}}<div class="sc2-field"><span class="sc2-caption">{{label}}</span><b class="sc2-value">{{signed total}}</b></div>{{/each}}
@@ -169,6 +175,9 @@
     <h3>{{localize "SPYCRAFT.Template.ActorNpcSheet.QualitiesInPlay"}}</h3>
     <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>
     <ul>{{#each system.qualityEffects.notes}}<li><b>{{name}}</b> — {{text}} <small>(p.{{page}})</small></li>{{/each}}</ul>
+    {{#if commanderMark}}<p>{{#if commanderMark.token}}<label class="sc2-check"><input type="checkbox" name="system.commander"
+      {{checked system.commander}} {{#unless editable}}disabled{{/unless}} /> {{localize "SPYCRAFT.Npc.CommanderMark"}}</label>{{else}}<span
+      class="muted">{{localize "SPYCRAFT.Npc.CommanderLinked"}}</span>{{/if}}</p>{{/if}}
     {{#each system.qualityEffects.saveCalls}}<p><button type="button" class="sc2-action" data-action="callQualitySave"
       data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorNpcSheet.CallForTheSave"}}: {{name}} ({{localize "SPYCRAFT.Template.ActorNpcSheet.WillDC"}} {{dc}})</button></p>{{/each}}
   </div>{{/if}}

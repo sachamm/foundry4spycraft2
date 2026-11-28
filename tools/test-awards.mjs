@@ -97,6 +97,23 @@ test("post-multiplier XP is an explicit GC amount; settlement is once per missio
   for (const patch of [{ missionCompleteConfirmed: false }, { baseXP: -1 }, { threatLevel: 0 }, { modifierReason: "" }])
     assert.throws(() => missionXPPlan(sys(), { ...options, ...patch }));
 });
+test("a settlement reopened by Resume takes awards again and settles only the difference", () => {
+  const s = sys();
+  s.actionDieAwards.m = { count: 1, mission: "m" };
+  const options = { baseXP: 100, threatLevel: 3, mission: "m", missionCompleteConfirmed: true };
+  const first = missionXPPlan(s, options);
+  s.missionXPRewards.m = { ...first.record, reopened: true };
+  s.xp = first.xp;
+  assert.equal(actionDieAwardSummary(s).settled, false);
+  // An award after the resume is accepted.
+  const more = actionDieAwardPlan(s, award);
+  s.actionDieAwards.m = more.record;
+  const second = missionXPPlan(s, options);
+  assert.equal(second.record.previousTotalXP, first.record.totalXP);
+  assert.equal(second.record.gainedXP, second.record.totalXP - first.record.totalXP);
+  assert.equal(second.xp, first.xp + second.record.gainedXP);
+  assert.equal(second.record.reopened, undefined, "the new record is settled again");
+});
 let settings,
   posts,
   failPost = false,
@@ -541,12 +558,15 @@ test("a failed XP post preserves unrelated later XP and reconciles committed rol
     const a = new SpycraftActor(),
       create = ChatMessage.create,
       update = a.update.bind(a);
-    if (variant === "laterXP")
-      ChatMessage.create = async () => {
+    if (variant === "laterXP") {
+      // Only the XP post itself: the Undo note a failed step still leaves is posted after it.
+      let posts = 0;
+      ChatMessage.create = async data => {
+        if (posts++) return data;
         a.system.xp += 7;
         throw Error("post rejected");
       };
-    else {
+    } else {
       failPost = true;
       a.update = async patch => {
         await update(patch);

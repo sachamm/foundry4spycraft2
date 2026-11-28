@@ -165,12 +165,8 @@
   width: auto;
   cursor: pointer;
 }
-.spycraft2.sheet.agent .sheet-rail :is(.setup-next, details.todo, details.warnings) {
+.spycraft2.sheet.agent .sheet-rail :is(details.todo, details.warnings) {
   margin: 0;
-}
-.spycraft2.sheet.agent .sheet-rail .setup-next {
-  flex-direction: column;
-  align-items: stretch;
 }
 .spycraft2.sheet.agent .sheet-rail details.todo ul {
   columns: 1;
@@ -203,12 +199,6 @@
   font-size: var(--sc2-text-s);
   opacity: 1;
   color: var(--sc2-ink-muted);
-}
-.spycraft2.sheet.agent .condition-summary {
-  margin: 0;
-  padding: 6px 10px;
-  background: var(--sc2-bad-tint);
-  border-left: 3px solid var(--sc2-bad);
 }
 .spycraft2.sheet .sc2-weapon {
   display: grid;
@@ -330,9 +320,6 @@
   flex-direction: column;
   gap: 0;
 }
-.spycraft2.sheet.agent.play-mode .main-reference > .col:first-child {
-  order: 2;
-}
 .spycraft2.sheet.agent.play-mode .main-reference .stat-grid {
   grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
   gap: 6px;
@@ -415,9 +402,6 @@
 }
 
 /* ---------- Creation track: the build order, each step in its own hue ---------- */
-.spycraft2.sheet.agent .creation-track[hidden] {
-  display: none;
-}
 .spycraft2.sheet.agent .creation-track {
   margin-bottom: var(--sc2-space-2);
 }
@@ -498,6 +482,13 @@
   background: var(--sc2-bad);
   color: var(--sc2-on-action);
 }
+/* The overspent badge carries words, so it widens to fit them. */
+.spycraft2.sheet.agent .track-step.over .sc2-uses.track-over {
+  width: auto;
+  min-width: 0;
+  padding: 0 6px;
+  white-space: nowrap;
+}
 .spycraft2.sheet.agent .track-start {
   font: 600 var(--sc2-text-s)/1.35 var(--font-primary, sans-serif);
   letter-spacing: 0;
@@ -516,7 +507,7 @@
 }
 .spycraft2.sheet.agent .round-pip {
   min-width: 7.5em;
-  min-height: 26px;
+  min-height: 28px;
   margin: 0;
   padding: 2px 10px;
   font: 600 var(--sc2-text-s)/1.2 var(--font-primary, sans-serif);
@@ -534,9 +525,6 @@
   border-style: dashed;
   border-color: var(--sc2-rule-strong);
   text-decoration: line-through;
-}
-.spycraft2.sheet.agent .pinned-tools[hidden] {
-  display: none;
 }
 .spycraft2.sheet.agent .pinned-tools {
   padding: 0;

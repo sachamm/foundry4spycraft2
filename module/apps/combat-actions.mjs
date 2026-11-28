@@ -95,6 +95,25 @@ rollPipeline.register({
   read: (context, input) => fireActionInput(input)
 });
 
+// The same section on the ordinary attack dialog, so an NPC's or a Play-tab attack reaches Burst, Autofire, Strafe,
+// Cover Fire and Suppressive Fire from its one attack button.
+rollPipeline.register({
+  id: "fireActionContent:attack",
+  dialogs: ["attack"],
+  order: 9740,
+  dialog: ({ actor, item }) => {
+    let preview = null;
+    try {
+      preview = actor?.weaponAttack?.(item) ?? null;
+    } catch {
+      return null;
+    }
+    const html = fireActionContent(preview, item, actor);
+    return html ? [{ at: 65, html }] : null;
+  },
+  read: ({ entered }) => fireActionInput(entered ?? {})
+});
+
 /** Pummel on the quick attack dialog, for unarmed attacks. */
 export function pummelContent(item) {
   const unarmed = item?.system?.proficiency === "unarmed" || /\bNKL\b/.test(item?.system?.qualities ?? "");

@@ -39,6 +39,7 @@ const autoApprove = () => {
 
 /** The GC's side: check the request, ask if needed, do it. Always answers with { value } or { error }. */
 export async function handleRelay({ action, data, userId } = {}) {
+  let card = null;
   try {
     const handler = actions.get(action),
       user = game.users.get(userId);
@@ -48,15 +49,22 @@ export async function handleRelay({ action, data, userId } = {}) {
     const question = handler.describe ? await handler.describe(data ?? {}, user) : null;
     const concerns = handler.concerns ? ((await handler.concerns(data ?? {}, user)) ?? []).filter(Boolean) : [];
     if (question && (!autoApprove() || concerns.length)) {
-      const allowed = await askInChat(
+      const asked = await askInChat(
         [question, ...concerns.map(concern => `<span class="bad">${esc(concern)}</span>`)].join("<br>"),
-        user
+        user,
+        { concern: concerns.length > 0 }
       );
-      if (!allowed) throw new Error(loc`The GC declined the request.`);
+      if (!asked.allowed) throw new Error(loc`The GC declined the request.`);
+      card = asked.message;
     }
-    return { value: (await handler.run(data ?? {}, user)) ?? null };
+    const value = (await handler.run(data ?? {}, user)) ?? null;
+    // The card's last word is what happened, not only what the GC chose.
+    if (card) await recordAnswer(card, loc`Allowed and applied.`);
+    return { value };
   } catch (error) {
-    return { error: error?.message || loc`The request failed on the GC's client.` };
+    const reason = error?.message || loc`The request failed on the GC's client.`;
+    if (card) await recordAnswer(card, loc`Allowed, but it failed: ${reason}`);
+    return { error: reason };
   }
 }
 
@@ -66,41 +74,66 @@ export async function handleRelay({ action, data, userId } = {}) {
 
 /** Requests waiting for the GC's answer on this client: id → resolve(boolean). */
 const waiting = new Map();
-const ASK_TIMEOUT = 110000;
+/** How long the GC has to answer, in seconds (world setting); the player's client waits a little longer. */
+export const askTimeoutSeconds = () => {
+  const seconds = Number(readSetting("relayTimeout", 110));
+  return Number.isFinite(seconds) && seconds >= 15 ? Math.min(seconds, 900) : 110;
+};
+
+/** How many requests wait for this GC's answer: shown in the console's status strip. */
+export const pendingRequests = () => waiting.size;
+const pendingChanged = () => {
+  try {
+    globalThis.Hooks?.callAll?.("spycraft2.relayPending", waiting.size);
+  } catch {
+    /* nothing listens */
+  }
+};
 
 /**
  * Put a request to the GC as a card in the GC's own chat, with Allow and Decline, rather than a dialog that blocks
- * the screen. Requests made during a busy round line up in the chat log and are answered in any order.
- * @returns {Promise<boolean>}
+ * the screen. Requests made during a busy round line up in the chat log and are answered in any order. The card is
+ * kept as a record: its flags say whether it is still waiting, and a GC reload marks the ones it loses.
+ * @returns {Promise<{allowed: boolean, message: object|null}>}
  */
-export async function askInChat(question, user) {
-  const id = foundry.utils.randomID(12);
+export async function askInChat(question, user, { concern = false } = {}) {
+  const id = foundry.utils.randomID(12),
+    seconds = askTimeoutSeconds(),
+    by = new Date(Date.now() + seconds * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   const answer = new Promise(resolve => waiting.set(id, resolve));
+  pendingChanged();
   const message = await ChatMessage.create({
     whisper: [game.user.id],
     speaker: { alias: loc`${user.name} asks` },
-    content: `<div class="spycraft2 chat-note relay-ask"><p>${question}</p><p class="hint">${loc`The name is the one the player's client sent.`}</p></div>`,
-    flags: { spycraft2: { relayAsk: id } }
+    content: `<div class="spycraft2 chat-note relay-ask"><p>${question}</p><p class="hint">${loc`Answer by ${by}, or it is declined. The name is the one the player's client sent.`}</p></div>`,
+    flags: { spycraft2: { relayAsk: id, relayConcern: concern, relayState: "waiting" } }
   });
-  const timer = setTimeout(() => settleAsk(id, false, message, loc`No answer in time: declined.`), ASK_TIMEOUT);
+  const timer = setTimeout(() => settleAsk(id, false, message, loc`No answer in time: declined.`), seconds * 1000);
   const allowed = await answer;
   clearTimeout(timer);
-  return allowed;
+  return { allowed, message };
+}
+
+async function recordAnswer(message, note, state = "done") {
+  try {
+    await message?.update({
+      content: `${message.content}<p class="relay-answer" role="status"><b>${esc(note)}</b></p>`,
+      "flags.spycraft2.relayAnswered": true,
+      "flags.spycraft2.relayState": state
+    });
+  } catch {
+    /* the card is only a record */
+  }
 }
 
 async function settleAsk(id, allowed, message, note) {
   const resolve = waiting.get(id);
   if (!resolve) return;
   waiting.delete(id);
+  pendingChanged();
   resolve(allowed);
-  try {
-    await message?.update({
-      content: `${message.content}<p class="relay-answer"><b>${esc(note)}</b></p>`,
-      "flags.spycraft2.relayAnswered": true
-    });
-  } catch {
-    /* the card is only a record */
-  }
+  // An allowed request is recorded once it has run (handleRelay); a declined one ends here.
+  if (!allowed) await recordAnswer(message, note, "declined");
 }
 
 /** Allow and Decline on a waiting request card (the `renderChatMessageHTML` hook). */
@@ -114,9 +147,11 @@ export function renderRelayAsk(message, html) {
     note.className = "hint";
     note.textContent = loc`This request is no longer waiting.`;
     row.append(note);
-  } else
+  } else {
+    // A request the system flagged is not Allow-by-default: neither button leads.
+    const concern = message.flags.spycraft2.relayConcern === true;
     for (const [label, allowed, className] of [
-      [loc`Allow`, true, "sc2-primary-action"],
+      [loc`Allow`, true, concern ? "" : "sc2-primary-action"],
       [loc`Decline`, false, ""]
     ]) {
       const button = document.createElement("button");
@@ -126,7 +161,22 @@ export function renderRelayAsk(message, html) {
       button.addEventListener("click", () => settleAsk(id, allowed, message, allowed ? loc`Allowed.` : loc`Declined.`));
       row.append(button);
     }
+  }
   html.append(row);
+}
+
+/** A GC's reload drops the requests it was holding: their cards say so, and the players ask again. */
+export async function markLostRequests(messages = globalThis.game?.messages ?? []) {
+  const lost = [...messages].filter(
+    message =>
+      message.flags?.spycraft2?.relayAsk &&
+      !message.flags.spycraft2.relayAnswered &&
+      !waiting.has(message.flags.spycraft2.relayAsk) &&
+      message.isAuthor !== false
+  );
+  for (const message of lost)
+    await recordAnswer(message, loc`Lost when this GC's client reloaded: the player asks again.`, "lost");
+  return lost.length;
 }
 
 /**
@@ -147,12 +197,17 @@ export const gcAvailable = () => game.user?.isGM === true || !!game.users?.activ
  * Have the GC's client do something this user may not.
  * @returns {Promise<*>} the action's result; throws with the reason when it is refused or cannot be sent
  */
-export async function askGC(action, data = {}, { timeout = 120000 } = {}) {
+export async function askGC(action, data = {}, { timeout = askTimeoutSeconds() * 1000 + 10000 } = {}) {
   const handler = actions.get(action);
   if (!handler) throw new Error(loc`The GC's client does not know this request.`);
   if (game.user.isGM) return handler.run(data, game.user);
   const gm = game.users.activeGM;
   if (!gm) throw new Error(loc`No GC is connected to do this. Ask again when the GC is here.`);
+  // Foundry lets a player send a request to another user only with the "Query users" permission.
+  if (globalThis.CONST?.USER_PERMISSIONS?.QUERY_USER && game.user.can?.("QUERY_USER") === false)
+    throw new Error(
+      loc`Your user role cannot send requests to the GC. The GC can allow "Query users" for players in Foundry's permission settings.`
+    );
   let answer;
   try {
     answer = await gm.query(RELAY_QUERY, { action, data, userId: game.user.id }, { timeout });
@@ -184,13 +239,17 @@ const MARKS = {
 
 // Each damage record gets its own key, so two applies close together both survive: rewriting one array from a stale
 // copy could drop the first (read them with appliedDamageEntries).
-const markUpdate = (message, key, value) =>
+const ENTRY_ID = /^[A-Za-z0-9]{8,32}$/;
+const markUpdate = (message, key, value, entryId = null) =>
   key === "damageAppliedEntry"
-    ? { [`flags.spycraft2.damageAppliedBy.${foundry.utils.randomID()}`]: value }
+    ? {
+        [`flags.spycraft2.damageAppliedBy.${entryId && ENTRY_ID.test(entryId) ? entryId : foundry.utils.randomID()}`]:
+          value
+      }
     : { [`flags.spycraft2.${key}`]: value };
 
 registerRelay("markCard", {
-  async run({ messageId, key, value }, user) {
+  async run({ messageId, key, value, entryId = null }, user) {
     const message = game.messages.get(messageId),
       check = message?.flags?.spycraft2,
       actor = check?.actorUuid ? await fromUuid(check.actorUuid) : null;
@@ -212,19 +271,42 @@ registerRelay("markCard", {
     }
     if (!user.isGM && !actor?.testUserPermission(user, "OWNER") && !damaged?.testUserPermission?.(user, "OWNER"))
       throw new Error(loc`Only the character's own player can mark that card.`);
-    await message.update(markUpdate(message, key, value));
+    await message.update(markUpdate(message, key, value, entryId));
     return true;
   }
 });
+
+// Undo of applied damage takes its own mark off the card: the player who owns the damaged character may do that
+// through the GC, as they may set it.
+registerRelay("unmarkDamage", {
+  async run({ messageId, entryId }, user) {
+    const message = game.messages.get(messageId),
+      entry = message?.flags?.spycraft2?.damageAppliedBy?.[entryId];
+    if (!entry || typeof entryId !== "string" || !ENTRY_ID.test(entryId))
+      throw new Error(loc`That card has no such damage mark.`);
+    const target = typeof entry.targetUuid === "string" ? await fromUuid(entry.targetUuid) : null;
+    if (!user.isGM && !target?.testUserPermission?.(user, "OWNER"))
+      throw new Error(loc`Only the character's own player can clear that mark.`);
+    await message.update({ [`flags.spycraft2.damageAppliedBy.-=${entryId}`]: null });
+    return true;
+  }
+});
+
+/** Take one applied-damage mark off a card, through the GC when the card is someone else's. */
+export async function unmarkDamage(message, entryId) {
+  if (message.isAuthor || game.user.isGM)
+    return message.update({ [`flags.spycraft2.damageAppliedBy.-=${entryId}`]: null });
+  return askGC("unmarkDamage", { messageId: message.id, entryId });
+}
 
 /**
  * Record on a chat card that one of its steps is done, through the GC when the card is someone else's.
  * Returns false, with a warning unless `quiet`, when it could not be recorded.
  */
-export async function markCard(message, key, value = true, { quiet = false } = {}) {
+export async function markCard(message, key, value = true, { quiet = false, entryId = null } = {}) {
   try {
-    if (message.isAuthor || game.user.isGM) await message.update(markUpdate(message, key, value));
-    else await askGC("markCard", { messageId: message.id, key, value });
+    if (message.isAuthor || game.user.isGM) await message.update(markUpdate(message, key, value, entryId));
+    else await askGC("markCard", { messageId: message.id, key, value, entryId });
     return true;
   } catch (error) {
     if (quiet) return false;
@@ -253,6 +335,18 @@ export function installGCRelay() {
     type: Boolean,
     default: true
   });
+  game.settings.register("spycraft2", "relayTimeout", {
+    name: locKey`Time to answer a player's request (seconds)`,
+    hint: locKey`How long a request card waits for Allow before it is declined. The player's client waits ten seconds longer.`,
+    scope: "world",
+    config: true,
+    type: Number,
+    range: { min: 15, max: 900, step: 5 },
+    default: 110
+  });
   CONFIG.queries[RELAY_QUERY] = handleRelay;
   Hooks.on("renderChatMessageHTML", renderRelayAsk);
+  Hooks.once("ready", () => {
+    if (game.users?.activeGM?.id === game.user?.id) markLostRequests().catch(() => 0);
+  });
 }

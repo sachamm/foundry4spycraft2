@@ -528,6 +528,10 @@ test("a renamed NPC takes its tokens along unless the GC named them by hand", as
   assert.equal(renamedTokenName("The Broker", "Guard", "Sentry"), null);
   assert.equal(renamedTokenName("Guard", "Guard", "Guard"), null);
   assert.equal(renamedTokenName(undefined, "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard (2)", "Guard", "Sentry"), "Sentry (2)", "Foundry's own numbering follows");
+  const { renamedFromAny } = await import("../module/rules/creation-defaults.mjs");
+  assert.equal(renamedFromAny("Guard 2", ["Sentry", "Guard"], "Watch"), "Watch 2", "a token behind a quick rename");
+  assert.equal(renamedFromAny("Bob", ["Sentry", "Guard"], "Watch"), null);
 });
 
 test("a dialog's Cancel button answers like closing the dialog", async () => {
@@ -560,4 +564,32 @@ test("a hidden field's limits are set aside so it cannot hold the dialog, and co
   const cancel = {};
   freeCancel({ querySelectorAll: () => [cancel] });
   assert.equal(cancel.formNoValidate, true);
+});
+
+test("Add NPC: a stale import is not reused, and a hex grid's corners land on the grid", async () => {
+  const { importedCopy, onGrid } = await import("../module/apps/gc/add-npc.mjs");
+  const uuid = "Compendium.spycraft2.core-npcs.Actor.x";
+  const actors = [{ name: "Anton", _stats: { compendiumSource: uuid, createdTime: 100 } }];
+  assert.equal(importedCopy(uuid, actors, { _stats: { modifiedTime: 50 } }).name, "Anton");
+  assert.equal(importedCopy(uuid, actors, { _stats: { modifiedTime: 200 } }), null, "rebuilt since the import");
+  const square = [{ x: 0, y: 0 }];
+  assert.equal(onGrid(square, { isSquare: true }), square);
+  const hex = {
+    isSquare: false,
+    getTopLeftPoint: p => ({ x: Math.round(p.x / 87) * 87, y: Math.round(p.y / 100) * 100 })
+  };
+  assert.deepEqual(
+    onGrid(
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 10, y: 0 }
+      ],
+      hex
+    ),
+    [
+      { x: 0, y: 0 },
+      { x: 87, y: 0 }
+    ]
+  );
 });

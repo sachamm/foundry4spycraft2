@@ -48,7 +48,7 @@
   min-width: 0;
   overflow-wrap: anywhere;
   text-align: end;
-  font-size: 0.85em;
+  font-size: var(--sc2-text-s);
   opacity: 0.8;
 }
 .gc-console-body details.gc-section[open] {
@@ -63,7 +63,6 @@
 }
 .gc-console-body .controls button.gc-primary {
   grid-column: 1 / -1;
-  order: -1;
   font-weight: bold;
 }
 .gc-console-body h3 {
@@ -80,7 +79,7 @@
 .gc-console-body h3 button {
   width: auto;
   display: inline-block;
-  font-size: 0.75em;
+  font-size: var(--sc2-text-s);
   line-height: 1.6;
   padding: 0 0.6em;
   margin-left: 0.5em;
@@ -142,7 +141,7 @@
   padding: 0.35em 0.5em;
 }
 .gc-console-body h2 {
-  font-size: 1.2em;
+  font-size: var(--sc2-text-l);
 }
 .gc-console-body h3 {
   flex-wrap: wrap;
@@ -157,7 +156,7 @@
   flex: 0 0 auto;
   width: var(--players-width, 200px);
   max-width: none;
-  min-height: 26px;
+  min-height: 28px;
   height: auto;
   margin: 0 0 4px;
   padding: 3px 8px;
@@ -183,18 +182,22 @@
   flex-direction: column;
   gap: 6px;
 }
+/* The clock is a system window like the dialogs: section heads, muted text and header buttons use the same roles. */
 .sc2-game-clock-body h3 {
   margin: 6px 0 0;
-  border-bottom: 1px solid currentColor;
-  font-size: 1.05em;
 }
 .sc2-game-clock-body .muted {
-  opacity: 0.65;
+  color: var(--sc2-ink-muted);
   margin: 0;
+}
+.spycraft2.application.sc2-game-clock .window-header button {
+  color: var(--sc2-on-bar);
+  background: transparent;
+  border-color: transparent;
 }
 .sc2-clock-now {
   margin: 0;
-  font-size: 1.25em;
+  font-size: var(--sc2-text-l);
   font-weight: bold;
   text-align: center;
 }
@@ -240,7 +243,7 @@
 .sc2-timer-controls button {
   width: auto;
   flex: 0 0 auto;
-  font-size: 0.85em;
+  font-size: var(--sc2-text-s);
   line-height: 1.6;
   min-height: 0;
   padding: 0 0.6em;
@@ -263,7 +266,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.9em;
+  font-size: var(--sc2-text-s);
 }
 .sc2-timer-new button {
   grid-column: 3;
@@ -282,16 +285,17 @@
   justify-content: flex-start;
   text-align: left;
   padding: 3px 8px;
-  font-size: 13px;
+  font-size: var(--sc2-text-s);
 }
 .gc-console-body .controls button.gc-primary {
   justify-content: center;
 }
+/* Row verbs keep the 44px icon hit area; only the glyph is smaller. */
 .gc-console-body li .sc2-icon-button[data-sc2-mode="icon"] {
-  width: 26px;
-  height: 26px;
-  min-width: 26px;
-  min-height: 26px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   --sc2-icon-size: 20px;
   background: var(--sc2-paper-raised);
   vertical-align: middle;
@@ -662,19 +666,6 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* Read by a screen reader, not drawn: the turn announced once when it changes (console.mjs _announceTurn). */
-.gc-console .gc-live.sc2-visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-
 /* An NPC dragged over the console: the body is outlined and says what a drop here does. */
 .gc-console-body[data-drop-action] {
   outline: 2px dashed var(--sc2-action);
@@ -802,4 +793,10 @@
   flex: 1;
   min-width: 0;
   min-height: var(--sc2-control);
+}
+
+/* A console step still running: the pressed button shows it until the step settles. */
+.gc-console-body button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.7;
 }

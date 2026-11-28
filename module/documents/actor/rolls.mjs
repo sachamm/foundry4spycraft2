@@ -1,7 +1,7 @@
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
 import { actionDieTerm } from "../../rules/action-die-formula.mjs";
 import { refuse } from "../../error-notices.mjs";
-import { messageModeOption } from "../../rolls/message-mode.mjs";
+import { messageModeOption, npcRollMode } from "../../rolls/message-mode.mjs";
 import { blackCatRollEffect } from "../../rules/black-cat.mjs";
 import { allOrNothingEligible, allOrNothingRanges } from "../../rules/all-or-nothing.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
@@ -50,12 +50,12 @@ export const ActorRolls = Base =>
      */
     async rollCheck(formula, data, options = {}) {
       let {
+        rollMode,
         flavor = "",
         threat = 20,
         error = 1,
         cap = null,
         resultCeiling = null,
-        rollMode,
         actionDiceAllowed = true,
         checkMethod = "roll",
         checkKind = "check",
@@ -84,6 +84,8 @@ export const ActorRolls = Base =>
         opponentResult = null,
         requiredBonusPoolId = null
       } = options;
+      // An NPC the GC marked "GC only" keeps its attacks, damage and saves to the GC unless the roll chose otherwise.
+      rollMode = npcRollMode(this, checkKind, rollMode);
       // Campaign qualities (pp.406–408): Omni-Competent lifts skill result caps; Tense forbids taking 10.
       // An NPC skill roll from the GC tools is marked with npcSkill rather than its own check kind.
       if (["skill", "knowledge"].includes(checkKind) || options.npcSkill) {

@@ -122,6 +122,41 @@ core("cunningPlanControl", 9100, ctx => {
   return card("Cunning Plan", () => actor.useCunningPlan(message));
 });
 
+// A flanking bonus the map or the dialog ticked stays a choice until the attack is resolved (p.341).
+core("removeFlankingControl", 9105, ctx => {
+  const { message, check, actor } = ctx,
+    flanking = check.attackContext?.flanking;
+  if (!open(ctx) || check.checkKind !== "attack" || !flanking?.declared || flanking.blocked || flanking.removed)
+    return null;
+  if (!(flanking.attackBonus > 0) || typeof check.successConfirmed === "boolean" || check.attackResolution) return null;
+  return [
+    {
+      label: loc`Not flanking (−${flanking.attackBonus})`,
+      hint: loc`Not flanking (−${flanking.attackBonus}): take the flanking bonus off this attack`,
+      run: () => actor.removeFlanking(message),
+      placement: "card",
+      emphasis: "quiet"
+    }
+  ];
+});
+
+// "Not flanking" pressed by mistake: the bonus goes back while the attack is still open.
+core("restoreFlankingControl", 9106, ctx => {
+  const { message, check, actor } = ctx,
+    flanking = check.flankingRestore?.check?.attackContext?.flanking;
+  if (!open(ctx) || check.checkKind !== "attack" || !check.attackContext?.flanking?.removed || !flanking) return null;
+  if (typeof check.successConfirmed === "boolean" || check.attackResolution) return null;
+  return [
+    {
+      label: loc`Flanking after all (+${flanking.attackBonus})`,
+      hint: loc`Flanking after all (+${flanking.attackBonus}): put the flanking bonus back on this attack`,
+      run: () => actor.restoreFlanking(message),
+      placement: "card",
+      emphasis: "quiet"
+    }
+  ];
+});
+
 core("manualAdjustmentControl", 9110, ctx => {
   const { message, check, actor } = ctx;
   if (!open(ctx) || !manualAdjustment(ctx)) return null;
@@ -143,6 +178,8 @@ core("criticalControl", 9130, ctx => {
   if (check.criticalSuccess || check.criticalFailure) return null;
   // An NPC's own threat is paid from the GC pool by its own button (module/apps/gc/npc-card-dice.mjs).
   if (actor.type === "npc" && !check.errorConfirmed) return null;
+  // An agent's error is activated by the GC, who pays for it: the player who rolled has nothing to spend here.
+  if (check.errorConfirmed && actor.type === "agent" && !(ctx.user ?? globalThis.game?.user)?.isGM) return null;
   // The label names what is being activated; the dialog works out the cost from the chosen effect.
   const label = check.threatConfirmed
     ? check.checkKind === "attack"

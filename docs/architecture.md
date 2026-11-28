@@ -63,3 +63,21 @@ to move. Rewrite the fingerprints with `UPDATE_GOLDEN=1 node --test tools/test-e
 - Rich text written by users is wrapped in `.sc2-prose` so the sheet's heading and table styles do not apply to it.
 - Layout tests load the stylesheets with `systemCss()` from `tools/lib/system-css.mjs`, the same set and order a
   world loads.
+
+## Stored records worth knowing
+
+- **`item.system.acquiredAtLevel`** (feats, and other items taken at a level): the career level the item was taken at.
+  It decides which level's prerequisites apply and which skill pairs a feat links. `0` means the level was never
+  recorded, and the engine treats it as level 1 (`engine.mjs`, `acquiredAtLevel || 1`).
+- **`system.progression[n].expertEntry`**: the expert class's prerequisite result as it stood when the character
+  entered the class (`{ ok, unmet }`). The engine trusts it over a fresh check, so a later drop in a score does not
+  undo an entry that was legal. With no stored result the current level is checked, and the warning says the entry is
+  unknown.
+- **Action dice and the result cap** (p.88): `resolveSkillResult` in `module/rules/checks.mjs` caps the die result
+  first and then adds the action dice, so a boost always raises a capped result. There is no setting for the other
+  reading.
+- **Records kept on chat messages.** Several one-off states live only on the card that made them: an attack's
+  resolution and the damage-applied marks, earned opportunities such as a counter-Trip or a critical Trip's final
+  attack, "once per trigger" guards (B-187) and the pending GC relay asks. Clearing the chat log discards them: an
+  earned opportunity is lost, a guard can be used again, and Undo notes for those cards stop working. Actor and
+  mission records (resources, XP, the mission record, usage periods) are not affected.

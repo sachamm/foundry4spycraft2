@@ -105,7 +105,7 @@ export function balanceSurfacePlan(
     balanceDistanceFeet < 0
   )
     return reject(
-      loc`The GC must confirm the actual Balance table row, cumulative surface conditions and legal counted movement. Inclines above60° require Climb, not Balance.`
+      loc`The GC must confirm the actual Balance table row, cumulative surface conditions and legal counted movement. Inclines above 60° require Climb, not Balance.`
     );
   if (!Array.isArray(system?.activeFeatNames) || system.activeFeatNames.some(n => typeof n !== "string" || !n.trim()))
     return reject(loc`Review the character’s current qualified Equilibrium sources.`);

@@ -1,4 +1,4 @@
-import { isRefusal, lastRefusalMessage, refusalCount } from "../error-notices.mjs";
+import { isRefusal, lastRefusalMessage, plainErrorMessage, refusalCount } from "../error-notices.mjs";
 import { loc } from "../i18n.mjs";
 
 /** Keep feedback local to an explicit action, rather than announcing historical chat on render. */
@@ -37,8 +37,8 @@ export async function runChatAction(button, run) {
     status.setAttribute("role", "alert");
     // A thrown refusal is a rule saying no; anything else is a fault in the code.
     status.textContent = isRefusal(error)
-      ? loc`Not done: ${error.message}`
-      : loc`Action failed: ${error?.message ?? String(error)}. Review the settings and try again.`;
+      ? loc`Not done: ${plainErrorMessage(error)}`
+      : loc`Action failed: ${plainErrorMessage(error)}. Review the settings and try again.`;
     if (!isRefusal(error)) console.error(error);
   } finally {
     button.disabled = false;

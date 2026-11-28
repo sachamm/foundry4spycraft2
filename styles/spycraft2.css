@@ -649,3 +649,21 @@
 .sc2-icon-button:disabled > .sc2-button-icon {
   opacity: 0.45;
 }
+
+/* Combat tracker rows: the turn and state notes sit on the name's line in a smaller face, never on a line of their
+   own, so every row keeps Foundry's height. */
+#combat .spycraft2-row-name,
+#combat-popout .spycraft2-row-name {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+#combat .spycraft2-row-state,
+#combat-popout .spycraft2-row-state {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.8em;
+  font-weight: normal;
+}

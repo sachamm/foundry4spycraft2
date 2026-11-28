@@ -125,22 +125,26 @@ const posted = (actor, id) =>
       m.flags.spycraft2.tripAttack?.counterTrip?.id === id &&
       !m.flags.spycraft2.rerollOf
   );
+/** The settled critical defenses that earned this agent a free counter-Trip. */
+export function counterTripCandidates(actor) {
+  return [...(game.messages ?? [])].filter(
+    m =>
+      m.flags?.spycraft2?.actorUuid === actor.uuid &&
+      m.flags.spycraft2.tripDefense?.version === 3 &&
+      m.flags.spycraft2.tripSettlement?.defenderUuid === actor.uuid &&
+      m.flags.spycraft2.tripSettlement?.version === 3 &&
+      m.flags.spycraft2.tripSettlement.criticalOpportunity === "counterTrip" &&
+      m.flags.spycraft2.tripSettlement.state === "applied" &&
+      m.visible !== false &&
+      m.isContentVisible !== false &&
+      (!m.blind || game.user.isGM)
+  );
+}
 export async function takeCounterTrip(actor, input = {}) {
   if (!actor.isOwner || actor.type !== "agent") return null;
   if (!Object.hasOwn(input, "immediateConfirmed")) {
     const esc = foundry.utils.escapeHTML,
-      ms = [...game.messages].filter(
-        m =>
-          m.flags?.spycraft2?.actorUuid === actor.uuid &&
-          m.flags.spycraft2.tripDefense?.version === 3 &&
-          m.flags.spycraft2.tripSettlement?.defenderUuid === actor.uuid &&
-          m.flags.spycraft2.tripSettlement?.version === 3 &&
-          m.flags.spycraft2.tripSettlement.criticalOpportunity === "counterTrip" &&
-          m.flags.spycraft2.tripSettlement.state === "applied" &&
-          m.visible !== false &&
-          m.isContentVisible !== false &&
-          (!m.blind || game.user.isGM)
-      );
+      ms = counterTripCandidates(actor);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Earned free counter-Trip` },
       rejectClose: false,

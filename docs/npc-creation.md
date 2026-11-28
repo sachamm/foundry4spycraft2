@@ -1,12 +1,13 @@
 # NPC creation
 
+For the GC. Where the data lives, how it is built and how it was checked is in
+[maintaining-gc-data.md](maintaining-gc-data.md).
+
 Open an NPC actor and choose **Use graded NPC creation**. Existing NPCs remain in manual mode until explicitly enabled; their stored manual statistics are not migrated or deleted. Turning graded mode off restores those source statistics. Legacy `villain` selections resolve as special NPCs; Minion, Henchman and Mastermind are qualities in new profiles.
 
-## Rules data
+## What the builder works out
 
-`src/data/npcs.json` is the editable source. `npm run build` generates `module/rules/npc-tables.mjs`, which is included in release archives alongside the existing generated tables. `module/rules/npcs.mjs` contains the pure calculator.
-
-The tables were transcribed from the user-supplied `Spycraft_2.0_AI_Rules.md` and compared cell-for-cell with the local Hyperlinked and Second Printing rulebook PDFs. All 1,600 table cells match both PDFs. References use printed page numbers.
+What the builder works out, with printed page numbers:
 
 - Table 7.11 (pp.444–445): independent Initiative, Attack, Defense, Resilience, Damage Save, vitality/wounds and Competence lookups for grades I–X and TL 1–20.
 - Table 7.13 (p.450) and p.452: use the higher of Competence and the individually purchased Skilled bonus. That bonus is the effective skill rank for result caps (existing Table 2.4). Listed skills cost their grade in XP, limited to three for standard NPCs and five for special NPCs. Animals have no Competence and use their restricted skills.
@@ -27,8 +28,6 @@ The builder resolves the creation tables, base statistics and cost accounting. A
 
 Animal command/action restrictions, complex movement modes, Removable Quality linkage, and feat/class eligibility require GC review. Full special NPCs built with PC rules and their 300-XP-per-scene rule are outside the graded builder. Combat automation, NPC critical activation rules, mission encounter accounting and automatic rest/healing are separate work.
 
-Verification includes numeric comparison against both supplied PDFs, pure calculator tests, mocked sheet/model persistence tests and an isolated browser render of the actual Handlebars partial. A live Foundry world playtest is still needed; an isolated browser render does not exercise Foundry's complete document/form lifecycle.
-
 ## Core NPC Templates
 The **Core NPC Templates** Actor compendium contains twenty original campaign starting points. Import or duplicate one, then change its name, faction and circumstances. Each starts as a standard NPC at Tier III and follows the active mission’s Threat Level; its fallback Threat Level is 1.
 Equipment is embedded from the existing item catalogs. The graded allowance matches each included pick, and a group’s vehicle is shared. One primary weapon is equipped; other carried weapons can be readied when needed. Each firearm includes an ordinary ammunition stockpile and a selected supplied ammunition code. Stockpile inventory quantity counts stockpiles; its weight is per stockpile. Weapon and stockpile flags link the records; expenditure still uses the existing inventory and ammunition workflows.
@@ -36,8 +35,6 @@ The pack does not populate a world automatically. A newly added compendium becom
 ## Feat selections
 
 Each template now includes one to five feats. The pack builder creates a Feat quality and an embedded catalog item for each purchase. Every selection costs 2 XP, including prerequisite feats; any special-NPC multiplier is applied afterward by the usual calculator.
-
-The builder checks the prerequisite feat graph and chosen Basic Skill feats, independently of the list order. It waives numeric requirements under the NPC rules (p.447), checks the purchase limit, and rejects duplicate or unknown selections. Embedded items retain their catalog source IDs and their original prerequisite records; the NPC validation does not rewrite the PC feat catalog.
 
 Feat descriptions remain available from the NPC inventory. Benefits outside the NPC workflows still need GC adjudication; adding a feat does not imply that all of its play effects have been automated. These changes do not replace already imported world actors; import a fresh template to use the new selection.
 
@@ -68,9 +65,9 @@ Feat descriptions remain available from the NPC inventory. Benefits outside the 
 
 Role-specific weapons, armor, kits, communications, recording tools and vehicles are embedded from the item catalogs. Each paid item contributes its actual Caliber to the profile; added picks and Caliber upgrades feed the final reward shown above. Wealth does not grant extra equipment. Vehicles marked as group equipment are shared when placing several copies.
 
-Common Items use a separate curated list in `src/data/npc-common-items.json`. Phones, lights, notebooks and other ordinary supplies do not consume full equipment picks or add XP. Their entries grant no automatic bonus, and their unspecified weights require GC review when tracking load. Clothing and personal keys appear as personal effects in the biography. Kits retain their catalog contents without charging for those contents again.
+Common Items come from a separate list. Phones, lights, notebooks and other ordinary supplies do not consume full equipment picks or add XP. Their entries grant no automatic bonus, and their unspecified weights require GC review when tracking load. Clothing and personal keys appear as personal effects in the biography. Kits retain their catalog contents without charging for those contents again.
 
-Standard NPC weapons receive one included ammunition stockpile; special NPC weapons receive three. The template builder requires compatible ordinary ammunition and a valid supplied code, and rejects unpriced conversions. Additional stockpiles must be purchased in pairs, adding 1 XP per pair. The twenty current templates use only the standard included allowance. Already imported world actors keep their current inventories; import fresh templates for these loadouts.
+Standard NPC weapons receive one included ammunition stockpile; special NPC weapons receive three. Additional stockpiles must be purchased in pairs, adding 1 XP per pair. The twenty current templates use only the standard included allowance. Already imported world actors keep their current inventories; import fresh templates for these loadouts.
 
 ## Optional Threat Level packages
 
@@ -82,10 +79,10 @@ On a core template's graded NPC sheet, the GC can choose **Preview a package**. 
 
 Package application retains grades, listed skills, other qualities and additional purchases. It removes the previous package's feat purchases and equipment allowances, adds the new ones, and validates the resulting inventory. Every feat must have a matching priced Feat quality, prerequisite feats must remain present, and the applicable feat limit is enforced. Each priced inventory item needs a matching Caliber allowance. Ammunition extras use the same stockpile-pair accounting as fixed templates. Unpriced custom items, incompatible extra feats or manually altered prior package allowances prevent application until the GC reconciles the actor. The feature currently supports the twenty standard graded NPC templates; conversion to special/animal or manual creation requires ordinary GC editing.
 
-The preview is checked again before application. A changed NPC or mission TL requires a fresh preview. Item replacement, the graded profile, the generated equipment/feat biography section and the package receipt are submitted in one Foundry v14 document update. New data is compiled from `src/data/npc-packages.json` through the same builders as fixed templates into `module/data/npc-packages.json`; run `npm run build` after editing it. The file is bundled with the system and loaded when opening the package dialog. Import fresh templates if an older copy lacks the matching purchases and allowances.
+The preview is checked again before application. A changed NPC or mission TL requires a fresh preview. Import fresh templates if an older copy lacks the matching purchases and allowances.
 
 ## Template artwork
 
-All twenty core templates include an original AI-generated painted portrait and a matching circular token. Portraits are stored under `assets/npcs/portraits/` and tokens under `assets/npcs/tokens/`; the token PNGs preserve transparency outside the circular border. The actor image and prototype-token texture are separate source fields in `src/data/npc-templates.json`.
+All twenty core templates include an original AI-generated painted portrait and a matching circular token. 
 
-These are illustrative appearances for reusable roles, not required identities. The GC can replace either image on an imported actor. Applying a TL package preserves the actor portrait and token settings. Existing world actors keep their current artwork; import a fresh template to use these defaults. Generation prompts and provenance are recorded in `assets/npcs/generation-prompts.json`.
+These are illustrative appearances for reusable roles, not required identities. The GC can replace either image on an imported actor. Applying a TL package preserves the actor portrait and token settings. Existing world actors keep their current artwork; import a fresh template to use these defaults.

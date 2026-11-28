@@ -218,3 +218,13 @@ test("weapon refresh carries reviewed additional-upgrade allowances while retain
     [["system.upgradeAllowance", null, 3]]
   );
 });
+
+test("rules refresh dialog names fields and summarises values in words", async () => {
+  const { refreshFieldLabel, refreshValueSummary } = await import("../module/apps/rules-refresh.mjs");
+  assert.equal(refreshFieldLabel("system.kitGrade"), "Kit grade");
+  assert.equal(refreshFieldLabel("name"), "Name");
+  assert.equal(refreshValueSummary(null), "Not set");
+  assert.equal(refreshValueSummary(true), "Yes");
+  assert.equal(refreshValueSummary([{ name: "Alpha" }, { name: "Beta" }]), "2 entries: Alpha, Beta");
+  assert.equal(refreshValueSummary({ a: { x: 1 } }), "1 entry");
+});

@@ -1,4 +1,14 @@
 <section class="tab gear {{tab.cssClass}}" data-tab="gear" data-group="primary">
+  <h2 class="sc2-visually-hidden">{{localize "SPYCRAFT.Tab.Gear"}}</h2>
+  {{!-- What the mission lets the agent carry comes first; the full planning panel stays at the foot of the tab. --}}
+  <div class="gear-loadout">
+    <h3>{{localize "SPYCRAFT.GearLoadout"}}</h3>
+    <div class="gear-picks">
+      {{#each gearPicks}}<span class="slot {{#if (sc2lt remaining 0)}}bad{{/if}}" data-tooltip="{{label}}"><b>{{key}}</b> {{spent}} / {{available}}</span>{{/each}}
+    </div>
+    <p><button type="button" class="sc2-action" data-action="rollGearAcquisition">{{localize "SPYCRAFT.Template.ActorAgentGear.RequestGearCheck"}}</button>
+      {{localize "SPYCRAFT.Request"}} {{signed system.requestCheck}} · {{localize "SPYCRAFT.GearCheck"}} {{signed system.gearCheck}}</p>
+  </div>
   {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Weapons" type="weapon" browse="SPYCRAFT.Template.ActorAgentGear.BrowseWeapons" add="SPYCRAFT.Template.ActorAgentGear.AddWeapon"}}
   <ul class="inventory-weapons" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Weapons'}}">
     {{#each weapons}}
@@ -9,13 +19,14 @@
           data-action="rollAttack"
           class="sc2-primary-action sc2-action"
           aria-label="{{localize 'SPYCRAFT.Action.RollAttackWith'
-          name=item.name}}" {{sc2tip attackTip}}>{{localize "SPYCRAFT.Template.ActorAgentGear.Attack"}} {{signed attack.total}}</button>
+          name=item.name}} {{signed attack.total}}" {{sc2tip attackTip}}>{{localize "SPYCRAFT.Template.ActorAgentGear.Attack"}} {{signed attack.total}}</button>
         {{#if untrained}}<span
           class="sc2-untrained"
           data-tooltip="{{localize 'SPYCRAFT.Weapon.UntrainedHint'}}"><i
           class="fa-solid fa-triangle-exclamation"
           aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}
-        <button type="button" class="sc2-action" data-action="rollDamage" aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}}">{{item.system.damage}}</button>
+        <button type="button" class="sc2-action" data-action="rollDamage"
+          aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}} {{item.system.damage}}">{{item.system.damage}}</button>
         {{#if attack.range}}<button type="button" class="sc2-action" data-action="rollRangedAttack" aria-label="{{localize 'SPYCRAFT.Action.MeasuredAttackWith' name=item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.MeasuredAttack"}}</button>{{/if}}
       </div>
       <dl class="inventory-stats">

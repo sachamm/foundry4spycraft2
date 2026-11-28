@@ -248,4 +248,60 @@ export function installCharacterOwnership() {
     if (actor) queueOwnershipReview([actor]);
   });
   Hooks.once("spycraft2.ready", () => queueOwnershipReview());
+  Hooks.on("renderActorDirectory", (_app, html) => actorDirectoryHelp(html));
+}
+
+/**
+ * One step for the GC: a new agent, owned by the chosen player and assigned as that player's character, opened on its
+ * sheet. Returns the actor, or null when cancelled.
+ */
+export async function newAgentForPlayer(input = null) {
+  if (!game.user?.isGM) return null;
+  const players = [...(game.users ?? [])].filter(user => !user.isGM);
+  if (!players.length) {
+    ui.notifications?.warn?.(loc`There are no player users yet. Add one under Configure Players first.`);
+    return null;
+  }
+  const esc = foundry.utils.escapeHTML;
+  input ??= await systemDialog.input({
+    window: { title: loc`New agent for a player` },
+    rejectClose: false,
+    ok: { label: loc`Create agent` },
+    content: `<div class="spycraft2-roll-options">
+      <label>${loc`Player`} <select name="userId">${players.map(user => `<option value="${esc(user.id)}">${esc(user.name)}</option>`).join("")}</select></label>
+      <label>${loc`Agent name`} <input name="name" placeholder="${esc(loc`Leave blank to name it after the player`)}" /></label>
+      <p class="hint">${loc`The player owns the agent and has it as their character; the sheet opens on character creation.`}</p></div>`
+  });
+  if (!input) return null;
+  const user = game.users.get(input.userId);
+  if (!user || user.isGM) return null;
+  const name = String(input.name ?? "").trim() || loc`${user.name}'s agent`;
+  const actor = await Actor.create({ name, type: "agent", ownership: { [user.id]: OWNERSHIP.OWNER } });
+  if (!actor) return null;
+  await user.update({ character: actor.id });
+  ui.notifications?.info?.(loc`${name} created for ${user.name}, who owns it and has it as their character.`);
+  actor.sheet?.render?.(true);
+  return actor;
+}
+
+/** The Actors tab: a "New agent for a player" button for the GC, and a line for a player who has nothing there yet. */
+export function actorDirectoryHelp(html, user = game.user, actors = game.actors) {
+  const root = html?.querySelector ? html : html?.[0];
+  if (!root || root.querySelector(".sc2-directory-help")) return;
+  const holder = document.createElement("div");
+  holder.className = "sc2-directory-help";
+  if (user?.isGM) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = loc`New agent for a player`;
+    button.addEventListener("click", () => newAgentForPlayer());
+    holder.append(button);
+  } else if (![...(actors ?? [])].some(actor => actor.isOwner)) {
+    const note = document.createElement("p");
+    note.textContent = loc`No agent of yours yet. Your GC creates one for you, or gives you permission to create actors.`;
+    holder.append(note);
+  } else return;
+  const header = root.querySelector(".directory-header") ?? root.querySelector("header");
+  if (header) header.after(holder);
+  else root.prepend(holder);
 }

@@ -57,7 +57,8 @@ export function feintCheckPlan(
     empty = { evidence: null, bonuses: [], blockedReason: "", notes: [] };
   if (!role) return empty;
   const reject = blockedReason => ({ ...empty, blockedReason });
-  if (method !== "roll") return reject(loc`Feint is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
+  if (method !== "roll")
+    return reject(loc`Feint is an opposed combat action; taking 10/20 is unavailable (pp.91,352).`);
   if (!validOwnCountClock(feintCombat) || (role === "attacker" && feintCombat.turn !== feintCombat.ownTurnIndex))
     return reject(
       loc`Use a started combat with this participant; take the ordinary Feint half action during your Initiative Count.`
@@ -116,7 +117,7 @@ export function feintCheckPlan(
             loc`Flail Basics: +2 gear with this Feint skill check while holding a reviewed readied flail; gear bonuses do not stack (p.178).`
           ]
         : []),
-      loc`Feint: opposed ${role === "attacker" ? (key === "impress" ? loc`Impress(CHA) through Fan Service, Vision; one half action, or a full action against every opponent in range, each resisting separately (p.203)` : loc`Sleight of Hand(DEX), Hands-On and Vision; one half action`) : loc`Notice(WIS), Vision; response to the incoming half action`}; base error1 plus action error+1 on both checks (pp.352,357).`,
+      loc`Feint: opposed ${role === "attacker" ? (key === "impress" ? loc`Impress(CHA) through Fan Service, Vision; one half action, or a full action against every opponent in range, each resisting separately (p.203)` : loc`Sleight of Hand(DEX), Hands-On and Vision; one half action`) : loc`Notice(WIS), Vision; response to the incoming half action`}; base error 1 plus action error+1 on both checks (pp.352,357).`,
       ...(fencingBasics
         ? [
             loc`Fencing Basics: +2 gear with this Feint skill check while holding a readied one-handed FIN sword; gear bonuses do not stack (p.178).`

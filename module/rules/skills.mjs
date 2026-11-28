@@ -1,5 +1,5 @@
 import { campaignRules, campaignTake10Time, omniPenalty } from "./campaign-rules.mjs";
-import { checkFocus, isHideCheck } from "./check-identity.mjs";
+import { checkFocus, sizeStealthCheck } from "./check-identity.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
 import "./stalking-stance.mjs";
@@ -802,7 +802,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const penalty = omniPenalty();
   const checkAdjustment = [
     skillConditionCheckPenalty(conditionSystem, selected),
-    isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0,
+    sizeStealthCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0,
     hasForte ? 1 : 0,
     armor,
     vision,

@@ -309,6 +309,23 @@ test("exposure infractions reduce standing at once; standing award pays the Cali
   await mission.recordInfraction();
   assert.equal(actors.get("a1").system.reputation, -2);
   assert.match(lastMessage(), /Negative standing/);
+  // A row can be taken off again, and the agent gets back what it cost.
+  const rows = state.getMission().infractions;
+  assert.ok(
+    rows.every(row => row.id),
+    "each row has its own id"
+  );
+  assert.ok(
+    messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions),
+    "an Undo note"
+  );
+  await mission.removeInfraction(rows.at(-1).id);
+  assert.equal(actors.get("a1").system.reputation, 0);
+  assert.equal(state.getMission().infractions.length, rows.length - 1);
+  assert.equal(await mission.removeInfraction("gone"), false);
+  answer({ actor: "a1", infraction: "adhere-to-honor-code|1", currency: "reputation", preventing: true, honor: false });
+  await mission.recordInfraction();
+  assert.equal(actors.get("a1").system.reputation, -2);
   answer({ currency: "reputation" });
   assert.equal(await mission.awardStanding(), 12, "Caliber III is 10, +2 for a Threat Level raised by 2");
   assert.equal(actors.get("a2").system.reputation, 14);
@@ -351,6 +368,18 @@ test("End mission asks first, keeps the record for settlement, and Resume reopen
     { baseXP: 325, threatLevel: 6, triumph: false },
     "settlement still has the totals"
   );
+  // The figures are kept with the ended mission: a season quality added later does not move them.
+  const season = game.settings.get("spycraft2", "campaign");
+  await game.settings.set("spycraft2", "campaign", {
+    ...season,
+    qualities: [...(season?.qualities ?? []), "cakewalk"]
+  });
+  assert.equal(missionSettlementDefaults().baseXP, 325);
+  const kept = state.getMission().settlementFigures;
+  await state.updateMission({ settlementFigures: null });
+  assert.notEqual(missionSettlementDefaults().baseXP, 325, "without the kept figures the quality would count");
+  await state.updateMission({ settlementFigures: kept });
+  await game.settings.set("spycraft2", "campaign", season);
   assert.equal(consoleContext().mission.ended, true);
   await mission.resumeMission();
   m = state.getMission();
@@ -384,7 +413,11 @@ test("starting an ended mission again asks, then clears the last run's results",
   confirmAnswers.push(false);
   assert.equal(await mission.startMission(), null);
   assert.equal(state.getMission().objectives[0].complete, true, "cancelled: nothing cleared");
+  // Asked about the exposure losses: kept.
+  const reputation = actors.get("a1").system.reputation;
+  confirmAnswers.push(true, false);
   await mission.startMission();
+  assert.equal(actors.get("a1").system.reputation, reputation, "the losses stay when the GC keeps them");
   const m = state.getMission();
   assert.deepEqual([m.active, m.ended, m.infractions.length, m.scenesPlayed], [true, false, 0, 0]);
   assert.equal(m.objectives[0].complete, false);
@@ -598,15 +631,36 @@ test("standard NPC Damage saves accumulate, kill and reset; special NPCs are ref
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });
   assert.deepEqual([result.dc, result.failed, guard.system.damageTrack.accumulated], [14, false, 8]);
-  dice(3);
-  result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
-  assert.deepEqual([result.dc, result.state], [19, "dead"]);
-  assert.ok(guard.statuses.has("dead"));
-  assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
-  assert.match(warnings.at(-1), /already dead/);
-  await npc.resetDamageTrack(guard);
-  assert.equal(guard.system.damageTrack.state, "active");
-  assert.ok(!guard.statuses.has("dead"));
+  const combatant = (actor, defeated = false) => ({
+      actor,
+      defeated,
+      flags: {},
+      async update(change) {
+        if ("defeated" in change) this.defeated = change.defeated;
+        if (change["flags.spycraft2.defeatedByDamageSave"]) this.flags.spycraft2 = { defeatedByDamageSave: true };
+        if ("flags.spycraft2.-=defeatedByDamageSave" in change) delete this.flags.spycraft2?.defeatedByDamageSave;
+      }
+    }),
+    saved = combatant(guard),
+    byHand = combatant(guard, true),
+    keptCombats = game.combats;
+  game.combats = [{ combatants: [saved] }, { combatants: [byHand] }];
+  try {
+    dice(3);
+    result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
+    assert.deepEqual([result.dc, result.state], [19, "dead"]);
+    assert.ok(guard.statuses.has("dead"));
+    assert.equal(saved.defeated, true);
+    assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
+    assert.match(warnings.at(-1), /already dead/);
+    await npc.resetDamageTrack(guard);
+    assert.equal(guard.system.damageTrack.state, "active");
+    assert.ok(!guard.statuses.has("dead"));
+    // Reset clears the defeat the save set, and leaves the one marked by hand.
+    assert.deepEqual([saved.defeated, byHand.defeated], [false, true]);
+  } finally {
+    game.combats = keptCombats;
+  }
   await npc.npcDamageSave(boss, { damage: 5, kind: "lethal" });
   assert.match(warnings.at(-1), /Special NPCs/);
 });
@@ -706,6 +760,8 @@ const makeCombat = list => {
     flags: {},
     combatants: {
       get: id => combatants.get(id),
+      set: (id, combatant) => combatants.set(id, combatant),
+      delete: id => combatants.delete(id),
       find: fn => [...combatants.values()].find(fn),
       filter: fn => [...combatants.values()].filter(fn),
       [Symbol.iterator]: () => combatants.values()
@@ -848,8 +904,9 @@ test("the tracker menu entries use the Foundry 14 shape and act on the clicked r
   assert.equal(mook.flags.spycraft2?.readied, undefined);
   fight.turn = 1;
   assert.equal(fight.combatant, mook);
+  answer({ trigger: "the door opens", endTurn: false });
   await find("Ready an action").onClick(null, row);
-  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round });
+  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round, trigger: "the door opens" });
   assert.equal(combat.halfActionsLeft(mook), 1);
   assert.equal(find("Ready an action").visible(row), false);
   assert.equal(find("Readied action triggered").visible(row), true);
@@ -874,12 +931,36 @@ test("group initiative makes one roll per NPC type; tie-breaks are stored", asyn
     ["g1", "g2", "b", "h"].map(id => fight.combatants.get(id).initiative),
     [13, 13, 18, null]
   );
+  assert.match(lastMessage(), /Guard Count 13/);
+  // A late guard joins the guards' Count without a roll.
+  const late = makeActor("g9", "combatant", null, {
+    name: "Guard",
+    actor: guard,
+    initiative: null,
+    parent: fight,
+    actorId: guard.id
+  });
+  fight.combatants.set("g9", late);
+  assert.equal(await combat.rollGroupInitiative(fight), 1);
+  assert.equal(late.initiative, 13);
+  assert.match(lastMessage(), /joins/);
+  fight.combatants.delete?.("g9");
   dice(4, 17);
   assert.equal(await combat.rollTiebreaks(fight), 2);
   const sorted = [fight.combatants.get("g1"), fight.combatants.get("g2")].sort(
     (a, b) => b.flags.spycraft2.tiebreak - a.flags.spycraft2.tiebreak
   );
   assert.equal(sorted[0].id, "g2");
+  // A third joins the tie: only the newcomer rolls, so the first two keep their places.
+  const kept = sorted.map(c => c.flags.spycraft2.tiebreak);
+  const third = makeActor("g3", "combatant", null, { name: "Guard", actor: guard, initiative: 13, parent: fight });
+  fight.combatants.set("g3", third);
+  dice(9);
+  assert.equal(await combat.rollTiebreaks(fight), 1);
+  assert.deepEqual(
+    sorted.map(c => c.flags.spycraft2.tiebreak),
+    kept
+  );
   const Sorted = combat.fluidCombatClass(class {});
   const order = [
     { id: "x", initiative: 12, actor: { system: { initiative: { total: 1 } } }, flags: {} },
@@ -1073,7 +1154,7 @@ test("Undo after Add NPC takes the placed tokens and their combatants off, and n
     const flags = {
       spycraft2: {
         undo: {
-          label: "Placed 2 × Guard",
+          label: "Placed 2 copies of Guard",
           entries: [],
           placedTokens: { scene: "s1", ids: ["t1", "t2", "gone"], combat: "f1", combatants: ["c1", "c9"] }
         }
@@ -1262,6 +1343,44 @@ test("the Combat section names the acting combatant, words each row and finds th
   assert.equal(await turnTools.passGroup(fight, [fight.combatants.get("g1"), fight.combatants.get("g2")]), 2);
   assert.equal(fight.combatant.id, "b"); // Off the group's own turn the mob does not attack.
   assert.ok(!(await turnTools.mobAttackDialog(fight, "guard")), "the turn is someone else's");
+  // Weapons are matched by item, and a member who lacks the weapon is named.
+  const knife = { id: "w1", name: "Knife", type: "weapon", system: { proficiency: "edged" } };
+  guard.items = [knife];
+  twin.items = [];
+  const [weapon] = turnTools.mobWeapons([fight.combatants.get("g1"), fight.combatants.get("g2")]);
+  assert.equal(weapon.items.get("g1"), knife);
+  assert.deepEqual(
+    weapon.without.map(member => member.id),
+    ["g2"]
+  );
+  // Only the members on the acting Count attack now; one on a later Count acts on its own turn.
+  fight.turn = 1;
+  assert.deepEqual(
+    turnTools.mobAttackers(fight, turnTools.mobGroups(fight)[0]).map(member => member.id),
+    ["g1", "g2"]
+  );
+  fight.combatants.get("g2").initiative = 10;
+  assert.deepEqual(
+    turnTools.mobAttackers(fight, { members: [fight.combatants.get("g1"), fight.combatants.get("g2")] }).map(m => m.id),
+    ["g1"]
+  );
+  fight.combatants.get("g2").initiative = 15;
+  // Allies on the mob's side are not offered as targets.
+  for (const [id, disposition] of [
+    ["h", 1],
+    ["g1", -1],
+    ["g2", -1],
+    ["b", -1]
+  ])
+    fight.combatants.get(id).token = { id: `t-${id}`, disposition };
+  assert.deepEqual(
+    turnTools.mobFoes(fight, turnTools.mobGroups(fight)[0]).map(foe => foe.id),
+    ["h"]
+  );
+  assert.equal(turnTools.mobAttackBlocked(fight, turnTools.mobGroups(fight)[0]), "");
+  delete guard.items;
+  delete twin.items;
+  for (const id of ["h", "g1", "g2", "b"]) delete fight.combatants.get(id).token;
 });
 
 test("a Count that changes off-turn leaves the turn with the character who was acting", async () => {
@@ -1297,6 +1416,12 @@ test("a Count that changes off-turn leaves the turn with the character who was a
   fight.turns = ["q", "x", "r", "b"].map(id => ({ id }));
   await keepActingTurn(fight);
   assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
+  // A Delay names the place it left: the lead GM moves the turn there and starts that turn.
+  fight.turns = ["x", "r", "b", "q"].map(id => ({ id }));
+  fight.turn = 3;
+  await keepActingTurn(fight, { handOver: true, handOverTurn: 0 });
+  assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
+  assert.equal(fight.combatant.id, "x");
 });
 
 test("console sections open for the state in play and keep the GC's choice until that state changes", () => {
@@ -1400,6 +1525,20 @@ test("an agent's Triumph since the mission began ticks the settlement's Triumph 
     assert.equal(missionSettlementDefaults().triumph, false, "a1 is not on this team");
     await state.updateMission({ team: ["a1", "a2"] });
     assert.equal(missionSettlementDefaults().triumph, true);
+    // One the GC's client recorded counts though this client cannot read its card (a whispered or blind roll).
+    game.messages = Object.assign([], { get: () => undefined });
+    assert.equal(missionSettlementDefaults().triumph, false);
+    await state.updateMission({ triumphMessageId: "hidden" });
+    assert.equal(missionSettlementDefaults().triumph, true, "recorded on the mission");
+    // A recorded card this client can read, whose Triumph was taken back, no longer counts.
+    const undone = {
+      id: "hidden",
+      timestamp: 2000,
+      speaker: { actor: "a1" },
+      flags: { spycraft2: { triumphed: false } }
+    };
+    game.messages = Object.assign([undone], { get: id => (id === "hidden" ? undone : undefined) });
+    assert.equal(missionSettlementDefaults().triumph, false);
   } finally {
     delete game.messages;
     await state.setMission(saved);
@@ -1476,6 +1615,11 @@ test("a mission Caliber increase reaches the team's reserves, with an Undo, and 
     const posted = messages.slice(start);
     const undo = posted.find(m => m.flags?.spycraft2?.undo);
     assert.equal(undo?.flags.spycraft2.undo.entries.length, 1, "an Undo note for the one agent changed");
+    assert.deepEqual(
+      (({ was, now }) => ({ was, now }))(undo.flags.spycraft2.undo.missionCaliber),
+      { was: 1, now: 3 },
+      "the same note puts the mission's Caliber back"
+    );
     assert.ok(posted.some(m => /Mission Caliber is now III/.test(m.content) && /p\.398/.test(m.content)));
   } finally {
     await state.setMission(saved);
@@ -1501,8 +1645,18 @@ test("a mission's start rolls liquidation for each targeted agent and keeps the 
     const posted = messages.slice(start);
     assert.ok(posted.some(m => /Marked for Death: a3 is the target/.test(m.content)));
     assert.ok(posted.some(m => m.flags?.spycraft2?.undo));
+    const events = state.getMission().scriptedEvents;
+    assert.deepEqual(
+      events.map(({ id, actor, source }) => ({ id, actor, source })),
+      [{ id: "marked-for-death", actor: "a3", source: "liquidation" }],
+      "the event joins the mission record"
+    );
+    dice(6);
+    await mission.rollLiquidations([a3]);
+    assert.equal(state.getMission().scriptedEvents.length, 1, "a second roll replaces the agent's earlier event");
     assert.deepEqual(await mission.rollLiquidations([a4]), [], "nothing to roll or clear");
   } finally {
+    await state.updateMission({ scriptedEvents: [] });
     a3.system.reputation = before.a3;
     a4.system.reputation = before.a4;
     a3.flags = before.flags3;
@@ -1710,4 +1864,40 @@ test("the inline objective gives its words back when the save fails", async () =
   }
   assert.equal(field.value, "2 Tap the line");
   assert.deepEqual(warned, ["Setting refused"]);
+});
+
+test("a pool set up for another Caliber, and untouched since, offers one button that brings it in step", async () => {
+  const before = game.settings.get("spycraft2", "gcActionDice"),
+    m = state.getMission();
+  await state.updateMission({ caliber: 2 });
+  await game.settings.set("spycraft2", "gcActionDice", {
+    value: 4,
+    session: String(game.settings.get("spycraft2", "usagePeriods")?.session ?? "initial"),
+    playersPresent: 2,
+    caliber: 1,
+    lastReason: "Session start"
+  });
+  const stale = consoleContext().dice.stale;
+  assert.match(stale.line, /Caliber I;.*Caliber II\./);
+  assert.match(stale.button, /Reset to 6 dice/);
+  await game.settings.set("spycraft2", "gcActionDice", { ...gcDiceStatus(), lastReason: "Helpful hint" });
+  assert.equal(consoleContext().dice.stale, null, "once a die has moved, the GC adjusts by hand");
+  await state.updateMission({ caliber: m.caliber });
+  await game.settings.set("spycraft2", "gcActionDice", before);
+});
+
+test("the console's live line says who is still to roll Initiative, then whose turn it is", () => {
+  const live = { className: "", textContent: "", setAttribute() {} };
+  const self = {
+    isPopout: true,
+    element: { querySelector: () => live, append() {} }
+  };
+  const say = combat => (GCConsole.prototype._announceTurn.call(self, { combat }), live.textContent);
+  assert.equal(
+    say({ started: false, unrolled: 2, unrolledNames: "Ana, Guard" }),
+    "Still to roll Initiative: Ana, Guard."
+  );
+  assert.equal(say({ started: false, unrolled: 0, unrolledNames: "" }), "Every combatant has an Initiative Count.");
+  assert.equal(say({ started: true, round: 1, acting: { name: "Ana" } }), "Round 1: Ana's turn.");
+  assert.equal(say(null), "");
 });

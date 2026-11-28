@@ -9,7 +9,8 @@ import {
   characterMissionXP,
   exposurePenalty,
   defaultMission,
-  sessionDiceApplied
+  sessionDiceApplied,
+  antagonistPreview
 } from "../../rules/gc/mission.mjs";
 import { qualityAddition, qualityClash, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
@@ -36,11 +37,14 @@ import { standingStatus, liquidationCheck } from "../../rules/standing.mjs";
 import { startUsagePeriod } from "../../services/periods.mjs";
 import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
+import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
+import { missionSettlementDefaults } from "./mission-defaults.mjs";
 import { qualityHandling } from "./console-view.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null, render = null) =>
+  formDialog({ title, ok, validate, fields: [raw(content)], ...(render ? { dialog: { render } } : {}) });
 const options = (rows, selected) =>
   rows
     .map(
@@ -85,6 +89,8 @@ export async function editMission() {
   const input = await formDialog({
     title: loc`Mission record`,
     ok: loc`Save mission`,
+    // A mission with no name cannot be told apart in the console, the chat or the filed records.
+    validate: values => (String(values.name ?? "").trim() ? null : loc`Name the mission.`),
     fields: [
       raw(`
     <p class="hint">${loc`A name, the team and the Caliber are all Start mission needs; the rest can wait.`}</p>
@@ -141,6 +147,33 @@ export async function editMission() {
     notes: String(input.notes ?? ""),
     team: agents.filter(actor => input[`team-${actor.id}`]).map(actor => actor.id)
   });
+  // A running mission keeps the Threat Level fixed at its start. When the edit would change it, one question applies
+  // the new level, the starting dice and the reward together.
+  if (saved.active) {
+    const next = threatLevel(saved, teamLevels(saved)),
+      applied = Number.isSafeInteger(saved.threatAdjustApplied) ? saved.threatAdjustApplied : saved.threatAdjust;
+    if (next.value !== saved.threatLevel || (!next.override && next.adjust !== applied)) {
+      const following = [...(game.actors ?? [])].filter(actor => actor.type === "npc" && actor.system?.followMission);
+      const apply = await systemDialog.confirm({
+        window: { title: loc`Apply the new Threat Level?` },
+        rejectClose: false,
+        content: `<p>${esc(loc`The mission is running at Threat Level ${saved.threatLevel}. The record now works out to ${next.value}.`)}</p><p>${esc(
+          loc`Apply it now: the starting dice and the standing reward follow it${following.length ? loc`, and ${following.length} NPC(s) that follow the mission's Threat Level change their numbers` : ""}.`
+        )}</p>`,
+        yes: { label: loc`Apply Threat Level ${next.value}` },
+        no: { label: loc`Keep ${saved.threatLevel}` }
+      });
+      if (apply) {
+        const before = saved.threatLevel,
+          result = await fixThreatLevel();
+        if (gcDiceStatus().current) await applySessionDiceAdjustments({ quiet: true });
+        ui.notifications.info(
+          loc`Threat Level ${before} → ${result.value}.${following.length ? ` ${loc`NPCs following it: ${following.map(actor => actor.name).join(", ")}.`}` : ""}`
+        );
+        return getMission();
+      }
+    }
+  }
   // Said once saved, so the GC knows what the record now gives without reopening it.
   ui.notifications.info(
     loc`${saved.name || loc`Mission`} saved. ${saved.active ? loc`Threat Level ${saved.threatLevel} (fixed at Start mission; Recalculate in More tools).` : threatLine(teamLevels(saved), saved.threatAdjust, saved.threatOverride)}`
@@ -185,7 +218,15 @@ export async function beginSession() {
     ...(fights ? [loc`A fight is running (${fights}).`] : []),
     loc`Start a new session: abilities usable once per session come back and each agent's action dice reset.`,
     loc`GC action dice: player characters at the table + 2 × Caliber ${caliber}.`,
-    loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
+    // What the Threat Level gives, in numbers, before the GC begins (p.61).
+    mission.active && mission.threatLevel
+      ? (() => {
+          const extra = threatBonusActionDice(mission.threatLevel, teamLevels(mission));
+          return extra
+            ? loc`Threat Level ${mission.threatLevel} gives each agent ${extra} more starting action ${extra === 1 ? loc`die` : loc`dice`} (p.61); campaign qualities may add more.`
+            : loc`Threat Level ${mission.threatLevel} is not far enough above the team's level to add starting action dice (p.61); campaign qualities may still change them.`;
+        })()
+      : loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
   ];
   // A guest agent not on the mission's team still counts; more than the team is allowed, with a note so a typo shows.
   const gcDiceTotal = (present, cal) =>
@@ -230,11 +271,34 @@ export async function nextScene() {
   requireGC();
   const mission = getMission();
   const fights = runningFights();
-  const ok = await confirmStep(loc`Next scene`, [
-    ...(fights ? [loc`A fight is running (${fights}). Its standard NPCs lose their accumulated damage too.`] : []),
-    loc`Abilities usable once per scene come back; a dramatic scene returns to standard; standard NPCs' accumulated damage clears.`,
-    ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
-  ]);
+  // Who loses damage: every standard NPC carrying some, in every scene, named so nothing is cleared by surprise.
+  const carrying = [...(game.actors ?? [])]
+    .flatMap(actor => [
+      actor,
+      ...[...(game.scenes ?? [])].flatMap(scene =>
+        [...(scene.tokens ?? [])]
+          .filter(token => !token.actorLink && token.actorId === actor.id)
+          .map(token => token.actor)
+          .filter(Boolean)
+      )
+    ])
+    .filter(
+      actor => actor?.type === "npc" && !npcIsSpecial(actor) && (damageSaveState(actor).track.accumulated ?? 0) > 0
+    )
+    .map(actor => actor.name);
+  const ok = await confirmStep(
+    loc`Next scene`,
+    [
+      ...(fights ? [loc`A fight is running (${fights}). Its standard NPCs lose their accumulated damage too.`] : []),
+      loc`Abilities usable once per scene come back; a dramatic scene returns to standard; standard NPCs' accumulated damage clears.`,
+      ...(carrying.length
+        ? [loc`Standard NPCs whose damage clears, in every scene: ${[...new Set(carrying)].join(", ")}.`]
+        : []),
+      ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
+    ],
+    loc`Next scene`,
+    carrying.length ? { warning: loc`The cleared damage cannot be put back.` } : {}
+  );
   if (!ok) return null;
   await startUsagePeriod("scene");
   if (mission.active) await updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }));
@@ -285,6 +349,8 @@ export async function startMission() {
       (before.infractions ?? []).length > 0 ||
       (before.scenesPlayed ?? 0) > 0 ||
       Object.keys(before.standingPaid ?? {}).length > 0);
+  const owed = (before.infractions ?? []).filter(entry => game.actors.get(entry.actor));
+  let refund = false;
   if (hadResults) {
     const ok = await confirmStep(
       loc`Start the mission again`,
@@ -298,11 +364,35 @@ export async function startMission() {
       { warning: loc`This clears the last run's results and cannot be undone.` }
     );
     if (!ok) return null;
+    // The exposure rows go, but what they cost the agents stays unless the GC gives it back now.
+    if (owed.length) {
+      const answer = await systemDialog.confirm({
+        window: { title: loc`Exposure from the last run` },
+        rejectClose: false,
+        content: `<p>${esc(
+          loc`The last run recorded ${owed.length} exposure row(s): ${owed
+            .map(entry => `${game.actors.get(entry.actor)?.name}, ${entry.name} (${entry.penalty})`)
+            .join("; ")}.`
+        )}</p><p>${loc`Give the agents back what those rows cost before the record is cleared?`}</p>`,
+        yes: { label: loc`Give it back` },
+        no: { label: loc`Keep the losses` }
+      });
+      if (answer === null) return null;
+      refund = answer === true;
+    }
   }
-  // The mission record and the mission's usage period begin together: mission uses come back.
+  // The mission record and the mission's usage period begin together: mission uses come back. The period starts
+  // first, since it can refuse (an interrupted start to review): a refused start must not have paid the refunds.
   await startUsagePeriod("mission");
+  if (refund)
+    for (const entry of owed) {
+      const actor = game.actors.get(entry.actor);
+      if (actor) await actor.update(refundUpdate(actor, entry));
+    }
   await updateMission(mission => ({
     active: true,
+    settlementFigures: null,
+    triumphMessageId: null,
     // When this run began: a Triumph on a card after it counts for the team's XP (p.331).
     startedAt: Date.now(),
     ended: false,
@@ -310,6 +400,8 @@ export async function startMission() {
     scenesPlayed: 0,
     standingPaid: {},
     reportPosted: false,
+    // The last run's Marked for Death events go; this run's liquidation rolls add their own.
+    scriptedEvents: (mission.scriptedEvents ?? []).filter(entry => entry.source !== "liquidation"),
     objectives: (mission.objectives ?? []).map(objective => ({ ...objective, complete: false })),
     // A promotion lasts one mission (p.398), so a new run starts the NPC as standard again.
     antagonists: (mission.antagonists ?? []).map(({ promoted: _promoted, ...antagonist }) => ({
@@ -350,6 +442,21 @@ export async function rollLiquidations(team) {
       const roll = await new Roll("1d20").evaluate(),
         check = liquidationCheck(missions, roll.total);
       results.push({ actor: actor.id, missions, total: roll.total, ...check });
+      // The event joins the mission record, where the GC sees it beside the mission's complications.
+      if (check.marked)
+        await updateMission(m => ({
+          scriptedEvents: [
+            // Starting the mission again rolls again: the earlier roll's event for this agent is replaced.
+            ...(m.scriptedEvents ?? []).filter(entry => !(entry.source === "liquidation" && entry.actor === actor.id)),
+            {
+              key: foundry.utils.randomID(),
+              id: "marked-for-death",
+              name: loc`Marked for Death: ${actor.name}`,
+              actor: actor.id,
+              source: "liquidation"
+            }
+          ]
+        }));
       await ChatMessage.create({
         speaker: { alias: loc`Game Control` },
         content: esc(
@@ -424,7 +531,8 @@ export function missionRecordHtml(mission, { xp = null, team = [] } = {}) {
 export async function planNextMission() {
   requireGC();
   const mission = getMission();
-  if (mission.active) return refuse(loc`End the mission first; its record is kept for the XP report until then.`);
+  if (mission.active)
+    return refuse(loc`End the mission first. Its details stay for the XP report until you plan the next one.`);
   const name = mission.name || loc`Unnamed mission`;
   const team = teamActors(mission),
     unpaid = team.filter(actor => !mission.standingPaid?.[actor.id]).length;
@@ -513,6 +621,8 @@ export async function endMission({ clear = false } = {}) {
     ended: true,
     ...(input.countFinalScene === true ? { scenesPlayed: (now.scenesPlayed ?? 0) + 1 } : {})
   }));
+  // The settlement's figures are kept with the ended mission, so a season quality changed later does not move them.
+  await updateMission({ settlementFigures: { ...missionSettlementDefaults(), at: Date.now() } });
   if (input.recordCritical === true && pendingCritical) {
     // Each agent pays in their own affiliation's currency; the Undo note gives the standing back. What is due is
     // worked out again from the record as it is now, so an objective ticked while the dialog was open is not charged.
@@ -522,7 +632,7 @@ export async function endMission({ clear = false } = {}) {
       recorded = [];
     await withUndo(
       team,
-      loc`Critical objectives: exposure recorded`,
+      loc`Critical objectives: exposure charged`,
       async () => {
         for (const actor of team) {
           const currency = actor.system.affiliationType === "freelance" ? "netWorth" : "reputation",
@@ -548,7 +658,7 @@ export async function endMission({ clear = false } = {}) {
     );
   }
   await say(
-    `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its record is kept for the XP report, XP settlement and standing. Resume mission reopens it.`}`
+    `<b>${loc`Mission ${esc(mission.name || "")} ended.`}</b> ${loc`Its details stay for the XP report, each agent's XP and standing until you plan the next mission. Resume mission reopens it.`}`
   );
   return true;
 }
@@ -558,8 +668,20 @@ export async function resumeMission() {
   requireGC();
   const mission = getMission();
   if (mission.active) return decline(loc`The mission is already active.`);
-  await updateMission({ active: true, ended: false });
-  await say(`<b>${loc`Mission ${esc(mission.name || "")} resumed.`}</b>`);
+  await updateMission({ active: true, ended: false, settlementFigures: null });
+  // An agent already settled for this mission takes awards again; settling again pays only the difference.
+  const period = String(game.settings.get("spycraft2", "usagePeriods")?.mission ?? "initial"),
+    key = encodeURIComponent(period).replaceAll(".", "%2E"),
+    reopened = [];
+  for (const actor of teamActors(getMission())) {
+    const reward = actor.system?.missionXPRewards?.[key];
+    if (!reward || reward.reopened) continue;
+    await actor.update({ [`system.missionXPRewards.${key}.reopened`]: true });
+    reopened.push(actor.name);
+  }
+  await say(
+    `<b>${loc`Mission ${esc(mission.name || "")} resumed.`}</b>${reopened.length ? ` ${esc(loc`XP settlement reopened for ${reopened.join(", ")}: settling again adds only the difference.`)}` : ""}`
+  );
   // Threat Level dice taken back by an adjustment made while the mission was ended are returned.
   if (sessionStarted()) await applySessionDiceAdjustments({ quiet: true });
   return true;
@@ -689,13 +811,12 @@ export async function addAntagonist({ uuid = "", another = false, dropped = null
     edit ? loc`Edit ${edit.name} (p.452)` : loc`Add an antagonist (p.452)`,
     `
     <p>${loc`Each NPC type counts once per mission however many appear; a special NPC counts four times its reward; a ‘full’ special NPC built with the character rules earns 300 XP per scene instead.`}</p>
-    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${options(
-      npcs.map(actor => [
-        actor.uuid,
-        `${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : " (enter XP)"}`
-      ]),
-      uuid
-    )}</select></label>
+    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${npcs
+      .map(
+        actor =>
+          `<option value="${esc(actor.uuid)}" data-xp="${Number.isFinite(actor.system.npcBuild?.xp) ? actor.system.npcBuild.xp : ""}" data-special="${["special", "villain"].includes(actor.system.npcType)}"${actor.uuid === uuid ? " selected" : ""}>${esc(`${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : loc` (enter XP)`}`)}</option>`
+      )
+      .join("")}</select></label>
     <label>${loc`Name`} <input name="name" value="${esc(edit?.name ?? "")}" /></label>
     <label>${loc`XP reward if not read from the actor`} <input type="number" name="xp" min="0" value="${edit?.xp ?? 0}" /></label>
     <label>${loc`Type`} <select name="type">${options(
@@ -708,9 +829,30 @@ export async function addAntagonist({ uuid = "", another = false, dropped = null
     )}</select></label>
     <label><input type="checkbox" name="full"${edit?.full ? " checked" : ""} /> ${loc`‘Full’ special NPC (300 XP per scene)`}</label>
     <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="${edit?.scenes ?? 1}" /></label>
+    <p class="hint" data-antagonist-preview aria-live="polite"></p>
     ${edit ? "" : `<label><input type="checkbox" name="another"${another ? " checked" : ""} /> ${loc`Add another after this one`}</label>`}`,
     edit ? loc`Save antagonist` : loc`Record for XP`,
-    values => (!values.uuid && !String(values.name ?? "").trim() ? loc`Choose an NPC, or name the antagonist.` : "")
+    values => (!values.uuid && !String(values.name ?? "").trim() ? loc`Choose an NPC, or name the antagonist.` : ""),
+    // The line under the fields says what the row will add, as the fields change.
+    (event, app) => {
+      const root = app?.element ?? event?.target,
+        line = root?.querySelector?.("[data-antagonist-preview]");
+      if (!line) return;
+      const field = name => root.querySelector(`[name="${name}"]`);
+      const update = () => {
+        const picked = field("uuid")?.selectedOptions?.[0],
+          type = field("type")?.value;
+        line.textContent = antagonistPreview({
+          xp: picked?.dataset.xp ? Number(picked.dataset.xp) : Number(field("xp")?.value),
+          special: type ? type === "special" : picked?.dataset.special === "true",
+          full: !!field("full")?.checked,
+          scenes: Number(field("scenes")?.value)
+        });
+      };
+      root.addEventListener("input", update);
+      root.addEventListener("change", update);
+      update();
+    }
   );
   if (!input) return null;
   const actor = input.uuid ? await fromUuid(input.uuid) : null;
@@ -1039,20 +1181,66 @@ export async function recordInfraction() {
     honorMultiplier: input.honor ? honorMultiplier : 1
   })[input.currency];
   const path = `system.${input.currency}`,
-    before = actor.system[input.currency] ?? 0;
-  await actor.update({ [path]: before + penalty });
-  await updateMission(m => ({
-    infractions: [
-      ...(m.infractions ?? []),
-      { actor: actor.id, name: infraction.name, currency: input.currency, penalty, at: Date.now() }
-    ]
-  }));
+    before = actor.system[input.currency] ?? 0,
+    row = {
+      id: foundry.utils.randomID(),
+      actor: actor.id,
+      name: infraction.name,
+      currency: input.currency,
+      penalty,
+      at: Date.now()
+    };
+  // The loss and its row go on one Undo note, so a mistaken infraction can be taken back whole.
+  await withUndo(
+    [actor],
+    loc`Exposure: ${actor.name}, ${infraction.name}`,
+    async () => {
+      await actor.update({ [path]: before + penalty });
+      await updateMission(m => ({ infractions: [...(m.infractions ?? []), row] }));
+    },
+    () => ({ addedInfractions: { period: missionEpoch(), ids: [row.id] } })
+  );
   const after = before + penalty,
     burned = after < 0;
   await say(
     `<b>${loc`Exposure:`}</b> ${esc(actor.name)} — ${esc(infraction.name)}. ${input.currency === "reputation" ? `${loc`Reputation ${before} →`} <b>${after}</b>` : `${loc`Net Worth ${money(before)} →`} <b>${after < 0 ? "−" : ""}${money(after)}</b>`}.${burned ? ` <b>${loc`Negative standing: see p.439 for the consequences.`}</b>` : ""}`
   );
   return penalty;
+}
+
+/** Paying back an exposure row: what the agent lost goes back (a penalty is negative, so the refund adds). */
+const refundUpdate = (actor, entry) => ({
+  [`system.${entry.currency}`]: (actor.system?.[entry.currency] ?? 0) - (Number(entry.penalty) || 0)
+});
+
+/**
+ * Take one exposure row off the mission and give the agent back what it cost, with an Undo note. A row recorded
+ * before rows had ids is found by its position.
+ */
+export async function removeInfraction(key) {
+  requireGC();
+  const rows = getMission().infractions ?? [],
+    index = rows.findIndex((entry, i) => (entry.id ?? `row-${i}`) === key);
+  if (index < 0) return refuse(loc`That exposure row is no longer on the mission.`);
+  const entry = rows[index],
+    actor = game.actors.get(entry.actor);
+  await withUndo(
+    actor ? [actor] : [],
+    loc`Exposure removed: ${actor?.name ?? entry.actor}, ${entry.name}`,
+    async () => {
+      if (actor) await actor.update(refundUpdate(actor, entry));
+      await updateMission(now => ({ infractions: (now.infractions ?? []).filter((_, i) => i !== index) }));
+    },
+    () => ({
+      missionRow: { list: "infractions", key: entry.id ?? `row-${index}`, entry, index, period: missionEpoch() }
+    })
+  );
+  ui.notifications.info(
+    actor
+      ? loc`Removed ${entry.name} and gave ${actor.name} back ${Math.abs(Number(entry.penalty) || 0)} ${entry.currency === "netWorth" ? loc`Net Worth` : loc`Reputation`}.`
+      : loc`Removed ${entry.name}; its character is no longer in this world, so nothing was given back.`
+  );
+  return entry;
 }
 
 /**
@@ -1204,8 +1392,11 @@ export async function awardStanding() {
     // Read again on submit: another GC may have paid while this dialog was open.
     validate: values => {
       const now = getMission().standingPaid ?? {};
+      // The dialog has the correction box only if someone was paid when it opened.
       return !values.again && team.length && team.every(actor => now[actor.id])
-        ? loc`Everyone on the team has been paid. Tick the correction box to pay again.`
+        ? anyPaid
+          ? loc`Everyone on the team has been paid. Tick the correction box to pay again.`
+          : loc`Everyone on the team was paid while this was open. Cancel, then open Award standing again to correct it.`
         : "";
     }
   });
