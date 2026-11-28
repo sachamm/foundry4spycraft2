@@ -218,7 +218,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-172 | Document: the persisted `acquiredAtLevel` and `expertEntry` fields; which open steps a chat flush discards; that feats with no acquisition level default to level 1; that action dice always add above the result cap (p.88), or add a setting. | RW (audit-2026-11), WEB-07, R-11 | S |
 
 ## Rules gaps and steps still left to the GC
 
