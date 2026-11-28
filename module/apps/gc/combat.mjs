@@ -799,7 +799,10 @@ export function installFluidInitiativeHooks() {
       if (!notes.length) continue;
       const badge = document.createElement("span");
       badge.className = "spycraft2-actions-left spycraft2-row-state";
-      badge.textContent = ` (${notes.join(", ")})`;
+      // One line beside the name; a narrow tracker cuts it short and the tooltip keeps the whole of it.
+      badge.textContent = notes.join(" · ");
+      badge.dataset.tooltip = notes.join(", ");
+      name.classList.add("spycraft2-row-name");
       name.append(badge);
     }
   });
