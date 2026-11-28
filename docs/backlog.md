@@ -138,12 +138,10 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-085 | **The focus ring is about 1.05:1 on teal primary buttons** and inconsistent elsewhere; scroll containers clip it; the checkbox draws a second ring. | UX-33, CSS-09, C13 | S | live |
+| B-085 | **Scroll containers clip the focus ring** (filled buttons now take an ink ring, and checkboxes show one ring). | UX-33, CSS-09, C13 | S | live |
 | B-086 | **Keyboard order contradicts visual order** in the console (Previous turn before Next turn, Edit mission before Start mission, Spend dice) and on the NPC sheet, because CSS reorders them. Put the DOM in visual order. | DES-16, CX-N3, CX-U1 | S | live |
-| B-087 | **Disabled buttons look exactly like enabled ones; secondary button borders are 1.69:1 dark and 1.48:1 light** (`--sc2-rule` where `--sc2-rule-strong` is meant); primaries have no hover change and secondaries a 0.5 s `transition: all`. | DES-17, DES-18, DES-19, DES-51 | S | live |
 | B-088 | **Names and roles**: special NPC health inputs read "Vitality / 16" and "Vitality /"; weapon buttons omit their numbers; defeat is styling only; mission row buttons have no row identity; headings skip levels (1 h2, 52 h3). | CX-U2, CX-U13, CX-U5, CX-U4, UX-35, C14, C3 | M | code |
-| B-089 | **Click targets**: section-bar controls 22px (under the 24px minimum), console icons 26px and row icons 36px against the guide's 44px icon area, agent tabs 32px; button rows mix 36px and 44px. | DES-09, DES-12, CX-U18, CSS-14 | S | live |
-| B-090 | **Dark `--sc2-danger` on raised is 4.48:1**; step hues have no dark values; the contrast test omits good, warn, danger-on-raised and borders. | SG-S8, SG-S10, CSS-10, CX-U18 | S | earlier |
+| B-089 | **Click targets**: button rows still mix 36px and 44px heights. (Section-bar controls, the console's row icons, round pips and the clock badge now meet the 28px and 44px sizes.) | DES-09, DES-12, CX-U18, CSS-14 | S | live |
 | B-091 | **Results are not announced**: no live region for request state, initiative results or search counts. | CX-U11, CX-U17, UX-35 | S | code |
 | B-092 | **At 200% zoom the console works but a sheet buries it**; the chat log moves under the pointer. | UX-37, UX-40 | S | live |
 | B-235 | **Console and NPC strip status regions are replaced whole on every redraw**, so a turn or grade change is not announced as a change, and the console's focus release also acts on Foundry's own sidebar buttons. Update the status text in place and limit the release to the console's buttons. (Redraws already wait while a pointer is down.) | CU-11, CU-19, CX2-U11 | M | code |

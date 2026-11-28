@@ -23,10 +23,29 @@
   text-shadow: none;
   color: var(--sc2-teal);
   background: var(--sc2-paper-raised);
-  border: 1px solid var(--sc2-rule);
+  /* The strong rule: a button's edge is what marks it as one, so it needs 3:1. */
+  border: 1px solid var(--sc2-rule-strong);
   border-radius: var(--sc2-radius);
   box-shadow: none;
   cursor: pointer;
+}
+/* Disabled (not now): muted text, a dashed edge and no hover change, so it never reads as live. */
+.spycraft2.application :is(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action):disabled,
+.gc-console-body :is(button, .sc2-icon-button):disabled,
+.spycraft2.application :is(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action):disabled:hover,
+.gc-console-body :is(button, .sc2-icon-button):disabled:hover {
+  color: var(--sc2-ink-muted);
+  background: var(--sc2-paper-sunk);
+  border-color: var(--sc2-rule-strong);
+  border-style: dashed;
+  font-weight: inherit;
+  cursor: not-allowed;
+}
+/* A disabled row verb stays a ghost; its faded glyph carries the state. */
+.spycraft2.application .sc2-icon-button[data-sc2-mode="icon"]:disabled,
+.gc-console-body .sc2-icon-button[data-sc2-mode="icon"]:disabled {
+  background: transparent;
+  border-color: transparent;
 }
 .spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn):hover,
 .spycraft2.application:is(.npc, .vehicle) :where(a[data-action]):hover,
@@ -372,7 +391,8 @@
   color: var(--sc2-on-bar);
 }
 .spycraft2.application h3 .controls button {
-  min-height: 22px;
+  /* The compact minimum: nothing interactive is under 28px. */
+  min-height: 28px;
   padding: 1px 8px;
   font-size: var(--sc2-text-s);
   color: var(--sc2-on-bar);
@@ -385,7 +405,7 @@
   border-color: var(--sc2-on-bar);
 }
 .spycraft2.application h3 input {
-  height: 20px;
+  height: 28px;
   min-height: 0;
 }
 
@@ -827,6 +847,15 @@
 .spycraft2.gc-console-body :is(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
   outline: 3px solid var(--sc2-focus-color, var(--sc2-action));
   outline-offset: 3px;
+  box-shadow: none;
+}
+/* A teal ring beside a teal button is invisible; filled buttons take the ink colour instead. */
+.spycraft2.application :is(.sc2-primary-action, .sc2-btn.primary):focus-visible,
+.gc-console-body button.gc-primary:focus-visible {
+  outline-color: var(--sc2-ink-strong);
+}
+/* A checkbox or radio shows the one ring above, not Foundry's own glow as well. */
+.spycraft2 :is(input[type="checkbox"], input[type="radio"]):focus-visible {
   box-shadow: none;
 }
 .spycraft2.application summary,

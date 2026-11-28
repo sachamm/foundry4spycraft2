@@ -516,7 +516,7 @@
 }
 .spycraft2.sheet.agent .round-pip {
   min-width: 7.5em;
-  min-height: 26px;
+  min-height: 28px;
   margin: 0;
   padding: 2px 10px;
   font: 600 var(--sc2-text-s)/1.2 var(--font-primary, sans-serif);
