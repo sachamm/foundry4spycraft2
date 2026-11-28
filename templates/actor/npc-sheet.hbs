@@ -39,7 +39,15 @@
     {{#if system.npcProfile.enabled}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.PinnedXP"}}</span><b class="sc2-value">{{system.npcBuild.xp}}</b></div>{{/if}}
   </div>
   {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
+  <fieldset {{#unless editable}}disabled{{/unless}} class="npc-defense-extras">
+    <legend>{{localize "SPYCRAFT.NpcDefense.Extras"}}</legend>
+    <p class="hint">{{localize "SPYCRAFT.NpcDefense.Once"}}</p>
+    <label>{{localize "SPYCRAFT.NpcDefense.Other"}} <input name="system.defenseExtras.misc" type="number" step="1" value="{{system.defenseExtras.misc}}" /></label>
+    <label>{{localize "SPYCRAFT.NpcDefense.Dodge"}} <input name="system.defenseExtras.dodge" type="number" step="1" value="{{system.defenseExtras.dodge}}" /></label>
+  </fieldset>
   {{/if}}
+  {{#if system.defenseConditions.vulnerable}}<p class="hint">{{localize "SPYCRAFT.NpcDefense.Vulnerable" dex=system.defense.dexterity lost=system.defense.dodgeLost}}</p>{{/if}}
+  {{#if editable}}{{#if system.npcBuiltIn.warnings}}<ul class="npc-warnings" role="status">{{#each system.npcBuiltIn.warnings}}<li>{{this}}</li>{{/each}}</ul>{{/if}}{{/if}}
   {{!-- Weapons first: attacking is what an NPC does most in play. --}}
   <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
   <ul class="item-list compact">

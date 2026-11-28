@@ -24,6 +24,7 @@ import { weaponDamageExpression, underwaterMeleeDamage } from "./weapon-damage-e
 import { laserWeaponDamage } from "./damage-types.mjs";
 import { trainedOnlyWeaponPlan } from "./trained-only-weapon.mjs";
 import { builtInQuality } from "./origins.mjs";
+import { npcWeaponTraining } from "./npc-weapons.mjs";
 import { accurizedWeaponPlan } from "./accurized-weapon.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
 import "./cleave.mjs";
@@ -282,8 +283,9 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     };
   const ability = weapon.attackAbility || cfg.proficiencies[weapon.proficiency]?.ability || "dex";
   const p = (system.proficiencyTotals ?? system.proficiencies)?.[weapon.proficiency];
-  const builtIn = type === "agent" ? builtInQuality(system, sourceWeapon) : "";
-  const trained = type !== "agent" || !!p?.proficient || !!builtIn,
+  const npcTraining = type === "npc" ? npcWeaponTraining(system, sourceWeapon) : null,
+    builtIn = builtInQuality(system, sourceWeapon);
+  const trained = npcTraining ? npcTraining.trained : type !== "agent" || !!p?.proficient || !!builtIn,
     forte = p?.forte ? 1 : 0;
   const range = weaponRanges(weapon, system.unarmed),
     grip = weaponGrip(
@@ -297,6 +299,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
   const twoWeaponWaiver = twoWeaponHandgunWaiver(system, weapon);
   const projectile = projectileContext(weapon, options.ammunition),
     unavailable =
+      (npcTraining?.blockedReason ?? "") ||
       (dartingStyleState(system).needsReview ? dartingStyleState(system).reason : "") ||
       (twoWeaponStyleState(system).needsReview ? twoWeaponStyleState(system).reason : "") ||
       restraintActionBlock(system, { free: options.freeFinalAttack === true }) ||
@@ -444,6 +447,12 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     [
       5,
       builtIn ? loc`${builtIn}: built in, so always proficient, readied as a free action and impossible to disarm.` : ""
+    ],
+    [
+      6,
+      npcTraining?.nonCombatant && !npcTraining.trained
+        ? loc`Non-Combatant: no weapon proficiency; the ordinary untrained attack and error penalties apply.`
+        : ""
     ],
     [10, reach?.notes ?? []],
     [20, meleeArmorPiercing.notes],
@@ -745,7 +754,11 @@ export function weaponDamage(
     !["Dart", "Shuriken"].includes(weapon.name);
   const grip = weaponGrip(system, weapon, options);
   const trained =
-    type !== "agent" || !!(system.proficiencyTotals ?? system.proficiencies)?.[weapon.proficiency]?.proficient;
+    type === "npc"
+      ? npcWeaponTraining(system, weapon).trained
+      : type !== "agent" ||
+        !!(system.proficiencyTotals ?? system.proficiencies)?.[weapon.proficiency]?.proficient ||
+        !!builtInQuality(system, weapon);
   const useFinesse = !!finesse && trained && /\bFIN\b/.test(weapon.qualities ?? "");
   const u = system.unarmed ?? { die: 3, extraDice: 0, damageBonus: system.abilities.str.mod };
   let base = knuckle ? `${1 + (u.extraDice ?? 0)}d${u.die} + ${expression}` : expression;

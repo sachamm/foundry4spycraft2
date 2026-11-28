@@ -129,6 +129,8 @@ export function resolveOriginChoices(item, system, items, cfg) {
  * proficient with it, readies it as a free action and cannot be disarmed of it. Returns the quality's label, or "".
  */
 export function builtInQuality(system, item) {
+  const npcSource = system.npcBuiltIn?.sources?.find(row => row.itemId === (item?.id ?? item?._id));
+  if (npcSource) return npcSource.key === "augmented" ? loc`Augmented` : loc`Natural Attack`;
   const name = String(item?.name ?? "")
     .trim()
     .toLowerCase();

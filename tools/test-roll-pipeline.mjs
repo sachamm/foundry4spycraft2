@@ -365,6 +365,7 @@ const { rollPipeline } = await import("../module/rolls/index.mjs");
 // The order contributors run in, phase by phase. Validation order decides which failure a player is shown first.
 const EXPECTED_ORDER = [
   "drainedBuildReview",
+  "npcWeaponTraining",
   "grappleContent:skill",
   "meleeFireContextContent:rangedAttack",
   "detectionObserverContent:skill",

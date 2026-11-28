@@ -1,4 +1,6 @@
 import { launcherOperationPlan } from "./firearms.mjs";
+import { npcWeaponTraining } from "./npc-weapons.mjs";
+import { builtInQuality } from "./origins.mjs";
 import { loc } from "../i18n.mjs";
 /** Immutable owned source, distinct from a substituted operating proficiency. */
 export function weaponSourceIdentity(weapon, { operatingProficiency = weapon?.proficiency ?? null } = {}) {
@@ -26,7 +28,7 @@ export function ownedWeaponTraining(
     (weaponUuid && item.uuid !== weaponUuid)
   )
     throw Error(loc`The owned attack weapon changed or is no longer present.`);
-  const weapon = { ...item.system, id: item.id ?? item._id },
+  const weapon = { ...item.system, id: item.id ?? item._id, name: item.name },
     context = attackContext.launcherOperation,
     launcher = launcherOperationPlan(weapon, {
       indirectFire: context?.mode === "indirect",
@@ -37,8 +39,12 @@ export function ownedWeaponTraining(
     operatingProficiency = launcher.applicable ? launcher.proficiency : weapon.proficiency;
   if (launcher.blocked || operatingProficiency !== weaponProficiency)
     throw Error(loc`The actual operating proficiency or launcher context changed before posting.`);
-  const trained =
-    actor.type !== "agent" ||
-    (actor.system.proficiencyTotals ?? actor.system.proficiencies)?.[operatingProficiency]?.proficient === true;
+  const npcTraining = actor.type === "npc" ? npcWeaponTraining(actor.system, weapon) : null;
+  if (npcTraining?.blockedReason) throw Error(npcTraining.blockedReason);
+  const trained = npcTraining
+    ? npcTraining.trained
+    : actor.type !== "agent" ||
+      (actor.system.proficiencyTotals ?? actor.system.proficiencies)?.[operatingProficiency]?.proficient === true ||
+      !!builtInQuality(actor.system, weapon);
   return { weapon, operatingProficiency, trained, launcherOperation: launcher };
 }

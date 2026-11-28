@@ -51,6 +51,26 @@ const make = () => ({
   initiative: { bonus: 0 }
 });
 
+test("NPC Defense condition changes preserve saved adjustments and never accumulate on preparation", () => {
+  for (const enabled of [true, false]) {
+    const model = Object.assign(new NpcData(), make(), { defenseExtras: { misc: 2, dodge: 3 } });
+    model.npcProfile.enabled = enabled;
+    model.parent = { items: [], flags: {}, statuses: new Set() };
+    model.prepareDerivedData();
+    const normal = model.defense.total;
+    model.parent.statuses.add("held");
+    model.prepareDerivedData();
+    assert.equal(model.defense.total, normal - 5);
+    assert.equal(model.vulnerable, true);
+    model.prepareDerivedData();
+    assert.equal(model.defense.total, normal - 5);
+    assert.deepEqual(model.defenseExtras, { misc: 2, dodge: 3 });
+    model.parent.statuses.clear();
+    model.prepareDerivedData();
+    assert.equal(model.defense.total, normal);
+  }
+});
+
 test("standard and animal NPC feat health changes reach the actual Damage save without altering stored bonuses", () => {
   for (const enabled of [true, false]) {
     for (const npcType of ["standard", "animal"]) {

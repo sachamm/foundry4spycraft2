@@ -71,6 +71,8 @@ import {
 } from "../rules/vehicle-environment.mjs";
 
 import { actorConditionContext } from "../rules/condition-context.mjs";
+import { npcBuiltInPlan } from "../rules/npc-weapons.mjs";
+import { npcDefensePlan } from "../rules/npc-defense.mjs";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
@@ -284,6 +286,7 @@ export class NpcData extends BaseActorData {
         ...partnerWarnings,
         ...this.resistanceReview,
         ...this.armorWarnings,
+        ...this.npcBuiltIn.warnings,
         ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : [])
       );
       this.warnings.push(
@@ -342,6 +345,7 @@ export class NpcData extends BaseActorData {
       ...(result.warnings ?? []),
       ...this.resistanceReview,
       ...this.armorWarnings,
+      ...this.npcBuiltIn.warnings,
       ...partnerWarnings,
       ...(this.companionBenefits.needsReview ? [this.companionBenefits.note] : []),
       ...campaignNpcHealthReview({
@@ -396,6 +400,7 @@ export class NpcData extends BaseActorData {
     const items = [...(this.parent?.items ?? [])].filter(
       i => !this.npcDrainedItemIds || this.npcDrainedItemIds.includes(i.id ?? i._id)
     );
+    this.npcBuiltIn = npcBuiltInPlan(this.npcProfile, items);
     const effects = npcFeatEffects(
       items.map(item => ({ type: item.type, name: item.name, system: item.system })),
       {
@@ -417,6 +422,17 @@ export class NpcData extends BaseActorData {
     Object.assign(this, equipment.fields);
     this.armorWarnings = equipment.warnings;
     this.defense.total += equipment.defense;
+    this.defenseConditions = npcDefensePlan(this);
+    this.defense.total += this.defenseConditions.adjustment;
+    Object.assign(this.defense, {
+      dexterity: this.defenseConditions.dexterity,
+      dodgeBonuses: this.defenseConditions.dodgeBonuses,
+      dodgeLost: this.defenseConditions.dodgeLost,
+      vulnerable: this.defenseConditions.vulnerable,
+      helpless: this.defenseConditions.helpless
+    });
+    this.vulnerable = this.defenseConditions.vulnerable;
+    this.helpless = this.defenseConditions.helpless;
     this.saves.ref.total += equipment.reflex;
     if (Number.isFinite(this.qualityEffects?.speed))
       this.qualityEffects.speed = Math.max(5, this.qualityEffects.speed + equipment.speed);
@@ -434,6 +450,10 @@ export class NpcData extends BaseActorData {
       manualDamageSave: int(0),
       damageSaveAdjust: int(0),
       damageSaveHealthMode: str("review", { choices: ["review", "automatic", "manual"] }),
+      defenseExtras: new SchemaField({
+        misc: int(0, { min: -Number.MAX_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER }),
+        dodge: int(0, { min: -Number.MAX_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER })
+      }),
       damageTrack: record("damageTrack", { nullable: true, initial: null }),
       disposition: record("disposition", { initial: () => ({ base: "neutral", toward: {} }) }),
       manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),

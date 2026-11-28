@@ -2628,3 +2628,35 @@ No product code changed during this pass. The existing **4,455** Node tests,
 **988** engine checks, **283** layouts and native schema/lint/format/bundle/copy
 checks remain applicable. The additional native creation, persistence and
 negative advancement cases passed without unexpected runtime errors.
+
+## Pass 84: NPC proficiency sources and vulnerable Defense
+
+**PC creation: 9.9/10. Combat: 9.8/10.** The score stays unchanged while
+known condition-stat and benefit/cover cases remain under review.
+
+The source review confirmed that ordinary NPCs are proficient with their carried
+weapons (p.452), Non-Combatant removes that assumption (p.449), and Augmented and
+Natural Attack retain their own proficiency exceptions (pp.446,448). Quality
+Details now identify the actual uniquely named owned item; unresolved or duplicate
+built-in choices require GC review rather than granting an invented exception.
+Attack penalties, error ranges, Finesse damage and the shared final weapon checks
+use the same training decision. Posted attacks retain the actual source evidence;
+changed or removed weapons are rejected while retaining the original dice.
+
+NPC Defense now uses the shared vulnerable calculation (pp.341–342). Separate
+saved other/dodge adjustments let positive dodge bonuses disappear alongside
+positive Dexterity while retaining penalties and untyped adjustments. Both manual
+and graded builds prepare repeatedly without accumulating the adjustment, and
+removing the condition restores the original value. Build warnings are owner-only.
+
+Native Foundry verified actual untrained and built-in attack cards on
+Actor.iel1cnNBFO5rPDC8 (ChatMessage.TuK0BPKldOgPytal and
+ChatMessage.WQBxde93PtD43BK4). An unknown built-in choice created no attack card.
+Held reduced Defense from 19 to 12, removing Dexterity +4 and dodge +3; repeated
+preparation was stable. Reload retained the original adjustments, source item and
+Defense 19. The real adjustment control fit at 413.69px in a 1280×720 viewport,
+after dismissing Foundry's known minimum-resolution notice. No browser errors.
+
+Validation: 4,504 Node tests, 988 engine fixtures, 303 layouts, native schemas,
+lint, formatting, bundle and copied-text checks. B-256 is resolved. The next NPC
+condition-stat findings are tracked in B-257; continue those and B-186/B-190.

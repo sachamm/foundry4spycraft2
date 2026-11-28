@@ -1964,6 +1964,14 @@
    "Review": "Review original release",
    "PendingMove": "Escape Hold requires the immediate Standard Move: at least 5 ft., up to the recorded maximum.",
    "ConfirmMove": "Confirm actual Escape Hold move"
+  },
+  "NpcDefense": {
+   "Extras": "Additional Defense",
+   "Once": "Enter each adjustment once, beyond base Defense. Subtract any amount already included in a manual base before using these fields.",
+   "Other": "Other Defense modifier",
+   "Dodge": "Dodge modifier",
+   "Vulnerable": "Vulnerable: Dexterity contribution {dex}; positive dodge Defense lost {lost}.",
+   "BuiltInChoice": "For Augmented or Natural Attack, name the actual owned item in Details. Use distinct item names to identify separate choices."
   }
  }
 }

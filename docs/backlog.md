@@ -315,7 +315,7 @@ Do these when touching the area. The council's conditions still apply: equality 
 | B-213 | Templates are unformatted and outside the formatter (439 lines over 200 characters). Do last, one file per PR. | HBS-13 | M |
 | B-214 | Tests and tooling: 164 test files build their own Foundry stub; no automated test inside Foundry; five layout specs not on `systemCss()`; no `checkJs`; 28 unused-variable warnings capped, not cleared; chat cards skinned only when flagged (111 `ChatMessage.create` calls, no helper); sheet submit guard checks flat keys only. | WEB-08, CSS-05, W13, C4, J5 | M |
 | B-215 | The CI lints of style guide 11.2 (banned terms, glued numbers, fragment keys, first person, hint length, ranges, template and CSS checks, one primary). None is written. | SGI-rules-expert Part C | M |
-| B-256 | Finish the NPC combat exceptions found in Pass 83: weapon attacks currently assume proficiency even with Non-Combatant; reconcile its Augmented/Natural Attack exceptions against actual owned sources. Audit prepared NPC Defense for lost positive Dexterity/dodge under vulnerable conditions. Shared condition context and named-check restrictions now execute; do not treat that as proof that every NPC statistic already accounts for every condition. | Rules pp.340–342,446,448–449,452; rules-completeness-99 | M |
+| B-257 | Complete the NPC condition-stat audit following Pass 84. NPC preparation lacks the PC fatigue/exhaustion attribute and movement projections, and does not prepare canRun/postureMovement for the shared movement controller. Preserve original saved scores, apply actual condition effects without accumulation, and verify ordinary Run plus blocked/reduced movement in Foundry. | Rules pp.340–342; rules-completeness-99 | M |
 
 ## Live checks owed
 
