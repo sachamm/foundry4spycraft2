@@ -52,6 +52,7 @@ import {
 } from "../game-clock.mjs";
 import { loc } from "../../i18n.mjs";
 import { pendingRequests } from "../gc-relay.mjs";
+import { isLeadGM } from "../../writers.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
@@ -435,10 +436,18 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     });
     this._wireActorDrops();
     this._announceTurn(context);
-    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}), {
-      terms: SEARCH_TERMS(),
-      elsewhere: SEARCH_ELSEWHERE()
-    });
+    // Each view keeps its own open and closed sections: a search ends on the view's own state, not another's.
+    this._search ??= {};
+    installToolSearch(
+      this.element,
+      "details.gc-section",
+      loc`Find a GC tool`,
+      (this._search[context.view ?? "all"] ??= {}),
+      {
+        terms: SEARCH_TERMS(),
+        elsewhere: SEARCH_ELSEWHERE()
+      }
+    );
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
     restoreConsoleState(this.element, this._kept);
     this._kept = null;
@@ -732,9 +741,16 @@ export function consoleContext() {
   const checklist = firstSessionChecklist({
     mission: m,
     diceCurrent: dice.current,
-    npcActors: [...(game.actors ?? [])].filter(actor => actor.type === "npc").length,
-    // Read from the world, not from the combat this client happens to view: another GC's fight does not count.
-    combatSeen: (m.scenesPlayed ?? 0) > 0 || (m.active && [...(game.combats ?? [])].some(c => c.started))
+    // Made and placed: an NPC's token on some scene, not only an NPC in the Actors list.
+    npcActors: [...(game.scenes ?? [])].some(scene =>
+      [...(scene.tokens ?? [])].some(
+        token => token.actor?.type === "npc" || game.actors?.get?.(token.actorId)?.type === "npc"
+      )
+    )
+      ? 1
+      : 0,
+    // A fight that has begun, read from the world (another GC's counts too); a played scene alone is not a fight.
+    combatSeen: readSetting("gcFirstCombatSeen", false) === true || [...(game.combats ?? [])].some(c => c.started)
   });
   // Done once is done for good: a new mission or session does not bring the list back.
   // The checklist's own Start mission button stands in for the plain one only while the checklist is shown.
@@ -822,7 +838,7 @@ export function consoleContext() {
         : !dice.current
           ? loc`none until Begin session`
           : dice.value > starting
-            ? loc`${dice.value} left`
+            ? loc`${dice.value} (started with ${starting})`
             : loc`${dice.value} left of ${starting}`,
       session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
     },
@@ -1041,6 +1057,10 @@ export function registerGCConsoleTab() {
   // Another scene's fight, run by another GC, does not redraw this console under the pointer.
   const viewed = fight => !game.combat || !fight || fight.id === game.combat.id;
   Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());
+  Hooks.on("updateCombat", (fight, changed) => {
+    if (changed?.round >= 1 && isLeadGM() && !readSetting("gcFirstCombatSeen", false))
+      Promise.resolve(game.settings.set("spycraft2", "gcFirstCombatSeen", true)).catch(() => {});
+  });
   for (const hook of ["createCombatant", "deleteCombatant", "updateCombatant"])
     Hooks.on(hook, combatant => viewed(combatant?.parent) && refreshSoon());
   // A card about the acting combatant changes what its next-step button says (Apply damage to …).

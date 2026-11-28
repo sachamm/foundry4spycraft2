@@ -73,6 +73,13 @@ export function registerGCSettings() {
     type: Boolean,
     default: false
   });
+  // Set once a fight in this world has begun, so the first-session list can tick its last step for good.
+  game.settings.register(SYSTEM, "gcFirstCombatSeen", {
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: false
+  });
   game.settings.register(SYSTEM, "fluidInitiative", {
     name: locKey`Fluid initiative`,
     hint: locKey`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,
