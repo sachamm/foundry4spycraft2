@@ -325,9 +325,6 @@
   margin-left: auto;
   font-size: 0.9em;
 }
-.spycraft2.sheet.agent .skills-table tr[hidden] {
-  display: none;
-}
 .spycraft2.sheet.agent .skills-table :is(th, td) {
   padding: 5px 4px;
 }
@@ -446,9 +443,6 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-}
-.spycraft2.sheet.agent .combat-toolbox [hidden] {
-  display: none !important;
 }
 .spycraft2.sheet.agent .combat-tool-groups {
   display: grid;

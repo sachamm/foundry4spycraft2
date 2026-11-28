@@ -205,7 +205,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | --- | --- | --- | --- |
 | B-165 | Section heading styled four times; tabs styled twice; agent name rules disagree; three design passes stacked (25 repeated selectors). | SG-S1, SG-S2, SG-S9, C6, CSS-11 | M |
 | B-166 | Literal colours and stale fallbacks outside tokens; two token vocabularies (`--sc2-bad`, `--sc2-teal`, `--sc2-paper-*`, `--sc2-border`); about 20 font sizes in three units. | SG-S6, C11, CSS-12, LR-38b | S |
-| B-167 | Agent breakpoints measure the window, not the pane; nested scroll areas in dialogs; one `[hidden]` base rule in place of seven repairs. | CSS-07, C9, C7 | S |
+| B-167 | Agent breakpoints measure the window, not the pane; nested scroll areas in dialogs. | CSS-07, C9, C7 | S |
 
 ### Docs
 

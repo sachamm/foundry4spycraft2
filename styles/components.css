@@ -1,6 +1,12 @@
 /* Shared components. Text carries data; pictograms carry verbs.
  * Loaded after the base and dossier styles, and built on styles/tokens.css. */
 
+/* One rule for the hidden attribute: a component's own display value never brings a hidden element back. */
+:is(.spycraft2, .spycraft2-roll-options, .sc2-card) [hidden],
+.spycraft2[hidden] {
+  display: none !important;
+}
+
 /* ---------- Buttons ---------- */
 /* Secondary: the resting look of every action in a sheet or console. */
 .spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action),
@@ -819,9 +825,6 @@
   min-height: 36px;
   align-content: center;
 }
-.spycraft2 :is(.sc2-tool-section, .gc-section)[hidden] {
-  display: none !important;
-}
 .spycraft2 .sc2-next-setup {
   display: grid;
   gap: 6px;
@@ -1042,10 +1045,6 @@
 }
 
 /* A field that belongs to another choice stays out of the way until that choice is made. */
-.spycraft2.application .spycraft2-roll-options [data-when][hidden],
-.spycraft2-roll-options [data-when][hidden] {
-  display: none;
-}
 
 /* The Actors tab's line for a new agent: the GC's button, or a player's note when nothing is theirs yet. */
 .sc2-directory-help {

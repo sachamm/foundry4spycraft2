@@ -402,9 +402,6 @@
 }
 
 /* ---------- Creation track: the build order, each step in its own hue ---------- */
-.spycraft2.sheet.agent .creation-track[hidden] {
-  display: none;
-}
 .spycraft2.sheet.agent .creation-track {
   margin-bottom: var(--sc2-space-2);
 }
@@ -528,9 +525,6 @@
   border-style: dashed;
   border-color: var(--sc2-rule-strong);
   text-decoration: line-through;
-}
-.spycraft2.sheet.agent .pinned-tools[hidden] {
-  display: none;
 }
 .spycraft2.sheet.agent .pinned-tools {
   padding: 0;
