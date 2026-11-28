@@ -653,6 +653,7 @@ const EXPECTED_ORDER = [
   "dispositionRecord",
   "sensesRecord",
   "fireActionContent:rangedAttack",
+  "fireActionContent:attack",
   "damageConversionContent:rangedAttack",
   "allOrNothingContent:rangedAttack",
   "allOrNothingContent:skill",

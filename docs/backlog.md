@@ -34,7 +34,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 1. **P0 table**, top to bottom: what is left there gives a GC a wrong result or loses work.
 2. **Finish the console turn**: combat setup and end inside the console (B-023), fluid initiative (B-025), half
-   actions (B-026) and the NPC fire actions (B-028).
+   actions (B-026).
 3. **Console safety and stability**: what is left of B-030 to B-037, chiefly undo for a GC boost (B-037).
 4. **Dialogs** (B-040 to B-046): sizing, the focus ring and keeping values after a refusal.
 5. The rest of P1 by area, then P2 when a surface is touched anyway.
@@ -54,7 +54,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | --- | --- | --- | --- | --- |
 | B-025 | **Fluid initiative**: show only the chosen event's fields (31 events in one flat list today), preview immediate against round-end movement, show the capped ±10 beside the raw sum, let the GC remove a mistaken event, clear a fulfilled Press, and do not offer the tool before combat starts. Check that automatic events are recorded when the combat is not the active one. (p.324) | UX-39, XGC-22, CX-D14, CX-N9, CX-E13, CX-U10, SG-D10 | M | live |
 | B-026 | **Half actions**: count skill checks and movement, or say on the strip which actions are counted; warn before going over, not after; a pip says on hover what marked it; undo from the card. | LR-8, SGI-rules-expert D15, SGI-seasoned-player R11, XGC-06 | M | earlier |
-| B-028 | **NPC attacks cannot use Burst, Autofire or Suppressive Fire**: the NPC sheet never opens the ranged-attack dialog that has them. Same gap on the agent's Play tab. One attack control with the fire actions, which also retires the weapon row's second "Measured attack" button (SG-A17). | LR-17, SG-A17, UX-41 | M | earlier |
+| B-028 | **The Gear tab's second attack button.** Burst, Autofire, Strafe, Cover Fire and Suppressive Fire are now in the ordinary attack dialog, so the NPC sheet and the Play tab reach them. The Gear tab's "Measured attack" still opens the older ranged dialog for its fog, light and weapon-mount fields; move those into the attack dialog and retire the button. | SG-A17, UX-41 | S | code |
 | B-029 | **Dramatic scene**: starting one is silent; scripted (free) and paid entries sit apart; doubling the Counts already rolled is a separate action (Counts rolled later are now doubled as they come in). One place, a visible "Dramatic" state, and a preview of who will be doubled. (p.424) | UX-10, CX-D13, CX-N8, CX-E14 | M | live |
 | B-241 | **Mob attack posts one card per member.** The group now asks about Reach once, names who attacked whom and who was left out, attacks only with members on the acting Count, offers only the other side as targets and charges each member its action. Still open: one card for the group's attacks. | XG2-13 | M | live |
 | B-242 | **Tracker and turn details.** A readied trigger gives no way to run the action from the console; the tracker menu and the console name the same action differently. | XG2-17, XG2-29, UX2-23 | S | live |

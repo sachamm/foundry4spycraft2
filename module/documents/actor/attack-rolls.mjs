@@ -204,6 +204,12 @@ export const ActorAttackRolls = Base =>
           ...rollPipeline.read({ dialog: "attack", actor: this, item, needsCQB, entered: input }, {})
         };
       }
+      // Cover Fire and Suppressive Fire, chosen in the attack dialog, take the action without an attack check.
+      if (options.fireAction === "coverFire" || options.fireAction === "suppressiveFire") {
+        const left = weaponShotsLeft(item),
+          fire = { ...options, ...(left !== null ? { shotsRemaining: left } : {}) };
+        return options.fireAction === "coverFire" ? coverFire(this, item, fire) : suppressiveFire(this, item, fire);
+      }
       if (
         options.disarm?.role !== "defender" &&
         reachIncreaseFeet(item.system.qualities ?? "") &&
