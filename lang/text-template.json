@@ -6506,6 +6506,7 @@
    "SSpecialist_1w91g08": "{0}'s specialist",
    "SToolsReachCaliberSoNo_0pqot5g": "{0}: {1}'s Tools reach Caliber {2}, so no pick may be higher (p.394).",
    "SToolsWeaponsUpToCaliber_0eeg881": "{0}'s Tools: weapons up to Caliber {1}, gear up to {2}, vehicles up to {3}.",
+   "STurnChangedWhileTheDialog_05klsdp": "{0}'s turn changed while the dialog was open. Nothing was readied.",
    "S_0ssa2ag": "{0} s",
    "S_1ei25ls": "{0}'s {1}",
    "SabotageCheck_00i29oh": "Sabotage Check",

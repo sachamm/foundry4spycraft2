@@ -50,6 +50,15 @@ export function keptVitalityRoll(actor, source) {
       .sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null
   );
 }
+/** The latest GC review of a stored vitality roll (reviews are kept by the roll's level id), or null. */
+export function latestVitalityReview(actor, levelId) {
+  if (!levelId) return null;
+  return (
+    Object.values(actor.flags?.spycraft2?.vitalityReviews ?? {})
+      .filter(review => review?.levelId === levelId && validId(review.id) && Number.isSafeInteger(review.value))
+      .sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null
+  );
+}
 export function vitalityRollRecord(actor, source, roll, at) {
   if (
     !validId(source.levelId) ||

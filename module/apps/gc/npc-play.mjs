@@ -2,7 +2,7 @@
 import { withUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
-import { messageModeOption } from "../../rolls/message-mode.mjs";
+import { messageModeOption, npcRollMode } from "../../rolls/message-mode.mjs";
 import { TABLES, SKILLS } from "../../rules/tables.mjs";
 import { stepLookup } from "../../rules/formula.mjs";
 import { currentDamageTrack, resolveDamageSave, healDamageTrack, damageSaveDC } from "../../rules/gc/npc-damage.mjs";
@@ -366,10 +366,14 @@ export async function npcDamageSave(actor, input = null) {
         : result.failures
           ? loc`fails ${result.failures} save(s), all ignored by tough`
           : loc`succeeds: no mechanical effect, the damage lingers`;
-  await roll.toMessage({
-    speaker: ChatMessage.getSpeaker({ actor }),
-    flavor: `${loc`Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} →`} <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
-  });
+  // A "GC only" NPC keeps its Damage saves to the GC, like its other saves.
+  await roll.toMessage(
+    {
+      speaker: ChatMessage.getSpeaker({ actor }),
+      flavor: `${loc`Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} →`} <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
+    },
+    messageModeOption(npcRollMode(actor, "save"))
+  );
   if (result.state !== "active") {
     try {
       await actor.toggleStatusEffect(result.state === "dead" ? "dead" : "unconscious", {

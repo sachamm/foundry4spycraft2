@@ -27,3 +27,11 @@ test("the owed turn lapses at the round's end and is not recorded twice", () => 
   });
   assert.equal(lateTurnRedirect({ round: 1, turn: 1, nextTurn: 2, nextRound: 1, order, late }), null, "another round");
 });
+
+test("a late roll is read from the update's options, so the lead GC sees one a player made", async () => {
+  const { rolledLate } = await import("../module/apps/gc/late-initiative.mjs");
+  const combatant = { id: "c1", parent: { started: true } };
+  assert.equal(rolledLate(combatant, { spycraft2LateRolls: ["c1"] }), true);
+  assert.equal(rolledLate(combatant, {}), false);
+  assert.equal(rolledLate({ ...combatant, parent: { started: false } }, { spycraft2LateRolls: ["c1"] }), false);
+});

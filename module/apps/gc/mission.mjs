@@ -400,6 +400,8 @@ export async function startMission() {
     scenesPlayed: 0,
     standingPaid: {},
     reportPosted: false,
+    // The last run's Marked for Death events go; this run's liquidation rolls add their own.
+    scriptedEvents: (mission.scriptedEvents ?? []).filter(entry => entry.source !== "liquidation"),
     objectives: (mission.objectives ?? []).map(objective => ({ ...objective, complete: false })),
     // A promotion lasts one mission (p.398), so a new run starts the NPC as standard again.
     antagonists: (mission.antagonists ?? []).map(({ promoted: _promoted, ...antagonist }) => ({

@@ -921,12 +921,18 @@ export async function readyCombatant(combatant) {
     ]
   });
   if (!input) return null;
+  // The dialog may have stayed open while the turn moved on or a half action was spent elsewhere: check again, and
+  // take the half action from the budget as it stands now.
+  if (combat.combatant?.id !== combatant.id || combatant.flags?.spycraft2?.readied)
+    return refuse(loc`${combatant.name}'s turn changed while the dialog was open. Nothing was readied.`);
+  const now = spendAction(actionsOf(combatant), "half", { extra: extraHalfActions(combatant) });
+  if (!now.ok) return refuse(loc`${combatant.name} has no half action left this turn to ready with.`);
   const trigger = String(input.trigger ?? "")
     .trim()
     .slice(0, 200);
   // One write for the half action and the readied mark, so a second press finds the mark already there.
   await combatant.update({
-    "flags.spycraft2.actions": spend.state,
+    "flags.spycraft2.actions": now.state,
     "flags.spycraft2.readied": { round: combat.round, ...(trigger ? { trigger } : {}) }
   });
   await say(

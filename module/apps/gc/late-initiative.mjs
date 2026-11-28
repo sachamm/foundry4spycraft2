@@ -48,16 +48,20 @@ export function lateEntry(late, { round, id }) {
   return same.ids.includes(id) ? same : { ...same, ids: [...same.ids, id] };
 }
 
+/** Whether this update gave a first Initiative to the combatant after the fight began (read from its options). */
+export const rolledLate = (combatant, options) =>
+  (options?.spycraft2LateRolls ?? []).includes(combatant.id) && !!combatant.parent?.started;
+
 export function installLateInitiative() {
-  const unrolled = new Set();
-  Hooks.on("preUpdateCombatant", (combatant, changed) => {
+  // Only the client that rolls sees the Count before it was set, and only the lead GC records the late turn. The ids
+  // travel in the update's options, which every client receives with the update.
+  Hooks.on("preUpdateCombatant", (combatant, changed, options) => {
     if (combatant.initiative === null && Number.isFinite(changed?.initiative) && combatant.parent?.started)
-      unrolled.add(combatant.id);
+      options.spycraft2LateRolls = [...(options.spycraft2LateRolls ?? []), combatant.id];
   });
-  Hooks.on("updateCombatant", async combatant => {
+  Hooks.on("updateCombatant", async (combatant, _changed, options) => {
     const combat = combatant.parent;
-    if (!unrolled.has(combatant.id) || !combat?.started) return;
-    unrolled.delete(combatant.id);
+    if (!rolledLate(combatant, options)) return;
     if (!isLeadGM()) return;
     combat.setupTurns?.();
     const index = combat.turns.findIndex(entry => entry.id === combatant.id);

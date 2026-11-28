@@ -4,6 +4,7 @@ import {
   vitalityRollRecord,
   vitalityMessageTag,
   keptVitalityRoll,
+  latestVitalityReview,
   vitalityReviewRecord
 } from "../rules/vitality.mjs";
 import { queueResources } from "../services/transactions.mjs";
@@ -98,19 +99,27 @@ export async function rollCareerVitality(actor, index) {
       );
     const kept = !source.levelId && keptVitalityRoll(actor, source);
     if (kept) {
-      const progression = cloneProgression(actor);
-      Object.assign(progression[index], { vitality: kept.value, vitalityRollId: kept.id });
+      // A GC review of that roll is kept with it: the corrected value comes back, not the superseded die.
+      const review = latestVitalityReview(actor, kept.id),
+        value = review?.value ?? kept.value,
+        progression = cloneProgression(actor);
+      Object.assign(progression[index], {
+        vitality: value,
+        vitalityRollId: kept.id,
+        ...(review ? { vitalityReviewId: review.id } : {})
+      });
       await commit(
         actor,
         { "system.progression": progression },
         () =>
           actor.system.progression[index]?.vitalityRollId === kept.id &&
-          actor.system.progression[index]?.vitality === kept.value
+          actor.system.progression[index]?.vitality === value &&
+          (!review || actor.system.progression[index]?.vitalityReviewId === review.id)
       );
       globalThis.ui?.notifications?.info?.(
-        loc`Career Level ${kept.careerLevel} keeps its earlier vitality roll of ${kept.value}; it is not rolled again.`
+        loc`Career Level ${kept.careerLevel} keeps its earlier vitality roll of ${value}; it is not rolled again.`
       );
-      return { total: kept.value, recorded: true, kept: true, levelId: kept.id };
+      return { total: value, recorded: true, kept: true, levelId: kept.id };
     }
     source = await ensureLevelId(actor, source);
     const expected = vitalitySourceEvidence(source),
