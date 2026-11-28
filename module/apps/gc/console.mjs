@@ -880,11 +880,16 @@ export function consoleContext() {
             ? turn
                 .mobGroups(combatNow)
                 .filter(group => group.members.some(member => member.id === combatNow.combatant?.id))
-                .map(group => ({
-                  key: group.key,
-                  label: loc`Mob attack: ${group.name} ×${group.count}`,
-                  short: loc`Mob: ${group.name} ×${group.count}`
-                }))
+                .map(group => {
+                  // The button counts the members who attack now, and says why when it cannot run.
+                  const count = turn.mobAttackers(combatNow, group).length;
+                  return {
+                    key: group.key,
+                    label: loc`Mob attack: ${group.name} ×${count}`,
+                    short: loc`Mob: ${group.name} ×${count}`,
+                    blocked: turn.mobAttackBlocked(combatNow, group)
+                  };
+                })
             : [],
           unrolled: combatNow.turns.filter(c => !Number.isFinite(c.initiative)).length,
           // Who the NPC Initiative buttons roll for, and who rolls on their own sheet, named before the press.

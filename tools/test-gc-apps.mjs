@@ -1283,6 +1283,44 @@ test("the Combat section names the acting combatant, words each row and finds th
   assert.equal(await turnTools.passGroup(fight, [fight.combatants.get("g1"), fight.combatants.get("g2")]), 2);
   assert.equal(fight.combatant.id, "b"); // Off the group's own turn the mob does not attack.
   assert.ok(!(await turnTools.mobAttackDialog(fight, "guard")), "the turn is someone else's");
+  // Weapons are matched by item, and a member who lacks the weapon is named.
+  const knife = { id: "w1", name: "Knife", type: "weapon", system: { proficiency: "edged" } };
+  guard.items = [knife];
+  twin.items = [];
+  const [weapon] = turnTools.mobWeapons([fight.combatants.get("g1"), fight.combatants.get("g2")]);
+  assert.equal(weapon.items.get("g1"), knife);
+  assert.deepEqual(
+    weapon.without.map(member => member.id),
+    ["g2"]
+  );
+  // Only the members on the acting Count attack now; one on a later Count acts on its own turn.
+  fight.turn = 1;
+  assert.deepEqual(
+    turnTools.mobAttackers(fight, turnTools.mobGroups(fight)[0]).map(member => member.id),
+    ["g1", "g2"]
+  );
+  fight.combatants.get("g2").initiative = 10;
+  assert.deepEqual(
+    turnTools.mobAttackers(fight, { members: [fight.combatants.get("g1"), fight.combatants.get("g2")] }).map(m => m.id),
+    ["g1"]
+  );
+  fight.combatants.get("g2").initiative = 15;
+  // Allies on the mob's side are not offered as targets.
+  for (const [id, disposition] of [
+    ["h", 1],
+    ["g1", -1],
+    ["g2", -1],
+    ["b", -1]
+  ])
+    fight.combatants.get(id).token = { id: `t-${id}`, disposition };
+  assert.deepEqual(
+    turnTools.mobFoes(fight, turnTools.mobGroups(fight)[0]).map(foe => foe.id),
+    ["h"]
+  );
+  assert.equal(turnTools.mobAttackBlocked(fight, turnTools.mobGroups(fight)[0]), "");
+  delete guard.items;
+  delete twin.items;
+  for (const id of ["h", "g1", "g2", "b"]) delete fight.combatants.get(id).token;
 });
 
 test("a Count that changes off-turn leaves the turn with the character who was acting", async () => {

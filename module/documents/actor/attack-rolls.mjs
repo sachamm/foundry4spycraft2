@@ -217,14 +217,17 @@ export const ActorAttackRolls = Base =>
         if (reach && !reach.within) {
           const text = loc`${reach.targetName} is ${reach.distanceFeet} ft. away, beyond the ${reach.reachFeet} ft. Reach of ${item.name} (p.327).`;
           if (!game.user?.isGM) return refuse(loc`${text} Move closer first, or ask the GC.`);
-          const go = await systemDialog.confirm({
-            window: { title: loc`Target beyond Reach` },
-            rejectClose: false,
-            // The attacker is named: a group attack asks once for each member.
-            content: `<p>${esc(loc`${this.name}:`)} ${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`,
-            yes: { label: loc`Attack anyway`, default: true },
-            no: { label: loc`Cancel` }
-          });
+          // A mob attack asks the GC once for the whole group, in its own dialog.
+          const go =
+            options.reachConfirmed === true ||
+            (await systemDialog.confirm({
+              window: { title: loc`Target beyond Reach` },
+              rejectClose: false,
+              // The attacker is named: a group attack asks once for each member.
+              content: `<p>${esc(loc`${this.name}:`)} ${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`,
+              yes: { label: loc`Attack anyway`, default: true },
+              no: { label: loc`Cancel` }
+            }));
           if (!go) return null;
         }
       }

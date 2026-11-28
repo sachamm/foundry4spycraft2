@@ -346,13 +346,13 @@ export const halfActionsLeft = combatant =>
   HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
 
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
-export async function spendTurnAction(combatant, kind) {
+export async function spendTurnAction(combatant, kind, { quiet = false } = {}) {
   if (!combatant) return null;
   const state = actionsOf(combatant);
   if (kind === "reset") return combatant.update({ "flags.spycraft2.actions": resetActions(state) });
   const result = spendAction(state, kind, { extra: extraHalfActions(combatant) });
   if (!result.ok) {
-    ui.notifications.warn(loc`${combatant.name} has ${result.left} half action(s) left this turn.`);
+    if (!quiet) ui.notifications.warn(loc`${combatant.name} has ${result.left} half action(s) left this turn.`);
     return null;
   }
   await combatant.update({ "flags.spycraft2.actions": result.state });
