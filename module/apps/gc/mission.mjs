@@ -36,6 +36,7 @@ import { standingStatus, liquidationCheck } from "../../rules/standing.mjs";
 import { startUsagePeriod } from "../../services/periods.mjs";
 import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
+import { damageSaveState, npcIsSpecial } from "./npc-play.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { qualityHandling } from "./console-view.mjs";
 
@@ -185,7 +186,15 @@ export async function beginSession() {
     ...(fights ? [loc`A fight is running (${fights}).`] : []),
     loc`Start a new session: abilities usable once per session come back and each agent's action dice reset.`,
     loc`GC action dice: player characters at the table + 2 × Caliber ${caliber}.`,
-    loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
+    // What the Threat Level gives, in numbers, before the GC begins (p.61).
+    mission.active && mission.threatLevel
+      ? (() => {
+          const extra = threatBonusActionDice(mission.threatLevel, teamLevels(mission));
+          return extra
+            ? loc`Threat Level ${mission.threatLevel} gives each agent ${extra} more starting action ${extra === 1 ? loc`die` : loc`dice`} (p.61); campaign qualities may add more.`
+            : loc`Threat Level ${mission.threatLevel} is not far enough above the team's level to add starting action dice (p.61); campaign qualities may still change them.`;
+        })()
+      : loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
   ];
   // A guest agent not on the mission's team still counts; more than the team is allowed, with a note so a typo shows.
   const gcDiceTotal = (present, cal) =>
@@ -230,11 +239,34 @@ export async function nextScene() {
   requireGC();
   const mission = getMission();
   const fights = runningFights();
-  const ok = await confirmStep(loc`Next scene`, [
-    ...(fights ? [loc`A fight is running (${fights}). Its standard NPCs lose their accumulated damage too.`] : []),
-    loc`Abilities usable once per scene come back; a dramatic scene returns to standard; standard NPCs' accumulated damage clears.`,
-    ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
-  ]);
+  // Who loses damage: every standard NPC carrying some, in every scene, named so nothing is cleared by surprise.
+  const carrying = [...(game.actors ?? [])]
+    .flatMap(actor => [
+      actor,
+      ...[...(game.scenes ?? [])].flatMap(scene =>
+        [...(scene.tokens ?? [])]
+          .filter(token => !token.actorLink && token.actorId === actor.id)
+          .map(token => token.actor)
+          .filter(Boolean)
+      )
+    ])
+    .filter(
+      actor => actor?.type === "npc" && !npcIsSpecial(actor) && (damageSaveState(actor).track.accumulated ?? 0) > 0
+    )
+    .map(actor => actor.name);
+  const ok = await confirmStep(
+    loc`Next scene`,
+    [
+      ...(fights ? [loc`A fight is running (${fights}). Its standard NPCs lose their accumulated damage too.`] : []),
+      loc`Abilities usable once per scene come back; a dramatic scene returns to standard; standard NPCs' accumulated damage clears.`,
+      ...(carrying.length
+        ? [loc`Standard NPCs whose damage clears, in every scene: ${[...new Set(carrying)].join(", ")}.`]
+        : []),
+      ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
+    ],
+    loc`Next scene`,
+    carrying.length ? { warning: loc`The cleared damage cannot be put back.` } : {}
+  );
   if (!ok) return null;
   await startUsagePeriod("scene");
   if (mission.active) await updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }));
