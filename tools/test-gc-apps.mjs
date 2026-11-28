@@ -598,15 +598,36 @@ test("standard NPC Damage saves accumulate, kill and reset; special NPCs are ref
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });
   assert.deepEqual([result.dc, result.failed, guard.system.damageTrack.accumulated], [14, false, 8]);
-  dice(3);
-  result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
-  assert.deepEqual([result.dc, result.state], [19, "dead"]);
-  assert.ok(guard.statuses.has("dead"));
-  assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
-  assert.match(warnings.at(-1), /already dead/);
-  await npc.resetDamageTrack(guard);
-  assert.equal(guard.system.damageTrack.state, "active");
-  assert.ok(!guard.statuses.has("dead"));
+  const combatant = (actor, defeated = false) => ({
+      actor,
+      defeated,
+      flags: {},
+      async update(change) {
+        if ("defeated" in change) this.defeated = change.defeated;
+        if (change["flags.spycraft2.defeatedByDamageSave"]) this.flags.spycraft2 = { defeatedByDamageSave: true };
+        if ("flags.spycraft2.-=defeatedByDamageSave" in change) delete this.flags.spycraft2?.defeatedByDamageSave;
+      }
+    }),
+    saved = combatant(guard),
+    byHand = combatant(guard, true),
+    keptCombats = game.combats;
+  game.combats = [{ combatants: [saved] }, { combatants: [byHand] }];
+  try {
+    dice(3);
+    result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
+    assert.deepEqual([result.dc, result.state], [19, "dead"]);
+    assert.ok(guard.statuses.has("dead"));
+    assert.equal(saved.defeated, true);
+    assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
+    assert.match(warnings.at(-1), /already dead/);
+    await npc.resetDamageTrack(guard);
+    assert.equal(guard.system.damageTrack.state, "active");
+    assert.ok(!guard.statuses.has("dead"));
+    // Reset clears the defeat the save set, and leaves the one marked by hand.
+    assert.deepEqual([saved.defeated, byHand.defeated], [false, true]);
+  } finally {
+    game.combats = keptCombats;
+  }
   await npc.npcDamageSave(boss, { damage: 5, kind: "lethal" });
   assert.match(warnings.at(-1), /Special NPCs/);
 });

@@ -122,6 +122,24 @@ core("cunningPlanControl", 9100, ctx => {
   return card("Cunning Plan", () => actor.useCunningPlan(message));
 });
 
+// A flanking bonus the map or the dialog ticked stays a choice until the attack is resolved (p.341).
+core("removeFlankingControl", 9105, ctx => {
+  const { message, check, actor } = ctx,
+    flanking = check.attackContext?.flanking;
+  if (!open(ctx) || check.checkKind !== "attack" || !flanking?.declared || flanking.blocked || flanking.removed)
+    return null;
+  if (!(flanking.attackBonus > 0) || typeof check.successConfirmed === "boolean" || check.attackResolution) return null;
+  return [
+    {
+      label: loc`Not flanking (−${flanking.attackBonus})`,
+      hint: loc`Not flanking (−${flanking.attackBonus}): take the flanking bonus off this attack`,
+      run: () => actor.removeFlanking(message),
+      placement: "card",
+      emphasis: "quiet"
+    }
+  ];
+});
+
 core("manualAdjustmentControl", 9110, ctx => {
   const { message, check, actor } = ctx;
   if (!open(ctx) || !manualAdjustment(ctx)) return null;

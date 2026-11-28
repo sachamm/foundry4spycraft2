@@ -92,6 +92,8 @@ export function checkFlavor(check) {
     notes.push(
       loc`Error range ${formatRange("error", check.error)}; threat range ${formatRange("threat", check.threat)}.`
     );
+  if (check.attackContext?.flanking?.removed)
+    notes.push(loc`Flanking taken off: −${check.attackContext.flanking.removed.attackBonus} attack.`);
   if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);
   if (check.cunningPlan)
     notes.push(
@@ -269,6 +271,7 @@ export function rollEvidence(check) {
         ]
       : []),
     ...(check.attackContext?.flanking?.whirling ? [{ whirlingFlanking: check.attackContext.flanking.whirling }] : []),
+    ...(check.attackContext?.flanking?.removed ? [{ flankingRemoved: check.attackContext.flanking.removed }] : []),
     ...(check.tripAttack ? [check.tripAttack] : []),
     ...(check.meleeArmorPiercing
       ? [{ meleeArmorPiercing: check.meleeArmorPiercing, weaponQualities: check.weaponQualities }]

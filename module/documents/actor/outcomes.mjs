@@ -31,7 +31,8 @@ import {
   automaticSkillSuccessSources,
   automaticSkillSuccessPlan,
   manualAdjustmentPlan,
-  cunningPlanCheck
+  cunningPlanCheck,
+  withoutFlanking
 } from "../../rules/class-checks.mjs";
 import { queueResources } from "../../services/transactions.mjs";
 import { openingRound } from "../../rolls/chat-controls.mjs";
@@ -1128,6 +1129,31 @@ export const ActorOutcomes = Base =>
         if (plan) await this.update(plan.updates);
         return plan;
       });
+    }
+
+    /** Take a flanking bonus off an open attack card: the GC, or the roller, rules the attacker was not flanking. */
+    async removeFlanking(message) {
+      const check = message.flags?.spycraft2;
+      if (!check || check.actorUuid !== this.uuid || !(message.isAuthor || game.user?.isGM))
+        return refuse(loc`Only the roller or the GC can change this attack.`);
+      const expected = rollEvidence(check);
+      return queueResources(
+        [this],
+        async () => {
+          const current = message.flags.spycraft2;
+          if (rollEvidence(current) !== expected)
+            return refuseStep(loc`This attack changed while flanking was being taken off. Review the card.`);
+          let next;
+          try {
+            next = withoutFlanking(current);
+          } catch (error) {
+            return refuseStep(error.message);
+          }
+          await message.update({ "flags.spycraft2": next, flavor: checkFlavor(next) });
+          return next;
+        },
+        { messages: [message] }
+      );
     }
 
     async useManualAdjustment(message, options = {}) {

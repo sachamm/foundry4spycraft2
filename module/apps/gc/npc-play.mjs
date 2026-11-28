@@ -302,6 +302,8 @@ export function damageSaveState(actor) {
   };
 }
 
+const DAMAGE_SAVE_DEFEAT = "flags.spycraft2.defeatedByDamageSave";
+
 /** Roll a standard NPC's Damage save for one injury and record the result. */
 export async function npcDamageSave(actor, input = null) {
   if (!actor.isOwner) return null;
@@ -377,7 +379,9 @@ export async function npcDamageSave(actor, input = null) {
     }
     for (const combat of game.combats ?? [])
       for (const combatant of combat.combatants)
-        if (combatant.actor === actor && !combatant.defeated) await combatant.update({ defeated: true });
+        if (combatant.actor === actor && !combatant.defeated)
+          // The mark lets Reset clear this defeat and leave one the GC set by hand.
+          await combatant.update({ defeated: true, [DAMAGE_SAVE_DEFEAT]: true });
   }
   return result;
 }
@@ -391,6 +395,12 @@ export async function resetDamageTrack(actor, { heal = null } = {}) {
   const state = damageSaveState(actor);
   const track = heal === null ? { ...currentDamageTrack(null, sceneEpoch()) } : healDamageTrack(state.track, heal);
   await actor.update({ "system.damageTrack": track });
+  if (track.state === "active")
+    // Clear only the defeat a failed Damage save set; a defeat the GC marked by hand stays.
+    for (const combat of game.combats ?? [])
+      for (const combatant of combat.combatants ?? [])
+        if (combatant.actor === actor && combatant.defeated && combatant.flags?.spycraft2?.defeatedByDamageSave)
+          await combatant.update({ defeated: false, "flags.spycraft2.-=defeatedByDamageSave": null });
   if (heal === null)
     for (const id of ["dead", "unconscious"])
       if (actor.statuses?.has(id)) {
