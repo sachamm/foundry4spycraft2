@@ -171,7 +171,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
 | B-136 | Gear picks, Caliber and gear check buried in a closed panel below inventory. "Mission loadout" at the top of Gear. | SG-A18 | S |
-| B-137 | Request and Gear check are values, not rolls. | SG-A19 | S |
 | B-138 | Cover identity only mid-page; not on the rail or cards. | SG-A23 | S |
 | B-139 | Browser rows about 61px; preview empty until a pick; the browser stays open after adding (except talents and specialties); a row click redraws list and preview; prerequisites recomputed on every draw. | SG-I6, LR-24b, LR-24f, HBS-04 | M |
 | B-140 | Stepper and sheet tabs are two navigations; steps may open browsers inconsistently (live check). | LR-21e, LR-21f | M |

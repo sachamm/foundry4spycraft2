@@ -16,8 +16,8 @@
   <h3>{{localize "SPYCRAFT.Checks"}}</h3>
   <div class="stat-grid">
     <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><button type="button" class="sc2-action" data-action="rollKnowledge" {{sc2tip tips.knowledge}}>{{signed system.knowledge}}</button></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b {{sc2tip tips.request}}>{{signed system.requestCheck}}</b></div>
-    <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b {{sc2tip tips.gearCheck}}>{{signed system.gearCheck}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><button type="button" class="sc2-action" data-action="rollGearAcquisition" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.RequestGearCheck'}}: {{localize 'SPYCRAFT.Request'}} {{signed system.requestCheck}}" {{sc2tip tips.request}}>{{signed system.requestCheck}}</button></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><button type="button" class="sc2-action" data-action="rollGearAcquisition" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.RequestGearCheck'}}: {{localize 'SPYCRAFT.GearCheck'}} {{signed system.gearCheck}}" {{sc2tip tips.gearCheck}}>{{signed system.gearCheck}}</button></div>
   </div>
   {{#if system.actionDieAwardSummary.count}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.GCActionDiceAwardedThisMission"}} {{system.actionDieAwardSummary.count}} · {{#if system.actionDieAwardSummary.settled}}{{localize "SPYCRAFT.Template.ActorAgentMain.MissionRewardSettled"}} {{system.actionDieAwardSummary.totalXP}} {{localize "SPYCRAFT.Template.ActorAgentMain.XP"}}{{else}}+{{system.actionDieAwardSummary.baseXP}} {{localize "SPYCRAFT.Template.ActorAgentMain.BaseMissionXPBeforeTheCareer"}}{{/if}}</p>{{/if}}
   {{#if combatTools.fortuneTeammates}}<p><button type="button" class="sc2-action" data-action="configureFortuneTeammates">{{localize "SPYCRAFT.Template.ActorAgentMain.ImprovedFortuneTeammates"}}</button>{{#if system.improvedFortune.value}} · +{{system.improvedFortune.value}} {{localize "SPYCRAFT.Template.ActorAgentMain.StartingActionDiceTeamCap3"}}{{/if}}</p>
