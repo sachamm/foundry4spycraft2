@@ -152,7 +152,7 @@ test("source proof binds current owned identity, qualification, effective FIN, g
   changed.attackContext.missTrickSources.combat.round = 4;
   assert.equal(rollEvidenceMatches(e, changed), false);
 });
-const { makeFatigueActor } = await import("./fixtures/fatigue-actor.mjs");
+await import("./fixtures/fatigue-actor.mjs");
 const { SpycraftActor } = await import("../module/documents/actor.mjs");
 const { limitedUseAbilities } = await import("../module/rules/limited-uses.mjs");
 const { takeMissTrick: take } = await import("../module/apps/miss-tricks.mjs");

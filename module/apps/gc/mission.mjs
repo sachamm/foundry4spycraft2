@@ -1449,13 +1449,6 @@ export async function awardStanding() {
   if (!input) return null;
   // The record is read again: another dialog, or another GC, may have paid while this one was open.
   const paidNow = () => getMission().standingPaid ?? {};
-  // Under Hybrid (p.407) each agent is paid in the currency of their own affiliation.
-  const currencyOf = actor =>
-    input.currency === "byAgent"
-      ? actor.system.affiliationType === "freelance"
-        ? "netWorth"
-        : "reputation"
-      : input.currency;
   const due = team.filter(actor => input.again || !paidNow()[actor.id]);
   if (!due.length) return decline(loc`Everyone on the team has been paid. Tick the correction box to pay again.`);
   const plans = new Map();

@@ -58,9 +58,9 @@ test("wrong source/family/readiness, nonstandard/ranged/disarm, manual target an
   }
 });
 test("Thread-only hit invents no zero-value damage claim; a combined All-out hit supplies only its real damage bonus", async () => {
-  let { a, m } = await hit();
+  let { a } = await hit();
   assert.deepEqual(eligibleAttackDamageHits(a, a.items[0]), []);
-  ({ a, m } = await hit(actor(), { allOutPenalty: 2 }));
+  ({ a } = await hit(actor(), { allOutPenalty: 2 }));
   const hits = eligibleAttackDamageHits(a, a.items[0]);
   assert.equal(hits.length, 1);
   assert.equal(hits[0].proof.bonus, 4);

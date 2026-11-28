@@ -192,7 +192,6 @@ test("private counter metadata carries source identities without copying opposed
     p = m.flags.spycraft2.tripAttack;
   for (const key of ["sourceEvidence", "rollData", "naturalDie", "effectiveTotal"])
     assert.equal(Object.hasOwn(p.counterTrip, key), false);
-  const c = m.flags.spycraft2;
   for (const patch of [{ targetUuid: "Actor.other" }, { depth: 2 }, { activeCombatantId: "other" }])
     assert.throws(() =>
       validateTripCounterProof(

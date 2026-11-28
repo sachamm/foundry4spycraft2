@@ -55,7 +55,6 @@ test("Disarm grip, actual weapon Size differences and Expert Disarm bonuses are 
 test("all twelve weapon Size categories compare by categories, never object-hardness modifiers; ranged attempts never gain the Size bonus", () => {
   for (const a of DISARM_SIZES)
     for (const b of DISARM_SIZES) {
-      const code = a[0];
       const p = disarmAttackPlan({ ...system(), size: a }, weapon("unarmed"), {
         context: { ...context(), opponentWeaponSize: b },
         grip: { hands: 2 }

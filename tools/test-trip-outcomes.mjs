@@ -142,7 +142,6 @@ test("paired clocks and reciprocal Sizes must agree with original own Count and 
 });
 test("opposed ties use higher recorded skill bonus then explicit random tie-break confirmation", () => {
   const f = pair(),
-    x = f.am.flags.spycraft2,
     y = f.dm.flags.spycraft2;
   y.effectiveTotal = 20;
   y.rollData = { total: 1 };

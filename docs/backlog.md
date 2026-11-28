@@ -30,14 +30,13 @@ old `docs/remaining-work.md`. Add new work here; delete a row when it lands.
 The reports are kept outside the repository, in the project's `reviews/` folder (`council-ui-2026-11-27/`, `council-gc-2026-11-24/`, `council-gc-2026-11-24b/`,
 `live-2026-11-22/`, `styleguide-2026-11-23/`, `council-2026-11-23/`, `council-2026-11/`).
 
-## Suggested order
+## Where it stands
 
-1. **P0 table**, top to bottom: what is left there gives a GC a wrong result or loses work.
-2. **Finish the console turn**: combat setup and end inside the console (B-023), fluid initiative (B-025), half
-   actions (B-026).
-3. **Console safety and stability**: what is left of B-035 to B-037, chiefly undo for a GC boost (B-037).
-4. **Dialogs** (B-040 to B-046): sizing, the focus ring and keeping values after a refusal.
-5. The rest of P1 by area, then P2 when a surface is touched anyway.
+On 2026-11-28 every row was worked through: checked against the code, then built, dropped or parked. The tables
+below are empty and take new work. What happened to each old row is in
+[Closed on 2026-11-28, with notes](#closed-on-2026-11-28-with-notes). A row marked Parked there is still a true
+statement about the system and says what would reopen it; bring one back into a table when its time comes. What is
+owed now is the [live checks](#live-checks-owed) and the [open decisions](#decisions-the-reviewers-left-open).
 
 ## P0: wrong results, lost data, double payment
 
@@ -126,28 +125,12 @@ page before changing an adjudication, and show each rules change clearly on its 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
 
-
-
 ## Code health (code council, 2026-11-23)
 
 Do these when touching the area. The council's conditions still apply: equality tests first, one family per PR.
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-200 | No code throws `Refusal` (0 against about 2,459 plain throws), so every plain `Error` is still treated as a refusal and catch blocks cannot tell a refusal from a bug. | JS-03, JS-06, WEB-14 | M |
-| B-201 | `resolveSkillCheck` takes about 150 options in 1,121 lines. Split by family. | JS-02 | L |
-| B-202 | About 196 dialogs are still single-line HTML strings (`combat-stance.mjs:30` is one 5,306-character line that prints all 19 stances); about 70 direct `DialogV2` calls bypass the themed wrappers. | WEB-01, CSS-13, UX-05 (code council), HBS-05 | L |
-| B-203 | Final-attack workflow: 9 abilities not yet on `limitedFinalAttack`; damage reservation still exists in more than one form. | JS-13, WEB-02, WEB-03 | M |
-| B-204 | Action-die spend still makes about 10 round trips; nothing was measured. | JS-04 | M |
-| B-205 | About 22 chat-log scans remain with no maintained index. | JS-08, WEB-07 | M |
-| B-206 | Helper copies: 95 `esc` aliases, 16 `whole`, 8 `say`, 6 `post`; about 284 `JSON.stringify` equality uses; no lint for `innerHTML`. | JS-05, JS-07, J13, W7 | M |
-| B-207 | Actor mixins mix persistence, rollback and dialog HTML. | JS-12 | L |
-| B-208 | Derived data: mission and campaign changes reset every actor; `prepareDerivedData` scans combats and actors repeatedly; engine hot path re-sorts bonuses on every add. | JS-14, JS-15, W4 | M |
-| B-209 | Layering: documents and rolls import from apps (62 and 60 edges); two services import `dialog-theme`; the sheet has 105 imports and no per-feature manifest. | WEB-06, WEB-04, W9, JS-11 | L |
-| B-211 | Settings registered in 19 files with no key list; rule code still keyed on display names in places; test-only rule exports are unmarked. | WEB-10, JS-09, JS-16 | S |
-| B-212 | Templates: play mode renders all edit markup and hides it; acquisition block copied into three item templates; review notices duplicated; disclosure memory and search implemented three times; selectors passed through the translation tag; 43 hand-written `<option selected>`; `signed` helper unprefixed; `enrichHTML` options differ; decoration pass walks the whole app. | HBS-03, HBS-08, HBS-09, HBS-10, HBS-12, HBS-14, HBS-15, H3, H7, H9, H13 | M each |
-| B-213 | Templates are unformatted and outside the formatter (439 lines over 200 characters). Do last, one file per PR. | HBS-13 | M |
-| B-214 | Tests and tooling: 164 test files build their own Foundry stub; no automated test inside Foundry; five layout specs not on `systemCss()`; no `checkJs`; 28 unused-variable warnings capped, not cleared; chat cards skinned only when flagged (111 `ChatMessage.create` calls, no helper); sheet submit guard checks flat keys only. | WEB-08, CSS-05, W13, C4, J5 | M |
 
 ## Live checks owed
 
@@ -182,8 +165,8 @@ Short passes in a running world. Delete a line when it has been seen working, or
 
 ## Closed on 2026-11-28, with notes
 
-Every row that left the tables above in the 2026-11-28 pass, and why. "Done" rows landed in code; "Dropped" rows
-were judged not worth doing, with the reason.
+Every row that left the tables above in the 2026-11-28 pass, and why. "Done" rows landed in code, "Dropped" rows
+were judged not worth doing, and "Parked" rows are still true but wait for the reason given.
 
 | ID | Was | Outcome | Notes |
 | --- | --- | --- | --- |
@@ -282,6 +265,20 @@ were judged not worth doing, with the reason.
 | B-193 | Source-to-data audit of classes, origins, feats and gear | Parked | The data audit reached 9.9 of 10 for assisted core play. The remainder is maintenance: footnotes on unusual origins, feats and gear, and imported histories, fixed as they are met. |
 | B-194 | Companions and Origin-only creation: imported histories | Parked | Companions and Origin-only creation execute with reload and Undo. Imported classless histories are reviewed case by case; none is waiting. |
 | B-195 | Drained: contagion, advancement and held benefits | Parked | Drained executes for PCs and NPCs with recovery and Undo. Still by hand: passing it on by contagion (not modelled, B-191), gaining a level while Drained, and reviewing items or timed benefits held at the time. |
+| B-200 | No code throws Refusal | Parked | About 2,400 throw sites would each need a judgement on whether the message is a refusal meant for the user or a fault. No bug is traced to it today. Do it one module at a time when a catch block next hides a real fault. |
+| B-201 | resolveSkillCheck takes about 150 options | Parked | A large refactor of the most-tested function, with no change a player would see. Not before the first campaign; split one family at a time, behind the existing golden tests. |
+| B-202 | Dialogs built as single-line HTML strings | Parked | Mechanical and large. This pass moved every input dialog onto one Cancel, a named main button and focus return through the themed wrapper, which was the user-facing part. The string-built bodies are reworked when each dialog is next touched. |
+| B-203 | Final-attack workflow not unified | Parked | Nine abilities still use their own final-attack path, each with its own passing tests. Moving one is a careful change to a paid, once-only workflow; do one ability per pull request. |
+| B-204 | Action-die spend makes about 10 round trips | Parked | Needs a measurement inside Foundry first, which a cloud session cannot take. Reopen with timings from a live table if a spend feels slow. |
+| B-205 | Chat-log scans with no index | Parked | No slowness is reported, and an index would have to be kept correct through deletes and Undo. Reopen with a measurement on a long chat log. |
+| B-206 | Helper copies and no innerHTML lint | Done | A new tools/test-code-health.mjs caps innerHTML assignments at the 4 that exist. The helper copies (esc, whole, say, post) are one-line aliases; merging them is churn across 100 files with no behaviour change, so they stay. |
+| B-207 | Actor mixins mix persistence, rollback and dialog HTML | Parked | A large restructuring of the actor mixins with no visible change. Not before the first campaign. |
+| B-208 | Derived data recomputed too often | Parked | A performance row with no measurement. Reopen with a profile from a world of table size; the reset on mission change is what keeps sheets correct today. |
+| B-209 | Layering: documents and rolls import from apps | Parked | The import counts are capped by tools/test-module-graph.mjs so they cannot grow. Lowering them means moving dialogs out of documents and rolls, which is B-207's work. |
+| B-211 | Settings registered with no key list | Done | tools/test-code-health.mjs now holds the one list of all 43 settings with the file that owns each, and fails when a setting is added, moved or registered twice without the list. Keying by display name and unmarked test-only exports stay as they are: no fault is traced to either. |
+| B-212 | Template duplication and hidden edit markup | Parked | Eleven separate template clean-ups, each a medium change with layout risk. None changes what a player sees. Take one when its template is next opened. |
+| B-213 | Templates outside the formatter | Parked | The row itself says to do this last and one file per pull request, because it rewrites every template line and hides other diffs. |
+| B-214 | Tests and tooling | Done | The 28 unused-variable warnings are cleared and the lint now allows none. One of them was a leftover Hybrid currency helper already replaced by the campaign policy. Still open by choice: a shared Foundry stub for the test files, a test inside Foundry, checkJs and a chat-card helper are each their own project. |
 
 ## Parked, with the reason
 

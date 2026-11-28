@@ -346,7 +346,6 @@ export async function resolveAttack(message, options = {}) {
       check.attackContext = { ...check.attackContext, targetRole: roleChange.role };
     }
   }
-  const before = check.attackResolution ?? null;
   const resolution = {
     targetUuid: target?.uuid ?? "",
     targetName: target?.name ?? "",

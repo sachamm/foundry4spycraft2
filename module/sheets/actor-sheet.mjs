@@ -983,7 +983,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const miscLabel = game.i18n.localize("SPYCRAFT.Misc");
     const classLabel = game.i18n.localize("SPYCRAFT.Class.Label");
     const armorLabel = game.i18n.localize("SPYCRAFT.Armor");
-    const vitBonus = (src.vitality ?? []).reduce((n, s) => n + s.value, 0);
     const conPart = sys.abilities.con.mod * sys.level;
     context.tips = {
       // Roll bonuses: every part, then a total that matches the button (module/sheets/bonus-tips.mjs).
@@ -1302,7 +1301,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const lvl = Math.clamp(this._skillLevel ?? sys.level, 1, Math.max(1, sys.level));
     context.skillLevel = sys.level ? lvl : null;
     const entry = sys.progression[lvl - 1];
-    const lvlClass = entry ? classById[entry.classId] : null;
     context.skillLevelInfo = sys.skillPoints?.[lvl - 1];
     context.canReviewSkillPurchasePolicy = game.user.isGM && sys.level > 0 && !sys.companionOf?.ownerUuid;
     context.skillPurchasePolicyLabel = loc`Review skill-cost history`;

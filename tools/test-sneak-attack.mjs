@@ -364,8 +364,7 @@ test("Sniper extended sneak range does not allow an attacker to flank from beyon
 });
 
 const { knownSneakAttackImmunity } = await import("../module/rules/sneak-attack.mjs");
-const { damageTargetChoices, sneakAttackTargetSnapshot, validateSneakAttackTarget } =
-  await import("../module/apps/damage-target.mjs");
+const { damageTargetChoices, validateSneakAttackTarget } = await import("../module/apps/damage-target.mjs");
 test("known Armor Supremacy and enabled Construct protections prohibit sneak dice while leaving ordinary damage available", () => {
   for (const targetSystem of [
     { armorFeatRules: { sneakAttackImmune: true } },

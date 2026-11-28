@@ -15,12 +15,11 @@ export async function reviewCandidate(item, options = {}) {
   if (featAcquisitionLevel(item.system) !== 1)
     throw new Error(loc`Candidate must have been acquired at the first career level.`);
   const before = JSON.stringify([
-      item.name,
-      item.system.choice,
-      item.system.candidateBasis,
-      item.system.acquiredAtLevel
-    ]),
-    esc = foundry.utils.escapeHTML;
+    item.name,
+    item.system.choice,
+    item.system.candidateBasis,
+    item.system.acquiredAtLevel
+  ]);
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({

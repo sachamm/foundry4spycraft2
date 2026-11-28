@@ -11,7 +11,13 @@ import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
-import { agentTokenDefaults, npcTokenDefaults, linkedImport, renamedTokenName, renamedFromAny } from "../rules/creation-defaults.mjs";
+import {
+  agentTokenDefaults,
+  npcTokenDefaults,
+  linkedImport,
+  renamedTokenName,
+  renamedFromAny
+} from "../rules/creation-defaults.mjs";
 import { primaryWriterFor } from "../writers.mjs";
 import { newAgentPoolMax, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";

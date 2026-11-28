@@ -148,13 +148,6 @@ const norm = s =>
     .trim()
     .toLowerCase();
 
-function setPath(obj, path, value) {
-  const keys = path.split(".");
-  let o = obj;
-  for (const k of keys.slice(0, -1)) o = o[k] ??= {};
-  o[keys.at(-1)] = value;
-}
-
 /** Accumulates bonus values by target. */
 class Bonuses {
   constructor() {
@@ -2276,14 +2269,12 @@ function deriveProficiencies(state) {
     plural,
     progression,
     level,
-    classAtLevel,
     tb,
     lr,
     stageAt,
     purchasedRanks,
     B
   } = state;
-  const firstClass = classAtLevel[0];
   const { available: profAvail, used: profUsed } = sys.proficiencyPicks;
   if (profUsed > profAvail)
     warnings.push(loc`${profUsed - profAvail} more weapon proficiencies/fortes than available.`);
@@ -2724,8 +2715,7 @@ function deriveExperience(state) {
 
 /** Step 14: core abilities. */
 function deriveCoreAbilities(state) {
-  const { sys, warnings, classAtLevel, coreItems } = state;
-  const firstExpertIdx = classAtLevel.findIndex(c => c?.system.expert);
+  const { sys, warnings, coreItems } = state;
   sys.coreAbilities = coreItems.map(c => ({ className: c.name, ...c.system.coreAbility }));
 
   const eagle = eagleEyeState(sys);
@@ -2751,11 +2741,8 @@ function settlePrerequisites(state) {
     classLevels,
     skillRanks,
     featItems,
-    featNames,
-    activeFeatTrees,
     rd
   } = state;
-  const ctx = prerequisiteContext(sys, featNames, activeFeatTrees, skillRanks);
   const permanentSystem = featItems.some(f => f.system.featKind === "temporary")
     ? computeAgent(
         Object.assign(sys.toObject?.() ?? structuredClone(sys), {
@@ -2855,7 +2842,7 @@ function settlePrerequisites(state) {
   // Keep entry evidence separate from present qualification: later losses suspend abilities, not owned progression.
   const expertStatuses = {},
     inactiveExpertClasses = [];
-  for (const [cid, lvl] of Object.entries(classLevels)) {
+  for (const cid of Object.keys(classLevels)) {
     const ci = classById.get(cid);
     if (!ci?.system.expert || !ci.system.requirements) continue;
     const firstEntry = progression.find(e => e.classId === cid);

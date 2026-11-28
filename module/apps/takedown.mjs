@@ -226,7 +226,7 @@ async function settleTakedownWork(actor, message) {
   return queueResources(
     [actor],
     async () => {
-      let { r, c, p } = resolvedSave(actor, message);
+      let { r, c } = resolvedSave(actor, message);
       if (r.settlement?.state === "applied") {
         await message.update({ "flags.spycraft2.takedownSettlement": r.settlement });
         return r.settlement;

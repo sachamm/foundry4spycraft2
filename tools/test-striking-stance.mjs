@@ -268,9 +268,9 @@ test("owned unresolved original replacements retain temporal source after stance
   assert.equal(a.system.resourceUses.strikingStance.used, 1);
 });
 test("missing-result GC closure preserves current resource history, authorizes no new attack and cannot be used as a source retry", async () => {
-  const a = actor(),
-    m = await take(a, input()),
-    row = strikingRows(a)[0];
+  const a = actor();
+  await take(a, input());
+  const row = strikingRows(a)[0];
   game.messages.splice(0, 1);
   row.state = "reserved";
   row.messageUuid = null;
