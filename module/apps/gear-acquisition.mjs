@@ -617,7 +617,11 @@ export function finishGearAcquisition(actor, message) {
             "flags.spycraft2.resolved": true,
             "flags.spycraft2.successConfirmed": result.success,
             "flags.spycraft2.gearAttempt": gearAttempt,
-            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${loc`Final result ${check.effectiveTotal}: ${notes}`}</strong>`
+            flavor: `${check.baseFlavor ?? loc`Acquisition`}<br><strong>${loc`Final result ${check.effectiveTotal}: ${notes}`}</strong>`,
+            // The delivery-time roll joins the check's own, so its dice can be seen behind the time given.
+            ...(roll && typeof message.toObject === "function"
+              ? { rolls: [...(message.toObject().rolls ?? []), JSON.stringify(roll.toJSON())] }
+              : {})
           });
         } catch (error) {
           const current = message.flags?.spycraft2;
