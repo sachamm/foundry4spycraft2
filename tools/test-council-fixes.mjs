@@ -528,6 +528,10 @@ test("a renamed NPC takes its tokens along unless the GC named them by hand", as
   assert.equal(renamedTokenName("The Broker", "Guard", "Sentry"), null);
   assert.equal(renamedTokenName("Guard", "Guard", "Guard"), null);
   assert.equal(renamedTokenName(undefined, "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard (2)", "Guard", "Sentry"), "Sentry (2)", "Foundry's own numbering follows");
+  const { renamedFromAny } = await import("../module/rules/creation-defaults.mjs");
+  assert.equal(renamedFromAny("Guard 2", ["Sentry", "Guard"], "Watch"), "Watch 2", "a token behind a quick rename");
+  assert.equal(renamedFromAny("Bob", ["Sentry", "Guard"], "Watch"), null);
 });
 
 test("a dialog's Cancel button answers like closing the dialog", async () => {

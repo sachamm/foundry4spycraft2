@@ -10,10 +10,14 @@ import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
-import { agentTokenDefaults, linkedImport, renamedTokenName } from "../rules/creation-defaults.mjs";
+import { agentTokenDefaults, linkedImport, renamedTokenName, renamedFromAny } from "../rules/creation-defaults.mjs";
+import { primaryWriterFor } from "../writers.mjs";
 import { newAgentPoolMax, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
+
+/** The names each NPC had before its latest renames, newest first, kept on this client only. */
+const recentNames = new Map();
 
 export class SpycraftActor extends ActorRolls(
   ActorSkillRolls(
@@ -112,21 +116,29 @@ export class SpycraftActor extends ActorRolls(
     if (this.isToken) return;
     if (this.type !== "npc" || typeof changed.name !== "string" || changed.name === this.name) return;
     options.spycraft2RenamedFrom = this.name;
+    // Quick renames in a row: a token may still carry a name from before the last one, so the earlier names travel too.
+    options.spycraft2EarlierNames = [this.name, ...(recentNames.get(this.id) ?? [])].slice(0, 5);
+    recentNames.set(this.id, options.spycraft2EarlierNames);
     if (changed.prototypeToken?.name !== undefined) return;
     const next = renamedTokenName(this.prototypeToken?.name, this.name, changed.name);
     if (next) changed.prototypeToken = { ...(changed.prototypeToken ?? {}), name: next };
   }
 
-  /** Placed tokens still called by the old name (with or without a number) follow too, on the renaming client. */
+  /**
+   * Placed tokens still called by the old name (with or without a number) follow too. The lead GC writes them, so a
+   * player who owns the NPC can rename it; with no GC connected the renaming client does.
+   */
   _onUpdate(changed, options, userId) {
     super._onUpdate(changed, options, userId);
     const old = options?.spycraft2RenamedFrom;
-    if (!old || this.isToken || this.type !== "npc" || userId !== game.user?.id || typeof changed.name !== "string")
-      return;
+    if (!old || this.isToken || this.type !== "npc" || typeof changed.name !== "string") return;
+    const writer = game.users?.activeGM ? primaryWriterFor(this) : game.users?.get?.(userId);
+    if ((writer?.id ?? userId) !== game.user?.id) return;
+    const earlier = options.spycraft2EarlierNames ?? [old];
     for (const scene of game.scenes ?? []) {
       const updates = [...scene.tokens]
         .filter(token => token.actorId === this.id)
-        .map(token => ({ _id: token.id, name: renamedTokenName(token.name, old, changed.name) }))
+        .map(token => ({ _id: token.id, name: renamedFromAny(token.name, earlier, changed.name) }))
         .filter(update => update.name);
       if (updates.length && scene.isOwner !== false)
         scene

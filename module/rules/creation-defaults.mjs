@@ -45,7 +45,17 @@ export function equipsAsFirstWeapon(data = {}, items = []) {
 export function renamedTokenName(tokenName, oldName, newName) {
   if (!oldName || !newName || oldName === newName || typeof tokenName !== "string") return null;
   if (tokenName === oldName) return newName;
-  if (tokenName.startsWith(`${oldName} `) && /^\d+$/.test(tokenName.slice(oldName.length + 1)))
+  // A copy number follows the name either way it is written: ours ("Guard 2") or Foundry's ("Guard (2)").
+  if (tokenName.startsWith(`${oldName} `) && /^(\d+|\(\d+\))$/.test(tokenName.slice(oldName.length + 1)))
     return `${newName}${tokenName.slice(oldName.length)}`;
+  return null;
+}
+
+/** The token's new name against any of the names the actor recently had, newest first. */
+export function renamedFromAny(tokenName, oldNames = [], newName) {
+  for (const old of oldNames) {
+    const next = renamedTokenName(tokenName, old, newName);
+    if (next) return next;
+  }
   return null;
 }
