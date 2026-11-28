@@ -1856,3 +1856,19 @@ test("a pool set up for another Caliber, and untouched since, offers one button 
   await state.updateMission({ caliber: m.caliber });
   await game.settings.set("spycraft2", "gcActionDice", before);
 });
+
+test("the console's live line says who is still to roll Initiative, then whose turn it is", () => {
+  const live = { className: "", textContent: "", setAttribute() {} };
+  const self = {
+    isPopout: true,
+    element: { querySelector: () => live, append() {} }
+  };
+  const say = combat => (GCConsole.prototype._announceTurn.call(self, { combat }), live.textContent);
+  assert.equal(
+    say({ started: false, unrolled: 2, unrolledNames: "Ana, Guard" }),
+    "Still to roll Initiative: Ana, Guard."
+  );
+  assert.equal(say({ started: false, unrolled: 0, unrolledNames: "" }), "Every combatant has an Initiative Count.");
+  assert.equal(say({ started: true, round: 1, acting: { name: "Ana" } }), "Round 1: Ana's turn.");
+  assert.equal(say(null), "");
+});

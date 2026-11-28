@@ -466,7 +466,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   }
 
   /**
-   * Say a new turn once, politely, from a region the redraw leaves in place: the status strip is drawn afresh each
+   * Say a new turn, or a change in who is still to roll Initiative, once, politely, from a region the redraw leaves in place: the status strip is drawn afresh each
    * time, so a screen reader would hear all of it, or nothing, on every redraw.
    */
   _announceTurn(context) {
@@ -479,8 +479,17 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     }
     // With the console both in the sidebar and in its own window, only the window speaks.
     const speaks = this.isPopout || !this.popout?.rendered;
-    const acting = speaks && context.combat?.started ? context.combat.acting : null;
-    const text = acting ? loc`Round ${context.combat.round}: ${acting.name}'s turn.` : "";
+    const combat = speaks ? context.combat : null;
+    const acting = combat?.started ? combat.acting : null;
+    // Before the fight begins, the Initiative rolls are what changes: say who is still to roll, and when all have.
+    const waiting = combat && !combat.started && Number.isFinite(combat.unrolled) ? combat.unrolled : null;
+    const text = acting
+      ? loc`Round ${combat.round}: ${acting.name}'s turn.`
+      : waiting === null
+        ? ""
+        : waiting
+          ? loc`Still to roll Initiative: ${combat.unrolledNames}.`
+          : loc`Every combatant has an Initiative Count.`;
     if (live.textContent !== text) live.textContent = text;
   }
 
