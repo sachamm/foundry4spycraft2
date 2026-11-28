@@ -2959,3 +2959,28 @@ schemas, lint, formatting, bundle and copied-text checks pass. The next review
 caught an over-restrictive recipient assumption in the new benefit prerequisites:
 Break Pin and Escape Hold may assist another participant. Add that explicit GC
 recipient choice and preserve Held after breaking a pin before the final score.
+
+## Pass 94: Assisted grapple recipients and preserved holds
+
+Break Pin and Escape Hold now offer an actual participant choice. The GC
+confirms membership and reviews the actual restraint sources. Ordered benefit
+validation uses each participant's current condition state: a winner need not
+be held to help someone else. Breaking a pin preserves Held, including a saved
+pin with no separate Held effect. Assistance cannot redirect a damage benefit,
+use a missing character or bypass confirmation. Reports retain the recipient
+identity and the required immediate Escape Hold move, with group exits and
+remaining independent holds explicitly reviewed by the GC.
+
+Native Break Pin ChatMessage.BVIDi9RVESXmq8i8 changed selected NPC
+Actor.EJflj3GLt9zA1Sl6 from Pinned to Held. Escape Hold
+ChatMessage.12lmU8eZlsBqbvEq released that same character and preserved the
+winner's existing conditions. The second form left its first benefit undecided;
+the saved award correctly retained the recipient for the second slot. The new
+benefit dialog has a bounded height so its action remains reachable when the
+assistance disclosure opens.
+
+Validation: **4,549 Node tests**, **988 engine fixtures**, **307 layout checks**,
+schemas, lint, formatting, bundle and copied-text checks pass. A fresh upstream
+fetch discovered main had advanced to 75b2b1b. Preserve this completed change in
+its own commit, then resolve the upstream overlap and repeat validation before
+final scoring. No upstream work has been published or merged into main here.

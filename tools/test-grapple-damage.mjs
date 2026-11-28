@@ -60,6 +60,58 @@ test("ordered benefit prerequisites reject a free weapon attack or damage after 
   assert.throws(() => grappleBenefitEligibility(["breakPin"]), /actual held or pinned/);
 });
 
+test("Break Pin preserves Held, including a pin whose separate Held source is missing", () => {
+  assert.deepEqual(grappleBenefitEligibility(["breakPin", "escape"], { winnerStatuses: ["pinned"] }), [
+    { heldTarget: false, pinnedTarget: false },
+    { heldTarget: false, pinnedTarget: false }
+  ]);
+  assert.throws(
+    () => grappleBenefitEligibility(["breakPin", "breakPin"], { winnerStatuses: ["pinned"] }),
+    /actual held or pinned/
+  );
+});
+test("an unrestrained winner may free a reviewed third participant in order", () => {
+  const recipient = { uuid: "Actor.ally", statuses: ["pinned"] };
+  const result = grappleBenefitEligibility(["breakPin", "escape"], {
+    recipients: [recipient, recipient],
+    recipientsConfirmed: true
+  });
+  assert.equal(result[0].recipientUuid, "Actor.ally");
+  assert.equal(result[1].recipientUuid, "Actor.ally");
+  assert.throws(
+    () => grappleBenefitEligibility(["breakPin"], { recipients: [recipient] }),
+    /Confirm the actual recipient/
+  );
+  assert.throws(
+    () =>
+      grappleBenefitEligibility(["injure"], {
+        loserStatuses: ["held"],
+        recipients: [recipient],
+        recipientsConfirmed: true
+      }),
+    /Only Break Pin/
+  );
+});
+test("assisted release and opponent benefits share the same ordered participant state", () => {
+  const context = {
+    winnerUuid: "Actor.winner",
+    loserUuid: "Actor.foe",
+    loserStatuses: ["pinned"],
+    recipients: [{ uuid: "Actor.foe" }],
+    recipientsConfirmed: true
+  };
+  assert.equal(grappleBenefitEligibility(["breakPin", "injure"], context)[1].heldTarget, true);
+  assert.throws(() => grappleBenefitEligibility(["escape", "injure"], context), /actual held or pinned/);
+  assert.throws(
+    () =>
+      grappleBenefitEligibility(["escape"], {
+        recipients: [{ uuid: "Actor.free", statuses: [] }],
+        recipientsConfirmed: true
+      }),
+    /actual held or pinned/
+  );
+});
+
 const registry = new Map(),
   messages = [];
 function update(patch) {

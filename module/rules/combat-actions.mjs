@@ -364,10 +364,10 @@ export function grapplerLimit(targetDifference) {
 
 /** Grapple benefits (p.357). Summaries are our own; the page has the full terms. */
 export const GRAPPLE_BENEFITS = [
-  { id: "breakPin", needs: "pinnedSelf" },
+  { id: "breakPin", needs: "pinnedParticipant" },
   { id: "disarm" },
   { id: "draw" },
-  { id: "escape", needs: "heldSelf" },
+  { id: "escape", needs: "heldParticipant" },
   { id: "injure" },
   { id: "second" },
   { id: "gear" },
@@ -384,7 +384,7 @@ export const GRAPPLE_BENEFITS = [
  * Benefits with no entry change no condition.
  */
 export const GRAPPLE_BENEFIT_CONDITIONS = {
-  breakPin: { winner: { remove: ["pinned"] } },
+  breakPin: { winner: { remove: ["pinned"], add: ["held"] } },
   escape: { winner: { remove: ["held", "pinned"] } },
   mute: { loser: { add: ["mute"] } },
   pin: { loser: { add: ["pinned"] } },
@@ -407,26 +407,51 @@ export function grappleBenefitChanges(benefits = []) {
 }
 
 /** Check ordered prerequisites before any benefit changes conditions or rolls damage. */
-export function grappleBenefitEligibility(benefits, { winnerStatuses = [], loserStatuses = [] } = {}) {
+export function grappleBenefitEligibility(
+  benefits,
+  {
+    winnerStatuses = [],
+    loserStatuses = [],
+    winnerUuid = "winner",
+    loserUuid = "loser",
+    recipients = [],
+    recipientsConfirmed = false
+  } = {}
+) {
   const winner = new Set(winnerStatuses),
     loser = new Set(loserStatuses),
+    participants = new Map([
+      [winnerUuid, winner],
+      [loserUuid, loser]
+    ]),
     result = [];
-  for (const id of benefits) {
+  for (const recipient of recipients) {
+    if (recipient?.uuid && !participants.has(recipient.uuid))
+      participants.set(recipient.uuid, new Set(recipient.statuses ?? []));
+  }
+  for (const [index, id] of benefits.entries()) {
     if (!GRAPPLE_BENEFITS.some(b => b.id === id)) throw Error(loc`Choose a listed grapple benefit.`);
-    const held = loser.has("held") || loser.has("pinned"),
+    const recipient = recipients[index],
+      assisted = recipient?.uuid && recipient.uuid !== winnerUuid;
+    if (assisted && (!["breakPin", "escape"].includes(id) || recipientsConfirmed !== true))
+      throw Error(
+        loc`Only Break Pin or Escape Hold may help another participant. Confirm the actual recipient belongs to this grapple.`
+      );
+    const freed = assisted ? participants.get(recipient.uuid) : winner,
+      held = loser.has("held") || loser.has("pinned"),
       pinned = loser.has("pinned");
     if (
-      (id === "breakPin" && !winner.has("pinned")) ||
-      (id === "escape" && !winner.has("held") && !winner.has("pinned")) ||
+      (id === "breakPin" && !freed.has("pinned")) ||
+      (id === "escape" && !freed.has("held") && !freed.has("pinned")) ||
       (id === "useWeapon" && !pinned) ||
       (["injure", "pin", "mute", "sprawl", "throw"].includes(id) && !held)
     )
       throw Error(
         loc`This benefit needs an actual held or pinned participant in the chosen order. Review the current grapple.`
       );
-    result.push({ heldTarget: held, pinnedTarget: pinned });
+    result.push({ heldTarget: held, pinnedTarget: pinned, ...(assisted ? { recipientUuid: recipient.uuid } : {}) });
     for (const change of grappleBenefitChanges([id])) {
-      const statuses = change.side === "winner" ? winner : loser;
+      const statuses = change.side === "winner" ? (["breakPin", "escape"].includes(id) ? freed : winner) : loser;
       if (change.active) statuses.add(change.id);
       else statuses.delete(change.id);
     }

@@ -365,13 +365,20 @@ async function grappleBenefitsChosen(actor, input, outcome) {
   const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
   const winner = outcome.winner === "actor" ? actor : opponent,
     loser = outcome.winner === "actor" ? opponent : actor;
-  let chosen = input.benefits;
+  let chosen = input.benefits,
+    recipientUuids = input.benefitRecipients ?? [],
+    recipientsConfirmed = input.benefitRecipientsConfirmed === true;
   if (!Array.isArray(chosen)) {
     const list = GRAPPLE_BENEFITS.map(benefit => {
       const [name, summary] = grappleBenefitText(benefit.id);
       return `<option value="${benefit.id}">${esc(name)} — ${esc(summary)}</option>`;
     }).join("");
+    const recipients = attackCharacterTargetChoices()
+      .filter(a => a.uuid !== winner?.uuid && (a.statuses?.has("held") || a.statuses?.has("pinned")))
+      .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
+      .join("");
     const picked = await systemDialog.input({
+      position: { width: 520, height: 600 },
       window: {
         title: loc`${winner?.name ?? loc`The opponent`}: ${outcome.benefits} grapple benefit(s)`
       },
@@ -383,10 +390,15 @@ async function grappleBenefitsChosen(actor, input, outcome) {
           `<label>${loc`Benefit ${index + 1}`} <select name="benefit${index}"><option value="">${loc`Decide later`}</option>${list}</select></label>`
       ).join(
         ""
-      )}<p class="hint">${loc`Pin, Sprawl, Throw, Mute, Escape Hold and Break Pin change conditions on both characters; the GC is asked for a character you do not own. The others are carried out at the table.`}</p></div>`
+      )}<details><summary>${loc`Help another participant`}</summary><p class="hint">${loc`Break Pin and Escape Hold can help another character in this grapple. Other benefits use the winner and opponent.`}</p>${Array.from({ length: outcome.benefits }, (_, index) => `<label>${loc`Recipient for benefit ${index + 1}`} <select name="benefitRecipient${index}"><option value="">${esc(winner?.name ?? loc`The winner`)}</option>${recipients}</select></label>`).join("")}<label><input type="checkbox" name="benefitRecipientsConfirmed" /> ${loc`The GC confirms each selected recipient belongs to this grapple and reviews all sources of Held and Pinned`}</label></details><p class="hint">${loc`The GC is asked for condition changes on a character you do not own. Equipment choices and movement need table review.`}</p></div>`
     });
     if (!picked) return [];
-    chosen = Array.from({ length: outcome.benefits }, (_, index) => picked[`benefit${index}`]).filter(Boolean);
+    const slots = Array.from({ length: outcome.benefits }, (_, index) => index).filter(
+      index => picked[`benefit${index}`]
+    );
+    chosen = slots.map(index => picked[`benefit${index}`]);
+    recipientUuids = slots.map(index => picked[`benefitRecipient${index}`] || "");
+    recipientsConfirmed = picked.benefitRecipientsConfirmed === true;
   }
   if (!chosen.length) return [];
   if (chosen.length > outcome.benefits || chosen.some(id => !GRAPPLE_BENEFITS.some(b => b.id === id)))
@@ -395,16 +407,40 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     lines = [
       loc`${esc(winner?.name ?? loc`The opponent`)} takes: ${chosen.map(id => esc(grappleBenefitText(id)[0])).join(", ")}.`
     ];
+  if (!Array.isArray(recipientUuids) || recipientUuids.length > chosen.length)
+    throw Error(loc`Choose one recipient for each earned benefit.`);
+  const recipients = await Promise.all(
+    chosen.map(async (_id, index) => {
+      const uuid = recipientUuids[index];
+      if (!uuid || uuid === winner?.uuid) return winner;
+      const recipient = await fromUuid(uuid);
+      if (!recipient || !["agent", "npc"].includes(recipient.type))
+        throw Error(loc`Choose an actual character participating in this grapple.`);
+      return recipient;
+    })
+  );
   const eligibility = grappleBenefitEligibility(chosen, {
+    winnerUuid: winner?.uuid,
+    loserUuid: loser?.uuid,
     winnerStatuses: winner?.statuses ?? [],
-    loserStatuses: loser?.statuses ?? []
+    loserStatuses: loser?.statuses ?? [],
+    recipients: recipients.map(a => ({ uuid: a?.uuid, statuses: a?.statuses ?? [] })),
+    recipientsConfirmed
   });
-  for (const change of grappleBenefitChanges(chosen)) {
-    const who = change.side === "winner" ? winner : loser,
-      label = labels[change.id] ?? change.id;
-    // Removing a condition the character does not have is nothing to report.
-    if (!change.active && who && !who.statuses?.has(change.id)) continue;
-    lines.push(await changeGrappleCondition(who, change.id, change.active, label));
+  for (const [index, id] of chosen.entries()) {
+    const recipient = recipients[index];
+    if (["breakPin", "escape"].includes(id))
+      lines.push(loc`${esc(grappleBenefitText(id)[0])}: ${esc(recipient?.name ?? loc`The winner`)}.`);
+    for (const change of grappleBenefitChanges([id])) {
+      const who = change.side === "winner" ? (["breakPin", "escape"].includes(id) ? recipient : winner) : loser,
+        label = labels[change.id] ?? change.id;
+      if (!change.active && who && !who.statuses?.has(change.id)) continue;
+      lines.push(await changeGrappleCondition(who, change.id, change.active, label));
+    }
+    if (id === "escape")
+      lines.push(
+        loc`${esc(recipient?.name ?? loc`The freed participant`)} must immediately make a Standard Move of at least 5 ft., up to Speed. The GC reviews other holds, the group's exits in Initiative order and clearing Vulnerable when the grapple ends (p.357).`
+      );
   }
   const strength = winner?.system?.abilities?.str?.mod;
   for (const id of chosen) {

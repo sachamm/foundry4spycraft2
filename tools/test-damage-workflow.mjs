@@ -2429,6 +2429,102 @@ test("grapple benefits the winner takes change conditions on both sides", async 
   assert.match(posted.at(-1).content, /1d4 \+ Strength subdual/);
 });
 
+function grappleParticipant(name, statuses = []) {
+  const actor = character(name, {});
+  actor.createEmbeddedDocuments = async (_kind, rows) =>
+    rows.map((row, index) => {
+      const effect = {
+        ...row,
+        id: row._id ?? name + actor.effects.length + index,
+        statuses: new Set(row.statuses),
+        toObject() {
+          return { ...row, _id: this.id, statuses: [...this.statuses] };
+        }
+      };
+      actor.effects.push(effect);
+      for (const id of row.statuses) actor.statuses.add(id);
+      return effect;
+    });
+  actor.deleteEmbeddedDocuments = async (_kind, ids) => {
+    actor.effects = actor.effects.filter(e => !ids.includes(e.id));
+    actor.statuses = new Set(actor.effects.flatMap(e => [...e.statuses]));
+  };
+  for (const id of statuses) {
+    actor.statuses.add(id);
+    actor.effects.push({ id, statuses: new Set([id]), toObject: () => ({ _id: id, statuses: [id] }) });
+  }
+  return actor;
+}
+test("actual benefit settlement frees another participant and preserves the winner", async () => {
+  reset();
+  const winner = grappleParticipant("Helpful winner"),
+    foe = grappleParticipant("Holding foe", ["held"]),
+    ally = grappleParticipant("Pinned ally", ["pinned"]);
+  const input = {
+    total: 30,
+    opponentTotal: 1,
+    opponentUuid: foe.uuid,
+    benefitRecipients: [ally.uuid],
+    benefitRecipientsConfirmed: true
+  };
+  await settleGrapple(winner, { ...input, benefits: ["breakPin"] });
+  assert.deepEqual([...ally.statuses], ["held"]);
+  assert.equal(winner.statuses.size, 0);
+  assert.equal(foe.statuses.has("held"), true);
+  assert.equal(posted.at(-1).flags.spycraft2.grappleBenefits.eligibility[0].recipientUuid, ally.uuid);
+  await settleGrapple(winner, { ...input, benefits: ["escape"] });
+  assert.equal(ally.statuses.size, 0);
+  assert.match(
+    posted.at(-1).content,
+    /Pinned ally must immediately make a Standard Move of at least 5 ft., up to Speed/
+  );
+});
+test("missing, unreviewed or inappropriate assistance changes no conditions", async () => {
+  reset();
+  const winner = grappleParticipant("Safe helper"),
+    foe = grappleParticipant("Safe foe", ["held"]),
+    ally = grappleParticipant("Safe ally", ["pinned"]);
+  const input = {
+    total: 30,
+    opponentTotal: 1,
+    opponentUuid: foe.uuid,
+    benefits: ["breakPin"],
+    benefitRecipients: [ally.uuid],
+    benefitRecipientsConfirmed: true
+  };
+  for (const patch of [
+    { benefitRecipientsConfirmed: false },
+    { benefitRecipients: ["Actor.missing"] },
+    { benefits: ["injure"] }
+  ]) {
+    await assert.rejects(settleGrapple(winner, { ...input, ...patch }));
+    assert.deepEqual([...ally.statuses], ["pinned"]);
+    assert.deepEqual([...foe.statuses], ["held"]);
+    assert.equal(winner.statuses.size, 0);
+  }
+});
+test("earned benefits may break a pin and release that same assisted participant in order", async () => {
+  reset();
+  const winner = grappleParticipant("Critical helper"),
+    foe = grappleParticipant("Critical foe", ["held"]),
+    ally = grappleParticipant("Critical ally", ["pinned"]);
+  await settleGrapple(winner, {
+    total: 30,
+    opponentTotal: 1,
+    critical: true,
+    opponentUuid: foe.uuid,
+    benefits: ["breakPin", "escape"],
+    benefitRecipients: [ally.uuid, ally.uuid],
+    benefitRecipientsConfirmed: true
+  });
+  assert.equal(ally.statuses.size, 0);
+  assert.equal(winner.statuses.size, 0);
+  assert.deepEqual(
+    posted.at(-1).flags.spycraft2.grappleBenefits.eligibility.map(e => e.recipientUuid),
+    [ally.uuid, ally.uuid]
+  );
+});
+
 test("actual opening grapple settlement rejects oversized, missing, self or unconfirmed participants before writing conditions or chat", async () => {
   reset();
   const grappler = character("Small grappler", { size: "Small" });
