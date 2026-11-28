@@ -165,12 +165,8 @@
   width: auto;
   cursor: pointer;
 }
-.spycraft2.sheet.agent .sheet-rail :is(.setup-next, details.todo, details.warnings) {
+.spycraft2.sheet.agent .sheet-rail :is(details.todo, details.warnings) {
   margin: 0;
-}
-.spycraft2.sheet.agent .sheet-rail .setup-next {
-  flex-direction: column;
-  align-items: stretch;
 }
 .spycraft2.sheet.agent .sheet-rail details.todo ul {
   columns: 1;
@@ -203,12 +199,6 @@
   font-size: var(--sc2-text-s);
   opacity: 1;
   color: var(--sc2-ink-muted);
-}
-.spycraft2.sheet.agent .condition-summary {
-  margin: 0;
-  padding: 6px 10px;
-  background: var(--sc2-bad-tint);
-  border-left: 3px solid var(--sc2-bad);
 }
 .spycraft2.sheet .sc2-weapon {
   display: grid;
