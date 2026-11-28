@@ -285,7 +285,8 @@ export async function managePowerStanceInitiative(actor, input = {}) {
     if (!input) return null;
   }
   const [combatId, combatantId, ...extra] = String(input.combatant).split("|");
-  if (extra.length) throw Error(loc`Choose a listed combatant.`);
+  if (extra.length)
+    throw Error(loc`That combatant could not be read. Open the dialog again and pick one from its list.`);
   return reviewPowerStanceInitiative(actor, combatId, combatantId, input);
 }
 export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {

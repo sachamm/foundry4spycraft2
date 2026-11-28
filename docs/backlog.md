@@ -177,7 +177,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-156 | Internal vocabulary: "actual" (487), "recorded" (335), "receipt" (111), "RAW", a "Health" section that does not exist. | SG-L10 | M |
 | B-157 | First person in labels: 71 strings start "I ", 27 contain "I am". | SG-L11 | M |
 | B-158 | 46 strings over 300 characters, 335 over 160. | SG-L12 | M |
-| B-159 | A developer error shown to users; four refusals without the fix or in internal language. (The Charisma gear-pick warnings now name the category and the fix.) | SG-L13, SG-L14, LR-40c | S |
 | B-161 | The formula hint under Bonuses shows to every owner (not found in the current templates; recheck live). (The VP, WP, DR, Qty and Codename labels and the class browser's "VP · SP" are now words.) | SGI-novice-gc D17, LR-40b, LR-39b | S |
 | B-162 | English literals in context builders; hard-coded English in attributes; raw schema keys as labels; text localised at load time stays English (migration labels, the console tab tooltip). | HBS-11, H6, WEB-09 | S |
 | B-236 | Undo still lives on its own whispered note instead of on the card that made the change (7.5, 8.3). (The end-mission texts, the wrap-up strip, the Undo tooltip, the GC dice cost, the Add NPC summary and the console's heading levels are reworded.) | CU-16, CU-17 | M | live |
