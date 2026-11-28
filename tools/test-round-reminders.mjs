@@ -79,9 +79,9 @@ test("at a new round the burning reminder waits for fluid initiative and goes to
   combat.turns = [leader, old];
   release();
   await Promise.all(runs);
-  const burning = posts.filter(p => p.flags.spycraft2.roundReminder.kind === "burning");
+  const burning = posts.flatMap(p => p.flags.spycraft2.roundReminders.items).filter(r => r.kind === "burning");
   assert.deepEqual(
-    burning.map(p => p.flags.spycraft2.roundReminder.actorUuid),
+    burning.map(r => r.actorUuid),
     ["Actor.leader"]
   );
 });
@@ -96,4 +96,20 @@ test("a tactician's Stratagem is prompted at the start of each round", () => {
   assert.deepEqual(roundReminders({ combatants, roundEnded: false, roundStarted: true }), [
     { kind: "stratagem", actorUuid: "Actor.t", name: "t" }
   ]);
+});
+
+test("reminders for the same people share one card, a line each", async () => {
+  const { groupReminders } = await import("../module/rules/round-reminders.mjs");
+  const owners = { a: ["gm"], b: ["gm"], c: ["p1", "gm"] };
+  const groups = groupReminders(
+    [{ actorUuid: "a" }, { actorUuid: "c" }, { actorUuid: "b" }],
+    reminder => owners[reminder.actorUuid]
+  );
+  assert.deepEqual(
+    groups.map(group => [group.owners, group.reminders.map(r => r.actorUuid)]),
+    [
+      [["gm"], ["a", "b"]],
+      [["gm", "p1"], ["c"]]
+    ]
+  );
 });

@@ -165,7 +165,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-123 | "Clock and timers" is a different dialog family. | DES-37 | S |
 | B-124 | `game.spycraft2.gc` functions open dialogs and take no arguments; GC tools cannot be dropped on the hotbar; the token HUD and token right-click add nothing. | XGC-36, XGC-37, XGC-38 | M |
 | B-125 | No way to ask a player for a skill check from the GC side. | NGC-38 | M |
-| B-126 | Turn-start reminders as one line per combatant, not a chat card each. | SGI-novice-gc R21 | S |
 | B-129 | Settings: related combat and approval choices sit among long hints; link a short policy summary from campaign setup. | CX-D18, CX-E17 | S |
 | B-130 | Reduced motion and theme: measured oddities whose source was not found. | UX-36 | S |
 
