@@ -9,6 +9,8 @@
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.GCActionDice"}}</span><b
       class="sc2-value"{{#if session.begun}}{{#unless mission.ended}} data-tooltip="{{localize 'SPYCRAFT.Console.Session'}} {{status.session}}"{{/unless}}{{/if}}>{{status.dice}}</b>{{#if session.begun}}{{#unless mission.ended}}<span
       class="gc-note gc-session-note">{{localize "SPYCRAFT.Console.Session"}} {{status.session}}</span>{{/unless}}{{/if}}</div>
+    {{#if status.requests}}<div class="sc2-field" data-tooltip="{{localize 'SPYCRAFT.Console.RequestsWaitingHint'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.RequestsWaiting"}}</span><b
+      class="sc2-value gc-tag-warn">{{status.requests}}</b></div>{{/if}}
   </div>
   <div class="gc-views" role="group" aria-label="{{localize 'SPYCRAFT.Console.Views'}}">{{#each views}}
     <button type="button" data-action="consoleView" data-view="{{id}}" aria-pressed="{{active}}" data-tooltip="{{hint}}">{{label}}</button>{{/each}}{{#unless windowed}}

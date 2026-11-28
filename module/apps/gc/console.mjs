@@ -51,6 +51,7 @@ import {
   setClockDateDialog
 } from "../game-clock.mjs";
 import { loc } from "../../i18n.mjs";
+import { pendingRequests } from "../gc-relay.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
@@ -483,13 +484,17 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     const acting = combat?.started ? combat.acting : null;
     // Before the fight begins, the Initiative rolls are what changes: say who is still to roll, and when all have.
     const waiting = combat && !combat.started && Number.isFinite(combat.unrolled) ? combat.unrolled : null;
-    const text = acting
+    const turn = acting
       ? loc`Round ${combat.round}: ${acting.name}'s turn.`
       : waiting === null
         ? ""
         : waiting
           ? loc`Still to roll Initiative: ${combat.unrolledNames}.`
           : loc`Every combatant has an Initiative Count.`;
+    const requests = speaks ? (context.status?.requests ?? 0) : 0,
+      asking =
+        requests === 1 ? loc`1 player request waiting.` : requests ? loc`${requests} player requests waiting.` : "";
+    const text = [turn, asking].filter(Boolean).join(" ");
     if (live.textContent !== text) live.textContent = text;
   }
 
@@ -799,6 +804,8 @@ export function consoleContext() {
     ),
     checklist,
     status: {
+      // Player requests waiting for this GC's Allow, so none sits unseen in a busy chat log.
+      requests: game.user?.isGM ? pendingRequests() : 0,
       mission: m.name || loc`No mission recorded`,
       missionState: m.active ? loc`active` : m.ended ? loc`ended` : loc`not started`,
       // The scene's kind, not the campaign's era: "period" reads as the decade in a Historical campaign.
@@ -1030,6 +1037,7 @@ const inFight = actor =>
 /** Register before Foundry constructs its sidebar applications. */
 export function registerGCConsoleTab() {
   for (const hook of ["createCombat", "deleteCombat"]) Hooks.on(hook, refreshSoon);
+  Hooks.on("spycraft2.relayPending", refreshSoon);
   // Another scene's fight, run by another GC, does not redraw this console under the pointer.
   const viewed = fight => !game.combat || !fight || fight.id === game.combat.id;
   Hooks.on("updateCombat", fight => viewed(fight) && refreshSoon());

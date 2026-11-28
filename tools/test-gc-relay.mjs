@@ -252,3 +252,22 @@ test("marking a card someone else posted goes through the GC, and a failure warn
   assert.equal(await markCard({ ...message, isAuthor: true }, "pendingSave.rolled"), true);
   assert.equal(updates.length, 1);
 });
+
+test("a request card the GC's reload dropped says it was lost, and the timeout is a world setting", async () => {
+  const { markLostRequests, askTimeoutSeconds, pendingRequests } = await import("../module/apps/gc-relay.mjs");
+  const updated = [];
+  const card = {
+    content: "<p>Allow?</p>",
+    flags: { spycraft2: { relayAsk: "gone" } },
+    update: async change => updated.push(change)
+  };
+  assert.equal(await markLostRequests([card, { flags: {} }]), 1);
+  assert.match(updated[0].content, /Lost when this GC's client reloaded/);
+  assert.equal(updated[0]["flags.spycraft2.relayState"], "lost");
+  assert.equal(pendingRequests(), 0);
+  settings.relayTimeout = 60;
+  assert.equal(askTimeoutSeconds(), 60);
+  settings.relayTimeout = 3;
+  assert.equal(askTimeoutSeconds(), 110, "a value below 15 s falls back to the default");
+  delete settings.relayTimeout;
+});

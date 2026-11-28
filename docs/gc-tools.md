@@ -24,8 +24,10 @@ Foundry already supplies scenes, tokens, journals, roll tables and the combat tr
 - Until the GC action dice are set up the console offers **Set up GC action dice**, pre-filled with the players present and the Caliber.
 - On an open NPC card the GC gets **GC boost** and **Activate threat (GC dice)**, paid from the GC pool.
 - A player's request to change something they do not own (damage to an NPC, treating a teammate) arrives as a card in
-  the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. Unanswered requests are declined
-  after about two minutes.
+  the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. The card says when it runs out
+  (the *Time to answer a player's request* setting, 110 seconds by default), and ends by saying whether the change was
+  applied or failed. The console's status strip counts the requests waiting. A request open when the GC's client
+  reloads is marked lost, and the player asks again.
 
 World settings that change the flow:
 
