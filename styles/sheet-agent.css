@@ -495,6 +495,13 @@
   background: var(--sc2-bad);
   color: var(--sc2-on-action);
 }
+/* The overspent badge carries words, so it widens to fit them. */
+.spycraft2.sheet.agent .track-step.over .sc2-uses.track-over {
+  width: auto;
+  min-width: 0;
+  padding: 0 6px;
+  white-space: nowrap;
+}
 .spycraft2.sheet.agent .track-start {
   font: 600 var(--sc2-text-s)/1.35 var(--font-primary, sans-serif);
   letter-spacing: 0;

@@ -852,6 +852,7 @@ function deriveAttributes(state) {
       order: 9,
       always: true,
       error: true,
+      over: -sys.pointBuy.remaining,
       tab: "main",
       text: loc`Attribute points overspent by ${-sys.pointBuy.remaining}: lower an attribute.`
     });
@@ -1916,6 +1917,7 @@ function deriveSkillTotals(state) {
         order: 29,
         always: true,
         error: true,
+        over: ranks - skillMaxRanks,
         tab: "skills",
         text: loc`${sd.name} is over its rank maximum (${ranks} / ${skillMaxRanks}): remove ${ranks - skillMaxRanks}.`
       });
@@ -1967,6 +1969,7 @@ function deriveSkillTotals(state) {
         order: 29,
         always: true,
         error: true,
+        over: -sp.remaining,
         tab: "skills",
         skillLevel: idx + 1,
         text: loc`Level ${idx + 1} skill points overspent by ${-sp.remaining}: lower a skill.`

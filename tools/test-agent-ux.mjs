@@ -218,3 +218,13 @@ test("Improved Fortune teammates is offered only when there is a teammate to pic
   assert.equal(combatToolVisibility({}, COMBAT_STANCES).fortuneTeammates, false);
   assert.equal(combatToolVisibility({}, COMBAT_STANCES, { earned: { fortuneTeammates: true } }).fortuneTeammates, true);
 });
+
+test("an overspent creation step says by how much in words", async () => {
+  const { buildCreationTrack } = await import("../module/sheets/agent-ux.mjs");
+  const { steps } = buildCreationTrack([
+    { order: 9, error: true, over: 2, tab: "main", text: "Attribute points overspent by 2: lower an attribute." }
+  ]);
+  const step = steps.find(s => s.error);
+  assert.equal(step.overLabel, "over by 2");
+  assert.ok(steps.filter(s => !s.error).every(s => s.overLabel === ""));
+});
