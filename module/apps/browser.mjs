@@ -246,7 +246,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
           group = s.expert ? "expert" : "base";
           groupLabel = game.i18n.localize(s.expert ? "SPYCRAFT.Class.Expert" : "SPYCRAFT.Class.Base");
           req = s.requirements;
-          extra = `d${s.vitalityDie} VP · ${s.skillPoints} SP`;
+          extra = loc`Vitality d${s.vitalityDie} · ${s.skillPoints} skill points`;
           break;
         case "origin":
           group = s.originType;
