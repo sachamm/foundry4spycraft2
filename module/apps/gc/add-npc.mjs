@@ -44,13 +44,32 @@ export async function npcChoices({ actors = game.actors, packs = game.packs } = 
   return [...world, ...fromPacks];
 }
 
-/** A world actor already imported from this compendium entry, so it can be placed again without a copy. */
-export function importedCopy(uuid, actors = game.actors) {
+/**
+ * A world actor already imported from this compendium entry, so it can be placed again without a copy. One imported
+ * before the GC last changed the entry is out of date and is not reused: the entry is imported afresh.
+ */
+export function importedCopy(uuid, actors = game.actors, entry = null) {
+  const changed = Number(entry?._stats?.modifiedTime) || 0;
   return (
     [...(actors ?? [])].find(
-      actor => actor._stats?.compendiumSource === uuid || actor.flags?.core?.sourceId === uuid
+      actor =>
+        (actor._stats?.compendiumSource === uuid || actor.flags?.core?.sourceId === uuid) &&
+        !(changed && (Number(actor._stats?.createdTime) || 0) < changed)
     ) ?? null
   );
+}
+
+/** Corners moved onto the grid in use: a hex or gridless scene is not laid out in squares. */
+export function onGrid(corners, grid) {
+  if (!grid || grid.isSquare !== false) return corners;
+  const snap = point => grid.getTopLeftPoint?.(point) ?? point;
+  const seen = new Set();
+  return corners.map(snap).filter(point => {
+    const key = `${Math.round(point.x)},${Math.round(point.y)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /** The top-left corner that puts a token of this many grid squares at the centre of the view, on the grid. */
@@ -248,6 +267,7 @@ export async function addNpcToScene({ uuid = null } = {}) {
       <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" placeholder="${esc(loc`1, or a Minion squad`)}" /></label>
       <label>${loc`Stands toward the team as`} <select name="disposition"><option value="hostile" selected>${loc`Hostile`}</option><option value="neutral">${loc`Neutral`}</option><option value="friendly">${loc`Friendly`}</option><option value="keep">${loc`As its own token is set`}</option></select></label>
       <label><input type="checkbox" name="hidden" /> ${loc`Hidden from the players`}</label>
+      <label><input type="checkbox" name="fresh" /> ${loc`A compendium NPC already in this world: import a fresh copy instead of reusing it`}</label>
       ${fight ? `<label><input type="checkbox" name="join" checked /> ${loc`Join the fight on the tracker`}</label>` : ""}
       ${mission.name || mission.active ? `<label><input type="checkbox" name="record" /> ${loc`Also record it for mission XP, if its type is not listed yet`}</label>` : ""}
       <p class="hint">${loc`A compendium NPC is imported the first time and reused after that. Tokens go on free squares around the centre of your view, numbered when there is more than one.`} ${loc`Left blank, a Minion comes as a squad the team's size (twice that with Horde), one of them its Commander if it has that quality (pp.447–448).`}</p></div>`
@@ -260,7 +280,9 @@ export async function addNpcToScene({ uuid = null } = {}) {
     return refuse(loc`The scene changed while the dialog was open. Nothing was added.`);
   let actor = await fromUuid(input.uuid);
   if (actor?.pack)
-    actor = importedCopy(input.uuid) ?? (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
+    actor =
+      (input.fresh ? null : importedCopy(input.uuid, game.actors, actor)) ??
+      (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
   if (actor?.type !== "npc") return refuse(loc`That NPC could not be found.`);
   const prototype = await actor.getTokenDocument();
   // A Minion squad has as many members as the team, twice as many under Horde (pp.447–448).
@@ -277,16 +299,19 @@ export async function addNpcToScene({ uuid = null } = {}) {
     snap: point => canvas.grid.getTopLeftPoint?.(point) ?? point
   });
   const others = [...scene.tokens];
-  const corners = spreadCorners({
-    origin,
-    count,
-    gridSize: canvas.grid.size,
-    width: prototype.width,
-    height: prototype.height,
-    occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height })),
-    bounds: canvas.dimensions?.sceneRect ?? null,
-    blocked: wallBetween(origin, canvas.grid.size, prototype.width, prototype.height)
-  });
+  const corners = onGrid(
+    spreadCorners({
+      origin,
+      count,
+      gridSize: canvas.grid.size,
+      width: prototype.width,
+      height: prototype.height,
+      occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height })),
+      bounds: canvas.dimensions?.sceneRect ?? null,
+      blocked: wallBetween(origin, canvas.grid.size, prototype.width, prototype.height)
+    }),
+    canvas.grid
+  );
   if (!corners.length) return refuse(loc`There is no free square near the centre of the view.`);
   const names = numberedNames(
     prototype.name || actor.name,

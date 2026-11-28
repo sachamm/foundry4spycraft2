@@ -565,3 +565,31 @@ test("a hidden field's limits are set aside so it cannot hold the dialog, and co
   freeCancel({ querySelectorAll: () => [cancel] });
   assert.equal(cancel.formNoValidate, true);
 });
+
+test("Add NPC: a stale import is not reused, and a hex grid's corners land on the grid", async () => {
+  const { importedCopy, onGrid } = await import("../module/apps/gc/add-npc.mjs");
+  const uuid = "Compendium.spycraft2.core-npcs.Actor.x";
+  const actors = [{ name: "Anton", _stats: { compendiumSource: uuid, createdTime: 100 } }];
+  assert.equal(importedCopy(uuid, actors, { _stats: { modifiedTime: 50 } }).name, "Anton");
+  assert.equal(importedCopy(uuid, actors, { _stats: { modifiedTime: 200 } }), null, "rebuilt since the import");
+  const square = [{ x: 0, y: 0 }];
+  assert.equal(onGrid(square, { isSquare: true }), square);
+  const hex = {
+    isSquare: false,
+    getTopLeftPoint: p => ({ x: Math.round(p.x / 87) * 87, y: Math.round(p.y / 100) * 100 })
+  };
+  assert.deepEqual(
+    onGrid(
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 10, y: 0 }
+      ],
+      hex
+    ),
+    [
+      { x: 0, y: 0 },
+      { x: 87, y: 0 }
+    ]
+  );
+});
