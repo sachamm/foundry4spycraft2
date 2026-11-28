@@ -1,5 +1,6 @@
 import { installUndo } from "./module/apps/undo.mjs";
 import { installIdentitySpeaker } from "./module/apps/flawless-identity.mjs";
+import { installNpcImport } from "./module/apps/npc-import.mjs";
 import { renderOpenSheet } from "./module/services/refresh.mjs";
 import { installUITooltipHooks } from "./module/apps/ui-tooltips.mjs";
 import { installSampleAgentHooks } from "./module/sample-agents.mjs";
@@ -240,6 +241,7 @@ Hooks.once("init", () => {
   installRoundReminders();
   installInitiativeBoost();
   installIdentitySpeaker();
+  installNpcImport();
   installTargetNotices();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();

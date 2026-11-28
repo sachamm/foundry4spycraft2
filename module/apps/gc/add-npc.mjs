@@ -282,7 +282,7 @@ export async function addNpcToScene({ uuid = null } = {}) {
   if (actor?.pack)
     actor =
       (input.fresh ? null : importedCopy(input.uuid, game.actors, actor)) ??
-      (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
+      (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id, {}, { spycraft2Placing: true }));
   if (actor?.type !== "npc") return refuse(loc`That NPC could not be found.`);
   const prototype = await actor.getTokenDocument();
   // A Minion squad has as many members as the team, twice as many under Horde (pp.447–448).
