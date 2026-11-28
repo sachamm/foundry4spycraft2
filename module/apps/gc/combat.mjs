@@ -179,17 +179,13 @@ export async function recordFluidEvent(combatant, id, input = {}) {
     const wasActing = combat?.started && combat.combatant?.id === combatant.id,
       turnBefore = combat?.turn;
     // The acting character stepping down hands the turn on; anyone else's Count change leaves the turn where it is.
+    // The delaying character steps down the order; the turn goes to whoever now stands in that place, so the
+    // characters between the old and the new Count still act this round (p.356). The lead GM moves the turn and
+    // starts the next one (keepActingTurn), so a player who delays needs no right to change the fight.
     await combatant.update(
       { initiative: result.count, "flags.spycraft2.fluid": { ...state, delayed: result.used } },
-      wasActing ? { spycraft2HandOver: true } : {}
+      wasActing && Number.isInteger(turnBefore) ? { spycraft2HandOver: true, spycraft2HandOverTurn: turnBefore } : {}
     );
-    // The delaying character steps down the order; the turn goes to whoever now stands in that place, so the
-    // characters between the old and the new Count still act this round (p.356).
-    if (wasActing && Number.isInteger(turnBefore)) {
-      combat.setupTurns?.();
-      const now = combat.turns?.findIndex?.(c => c.id === combatant.id) ?? -1;
-      if (now > turnBefore) await combat.update({ turn: turnBefore });
-    }
     return { count: result.count };
   }
   if (id === "press") {
@@ -434,8 +430,19 @@ async function endOfRoundWork(combat, endedRound) {
   return lines;
 }
 
-/** Break remaining ties (same Count and bonus) with a d20 roll-off stored on the combatants. */
-export async function rollTiebreaks(combat = game.combat) {
+/**
+ * Break remaining ties (same Count and bonus) with a d20 roll-off stored on the combatants. Only members with no
+ * stored roll-off roll, so two tied combatants never swap places when a third joins them; one pass runs at a time
+ * for each fight.
+ */
+const tiebreakRuns = new Map();
+export function rollTiebreaks(combat = game.combat) {
+  const key = combat?.id ?? "";
+  const run = (tiebreakRuns.get(key) ?? Promise.resolve()).catch(() => 0).then(() => rollTiebreaksNow(combat));
+  tiebreakRuns.set(key, run);
+  return run;
+}
+async function rollTiebreaksNow(combat) {
   const groups = new Map();
   for (const combatant of combat?.combatants ?? []) {
     if (!Number.isFinite(combatant.initiative)) continue;
@@ -444,9 +451,10 @@ export async function rollTiebreaks(combat = game.combat) {
   }
   let rolled = 0;
   for (const tied of groups.values()) {
-    if (tied.length < 2 || tied.every(combatant => Number.isFinite(combatant.flags?.spycraft2?.tiebreak))) continue;
-    const seen = new Set();
-    for (const combatant of tied) {
+    const stored = combatant => Number.isFinite(combatant.flags?.spycraft2?.tiebreak);
+    if (tied.length < 2 || tied.every(stored)) continue;
+    const seen = new Set(tied.filter(stored).map(combatant => combatant.flags.spycraft2.tiebreak));
+    for (const combatant of tied.filter(entry => !stored(entry))) {
       let value;
       do {
         value = (await new Roll("1d20").evaluate()).total + Math.random();
@@ -603,11 +611,19 @@ const actingIn = new Map(),
  * would pass to whoever now stands in the old place. Unless the acting character stepped down on purpose, the
  * lead GM points the turn back at the same character.
  */
-export async function keepActingTurn(combat, { handOver = false } = {}) {
+export async function keepActingTurn(combat, { handOver = false, handOverTurn = null } = {}) {
   if (!combat?.started || settling.has(combat.id)) return null;
   combat.setupTurns?.();
   const expected = actingIn.get(combat.id);
   const index = expected ? (combat.turns?.findIndex?.(entry => entry.id === expected) ?? -1) : -1;
+  if (handOver && Number.isInteger(handOverTurn)) {
+    // The acting character delayed: whoever now stands in its old place acts next, with its turn start.
+    if (combat.turn !== handOverTurn)
+      await combat.update({ turn: handOverTurn }, { spycraft2KeepTurn: true, turnEvents: false });
+    actingIn.set(combat.id, combat.combatant?.id ?? null);
+    await turnStart(combat, combat.combatant);
+    return null;
+  }
   if (handOver || index < 0) {
     actingIn.set(combat.id, combat.combatant?.id ?? null);
     return null;
@@ -616,6 +632,28 @@ export async function keepActingTurn(combat, { handOver = false } = {}) {
   return combat.update({ turn: index }, { spycraft2KeepTurn: true, turnEvents: false });
 }
 
+/**
+ * What happens as a combatant's turn begins, whichever way the turn reached it (Next turn, a Delay handing it on): a
+ * readied action left from an earlier round lapses, and flat-footedness ends (p.342).
+ */
+export async function turnStart(combat, combatant) {
+  const actor = combatant?.actor;
+  if (!combat?.started || !combatant) return;
+  const readied = combatant.flags?.spycraft2?.readied;
+  if (readied && readied.round !== combat.round) await combatant.update({ "flags.spycraft2.readied": null });
+  if (!actor?.statuses?.has?.("flat-footed")) return;
+  const facts = { round: combat.round, surprise: combat.flags?.spycraft2?.surprise ?? null };
+  if (!flatFootedEndsOnTurn(facts, { playerSide: actor.hasPlayerOwner === true })) return;
+  try {
+    await setConditionStatus(actor, "flat-footed", false, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
+  } catch {
+    /* supplied by another source: left for the GC */
+  }
+}
+
+/** Fights whose start has already made everyone flat-footed: the pass runs once per fight. */
+const flatFootedFights = new Set();
+
 export function installFluidInitiativeHooks() {
   // Everyone starts a fight flat-footed unless he joins it deliberately after it begins (p.323).
   // The start is read from the combat's own update, which every client sees: the lead GM marks the fight whoever
@@ -623,6 +661,9 @@ export function installFluidInitiativeHooks() {
   Hooks.on("updateCombat", (combat, changed, options) => {
     if (changed?.round !== 1 || options?.direction < 0) return;
     if (!isLeadGM() || !setting("startFlatFooted")) return;
+    // Round 1 can be entered twice (back to round 0 and forward again): the fight starts flat-footed once.
+    if (flatFootedFights.has(combat.id)) return;
+    flatFootedFights.add(combat.id);
     startPass = (async () => {
       for (const combatant of combat.combatants) await condition(combatant.actor, "flat-footed", "Flat-footed");
     })();
@@ -643,7 +684,10 @@ export function installFluidInitiativeHooks() {
     if (Object.hasOwn(changed, "turn") || Object.hasOwn(changed, "round"))
       actingIn.set(combat.id, combat.combatant?.id ?? null);
   });
-  Hooks.on("deleteCombat", combat => actingIn.delete(combat.id));
+  Hooks.on("deleteCombat", combat => {
+    actingIn.delete(combat.id);
+    flatFootedFights.delete(combat.id);
+  });
   // After a reload the lead GM learns who is acting before any Count can move.
   const learn = () => {
     for (const combat of game.combats ?? []) if (combat.started) actingIn.set(combat.id, combat.combatant?.id ?? null);
@@ -655,24 +699,16 @@ export function installFluidInitiativeHooks() {
     if (!Object.hasOwn(changed, "turn") && !Object.hasOwn(changed, "round")) return;
     // The same character is still acting: only its place in the order moved.
     if (options?.direction < 0 || options?.spycraft2KeepTurn) return;
+    // Who this turn belongs to is read now: a quick second Next turn must not make this pass act on someone else.
+    const captured = combat.combatant;
     await startPass;
     if (Object.hasOwn(changed, "round")) {
       await null;
       await fluidRoundSettled();
+      // A new round may have been reordered; its first turn is whoever leads the new order.
+      return turnStart(combat, combat.combatant);
     }
-    const combatant = combat.combatant,
-      actor = combatant?.actor;
-    // A readied action that never went off is lost when the character's next turn comes round.
-    const readied = combatant?.flags?.spycraft2?.readied;
-    if (readied && readied.round !== combat.round) await combatant.update({ "flags.spycraft2.readied": null });
-    if (!actor?.statuses?.has?.("flat-footed")) return;
-    const facts = { round: combat.round, surprise: combat.flags?.spycraft2?.surprise ?? null };
-    if (!flatFootedEndsOnTurn(facts, { playerSide: actor.hasPlayerOwner === true })) return;
-    try {
-      await setConditionStatus(actor, "flat-footed", false, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
-    } catch {
-      /* supplied by another source: left for the GC */
-    }
+    return turnStart(combat, captured);
   });
   Hooks.on("updateCombat", async (combat, changed, options) => {
     if (!isLeadGM() || !Object.hasOwn(changed, "round") || !setting("fluidInitiative")) return;
@@ -708,7 +744,10 @@ export function installFluidInitiativeHooks() {
     if (!isLeadGM()) return;
     const moved = Object.hasOwn(changed, "initiative");
     if (moved || Object.hasOwn(changed.flags?.spycraft2 ?? {}, "tiebreak"))
-      keepActingTurn(combatant.parent, { handOver: options?.spycraft2HandOver === true }).catch(() => {});
+      keepActingTurn(combatant.parent, {
+        handOver: options?.spycraft2HandOver === true,
+        handOverTurn: options?.spycraft2HandOverTurn
+      }).catch(() => {});
     if (moved) rollTiebreaks(combatant.parent).catch(() => {});
   });
   // Beside each name: what is left of the acting combatant's turn, and the states that change how it is attacked.
@@ -840,23 +879,31 @@ export async function triggerReadied(combatant) {
   if (!combatant) return null;
   const combat = combatant.parent,
     at = combat?.combatant?.initiative ?? combatant.initiative;
-  const acted = hasActed(combatant);
-  const result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
-  if (!result) return result;
+  const acted = hasActed(combatant),
+    readied = combatant.flags?.spycraft2?.readied ?? null;
+  // The marker comes off before the Count moves and the card posts, so nobody sees a readied action that went off.
+  await combatant.update({ "flags.spycraft2.readied": null });
+  let result;
+  try {
+    result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
+  } catch (error) {
+    await combatant.update({ "flags.spycraft2.readied": readied });
+    throw error;
+  }
+  if (!result) {
+    await combatant.update({ "flags.spycraft2.readied": readied });
+    return result;
+  }
   // The readied action was this round's action. If the new Count puts the combatant ahead of the turn pointer
   // again, its turn is marked as used up so the tracker and console show nothing left to do.
   const again = acted && !hasActed(combatant) && combat.combatant?.id !== combatant.id;
-  await combatant.update({
-    "flags.spycraft2.readied": null,
-    ...(again
-      ? {
-          "flags.spycraft2.actions": {
-            round: combat.round,
-            used: HALF_ACTIONS_PER_TURN + Math.max(0, extraHalfActions(combatant))
-          }
-        }
-      : {})
-  });
+  if (again)
+    await combatant.update({
+      "flags.spycraft2.actions": {
+        round: combat.round,
+        used: HALF_ACTIONS_PER_TURN + Math.max(0, extraHalfActions(combatant))
+      }
+    });
   if (again)
     ui.notifications.info(
       loc`${combatant.name} has acted this round: pass its turn when it comes up again at the new Count.`

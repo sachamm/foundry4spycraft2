@@ -52,6 +52,7 @@ import {
 } from "./module/apps/gc/state.mjs";
 import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
 import { installDramaticInitiative } from "./module/apps/gc/spend.mjs";
+import { installLateInitiative } from "./module/apps/gc/late-initiative.mjs";
 import { registerKeybindings } from "./module/apps/keybindings.mjs";
 import {
   installFluidInitiativeHooks,
@@ -232,6 +233,7 @@ Hooks.once("init", () => {
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
+  installLateInitiative();
   installDramaticInitiative();
   installRoundReminders();
   installTargetNotices();

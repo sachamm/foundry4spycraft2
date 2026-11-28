@@ -3,7 +3,7 @@
  * The actions that move a combat or spend GC action dice are for the GC only.
  */
 import { loc, locKey } from "../i18n.mjs";
-import { stepBackTurn } from "./gc/combat.mjs";
+import { fluidRoundSettled, stepBackTurn } from "./gc/combat.mjs";
 
 /** The newest chat card on screen that holds a button matching the selector, and that button. */
 export function newestCardButton(root, selector, keep = () => true) {
@@ -229,15 +229,20 @@ function actingWeapon(index) {
 
 function openActingSheet() {
   if (!game.combat?.combatant) return false;
-  Promise.resolve(turnChange).then(() => {
-    const sheet = game.combat?.combatant?.actor?.sheet;
-    if (!sheet) return;
-    // One sheet follows the turn: the one this shortcut opened last is closed when the turn has moved on.
-    if (shortcutSheet && shortcutSheet !== sheet && shortcutSheet.rendered) shortcutSheet.close();
-    // A sheet the GC already had open is theirs: the shortcut does not close it later.
-    shortcutSheet = sheet.rendered ? null : sheet;
-    sheet.render(true);
-  });
+  // At a round change the end-of-round reorder lands after the turn does: wait for it, so the sheet is the new
+  // order's first combatant and not the old one's.
+  Promise.resolve(turnChange)
+    .then(() => fluidRoundSettled())
+    .catch(() => null)
+    .then(() => {
+      const sheet = game.combat?.combatant?.actor?.sheet;
+      if (!sheet) return;
+      // One sheet follows the turn: the one this shortcut opened last is closed when the turn has moved on.
+      if (shortcutSheet && shortcutSheet !== sheet && shortcutSheet.rendered) shortcutSheet.close();
+      // A sheet the GC already had open is theirs: the shortcut does not close it later.
+      shortcutSheet = sheet.rendered ? null : sheet;
+      sheet.render(true);
+    });
   return true;
 }
 

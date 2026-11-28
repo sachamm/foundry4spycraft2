@@ -760,6 +760,7 @@ const makeCombat = list => {
     flags: {},
     combatants: {
       get: id => combatants.get(id),
+      set: (id, combatant) => combatants.set(id, combatant),
       find: fn => [...combatants.values()].find(fn),
       filter: fn => [...combatants.values()].filter(fn),
       [Symbol.iterator]: () => combatants.values()
@@ -934,6 +935,16 @@ test("group initiative makes one roll per NPC type; tie-breaks are stored", asyn
     (a, b) => b.flags.spycraft2.tiebreak - a.flags.spycraft2.tiebreak
   );
   assert.equal(sorted[0].id, "g2");
+  // A third joins the tie: only the newcomer rolls, so the first two keep their places.
+  const kept = sorted.map(c => c.flags.spycraft2.tiebreak);
+  const third = makeActor("g3", "combatant", null, { name: "Guard", actor: guard, initiative: 13, parent: fight });
+  fight.combatants.set("g3", third);
+  dice(9);
+  assert.equal(await combat.rollTiebreaks(fight), 1);
+  assert.deepEqual(
+    sorted.map(c => c.flags.spycraft2.tiebreak),
+    kept
+  );
   const Sorted = combat.fluidCombatClass(class {});
   const order = [
     { id: "x", initiative: 12, actor: { system: { initiative: { total: 1 } } }, flags: {} },
@@ -1389,6 +1400,12 @@ test("a Count that changes off-turn leaves the turn with the character who was a
   fight.turns = ["q", "x", "r", "b"].map(id => ({ id }));
   await keepActingTurn(fight);
   assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
+  // A Delay names the place it left: the lead GM moves the turn there and starts that turn.
+  fight.turns = ["x", "r", "b", "q"].map(id => ({ id }));
+  fight.turn = 3;
+  await keepActingTurn(fight, { handOver: true, handOverTurn: 0 });
+  assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
+  assert.equal(fight.combatant.id, "x");
 });
 
 test("console sections open for the state in play and keep the GC's choice until that state changes", () => {

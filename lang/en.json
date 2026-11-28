@@ -200,6 +200,7 @@
    "CountHeading": "Count",
    "UnrolledNamed": "Not rolled yet: {names}.",
    "Elsewhere": "This fight is on {scene}, not the scene in view. Next turn moves it.",
+   "LateTurn": "{name} rolled on a Count already passed this round, so takes the next turn.",
    "Unscened": "This fight belongs to no scene, so it shows on every scene. Next turn moves it.",
    "SessionBegun": "Session begun",
    "BeginNewSession": "Begin a new session…",
