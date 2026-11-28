@@ -152,7 +152,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-121 | Mission facts were measured stacking as full-width tiles (564px). `.gc-facts` is an auto-fill grid now; confirm in a live console and find what overrides it if they still stack. | DES-06 | S |
 | B-122 | Raw `COMBAT.RollAll` / `COMBAT.RollNPC` tooltips on the tracker: probably Foundry core with a missing translation; confirm in a live world before working around it. | LR-30 | S |
 | B-124 | `game.spycraft2.gc` functions open dialogs and take no arguments; GC tools cannot be dropped on the hotbar; the token HUD and token right-click add nothing. | XGC-36, XGC-37, XGC-38 | M |
-| B-125 | No way to ask a player for a skill check from the GC side. | NGC-38 | M |
 | B-129 | Settings: related combat and approval choices sit among long hints; link a short policy summary from campaign setup. | CX-D18, CX-E17 | S |
 | B-130 | Reduced motion and theme: measured oddities whose source was not found. | UX-36 | S |
 

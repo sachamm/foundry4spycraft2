@@ -1,3 +1,4 @@
+import { requestSkillCheck } from "./request-check.mjs";
 import { readSetting } from "../../settings.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
@@ -226,6 +227,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       }),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
+      requestCheck: guard(() => requestSkillCheck()),
       // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
       previousTurn: guard(() => combat.stepBackTurn(game.combat)),
       nextTurn: guard(() => {

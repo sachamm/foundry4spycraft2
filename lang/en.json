@@ -202,6 +202,8 @@
    "BeginSessionHint": "New session: resets session uses and action dice, sets up the GC action dice and applies starting-dice changes",
    "NextScene": "Next scene",
    "NextSceneHint": "Resets scene uses, ends a dramatic scene and NPCs' accumulated damage, and counts the scene played",
+   "RequestCheck": "Ask for a check",
+   "RequestCheckHint": "Ask agents for a skill check: each owner gets a roll button on the card",
    "SetUpPool": "Set up GC action dice",
    "Caliber": "Caliber",
    "StandingReward": "Standing reward",
