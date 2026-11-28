@@ -377,6 +377,10 @@ test("Next scene can be taken back until a later scene begins", async () => {
     {}
   );
   assert.ok(scenePeriodRevert({ scene: "s3", sceneSequence: 5 }, change).reason);
+  assert.match(
+    scenePeriodRevert({ scene: "s2", sceneSequence: 4 }, change, { damaged: ["Guard"] }).reason,
+    /Guard took damage in the new scene/
+  );
   assert.ok(scenePeriodRevert({}, {}).reason);
 });
 

@@ -117,7 +117,7 @@ export async function gcBoostCard(message, actor) {
       cardBoost: {
         messageId: message.id,
         before,
-        after: { boostTotal, count: (check.gcBoosts ?? []).length + 1 }
+        after: { boostTotal, count: before.gcBoosts.length + 1 }
       }
     });
   } catch (error) {

@@ -16,6 +16,35 @@ export function damageSavePreview(accumulated, damage) {
   const total = accumulated + hit;
   return loc`This save: DC ${damageSaveDC(total)} (10 + half of ${total}: ${accumulated} already taken this scene and ${hit} now).`;
 }
+/**
+ * The damage a typed figure comes to after the campaign's stress multipliers and the NPC's prepared stress or
+ * subdual resistance, as the save itself will count it. Typed cold, heat or electrical defenses are not previewed.
+ */
+export function damageAfterAdjustments(actor, { damage, kind = "lethal", campaignStressAdjusted = false } = {}) {
+  let hit = Math.trunc(Number(damage));
+  if (!(hit >= 1)) return null;
+  try {
+    if (kind === "stress" && campaignStressAdjusted !== true) {
+      const campaign = campaignStressDamage(hit, campaignStressPolicy(actor.system.campaignEffects));
+      if (campaign) hit = campaign.adjustedDamage;
+    }
+    if (["stress", "subdual"].includes(kind)) hit = damageResistancePlan(actor.system, kind, hit).net;
+  } catch {
+    return Math.trunc(Number(damage));
+  }
+  return hit;
+}
+/** The preview line for the dialog: the DC after adjustments, or that nothing is left to save against. */
+export function adjustedSavePreview(actor, accumulated, input) {
+  const entered = Math.trunc(Number(input?.damage)),
+    hit = damageAfterAdjustments(actor, input);
+  if (hit === null) return damageSavePreview(accumulated, null);
+  if (hit < 1) return loc`No damage is left after campaign modifiers and resistance, so no save is rolled.`;
+  const line = damageSavePreview(accumulated, hit);
+  return hit === entered
+    ? line
+    : loc`${entered} damage counts as ${hit} after campaign modifiers and resistance. ${line}`;
+}
 const options = (rows, selected) =>
   rows
     .map(
@@ -69,9 +98,18 @@ export async function askNpcDamageSaveInput(actor) {
           field = root?.querySelector?.('[name="damage"]'),
           line = root?.querySelector?.("[data-save-preview]");
         if (!field || !line) return;
-        field.addEventListener("input", () => {
-          line.textContent = damageSavePreview(state.track.accumulated, field.value);
-        });
+        const kind = root.querySelector('[name="kind"]'),
+          adjusted = root.querySelector('[name="campaignStressAdjusted"]');
+        const show = () => {
+          line.textContent = adjustedSavePreview(actor, state.track.accumulated, {
+            damage: field.value,
+            kind: kind?.value ?? "lethal",
+            campaignStressAdjusted: adjusted?.checked === true
+          });
+        };
+        field.addEventListener("input", show);
+        kind?.addEventListener("change", show);
+        adjusted?.addEventListener("change", show);
       }
     }
   );

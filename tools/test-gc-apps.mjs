@@ -2323,6 +2323,13 @@ test("the Damage save dialog shows the DC the new injury will be rolled against 
   const { damageSavePreview } = await import("../module/apps/gc/npc-damage-save.mjs");
   assert.match(damageSavePreview(6, 9), /DC 17 \(10 \+ half of 15: 6 already taken this scene and 9 now\)/);
   assert.match(damageSavePreview(6, ""), /Enter the damage/);
+  const { adjustedSavePreview, damageAfterAdjustments } = await import("../module/apps/gc/npc-damage-save.mjs");
+  const tough = { system: { survivalStats: { resistances: { subdual: 8 }, resistanceSources: [] } } };
+  assert.equal(damageAfterAdjustments(tough, { damage: 10, kind: "lethal" }), 10);
+  assert.equal(damageAfterAdjustments(tough, { damage: 10, kind: "subdual" }), 2);
+  assert.match(adjustedSavePreview(tough, 0, { damage: 10, kind: "subdual" }), /10 damage counts as 2 .* DC 11 /);
+  assert.match(adjustedSavePreview(tough, 0, { damage: 8, kind: "subdual" }), /no save is rolled/);
+  assert.match(adjustedSavePreview(tough, 0, { damage: 10, kind: "lethal" }), /^This save: DC 15 /);
 });
 
 test("an attack card's first line names its target (B-077)", async () => {

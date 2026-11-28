@@ -242,14 +242,33 @@ export async function startUsagePeriod(period) {
     })
   );
 }
+/** Names of the NPCs, in the sidebar or on a scene, whose damage record belongs to this scene period. */
+export function npcsDamagedInScene(scene) {
+  if (!scene || !globalThis.game?.actors) return [];
+  const actors = new Set(game.actors);
+  for (const place of game.scenes ?? [])
+    for (const token of place.tokens ?? []) if (token.actor) actors.add(token.actor);
+  return [...actors]
+    .filter(actor => actor.type === "npc" && String(actor.system?.damageTrack?.scene ?? "") === String(scene))
+    .filter(actor => {
+      const track = actor.system.damageTrack;
+      return track.accumulated > 0 || track.failures > 0 || track.ignored > 0 || !!track.last;
+    })
+    .map(actor => actor.name);
+}
 /**
  * What taking back a "Next scene" would write, or the reason it cannot be taken back. Pure, so it can be tested.
  * @param {object} periods  the stored usage periods now
  * @param {object} change   { before: {scene, sceneSequence}, after: scene id the step set }
  */
-export function scenePeriodRevert(periods = {}, change = {}) {
+export function scenePeriodRevert(periods = {}, change = {}, { damaged = npcsDamagedInScene(change?.after) } = {}) {
   if (!change?.after || String(periods?.scene ?? "initial") !== String(change.after))
     return { reason: loc`A later scene has begun since, so that Next scene can no longer be taken back.` };
+  // A standard NPC keeps one damage record; damage in the new scene has replaced the earlier scene's.
+  if (damaged.length)
+    return {
+      reason: loc`${damaged.slice(0, 3).join(", ")} took damage in the new scene, which replaced the record from the scene before. That Next scene can no longer be taken back.`
+    };
   const target = { ...periods };
   if (change.before?.scene === undefined || change.before.scene === null) delete target.scene;
   else target.scene = change.before.scene;
