@@ -119,8 +119,7 @@ globalThis.Actor = class {
 globalThis.game = { i18n: { localize: s => s, format: s => s } };
 globalThis.ChatMessage = { getSpeaker: () => ({}) };
 globalThis.ui = { notifications: { warn: () => null } };
-let rollResults = [3],
-  posts = 0;
+let rollResults = [3];
 globalThis.Roll = class {
   constructor(formula) {
     this.formula = formula;
@@ -130,7 +129,6 @@ globalThis.Roll = class {
     return this;
   }
   async toMessage() {
-    posts++;
     return {};
   }
 };

@@ -10,8 +10,21 @@ function themedOptions(options = {}) {
   return { ...options, classes: [...new Set([...(options.classes ?? []), "spycraft2", "sc2-dialog"])] };
 }
 
+/**
+ * An option dialog that answers null when closed also gets a Cancel button, which answers the same way, so no dialog
+ * has only its main button and the corner cross to leave by. A dialog that names its own buttons is left as written.
+ */
+export function withCancel(options = {}) {
+  if (options.rejectClose !== false || (options.buttons ?? []).length) return options;
+  return { ...options, buttons: [{ action: "cancel", label: loc`Cancel` }] };
+}
+async function inputWithCancel(options) {
+  const result = await foundry.applications.api.DialogV2.input(themedOptions(withCancel(options)));
+  return result === "cancel" ? null : result;
+}
+
 export const systemDialog = {
-  input: options => foundry.applications.api.DialogV2.input(themedOptions(options)),
+  input: options => inputWithCancel(options),
   confirm: options => foundry.applications.api.DialogV2.confirm(themedOptions(options)),
   prompt: options => foundry.applications.api.DialogV2.prompt(themedOptions(options)),
   wait: options => foundry.applications.api.DialogV2.wait(themedOptions(options))
@@ -23,9 +36,27 @@ export function themeSystemDialog(dialog) {
   if (!element || (!element.classList.contains("sc2-dialog") && !element.querySelector(".spycraft2-roll-options")))
     return;
   element.classList.add("spycraft2", "sc2-dialog");
+  nameMainButton(element);
+  // Cancel always closes: it skips the browser's field checks, which would otherwise hold the dialog open.
+  for (const button of element.querySelectorAll?.('button[data-action="cancel"]') ?? []) button.formNoValidate = true;
   if (tableTrusted()) trustConfirmations(element);
   // The GC is the one these boxes ask: they open ticked for the GC, who unticks any that do not hold.
   else if (globalThis.game?.user?.isGM) trustConfirmations(element, { asGC: true });
+}
+
+/**
+ * A main button still carrying Foundry's stock "Confirm" takes the dialog's own title, so it says what it will do
+ * (style guide, Dialogs). A long title or a question is left alone. Returns the label set, or "".
+ */
+export function nameMainButton(element) {
+  const button = element.querySelector?.('.form-footer button[data-action="ok"]'),
+    title = element.querySelector?.(".window-title")?.textContent?.trim() ?? "";
+  if (!button || !title || title.length > 36 || /[?:…]$/.test(title)) return "";
+  const stock = globalThis.game?.i18n?.localize?.("Confirm") ?? "Confirm",
+    text = button.querySelector("span") ?? button;
+  if (text.textContent.trim() !== stock) return "";
+  text.textContent = title;
+  return title;
 }
 
 /** The world setting that lets players' declarations stand without ticking each GC confirmation. */
@@ -59,8 +90,43 @@ export function trustConfirmations(element, { asGC = false } = {}) {
   return boxes.length;
 }
 
+/** The control that had the keyboard before a dialog took it, so closing the dialog can hand it back. */
+let lastOutsideFocus = null;
+const inDialog = element => !!element?.closest?.("dialog, .application.dialog, .sc2-dialog");
+
+/** Remember which control opened a system dialog (the `renderDialogV2` hook, after theming). */
+export function rememberOpener(dialog) {
+  if (!dialog?.element?.classList?.contains("sc2-dialog") || dialog._sc2Opener !== undefined) return;
+  dialog._sc2Opener = lastOutsideFocus;
+}
+
+/**
+ * When a system dialog closes, the keyboard goes back to the control that opened it if that control is still on the
+ * page, and any hover help left up by the press is taken down (the `closeDialogV2` hook).
+ */
+export function returnFocusToOpener(dialog) {
+  if (!dialog?.element?.classList?.contains("sc2-dialog")) return false;
+  globalThis.game?.tooltip?.deactivate?.();
+  const opener = dialog._sc2Opener;
+  if (!opener?.isConnected || opener.disabled) return false;
+  // After the close has finished moving focus, so the hand-back is the last word.
+  (globalThis.requestAnimationFrame ?? (run => run()))(() => {
+    if (opener.isConnected && !inDialog(globalThis.document?.activeElement)) opener.focus?.({ preventScroll: true });
+  });
+  return true;
+}
+
 export function installDialogThemeHooks() {
   Hooks.on("renderDialogV2", themeSystemDialog);
+  Hooks.on("renderDialogV2", rememberOpener);
+  Hooks.on("closeDialogV2", returnFocusToOpener);
+  globalThis.document?.addEventListener?.(
+    "focusin",
+    event => {
+      if (!inDialog(event.target)) lastOutsideFocus = event.target;
+    },
+    { capture: true, passive: true }
+  );
 }
 
 /** Register the table-trust setting. Call during `init`. */

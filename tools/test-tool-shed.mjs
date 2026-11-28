@@ -318,7 +318,7 @@ test("expired kit warnings survive the feat prerequisite convergence passes", ()
 });
 test("skill posting re-fetches the owned kit after RNG and rejects deletion before the receipt is posted", async () => {
   const a = actor(),
-    { s, item } = grant(
+    { item } = grant(
       a.system,
       third.find(k => k.system.kitType === "Authentication Kit")
     );

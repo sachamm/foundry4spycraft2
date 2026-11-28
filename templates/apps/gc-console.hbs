@@ -38,6 +38,7 @@
   {{#if shown.wrap}}
   <section class="gc-wrap" aria-label="{{localize 'SPYCRAFT.Console.WrapUp'}}">
     <h3>{{localize "SPYCRAFT.Console.WrapUp"}}</h3>
+    <p class="gc-note">{{wrap.objectives}}</p>
     <ol>
       <li>
         <button type="button" class="{{#if (eq @root.primary "missionReport")}} gc-primary{{/if}}" data-action="missionReport"
@@ -85,11 +86,11 @@
       class="tag">{{localize "SPYCRAFT.Template.AppsGcConsole.Active"}}</span>{{else if mission.ended}}<span
       class="tag muted">{{localize "SPYCRAFT.Console.MissionEnded"}}</span>{{/if}}</span></summary>
     <div class="gc-facts">
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b
+      <div class="sc2-field" data-tooltip="{{terms.threatLevel}}"><span class="sc2-caption">{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}}</span><b
         class="sc2-value">{{mission.threatLevel}}</b>{{#if mission.threatNote}}<span class="gc-note">{{mission.threatNote}}</span>{{/if}}</div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
+      <div class="sc2-field" data-tooltip="{{terms.caliber}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Caliber"}}</span><b class="sc2-value">{{mission.caliberLabel}}</b></div>
       <div class="sc2-field"><span class="sc2-caption">{{xp.label}}</span><span class="sc2-value">{{#if xp.started}}{{localize "SPYCRAFT.Console.XPValue" earned=xp.earned planned=xp.planned}}{{else}}{{xp.planned}}{{/if}}</span></div>
-      <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span
+      <div class="sc2-field" data-tooltip="{{terms.standing}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StandingReward"}}</span><span
         class="sc2-value">{{localize "SPYCRAFT.Console.StandingValue" reputation=mission.standing.reputation netWorth=mission.standing.netWorthLabel}}</span></div>
       {{#if mission.bonusDice}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingDice"}}</span><span
         class="sc2-value">{{localize "SPYCRAFT.Console.StartingDiceValue" dice=mission.bonusDice}}</span></div>{{/if}}
@@ -273,10 +274,15 @@
   </details>
   <details class="gc-section" data-section="campaign" data-view-hidden="{{hiddenSections.campaign}}" data-state="{{sections.campaign.state}}" {{#if sections.campaign.open}}open{{/if}}>
     <summary><span class="gc-section-title">{{localize "SPYCRAFT.Template.AppsGcConsole.CampaignQualities"}}</span></summary>
-    <p class="controls"><button type="button" data-action="seasonQualities">{{localize "SPYCRAFT.Template.AppsGcConsole.SeasonQualities"}}</button></p>
+    <p class="controls"><button type="button" data-action="seasonQualities">{{localize "SPYCRAFT.Template.AppsGcConsole.SeasonQualities"}}</button>
+      <button type="button" class="sc2-action" data-action="openSystemSettings" data-tooltip="{{localize 'SPYCRAFT.Console.QualitySettingsHint'}}">{{localize "SPYCRAFT.Console.QualitySettings"}}</button></p>
+    <p class="sc2-caption">{{localize "SPYCRAFT.Console.QualitiesSeason"}}</p>
     <ul data-sc2-display="icon">{{#each season}}<li data-tooltip="{{summary}}">{{name}} ({{xp}} {{localize "SPYCRAFT.Template.AppsGcConsole.XP3"}} <span
       class="tag muted">{{handling}}</span> {{summary}}</li>{{else}}<li
       class="muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NoSeasonLongQualities"}}</li>{{/each}}</ul>
+    {{#if mission.qualities.length}}<p class="sc2-caption">{{localize "SPYCRAFT.Console.QualitiesThisMission"}}</p>
+    <ul data-sc2-display="icon">{{#each mission.qualities}}<li>{{name}} <span
+      class="tag muted">{{#if added}}{{localize "SPYCRAFT.Console.QualityBought"}}{{else}}{{localize "SPYCRAFT.Console.QualityScripted"}}{{/if}}</span></li>{{/each}}</ul>{{/if}}
     {{#if ruleLines.length}}<p>{{localize "SPYCRAFT.Template.AppsGcConsole.RulesInForce"}}</p>
     <ul data-sc2-display="icon">{{#each ruleLines}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
     {{#each effectConflicts}}<p class="bad">{{key}} {{localize "SPYCRAFT.Template.AppsGcConsole.IsSetDifferentlyBy"}} {{qualities}}{{localize "SPYCRAFT.Template.AppsGcConsole.GCRulingNeeded"}}
@@ -291,6 +297,7 @@
     <button type="button" data-action="npcKnowledge">{{localize "SPYCRAFT.Template.AppsGcConsole.NpcKnowledge"}}</button></p>
     <p class="gc-note gc-shortcuts"><b>{{localize "SPYCRAFT.Console.Shortcuts"}}:</b> {{localize "SPYCRAFT.Console.ShortcutsLine" next=shortcuts.nextTurn previous=shortcuts.previousTurn card=shortcuts.cardPrimary boost=shortcuts.gcBoost spend=shortcuts.spendDice sheet=shortcuts.activeSheet console=shortcuts.gcConsole mob=shortcuts.mobAttack weapon1=shortcuts.actingWeapon1 weapon2=shortcuts.actingWeapon2}}
       </p>
-    <p class="controls"><button type="button" data-action="openControls">{{localize "SPYCRAFT.Console.OpenControls"}}</button></p>
+    <p class="controls"><button type="button" data-action="openControls">{{localize "SPYCRAFT.Console.OpenControls"}}</button>
+      <button type="button" data-action="openGlossary" data-tooltip="{{localize 'SPYCRAFT.Console.GlossaryHint'}}">{{localize "SPYCRAFT.Console.Glossary"}}</button></p>
   </details>
 </section>

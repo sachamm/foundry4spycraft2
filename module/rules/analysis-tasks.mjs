@@ -46,9 +46,8 @@ export function analysisTaskValid(t) {
     t.revision !== t.events.length
   )
     return false;
-  let pressure;
   try {
-    pressure = taskPressureState(t);
+    taskPressureState(t);
   } catch {
     return false;
   }

@@ -11,9 +11,7 @@ let scene = "s",
   failPost = false,
   hook = null,
   serial = 0;
-const source = "Forensic Genius",
-  opts = { gearStatus: "available" },
-  task = { ...opts, complexAnalysisTask: true, analysisBaseChallenges: 6 };
+const source = "Forensic Genius";
 const state = () => ({
   activeFeatNames: [source],
   activeFeatSelections: [],

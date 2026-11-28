@@ -242,6 +242,69 @@ export async function startUsagePeriod(period) {
     })
   );
 }
+/**
+ * Names of the characters, in the sidebar or on a scene, whose stored data mentions this scene period: a use, a
+ * damage record or an ability record written since the scene began. Such a record replaced the one from the scene
+ * before, so that scene can no longer be read back.
+ */
+export function actorsRecordedInScene(scene) {
+  if (!scene || !globalThis.game?.actors) return [];
+  const id = JSON.stringify(String(scene)),
+    actors = new Set(game.actors);
+  for (const place of game.scenes ?? [])
+    for (const token of place.tokens ?? []) if (token.actor) actors.add(token.actor);
+  return [...actors]
+    .filter(actor => {
+      try {
+        const source = actor.toObject?.() ?? actor;
+        return JSON.stringify([source.system ?? {}, source.flags?.spycraft2 ?? {}]).includes(id);
+      } catch {
+        return false;
+      }
+    })
+    .map(actor => actor.name);
+}
+/**
+ * What taking back a "Next scene" would write, or the reason it cannot be taken back. Pure, so it can be tested.
+ * @param {object} periods  the stored usage periods now
+ * @param {object} change   { before: {scene, sceneSequence}, after: scene id the step set }
+ */
+export function scenePeriodRevert(periods = {}, change = {}, { damaged = actorsRecordedInScene(change?.after) } = {}) {
+  if (!change?.after || String(periods?.scene ?? "initial") !== String(change.after))
+    return { reason: loc`A later scene has begun since, so that Next scene can no longer be taken back.` };
+  // A character keeps one record per kind (damage taken, a paid ability, a use); one written in the new scene has
+  // replaced the earlier scene's.
+  if (damaged.length)
+    return {
+      reason: loc`Something was recorded in the new scene for ${damaged.slice(0, 3).join(", ")}${damaged.length > 3 ? loc` and ${damaged.length - 3} more` : ""}, which replaced the record from the scene before. That Next scene can no longer be taken back.`
+    };
+  const target = { ...periods };
+  if (change.before?.scene === undefined || change.before.scene === null) delete target.scene;
+  else target.scene = change.before.scene;
+  if (Number.isSafeInteger(change.before?.sceneSequence)) target.sceneSequence = change.before.sceneSequence;
+  else delete target.sceneSequence;
+  return { target };
+}
+/** Take back a "Next scene": the scene period returns to the scene before it, so that scene's records read again. */
+export async function revertScenePeriod(change) {
+  if (!game.user?.isGM) throw new Error(loc`Only the GC can start a new usage period.`);
+  if (getUsagePeriodReview().needsReview)
+    throw new Error(loc`Review the interrupted start before starting another scene or session.`);
+  const actors = tracked();
+  return queueResources(actors, () =>
+    withGCPeriodLock(async () => {
+      const { target, reason } = scenePeriodRevert(periodState(), change);
+      if (reason) throw new Error(reason);
+      try {
+        await game.settings.set("spycraft2", "usagePeriods", target);
+      } catch (error) {
+        if (!same(periodState(), target)) throw error;
+      }
+      refreshUsagePeriodActors();
+      return target;
+    })
+  );
+}
 export async function reviewUsagePeriod(options = {}) {
   if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted start.`);
   const saved = clone(getUsagePeriodReview());

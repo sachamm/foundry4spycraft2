@@ -68,7 +68,7 @@ test("actual Fend declaration requires no full action and changes no attack, thr
   assert.equal(p.fullActionConfirmed, false);
   assert.equal(p.damageBonus, 0);
   assert.equal(validRecordedMeleeTrick(p, c.attackContext), true);
-  assert.match(meleeTrickContent(a), /optional5ft move after hit or miss/);
+  assert.match(meleeTrickContent(a), /optional 5 ft move after hit or miss/);
   for (const patch of [{ meleeTrickOnlyConfirmed: false }, { meleeFeatTrick: "chop" }, { attackAction: "other" }]) {
     const a = make();
     await attack(a, patch);
@@ -86,7 +86,7 @@ test("actual Fend declaration requires no full action and changes no attack, thr
     assert.equal(game.messages.length, 0);
   }
 });
-test("both actual adopted finished hits and misses record one exactly5ft movement and one non-roll receipt without dice or another action", async () => {
+test("both actual adopted finished hits and misses record one exactly 5 ft movement and one non-roll receipt without dice or another action", async () => {
   for (const succeeded of [true, false]) {
     const { a, m } = await finish(succeeded),
       random = controls.draw;
@@ -104,7 +104,7 @@ test("both actual adopted finished hits and misses record one exactly5ft movemen
     controls.draw = random;
   }
 });
-test("source-bound replay is read-only even after later movement or Count changes and concurrent calls cannot spend the5ft twice", async () => {
+test("source-bound replay is read-only even after later movement or Count changes and concurrent calls cannot spend the 5 ft twice", async () => {
   const { a, m } = await finish(),
     all = await Promise.all([move(a, m), move(a, m)]);
   assert.equal(all[0].uuid, all[1].uuid);
@@ -145,7 +145,7 @@ test("unconfirmed, wrong-size, delayed, unresolved, superseded, nonstandard or f
   const { a } = await finish();
   await assert.rejects(recordFendMovement(a, { sourceMessage: "ChatMessage.fake" }));
 });
-test("round caps, immobility and sprawled prevent Fend while a legal prone5ft step is not reclassified as a Standard Move", async () => {
+test("round caps, immobility and sprawled prevent Fend while a legal prone 5 ft step is not reclassified as a Standard Move", async () => {
   for (const change of [
     a => (a.system.postureMovement = { bonusStep: false }),
     a => (a.system.encumbrance = { immobile: true }),

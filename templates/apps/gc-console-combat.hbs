@@ -81,6 +81,7 @@
           class="tag gc-tag-{{tone}}">{{text}}</span>{{/each}}</span>{{/if}}<span
           class="gc-row-count" aria-label="{{count}}">{{countValue}}</span></button></li>{{/each}}
     </ul>
+    {{#if combat.readied.length}}<p class="controls gc-readied">{{#each combat.readied}}<button type="button" data-action="triggerReadied" data-id="{{id}}" data-tooltip="{{hint}}">{{label}}</button>{{/each}}</p>{{/if}}
     {{#if combat.started}}
     <details class="gc-more">
       <summary>{{localize "SPYCRAFT.Console.InitiativeTools"}}</summary>

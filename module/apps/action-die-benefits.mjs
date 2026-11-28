@@ -6,8 +6,7 @@ import { loc } from "../i18n.mjs";
 export function surchargeFundingControl(actor, { benefitCount = 1, perBenefit = false } = {}) {
   const rules = shakenRules(actor.actionDiceFundingSystem);
   if (!rules.extraDice || rules.spendingForbidden) return "";
-  const esc = foundry.utils.escapeHTML,
-    pools = unrestrictedBonusPools(actor.actionDiceFundingSystem, actor.usagePeriods).filter(p => p.available);
+  const esc = foundry.utils.escapeHTML;
   return `<p>${loc`Shaken adds ${perBenefit ? loc`${rules.extraDice} extra action dice for each distinct paid benefit selected here` : loc`${rules.extraDice * benefitCount} extra action dice to this activation`}. Surcharge dice do not increase its benefit.`}</p><label>${loc`Surcharge funding`} <select name="surchargeBonusPoolId"><option value="same">${loc`Same source as the benefit dice`}</option><option value="">${loc`Ordinary action dice`}</option>${unrestrictedBonusPools(
     actor.actionDiceFundingSystem,
     actor.usagePeriods

@@ -384,13 +384,13 @@ rollPipeline.register({
             plan.key === "betweenRibs"
               ? loc`Between the Ribs: full-action Standard Attack with this readied knife. A hit inflicts 1 die of sneak attack damage: roll damage from this recorded hit and include its sneak attack die. The general sneak attack conditions still apply (p.179).`
               : plan.key === "threadNeedle"
-                ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180).`
+                ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond 5 ft ends this hold (p.180).`
                 : plan.key === "impale"
                   ? loc`Impale: on a hit, +1 damage for every 2 points by which this attack result beats the target’s Defense. Roll damage from this recorded hit; the GC confirms the target’s Defense then (p.180).`
                   : plan.key === "entwine"
                     ? loc`Entwine: a hit deals the whip’s damage and leaves the target held until they escape, you release them or you move more than 10 ft. away; at the end of each round they stay held you may shift them into an open adjacent square (p.180).`
                     : plan.key === "fend"
-                      ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
+                      ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move 5 ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
                       : loc` ${plan.source}: full-action Standard Attack; ${plan.attackBonus >= 0 ? "+" : ""}${plan.attackBonus} attack, +${plan.damageBonus} recorded-hit damage${plan.threatIncrease ? `, +${plan.threatIncrease} threat range` : ""}${plan.grantedQuality ? ", takedown quality" : ""} (p.${MELEE_ATTACK_TRICKS[plan.key].page}).`
           ]
         : []

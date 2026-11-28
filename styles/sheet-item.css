@@ -35,7 +35,7 @@
 }
 /* Unqualified rows stay at full contrast; the tag and the red prerequisite line carry the state. */
 .spycraft2.browser li.unqualified .unqualified-tag {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
   border-color: currentColor;
   opacity: 1;
   margin-right: 6px;
@@ -112,7 +112,7 @@
   cursor: pointer;
 }
 .spycraft2.application.browser .row-main .name:hover {
-  color: var(--sc2-teal);
+  color: var(--sc2-action);
   text-decoration: underline;
 }
 .spycraft2.browser .row-main .summary {
@@ -122,11 +122,11 @@
 }
 .spycraft2.application.browser li button[data-action="add"] {
   flex: 0 0 var(--sc2-control);
-  background: var(--sc2-paper-raised);
+  background: var(--sc2-surface-raised);
   border-color: var(--sc2-rule);
 }
 .spycraft2.application.browser li button.owned {
-  background: var(--sc2-teal-tint);
+  background: var(--sc2-action-tint);
   border-color: var(--sc2-good);
 }
 

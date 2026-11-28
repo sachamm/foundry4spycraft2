@@ -14,6 +14,7 @@ import { standingStatus } from "../../rules/standing.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import {
   getMission,
+  missionEpoch,
   teamActors,
   teamLevels,
   missionXP,
@@ -35,15 +36,18 @@ import * as turn from "./console-turn.mjs";
 import {
   VIEWS,
   VIEW_SECTIONS,
+  applyConsoleButtonTips,
   consoleView,
   consoleSections,
   effectLabel,
   firstSessionChecklist,
   primaryAction,
-  qualityHandling
+  qualityHandling,
+  searchOtherViews
 } from "./console-view.mjs";
 import { npcDamageSaveWithUndo } from "./npc-play.mjs";
 import { withUndo } from "../undo.mjs";
+import { openGlossary, termMeans } from "../glossary.mjs";
 import { pressActorCard, shortcutLabel } from "../keybindings.mjs";
 import {
   advanceClock,
@@ -162,12 +166,41 @@ const QUALITY_HANDLING = {
   hand: () => loc`by hand`
 };
 
+export const GC_TOOL_DRAG = "spycraft2.gcTool";
+/** Whether a console button works from its action alone: one that names a combatant, a row, a view or a field does not. */
+export function hotbarTool(button) {
+  const data = Object.keys(button?.dataset ?? {}).filter(
+    key => !["action", "tooltip", "tooltipDirection"].includes(key)
+  );
+  // A button that reads a field beside it (the quick Add) has nothing to read from the hotbar.
+  if (button?.closest?.(".gc-quick-add")) return false;
+  return !!button?.dataset?.action && data.every(key => /^sc2|^search/.test(key)) && !button.disabled;
+}
+
+/**
+ * Run one of the console's tools by its action name, as a hotbar macro does: `game.spycraft2.gc.run("spendDice")`.
+ * Only tools that need no row or combatant can run this way.
+ */
+export async function runConsoleTool(action) {
+  if (!game.user?.isGM) return refuse(loc`The GC Console is for the Game Control.`);
+  const handler = GCConsole.DEFAULT_OPTIONS.actions[action];
+  if (typeof handler !== "function") return refuse(loc`The GC Console has no tool called ${action}.`);
+  const target = globalThis.document?.createElement?.("button") ?? {
+    dataset: {},
+    setAttribute() {},
+    removeAttribute() {}
+  };
+  target.dataset.action = action;
+  return handler.call(ui.gc, { detail: 1 }, target);
+}
+
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "gc-console"],
-    position: { width: 720, height: 800 },
+    // One column of controls needs no more width than this, and a narrower window leaves the map in view.
+    position: { width: 480, height: 800 },
     window: {
       get title() {
         return loc`GC Console`;
@@ -289,7 +322,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return spend.spendGCDice({ preferActor: acting?.actor ?? null });
       }),
       dramaticOn: guard(async () => {
-        if (await spend.setDramaticScene(true)) ui.notifications.info(loc`This scene is now dramatic (no dice spent).`);
+        if (await spend.startDramaticScene(game.combat))
+          ui.notifications.info(loc`This scene is now dramatic. The details are in chat.`);
       }),
       dramaticOff: guard(async () => {
         if (await spend.setDramaticScene(false)) ui.notifications.info(loc`This scene is back to standard.`);
@@ -309,6 +343,14 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       }),
       fightEnd: guard(() => combat.endFight()),
       combatReference: guard(() => combat.combatReferenceDialog()),
+      // A readied action goes off on somebody else's turn, so its button sits with the order, not the acting block.
+      triggerReadied: guard((event, target) => {
+        const readied = game.combat?.combatants?.get(target.dataset.id);
+        if (!readied?.flags?.spycraft2?.readied) return null;
+        return withUndo([readied.actor], loc`Readied action triggered: ${readied.name}`, () =>
+          combat.triggerReadied(readied)
+        );
+      }),
       openCombatant: guard((event, target) =>
         turn.openCombatant(game.combat, target.dataset.id, { sheet: target.dataset.sheet === "true" || event.shiftKey })
       ),
@@ -352,6 +394,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return pressActorCard(acting, "button.sc2-primary-action[data-roll-control]");
       }),
       mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
+      openGlossary: guard(() => openGlossary()),
+      openSystemSettings: guard(() => game.settings.sheet?.render?.(true)),
       consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
       startConflict: guard(() => conflicts.startConflictDialog()),
       addOrganization: guard(() => organizations.editOrganization()),
@@ -409,6 +453,20 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
   _onRender(context, options) {
     super._onRender(context, options);
+    applyConsoleButtonTips(this.element);
+    // A tooltip left up from before the redraw would sit over whatever is drawn in its place.
+    globalThis.game?.tooltip?.deactivate?.();
+    // A tool that needs nothing but its own press can be dragged to the hotbar, where it becomes a macro.
+    for (const tool of this.element.querySelectorAll("button[data-action]")) {
+      if (!hotbarTool(tool) || tool.draggable) continue;
+      tool.draggable = true;
+      tool.addEventListener("dragstart", event => {
+        event.dataTransfer?.setData(
+          "text/plain",
+          JSON.stringify({ type: GC_TOOL_DRAG, action: tool.dataset.action, name: tool.textContent.trim() })
+        );
+      });
+    }
     // The main button leads its row on screen, so it leads in the markup too and the keyboard reaches it first.
     for (const primary of this.element.querySelectorAll(".controls > button.gc-primary"))
       if (primary.parentElement.firstElementChild !== primary) primary.parentElement.prepend(primary);
@@ -449,7 +507,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       (this._search[context.view ?? "all"] ??= {}),
       {
         terms: SEARCH_TERMS(),
-        elsewhere: SEARCH_ELSEWHERE()
+        elsewhere: { ...SEARCH_ELSEWHERE(), ...searchOtherViews(context.view) }
       }
     );
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
@@ -681,8 +739,8 @@ const viewState = () => {
   const m = getMission();
   return game.combat ? "combat" : m.active ? "active" : m.ended ? "ended" : "planning";
 };
-/** What the choice was made in: this fight, or outside a fight. A choice made in one fight does not hold in the next. */
-const viewKey = () => game.combat?.id ?? null;
+/** What the choice was made in: this fight, or this mission outside a fight. It does not hold in the next one. */
+const viewKey = () => game.combat?.id ?? missionEpoch();
 function rememberView(view, state) {
   if (!VIEWS.includes(view)) return null;
   return game.settings.set("spycraft2", VIEW_SETTING, { view, state, key: viewKey() });
@@ -846,7 +904,24 @@ export function consoleContext() {
             : loc`${dice.value} left of ${starting}`,
       session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
     },
+    // One-line meanings of the terms the mission facts use, from the shared list.
+    terms: {
+      threatLevel: termMeans(loc`Threat Level`),
+      caliber: termMeans(loc`Caliber`),
+      standing: termMeans(loc`Standing`)
+    },
     wrap: {
+      // What is still open is said first, since ending the mission settles XP on what is ticked now.
+      objectives: (open =>
+        !m.objectives.length
+          ? loc`No objectives recorded`
+          : !open
+            ? loc`Every objective is completed`
+            : open === 1
+              ? loc`1 objective is not completed; tick it in Objectives if the team achieved it`
+              : loc`${open} objectives are not completed; tick in Objectives those the team achieved`)(
+        m.objectives.filter(objective => !objective.complete).length
+      ),
       standing:
         team.length && paid >= team.length
           ? loc`Standing: everyone paid`
@@ -974,6 +1049,7 @@ export function consoleContext() {
           surprise: combatNow.flags?.spycraft2?.surprise ?? null,
           acting,
           combatants: turn.combatRows(combatNow),
+          readied: combatNow.started ? turn.readiedRows(combatNow) : [],
           // Before the fight begins a mob cannot attack, and it attacks on a member's turn: only the acting
           // combatant's own mob gets a button.
           mobs: started

@@ -62,8 +62,48 @@ const parts = [
     ({ options }) =>
       `<label>${loc`Situational modifier`} <input name="situationalModifier" type="number" step="1" value="${Number(options.situationalModifier) || 0}" /></label>`
   ],
+  // The measured-shot conditions the Gear tab's second attack button used to open a dialog of its own for: light,
+  // fog, mounts, bracing and the rest. Folded shut, so a plain shot is still one glance.
+  [68, context => measuredShotContent(context)],
   [70, () => `</div>`]
 ];
+
+const fieldNames = html => new Set([...String(html).matchAll(/\bname="([^"]+)"/g)].map(match => match[1]));
+let nesting = false;
+/**
+ * Every field of the "rangedAttack" dialog that the attack dialog does not already hold, inside one disclosure.
+ * Built from the ranged dialog's own pieces, so a rule that adds a field there shows here without more work.
+ */
+export function measuredShotContent(context) {
+  if (nesting || !rangedWeapon(context?.item)) return "";
+  nesting = true;
+  try {
+    const { actor, item, options = {} } = context;
+    // An unfinished character may have no figures to preview the weapon with: the section then leaves out fire modes.
+    let preview = {};
+    try {
+      preview = actor?.weaponAttack?.(item) ?? {};
+    } catch {
+      preview = {};
+    }
+    const mine = fieldNames(rollPipeline.dialog({ ...context, dialog: "attack" }));
+    const ranged = rollPipeline.dialog({ dialog: "rangedAttack", actor, item, options, preview, esc: escapeText });
+    const labels = (ranged.match(/<label\b[\s\S]*?<\/label>/g) ?? []).filter(label => {
+      const names = [...fieldNames(label)];
+      return names.length && names.every(name => !mine.has(name));
+    });
+    if (!labels.length) return "";
+    return `<details class="sc2-measured-shot"><summary>${loc`Light, fog, mounts and bracing`}</summary><p class="hint">${loc`Leave these alone for an ordinary shot. Fill in what applies when the shot is measured: the range modifier comes from the distance above.`}</p>${labels.join("")}</details>`;
+  } finally {
+    nesting = false;
+  }
+}
+const escapeText = value => globalThis.foundry?.utils?.escapeHTML?.(String(value)) ?? String(value);
+
+/** The names of the measured-shot fields this dialog shows for a weapon, to know which entered values are theirs. */
+export function measuredShotFields(context) {
+  return fieldNames(measuredShotContent(context));
+}
 
 export const ATTACK_DIALOG = Object.freeze({ id: "attack", anchors: Object.freeze({}) });
 

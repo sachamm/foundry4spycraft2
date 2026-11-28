@@ -38,7 +38,7 @@ test("concurrent/repeated application reuses the original condition; ending and 
   assert.equal(target.effects.length, 0);
   assert.equal((await end(a, m, { reason: "movedBeyond", separationFeet: 0 })).end.reason, "release");
 });
-test("release preserves other Held and Pinned effects, and movement ending needs actual holder movement and resulting separation over5ft", async () => {
+test("release preserves other Held and Pinned effects, and movement ending needs actual holder movement and resulting separation over 5 ft", async () => {
   const { a, m, target } = await hit();
   await target.createEmbeddedDocuments("ActiveEffect", [
     {

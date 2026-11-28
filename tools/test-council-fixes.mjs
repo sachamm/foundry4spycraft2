@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { recordedAttackDistance } from "../module/rules/cqb.mjs";
-import { agentTokenDefaults, equipsAsFirstWeapon } from "../module/rules/creation-defaults.mjs";
+import { agentTokenDefaults, equipsAsFirstWeapon, npcTokenDefaults } from "../module/rules/creation-defaults.mjs";
 import { buildCreationTrack, buildSetupGuide } from "../module/sheets/agent-ux.mjs";
 import { prerequisitesUseSkills } from "../module/rules/prerequisites.mjs";
 import { orderSkillChecks, needsGear } from "../module/rules/skill-check-order.mjs";
@@ -439,6 +439,7 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
   );
   assert.deepEqual(rows[1], {
     name: "Guard 2",
+    delta: { name: "Guard 2" },
     actorLink: false,
     appendNumber: false,
     disposition: -1,
@@ -465,8 +466,8 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
     }
   );
   assert.equal(squad[0].name, "Guard 1 (Commander)");
-  assert.deepEqual(squad[0].delta, { system: { commander: true } });
-  assert.equal("delta" in squad[1], false);
+  assert.deepEqual(squad[0].delta, { name: "Guard 1 (Commander)", system: { commander: true } });
+  assert.deepEqual(squad[1].delta, { name: "Guard 2" });
   assert.deepEqual(numberedNames("Guard", 1, ["Guard 1 (Commander)", "Guard 2"]), ["Guard 3"]);
 
   const created = [];
@@ -597,4 +598,70 @@ test("Add NPC: a stale import is not reused, and a hex grid's corners land on th
       { x: 87, y: 0 }
     ]
   );
+});
+
+test("a new NPC's token is hostile and readable by the GC; a special one is linked with its two bars (B-062)", () => {
+  assert.deepEqual(npcTokenDefaults({}, "standard"), { disposition: -1, displayName: 20 });
+  assert.deepEqual(npcTokenDefaults({}, "special"), {
+    disposition: -1,
+    displayName: 20,
+    actorLink: true,
+    displayBars: 40,
+    bar1: { attribute: "vitality" },
+    bar2: { attribute: "wounds" }
+  });
+  // What the creator chose is kept.
+  assert.deepEqual(npcTokenDefaults({ disposition: 1, displayName: 0 }, "standard"), null);
+  assert.equal(npcTokenDefaults({ actorLink: false }, "special").actorLink, undefined);
+});
+
+test("copies laid out on a hex grid never share a hex and the group keeps its size (B-230)", async () => {
+  const { spreadCorners } = await import("../module/apps/gc/add-npc.mjs");
+  // A coarse snap that maps two neighbouring squares of each row onto one cell, as a hex row offset can.
+  const snap = point => ({ x: Math.floor(point.x / 200) * 200, y: point.y });
+  const corners = spreadCorners({ origin: { x: 400, y: 400 }, count: 6, gridSize: 100, snap });
+  assert.equal(corners.length, 6);
+  assert.equal(new Set(corners.map(point => `${point.x},${point.y}`)).size, 6);
+});
+
+test("an unlinked copy's own actor carries the token's name, at placement and after a rename (B-251)", async () => {
+  const { placementData } = await import("../module/apps/gc/add-npc.mjs");
+  const { unlinkedRename } = await import("../module/apps/token-links.mjs");
+  const placed = placementData(
+    { name: "Guard", actorLink: false },
+    {
+      corners: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 }
+      ],
+      names: ["Guard 1", "Guard 2"],
+      commanderIndex: 1
+    }
+  );
+  assert.equal(placed[0].delta.name, "Guard 1");
+  assert.deepEqual(placed[1].delta, { name: "Guard 2 (Commander)", system: { commander: true } });
+  // A lone linked token keeps the actor's own name.
+  assert.equal(
+    placementData({ name: "Boss", actorLink: true }, { corners: [{ x: 0, y: 0 }], names: [] })[0].delta,
+    undefined
+  );
+  const token = { actorLink: false, actor: { name: "Guard 1" } };
+  assert.equal(unlinkedRename(token, { name: "Sergeant" }), "Sergeant");
+  assert.equal(unlinkedRename(token, { name: "Guard 1" }), null);
+  assert.equal(unlinkedRename({ ...token, actorLink: true }, { name: "Sergeant" }), null);
+  assert.equal(unlinkedRename(token, { x: 5 }), null);
+});
+
+test("the save dialog always offers the GC's modifier (B-102)", async () => {
+  await import("../module/rolls/dialogs/save.mjs");
+  const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+  const content = rollPipeline.dialog({
+    dialog: "save",
+    actor: { system: {} },
+    feats: new Set(),
+    key: "fort",
+    stillStandingContent: "",
+    options: {}
+  });
+  assert.match(content, /name="situationalModifier"/);
 });

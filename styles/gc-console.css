@@ -297,7 +297,7 @@
   min-width: 44px;
   min-height: 44px;
   --sc2-icon-size: 20px;
-  background: var(--sc2-paper-raised);
+  background: var(--sc2-surface-raised);
   vertical-align: middle;
 }
 
@@ -418,10 +418,16 @@
   min-height: var(--sc2-control);
   white-space: nowrap;
 }
+.gc-console-body .gc-views button:hover:not([aria-pressed="true"]) {
+  border-color: var(--sc2-action);
+  color: var(--sc2-ink-strong);
+}
+/* The chosen view is told by weight and an underline as well as its fill, which alone is too close to the page. */
 .gc-console-body .gc-views button[aria-pressed="true"] {
   color: var(--sc2-on-bar);
   background: var(--sc2-bar);
   font-weight: 700;
+  box-shadow: inset 0 -3px 0 var(--sc2-action);
 }
 .gc-console-body details.gc-section[data-view-hidden="true"]:not([data-tool-search-active="true"]) {
   display: none;
@@ -738,7 +744,7 @@
   grid-column: 3;
 }
 .gc-console-body .gc-tag-bad {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
 }
 .gc-console-body .gc-tag-warn {
   color: var(--sc2-warn);

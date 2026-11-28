@@ -616,7 +616,7 @@ export async function manageDisposition(actor) {
     villain = isVillain(actor),
     mission = String(actor.system.usagePeriods?.mission ?? "initial");
   const targets = [
-    ["", `Everyone not listed (${dispositionGrade(record.base).name})`],
+    ["", loc`Everyone not listed (${dispositionGrade(record.base).name})`],
     ...teamActors(getMission()).map(agent => [
       agent.id,
       `${agent.name} (${dispositionGrade(dispositionToward(record, agent.id)).name})`
@@ -631,14 +631,14 @@ export async function manageDisposition(actor) {
     <label>${loc`Toward`} <select name="target">${options(targets, "")}</select></label>
     <label>${loc`Action`} <select name="action">${options(
       [
-        ["show", loc`Show check modifiers`],
         ["shift", loc`Shift by grades`],
         ["set", loc`Set a grade (GC ruling)`],
+        ["show", loc`Show check modifiers`],
         ["loyalty", loc`Roll a Loyalty decision`],
         ["combat", loc`Roll whether the NPC joins a fight`],
         ["persuade", loc`A side tries to talk the NPC into the fight (once per combat)`]
       ],
-      "show"
+      "shift"
     )}</select></label>
     <label data-when="action=shift">${loc`Shift (positive is friendlier)`} <input type="number" name="steps" value="1" /></label>
     <label data-when="action=shift"><input type="checkbox" name="automatic" /> ${loc`The shift comes from an ability that shifts disposition automatically (once per mission)`}</label>
@@ -675,7 +675,7 @@ export async function manageDisposition(actor) {
   if (!input) return null;
   const targetId = input.target || "",
     gradeNow = targetId ? dispositionToward(record, targetId) : record.base,
-    name = targetId ? (game.actors.get(targetId)?.name ?? targetId) : "everyone else";
+    name = targetId ? (game.actors.get(targetId)?.name ?? targetId) : loc`everyone else`;
   try {
     if (input.action === "persuade") {
       if (villain) return refuse(loc`Villains ignore combat disposition effects.`);

@@ -21,7 +21,8 @@ import {
   opposedOutcome,
   reducedDamage,
   restPlan,
-  woundState
+  woundState,
+  withoutLegacyDamageMark
 } from "../module/rules/damage-application.mjs";
 import { grappleBenefitChanges } from "../module/rules/combat-actions.mjs";
 import { ammunitionLabel, ammunitionState, reloadPlan, spendShotsPlan } from "../module/rules/ammunition-use.mjs";
@@ -407,4 +408,15 @@ test("grapple benefits name the conditions they change on each side", () => {
   ]);
   assert.deepEqual(grappleBenefitChanges(["draw", "injure"]), []);
   assert.throws(() => grappleBenefitChanges(["tickle"]), /listed grapple benefit/);
+});
+
+test("Undo frees an old card's array of marks: the newest record for that target comes off", () => {
+  const a = { targetUuid: "Actor.a", damage: 3 },
+    b = { targetUuid: "Actor.b", damage: 4 },
+    a2 = { targetUuid: "Actor.a", damage: 5 };
+  assert.deepEqual(withoutLegacyDamageMark({ damageApplied: [a, b, a2] }, "Actor.a"), [a, b]);
+  assert.deepEqual(withoutLegacyDamageMark({ damageApplied: [a] }, "Actor.a"), []);
+  assert.equal(withoutLegacyDamageMark({ damageApplied: [b] }, "Actor.a"), null);
+  assert.equal(withoutLegacyDamageMark({ damageAppliedBy: { x: a } }, "Actor.a"), null);
+  assert.equal(withoutLegacyDamageMark({ damageApplied: [a] }, undefined), null);
 });

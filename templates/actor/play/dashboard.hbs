@@ -1,7 +1,7 @@
   <div class="play-dashboard play-only">
     {{#if startedCharacterCombat}}<div class="round-tracker" role="group" aria-label="{{localize 'SPYCRAFT.Round.Title'}}">
       <span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.Round.Hint'}}">{{localize "SPYCRAFT.Round.Title"}}</span>
-      {{#each roundActions}}<button type="button" class="round-pip{{#if spent}} spent{{/if}}" data-sc2-display="text" data-action="toggleHalfAction" data-index="{{index}}" aria-pressed="{{spent}}">{{localize "SPYCRAFT.Round.Half"}}</button>{{/each}}
+      {{#each roundActions}}<button type="button" class="round-pip{{#if spent}} spent{{/if}}" data-sc2-display="text" data-action="toggleHalfAction" data-index="{{index}}" aria-pressed="{{spent}}" data-tooltip="{{tip}}">{{localize "SPYCRAFT.Round.Half"}}</button>{{/each}}
     </div>{{/if}}
     <div class="pinned-tools tool-actions" aria-label="{{localize 'SPYCRAFT.Pins.Title'}}" hidden></div>
     <div class="ability-strip" aria-label="{{localize 'SPYCRAFT.Attributes'}}">
@@ -36,6 +36,11 @@
         data-name="{{name}}"{{#unless remaining}} disabled
         data-tooltip="{{localize 'SPYCRAFT.Uses.Spent' period=period}}"{{/unless}}>{{localize "SPYCRAFT.Template.ActorAgentClasses.Use"}}</button>{{/if}}</li>{{/each}}</ul>
     </div>{{/if}}
+    {{#if featPlayActions.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Play.FeatActions'}}">
+      {{#unless limitedUses.length}}<h3>{{localize "SPYCRAFT.Play.AbilitiesInPlay"}}</h3>{{/unless}}
+      <p class="tool-actions">{{#each featPlayActions}}<button type="button" class="sc2-action" data-action="{{action}}"{{#if resource}}
+        data-resource="{{resource}}"{{/if}} data-tooltip="{{feat}}">{{localize label}}</button> {{/each}}</p>
+    </div>{{/if}}
     <div class="quick-actions" role="group" aria-label="{{localize 'SPYCRAFT.Play.YourTurn'}}">
       <h3>{{localize "SPYCRAFT.Play.YourTurn"}}</h3>
       <p
@@ -44,6 +49,10 @@
         data-action="takeTotalDefense">{{localize "SPYCRAFT.Template.ActorAgentMain.TakeTotalDefense"}}</button> <button type="button"
         class="sc2-action"
         data-action="checkCombatMovement">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckCombatMovement"}}</button> <button type="button"
+        class="sc2-action"
+        data-action="setMovementCondition"
+        data-condition="prone"
+        data-tooltip="{{localize 'SPYCRAFT.Play.ProneHint'}}">{{#if system.postureMovement.prone}}{{localize "SPYCRAFT.Play.StandUp"}}{{else}}{{localize "SPYCRAFT.Play.DropProne"}}{{/if}}</button> <button type="button"
         class="sc2-action"
         data-action="checkNumericalAdvantage">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckNumericalAdvantage"}}</button>{{#if startedCharacterCombat}} <button type="button"
         class="{{#if ownTurn}}sc2-primary-action {{/if}}sc2-action"

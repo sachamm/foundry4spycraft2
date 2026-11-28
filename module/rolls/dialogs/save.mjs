@@ -11,6 +11,11 @@ import { loc } from "../../i18n.mjs";
 /** [position, render(context)] — context holds the acting character and the values the roll has worked out so far. */
 const parts = [
   [10, () => `<div class="spycraft2-roll-options">`],
+  [
+    15,
+    () =>
+      `<label>${loc`Modifier the GC set for this save (0 for none)`} <input type="number" name="situationalModifier" step="1" value="0" /></label>`
+  ],
   [20, ({ stillStandingContent }) => stillStandingContent],
   [
     30,

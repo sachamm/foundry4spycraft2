@@ -329,10 +329,18 @@ function button(control) {
   else if (control.emphasis === "quiet") element.className = "sc2-quiet-action";
   if (control.split) element.classList.add("sc2-split-more");
   element.textContent = localizedLabel(control);
-  // The face stays short enough for the chat column; the full wording is the name and the tooltip.
-  const full = control.hint || element.textContent;
-  element.setAttribute("aria-label", full);
-  element.setAttribute("data-tooltip", full);
+  // The face stays short enough for the chat column; the full wording is the tooltip. The accessible name always
+  // contains the words on the face, so a voice command for what is seen finds the button; a button with no fuller
+  // wording keeps its face as its name and gets no tooltip repeating it.
+  const face = element.textContent,
+    full = control.hint || face;
+  if (control.hint) {
+    const name = control.hint.toLocaleLowerCase().includes(face.toLocaleLowerCase())
+      ? control.hint
+      : `${face}: ${control.hint}`;
+    element.setAttribute("aria-label", name);
+    element.setAttribute("data-tooltip", control.hint);
+  }
   element.dataset.rollControl = control.id;
   if (control.key) element.dataset.rollKey = control.key;
   // A control that is not legal now is shown disabled with its reason (style guide 8.6), and does nothing.

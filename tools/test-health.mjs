@@ -162,12 +162,10 @@ let failPost = false,
   rollResults = [4, 3],
   rollTotal = 9,
   rollCount = 0,
-  posts = 0,
   postHook = null;
 const post = async () => {
   postHook?.();
   if (failPost) throw Error("message rejected");
-  posts++;
   return {};
 };
 globalThis.ChatMessage = { getSpeaker: () => ({}), create: post };

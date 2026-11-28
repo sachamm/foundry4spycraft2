@@ -265,6 +265,23 @@ function markValue(mark) {
     .reduce((value, key) => value?.[key], card?.flags?.spycraft2);
 }
 
+/**
+ * Why a GC boost cannot come off its card, or "" when it can: the card must still exist, be unsettled and carry
+ * exactly the boosts it had when this one was added.
+ */
+export function cardBoostRefusal(card, boost) {
+  const check = card?.flags?.spycraft2;
+  if (!check) return loc`That roll card is gone, so its boost cannot be taken back.`;
+  if (check.resolved || check.superseded || check.attackResolution || check.criticalSuccess || check.criticalFailure)
+    return loc`That roll has been settled since, so its boost stays. Correct the outcome by hand.`;
+  if (
+    (check.gcBoosts ?? []).length !== (boost.after?.count ?? 0) ||
+    (check.boostTotal ?? 0) !== boost.after?.boostTotal
+  )
+    return loc`That roll was boosted again since. Undo the later boost first.`;
+  return "";
+}
+
 /** Leave the Undo note: one line, seen only by whoever took the step. */
 export function postUndo(
   label,
@@ -286,7 +303,9 @@ export function postUndo(
     placedTokens = null,
     combatSurprise = null,
     closeSaves = null,
-    missionCaliber = null
+    missionCaliber = null,
+    nextScene = null,
+    cardBoost = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -322,7 +341,9 @@ export function postUndo(
           placedTokens,
           combatSurprise,
           closeSaves,
-          missionCaliber
+          missionCaliber,
+          nextScene,
+          cardBoost
         }
       }
     }
@@ -500,6 +521,17 @@ async function undoRecord(message, record) {
         loc`Only the latest Defense die on this still-pending attack can be undone. Undo later dice first; completed outcomes need GC review.`
       );
   }
+  // A GC boost comes off its card only while the card still stands as the boost left it.
+  if (record.cardBoost && game.user.isGM) {
+    const reason = cardBoostRefusal(game.messages?.get(record.cardBoost.messageId), record.cardBoost);
+    if (reason) throw Error(reason);
+  }
+  // A Next scene is checked before anything is marked: once a later scene has begun it cannot be taken back.
+  if (record.nextScene && game.user.isGM) {
+    const { scenePeriodRevert } = await import("../services/periods.mjs");
+    const { reason } = scenePeriodRevert(readSetting("usagePeriods", {}), record.nextScene);
+    if (reason) throw Error(reason);
+  }
   const targets = [];
   for (const entry of record.entries ?? []) {
     const actor = await fromUuid(entry.uuid);
@@ -671,6 +703,39 @@ async function undoRecord(message, record) {
       }
     }
   }
+  // A GC boost: the card's total, cap and Triumph marks go back to what they were before the die was added.
+  if (record.cardBoost && game.user.isGM) {
+    const card = game.messages.get(record.cardBoost.messageId),
+      before = record.cardBoost.before ?? {};
+    await card.update({
+      "flags.spycraft2.effectiveTotal": before.effectiveTotal,
+      "flags.spycraft2.boostTotal": before.boostTotal ?? 0,
+      "flags.spycraft2.capped": before.capped ?? false,
+      "flags.spycraft2.potentialTriumph": before.potentialTriumph ?? false,
+      "flags.spycraft2.gcBoosts": before.gcBoosts ?? [],
+      flavor: before.flavor ?? card.flavor
+    });
+  }
+  // Next scene: the scene period goes back to the scene before, which brings back that scene's uses, its dramatic
+  // state and the damage its standard NPCs carried; the scene comes off the mission's count within the same mission.
+  const scene = record.nextScene;
+  if (scene && game.user.isGM) {
+    const { revertScenePeriod } = await import("../services/periods.mjs");
+    const { getMission, updateMission, missionEpoch } = await import("./gc/state.mjs");
+    await revertScenePeriod(scene);
+    if (scene.sceneState && scene.sceneState.scene === (scene.before?.scene ?? "initial"))
+      await game.settings
+        .set("spycraft2", "sceneState", scene.sceneState)
+        .catch(error => ui.notifications.warn(loc`The dramatic scene state was not put back: ${error.message}`));
+    if (scene.counted) {
+      if (scene.period !== missionEpoch())
+        ui.notifications.warn(loc`A later mission has begun, so its scene count was left as it is.`);
+      else if ((getMission().scenesPlayed ?? 0) > 0)
+        await updateMission(now => ({ scenesPlayed: Math.max(0, (now.scenesPlayed ?? 0) - 1) })).catch(error =>
+          ui.notifications.warn(loc`The scene count was not put back: ${error.message}`)
+        );
+    }
+  }
   // A surprise round set from the console: the fight's mark goes back to what it was.
   const surprise = record.combatSurprise;
   if (surprise?.combat && game.user.isGM) {
@@ -740,12 +805,15 @@ async function undoRecord(message, record) {
     // application of the same card stays recorded either way.
     const own = record.damageCard.entryId && applied[record.damageCard.entryId] ? record.damageCard.entryId : null,
       key = own ?? marks.at(-1)?.[0];
-    // A player's own damage was marked on the GC's card through the GC, and is cleared the same way.
-    if (key) {
+    // A player's own damage was marked on the GC's card through the GC, and is cleared the same way. A card from
+    // before marks were keyed holds them in one array: its newest record for this target comes off instead.
+    const legacy =
+      !key && (card.flags?.spycraft2?.damageApplied ?? []).some?.(e => e?.targetUuid === record.damageCard.targetUuid);
+    if (key || legacy) {
       const { unmarkDamage } = await import("./gc-relay.mjs");
-      await Promise.resolve(unmarkDamage(card, key)).catch(error =>
-        ui.notifications.warn(loc`The damage card still reads as applied: ${error.message}`)
-      );
+      await Promise.resolve(
+        unmarkDamage(card, key, legacy ? { legacyTargetUuid: record.damageCard.targetUuid } : {})
+      ).catch(error => ui.notifications.warn(loc`The damage card still reads as applied: ${error.message}`));
     }
   }
   return targets.map(([entry]) => entry.name);
@@ -823,6 +891,10 @@ export async function reviewLegacyGCRefund(message, input = {}) {
   );
 }
 
+/** The id of the chat card an Undo note's step changed, when it changed one. */
+export const undoSourceCard = record =>
+  record?.damageCard?.messageId ?? record?.cardBoost?.messageId ?? record?.cardMarks?.[0]?.messageId ?? null;
+
 /** The Undo button on a note (the `renderChatMessageHTML` hook). */
 export function renderUndo(message, html) {
   const record = message.flags?.spycraft2?.undo;
@@ -836,7 +908,31 @@ export function renderUndo(message, html) {
     by.textContent = loc`Step taken by ${message.author.name}.`;
     row.append(by);
   }
+  const source = undoSourceCard(record);
+  if (source && game.messages?.get(source)) {
+    // The note sits apart from the card it takes back, so it offers the way there.
+    const show = document.createElement("button");
+    show.type = "button";
+    show.className = "sc2-quiet-action";
+    show.textContent = loc`Show the card`;
+    show.dataset.tooltip = loc`Scrolls the chat log to the card this step changed`;
+    show.addEventListener("click", () => {
+      const card = document.querySelector(
+        `#chat [data-message-id="${source}"], .chat-log [data-message-id="${source}"]`
+      );
+      if (!card) {
+        ui.notifications.info(loc`That card is further back in the chat log. Scroll up to load it.`);
+        return;
+      }
+      card.scrollIntoView({ block: "center" });
+      card.classList.add("sc2-card-shown");
+      setTimeout(() => card.classList.remove("sc2-card-shown"), 2000);
+    });
+    row.append(show);
+  }
   if (record.done) {
+    // The step's own line no longer holds, so it reads as taken back.
+    html.querySelector?.(".sc2-undo-note")?.classList.add("sc2-undone");
     const note = document.createElement("p");
     note.className = "hint";
     note.setAttribute("role", "status");

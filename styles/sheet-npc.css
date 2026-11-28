@@ -13,7 +13,7 @@
   padding: 4px 2px;
   background: color-mix(in srgb, var(--sc2-surface-raised) 70%, transparent);
   border: 1px solid var(--sc2-rule);
-  border-top: 2px solid var(--sc2-brass);
+  border-top: 2px solid var(--sc2-rule-strong);
   border-radius: 2px;
 }
 .spycraft2.npc .ability .mod {

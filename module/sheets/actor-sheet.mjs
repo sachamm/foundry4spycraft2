@@ -5,7 +5,7 @@ import { enrich } from "./enrich.mjs";
 import { chosenPicks, ruleTip } from "./rule-tips.mjs";
 import { abilityTip, agentBonusTips, npcSkillTip, saveTip, skillTip, weaponAttackTip } from "./bonus-tips.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
-import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
+import { HALF_ACTIONS_PER_TURN, actionBudget, pipSources, setActionsUsed } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { formDialog } from "../apps/dialog-kit.mjs";
@@ -493,7 +493,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         // Choosing the last spent pip frees it; choosing any other marks everything up to it as spent.
         const next = spent === index + 1 ? index : index + 1;
         // The same record the combat tracker's menu keeps, so the two always agree.
-        await combatant.update({ "flags.spycraft2.actions": { round: combat.round, used: next } });
+        const record = actionBudget(combatant.flags?.spycraft2?.actions, { round: combat.round });
+        await combatant.update({ "flags.spycraft2.actions": setActionsUsed(record, next, loc`a click on the pip`) });
         return this.render();
       },
       setupTask: SpycraftAgentSheet.#onSetupTask,
@@ -529,9 +530,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       markInjuryHealed(event, target) {
         return markInjuryHealed(this.actor, target.dataset.injury);
       },
-      takeTotalDefense: costsAction("full", function () {
-        return takeTotalDefense(this.actor);
-      }),
+      takeTotalDefense: costsAction(
+        "full",
+        function () {
+          return takeTotalDefense(this.actor);
+        },
+        () => loc`Total Defense`
+      ),
       takeCleaveBasics() {
         return takeDropFollowUp(this.actor, "cleaveBasics");
       },
@@ -565,9 +570,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       enterIdentity(event, target) {
         return enterIdentity(this.actor, target.dataset.id);
       },
-      rollDisarm: costsAction(attackActionCost, function () {
-        return rollDisarm(this.actor);
-      }),
+      rollDisarm: costsAction(
+        attackActionCost,
+        function () {
+          return rollDisarm(this.actor);
+        },
+        () => loc`Disarm`
+      ),
       rollDisarmResponse(event, target) {
         return rollDisarmResponse(this.actor, { weaponId: target.closest("[data-item-id]")?.dataset.itemId });
       },
@@ -709,16 +718,24 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       restoreRules() {
         return reviewActorRules(this.actor, { restore: true });
       },
-      reloadWeapon: costsAction("half", function (event, target) {
-        return reloadWeapon(this._item(target));
-      }),
+      reloadWeapon: costsAction(
+        "half",
+        function (event, target) {
+          return reloadWeapon(this._item(target));
+        },
+        () => loc`Reload`
+      ),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
-      rollAttack: costsAction(attackActionCost, SpycraftAgentSheet.#onRollAttack),
-      rollRangedAttack: costsAction(attackActionCost, function (event, target) {
-        return this.actor.rollRangedAttack(this._item(target));
-      }),
+      rollAttack: costsAction(attackActionCost, SpycraftAgentSheet.#onRollAttack, () => loc`Attack`),
+      rollRangedAttack: costsAction(
+        attackActionCost,
+        function (event, target) {
+          return this.actor.rollRangedAttack(this._item(target));
+        },
+        () => loc`Attack`
+      ),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
       pinPlaySkill: SpycraftAgentSheet.#onPinPlaySkill,
@@ -966,7 +983,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const miscLabel = game.i18n.localize("SPYCRAFT.Misc");
     const classLabel = game.i18n.localize("SPYCRAFT.Class.Label");
     const armorLabel = game.i18n.localize("SPYCRAFT.Armor");
-    const vitBonus = (src.vitality ?? []).reduce((n, s) => n + s.value, 0);
     const conPart = sys.abilities.con.mod * sys.level;
     context.tips = {
       // Roll bonuses: every part, then a total that matches the button (module/sheets/bonus-tips.mjs).
@@ -1285,7 +1301,6 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const lvl = Math.clamp(this._skillLevel ?? sys.level, 1, Math.max(1, sys.level));
     context.skillLevel = sys.level ? lvl : null;
     const entry = sys.progression[lvl - 1];
-    const lvlClass = entry ? classById[entry.classId] : null;
     context.skillLevelInfo = sys.skillPoints?.[lvl - 1];
     context.canReviewSkillPurchasePolicy = game.user.isGM && sys.level > 0 && !sys.companionOf?.ownerUuid;
     context.skillPurchasePolicyLabel = loc`Review skill-cost history`;
@@ -1341,6 +1356,10 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         };
       })
       .sort((a, b) => a.treeLabel.localeCompare(b.treeLabel) || a.item.name.localeCompare(b.item.name));
+    // The same buttons on the Play tab, under "Abilities in play", so a feat is used where the turn is played.
+    context.featPlayActions = context.feats.flatMap(row =>
+      row.actions.map(entry => ({ ...entry, feat: row.item.name }))
+    );
     // Hover help shows to anyone who can open the sheet, so it is rendered with every secret block left out.
     await Promise.all(
       context.feats.map(async feat => {
@@ -1574,9 +1593,23 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const diceShown = Math.min(12, Math.max(diceHeld, Number(sys.actionDice?.max) || 0));
     context.actionDicePips = Array.from({ length: diceShown }, (_, index) => index < diceHeld);
     const halfSpent = this._roundActionsSpent();
+    const roundCombatant = this._roundCombatant(),
+      pipMarks = roundCombatant
+        ? pipSources(
+            actionBudget(roundCombatant.flags?.spycraft2?.actions, { round: roundCombatant.parent.round }),
+            halfSpent
+          )
+        : [];
     context.roundActions = Array.from({ length: this._roundActionLimit() }, (_, index) => ({
       index,
-      spent: index < halfSpent
+      spent: index < halfSpent,
+      // On hover, a spent pip says what marked it; a free one says what a click does.
+      tip:
+        index < halfSpent
+          ? pipMarks[index]
+            ? loc`Spent: marked by ${pipMarks[index]}. Click the last spent pip to free it.`
+            : loc`Spent. Click the last spent pip to free it.`
+          : loc`Free. Click to mark it spent for something this sheet did not count.`
     }));
     context.dying = woundState(Number(sys.wounds?.value), sys.deathThreshold) === "dying";
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
@@ -1803,10 +1836,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
   }
 
   static #onRollAbility(event, target) {
-    return this.actor.rollAbility(target.dataset.ability);
+    return this.actor.rollAbility(target.dataset.ability, { askContext: !skipDialog(event) });
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
+    return this.actor.rollSave(target.dataset.save, {
+      askContext: !skipDialog(event),
+      askModifier: !skipDialog(event)
+    });
   }
   static #onRollSkill(event, target) {
     return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null, {
@@ -1860,9 +1896,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true);
   }
   /** Another level in a class the character already has, without opening the class browser. */
-  static #onAddLevelInClass(event, target) {
+  static async #onAddLevelInClass(event, target) {
     const cls = this._item(target);
-    return cls?.type === "class" ? this.actor.addClassLevel(cls) : null;
+    if (cls?.type !== "class") return null;
+    const added = await this.actor.addClassLevel(cls);
+    // The level brings choices (skill points, perhaps a feat): the sheet turns to Edit with the list of what is
+    // left open, so the level-up carries on from one place instead of being hunted for tab by tab.
+    if (added !== null && added !== false && this.isEditable) {
+      this._editMode = true;
+      this._open.todo = true;
+      await this.render();
+    }
+    return added;
   }
   static async #onRemoveLevel() {
     const ok = await systemDialog.confirm({
@@ -2134,9 +2179,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       npcRemoveRow: SpycraftNpcSheet.#onRemoveRow,
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
-      reloadWeapon: costsAction("half", function (event, target) {
-        return reloadWeapon(this._item(target));
-      }),
+      reloadWeapon: costsAction(
+        "half",
+        function (event, target) {
+          return reloadWeapon(this._item(target));
+        },
+        () => loc`Reload`
+      ),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
@@ -2167,7 +2216,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
       },
-      rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack),
+      rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack, () => loc`Attack`),
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
       itemDelete: SpycraftNpcSheet.#onItemDelete,
@@ -2379,6 +2428,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
           key,
           label: key === "health" ? (result.type === "special" ? loc`Vitality / wounds` : loc`Damage save`) : label,
           value: profile.grades?.[key],
+          // What the grade is worth at this Threat Level, so the GC need not look the table up.
+          gives: npcGradeGives(key, result),
           options: key === "wealth" ? { 0: loc`None`, ...gradeOptions } : gradeOptions
         })),
       skills: (profile.skills ?? []).map((s, index) => ({
@@ -2499,10 +2550,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     return this.actor.items.get(target.closest("[data-item-id]")?.dataset.itemId);
   }
   static #onRollAbility(event, target) {
-    return this.actor.rollAbility(target.dataset.ability);
+    return this.actor.rollAbility(target.dataset.ability, { askContext: !skipDialog(event) });
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
+    return this.actor.rollSave(target.dataset.save, {
+      askContext: !skipDialog(event),
+      askModifier: !skipDialog(event)
+    });
   }
   static async #onRollAttack(event, target) {
     const item = this._item(target);
@@ -2519,4 +2573,15 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
   static #onItemDelete(event, target) {
     return this._item(target)?.deleteDialog();
   }
+}
+
+/** The figure a statistic's grade produces at the NPC's effective Threat Level, as text for the builder; "" if none. */
+export function npcGradeGives(key, result = {}) {
+  const sign = value => (Number.isFinite(value) ? (value >= 0 ? `+${value}` : `−${Math.abs(value)}`) : "");
+  if (key === "health")
+    return Array.isArray(result.health)
+      ? loc`${result.health[0]} vitality, ${result.health[1]} wounds`
+      : sign(result.health);
+  if (key === "competence") return sign(result.competence);
+  return sign(result.stats?.[key]);
 }

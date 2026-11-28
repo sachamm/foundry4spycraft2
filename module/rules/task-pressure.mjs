@@ -72,7 +72,7 @@ export function taskPressureState(task) {
         !e.damageEventId ||
         damageEvents.has(e.damageEventId)
       )
-        throw new Error(loc`A failed pressure check needs its unique1d6stress event.`);
+        throw new Error(loc`A failed pressure check needs its unique 1d6 stress event.`);
       damageEvents.add(e.damageEventId);
       if (e.criticalFailure)
         errorIncrease++; /* User ruling: full resistance does not negate this separate consequence. */
@@ -130,7 +130,7 @@ export function taskPressureStressRollProof(task, check, stressMessage, { actorU
     c.rawTotal !== roll.total ||
     c.effectiveTotal !== roll.total
   )
-    throw new Error(loc`Use the locked pressure check’s actual unboosted1d6stress receipt.`);
+    throw new Error(loc`Use the locked pressure check’s actual unboosted 1d6 stress receipt.`);
   return { raw: roll.total, stressMessageUuid: stressMessage.uuid };
 }
 export function taskPressureStressProof(task, check, stressMessage, damageEvent, options = {}) {

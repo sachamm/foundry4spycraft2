@@ -361,3 +361,52 @@ test("a step that fails part way still leaves a note for what it wrote, then rep
   assert.equal(posted.length, 1);
   assert.match(posted[0].flags.spycraft2.undo.label, /stopped part way/);
 });
+
+test("Next scene can be taken back until a later scene begins", async () => {
+  const { scenePeriodRevert } = await import("../module/services/periods.mjs");
+  const change = { before: { scene: "s1", sceneSequence: 3 }, after: "s2" };
+  assert.deepEqual(scenePeriodRevert({ scene: "s2", sceneSequence: 4, session: "x" }, change).target, {
+    scene: "s1",
+    sceneSequence: 3,
+    session: "x"
+  });
+  // The very first scene had no period of its own.
+  assert.deepEqual(
+    scenePeriodRevert({ scene: "s2", sceneSequence: 1 }, { before: { scene: null, sceneSequence: null }, after: "s2" })
+      .target,
+    {}
+  );
+  assert.ok(scenePeriodRevert({ scene: "s3", sceneSequence: 5 }, change).reason);
+  assert.match(
+    scenePeriodRevert({ scene: "s2", sceneSequence: 4 }, change, { damaged: ["Guard"] }).reason,
+    /recorded in the new scene for Guard/
+  );
+  assert.ok(scenePeriodRevert({}, {}).reason);
+});
+
+test("a GC boost comes off its card only while the card stands as the boost left it (B-037)", async () => {
+  const { cardBoostRefusal } = await import("../module/apps/undo.mjs");
+  const boost = { messageId: "m", after: { boostTotal: 5, count: 1 } };
+  const card = flags => ({ flags: { spycraft2: { boostTotal: 5, gcBoosts: [5], ...flags } } });
+  assert.equal(cardBoostRefusal(card({}), boost), "");
+  assert.match(cardBoostRefusal(null, boost), /gone/);
+  assert.match(cardBoostRefusal(card({ attackResolution: { hit: true } }), boost), /settled/);
+  assert.match(cardBoostRefusal(card({ resolved: true }), boost), /settled/);
+  assert.match(cardBoostRefusal(card({ boostTotal: 9, gcBoosts: [5, 4] }), boost), /later boost/);
+});
+
+test("a record written in the new scene is found on a sidebar actor or a token's actor", async () => {
+  const { actorsRecordedInScene } = await import("../module/services/periods.mjs");
+  const keep = { actors: game.actors, scenes: game.scenes };
+  try {
+    game.actors = [
+      { name: "Sniper", system: { eagleEyeBoost: { scene: "s2" } } },
+      { name: "Idle", system: { eagleEyeBoost: { scene: "s1" } } }
+    ];
+    game.scenes = [{ tokens: [{ actor: { name: "Guard", system: { damageTrack: { scene: "s2" } } } }] }];
+    assert.deepEqual(actorsRecordedInScene("s2"), ["Sniper", "Guard"]);
+    assert.deepEqual(actorsRecordedInScene("s9"), []);
+  } finally {
+    Object.assign(game, keep);
+  }
+});

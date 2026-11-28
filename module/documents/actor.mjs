@@ -11,7 +11,13 @@ import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
-import { agentTokenDefaults, linkedImport, renamedTokenName, renamedFromAny } from "../rules/creation-defaults.mjs";
+import {
+  agentTokenDefaults,
+  npcTokenDefaults,
+  linkedImport,
+  renamedTokenName,
+  renamedFromAny
+} from "../rules/creation-defaults.mjs";
 import { primaryWriterFor } from "../writers.mjs";
 import { newAgentPoolMax, poolRules, POOL_MAX_FLAG } from "../rules/pool-max.mjs";
 import { ActorGear } from "./actor/gear.mjs";
@@ -157,6 +163,18 @@ export class SpycraftActor extends ActorRolls(
           sight: { ...(token.sight ?? {}), ...(defaults.sight ?? {}) }
         };
       }
+    }
+    // A new NPC made by hand is an opponent the GC can read at a glance; a companion, an import with its own token
+    // and a character rebuilt from a token keep what they have.
+    if (
+      (data.type ?? this.type) === "npc" &&
+      !options?.spycraft2TokenLink &&
+      !data._stats?.compendiumSource &&
+      !(data.system ?? this.system)?.companionOf?.ownerUuid
+    ) {
+      const given = data.prototypeToken ?? {};
+      const defaults = npcTokenDefaults(given, (data.system ?? this.system)?.npcType);
+      if (defaults) updates.prototypeToken = { ...(this._source?.prototypeToken ?? given), ...defaults };
     }
     if (Object.keys(updates).length) this.updateSource(updates, { recursive: false });
   }

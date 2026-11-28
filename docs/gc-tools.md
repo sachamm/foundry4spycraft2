@@ -1,6 +1,6 @@
 # Game Control tools
 
-Open the **GC Console** with Alt+G (it opens as a window beside the chat log), from the sidebar tab after Combat, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
+Open the **GC Console** with Alt+G (it opens as a window beside the chat log), from the sidebar tab after Combat, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros, and any console button that needs no row or combatant (Spend dice, Next scene, XP report and the like) can be dragged to the hotbar, where it becomes a macro that runs `game.spycraft2.gc.run("…")`. Page references are printed page numbers.
 
 New to the console? Start with [gc-quickstart.md](gc-quickstart.md).
 
@@ -74,11 +74,12 @@ A **dramatic scene** lasts until the next scene starts. While it lasts, GC dice 
   Count yet; an NPC of a kind already rolled joins that kind's Count. An agent no player owns is named in the report so
   it can be rolled from its sheet. A combatant whose Initiative is rolled after the round has passed its Count takes
   its turn next, then the order carries on.
-- The tracker's right-click menu has **Spend a half action**, **Spend a full action**, **Give back this round's
-  actions**, **Delay 1 Count**, **Delay…**, **Ready an action**, **Readied action triggered** and **Fluid initiative
+- The tracker's right-click menu has **Spend half action**, **Spend full action**, **Give back this turn's
+  actions** (the console's own names for them), **Delay 1 Count**, **Delay…**, **Ready an action**, **Readied action triggered** and **Fluid initiative
   event…**. Delay asks for the Count to move to and lists who is still to act; Ready asks for the trigger, which shows on the
   combatant's row, and ends the turn unless unticked. A readied combatant is marked on its row until the action goes
-  off or its next turn comes. Delay is
+  off or its next turn comes; while it is, the console shows **Readied action triggered: (name)** under the order,
+  whoever's turn it is. Delay is
   refused for a combatant whose turn has already passed this round; a readied action that goes off after the
   combatant's turn uses up the turn it would get at the new Count. Delay and Ready lines for an NPC no player
   runs are whispered to the GCs.

@@ -764,6 +764,15 @@ export const ActorOutcomes = Base =>
             preset?.addEventListener("change", () => {
               if (agreed && preset.value) agreed.checked = true;
             });
+            // Choosing who pays is the declaration that they may: both conditions start ticked and can be unticked.
+            const payer = form?.querySelector?.('[name="payerId"]');
+            payer?.addEventListener("change", () => {
+              if (!payer.value) return;
+              for (const name of ["opponent", "lineOfSight"]) {
+                const box = form.querySelector(`[name="${name}"]`);
+                if (box) box.checked = true;
+              }
+            });
           },
           content: `<div class="spycraft2-roll-options">
         <p class="hint">${
@@ -782,8 +791,8 @@ export const ActorOutcomes = Base =>
         ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage"${damageRolled ? "" : " checked"} /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
         <details${errorOnly ? " open" : ""}><summary>${check.checkKind === "attack" ? loc`Who pays for a critical miss` : loc`Who pays for a critical failure`}</summary>
         <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc"${defaultGC ? " selected" : ""}>${loc`GC action dice`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
-        <label><input type="checkbox" name="opponent"${defaultGC ? " checked" : ""} /> ${loc`Failure payer is an opponent`}</label>
-        <label><input type="checkbox" name="lineOfSight"${defaultGC ? " checked" : ""} /> ${loc`Failure payer has line of sight to the acting character`}</label>
+        <label><input type="checkbox" name="opponent"${errorOnly ? " checked" : ""} /> ${loc`Failure payer is an opponent`}</label>
+        <label><input type="checkbox" name="lineOfSight"${errorOnly ? " checked" : ""} /> ${loc`Failure payer has line of sight to the acting character`}</label>
         <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1 cost, minimum 0; one Chance-based session use)`}</label>
         </details>
         <details><summary>${loc`Pay from bonus dice or several wallets`}</summary>

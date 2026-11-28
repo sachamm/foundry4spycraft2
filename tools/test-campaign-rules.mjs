@@ -332,7 +332,21 @@ test("round-3 council: NPC critical prices, Feat Purchase mid-mission, the whole
   assert.equal(npcCriticalPrice({ checkKind: "skill", blackCat: { toughLuck: true } }, 1).cost, 2, "skill too");
   const role = { ...attack, attackContext: { targetRole: { label: "Mastermind", extraDiceToActivate: 2 } } };
   assert.equal(npcCriticalPrice(role, 1).cost, 3);
-  assert.equal(npcCriticalPrice(role, 2, { bloodbath: true }).cost, 0);
+  assert.equal(npcCriticalPrice(role, 2, { bloodbath: true }).cost, 3, "only the one-die critical is free");
+  assert.equal(npcCriticalPrice(attack, 1, { bloodbath: true }).cost, 0);
+  {
+    const { criticalPlan } = await import("../module/rules/criticals.mjs");
+    const hit = { checkKind: "attack", threatConfirmed: true },
+      options = { effect: "Critical hit", effectConfirmed: true, beforeDamage: true, available: 4 },
+      bloodbath = { ...options, campaignEffects: effectsOf("bloodbath") };
+    assert.equal(criticalPlan({}, hit, options).cost, 1);
+    assert.equal(criticalPlan({}, hit, bloodbath).cost, 0, "an agent's critical hit is free");
+    assert.equal(criticalPlan({}, hit, { ...bloodbath, baseCost: 4 }).cost, 3, "a dearer effect pays the rest");
+    assert.equal(criticalPlan({ npcType: "special" }, hit, bloodbath).cost, 0);
+    assert.equal(criticalPlan({ npcType: "standard" }, hit, bloodbath).cost, 1, "standard NPCs pay as usual");
+    assert.equal(criticalPlan({ npcType: "standard", promoted: true }, hit, bloodbath).cost, 0);
+    assert.equal(criticalPlan({}, { ...hit, checkKind: "skill" }, bloodbath).cost, 1, "attacks only");
+  }
   assert.equal(npcCriticalPrice({ checkKind: "skill" }, 1, { bloodbath: true, laser: true }).cost, 1, "attacks only");
 
   const system = { level: 3, xp: 20000, usagePeriods: { mission: "m2" } };

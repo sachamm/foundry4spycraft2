@@ -40,7 +40,9 @@ tooltip says what it changes, and its key when it has one. The keys are listed u
    then starts the session, sets up the GC action dice and
    gives each agent its starting action dice, with any Threat Level bonus. The status strip then shows when the
    session began. The two can be pressed in either order: whichever comes second adds only what the first could not.
-3. Press **Next scene** each time the scene changes; between fights it is Play's filled button. A notice confirms it.
+3. Press **Next scene** each time the scene changes; between fights it is Play's filled button. A notice confirms it,
+   and its Undo note in chat goes back to the scene before, with that scene's uses, dramatic state and NPC damage,
+   until a later scene begins.
 
 ## The first combat
 

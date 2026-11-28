@@ -12,7 +12,7 @@ export function terrainCoverPlan(
   } = {}
 ) {
   if (![personalCover, sceneryCover].every(n => Number.isSafeInteger(n) && n >= 0 && n <= 4))
-    throw new Error(loc`Choose actual personal/scenery cover grades from0through4 before terrain feat adjustments.`);
+    throw new Error(loc`Choose actual personal/scenery cover grades from 0 through 4 before terrain feat adjustments.`);
   if ([homeTurfCover, partialSubmersionCover, terrainCoverConfirmed].some(v => typeof v !== "boolean"))
     throw new Error(loc`Declare the terrain cover circumstances with explicit boolean choices.`);
   if (!homeTurfCover && !partialSubmersionCover) return null;

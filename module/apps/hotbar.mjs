@@ -72,6 +72,22 @@ export function onHotbarDrop(bar, data, slot) {
     );
     return false;
   }
+  // A GC Console tool: the macro presses that tool.
+  if (data?.type === "spycraft2.gcTool" && typeof data.action === "string" && /^[A-Za-z]+$/.test(data.action)) {
+    const command = `game.spycraft2.gc.run(${JSON.stringify(data.action)});`;
+    (async () => {
+      let macro = game.macros.find(entry => entry.command === command && entry.isOwner);
+      macro ??= await Macro.create({
+        name: data.name || data.action,
+        type: "script",
+        img: "icons/svg/item-bag.svg",
+        command,
+        flags: { spycraft2: { gcTool: data.action } }
+      });
+      return game.user.assignHotbarMacro(macro, slot);
+    })();
+    return false;
+  }
   if (data?.type !== "Item" || !data.uuid) return true;
   const item = fromUuidSync(data.uuid);
   if (!item?.parent || item.parent.documentName !== "Actor" || item.type !== "weapon") return true;

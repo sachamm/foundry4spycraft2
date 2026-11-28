@@ -32,19 +32,6 @@
   --sc2-rule: #cdc5b1;
   --sc2-rule-strong: #8d8571;
 
-  /* Earlier names, kept so existing rules follow the roles. */
-  --sc2-paper: var(--sc2-surface);
-  --sc2-paper-raised: var(--sc2-surface-raised);
-  --sc2-paper-sunk: var(--sc2-surface-sunk);
-  --sc2-teal: var(--sc2-action);
-  --sc2-teal-dark: var(--sc2-action-strong);
-  --sc2-teal-tint: var(--sc2-action-tint);
-  --sc2-on-teal: var(--sc2-on-action);
-  --sc2-brass: var(--sc2-rule-strong);
-  --sc2-brass-dark: var(--sc2-rule-strong);
-  --sc2-bad: var(--sc2-danger);
-  --sc2-bad-tint: var(--sc2-danger-tint);
-
   /* Creation steps, in the order the rulebook walks through them. Used by the creation track only. */
   --sc2-step-1: #3f8f3a;
   --sc2-step-2: #7fae2e;

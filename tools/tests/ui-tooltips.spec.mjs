@@ -45,7 +45,7 @@ test("system fields, actions, tabs, editors and compact table cells receive cont
   await expect(page.locator("#skills-tab")).toHaveAttribute("data-tooltip", "Skills");
   await expect(page.locator("prose-mirror")).toHaveAttribute("data-tooltip", "Biography");
   await expect(page.locator("td input")).toHaveAttribute("data-tooltip", "Skill ranks");
-  await expect(page.locator("summary")).toHaveAttribute("data-tooltip", "Extra options");
+  await expect(page.locator("summary")).not.toHaveAttribute("data-tooltip");
   await expect(page.locator("#portrait")).toHaveAttribute("data-tooltip", "Change image");
   await expect(page.locator("#icon-only")).toHaveAttribute("data-tooltip", "review Special Case");
   await expect(page.locator("#reference")).toHaveAttribute("data-tooltip", "Reference");

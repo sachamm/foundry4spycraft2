@@ -436,7 +436,9 @@ export function enhanceTooltips(root) {
       !control.hasAttribute("data-tooltip-html")
     ) {
       const text = tooltipText({ action: control.dataset.action ?? control.dataset.rollControl ?? "", label });
-      if (text) {
+      // A tooltip that only repeats or shortens the words on the button says nothing: only a button shown as a
+      // bare icon gets its name this way.
+      if (text && !repeatsVisibleLabel(control, text)) {
         control.setAttribute("data-tooltip", text);
         control.setAttribute(GENERATED, "");
         control.removeAttribute("title");
@@ -485,6 +487,9 @@ export function enhanceTooltips(root) {
       step: control.getAttribute("step")
     });
     if (!text) continue;
+    // A section's heading is its own name: a tooltip or description made from its words (title and note run
+    // together) says nothing new.
+    if (control.matches("summary")) continue;
     control.setAttribute("data-tooltip", text);
     control.setAttribute(GENERATED, "");
     // Field guidance remains available to assistive technology without a native hover popup.
@@ -492,7 +497,37 @@ export function enhanceTooltips(root) {
   }
 }
 
+/** Letters and digits only, lower case: "Surprise rd" and "Surprise round" start alike. */
+const bare = text =>
+  clean(text)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+/** Whether help text only repeats the words a button already shows (whole, or shortened word by word). */
+export function repeatsVisibleLabel(control, text) {
+  if (buttonDisplay(control) === "icon") return false;
+  const shown = bare(control.querySelector?.(".sc2-button-content")?.textContent ?? control.textContent);
+  const help = bare(text);
+  if (!shown || !help) return false;
+  if (shown === help || shown.includes(help)) return true;
+  // An abbreviation: every word of the help is the start of a word on the button ("init" for "initiative").
+  const words = shown.split(" ");
+  return help.split(" ").every(part => words.some(word => word.startsWith(part) || part.startsWith(word)));
+}
+
+/** Hover help goes away when its control is pressed, so it never sits over what the press opened or redrew. */
+export function dismissTooltipOnPress(root = globalThis.document) {
+  root?.addEventListener?.(
+    "click",
+    event => {
+      if (event.target?.closest?.("[data-tooltip], [data-tooltip-html]")) globalThis.game?.tooltip?.deactivate?.();
+    },
+    { capture: true, passive: true }
+  );
+}
+
 export function installUITooltipHooks() {
+  dismissTooltipOnPress();
   const render = app => {
     const element = app.element;
     if (element?.matches?.(SCOPE) || element?.querySelector?.(SCOPE)) {

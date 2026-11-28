@@ -1117,6 +1117,31 @@ test("fluid initiative: record events, immediate actions, end-of-round applicati
   assert.equal((await combat.applyEndOfRound(fight, 1)).length, 0, "nothing is applied twice");
 });
 
+test("fluid initiative: Delay uses up the round's limit, and a mistaken event can be taken back", async () => {
+  const fight = makeCombat([["c-a1", actors.get("a1"), 30, true]]);
+  const hero = fight.combatants.get("c-a1");
+  await combat.recordFluidEvent(hero, "delay", { times: 8 });
+  assert.equal(hero.initiative, 22);
+  await combat.recordFluidEvent(hero, "finalAttack", { times: 3 });
+  await combat.recordFluidEvent(hero, "aim");
+  // The aim was a slip: taking it back leaves the Count alone and the other event recorded.
+  const aim = hero.flags.spycraft2.fluid.modifiers.findIndex(entry => entry.id === "aim");
+  await combat.removeFluidEvent(hero, aim, hero.flags.spycraft2.fluid.modifiers[aim]);
+  assert.deepEqual(
+    hero.flags.spycraft2.fluid.modifiers.map(entry => entry.id),
+    ["finalAttack"]
+  );
+  await assert.rejects(() => combat.removeFluidEvent(hero, 5), /no longer recorded/);
+  await combat.applyEndOfRound(fight, 1);
+  assert.equal(hero.initiative, 20, "8 Counts went to Delay, so only 2 of the 6 lost to final attacks still apply");
+  assert.match(combat.fluidPreviewLine("delay", { count: 22, immediate: true }), /at once/);
+  assert.match(combat.fluidPreviewLine("aim", { count: 22, due: { rows: [], count: 22, delta: 0 } }), /round ends/);
+  assert.match(
+    combat.fluidPreviewLine("aim", { count: 22, due: { rows: [{}], count: 12, delta: -10, capped: true } }),
+    /22 → 12 \(-10, limited to ±10\)/
+  );
+});
+
 test("delaying on your own turn hands the turn to whoever is next, so nobody is skipped (p.356)", async () => {
   const fight = makeCombat([
     ["c-a1", actors.get("a1"), 22, true],
@@ -1185,7 +1210,7 @@ test("the tracker menu entries use the Foundry 14 shape and act on the clicked r
   }
   const row = { dataset: { combatantId: "c-guard" } };
   const find = label => entries.find(entry => entry.label === label);
-  assert.equal(find("Spend a half action").visible(row), true);
+  assert.equal(find("Spend half action").visible(row), true);
   assert.equal(find("Readied action triggered").visible(row), false);
   await find("Delay 1 Count").onClick(null, row);
   const mook = fight.combatants.get("c-guard");
@@ -1793,6 +1818,34 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
   }
 });
 
+test("starting a dramatic scene previews who doubles, lets the GC take one off and says so in chat (B-029)", async () => {
+  await state.setSceneState({ dramatic: false, source: null });
+  const fight = makeCombat([
+    ["d-guard", guard, 12, false],
+    ["d-boss", boss, 30, false],
+    ["d-a1", actors.get("a1"), 20, true]
+  ]);
+  assert.deepEqual(
+    spend.dramaticDoublingPreview(fight).map(row => [row.id, row.from, row.to]),
+    [
+      ["d-guard", 12, 24],
+      ["d-boss", 30, 50]
+    ]
+  );
+  const result = await spend.startDramaticScene(fight, { source: "scripted", "double-d-boss": false });
+  assert.equal(state.getSceneState().dramatic, true);
+  assert.equal(fight.combatants.get("d-guard").initiative, 24);
+  assert.equal(fight.combatants.get("d-boss").initiative, 30, "taken off the list by the GC");
+  assert.equal(fight.combatants.get("d-a1").initiative, 20);
+  assert.deepEqual(result.skipped, ["d-boss"]);
+  assert.match(lastMessage(), /Dramatic scene, scripted/);
+  assert.match(lastMessage(), /Left as they were: /);
+  // A later pass leaves the one the GC took off alone.
+  await spend.doubleOpponentInitiative(fight, { quiet: true });
+  assert.equal(fight.combatants.get("d-boss").initiative, 30);
+  await state.setSceneState({ dramatic: false, source: null });
+});
+
 test("a dramatic scene doubles hostile combatants only (p.424)", () => {
   assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: -1 } }), true);
   assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: 1 } }), false, "an ally");
@@ -2213,4 +2266,118 @@ test("the console's live line says who is still to roll Initiative, then whose t
   assert.equal(say({ started: false, unrolled: 0, unrolledNames: "" }), "Every combatant has an Initiative Count.");
   assert.equal(say({ started: true, round: 1, acting: { name: "Ana" } }), "Round 1: Ana's turn.");
   assert.equal(say(null), "");
+});
+
+test("a search that finds nothing names the view that holds the tool (B-244)", async () => {
+  const { searchOtherViews } = await import("../module/apps/gc/console-view.mjs");
+  const play = Object.entries(searchOtherViews("play"));
+  assert.ok(play.some(([words, line]) => /caliber/.test(words) && /Prep/.test(line)));
+  assert.ok(!play.some(([words]) => /initiative/.test(words)));
+  assert.ok(Object.values(searchOtherViews("prep")).some(line => /Play/.test(line)));
+  assert.ok(!Object.values(searchOtherViews("wrap")).some(line => /Wrap-up view\.$/.test(line) && /Ending/.test(line)));
+});
+
+test("a GC ruling is written on the roll card with its reason and can be taken off (B-037)", async () => {
+  const { withGCRuling } = await import("../module/apps/gc/card-ruling.mjs");
+  const { checkFlavor } = await import("../module/rules/outcomes.mjs");
+  const check = { checkKind: "skill", rawTotal: 12, effectiveTotal: 12, naturalDie: 9 };
+  const ruled = withGCRuling(check, { outcome: "success", note: "The guard was <asleep>" }, "GC");
+  assert.deepEqual(ruled.gcRuling, { outcome: "success", note: "The guard was <asleep>", by: "GC" });
+  assert.match(checkFlavor(ruled), /GC ruling: this roll counts as a success\. The guard was &lt;asleep&gt;/);
+  assert.equal(withGCRuling(ruled, { outcome: "" }).gcRuling, undefined);
+  assert.equal(withGCRuling(check, { outcome: "maybe" }), null);
+  assert.doesNotMatch(checkFlavor(check), /GC ruling/);
+});
+
+test("the spend dialog states the cost and the pool before and after (B-042)", () => {
+  const context = { dramatic: false, status: { value: 5, current: true } };
+  const line = spend.spendCostLine({ id: "boostDC", dcCheck: "vault door" }, context);
+  assert.match(line, /Costs 1 die: the pool goes from 5 to 4\./);
+  assert.match(line, /Rolls a d12\./);
+  // An incomplete entry shows no cost: the refusal beside the button says what is missing.
+  assert.equal(spend.spendCostLine({ id: "boostDC", dcCheck: "" }, context), "");
+  assert.equal(spend.spendCostLine({ id: "boostRoll", actorId: "" }, context), "");
+});
+
+test("the chat log's right-click menu offers the ruling to the GC on a roll card only", async () => {
+  const { rulingMenuEntry } = await import("../module/apps/gc/card-ruling.mjs");
+  const before = { messages: game.messages, isGM: game.user.isGM };
+  try {
+    game.messages = new Map([
+      ["roll", { flags: { spycraft2: { rawTotal: 14 } } }],
+      ["note", { flags: { spycraft2: {} } }]
+    ]);
+    game.user.isGM = true;
+    const entry = rulingMenuEntry();
+    assert.equal(entry.visible({ dataset: { messageId: "roll" } }), true);
+    assert.equal(entry.visible({ dataset: { messageId: "note" } }), false);
+    game.user.isGM = false;
+    assert.equal(entry.visible({ dataset: { messageId: "roll" } }), false);
+  } finally {
+    game.messages = before.messages;
+    game.user.isGM = before.isGM;
+  }
+});
+
+test("the Damage save dialog shows the DC the new injury will be rolled against (B-068)", async () => {
+  const { damageSavePreview } = await import("../module/apps/gc/npc-damage-save.mjs");
+  assert.match(damageSavePreview(6, 9), /DC 17 \(10 \+ half of 15: 6 already taken this scene and 9 now\)/);
+  assert.match(damageSavePreview(6, ""), /Enter the damage/);
+  const { adjustedSavePreview, damageAfterAdjustments } = await import("../module/apps/gc/npc-damage-save.mjs");
+  const tough = { system: { survivalStats: { resistances: { subdual: 8 }, resistanceSources: [] } } };
+  assert.equal(damageAfterAdjustments(tough, { damage: 10, kind: "lethal" }), 10);
+  assert.equal(damageAfterAdjustments(tough, { damage: 10, kind: "subdual" }), 2);
+  assert.match(adjustedSavePreview(tough, 0, { damage: 10, kind: "subdual" }), /10 damage counts as 2 .* DC 11 /);
+  assert.match(adjustedSavePreview(tough, 0, { damage: 8, kind: "subdual" }), /no save is rolled/);
+  assert.match(adjustedSavePreview(tough, 0, { damage: 10, kind: "lethal" }), /^This save: DC 15 /);
+});
+
+test("an attack card's first line names its target (B-077)", async () => {
+  const { checkFlavor, attackTargetName } = await import("../module/rules/outcomes.mjs");
+  const attack = { checkKind: "attack", baseFlavor: "Pistol attack", rawTotal: 15, effectiveTotal: 15, naturalDie: 9 };
+  assert.equal(attackTargetName(attack), "");
+  const settled = { ...attack, attackResolution: { targetName: "Sentry <2>", hit: true, defense: 12, margin: 3 } };
+  assert.match(checkFlavor(settled), /^Pistol attack · at Sentry &lt;2&gt;<br>/);
+  assert.equal(attackTargetName({ ...settled, checkKind: "skill" }), "");
+});
+
+test("game terms are worded once and found by name (B-110)", async () => {
+  const { glossary, termMeans } = await import("../module/apps/glossary.mjs");
+  const terms = glossary();
+  assert.ok(terms.length >= 15);
+  assert.equal(new Set(terms.map(entry => entry.term)).size, terms.length);
+  assert.ok(terms.every(entry => entry.means.length <= 200 && /\.$/.test(entry.means)));
+  assert.match(termMeans("threat level"), /1 to 20/);
+  assert.equal(termMeans("no such term"), null);
+});
+
+test("a console tool that needs only its own press can go to the hotbar and be run by name (B-124)", async () => {
+  const { hotbarTool, runConsoleTool } = await import("../module/apps/gc/console.mjs");
+  assert.equal(hotbarTool({ dataset: { action: "spendDice", tooltip: "x" } }), true);
+  assert.equal(hotbarTool({ dataset: { action: "cardNextStep", combatant: "c1" } }), false);
+  assert.equal(
+    hotbarTool({ dataset: { action: "quickObjective" }, closest: () => ({}) }),
+    false,
+    "reads a field beside it"
+  );
+  assert.equal(hotbarTool({ dataset: { action: "consoleView", view: "prep" } }), false);
+  assert.equal(hotbarTool({ dataset: { action: "spendDice" }, disabled: true }), false);
+  const { onHotbarDrop } = await import("../module/apps/hotbar.mjs");
+  const made = [];
+  const before = { macros: game.macros, Macro: globalThis.Macro, assign: game.user.assignHotbarMacro };
+  try {
+    game.macros = [];
+    globalThis.Macro = { create: async data => (made.push(data), data) };
+    game.user.assignHotbarMacro = async () => true;
+    assert.equal(onHotbarDrop(null, { type: "spycraft2.gcTool", action: "spendDice", name: "Spend dice" }, 3), false);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(made[0].command, 'game.spycraft2.gc.run("spendDice");');
+    // A name that is not a plain action is not turned into code.
+    assert.equal(onHotbarDrop(null, { type: "spycraft2.gcTool", action: 'x");alert(1);("' }, 3), true);
+  } finally {
+    game.macros = before.macros;
+    globalThis.Macro = before.Macro;
+    game.user.assignHotbarMacro = before.assign;
+  }
+  assert.equal(typeof runConsoleTool, "function");
 });

@@ -246,9 +246,11 @@ test("a button with a hint shows its short label and carries the full wording as
     renderCheckControls(message({}), html);
     const [short, plain] = html.children[0].children;
     assert.equal(short.textContent, "Short");
-    assert.equal(short.attributes["aria-label"], "The full wording of this step");
+    // The name holds the words on the face; a button with no fuller wording gets no tooltip repeating it.
+    assert.equal(short.attributes["aria-label"], "Short: The full wording of this step");
     assert.equal(short.attributes["data-tooltip"], "The full wording of this step");
-    assert.equal(plain.attributes["data-tooltip"], "Plain words");
+    assert.equal(plain.attributes?.["data-tooltip"], undefined);
+    assert.equal(plain.attributes?.["aria-label"], undefined);
   } finally {
     rollPipeline.chatControls = response;
   }
@@ -271,7 +273,8 @@ test("the chat hook lays buttons out by placement and runs them once per click",
     ["boostControl", "generousControl", "opposedCheckControl", "finishControl"]
   );
   const finish = row.children[3];
-  assert.equal(finish.attributes["aria-label"], "Finish");
+  assert.equal(finish.attributes?.["aria-label"], undefined);
+  assert.equal(finish.textContent, "Finish");
   await finish.listeners.click();
   assert.deepEqual(actor.calls, [["finishCheck", msg]]);
   assert.equal(finish.disabled, false);

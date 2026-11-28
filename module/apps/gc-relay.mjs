@@ -19,7 +19,7 @@ import { esc } from "../html.mjs";
 import { loc, locKey } from "../i18n.mjs";
 import { validBlastExposureReview } from "../rules/blast-exposure.mjs";
 import { markDamageApplicationStart } from "../documents/actor/damage-hits.mjs";
-import { appliedDamageEntries, validReport } from "../rules/damage-application.mjs";
+import { appliedDamageEntries, validReport, withoutLegacyDamageMark } from "../rules/damage-application.mjs";
 
 export const RELAY_QUERY = "spycraft2.relay";
 const actions = new Map();
@@ -287,9 +287,19 @@ registerRelay("markCard", {
 // Undo of applied damage takes its own mark off the card: the player who owns the damaged character may do that
 // through the GC, as they may set it.
 registerRelay("unmarkDamage", {
-  async run({ messageId, entryId }, user) {
-    const message = game.messages.get(messageId),
-      entry = message?.flags?.spycraft2?.damageAppliedBy?.[entryId];
+  async run({ messageId, entryId, legacyTargetUuid = null }, user) {
+    const message = game.messages.get(messageId);
+    // A card from before marks were keyed: its newest record for that target comes off the old array.
+    if (legacyTargetUuid) {
+      const rest = withoutLegacyDamageMark(message?.flags?.spycraft2, legacyTargetUuid);
+      if (!rest) throw new Error(loc`That card has no such damage mark.`);
+      const target = await fromUuid(legacyTargetUuid);
+      if (!user.isGM && !target?.testUserPermission?.(user, "OWNER"))
+        throw new Error(loc`Only the character's own player can clear that mark.`);
+      await message.update({ "flags.spycraft2.damageApplied": rest });
+      return true;
+    }
+    const entry = message?.flags?.spycraft2?.damageAppliedBy?.[entryId];
     if (!entry || typeof entryId !== "string" || !ENTRY_ID.test(entryId))
       throw new Error(loc`That card has no such damage mark.`);
     const target = typeof entry.targetUuid === "string" ? await fromUuid(entry.targetUuid) : null;
@@ -300,8 +310,17 @@ registerRelay("unmarkDamage", {
   }
 });
 
-/** Take one applied-damage mark off a card, through the GC when the card is someone else's. */
-export async function unmarkDamage(message, entryId) {
+/**
+ * Take one applied-damage mark off a card, through the GC when the card is someone else's. With no keyed mark,
+ * `legacyTargetUuid` names the target whose newest record comes off an old card's array.
+ */
+export async function unmarkDamage(message, entryId, { legacyTargetUuid = null } = {}) {
+  if (!entryId && legacyTargetUuid) {
+    if (!(message.isAuthor || game.user.isGM))
+      return askGC("unmarkDamage", { messageId: message.id, legacyTargetUuid });
+    const rest = withoutLegacyDamageMark(message.flags?.spycraft2, legacyTargetUuid);
+    return rest ? message.update({ "flags.spycraft2.damageApplied": rest }) : false;
+  }
   if (message.isAuthor || game.user.isGM)
     return message.update({ [`flags.spycraft2.damageAppliedBy.-=${entryId}`]: null });
   return askGC("unmarkDamage", { messageId: message.id, entryId });

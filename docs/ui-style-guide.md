@@ -225,7 +225,7 @@ All values come from `styles/tokens.css`. A literal colour, size or spacing valu
 
 Rules:
 
-- Use role tokens in new code. The older aliases (`--sc2-paper`, `--sc2-teal`, `--sc2-bad`, `--sc2-brass` …, `tokens.css:28-39`) remain for existing rules; replace them when you touch a line.
+- Use role tokens only. The older aliases (`--sc2-paper`, `--sc2-teal`, `--sc2-bad`, `--sc2-brass` …) were removed on 2026-11-28 and a lint keeps them out.
 - **Danger red is for harm only.** Do not use it for hover, focus or decoration.
 - `--sc2-rule` (about 1.5:1 on the surface) is for dividers only. A border that is the only cue for a control's edge uses `--sc2-rule-strong` (3.2:1 light, 3.8:1 dark).
 - State never relies on colour alone: pair it with a word, an icon or a shape (5.6).
@@ -740,7 +740,7 @@ Two constraints met along the way, for whoever continues:
 
 ### 11.2 Lints that can run in CI
 
-These do not need the rulebook, so they can run in CI beside `npm test`. Each can start as a warning and become an error once the matching audit items are done. None is written yet (backlog B-215). The audit ids in the last column are the audit's own; the open ones are in the backlog as `SG-` rows. After the first pass few hits remain for Banned terms ("Current VP", "Current WP"), Glued numbers, Ranges and Templates: title (four authored `title` attributes), and Keybindings passes, so these five are the cheapest to turn on first.
+These do not need the rulebook, so they run in CI with `npm test`, in `tools/test-style-lints.mjs`. Banned terms, Glued numbers, Ranges, developer words, the three template lints and CSS sizes are hard rules: their count is nought and must stay there. Fragment keys, the internal words, First person, string length and CSS literals are ratchets: each has a cap equal to the count of old text still to reword, and a new string may not raise it; lower the cap whenever a count falls. One primary is covered by the console's own view test, and Keybindings by the keybinding tests. The audit ids in the last column are the audit's own.
 
 | Lint                     | Check                                                                                                                                                                                                                      | Audit items  |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |

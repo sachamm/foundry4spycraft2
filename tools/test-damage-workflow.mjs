@@ -2817,6 +2817,17 @@ test("resolving never targets the attacker, uses the one targeted token without 
       targetChoices().actors.map(actor => actor.name),
       ["Shooter", "Sentry", "Faraway"]
     );
+    // An unlinked token copy in the fight stands for its sidebar actor, which is not listed beside it (B-245).
+    const template = Object.assign(character("Thug", {}), { id: "thug-base" });
+    const copy = Object.assign(character("Thug 1", {}), { isToken: true, token: { actorId: "thug-base" } });
+    game.actors = [attacker, template];
+    game.combats = [{ turns: [{ actor: copy }] }];
+    assert.deepEqual(
+      targetChoices({ exclude: attacker.uuid }).actors.map(actor => actor.name),
+      ["Thug 1"]
+    );
+    game.actors = [attacker, guard, offScene];
+    game.combats = [{ turns: [{ actor: attacker }, { actor: guard }] }];
     const self = card("s1", { actorUuid: attacker.uuid, checkKind: "attack", rawTotal: 18, effectiveTotal: 18 });
     assert.equal(await resolveAttack(self, { targetUuid: attacker.uuid, defense: "" }), false);
     assert.equal(self.flags.spycraft2.attackResolution, undefined);

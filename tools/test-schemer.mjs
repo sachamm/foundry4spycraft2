@@ -287,7 +287,7 @@ test("the substituted INT check can use 10-Second Solution with both allowances 
 });
 
 const { cunningPlanEffect, cunningPlanCheck } = await import("../module/rules/class-checks.mjs");
-const { adjudicateCheck, checkCandidates, rollEvidence } = await import("../module/rules/outcomes.mjs");
+const { checkCandidates, rollEvidence } = await import("../module/rules/outcomes.mjs");
 const failedCheck = () => ({
   actorUuid: "Actor.schemer",
   formula: "1d20 + @total",

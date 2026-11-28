@@ -269,7 +269,7 @@ export async function recoverDeclaredDC(actor, message, input = {}) {
         return null;
       }
       if (!payment?.needsReview)
-        throw Error(loc`The interrupted DC payment is missing or already changed; review the GC pool first.`);
+        throw Error(loc`The interrupted DC payment is missing or already changed; review the GC's action dice first.`);
       const dice = Array.isArray(input.dice)
         ? input.dice
         : String(input.dice ?? "")

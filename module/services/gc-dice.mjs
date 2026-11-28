@@ -186,7 +186,8 @@ export function reviewUndoGCDice({ sourceUuid, count, session, credit, note }) {
       throw Error(loc`Confirm the original Undo receipt, session, amount and GC review note.`);
     const before = gcDiceStatus();
     requireValidBalance(before);
-    if (!before.current) throw Error(loc`Initialize the current GC pool before reviewing this refund.`);
+    if (!before.current)
+      throw Error(loc`Initialize the GC's action dice for this session before reviewing this refund.`);
     if (session !== before.session) return { sourceUuid, count, session, credit: false, outcome: "earlierSession" };
     const receipts = before.undoRefunds ?? [];
     if (!Array.isArray(receipts)) throw Error(loc`Review the saved GC refund receipts before changing this pool.`);

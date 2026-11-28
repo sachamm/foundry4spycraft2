@@ -36,7 +36,7 @@ export function healthLine(actor) {
   if (actor.type === "npc" && !npcIsSpecial(actor)) {
     const save = damageSaveState(actor);
     if (save.track.state && save.track.state !== "active") return loc`Out of the fight (${save.track.state})`;
-    return loc`Damage save ${signed(save.bonus)}, next DC ${save.nextDC}`;
+    return loc`Damage save ${signed(save.bonus)}, DC ${save.nextDC} before a new hit`;
   }
   return loc`Vitality ${system.vitality?.value ?? 0}/${system.vitality?.max ?? 0}, wounds ${system.wounds?.value ?? 0}/${system.wounds?.max ?? 0}`;
 }
@@ -96,6 +96,24 @@ export async function actingOutcome(actor, step) {
   if (!actor || !row) return null;
   const settle = (await row[2]())[row[0]];
   return settle(actor);
+}
+
+/** Combatants holding a readied action, with what sets it off, for the console's "triggered" buttons. */
+export function readiedRows(combat) {
+  const labels = combatantLabels(combat);
+  return [...(combat?.turns ?? [])]
+    .filter(combatant => combatant.flags?.spycraft2?.readied && !combatant.isDefeated && combatant.isOwner !== false)
+    .map(combatant => {
+      const name = labels.get(combatant.id) ?? combatant.name,
+        trigger = combatant.flags.spycraft2.readied.trigger ?? "";
+      return {
+        id: combatant.id,
+        label: loc`Readied action triggered: ${name}`,
+        hint: trigger
+          ? loc`"${trigger}". ${name} acts now, dropping to the acting Count if that is lower. Leaves an Undo note.`
+          : loc`${name} acts now, dropping to the acting Count if that is lower. Leaves an Undo note.`
+      };
+    });
 }
 
 /** What the console shows for the combatant whose turn it is; null before the fight starts. */
@@ -340,7 +358,7 @@ export async function attackWith(actor, itemId, event = null, combatant = null) 
 /** A rolled attack marks its time on the attacker's turn, as one made from the sheet does; a cancelled one does not. */
 async function attackMade(actor, message, quick = true) {
   if (!message) return null;
-  await markActionSpent(actor, attackActionCost(message));
+  await markActionSpent(actor, attackActionCost(message), { label: loc`an attack from the GC Console` });
   return quick ? resolveQuickAttack(message) : message;
 }
 
@@ -531,8 +549,9 @@ export async function mobAttackDialog(combat, key = null) {
         continue;
       }
       // Each member that attacked spends the time on its own turn record, the acting one as from the sheet.
-      if (attacker.id === combat.combatant?.id) await markActionSpent(actor, attackActionCost(message));
-      else await spendTurnAction(attacker, attackActionCost(message), { quiet: true });
+      if (attacker.id === combat.combatant?.id)
+        await markActionSpent(actor, attackActionCost(message), { label: loc`Mob attack` });
+      else await spendTurnAction(attacker, attackActionCost(message), { quiet: true, label: loc`Mob attack` });
       await resolveQuickAttack(message);
       attacked.push(loc`${attacker.name} → ${target.name}`);
     }

@@ -254,14 +254,16 @@ export async function advanceConflict(id) {
       const list = availableStrategies(conflict, side);
       const rows = list.map(entry => [
         entry.id,
-        `${entry.name} (${entry.modifier === null ? "see note" : signed(entry.modifier)}${entry.skill ? `; ${entry.skill}` : ""}${entry.roundDuration && !["—", "**"].includes(entry.roundDuration) ? `; ${entry.roundDuration}` : ""}) — ${entry.advantages.join(", ").replace("*", "any but Victory")}${entry.available ? "" : ` — needs ${entry.reasons.join("; ")}`}${entry.confirm ? loc` — GC confirms other requirement` : ""}`
+        `${entry.name} (${entry.modifier === null ? loc`see note` : signed(entry.modifier)}${entry.skill ? `; ${entry.skill}` : ""}${entry.roundDuration && !["—", "**"].includes(entry.roundDuration) ? `; ${entry.roundDuration}` : ""}) — ${entry.advantages.join(", ").replace("*", "any but Victory")}${entry.available ? "" : ` — needs ${entry.reasons.join("; ")}`}${entry.confirm ? loc` — GC confirms other requirement` : ""}`
       ]);
       const input = await ask(
         loc`${conflict.name}: ${sideName(conflict, side)} chooses a Strategy (Lead ${conflict.lead})`,
         `
         <p>${loc`Strategies are secret until both are chosen and cannot be changed afterwards. Ask now about abilities used before the reveal.`}</p>
         <label>${loc`Strategy`} <select name="strategy">${options(rows, list.find(entry => entry.available)?.id)}</select></label>
-        <label><input type="checkbox" name="confirmOther" /> ${loc`Other printed requirement confirmed (feat, class ability, approach, software…)`}</label>`
+        <label><input type="checkbox" name="confirmOther" /> ${loc`Other printed requirement confirmed (feat, class ability, approach, software…)`}</label>`,
+        // Strategies cannot be changed once chosen, so the button says so.
+        loc`Lock in this Strategy`
       );
       if (!input) return null;
       const next = chooseStrategy(conflict, side, input.strategy, { confirmOther: !!input.confirmOther });
@@ -301,7 +303,8 @@ export async function advanceConflict(id) {
             ["prey", sideName(conflict, "prey")]
           ],
           ""
-        )}</select></label>`
+        )}</select></label>`,
+        loc`Compare the results`
       );
       if (!input) return null;
       const next = resolveCheck(conflict, {
@@ -345,7 +348,8 @@ export async function advanceConflict(id) {
         `
         <p>${loc`Enter how many times each Advantage is chosen (total 1 to ${allowed}).`}</p>${inputs}
         <label>${loc`Override the Lead change (leave blank to use the printed rule)`} <input type="number" name="leadShift" min="0" /></label>
-        ${canSpend ? `<label><input type="checkbox" name="spendSmash" /> ${loc`Spend 1 of ${smashNow.points} Smash points to ${spendLabel} (p.365)`}</label>` : ""}`
+        ${canSpend ? `<label><input type="checkbox" name="spendSmash" /> ${loc`Spend 1 of ${smashNow.points} Smash points to ${spendLabel} (p.365)`}</label>` : ""}`,
+        loc`Apply these Advantages`
       );
       if (!input) return null;
       const picks = list.flatMap(advantage =>

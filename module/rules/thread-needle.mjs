@@ -49,5 +49,5 @@ export function threadNeedleEndPlan(input = {}) {
       );
     return { reason: "movedBeyond", separationFeet: input.separationFeet, holderMovedConfirmed: true };
   }
-  throw Error(loc`Choose the completed recorded escape, release or the holder’s completed movement beyond5ft.`);
+  throw Error(loc`Choose the completed recorded escape, release or the holder’s completed movement beyond 5 ft.`);
 }

@@ -22,12 +22,13 @@ import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from ".
 import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
 import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc } from "../../i18n.mjs";
-import { formDialog, raw } from "../dialog-kit.mjs";
+import { formDialog, formValues, raw } from "../dialog-kit.mjs";
 import { boostNpcDefense } from "./npc-defense.mjs";
 import { spendPostHitDefenseForNPC } from "./post-hit-defense.mjs";
 import { declareSkillDC } from "./declared-skill-dc.mjs";
 
-const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null, dialog = {}) =>
+  formDialog({ title, ok, validate, dialog, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -77,14 +78,14 @@ export function npcChoices(preferActor = null) {
   return [...rows.values()];
 }
 
-/** Why a spend dialog's entry would be refused, or "" when it can go ahead. Read before the dialog closes. */
-function spendRefusal(values, { dramatic, status }) {
+/** The plan a spend dialog's entry would pay for, or why it would be refused: { plan } or { refusal }. */
+function spendQuote(values, { dramatic, status }) {
   const spend = GC_SPENDS.find(entry => entry.id === values.id);
-  if (!spend) return loc`Choose a use for the action dice.`;
+  if (!spend) return { refusal: loc`Choose a use for the action dice.` };
   const actor = spend.needsNpc && values.actorId ? globalThis.fromUuidSync?.(values.actorId) : null;
-  if (spend.needsNpc && actor?.type !== "npc") return loc`Choose the NPC this applies to.`;
+  if (spend.needsNpc && actor?.type !== "npc") return { refusal: loc`Choose the NPC this applies to.` };
   if (values.id === "boostDC" && !String(values.dcCheck ?? "").trim())
-    return loc`Name the check whose DC rises, so its earlier boosts are counted.`;
+    return { refusal: loc`Name the check whose DC rises, so its earlier boosts are counted.` };
   try {
     const quality = values.id === "campaignQuality" ? campaignQuality(values.qualityId) : null;
     const plan = planSpend(values.id, {
@@ -103,11 +104,32 @@ function spendRefusal(values, { dramatic, status }) {
       fromDeath: !values.fromCapture,
       inCombat: !!game.combat?.started
     });
-    if (plan.cost > status.value) return loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`;
+    if (plan.cost > status.value)
+      return { refusal: loc`That costs ${plan.cost} action dice; the GC has ${status.value}.` };
+    return { plan };
   } catch (error) {
-    return error.message;
+    return { refusal: error.message };
   }
-  return "";
+}
+
+/** Why a spend dialog's entry would be refused, or "" when it can go ahead. Read before the dialog closes. */
+const spendRefusal = (values, context) => spendQuote(values, context).refusal ?? "";
+
+/**
+ * The line a spend dialog shows before its button is pressed: the cost, the pool before and after, the die rolled
+ * and what the rules attach to the spend. Empty while the entry is incomplete, since the refusal says why.
+ */
+export function spendCostLine(values, context) {
+  const { plan } = spendQuote(values, context);
+  if (!plan) return "";
+  const left = context.status.value - plan.cost;
+  const cost =
+    plan.cost === 0
+      ? loc`No dice spent: the pool stays at ${context.status.value}.`
+      : plan.cost === 1
+        ? loc`Costs 1 die: the pool goes from ${context.status.value} to ${left}.`
+        : loc`Costs ${plan.cost} dice: the pool goes from ${context.status.value} to ${left}.`;
+  return [cost, plan.die ? loc`Rolls a d${plan.die}.` : "", ...(plan.notes ?? [])].filter(Boolean).join(" ");
 }
 
 /**
@@ -133,12 +155,13 @@ export async function spendGCDice(input = {}) {
     const picked = await ask(
       loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
+      <p>${loc`The GC's action dice raise NPC rolls, Defense and DCs, pay for NPC criticals and agents' errors, and buy events. Pick one use; its cost shows below before anything is spent.`}</p>
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
       <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(([uuid, label]) => [uuid, label])], actors[0]?.[0] ?? "")}</select></label>
       <label data-when="id=activateThreat|activateError">${loc`Threat or error scored with`} <select name="checkKind">${options(
         [
-          ["attack", "an attack"],
-          ["skill", "a skill check"]
+          ["attack", loc`an attack`],
+          ["skill", loc`a skill check`]
         ],
         "attack"
       )}</select></label>
@@ -157,10 +180,24 @@ export async function spendGCDice(input = {}) {
         ["wounds", loc`2 wounds`]
       ])}</select></label>
       <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
-      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
+      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>
+      <p class="hint" data-spend-cost role="status"></p>`,
       loc`Spend dice`,
       // A spend that would be refused keeps the dialog open with the reason, so nothing typed is lost.
-      values => spendRefusal(values, { dramatic, status })
+      values => spendRefusal(values, { dramatic, status }),
+      {
+        // The cost is stated before the button is pressed, and follows each change to the entry.
+        render: (event, app) => {
+          const root = app?.element ?? event?.target,
+            form = root?.querySelector?.("form"),
+            line = root?.querySelector?.("[data-spend-cost]");
+          if (!form || !line) return;
+          const show = () => (line.textContent = spendCostLine(formValues(form), { dramatic, status }));
+          form.addEventListener("input", show);
+          form.addEventListener("change", show);
+          show();
+        }
+      }
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };
@@ -339,7 +376,95 @@ export function doubleOpponentInitiative(combat = game.combat, options = {}) {
   return queueInitiative(() => doubleNow(combat, options));
 }
 
-async function doubleNow(combat, { quiet = false } = {}) {
+/**
+ * Who a dramatic scene would double in a fight as things stand, with the Count each would move to. `skip` marks the
+ * combatants the GC took off the list.
+ */
+export function dramaticDoublingPreview(combat) {
+  return [...(combat?.combatants ?? [])]
+    .filter(
+      combatant =>
+        dramaticOpponent(combatant) &&
+        Number.isFinite(combatant.initiative) &&
+        !combatant.flags?.spycraft2?.dramaticDoubled
+    )
+    .map(combatant => ({
+      id: combatant.id,
+      name: combatant.name,
+      from: combatant.initiative,
+      to: dramaticInitiative(combatant.initiative)
+    }));
+}
+
+/**
+ * Begin a dramatic scene from one dialog (p.424): scripted at no cost or declared now for GC action dice, with the
+ * opponents whose Counts will double listed first so the GC can take any off. Says in chat, to the GC, what began.
+ */
+export async function startDramaticScene(combat = game.combat, input = null) {
+  requireGC();
+  if (isDramaticScene()) return refuse(loc`The current scene is already dramatic.`);
+  const status = gcDiceStatus(),
+    cost = GC_SPENDS.find(spend => spend.id === "dramaticScene")?.cost ?? 4,
+    preview = dramaticDoublingPreview(combat?.started || combat?.combatants?.size ? combat : null);
+  if (!input) {
+    input = await formDialog({
+      title: loc`Make this scene dramatic`,
+      ok: loc`Begin the dramatic scene`,
+      intro: loc`In a dramatic scene the GC's action dice explode on a 1 as well as their maximum, up to 3 dice may boost one DC, and each opponent's Initiative Count doubles, to 50 at most (p.424).`,
+      fields: [
+        {
+          select: "source",
+          label: loc`How it comes about`,
+          options: [
+            ["scripted", loc`Scripted in the mission (no cost)`],
+            ["spent", loc`Declared now for ${cost} GC action dice (${status.current ? status.value : 0} left)`]
+          ]
+        },
+        raw(
+          preview.length
+            ? `<fieldset><legend>${esc(loc`Counts that double now`)}</legend>${preview
+                .map(
+                  row =>
+                    `<label><input type="checkbox" name="double-${esc(row.id)}" checked /> ${esc(row.name)}: ${row.from} → ${row.to}</label>`
+                )
+                .join(
+                  ""
+                )}<p class="hint">${esc(loc`Untick anyone who is not an opponent of the agents. An opponent who rolls later is doubled as its Count comes in.`)}</p></fieldset>`
+            : `<p class="hint">${esc(loc`No opponent has an Initiative Count yet. Each one is doubled as its Count comes in.`)}</p>`
+        )
+      ],
+      validate: values =>
+        values.source === "spent" && !(status.current && status.value >= cost)
+          ? loc`The GC's pool has fewer than ${cost} action dice: begin a session, or choose the scripted scene.`
+          : ""
+    });
+    if (!input) return null;
+  }
+  const skip = new Set(preview.filter(row => input[`double-${row.id}`] === false).map(row => row.id));
+  if (input.source === "spent") {
+    if (!(await spendGCDice({ id: "dramaticScene" })) || !isDramaticScene()) return null;
+  } else await setDramaticScene(true);
+  const changed = combat ? await doubleOpponentInitiative(combat, { quiet: true, skip, silent: true }) : [];
+  await ChatMessage.create({
+    speaker: { alias: loc`Game Control` },
+    content: `<b>${esc(input.source === "spent" ? loc`Dramatic scene, declared for ${cost} GC action dice.` : loc`Dramatic scene, scripted (no dice spent).`)}</b><br>${esc(loc`GC action dice explode on 1 and their maximum; up to 3 dice may boost one DC; opponents' Initiative Counts double, to 50 at most (p.424).`)}${
+      changed.length ? `<br>${esc(loc`Doubled now:`)} ${changed.map(esc).join("; ")}` : ""
+    }${
+      skip.size
+        ? `<br>${esc(
+            loc`Left as they were: ${preview
+              .filter(row => skip.has(row.id))
+              .map(row => row.name)
+              .join(", ")}.`
+          )}`
+        : ""
+    }`,
+    whisper: gmWhisper()
+  });
+  return { source: input.source, doubled: changed, skipped: [...skip] };
+}
+
+async function doubleNow(combat, { quiet = false, skip = null, silent = false } = {}) {
   if (!combat) return quiet ? [] : refuse(loc`There is no active combat.`);
   if (!isDramaticScene()) return quiet ? [] : refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
@@ -350,11 +475,16 @@ async function doubleNow(combat, { quiet = false } = {}) {
       combatant.flags?.spycraft2?.dramaticDoubled
     )
       continue;
+    // Taken off the list by the GC: marked as dealt with, so a later pass leaves the Count alone too.
+    if (skip?.has(combatant.id)) {
+      await combatant.update({ "flags.spycraft2.dramaticDoubled": true });
+      continue;
+    }
     const next = dramaticInitiative(combatant.initiative);
     await combatant.update({ initiative: next, "flags.spycraft2.dramaticDoubled": true });
     changed.push(`${combatant.name}: ${next}`);
   }
-  if (changed.length)
+  if (changed.length && !silent)
     await ChatMessage.create({
       speaker: { alias: loc`Game Control` },
       content: `${loc`Dramatic scene — opponents’ Initiative Counts doubled (maximum 50).`}<br>${changed.map(esc).join("<br>")}`,

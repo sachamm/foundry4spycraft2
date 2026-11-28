@@ -287,7 +287,6 @@ test("review cancellation, invalid raw values and stale context do not alter leg
 test("conflicting or corrupt vitality evidence requires review and never triggers a replacement RNG result", async () => {
   let a = actor();
   await rollCareerVitality(a, 1);
-  const id = a.system.progression[1].vitalityRollId;
   a.system.progression[1].vitality = 0;
   await assert.rejects(rollCareerVitality(a, 1), /recorded history/);
   assert.equal(rng, 1);

@@ -101,17 +101,14 @@ test("the typed shared inputs refuse truthy strings and preserve both factual fl
       assert.throws(() => plan(sys(), weapon(), { [key]: value }));
     }
 });
-let response = null,
-  dialogs = 0;
+let response = null;
 foundry.utils.escapeHTML = String;
 foundry.applications.api.DialogV2.input = async () => {
-  dialogs++;
   return response;
 };
 game.user = { isGM: true, targets: new Set() };
 game.actors = [];
 function actor() {
-  dialogs = 0;
   response = null;
   const a = {
     uuid: "Actor.cqb",

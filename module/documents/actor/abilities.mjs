@@ -1228,7 +1228,6 @@ export const ActorAbilities = Base =>
           if (incapacity) throw new Error(loc`This character cannot currently activate Mental Leap: ${incapacity}`);
           const session = String(this.usagePeriods.session ?? "initial"),
             before = foundry.utils.deepClone(this.system.mentalLeaps ?? []),
-            source = mentalLeapSource(this.system),
             record = mentalLeapRecord(
               { ...this.system, ...this.attributeRuleContext },
               { id: foundry.utils.randomID(), ability: input.ability, combat: this.mentalLeapCombatContext() }
