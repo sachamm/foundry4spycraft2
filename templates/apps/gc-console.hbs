@@ -61,6 +61,7 @@
       <div class="sc2-field" data-tooltip="{{dice.formula}}"><span class="sc2-caption">{{localize "SPYCRAFT.Console.StartingNumber"}}</span><span
         class="sc2-value">{{dice.expected}}</span></div>
     </div>
+    {{#if dice.stale}}<p class="gc-note"><span class="gc-tag-warn">{{dice.stale.line}}</span> <button type="button" data-action="refitDice">{{dice.stale.button}}</button></p>{{/if}}
     <p class="controls">
       <button type="button" class="{{#if (eq @root.primary "spendDice")}} gc-primary{{/if}}" data-action="spendDice"
         data-tooltip="{{@root.tips.spendDiceAny}}"{{#if @root.shortcuts.spendDice}} aria-keyshortcuts="{{@root.shortcuts.spendDice}}"{{/if}}>{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>

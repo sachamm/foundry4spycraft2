@@ -776,6 +776,11 @@
   flex-basis: 100%;
   font-size: var(--sc2-text-s);
 }
+/* A control the search matched: an outline, not a colour change, so it reads in both themes. */
+.spycraft2 .sc2-search-hit {
+  outline: 2px dashed var(--sc2-action);
+  outline-offset: 2px;
+}
 .spycraft2 .sc2-tool-section {
   margin: 8px 0;
   padding: 10px;

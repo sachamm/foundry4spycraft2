@@ -1836,3 +1836,23 @@ test("the inline objective gives its words back when the save fails", async () =
   assert.equal(field.value, "2 Tap the line");
   assert.deepEqual(warned, ["Setting refused"]);
 });
+
+test("a pool set up for another Caliber, and untouched since, offers one button that brings it in step", async () => {
+  const before = game.settings.get("spycraft2", "gcActionDice"),
+    m = state.getMission();
+  await state.updateMission({ caliber: 2 });
+  await game.settings.set("spycraft2", "gcActionDice", {
+    value: 4,
+    session: String(game.settings.get("spycraft2", "usagePeriods")?.session ?? "initial"),
+    playersPresent: 2,
+    caliber: 1,
+    lastReason: "Session start"
+  });
+  const stale = consoleContext().dice.stale;
+  assert.match(stale.line, /Caliber I;.*Caliber II\./);
+  assert.match(stale.button, /Reset to 6 dice/);
+  await game.settings.set("spycraft2", "gcActionDice", { ...gcDiceStatus(), lastReason: "Helpful hint" });
+  assert.equal(consoleContext().dice.stale, null, "once a die has moved, the GC adjusts by hand");
+  await state.updateMission({ caliber: m.caliber });
+  await game.settings.set("spycraft2", "gcActionDice", before);
+});

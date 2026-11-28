@@ -4,7 +4,7 @@ import { systemDialog } from "../dialog-theme.mjs";
 import { installToolSearch } from "../tool-search.mjs";
 import { installResolutionGuide } from "../resolution-guide.mjs";
 /** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
-import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
+import { gcDiceStatus, initializeGCDice, manageGCDice } from "../../services/gc-dice.mjs";
 import { antagonistReward, threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { campaignRuleLines } from "../../rules/campaign-rules.mjs";
@@ -55,6 +55,32 @@ import { loc } from "../../i18n.mjs";
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
 const ROMAN = ["I", "II", "III", "IV", "V"];
+/** The words a GC types for a console tool that its label does not contain. */
+const SEARCH_TERMS = () => ({
+  missionReport: loc`xp report experience award earned planned`,
+  awardStanding: loc`standing reputation net worth payout reward`,
+  recordInfraction: loc`exposure infraction penalty`,
+  spendDice: loc`gc dice action dice spend buy`,
+  gcDice: loc`gc dice pool starting reset`,
+  addNpcToScene: loc`npc place token opponent enemy`,
+  startMission: loc`begin mission threat level`,
+  beginSession: loc`session start reset dice`,
+  nextScene: loc`scene new standard npc damage`,
+  dramaticOn: loc`dramatic scene`,
+  doubleInitiative: loc`dramatic initiative double`,
+  mobAttack: loc`mob group attack minions`,
+  groupInitiative: loc`initiative roll npc`,
+  clockAdvance: loc`time clock date`,
+  seasonQualities: loc`season campaign qualities`,
+  caliberIncrease: loc`caliber raise`,
+  hazards: loc`hazard fire falling poison`,
+  npcKnowledge: loc`npc knowledge information`
+});
+/** Tools a GC looks for here that live somewhere else. */
+const SEARCH_ELSEWHERE = () => ({
+  [loc`player request requests approve allow`]: loc`Player requests arrive as chat cards with Allow and Refuse.`,
+  [loc`disposition attitude`]: loc`Disposition changes come from a social skill check with the NPC targeted.`
+});
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 /**
  * A console action runs once at a time: a second press while it is still working, or its dialog is open, is dropped.
@@ -235,6 +261,18 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
             : loc`New scene begun: scene abilities are back and standard NPCs' damage is cleared.`
         );
       }),
+      refitDice: guard(async () => {
+        const status = gcDiceStatus(),
+          m = getMission();
+        if (status.lastReason !== "Session start")
+          return refuse(loc`A die has moved since the session began. Use Adjust pool instead.`);
+        const pool = await initializeGCDice({
+          playersPresent: status.playersPresent,
+          caliber: m.caliber,
+          replaceExisting: true
+        });
+        ui.notifications.info(loc`GC action dice reset to ${pool.value} for Caliber ${m.caliber}.`);
+      }),
       spendDice: guard(() => spend.spendGCDice()),
       actingSpendDice: guard((event, target) => {
         const acting = actingCombatant(target);
@@ -390,7 +428,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     });
     this._wireActorDrops();
     this._announceTurn(context);
-    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}));
+    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`, (this._search ??= {}), {
+      terms: SEARCH_TERMS(),
+      elsewhere: SEARCH_ELSEWHERE()
+    });
     installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
     restoreConsoleState(this.element, this._kept);
     this._kept = null;
@@ -848,7 +889,18 @@ export function consoleContext() {
       formula:
         dice.current && Number.isSafeInteger(dice.playersPresent)
           ? loc`${dice.playersPresent} players present + 2 × Caliber ${ROMAN[(Number(dice.caliber) || m.caliber) - 1] ?? m.caliber}`
-          : loc`${team.length} agents on the team + 2 × Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`
+          : loc`${team.length} agents on the team + 2 × Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}`,
+      // Set up for another Caliber and untouched since: one line and the button that brings it in step.
+      stale:
+        dice.current &&
+        dice.lastReason === "Session start" &&
+        Number.isSafeInteger(dice.playersPresent) &&
+        Number(dice.caliber) !== m.caliber
+          ? {
+              line: loc`The pool was set up for Caliber ${ROMAN[Number(dice.caliber) - 1] ?? dice.caliber}; the mission is now Caliber ${ROMAN[m.caliber - 1] ?? m.caliber}.`,
+              button: loc`Reset to ${dice.playersPresent + 2 * m.caliber} dice`
+            }
+          : null
     },
     scene,
     season: qualities
