@@ -105,10 +105,10 @@
 }
 
 .spycraft2.sc2-result-guide {
-  border-left: 3px solid var(--sc2-teal);
+  border-left: 3px solid var(--sc2-action);
   padding: 2px 8px;
   margin-bottom: 4px;
-  background: var(--sc2-paper-raised);
+  background: var(--sc2-surface-raised);
   color: var(--sc2-ink);
 }
 .spycraft2.sc2-result-guide .sc2-guide-title {

@@ -288,7 +288,7 @@
   letter-spacing: 0.02em;
 }
 .spycraft2.sheet.agent .skills-table tr.class-skill th button {
-  color: var(--sc2-teal-dark);
+  color: var(--sc2-action-strong);
 }
 
 /* ---------- Gear ---------- */
@@ -475,11 +475,11 @@
   box-shadow: inset 0 0 0 1px var(--sc2-step);
 }
 .spycraft2.sheet.agent .track-step.over .track-button {
-  border-color: var(--sc2-bad);
-  box-shadow: inset 0 0 0 1px var(--sc2-bad);
+  border-color: var(--sc2-danger);
+  box-shadow: inset 0 0 0 1px var(--sc2-danger);
 }
 .spycraft2.sheet.agent .track-step.over .sc2-uses {
-  background: var(--sc2-bad);
+  background: var(--sc2-danger);
   color: var(--sc2-on-action);
 }
 /* The overspent badge carries words, so it widens to fit them. */
@@ -604,10 +604,10 @@
   height: 5px;
   border: 0;
   appearance: none;
-  background: var(--sc2-paper-sunk);
+  background: var(--sc2-surface-sunk);
 }
 .spycraft2.sheet.agent .sc2-nonlethal-meter progress::-webkit-progress-bar {
-  background: var(--sc2-paper-sunk);
+  background: var(--sc2-surface-sunk);
 }
 .spycraft2.sheet.agent .sc2-nonlethal-meter progress::-webkit-progress-value {
   background: var(--sc2-warn);
@@ -616,5 +616,5 @@
   background: var(--sc2-warn);
 }
 .spycraft2.sheet.agent .sc2-nonlethal-meter.pending b {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
 }

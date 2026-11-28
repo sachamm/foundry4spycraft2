@@ -26,7 +26,7 @@
 }
 .spycraft2 .bad,
 .spycraft2 .bad input {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
   font-weight: bold;
 }
 .spycraft2 .tag {
@@ -176,13 +176,13 @@
   border-left: 2px solid var(--sc2-action);
 }
 .spycraft2 details.warnings {
-  border: 1px solid var(--sc2-bad);
+  border: 1px solid var(--sc2-danger);
   border-radius: 4px;
   padding: 2px 8px;
   margin: 4px 0;
 }
 .spycraft2 details.warnings summary {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
   cursor: pointer;
 }
 .spycraft2 details.warnings ul {
@@ -290,7 +290,7 @@
   font-style: italic;
 }
 .spycraft2 .feats-list li.unqualified .name {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
   text-decoration: line-through;
 }
 .spycraft2 .feat-slots,
@@ -467,7 +467,7 @@
   font-weight: bold;
 }
 .spycraft2-error {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
   font-weight: bold;
 }
 

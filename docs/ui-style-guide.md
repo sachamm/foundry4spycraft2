@@ -225,7 +225,7 @@ All values come from `styles/tokens.css`. A literal colour, size or spacing valu
 
 Rules:
 
-- Use role tokens in new code. The older aliases (`--sc2-paper`, `--sc2-teal`, `--sc2-bad`, `--sc2-brass` …, `tokens.css:28-39`) remain for existing rules; replace them when you touch a line.
+- Use role tokens only. The older aliases (`--sc2-paper`, `--sc2-teal`, `--sc2-bad`, `--sc2-brass` …) were removed on 2026-11-28 and a lint keeps them out.
 - **Danger red is for harm only.** Do not use it for hover, focus or decoration.
 - `--sc2-rule` (about 1.5:1 on the surface) is for dividers only. A border that is the only cue for a control's edge uses `--sc2-rule-strong` (3.2:1 light, 3.8:1 dark).
 - State never relies on colour alone: pair it with a word, an icon or a shape (5.6).

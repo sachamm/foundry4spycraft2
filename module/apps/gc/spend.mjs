@@ -160,8 +160,8 @@ export async function spendGCDice(input = {}) {
       <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(([uuid, label]) => [uuid, label])], actors[0]?.[0] ?? "")}</select></label>
       <label data-when="id=activateThreat|activateError">${loc`Threat or error scored with`} <select name="checkKind">${options(
         [
-          ["attack", "an attack"],
-          ["skill", "a skill check"]
+          ["attack", loc`an attack`],
+          ["skill", loc`a skill check`]
         ],
         "attack"
       )}</select></label>

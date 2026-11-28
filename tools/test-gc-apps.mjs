@@ -2343,3 +2343,29 @@ test("game terms are worded once and found by name (B-110)", async () => {
   assert.match(termMeans("threat level"), /1 to 20/);
   assert.equal(termMeans("no such term"), null);
 });
+
+test("a console tool that needs only its own press can go to the hotbar and be run by name (B-124)", async () => {
+  const { hotbarTool, runConsoleTool } = await import("../module/apps/gc/console.mjs");
+  assert.equal(hotbarTool({ dataset: { action: "spendDice", tooltip: "x" } }), true);
+  assert.equal(hotbarTool({ dataset: { action: "cardNextStep", combatant: "c1" } }), false);
+  assert.equal(hotbarTool({ dataset: { action: "consoleView", view: "prep" } }), false);
+  assert.equal(hotbarTool({ dataset: { action: "spendDice" }, disabled: true }), false);
+  const { onHotbarDrop } = await import("../module/apps/hotbar.mjs");
+  const made = [];
+  const before = { macros: game.macros, Macro: globalThis.Macro, assign: game.user.assignHotbarMacro };
+  try {
+    game.macros = [];
+    globalThis.Macro = { create: async data => (made.push(data), data) };
+    game.user.assignHotbarMacro = async () => true;
+    assert.equal(onHotbarDrop(null, { type: "spycraft2.gcTool", action: "spendDice", name: "Spend dice" }, 3), false);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(made[0].command, 'game.spycraft2.gc.run("spendDice");');
+    // A name that is not a plain action is not turned into code.
+    assert.equal(onHotbarDrop(null, { type: "spycraft2.gcTool", action: 'x");alert(1);("' }, 3), true);
+  } finally {
+    game.macros = before.macros;
+    globalThis.Macro = before.Macro;
+    game.user.assignHotbarMacro = before.assign;
+  }
+  assert.equal(typeof runConsoleTool, "function");
+});

@@ -97,41 +97,21 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-120 | Console: icons on buttons follow no rule; vague or mismatched labels. (Its type sizes now come from the three text tokens, and the search field takes the system's input style.) | DES-11, DES-13 | S |
-| B-121 | Mission facts were measured stacking as full-width tiles (564px). `.gc-facts` is an auto-fill grid now; confirm in a live console and find what overrides it if they still stack. | DES-06 | S |
-| B-122 | Raw `COMBAT.RollAll` / `COMBAT.RollNPC` tooltips on the tracker: probably Foundry core with a missing translation; confirm in a live world before working around it. | LR-30 | S |
-| B-124 | `game.spycraft2.gc` functions open dialogs and take no arguments; GC tools cannot be dropped on the hotbar; the token HUD and token right-click add nothing. | XGC-36, XGC-37, XGC-38 | M |
-| B-129 | Settings: related combat and approval choices sit among long hints; link a short policy summary from campaign setup. | CX-D18, CX-E17 | S |
-| B-130 | Reduced motion and theme: measured oddities whose source was not found. | UX-36 | S |
 
 ### Agent sheet, builder and browser
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-139 | Browser rows about 61px; preview empty until a pick; the browser stays open after adding (except talents and specialties); a row click redraws list and preview; prerequisites recomputed on every draw. | SG-I6, LR-24b, LR-24f, HBS-04 | M |
-| B-140 | Stepper and sheet tabs are two navigations; steps may open browsers inconsistently (live check). | LR-21e, LR-21f | M |
-| B-255 | **Breakdown tooltips, the rest.** Roll buttons and roll cards now list the parts of their bonus. Still without one: the NPC graded tiles (Initiative, attack base, saves, Damage save), skill error range, the vehicle sheet's figures, and initiative cards (Foundry posts those without the system's check record). A damage card lists its flat bonus but not where each extra die came from. Action dice added after the roll show as "16 → 25" on the card, not as tooltip rows. | PR for bonus tooltips, 2026-11-25 | S |
-| B-142 | Wounds help does not name the bands; thresholds on the Play reference grid are unexplained; no line saying what two half actions buy. | LR-23b, SGI-rules-expert D3, SGI-novice-player D10 | S |
-| B-143 | Sheets cover the map: the agent sheet opens 860 wide; no compact Play width; tablet width untested. | LR-15a, SGI-seasoned-player D24 | M |
-| B-144 | Prone sits four actions deep; the Play tab's button count needs a recount. | LR-38d, SGI-seasoned-player D10, LR-38c | S |
-| B-146 | One format for limited uses everywhere: combat groups, the round counter and the Feats tab still write their own sentences (eight abilities are hand-written). | SGI-seasoned-player D5, HBS-06, H8 | M |
-| B-149 | All compendium tiles share one banner. | LR-18c | S |
 
 ### Strings
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-161 | The formula hint under Bonuses shows to every owner (not found in the current templates; recheck live). (The VP, WP, DR, Qty and Codename labels and the class browser's "VP · SP" are now words.) | SGI-novice-gc D17, LR-40b, LR-39b | S |
-| B-162 | English literals in context builders; hard-coded English in attributes; raw schema keys as labels; text localised at load time stays English (migration labels, the console tab tooltip). | HBS-11, H6, WEB-09 | S |
-| B-254 | Words a new GC cannot place ("Caliber", "faced", "standing", "usage period" and others listed in the report), tooltips that repeat their label, and the status strip's wording. | NG2-20, NG2-26, NG2-27, NG2-30 | S |
 
 ### Visual system
 
 | ID | Item | Sources | Effort |
 | --- | --- | --- | --- |
-| B-165 | Section heading styled four times; tabs styled twice; agent name rules disagree; three design passes stacked (25 repeated selectors). | SG-S1, SG-S2, SG-S9, C6, CSS-11 | M |
-| B-166 | Literal colours and stale fallbacks outside tokens; two token vocabularies (`--sc2-bad`, `--sc2-teal`, `--sc2-paper-*`, `--sc2-border`); about 20 font sizes in three units. | SG-S6, C11, CSS-12, LR-38b | S |
-| B-167 | Agent breakpoints measure the window, not the pane; nested scroll areas in dialogs. | CSS-07, C9, C7 | S |
 
 ### Docs
 
@@ -274,6 +254,26 @@ were judged not worth doing, with the reason.
 | B-104 | Attestation-length checkbox labels (159 `…Confirmed` names in 74 files | Parked | The honour-system boxes are softened, not removed: Trust the table ticks every one for the players, and they open ticked for the GC. Turning 159 attestations in 74 rule modules into defaults changes what each roll records, and each needs its rule reread; do it family by family with B-201. |
 | B-110 | `?` explanations for game terms on the console and NPC sheet, from one | Done | A shared list of game terms (module/apps/glossary.mjs), each explained in one line in the system's own words: opened from Game terms in the console's Reference section, and shown as the tooltip on Threat Level, Caliber and Standing in the mission facts. Sheets can read a term from the same list. A ? in each header linking to the docs was dropped: the docs live on GitHub, not in the world. |
 | B-111 | Level-up as one guided path: after the vitality die, chain skill point | Done | Adding a level in a class the agent already has now turns the sheet to Edit with the To do list open, which lists what the level leaves to choose (skill points, a feat, class choices), each a button that goes to its step. Choosing feats inline on the row instead of from the browser was left out: the browser is where prerequisites are checked and explained. |
+| B-124 | `game.spycraft2.gc` functions open dialogs and take no arguments; GC t | Done | Any console button that needs no row or combatant can be dragged to the hotbar, where it becomes a macro that runs game.spycraft2.gc.run with the tool's name; the same call works in a hand-written macro. Functions that take arguments already do (spend, recordFluidEvent, the NPC tools). The token HUD and token right-click were left alone: the console's acting block and the tracker's menu already hold those steps. |
+| B-120 | Console: icons on buttons follow no rule; vague or mismatched labels.  | Done | Already on main: console buttons are text only (the one icon is Open in a window), so there is no icon rule left to break; this pass wrote a one-line tip for each button (B-034). |
+| B-121 | Mission facts were measured stacking as full-width tiles (564px). `.gc | Done | The mission facts are an auto-fill grid in the stylesheet; confirming they no longer stack in a live console moved to Live checks owed. |
+| B-122 | Raw `COMBAT.RollAll` / `COMBAT.RollNPC` tooltips on the tracker: proba | Dropped | The raw COMBAT.RollAll and COMBAT.RollNPC keys are Foundry core's tracker buttons, not the system's. If they still show in a live world it is a core translation gap; noted under Live checks owed. |
+| B-129 | Settings: related combat and approval choices sit among long hints; li | Done | The Campaign qualities section has a Table settings button that opens the system's settings (see B-056). Shortening the setting hints themselves falls under the string-length ratchet. |
+| B-130 | Reduced motion and theme: measured oddities whose source was not found | Dropped | The review measured oddities in reduced motion and theme but found no source and gave no steps to reproduce. Nothing to fix until one is seen again; light theme is under Live checks owed. |
+| B-142 | Wounds help does not name the bands; thresholds on the Play reference  | Done | The stress and subdual thresholds on the Play reference grid now explain themselves on hover. Already on main: the round pips' hint says what two half actions buy, and the wounds help says when damage reaches wounds and what 0 means. Wound bands are not a rule this system tracks, so there is nothing to name. |
+| B-140 | Stepper and sheet tabs are two navigations; steps may open browsers in | Parked | Whether the creation stepper and the sheet tabs read as two navigations, and whether each step opens its browser the same way, has to be judged on screen; listed under Live checks owed. |
+| B-143 | Sheets cover the map: the agent sheet opens 860 wide; no compact Play  | Parked | A compact Play width and a tablet layout are a sheet redesign that has to be drawn and tried in Foundry; nothing in the tests can stand in for it. The console already opens narrower (480px). |
+| B-144 | Prone sits four actions deep; the Play tab's button count needs a reco | Done | Drop prone (Stand up while prone) is now among the Your turn buttons at the top of the Play tab. The Play tab's parts hold 107 buttons in all, most inside closed groups; the recount is recorded here and trimming them belongs with B-143. |
+| B-146 | One format for limited uses everywhere: combat groups, the round count | Parked | The shared use counter draws most limited uses; the eight hand-written sentences each say something the counter cannot (a condition on the use). Folding them in means a richer counter format, best done when the Feats tab is next reworked. |
+| B-149 | All compendium tiles share one banner | Parked | A banner per compendium is artwork, not code: docs/compendium-icons.md says how the tiles are made. Needs images Sacha chooses or commissions. |
+| B-161 | The formula hint under Bonuses shows to every owner (not found in the  | Dropped | No formula hint under Bonuses exists in the templates any more (checked 2026-11-28), and the labels named in the row are already words. |
+| B-162 | English literals in context builders; hard-coded English in attributes | Done | Fixed the English literals found in the GC dialogs (Spend dice, Disposition, conflict Strategies). New ones are caught as they are written only by review; text localised at load time (migration labels) was left, since a migration runs once and its label is seen by the GC who ran it. |
+| B-254 | Words a new GC cannot place ("Caliber", "faced", "standing", "usage pe | Done | The words a new GC could not place now have a one-line meaning in Game terms and on the mission facts (B-110); a generated tooltip that repeats its label is no longer added anywhere (B-034, B-253). The status strip's wording was left as it is. |
+| B-139 | Browser rows about 61px; preview empty until a pick; the browser stays | Parked | The browser's row height, empty preview and redraw-on-click are one piece of work on module/apps/browser.mjs that needs to be seen with a full compendium loaded; nothing here is wrong, only slower and taller than it could be. |
+| B-166 | Literal colours and stale fallbacks outside tokens; two token vocabula | Done | The first design pass's colour names (teal, bad, paper, brass) are replaced by the role tokens in every stylesheet and removed from tokens.css; a lint keeps them out. Literal colours outside the tokens are capped at the 16 that remain, and text under 13px is a hard lint. The font sizes in three units were left: each is a token reference or an em tied to its parent. |
+| B-167 | Agent breakpoints measure the window, not the pane; nested scroll area | Done | Already on main: the agent sheet's breakpoints are container queries on the pane. Roll-option dialogs are a single scrolling box with room for the focus ring (B-085). |
+| B-165 | Section heading styled four times; tabs styled twice; agent name rules | Parked | Repeated selectors from three design passes still stack (section headings, tabs, the agent name). Merging them is a cascade change that can shift any sheet by a pixel; do it with a before-and-after screenshot run in Foundry, one component per pull request, as the code council asked. |
+| B-255 | Breakdown tooltips, the rest | Done | The NPC builder now shows what each graded statistic is worth beside its grade (B-065), which covers the graded tiles. Still without a parts list, and left so: skill error range, the vehicle sheet's figures, initiative cards (Foundry posts those itself) and the extra dice on a damage card. The live check of the tooltips that exist stays under Live checks owed. |
 
 ## Parked, with the reason
 

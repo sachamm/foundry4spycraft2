@@ -254,7 +254,7 @@ export async function advanceConflict(id) {
       const list = availableStrategies(conflict, side);
       const rows = list.map(entry => [
         entry.id,
-        `${entry.name} (${entry.modifier === null ? "see note" : signed(entry.modifier)}${entry.skill ? `; ${entry.skill}` : ""}${entry.roundDuration && !["—", "**"].includes(entry.roundDuration) ? `; ${entry.roundDuration}` : ""}) — ${entry.advantages.join(", ").replace("*", "any but Victory")}${entry.available ? "" : ` — needs ${entry.reasons.join("; ")}`}${entry.confirm ? loc` — GC confirms other requirement` : ""}`
+        `${entry.name} (${entry.modifier === null ? loc`see note` : signed(entry.modifier)}${entry.skill ? `; ${entry.skill}` : ""}${entry.roundDuration && !["—", "**"].includes(entry.roundDuration) ? `; ${entry.roundDuration}` : ""}) — ${entry.advantages.join(", ").replace("*", "any but Victory")}${entry.available ? "" : ` — needs ${entry.reasons.join("; ")}`}${entry.confirm ? loc` — GC confirms other requirement` : ""}`
       ]);
       const input = await ask(
         loc`${conflict.name}: ${sideName(conflict, side)} chooses a Strategy (Lead ${conflict.lead})`,

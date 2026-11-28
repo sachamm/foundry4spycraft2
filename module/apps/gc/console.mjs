@@ -166,6 +166,32 @@ const QUALITY_HANDLING = {
   hand: () => loc`by hand`
 };
 
+export const GC_TOOL_DRAG = "spycraft2.gcTool";
+/** Whether a console button works from its action alone: one that names a combatant, a row or a view does not. */
+export function hotbarTool(button) {
+  const data = Object.keys(button?.dataset ?? {}).filter(
+    key => !["action", "tooltip", "tooltipDirection"].includes(key)
+  );
+  return !!button?.dataset?.action && data.every(key => /^sc2|^search/.test(key)) && !button.disabled;
+}
+
+/**
+ * Run one of the console's tools by its action name, as a hotbar macro does: `game.spycraft2.gc.run("spendDice")`.
+ * Only tools that need no row or combatant can run this way.
+ */
+export async function runConsoleTool(action) {
+  if (!game.user?.isGM) return refuse(loc`The GC Console is for the Game Control.`);
+  const handler = GCConsole.DEFAULT_OPTIONS.actions[action];
+  if (typeof handler !== "function") return refuse(loc`The GC Console has no tool called ${action}.`);
+  const target = globalThis.document?.createElement?.("button") ?? {
+    dataset: {},
+    setAttribute() {},
+    removeAttribute() {}
+  };
+  target.dataset.action = action;
+  return handler.call(ui.gc, { detail: 1 }, target);
+}
+
 export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static tabName = "gc";
 
@@ -428,6 +454,17 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     applyConsoleButtonTips(this.element);
     // A tooltip left up from before the redraw would sit over whatever is drawn in its place.
     globalThis.game?.tooltip?.deactivate?.();
+    // A tool that needs nothing but its own press can be dragged to the hotbar, where it becomes a macro.
+    for (const tool of this.element.querySelectorAll("button[data-action]")) {
+      if (!hotbarTool(tool) || tool.draggable) continue;
+      tool.draggable = true;
+      tool.addEventListener("dragstart", event => {
+        event.dataTransfer?.setData(
+          "text/plain",
+          JSON.stringify({ type: GC_TOOL_DRAG, action: tool.dataset.action, name: tool.textContent.trim() })
+        );
+      });
+    }
     // The main button leads its row on screen, so it leads in the markup too and the keyboard reaches it first.
     for (const primary of this.element.querySelectorAll(".controls > button.gc-primary"))
       if (primary.parentElement.firstElementChild !== primary) primary.parentElement.prepend(primary);

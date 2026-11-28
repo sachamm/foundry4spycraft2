@@ -88,6 +88,9 @@ test("stylesheets take colours from the tokens and keep text at 13px or more", (
   const colours = lineHits(sheets, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, line => /^\s*(\/\*|\*)/.test(line));
   // Fallbacks inside var(…, #hex) written before the tokens were complete; do not add more.
   assert.ok(colours.length <= 16, `${colours.length} literal colours, cap 16:${sample(colours.slice(-5))}`);
+  // One token vocabulary: the colour names of the first design pass are gone and stay gone.
+  const old = lineHits(files("styles", ".css"), /--sc2-(teal|bad|paper|brass|on-teal)\b/);
+  assert.equal(old.length, 0, `Use the role tokens (action, danger, surface, rule):${sample(old)}`);
   const small = lineHits(sheets, /font(-size)?:[^;]*\b(9|10|11|12)px/);
   assert.equal(small.length, 0, `Text under 13px:${sample(small)}`);
 });

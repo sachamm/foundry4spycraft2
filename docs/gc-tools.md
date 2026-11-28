@@ -1,6 +1,6 @@
 # Game Control tools
 
-Open the **GC Console** with Alt+G (it opens as a window beside the chat log), from the sidebar tab after Combat, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
+Open the **GC Console** with Alt+G (it opens as a window beside the chat log), from the sidebar tab after Combat, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros, and any console button that needs no row or combatant (Spend dice, Next scene, XP report and the like) can be dragged to the hotbar, where it becomes a macro that runs `game.spycraft2.gc.run("…")`. Page references are printed page numbers.
 
 New to the console? Start with [gc-quickstart.md](gc-quickstart.md).
 

@@ -297,7 +297,7 @@
   min-width: 44px;
   min-height: 44px;
   --sc2-icon-size: 20px;
-  background: var(--sc2-paper-raised);
+  background: var(--sc2-surface-raised);
   vertical-align: middle;
 }
 
@@ -744,7 +744,7 @@
   grid-column: 3;
 }
 .gc-console-body .gc-tag-bad {
-  color: var(--sc2-bad);
+  color: var(--sc2-danger);
 }
 .gc-console-body .gc-tag-warn {
   color: var(--sc2-warn);

@@ -55,7 +55,7 @@ import {
   currentCampaignEffects,
   missionXP
 } from "./module/apps/gc/state.mjs";
-import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
+import { openGCConsole, registerGCConsoleTab, runConsoleTool } from "./module/apps/gc/console.mjs";
 import { installGCRulingMenu } from "./module/apps/gc/card-ruling.mjs";
 import { installDramaticInitiative } from "./module/apps/gc/spend.mjs";
 import { installLateInitiative } from "./module/apps/gc/late-initiative.mjs";
@@ -270,6 +270,7 @@ Hooks.once("init", () => {
   game.spycraft2 = {
     gc: {
       open: openGCConsole,
+      run: runConsoleTool,
       console: null,
       mission: { ...gcMission, get: getMission, threatLevel: missionThreatLevel, xp: missionXP },
       spend: spendGCDice,
