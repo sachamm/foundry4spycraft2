@@ -56,7 +56,8 @@
       <ul class="rows">
         {{#each system.subplots}}
           <li><input type="checkbox" name="subplots.{{@index}}.complete" {{checked complete}} />
-            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="{{@root.appId}}-subplots" />
+            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="{{@root.appId}}-subplots"
+              placeholder="{{localize 'SPYCRAFT.BioExample.subplot'}}" />
             <input type="text" name="subplots.{{@index}}.notes" value="{{notes}}" placeholder="{{localize 'SPYCRAFT.Notes'}}" />
             <button type="button" class="sc2-action" data-action="removeRow" data-list="subplots" data-index="{{@index}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveSubplot'}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveSubplot'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></li>
         {{/each}}

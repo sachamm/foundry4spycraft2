@@ -63,8 +63,10 @@
     </div>{{/each}}
     {{#if isVirtuoso}}<div class="choices">
       <label>{{localize "SPYCRAFT.Template.ActorAgentClasses.KeySkill"}} <select name="classField.{{item.id}}.keySkill">{{selectOptions skillOptions selected=item.system.keySkill blank="—"}}</select></label>
-      <label>{{localize "SPYCRAFT.Template.ActorAgentClasses.KeyFocusIfApplicable"}} <input type="text" name="classField.{{item.id}}.keyFocus" value="{{item.system.keyFocus}}" /></label>
-      <label>{{localize "SPYCRAFT.Template.ActorAgentClasses.RelatedProfessionFocus"}} <input type="text" name="classField.{{item.id}}.professionFocus" value="{{item.system.professionFocus}}" /></label>
+      <label>{{localize "SPYCRAFT.Template.ActorAgentClasses.KeyFocusIfApplicable"}} <input type="text" name="classField.{{item.id}}.keyFocus" value="{{item.system.keyFocus}}"
+        placeholder="{{localize 'SPYCRAFT.BioExample.keyFocus'}}" /></label>
+      <label>{{localize "SPYCRAFT.Template.ActorAgentClasses.RelatedProfessionFocus"}} <input type="text" name="classField.{{item.id}}.professionFocus"
+        value="{{item.system.professionFocus}}" placeholder="{{localize 'SPYCRAFT.BioExample.professionFocus'}}" /></label>
       <label>{{localize "SPYCRAFT.Template.ActorAgentClasses.PhDSkillClassLevel6"}} <select name="classField.{{item.id}}.phdSkill">{{selectOptions phdOptions selected=item.system.phdSkill blank="—"}}</select></label>
       <p>{{localize "SPYCRAFT.Template.ActorAgentClasses.FieldOfExpertiseBenefitsOnlyThe"}}</p>
     </div>{{/if}}

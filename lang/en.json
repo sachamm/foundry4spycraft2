@@ -69,7 +69,10 @@
    "height": "e.g. 5 ft. 8 in.",
    "weight": "e.g. 150 lb.",
    "eyes": "e.g. grey",
-   "hair": "e.g. short, black"
+   "hair": "e.g. short, black",
+   "keyFocus": "one focus of the class's key skill",
+   "professionFocus": "e.g. shipping administrator",
+   "subplot": "e.g. clear my brother's name"
   },
   "Track": {
    "Title": "Character creation steps",

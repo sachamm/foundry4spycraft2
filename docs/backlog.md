@@ -169,7 +169,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-144 | Prone sits four actions deep; the Play tab's button count needs a recount. | LR-38d, SGI-seasoned-player D10, LR-38c | S |
 | B-145 | Skills on Play: let a player pin an untrained skill; show a widened error range on skill rows. | SGI-seasoned-player D1, SGI-rules-expert D2 | S |
 | B-146 | One format for limited uses everywhere: combat groups, the round counter and the Feats tab still write their own sentences (eight abilities are hand-written). | SGI-seasoned-player D5, HBS-06, H8 | M |
-| B-148 | Example placeholders for the class key focus and profession focus fields and the subplot name (the Bio fields now have named labels and examples). | SGI-novice-player R21 | S |
 | B-149 | All compendium tiles share one banner. | LR-18c | S |
 
 ### Strings
