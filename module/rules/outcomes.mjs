@@ -55,6 +55,18 @@ export function viewerFlavor(check, viewerLanguage) {
   return checkFlavor(check);
 }
 
+/** The name of the character an attack card was declared or settled against, or "" when none is known. */
+export function attackTargetName(check) {
+  if (check?.checkKind !== "attack") return "";
+  if (check.attackResolution?.targetName) return check.attackResolution.targetName;
+  const uuid = check.attackContext?.targetActorUuid;
+  try {
+    return (uuid && globalThis.fromUuidSync?.(uuid)?.name) || "";
+  } catch {
+    return "";
+  }
+}
+
 export function checkFlavor(check) {
   const esc = v => String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   const candidates = checkCandidates(check),
@@ -118,7 +130,17 @@ export function checkFlavor(check) {
     );
   if (check.attackContext?.flanking?.removed)
     notes.push(loc`Flanking taken off: −${check.attackContext.flanking.removed.attackBonus} attack.`);
-  if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);
+  // An attack's line uses the stamp's own words, so the card does not say "Failed" beside "Miss".
+  if (known)
+    notes.push(
+      check.checkKind === "attack"
+        ? check.successConfirmed
+          ? loc`Hit.`
+          : loc`Missed.`
+        : check.successConfirmed
+          ? loc`Succeeded.`
+          : loc`Failed.`
+    );
   if (check.gcRuling?.outcome)
     notes.push(
       esc(
@@ -260,7 +282,10 @@ export function checkFlavor(check) {
     );
   const contributed = [...(check.planModifiers ?? []), ...(check.pipelineModifiers ?? [])];
   if (contributed.length) notes.push(`${esc(describeModifiers(contributed))}.`);
-  return `${check.baseFlavor ?? loc`Check`}${notes.length ? `<br>${notes.join(" ")}` : ""}`;
+  // An attack's first line names its target, so the log reads as who attacked whom without opening the card.
+  const target = attackTargetName(check),
+    heading = `${check.baseFlavor ?? loc`Check`}${target ? ` · ${esc(loc`at ${target}`)}` : ""}`;
+  return `${heading}${notes.length ? `<br>${notes.join(" ")}` : ""}`;
 }
 
 /** Decisions made in a dialog must still refer to the same roll when the transaction begins. */

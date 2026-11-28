@@ -487,6 +487,9 @@ export function enhanceTooltips(root) {
       step: control.getAttribute("step")
     });
     if (!text) continue;
+    // A section's heading is its own name: a tooltip or description made from its words (title and note run
+    // together) says nothing new.
+    if (control.matches("summary")) continue;
     control.setAttribute("data-tooltip", text);
     control.setAttribute(GENERATED, "");
     // Field guidance remains available to assistive technology without a native hover popup.

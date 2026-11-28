@@ -2324,3 +2324,12 @@ test("the Damage save dialog shows the DC the new injury will be rolled against 
   assert.match(damageSavePreview(6, 9), /DC 17 \(10 \+ half of 15: 6 already taken this scene and 9 now\)/);
   assert.match(damageSavePreview(6, ""), /Enter the damage/);
 });
+
+test("an attack card's first line names its target (B-077)", async () => {
+  const { checkFlavor, attackTargetName } = await import("../module/rules/outcomes.mjs");
+  const attack = { checkKind: "attack", baseFlavor: "Pistol attack", rawTotal: 15, effectiveTotal: 15, naturalDie: 9 };
+  assert.equal(attackTargetName(attack), "");
+  const settled = { ...attack, attackResolution: { targetName: "Sentry <2>", hit: true, defense: 12, margin: 3 } };
+  assert.match(checkFlavor(settled), /^Pistol attack · at Sentry &lt;2&gt;<br>/);
+  assert.equal(attackTargetName({ ...settled, checkKind: "skill" }), "");
+});

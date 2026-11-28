@@ -514,7 +514,9 @@
   min-height: 0;
   max-height: 50vh;
   overflow-y: auto;
-  padding-right: 0.35rem;
+  /* Room on every side for the focus ring (3px wide, 3px out), which a scrolling box would otherwise cut off. */
+  padding: 6px;
+  scroll-padding-block: 8px;
 }
 /* Feats the system does not work out, listed for the player to note on the roll. */
 .spycraft2-feat-reminders {
