@@ -28,7 +28,7 @@ import { formatRange } from "../../rules/outcome-labels.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -480,7 +480,28 @@ export async function manageDisposition(actor) {
     <label data-when="action=persuade">${loc`That side's Impress/Persuasion result (standard or cooperative)`} <input type="number" name="persuasion" min="0" /></label>
     <label data-when="action=persuade"><input type="checkbox" name="triumph" /> ${loc`The check was a Triumph (an Adversarial NPC needs one)`}</label>
     <label data-when="action=loyalty|combat">${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`,
-    loc`Apply`
+    loc`Apply`,
+    // Refused inside the dialog, so the target and the figures typed stay.
+    values => {
+      if (values.action === "shift" && !(Number.isInteger(Number(values.steps)) && Number(values.steps) !== 0))
+        return loc`Enter a whole number of grades to shift, other than 0.`;
+      if (["loyalty", "combat"].includes(values.action)) {
+        const foil = Number(values.foil);
+        if (!Number.isInteger(foil) || foil < -5 || foil > 5) return loc`The Foil modifier runs from −5 to +5.`;
+      }
+      if (values.action === "persuade") {
+        const side = values.target || "",
+          plan = persuadeJoinPlan(actor.flags?.spycraft2?.persuadedJoin ?? null, {
+            combatId: game.combat?.started ? game.combat.id : "",
+            side,
+            gradeId: side ? dispositionToward(record, side) : record.base,
+            result: values.persuasion === "" || values.persuasion === null ? NaN : Number(values.persuasion),
+            triumph: values.triumph === true
+          });
+        if (!plan.allowed) return plan.reason;
+      }
+      return null;
+    }
   );
   if (!input) return null;
   const targetId = input.target || "",

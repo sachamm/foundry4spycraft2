@@ -1052,7 +1052,18 @@ export async function combatReferenceDialog() {
     ])}</select></label>
     <label data-when="tool=surface">${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
     <label data-when="tool=surface">${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`,
-    loc`Look up`
+    loc`Look up`,
+    // Refused inside the dialog, so the tool and the figures chosen stay; nothing is quietly clamped.
+    values => {
+      const whole = (value, min, max = Infinity) =>
+        Number.isInteger(Number(value)) && Number(value) >= min && Number(value) <= max && String(value).trim() !== "";
+      if (values.tool === "deviation" && !whole(values.increment, 1, 10))
+        return loc`Enter a range increment from 1 to 10.`;
+      if (values.tool === "gas" && !whole(values.rounds, 0))
+        return loc`Enter the whole rounds since release, 0 or more.`;
+      if (values.tool === "surface" && !whole(values.speed, 0)) return loc`Enter the Speed in feet, 0 or more.`;
+      return null;
+    }
   );
   if (!input) return null;
   const roll = async formula => new Roll(formula).evaluate();
