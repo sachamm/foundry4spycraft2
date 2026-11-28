@@ -4,6 +4,7 @@ import { damageProfile } from "./damage-application.mjs";
 import { weaponGrip } from "./weapon-use.mjs";
 import { DAMAGE_TYPES } from "./damage-types.mjs";
 import { loc } from "../i18n.mjs";
+import { validateAnimalGrapple } from "./animal-grapple.mjs";
 
 export const GRAPPLE_DAMAGE_BENEFITS = ["injure", "sprawl", "throw", "useWeapon"];
 
@@ -13,6 +14,7 @@ export function grappleDamagePlan(
   benefit,
   { weapon = null, kind = "", conversionConfirmed = false, actorType = "agent" } = {}
 ) {
+  validateAnimalGrapple(system, { benefits: [benefit], weapon });
   if (!GRAPPLE_DAMAGE_BENEFITS.includes(benefit)) throw Error(loc`Choose an earned grapple damage benefit.`);
   const strength = system.abilities?.str?.mod;
   if (!Number.isSafeInteger(strength))

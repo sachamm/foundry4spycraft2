@@ -194,7 +194,8 @@
    "RollDamageSaveHint": "Enter the damage this NPC just took, then roll its Damage save against the next DC.",
    "ResetTrack": "Reset Damage save track",
    "ResetTrackHint": "Clears the damage taken and failed saves, and brings the NPC back up.",
-   "NoWeapons": "No weapons yet. Browse weapons to give this NPC one, or add a blank one to fill in."
+   "NoWeapons": "No weapons yet. Browse weapons to give this NPC one, or add a blank one to fill in.",
+   "AnimalActionReview": "Animal actions depend on Intelligence and granted equipment. Review the permitted actions with the GC (p.445). Equipment and second opponents are unavailable during Grapple."
   },
   "Play": {
    "TrainedSkills": "Trained and pinned skills",

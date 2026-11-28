@@ -3026,3 +3026,73 @@ Validation: **4,779 Node tests**, **988 independent engine fixtures**,
 existing warning caps, formatting, bundle and copied-text checks pass. A further
 24 template checks pass after removing the duplicated sheet sections. Native
 integration scenarios and the final scoring review follow in the next pass.
+
+## Pass 96: Native integration proof and the next upstream correction
+
+The integrated 0.8.8 system retains the complete Gifted/Student Snoop 4 /
+Field Analyst 1, Actor.Znm0LKz3tXgiJBCZ. Its 36-point purchase, all five career
+skill budgets (48 + 12 + 12 + 12 + 12), valid expert entry and empty setup list
+survive reload. The separately allocated Training points retain the Pass-79
+creation evidence.
+
+Actual trained NPC Throw ChatMessage.kxv2Xy7eSQ9SRVHf rolled 33 lethal damage
+from a d4 result of three and Strength +15 twice. Delivery reduced vitality
+100→67 and created the real massive-damage Fortitude save at DC 16. Untrained
+animal Throw ChatMessage.vU5xNsTfpQWKpDnF rolled two subdual damage from a d3
+result of two and Strength −1: floor standard damage at one, then add one.
+Both refused replacement dice; original results and health survived reload.
+This corrects the older Pass-92 Throw example rather than treating it as valid.
+
+Native total-cover source ChatMessage.vXTbV7eAPicqVdWM recorded an included
+Triumph critical against the cover before damage. Its original one damage
+left zero after penetration review; the protected target stayed at 100 vitality.
+The critical retained cover scope, and duplicate application and replacement
+dice were refused after reload. A separate positive contact carried seven of
+its original twelve damage to the target, 79→72 vitality. A dramatic NPC's
+actual defensive reaction raised Defense to 35 against attack 33, spending
+one GC die, 6→5; physical cover contact remained successful while the protected
+target was missed. An actual NPC Triumph used the shared critical workflow
+with the GC as payer and zero additional cost. Original dice, payment and
+completed states survived reload.
+
+Native assisted Break Pin and Escape Hold saved their actual recipient on
+ChatMessage.O2TdTbggfgDubHmo and ChatMessage.teQpCqf4YxPKmF2y. The ally
+remained Held after breaking the pin, then became free; the winner remained
+unchanged. The blank first benefit slot and second-slot recipient survived
+reload. Both forms fit light and dark themes at 1280×720, with their Take
+controls ending at 506.66px and 637.03px. Ordinary NPC Grapple recorded error
+three and two full actions when untrained; the trained PC recorded error one
+and one full action. Unreviewed context was refused before dice. Their controls
+ended at 669.5px, with the recorded policies intact after reload. No unexpected
+browser errors occurred.
+
+Upstream advanced once more to dd9539b during this verification. Integrated
+its effective Threat Level adjustment at the 1/20 boundaries and clarified
+that GC starting dice belong to a session, preserving the reviewed mission XP
+and creation-history rules. All 167 focused mission/award/period checks and
+all 4,779 then-current Node tests passed.
+
+## Pass 97: Animal Grapple exceptions
+
+The final source check of p.445 found that generic Grapple choices still allowed
+an animal to use equipment or take a second opponent. This is now enforced
+in the benefit picker, ordered eligibility, opening context, direct settlement
+and standard benefit-damage plan. Draw, second-opponent, gear manipulation
+and opponent-weapon choices are unavailable to animals. An owned or Augmented
+weapon and higher Intelligence do not waive these particular Grapple limits.
+The ordinary NPC and PC choices remain available. Reports filter the choices
+by the actual winner; the animal dialog explains its unarmed damage, and the
+NPC sheet identifies the broader permitted-action review with the GC.
+
+Native Actor.laxoPQudBPczztu9 refused all four prohibited benefits and a second
+opening without new cards, changed conditions or dice. Its actual picker
+excluded those choices in both themes. The attempt to use its owned weapon
+for a real earned Injure award was refused before a damage claim or dice;
+legal unarmed damage then posted ChatMessage.3Apz1UKHgMKiFdUw, one subdual.
+The controls ended at 353.69px. This native run had no browser errors.
+
+Validation: **4,781 Node tests**, **988 independent engine fixtures**,
+**308 layout checks**, lint at unchanged caps, formatting, bundle and copied-text
+checks pass. The focused rules checks include the higher-Intelligence/Augmented
+negative cases, valid animal benefits and an unchanged ordinary-character path.
+The final scoring review follows after the explanatory animal form is rechecked.

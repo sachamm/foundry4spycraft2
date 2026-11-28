@@ -134,6 +134,7 @@
       name="system.manualDamageSave" type="number" value="{{system.manualDamageSave}}"
       class="w-2" /></label>{{/unless}}</p></div>{{/unless}}
   <h3>{{localize "SPYCRAFT.Npc.ActionsHeading"}}</h3>
+  {{#if (sc2eq system.npcType "animal")}}<p class="hint">{{localize "SPYCRAFT.Npc.AnimalActionReview"}}</p>{{/if}}
   <div class="npc-play">
     {{#if gcPlay.special}}{{#unless system.npcProfile.enabled}}<p class="edit-only"><label>{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRoleSetsTheGCS"}} <select
       name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label></p>{{/unless}}{{/if}}

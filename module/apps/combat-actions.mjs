@@ -2,6 +2,7 @@
 import { esc } from "../html.mjs";
 import { grappleBenefitDamageContributor } from "./grapple-damage.mjs";
 import { refuse } from "../error-notices.mjs";
+import { animalGrappleBenefitAllowed, validateAnimalGrapple } from "../rules/animal-grapple.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   COVER_FIRE,
@@ -400,10 +401,12 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     recipientUuids = input.benefitRecipients ?? [],
     recipientsConfirmed = input.benefitRecipientsConfirmed === true;
   if (!Array.isArray(chosen)) {
-    const list = GRAPPLE_BENEFITS.map(benefit => {
-      const [name, summary] = grappleBenefitText(benefit.id);
-      return `<option value="${benefit.id}">${esc(name)} — ${esc(summary)}</option>`;
-    }).join("");
+    const list = GRAPPLE_BENEFITS.filter(benefit => animalGrappleBenefitAllowed(winner?.system, benefit.id))
+      .map(benefit => {
+        const [name, summary] = grappleBenefitText(benefit.id);
+        return `<option value="${benefit.id}">${esc(name)} — ${esc(summary)}</option>`;
+      })
+      .join("");
     const recipients = attackCharacterTargetChoices()
       .filter(a => a.uuid !== winner?.uuid && (a.statuses?.has("held") || a.statuses?.has("pinned")))
       .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
@@ -415,7 +418,7 @@ async function grappleBenefitsChosen(actor, input, outcome) {
       },
       rejectClose: false,
       ok: { label: loc`Take` },
-      content: `<div class="spycraft2-roll-options">${Array.from(
+      content: `<div class="spycraft2-roll-options">${winner?.system?.npcType === "animal" ? `<p class="hint">${loc`Animal Grapple damage is unarmed. Equipment, gear manipulation and second opponents are unavailable (p.445).`}</p>` : ""}${Array.from(
         { length: outcome.benefits },
         (_, index) =>
           `<label>${loc`Benefit ${index + 1}`} <select name="benefit${index}"><option value="">${loc`Decide later`}</option>${list}</select></label>`
@@ -451,6 +454,7 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     })
   );
   const eligibility = grappleBenefitEligibility(chosen, {
+    winnerSystem: winner?.system,
     winnerUuid: winner?.uuid,
     loserUuid: loser?.uuid,
     winnerStatuses: winner?.statuses ?? [],
@@ -594,6 +598,11 @@ export async function settleGrapple(actor, options = {}) {
       input = { ...input, sizeDifference: openingContext.difference };
     }
     outcome = grappleOutcome(input);
+    if (Array.isArray(input.benefits)) {
+      const winner =
+        outcome.winner === "actor" ? actor : input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+      validateAnimalGrapple(winner?.system, { benefits: input.benefits });
+    }
     if (
       Array.isArray(input.benefits) &&
       (input.benefits.length > outcome.benefits || input.benefits.some(id => !GRAPPLE_BENEFITS.some(b => b.id === id)))
@@ -603,10 +612,18 @@ export async function settleGrapple(actor, options = {}) {
     return refuse(error.message);
   }
   const sizeBonus = input.cardSizeBonus ?? grappleSizeBonus(Math.abs(input.sizeDifference ?? 0));
+  const winningSystem =
+    outcome.winner === "actor"
+      ? actor.system
+      : input.opponentUuid
+        ? (await fromUuid(input.opponentUuid))?.system
+        : null;
+  const selectableBenefits = GRAPPLE_BENEFITS.filter(benefit => animalGrappleBenefitAllowed(winningSystem, benefit.id));
   const benefits = outcome.benefits
     ? [
         loc`Grapple benefits to choose from:`,
-        `<ul>${GRAPPLE_BENEFITS.map(benefit => grappleBenefitText(benefit.id))
+        `<ul>${selectableBenefits
+          .map(benefit => grappleBenefitText(benefit.id))
           .map(([name, summary]) => `<li><b>${esc(name)}</b> — ${esc(summary)}</li>`)
           .join("")}</ul>`
       ]

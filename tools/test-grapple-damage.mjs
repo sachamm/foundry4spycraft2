@@ -278,3 +278,24 @@ test("changed awards or recipes reject before dice; an unknown started roll stay
   source.flags.spycraft2.grappleBenefits.winnerUuid = "Actor.other";
   assert.throws(() => grappleDamageAward(source, 1, actor.uuid), /actual winner/);
 });
+
+test("animals cannot select equipment or second-opponent Grapple benefits, even with higher Intelligence and Augmented", () => {
+  const animal = {
+    ...system(),
+    npcType: "animal",
+    abilities: { str: { mod: 2 }, int: { value: 6 } },
+    npcBuiltIn: { sources: [{ itemId: "weapon", key: "augmented" }] }
+  };
+  const context = { winnerSystem: animal, winnerStatuses: ["held"], loserStatuses: ["pinned"] };
+  for (const id of ["draw", "second", "gear", "useWeapon"])
+    assert.throws(() => grappleBenefitEligibility([id], context), /Animals cannot/);
+  for (const id of ["disarm", "escape", "injure", "move", "mute", "pin", "sprawl", "throw"])
+    assert.equal(grappleBenefitEligibility([id], context).length, 1, id);
+  assert.throws(() => grappleDamagePlan(animal, "useWeapon", { actorType: "npc" }), /Animals cannot/);
+  assert.throws(
+    () => grappleDamagePlan(animal, "injure", { weapon: { id: "weapon" }, actorType: "npc" }),
+    /Animals cannot/
+  );
+  assert.equal(grappleDamagePlan(animal, "injure", { actorType: "npc" }).profile.kind, "subdual");
+  assert.equal(grappleBenefitEligibility(["gear"], { ...context, winnerSystem: { npcType: "special" } }).length, 1);
+});

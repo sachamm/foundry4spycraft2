@@ -428,3 +428,16 @@ test("the ordinary attack dialog offers a firearm's fire actions and reads them 
   assert.equal(read.fireVolleys, 2);
   assert.equal(read.attackAction, "autofire");
 });
+
+test("an animal cannot open a second grapple even with the earned benefit and reviewed context", () => {
+  const context = { grappleContextConfirmed: true, heldOpponents: 1, secondOpponentBenefit: true };
+  assert.throws(
+    () => grappleOpeningContext({ npcType: "animal", size: "Medium" }, { size: "Medium" }, context),
+    /Animals cannot/
+  );
+  assert.equal(
+    grappleOpeningContext({ npcType: "animal", size: "Medium" }, { size: "Medium" }, { grappleContextConfirmed: true })
+      .secondOpponent,
+    false
+  );
+});

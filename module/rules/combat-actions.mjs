@@ -17,6 +17,7 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { specialtyAttackAction, specialtyAttackBonus } from "./specialty-attacks.mjs";
 import { unlimitedAmmunition } from "./ammunition-use.mjs";
+import { validateAnimalGrapple } from "./animal-grapple.mjs";
 
 /**
  * The time each sheet action takes, where the action table gives one (pp.352–353). Most sheet tools record or
@@ -313,6 +314,7 @@ export function grappleOpeningContext(
     secondOpponentBenefit = false
   } = {}
 ) {
+  validateAnimalGrapple(system, { heldOpponents });
   const knownSize = source => {
     const value = source?.size ?? source?.qualityEffects?.size;
     const base = typeof value === "string" ? value.replace(/\s*\(.*\)$/, "") : "";
@@ -411,6 +413,7 @@ export function grappleBenefitChanges(benefits = []) {
 export function grappleBenefitEligibility(
   benefits,
   {
+    winnerSystem = {},
     winnerStatuses = [],
     loserStatuses = [],
     winnerUuid = "winner",
@@ -419,6 +422,7 @@ export function grappleBenefitEligibility(
     recipientsConfirmed = false
   } = {}
 ) {
+  validateAnimalGrapple(winnerSystem, { benefits });
   const winner = new Set(winnerStatuses),
     loser = new Set(loserStatuses),
     participants = new Map([
