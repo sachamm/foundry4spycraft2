@@ -642,6 +642,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       }),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
+      pinPlaySkill: SpycraftAgentSheet.#onPinPlaySkill,
       rollVitality: SpycraftAgentSheet.#onRollVitality,
       reviewVitality(event, target) {
         return this.actor.reviewVitality(Number(target.dataset.index));
@@ -1359,7 +1360,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }
     // Play: the skills the character is trained in, one click from a roll.
     context.miscLabels = miscModifierLabels(cfg);
-    context.playSkills = context.skills.filter(skill => skill.ranks > 0);
+    // An untrained skill the player pinned from the Skills tab joins them.
+    const pinned = new Set(actor.getFlag?.("spycraft2", "playSkills") ?? []);
+    for (const skill of context.skills) skill.pinned = pinned.has(skill.key);
+    context.playSkills = context.skills
+      .filter(skill => skill.ranks > 0 || skill.pinned)
+      .map(skill => ({
+        ...skill,
+        // A widened error range is said on the button, before the roll.
+        errorLabel: skill.errorFloor > 1 ? loc`error ${formatRange("error", skill.errorFloor)}` : ""
+      }));
     context.activeEffects = activeEffectLines(sys);
     context.ownTurn =
       actor.participatingCombat?.started === true && actor.participatingCombat.combatant?.actor?.uuid === actor.uuid;
@@ -1619,6 +1629,14 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
   }
   static #onRollInitiative() {
     return this.actor.rollInitiative({ createCombatants: true });
+  }
+  /** Pin an untrained skill to the Play tab, or take it off again. */
+  static #onPinPlaySkill(event, target) {
+    const key = target.dataset.skill,
+      pinned = new Set(this.actor.getFlag("spycraft2", "playSkills") ?? []);
+    if (pinned.has(key)) pinned.delete(key);
+    else pinned.add(key);
+    return this.actor.setFlag("spycraft2", "playSkills", [...pinned]);
   }
   static #onRollVitality(event, target) {
     return this.actor.rollVitality(Number(target.dataset.index));

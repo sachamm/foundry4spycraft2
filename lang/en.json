@@ -127,7 +127,7 @@
    "NoWeapons": "No weapons yet. Browse weapons to give this NPC one, or add a blank one to fill in."
   },
   "Play": {
-   "TrainedSkills": "Trained skills",
+   "TrainedSkills": "Trained and pinned skills",
    "NoTrainedSkills": "No trained skills yet. Any skill can be rolled from the Skills tab.",
    "AbilitiesInPlay": "Abilities in play",
    "YourTurn": "Your turn",
@@ -370,6 +370,8 @@
    "ChoiceLevels": "chosen at levels"
   },
   "Skill": {
+   "PinNamed": "Show {name} on the Play tab",
+   "PinHint": "Show this untrained skill on the Play tab",
    "Label": "Skill",
    "Class": "Class",
    "Points": "Pts",
