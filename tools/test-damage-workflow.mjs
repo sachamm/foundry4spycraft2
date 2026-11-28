@@ -783,9 +783,11 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
     distanceFeet: 40
   });
   assert.equal(incomingFacts({ attackContext: { distanceFeet: null } }).distanceFeet, null);
-  // Once the attack is settled there is nothing left to answer on it.
-  attack.flags.spycraft2.attackResolution = { hit: true };
-  assert.deepEqual(ids(attack), []);
+  // Once the attack is settled, the target's row stays, disabled, and says how it went.
+  attack.flags.spycraft2.attackResolution = { hit: true, defense: 12, margin: 7, targetName: "Latch" };
+  assert.deepEqual(ids(attack), ["targetResolved"]);
+  const [settled] = targetResponseControls({ message: attack, check: attack.flags.spycraft2, user: player });
+  assert.match(settled.disabled, /Latch's Defense 12/);
   // Someone else's agent, or an attack that names itself, offers nothing.
   const other = character("Vector", {}, { isOwner: false });
   const elsewhere = card("t2", {

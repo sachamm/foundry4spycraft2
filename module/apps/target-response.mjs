@@ -16,7 +16,7 @@ import {
 } from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
 import { coverBetween } from "./map.mjs";
-import { appliedDamageEntries } from "../rules/damage-application.mjs";
+import { appliedDamageEntries, attackResolutionNote } from "../rules/damage-application.mjs";
 
 /** Whether a player who owns this agent is connected: the GC then leaves the response to that player. */
 const playerPresent = actor =>
@@ -51,9 +51,18 @@ function respondent(uuid, check, user) {
 export function targetResponseControls({ message, check, user }) {
   if (!check || check.superseded) return [];
   if (check.checkKind === "attack") {
-    if (check.resolved || check.attackResolution) return [];
     const target = respondent(check.attackContext?.targetActorUuid, check, user);
     if (!target) return [];
+    // Once settled, the target's row stays and says how it went, rather than vanishing from the card.
+    if (check.resolved || check.attackResolution)
+      return [
+        {
+          id: "targetResolved",
+          label: loc`Attack on ${target.name}: resolved`,
+          disabled: attackResolutionNote(check) || loc`The attacker has settled this attack.`,
+          run: () => null
+        }
+      ];
     // Whoever also owns the attacker has Resolve as the card's main step; Check Defense then stays a plain button,
     // so the card keeps one filled button.
     const ownsAttacker = !!(check.actorUuid && fromUuidSync(check.actorUuid)?.isOwner);
