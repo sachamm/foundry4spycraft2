@@ -127,3 +127,15 @@ test("roll visibility uses the new option name where Foundry lists the mode, and
   assert.deepEqual(messageModeOption("gmroll", { ChatMessage: { modes: { other: {} } } }), { rollMode: "gmroll" });
   assert.deepEqual(messageModeOption(undefined, v14), {});
 });
+
+test("an NPC marked GC only rolls its attacks, damage and saves for the GC, unless the roll chose otherwise", async () => {
+  const { npcRollMode } = await import("../module/rolls/message-mode.mjs");
+  const gc = { isGM: true },
+    player = { isGM: false },
+    marked = { type: "npc", flags: { spycraft2: { gcOnlyRolls: true } } };
+  for (const kind of ["attack", "damage", "save"]) assert.equal(npcRollMode(marked, kind, undefined, gc), "gmroll");
+  assert.equal(npcRollMode(marked, "skill", undefined, gc), undefined, "skills keep their own Secret box");
+  assert.equal(npcRollMode(marked, "attack", "publicroll", gc), "publicroll");
+  assert.equal(npcRollMode(marked, "attack", undefined, player), undefined);
+  assert.equal(npcRollMode({ type: "agent", flags: marked.flags }, "attack", undefined, gc), undefined);
+});

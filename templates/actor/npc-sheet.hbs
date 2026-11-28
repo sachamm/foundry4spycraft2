@@ -14,7 +14,9 @@
         class="sc2-chip">{{lookup npcTypes system.npcType}}</span><span
         class="sc2-chip">{{localize "SPYCRAFT.Defense"}} {{system.defense.total}}</span><span
         class="sc2-chip">{{healthChip}}</span>{{#each conditionStamps}}<span
-        class="sc2-stamp">{{this}}</span>{{/each}}</div>
+        class="sc2-stamp">{{this}}</span>{{/each}}{{#if isGM}}<label class="npc-gc-only"
+        data-tooltip="{{localize 'SPYCRAFT.Npc.GCOnlyRollsHint'}}"><input type="checkbox" name="flags.spycraft2.gcOnlyRolls" {{checked actor.flags.spycraft2.gcOnlyRolls}} />
+        {{localize "SPYCRAFT.Npc.GCOnlyRolls"}}</label>{{/if}}</div>
       <div class="summary edit-only">
         {{!-- While the mission sets it, the typed number is greyed out and shows the one in force. --}}
         <label{{#if system.usesMissionThreatLevel}} data-tooltip="{{localize 'SPYCRAFT.Npc.FollowingMission' value=system.effectiveThreatLevel}}"{{/if}}>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{#if system.usesMissionThreatLevel}}{{system.effectiveThreatLevel}}{{else}}{{system.threatLevel}}{{/if}}" class="w-2"{{#if system.usesMissionThreatLevel}} disabled{{/if}} /></label>
