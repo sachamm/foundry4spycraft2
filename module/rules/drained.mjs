@@ -2,11 +2,80 @@ import { stable } from "./equal.mjs";
 import { featAcquisitionLevel } from "./career-zero.mjs";
 import { loc } from "../i18n.mjs";
 import { rollEvidence } from "./outcomes.mjs";
+import { npcDrainedProjection } from "./npc-drained.mjs";
+import { shakenRules } from "./shaken.mjs";
+import { skillTimingPlan } from "./timing.mjs";
 
 export const DRAINED_CHOICES = ["proficiencies", "focuses", "skillFortes", "interests", "contacts", "wealthAllocation"];
-// Provisional passive classification: the condition names Resolve (Wis), without assigning a check category.
-// Preserve the classification with each actual attempt so later rulings cannot reinterpret its dice.
-export const DRAINED_RECOVERY_MODE = "Passive";
+// Table ruling: new recovery checks are active. Preserve each original attempt's category across later rulings.
+export const DRAINED_RECOVERY_MODE = "Active";
+export const drainedRecoveryMethodAllowed = (mode, method) =>
+  mode === "Active" ? ["roll", "take10", "take20"].includes(method) : mode === "Passive" && method === "roll";
+export const drainedRecoveryCheck = source => ({
+  id: "drained-recovery",
+  name: loc`Drained recovery (DC ${source.dc})`,
+  attributes: ["wis"],
+  tags: "",
+  mode: source.mode,
+  error: 1,
+  page: 341,
+  time: source.mode === "Active" ? "1 Free Action (Take 10 or Take 20)" : "1 Free Action",
+  synergies: []
+});
+export function drainedNpcCheckOptions(system, source, input, error) {
+  const method = input.method || "roll",
+    taking = method !== "roll";
+  if (!drainedRecoveryMethodAllowed(source.mode, method))
+    throw Error(loc`Use the original recovery check's method and category.`);
+  if (system.conditionContext?.sleeping && source.mode === "Active")
+    throw Error(loc`Sleeping prevents an active recovery check.`);
+  if (
+    taking &&
+    (input.safeToTake !== true ||
+      shakenRules(system).fixedResultsForbidden ||
+      error > 1 ||
+      (method === "take10" && system.campaignEffects?.forbidTake10))
+  )
+    throw Error(
+      loc`Taking 10/20 requires safety, no Shaken condition and an error range of 1 or less; Tense also prevents taking 10.`
+    );
+  return {
+    checkMethod: method,
+    fixedDie: taking ? (method === "take10" ? 10 : 20) : null,
+    actionDiceAllowed: !taking && source.mode === "Active",
+    ...(source.mode === "Passive" ? { rollMode: "blindroll" } : {}),
+    skillTiming: skillTimingPlan({ method, time: "1 Free Action", take10Base: system.campaignEffects?.take10Base ?? 2 })
+  };
+}
+const recoveryState = (system, items, record) =>
+  record?.kind === "npc"
+    ? npcDrainedProjection(system, items, record, { profile: system.undrainedNpcProfile ?? system.npcProfile }).state
+    : drainedState(system, items, record);
+
+/** Only the newest loss is restored. Manual NPC statistics and exceptional options need their own review. */
+export function drainedRestorationReview(system, items, record) {
+  if (record?.kind !== "npc") return false;
+  const state = recoveryState(system, items, record),
+    last = state.losses.at(-1);
+  return (
+    !!last &&
+    (last.manualStats ||
+      last.classOptionsReviewed ||
+      last.forfeit?.kind === "manual" ||
+      (last.forfeit?.kind === "quality" &&
+        !(system.undrainedNpcProfile ?? system.npcProfile)?.qualities?.some(q => q.entryId === last.forfeit.id)) ||
+      (last.forfeit?.kind === "feat" && !items.some(i => (i.id ?? i._id) === last.forfeit.id)))
+  );
+}
+function restoredFields(record, succeeded, input = {}, system, items) {
+  if (!succeeded) return {};
+  if (
+    drainedRestorationReview(system, items, record) &&
+    (input.restorationConfirmed !== true || !input.restorationNote?.trim() || !input.reviewer)
+  )
+    throw Error(loc`The GC must restore and verify the newest loss's manual statistics or exceptional options first.`);
+  return record.kind === "npc" ? { stack: record.stack.slice(0, -1) } : {};
+}
 const plain = value => value?.toObject?.() ?? value;
 const whole = n => Number.isSafeInteger(n) && n >= 0;
 const reserved = new Set(["__proto__", "prototype", "constructor"]);
@@ -144,7 +213,7 @@ export function drainedApplicationPlan(system, items, record, input) {
   )
     throw Error(loc`The GC must confirm the Drained source, retained build and review note.`);
   if (record?.applications?.[input.id]) return record;
-  if (Object.values(record?.recoveries ?? {}).some(r => r.state !== "completed"))
+  if (Object.values(record?.recoveries ?? {}).some(r => r?.state !== "completed"))
     throw Error(loc`Finish or review the original mission-end recovery before another Drained application.`);
   const old = drainedState(system, items, record);
   if (old.needsReview) throw Error(loc`Review the current Drained build before another loss.`);
@@ -243,7 +312,7 @@ export function reviewDrainedPlan(system, items, record, input) {
 }
 
 export function beginDrainedRecovery(system, items, record, { mission, attempt, confirmed, at } = {}) {
-  const state = drainedState(system, items, record);
+  const state = recoveryState(system, items, record);
   if (
     !state.levels ||
     state.needsReview ||
@@ -257,7 +326,7 @@ export function beginDrainedRecovery(system, items, record, { mission, attempt, 
     throw Error(loc`Verify the current Drained build and actual end of this mission before recovery.`);
   if (record.recoveries?.[mission])
     throw Error(loc`This mission already has a Drained recovery attempt. Keep its original dice.`);
-  if (Object.values(record.recoveries ?? {}).some(r => r.state !== "completed"))
+  if (Object.values(record.recoveries ?? {}).some(r => r?.state !== "completed"))
     throw Error(loc`Finish or review the previous mission's original recovery attempt first.`);
   const recovery = {
     attempt,
@@ -271,8 +340,8 @@ export function beginDrainedRecovery(system, items, record, { mission, attempt, 
   return { ...record, recoveries: { ...record.recoveries, [mission]: recovery } };
 }
 
-export function settleDrainedRecovery(system, items, record, mission, message, at) {
-  const state = drainedState(system, items, record),
+export function settleDrainedRecovery(system, items, record, mission, message, at, review = {}) {
+  const state = recoveryState(system, items, record),
     recovery = record?.recoveries?.[mission],
     check = message?.flags?.spycraft2;
   if (recovery?.state === "completed") return record;
@@ -290,7 +359,7 @@ export function settleDrainedRecovery(system, items, record, mission, message, a
     check.skillKey !== "resolve" ||
     check.ability !== "wis" ||
     check.checkId !== "drained-recovery" ||
-    check.checkMethod !== "roll" ||
+    !drainedRecoveryMethodAllowed(recovery.mode, check.checkMethod) ||
     check.resolved !== true ||
     typeof check.successConfirmed !== "boolean" ||
     check.superseded ||
@@ -308,6 +377,7 @@ export function settleDrainedRecovery(system, items, record, mission, message, a
     throw Error(loc`The confirmed recovery outcome disagrees with its actual result and original DC.`);
   return {
     ...record,
+    ...restoredFields(record, check.successConfirmed, review, system, items),
     levels: record.levels - (check.successConfirmed ? 1 : 0),
     recoveries: {
       ...record.recoveries,
@@ -317,6 +387,7 @@ export function settleDrainedRecovery(system, items, record, mission, message, a
         messageUuid: message.uuid,
         succeeded: check.successConfirmed,
         evidence: rollEvidence(check),
+        ...(check.successConfirmed && review.restorationConfirmed ? { restorationReview: review } : {}),
         completedAt: at
       }
     }
@@ -324,7 +395,7 @@ export function settleDrainedRecovery(system, items, record, mission, message, a
 }
 
 export function reviewDrainedRecoveryPlan(system, items, record, mission, input) {
-  const state = drainedState(system, items, record),
+  const state = recoveryState(system, items, record),
     recovery = record?.recoveries?.[mission];
   if (
     !recovery ||
@@ -345,6 +416,7 @@ export function reviewDrainedRecoveryPlan(system, items, record, mission, input)
       at: input.at,
       mode: input.mode
     };
+  if (input.restorationConfirmed) review.restorationNote = input.restorationNote?.trim();
   if (input.mode === "unused") {
     if (input.noDiceConfirmed !== true || input.noEffectsConfirmed !== true)
       throw Error(
@@ -364,6 +436,7 @@ export function reviewDrainedRecoveryPlan(system, items, record, mission, input)
   }
   return {
     ...record,
+    ...restoredFields(record, input.mode === "success", input, system, items),
     recoveries,
     levels: record.levels - (input.mode === "success" ? 1 : 0),
     recoveryReviews: [...(record.recoveryReviews ?? []), review]

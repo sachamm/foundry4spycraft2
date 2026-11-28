@@ -1,5 +1,27 @@
 {{!-- Contagions, fire and the other damage types at work on a character; shared by the agent and NPC sheets. --}}
 <div class="hazards">
+  {{#if npcDrained}}
+    <section class="hazard npc-drained">
+      <h4>{{localize "SPYCRAFT.Drained.Title"}}</h4>
+      {{#if npcDrained.needsReview}}<p class="hint">{{localize "SPYCRAFT.Drained.NeedsReview"}}</p>
+      {{else}}
+        {{#if npcDrained.count}}<p>{{localize "SPYCRAFT.Drained.NPCLosses" count=npcDrained.count}}</p>{{/if}}
+        {{#if npcDrained.specialLosses}}<p>{{localize "SPYCRAFT.Drained.NPCLevel" level=npcDrained.effectiveLevel base=npcDrained.baseLevel}}</p>{{/if}}
+        {{#if npcDrained.gradeLosses}}<p>{{localize "SPYCRAFT.Drained.NPCGrades" count=npcDrained.gradeLosses}}</p>{{/if}}
+        {{#if npcDrained.manualStats}}<p class="hint">{{localize "SPYCRAFT.Drained.NPCManual"}}</p>{{/if}}
+        {{#each npcDrained.losses}}<p>{{source}}{{#if quality}} — {{quality}}{{/if}}</p>{{/each}}
+      {{/if}}
+      {{#if npcDrained.canApply}}<button type="button" class="sc2-action" data-action="applyNpcDrained">{{localize "SPYCRAFT.Drained.Apply"}}</button>{{/if}}
+      {{#if npcDrained.canReview}}<button type="button" class="sc2-action" data-action="reviewNpcDrainedHistory">{{localize "SPYCRAFT.Drained.NPCReview"}}</button>{{/if}}
+      {{#if npcDrained.canRoll}}<button type="button" class="sc2-action" data-action="rollDrainedRecovery">{{localize "SPYCRAFT.Drained.RollRecovery"}}</button>{{/if}}
+      {{#if npcDrained.recoveryState}}<p>{{localize "SPYCRAFT.Drained.Recovery" state=npcDrained.recoveryState dc=npcDrained.recoveryDC}}</p>{{/if}}
+      {{#each npcDrained.pending}}
+        <p>{{localize "SPYCRAFT.Drained.Pending" mission=mission dc=dc}}</p>
+        <button type="button" class="sc2-action" data-action="settleDrainedRecoveryCheck" data-mission="{{mission}}">{{localize "SPYCRAFT.Drained.Settle"}}</button>
+        <button type="button" class="sc2-action" data-action="reviewDrainedRecovery" data-mission="{{mission}}">{{localize "SPYCRAFT.Drained.ReviewRecovery"}}</button>
+      {{/each}}
+    </section>
+  {{/if}}
   {{#if drained}}
     <section class="hazard">
       <h4>{{localize "SPYCRAFT.Drained.Title"}}</h4>

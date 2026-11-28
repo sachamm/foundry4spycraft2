@@ -2419,6 +2419,67 @@ Combat still needs its remaining Drained NPC handling and the recorded grapple,
 cover and secondary-effect cases. Automatic advancement during Drained remains
 held for GC review rather than rewriting the owned career. Recovery's category
 remains the documented provisional Passive assumption pending a table ruling.
+
+## Pass 80: NPC Drained profiles and the recovery rulings
+
+### PC creation: 9.9/10
+
+The score and complete-build evidence from Pass 79 remain unchanged. No owned
+career, acquired feat or original NPC build is deleted to represent Drained.
+
+### Combat play: 9.8/10
+
+The source review checked the standard-character exception on p.341, stat and
+named-skill grades on p.441, and NPC career level on p.452. Standard NPCs now
+forfeit one GC-selected quality or owned feat and temporarily lower all seven
+stat grades plus named skill grades. Grade I and Wealth None stay at their
+floors; equipment Calibers remain separate. Dependent feats become inactive
+through the existing prerequisite validator. The original items and profile stay
+saved. Stable quality references distinguish repeated instances of a quality.
+
+Special NPC losses lower only their effective career/Threat Level, stopping at
+level 1. Shared mission Threat Level and the original profile remain intact.
+Manual NPC statistics and class/Origin exceptions require explicit GC handling.
+Construct immunity, missing sources, malformed histories, duplicate applications,
+stale forms and interrupted writes have executable checks. The NPC builder edits
+the original inputs while its results use the current temporary profile.
+
+The user resolved both pending recovery questions. New Resolve (Wis) recovery
+checks are **Active**, with ordinary eligible benefits. Existing attempts retain
+their recorded category. PC recovery uses the actual skill options, including
+eligible taking 10/20 with ordinary safety, error-range, Shaken and campaign
+restrictions. Closing the context dialog before rolling releases only the
+definitely unused claim; uncertain results still require GC review.
+
+For standard NPCs, each Drained application counts as one recovery level. The
+mission-end DC is 15 + 5 per current loss; success restores only the newest loss,
+including its quality and grade step. Special NPCs regain one effective level.
+Both use durable original-attempt records and the actual NPC skill bonus/result
+cap. Taking a fixed result prevents action-die boosts. A successful manual or
+exceptional restoration requires a GC attestation and source note. Failed checks
+retain all losses. Corrections, Undo and repeat settlement retain original dice.
+
+Native Foundry verified a standard NPC with two independent losses: original
+grades VII remained saved, current grades became V and named skill IX became
+VII. Repeated preparation did not compound penalties. An actual Active take-20
+Resolve (Wis) recovery scored 34 against DC 25 and restored only the latest
+quality and grade step. Undo returned to two losses; re-settlement reused the
+same sole original result. Reload preserved one remaining loss, grade VI and
+original grade VII. The actual application control was reachable at 669.5px in
+a 1280×720 viewport.
+
+A separate native PC review used the actual Active recovery skill dialog. Its
+original result was 40 against DC 20, with ordinary action-die eligibility. The
+complete five-level career remained owned beneath the temporary level-4 view;
+recovery restored level 5 and vitality maximum 48. Undo and re-settlement reused
+one result. The previously verified Passive attempt was not reclassified.
+
+Validation: 4,476 Node tests, 988 engine fixtures and 291 layout checks, plus
+schemas, lint, formatting, bundle and copied-text checks. JS/CSS warnings remain
+at their existing caps. Combat stays at 9.8 pending the remaining NPC damage
+handoffs, grapple limits/benefits, cover and secondary-effect cases. Automatic
+advancement during Drained and manual item/timed benefits remain explicit GC
+reviews rather than guessed changes to owned history.
 Continue implementing and reviewing combat before completing this goal.
 
 No product code changed during this pass. The existing **4,455** Node tests,

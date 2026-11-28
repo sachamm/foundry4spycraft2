@@ -3,8 +3,14 @@ import assert from "node:assert/strict";
 import { computeAgent } from "../module/rules/engine.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { rollPipeline } from "../module/rules/roll-pipeline.mjs";
-import "../module/rolls/drained.mjs";
-import { beginDrainedRecovery, settleDrainedRecovery, reviewDrainedPlan } from "../module/rules/drained.mjs";
+import { validateDrainedRoll } from "../module/rolls/drained.mjs";
+import {
+  beginDrainedRecovery,
+  settleDrainedRecovery,
+  reviewDrainedPlan,
+  drainedRecoveryCheck,
+  drainedNpcCheckOptions
+} from "../module/rules/drained.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import {
   drainedApplicationPlan,
@@ -190,7 +196,7 @@ test("mission-end recovery preserves one original attempt, restores only one lev
         effectiveTotal: 27,
         rawTotal: 27,
         naturalDie: 17,
-        drainedRecovery: { mission: "m1", attempt: "original", levels: 2, dc: 25, mode: "Passive" },
+        drainedRecovery: { mission: "m1", attempt: "original", levels: 2, dc: 25, mode: "Active" },
         checkId: "drained-recovery",
         checkMethod: "roll"
       }
@@ -225,7 +231,7 @@ test("recovery requires the finished original Wisdom/Resolve result; a failure c
       resolved: true,
       successConfirmed: false,
       effectiveTotal: 10,
-      drainedRecovery: { mission: "mission", attempt: "roll", levels: 1, dc: 20, mode: "Passive" },
+      drainedRecovery: { mission: "mission", attempt: "roll", levels: 1, dc: 20, mode: "Active" },
       checkId: "drained-recovery",
       checkMethod: "roll"
     };
@@ -328,4 +334,76 @@ test("the actual named recovery check reaches ordinary skill planning with its o
       resolveSkillCheck(system, "resolve", checks[0], { ability: "wis", method, safeToTake: true }).blocked,
       true
     );
+});
+
+test("new active recovery checks permit ordinary rolled benefits and safe fixed methods while preserving safety guards", () => {
+  const system = source();
+  system.progression[0].skills.resolve = 1;
+  computeAgent(system, items, cfg);
+  const check = drainedRecoveryCheck({ mode: "Active", dc: 20 });
+  const plan = input =>
+    resolveSkillCheck(system, "resolve", check, { ability: "wis", gearStatus: "available", ...input });
+  assert.equal(plan({ method: "roll" }).actionDiceAllowed, true);
+  assert.notEqual(plan({ method: "roll" }).rollMode, "blindroll");
+  for (const method of ["take10", "take20"]) {
+    assert.equal(plan({ method, safeToTake: true }).blocked, false);
+    assert.equal(plan({ method, safeToTake: true }).actionDiceAllowed, false);
+    assert.equal(plan({ method }).blocked, true);
+  }
+  system.conditionContext = { shaken: true };
+  assert.equal(plan({ method: "take20", safeToTake: true }).blocked, true);
+  system.conditionContext = {};
+  system.campaignEffects = { forbidTake10: true };
+  assert.equal(plan({ method: "take10", safeToTake: true }).blocked, true);
+});
+
+test("NPC recovery preserves old passive attempts and enforces fixed-result safety, Shaken, error and Tense", () => {
+  const options = (system = {}, input = {}, error = 1, mode = "Active") =>
+    drainedNpcCheckOptions(system, { mode }, input, error);
+  assert.equal(options().actionDiceAllowed, true);
+  assert.equal(options({}, {}, 1, "Passive").rollMode, "blindroll");
+  assert.equal(options({}, {}, 1, "Passive").actionDiceAllowed, false);
+  assert.equal(options({}, { method: "take20", safeToTake: true }).fixedDie, 20);
+  for (const [system, input, error, mode] of [
+    [{}, { method: "take10" }],
+    [{ conditionContext: { shaken: true } }, { method: "take10", safeToTake: true }],
+    [{ campaignEffects: { forbidTake10: true } }, { method: "take10", safeToTake: true }],
+    [{}, { method: "take20", safeToTake: true }, 2],
+    [{}, { method: "take10", safeToTake: true }, 1, "Passive"]
+  ])
+    assert.throws(() => options(system, input, error, mode));
+});
+
+test("the final roll boundary catches changed NPC profiles and requires GC authority even for active recovery", async () => {
+  globalThis.game = { user: { isGM: true }, time: { worldTime: 1 }, settings: { get: () => false } };
+  const actor = {
+      type: "npc",
+      items: [],
+      system: {
+        npcType: "standard",
+        effectiveThreatLevel: 10,
+        npcProfile: { enabled: true, grades: { health: 5 } },
+        drainedState: { levels: 1 }
+      }
+    },
+    context = { actor, phase: "before", options: {}, checkKind: "skill", skillKey: "resolve", ability: "wis" };
+  validateDrainedRoll(context);
+  actor.system.npcProfile.grades.health = 4;
+  assert.throws(() => validateDrainedRoll({ ...context, phase: "after" }), /changed during/);
+  const recovery = { mode: "Active", mission: "mission", attempt: "original", dc: 20, levels: 1, state: "rolling" };
+  actor.flags = { spycraft2: { drained: { recoveries: { mission: recovery } } } };
+  globalThis.game = { user: { isGM: false } };
+  assert.throws(
+    () =>
+      validateDrainedRoll({
+        actor,
+        options: { drainedRecovery: recovery },
+        checkKind: "skill",
+        skillKey: "resolve",
+        ability: "wis",
+        checkId: "drained-recovery",
+        checkMethod: "roll"
+      }),
+    /reserved Resolve/
+  );
 });

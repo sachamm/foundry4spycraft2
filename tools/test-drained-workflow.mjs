@@ -173,6 +173,20 @@ test("a lost roll response retains the posted original, settlement restores one 
   assert.equal(rolls, 1);
 });
 
+test("a definite cancellation of the context dialog releases an unused claim while an uncertain null does not", async () => {
+  const { actor, input } = fixture();
+  await applyDrained(actor, input);
+  actor.rollSkill = async (key, ability, context) => {
+    await context.onDrainedRecoveryContextCancelled();
+    return null;
+  };
+  assert.equal(await rollDrainedRecovery(actor, { confirmed: true }), null);
+  assert.deepEqual(actor.flags.spycraft2.drained.recoveries, {});
+  actor.rollSkill = async () => null;
+  await rollDrainedRecovery(actor, { confirmed: true });
+  assert.equal(actor.flags.spycraft2.drained.recoveries.mission1.state, "needsReview");
+});
+
 test("uncertain recovery dice block replay and a GC review consumes the original outcome without replacement RNG", async () => {
   const { actor, input } = fixture();
   await applyDrained(actor, input);

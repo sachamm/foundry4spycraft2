@@ -149,6 +149,8 @@ import { RESISTANCE_TYPES, resistanceType } from "../rules/resistances.mjs";
 import { brightIdeaPoolStatus } from "../rules/bright-idea.mjs";
 import { queueResources, isResourceLock } from "../services/transactions.mjs";
 import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
+import { ownedNpcProfile } from "../rules/npc-drained.mjs";
+import { applyNpcDrained, reviewNpcDrainedHistory, npcDrainedView } from "../apps/npc-drained.mjs";
 import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
 import { reviewActorRules } from "../apps/rules-refresh.mjs";
 import { classSkillSelections, orderedClassChoices } from "../rules/class-skills.mjs";
@@ -1996,6 +1998,21 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         const key = target?.dataset?.skill;
         return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0, error: 1 } : null);
       },
+      applyNpcDrained() {
+        return applyNpcDrained(this.actor);
+      },
+      rollDrainedRecovery() {
+        return rollDrainedRecovery(this.actor);
+      },
+      settleDrainedRecoveryCheck(event, target) {
+        return settleDrainedRecoveryCheck(this.actor, { mission: target.dataset.mission });
+      },
+      reviewDrainedRecovery(event, target) {
+        return reviewDrainedRecovery(this.actor, { mission: target.dataset.mission });
+      },
+      reviewNpcDrainedHistory() {
+        return reviewNpcDrainedHistory(this.actor);
+      },
       callQualitySave(event, target) {
         return callQualitySave(this.actor, target.dataset.id);
       },
@@ -2114,6 +2131,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         manual: loc`Health bonuses already included manually`
       },
       hazards: hazardsView(this.actor),
+      npcDrained: npcDrainedView(this.actor),
       nonLethal: nonLethalTotals(this.actor),
       dying: woundState(Number(this.actor.system.wounds?.value), this.actor.system.deathThreshold) === "dying",
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),
@@ -2164,15 +2182,22 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
 
   _npcContext() {
     const sys = this.actor.system,
-      profile = sys.npcProfile ?? defaultNpcProfile();
+      profile =
+        (this.isEditable && this._editMode ? ownedNpcProfile(this.actor) : sys.npcProfile) ?? defaultNpcProfile();
     const result = conditionNpcProfile(
-      computeNpcProfile(profile, sys.npcType, sys.effectiveThreatLevel ?? sys.threatLevel, sys.abilities),
+      computeNpcProfile(
+        sys.npcProfile ?? profile,
+        sys.npcType,
+        sys.effectiveThreatLevel ?? sys.threatLevel,
+        sys.abilities
+      ),
       npcSkillConditionContext(this.actor)
     );
     const gradeOptions = Object.fromEntries(NPC_RULES.grades.map((g, i) => [i + 1, g]));
     const skillOptions = Object.fromEntries(Object.entries(CONFIG.SPYCRAFT.skills).map(([k, v]) => [k, v.name]));
     return {
       profile,
+      drainedBuildNote: !!sys.drainedState && this.isEditable && this._editMode,
       result,
       gradeOptions,
       wealthOptions: { 0: loc`None`, ...gradeOptions },
@@ -2237,7 +2262,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
 
   _prepareSubmitData(event, form, formData, updateData) {
     const flat = formData.object,
-      profile = structuredClone(this.actor.system.npcProfile ?? defaultNpcProfile());
+      profile = structuredClone(ownedNpcProfile(this.actor) ?? defaultNpcProfile());
     const changed = new Set();
     for (const [key, value] of Object.entries(flat)) {
       let m;
@@ -2264,11 +2289,11 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
 
   static #onEnable() {
     if (!this.isEditable) return;
-    return this.actor.update({ "system.npcProfile.enabled": !this.actor.system.npcProfile?.enabled });
+    return this.actor.update({ "system.npcProfile.enabled": !ownedNpcProfile(this.actor)?.enabled });
   }
   static #onAddSkill() {
     if (!this.isEditable) return;
-    const rows = structuredClone(this.actor.system.npcProfile.skills);
+    const rows = structuredClone(ownedNpcProfile(this.actor).skills);
     const key = Object.keys(CONFIG.SPYCRAFT.skills).find(key => !rows.some(s => s.key === key));
     if (key) rows.push({ key, grade: 1 });
     return this.actor.update({ "system.npcProfile.skills": rows });
@@ -2277,7 +2302,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     if (!this.isEditable) return;
     return this.actor.update({
       "system.npcProfile.qualities": [
-        ...structuredClone(this.actor.system.npcProfile.qualities),
+        ...structuredClone(ownedNpcProfile(this.actor).qualities),
         { id: "all-thumbs", units: 1, details: "", level: 1, modifier: 0, linkedCost: 1, limited: false, caliber: 1 }
       ]
     });
@@ -2285,7 +2310,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
   static async #onAddPick(event, target) {
     if (!this.isEditable || !NPC_CATEGORIES.includes(target.dataset.category)) return;
     await this.whenSaved();
-    const equipment = structuredClone(this.actor.system.npcProfile.equipment);
+    const equipment = structuredClone(ownedNpcProfile(this.actor).equipment);
     equipment[target.dataset.category].push(1);
     return this.actor.update({ "system.npcProfile.equipment": equipment });
   }
@@ -2294,7 +2319,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     const { list, index, category } = target.dataset;
     if (!["skills", "qualities", "equipment"].includes(list)) return;
     await this.whenSaved();
-    const rows = structuredClone(this.actor.system.npcProfile[list]);
+    const rows = structuredClone(ownedNpcProfile(this.actor)[list]);
     const array = list === "equipment" ? rows[category] : rows;
     if (!Array.isArray(array)) return;
     array.splice(Number(index), 1);

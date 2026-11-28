@@ -26,6 +26,7 @@ import { computeAgent } from "../rules/engine.mjs";
 import { characterSurvivalStats } from "../rules/terrain.mjs";
 import { qualityResistanceReview } from "../rules/resistances.mjs";
 import { npcArmorPlan } from "../rules/npc-equipment.mjs";
+import { npcDrainedProjection, ownedNpcProfile } from "../rules/npc-drained.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { campaignCQBRange, campaignNpcHealthReview } from "../rules/campaign-combat.mjs";
 import { characterCampaignPolicy } from "../rules/creation-policy.mjs";
@@ -187,6 +188,9 @@ function underminedCombatContext(system) {
 
 export class NpcData extends BaseActorData {
   prepareDerivedData() {
+    this.npcProfile = structuredClone(ownedNpcProfile(this.parent) ?? this.npcProfile);
+    delete this.drainedState;
+    delete this.npcDrainedItemIds;
     const policy = characterCampaignPolicy(
       this,
       currentCampaignRules().effects,
@@ -227,6 +231,26 @@ export class NpcData extends BaseActorData {
     }
     // p.398: a promoted standard NPC is special until the mission ends.
     this.promoted = !!this.promotion && this.promotion.mission === String(this.usagePeriods?.mission ?? "initial");
+    this.undrainedThreatLevel = this.effectiveThreatLevel;
+    this.undrainedNpcProfile = structuredClone(this.npcProfile);
+    try {
+      const drained = npcDrainedProjection(
+        this,
+        [...(this.parent?.items ?? [])],
+        this.parent?.flags?.spycraft2?.drained
+      );
+      if (drained.state.levels) {
+        this.npcProfile = drained.profile;
+        this.effectiveThreatLevel = drained.state.effectiveLevel;
+        this.drainedState = drained.state;
+        this.npcDrainedItemIds = drained.items.map(i => i.id ?? i._id);
+        this.activeFeatNames = [...new Set(drained.items.filter(i => i.type === "feat").map(i => ruleName(i)))].filter(
+          Boolean
+        );
+      }
+    } catch (error) {
+      this.drainedState = { needsReview: true, problem: error.message };
+    }
     // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
     this.qualityEffects = npcQualityEffects(this.npcProfile?.enabled ? this.npcProfile : null, {
       type: this.npcType === "villain" ? "special" : this.npcType,
@@ -327,6 +351,9 @@ export class NpcData extends BaseActorData {
   }
 
   reviewCreationRules() {
+    if (this.drainedState?.needsReview) this.warnings.push(this.drainedState.problem);
+    if (this.drainedState?.manualStats)
+      this.warnings.push(loc`Drained: the GC manages this NPC's manual statistics and their eventual restoration.`);
     if (this.featEffects?.damageSaveHealth?.needsReview)
       this.warnings.push(
         loc`Review the manual Damage save adjustment: choose whether it already includes vitality and wound bonuses.`
@@ -362,8 +389,11 @@ export class NpcData extends BaseActorData {
    * where the maximums are worked out from the NPC's grades rather than typed in.
    */
   applyFeatEffects({ health }) {
+    const items = [...(this.parent?.items ?? [])].filter(
+      i => !this.npcDrainedItemIds || this.npcDrainedItemIds.includes(i.id ?? i._id)
+    );
     const effects = npcFeatEffects(
-      [...(this.parent?.items ?? [])].map(item => ({ type: item.type, name: item.name, system: item.system })),
+      items.map(item => ({ type: item.type, name: item.name, system: item.system })),
       {
         level: this.effectiveThreatLevel ?? this.threatLevel,
         base: Object.fromEntries(Object.entries(this.saves).map(([key, save]) => [key, save.base]))
@@ -379,7 +409,7 @@ export class NpcData extends BaseActorData {
       this.wounds.max += effects.wounds;
     }
     this.featEffects = effects;
-    const equipment = npcArmorPlan(this, [...(this.parent?.items ?? [])]);
+    const equipment = npcArmorPlan(this, items);
     Object.assign(this, equipment.fields);
     this.armorWarnings = equipment.warnings;
     this.defense.total += equipment.defense;

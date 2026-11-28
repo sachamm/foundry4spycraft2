@@ -34,6 +34,7 @@ import { manageSceneDisposition } from "../scene-disposition.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { manageCombatPersuasion } from "./combat-persuasion.mjs";
 import { campaignSkillDCPolicy } from "../../rules/campaign-skill-dc.mjs";
+import { drainedRecoveryCheck, drainedNpcCheckOptions } from "../../rules/drained.mjs";
 
 const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
 const options = (rows, selected) =>
@@ -106,6 +107,39 @@ export async function callQualitySave(actor, id) {
 export async function rollNpcSkill(actor, input = null, context = {}) {
   if (!actor.isOwner) return null;
   const graded = actor.system.npcProfile?.enabled === true;
+  if (!input && context.drainedRecovery) {
+    const result = await formDialog({
+      title: loc`${actor.name}: Drained recovery`,
+      ok: loc`Make original recovery check`,
+      intro: loc`Resolve (Wis), DC ${context.drainedRecovery.dc}. Include only eligible modifiers. The original attempt keeps its category and one saved result.`,
+      fields: [
+        ...(!graded ? [{ number: "manualBonus", label: loc`Actual Resolve skill bonus before Wisdom`, value: 0 }] : []),
+        { number: "modifier", label: loc`Eligible situational or synergy modifier`, value: 0 },
+        { number: "error", label: loc`Actual error range before qualities`, value: 1, min: 0 },
+        ...(context.drainedRecovery.mode === "Active"
+          ? [
+              {
+                select: "method",
+                label: loc`Method`,
+                options: [
+                  ["roll", loc`Roll`],
+                  ["take10", loc`Take 10`],
+                  ["take20", loc`Take 20`]
+                ]
+              },
+              { check: "safeToTake", label: loc`Neither distracted nor endangered; required for taking 10/20` }
+            ]
+          : []),
+        raw(qualityCheckContent(actor.system.qualityEffects)),
+        { check: "secret", label: loc`Secret (GC only)` }
+      ]
+    });
+    if (!result) {
+      await context.onDrainedRecoveryContextCancelled?.();
+      return null;
+    }
+    input = { ...result, key: "resolve", ability: "wis" };
+  }
   if (!input) {
     const skillRows = SKILLS.filter(skill => !context.combatPersuasion || skill.key === "impress").map(skill => [
       skill.key,
@@ -147,15 +181,19 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     skill = SKILLS.find(entry => entry.key === skillKey);
   if (!skill) return refuse(loc`Choose a skill.`);
   if (input.key.split("/").length > 2) throw Error(loc`Choose one listed skill and named check.`);
-  const namedCheck = context.combatPersuasion
-    ? skill.checks.find(c => c.id === "persuasion")
-    : chosenCheck
-      ? npcNamedChecks(skill).find(c => c.id === chosenCheck)
-      : null;
+  const namedCheck = context.drainedRecovery
+    ? drainedRecoveryCheck(context.drainedRecovery)
+    : context.combatPersuasion
+      ? skill.checks.find(c => c.id === "persuasion")
+      : chosenCheck
+        ? npcNamedChecks(skill).find(c => c.id === chosenCheck)
+        : null;
   if ((chosenCheck && !namedCheck) || (context.combatPersuasion && chosenCheck && chosenCheck !== "persuasion"))
     throw Error(loc`Choose a valid named check for this skill and combat attempt.`);
   if (context.combatPersuasion && (skill.key !== "impress" || (input.ability && input.ability !== "cha")))
     return refuse(loc`Combat persuasion requires Impress/Persuasion with Charisma.`);
+  if (context.drainedRecovery && (skill.key !== "resolve" || input.ability !== "wis"))
+    throw Error(loc`Use the reserved Resolve (Wis) recovery check.`);
   if (
     actor.system.npcType === "animal" &&
     graded &&
@@ -243,8 +281,15 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     moralePenalty +
     disposition.bonus +
     skillPenaltyValue(actor.system, disposition.penalty);
+  const checkError =
+      (input.error == null || input.error === "" ? (namedCheck?.error ?? 1) : Math.max(0, Number(input.error) || 0)) +
+      quality.errorIncrease +
+      disposition.errorIncrease,
+    recoveryPlan = context.drainedRecovery
+      ? drainedNpcCheckOptions(actor.system, context.drainedRecovery, input, checkError)
+      : null;
   return actor.rollCheck(
-    "1d20 + @total",
+    recoveryPlan?.fixedDie ? `${recoveryPlan.fixedDie} + @total` : "1d20 + @total",
     { total },
     {
       // Players see the card too: the NPC's bonus, cap and modifiers are printed only on a roll kept to the GC.
@@ -270,10 +315,10 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
         total
       ),
       cap: plan.cap,
-      error:
-        (input.error == null || input.error === "" ? (namedCheck?.error ?? 1) : Math.max(0, Number(input.error) || 0)) +
-        quality.errorIncrease +
-        disposition.errorIncrease,
+      error: checkError,
+      ...(recoveryPlan
+        ? { ...recoveryPlan, difficultyClass: context.difficultyClass, drainedRecovery: context.drainedRecovery }
+        : {}),
       ...(disposition.threatIncrease ? { threat: Math.max(1, 20 - disposition.threatIncrease) } : {}),
       npcSkill: skill.key,
       checkKind: "skill",
@@ -282,6 +327,12 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       campaignSkillChecks: campaignChecks.evidence,
       dispositionSkill: disposition.evidence,
       validateSkillContext: () => {
+        if (
+          context.drainedRecovery &&
+          JSON.stringify(drainedNpcCheckOptions(actor.system, context.drainedRecovery, input, checkError)) !==
+            JSON.stringify(recoveryPlan)
+        )
+          throw Error(loc`The recovery method, conditions or campaign rules changed. Review the original attempt.`);
         const live = campaignSkillChecks(actor.system, skill.key, { id: checkId }, input);
         if (
           JSON.stringify(live.evidence) !== JSON.stringify(campaignChecks.evidence) ||

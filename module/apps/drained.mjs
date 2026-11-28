@@ -7,8 +7,11 @@ import {
   beginDrainedRecovery,
   settleDrainedRecovery,
   reviewDrainedRecoveryPlan,
-  DRAINED_RECOVERY_MODE
+  DRAINED_RECOVERY_MODE,
+  drainedRestorationReview
 } from "../rules/drained.mjs";
+import { npcDrainedBuildSignature } from "../rules/npc-drained.mjs";
+import { rollNpcSkill } from "./gc/npc-play.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { sameValues } from "../rules/equal.mjs";
 import { formDialog } from "./dialog-kit.mjs";
@@ -20,12 +23,15 @@ const itemsOf = actor => [...actor.items];
 const now = () => game.time.worldTime;
 const missionOf = actor => String(actor.system.usagePeriods?.mission ?? "initial");
 const own = actor => actor?.isOwner && actor.type === "agent";
-function requireGC(actor) {
-  if (!own(actor) || !game.user.isGM) throw Error(loc`An owning GC must review Drained character choices.`);
+const ownRecovery = actor => own(actor) || (actor?.isOwner && actor.type === "npc" && game.user.isGM);
+function requireGC(actor, recovery = false) {
+  if (!(recovery ? ownRecovery(actor) : own(actor)) || !game.user.isGM)
+    throw Error(loc`An owning GC must review Drained character choices.`);
 }
 const proof = actor => ({
   record: structuredClone(recordOf(actor)),
-  signature: drainedBuildSignature(actor.system, itemsOf(actor))
+  signature:
+    actor.type === "npc" ? npcDrainedBuildSignature(actor) : drainedBuildSignature(actor.system, itemsOf(actor))
 });
 function unchanged(actor, expected) {
   if (!sameValues(proof(actor), expected))
@@ -186,6 +192,7 @@ export async function reviewDrainedBuild(actor, options = {}) {
   });
 }
 function recoveryMessage(actor, recovery) {
+  if (!recovery) return null;
   return (
     [...(game.messages ?? [])].reverse().find(m => {
       const f = m.flags?.spycraft2;
@@ -194,8 +201,8 @@ function recoveryMessage(actor, recovery) {
   );
 }
 export async function rollDrainedRecovery(actor, options = {}) {
-  if (!own(actor)) return null;
-  if (DRAINED_RECOVERY_MODE === "Passive") requireGC(actor);
+  if (!ownRecovery(actor)) return null;
+  if (DRAINED_RECOVERY_MODE === "Passive") requireGC(actor, true);
   if (game.settings.get("spycraft2", "mission")?.active)
     throw Error(loc`End the active mission before rolling Drained recovery.`);
   const mission = missionOf(actor),
@@ -225,7 +232,7 @@ export async function rollDrainedRecovery(actor, options = {}) {
   if (!input?.confirmed) return null;
   let recovery;
   const reserved = await queueResources([actor], async () => {
-    if (!own(actor) || missionOf(actor) !== mission) throw Error(loc`Ownership or the mission changed.`);
+    if (!ownRecovery(actor) || missionOf(actor) !== mission) throw Error(loc`Ownership or the mission changed.`);
     unchanged(actor, expected);
     const next = beginDrainedRecovery(actor.system, itemsOf(actor), recordOf(actor), {
       mission,
@@ -261,11 +268,14 @@ export async function rollDrainedRecovery(actor, options = {}) {
       );
     });
   try {
-    const message = await actor.rollSkill("resolve", "wis", {
+    let contextCancelled = false;
+    const context = {
       askContext: true,
-      check: "drained-recovery",
-      method: "roll",
+      initialCheck: "drained-recovery",
       difficultyClass: recovery.dc,
+      onDrainedRecoveryContextCancelled: () => {
+        contextCancelled = true;
+      },
       drainedRecovery: {
         mission,
         attempt: recovery.attempt,
@@ -273,8 +283,24 @@ export async function rollDrainedRecovery(actor, options = {}) {
         dc: recovery.dc,
         mode: recovery.mode
       }
-    });
+    };
+    const message =
+      actor.type === "npc"
+        ? await rollNpcSkill(actor, null, context)
+        : await actor.rollSkill("resolve", "wis", context);
     const original = recoveryMessage(actor, recovery) ?? message;
+    if (!original && contextCancelled) {
+      await queueResources([actor], async () => {
+        const record = recordOf(actor),
+          actual = record?.recoveries?.[mission];
+        if (actual?.attempt !== recovery.attempt || actual.state !== "rolling" || recoveryMessage(actor, recovery))
+          return;
+        const recoveries = { ...record.recoveries };
+        delete recoveries[mission];
+        await write(actor, { ...record, recoveries }, "", { undo: false });
+      });
+      return null;
+    }
     if (original)
       await saveReceipt(
         original,
@@ -292,22 +318,47 @@ export async function rollDrainedRecovery(actor, options = {}) {
   }
 }
 export async function settleDrainedRecoveryCheck(actor, options = {}) {
-  requireGC(actor);
+  requireGC(actor, true);
   const mission = options.mission ?? missionOf(actor);
+  const expected = proof(actor);
+  let review = options;
+  if (
+    drainedRestorationReview(actor.system, itemsOf(actor), recordOf(actor)) &&
+    !options.restorationConfirmed &&
+    recoveryMessage(actor, expected.record?.recoveries?.[mission])?.flags?.spycraft2?.successConfirmed === true
+  ) {
+    review = await formDialog({
+      title: loc`GC: restore the newest NPC loss`,
+      ok: loc`Settle original recovery`,
+      intro: loc`On success, restore only the newest loss's manual statistics and exceptional class or Origin options. Automatic grades, qualities and feats return from their saved originals.`,
+      fields: [
+        {
+          check: "restorationConfirmed",
+          label: loc`The GC verified the newest loss and restored any manual benefits if the original check succeeded`
+        },
+        { text: "restorationNote", label: loc`Restored statistics or options and original source`, maxlength: 1000 }
+      ]
+    });
+    if (!review) return null;
+  }
   return queueResources([actor], async () => {
-    requireGC(actor);
+    requireGC(actor, true);
+    unchanged(actor, expected);
     const record = recordOf(actor),
       recovery = record?.recoveries?.[mission];
     if (!recovery) throw Error(loc`Roll the original mission-end recovery check first.`);
     const message = recoveryMessage(actor, recovery);
     if (!message) throw Error(loc`The GC must review this interrupted recovery attempt's actual result.`);
-    const next = settleDrainedRecovery(actor.system, itemsOf(actor), record, mission, message, now());
+    const next = settleDrainedRecovery(actor.system, itemsOf(actor), record, mission, message, now(), {
+      ...review,
+      reviewer: game.user.id
+    });
     if (next === record) return record;
     return write(actor, next, loc`Drained recovery: ${actor.name}`);
   });
 }
 export async function reviewDrainedRecovery(actor, options = {}) {
-  requireGC(actor);
+  requireGC(actor, true);
   const mission = options.mission ?? missionOf(actor),
     expected = proof(actor),
     recovery = expected.record?.recoveries?.[mission];
@@ -332,12 +383,25 @@ export async function reviewDrainedRecovery(actor, options = {}) {
           { check: "actualOutcomeConfirmed", label: loc`The GC verified the original dice and actual outcome` },
           { check: "noDiceConfirmed", label: loc`No recovery dice were rolled for this attempt` },
           { check: "noEffectsConfirmed", label: loc`No level was restored by this attempt` },
-          { text: "note", label: loc`Original dice, source and review reason`, maxlength: 1000 }
+          { text: "note", label: loc`Original dice, source and review reason`, maxlength: 1000 },
+          ...(drainedRestorationReview(actor.system, itemsOf(actor), recordOf(actor))
+            ? [
+                {
+                  check: "restorationConfirmed",
+                  label: loc`On success, the GC restored the newest loss's manual statistics and exceptional options`
+                },
+                {
+                  text: "restorationNote",
+                  label: loc`Restored statistics or options and original source`,
+                  maxlength: 1000
+                }
+              ]
+            : [])
         ]
       });
   if (!input) return null;
   return queueResources([actor], async () => {
-    requireGC(actor);
+    requireGC(actor, true);
     unchanged(actor, expected);
     const original =
         recoveryMessage(actor, recovery) ??
@@ -369,28 +433,35 @@ export function drainedView(actor) {
   )
     return null;
   const record = recordOf(actor),
-    state = actor.system.drainedState,
-    recovery = record?.recoveries?.[missionOf(actor)];
+    state = actor.system.drainedState;
   return {
+    ...drainedRecoveryView(actor),
     levels: record?.levels ?? 0,
     effectiveLevel: state?.effectiveLevel,
     needsReview: state?.needsReview ?? false,
     canApply: actor.isOwner && game.user.isGM,
-    canReview: !!record?.levels && actor.isOwner && game.user.isGM,
+    canReview: !!record?.levels && actor.isOwner && game.user.isGM
+  };
+}
+export function drainedRecoveryView(actor) {
+  const record = recordOf(actor),
+    state = actor.system.drainedState,
+    recovery = record?.recoveries?.[missionOf(actor)];
+  return {
     canRoll:
       !!record?.levels &&
       !state?.needsReview &&
       !recovery &&
-      actor.isOwner &&
+      ownRecovery(actor) &&
       (DRAINED_RECOVERY_MODE !== "Passive" || game.user.isGM) &&
-      !Object.values(record?.recoveries ?? {}).some(r => r.state !== "completed"),
+      !Object.values(record?.recoveries ?? {}).some(r => r?.state !== "completed"),
     canSettle: !!recovery && recovery.state !== "completed" && actor.isOwner && game.user.isGM,
     recoveryState: recovery?.state ?? "",
     recoveryDC: recovery?.dc,
     pending:
       actor.isOwner && game.user.isGM
         ? Object.entries(record?.recoveries ?? {})
-            .filter(([, r]) => r.state !== "completed")
+            .filter(([, r]) => r && r.state !== "completed")
             .map(([mission, r]) => ({ mission, dc: r.dc, state: r.state }))
         : []
   };

@@ -1948,7 +1948,13 @@
    "Levels": "{levels} level(s) Drained; active Career Level {level}.",
    "Recovery": "Recovery: {state}, DC {dc}.",
    "Pending": "Unfinished recovery for {mission}: DC {dc}.",
-   "ReviewRecovery": "GC: review original recovery"
+   "ReviewRecovery": "GC: review original recovery",
+   "NPCLosses": "{count} Drained loss(es).",
+   "NPCLevel": "Effective Career Level {level}, from {base} before Drained.",
+   "NPCGrades": "Stat and named skill grades lose {count} step(s), stopping at I.",
+   "NPCManual": "The GC separately handles manual statistics and their restoration.",
+   "NPCReview": "GC: correct Drained history",
+   "NPCBuild": "Build inputs retain the original grades and qualities. Prepared bonuses include Drained."
   }
  }
 }

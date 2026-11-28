@@ -221,7 +221,10 @@ export const ActorSkillRolls = Base =>
             skill
           })
         });
-        if (!input) return null;
+        if (!input) {
+          await options.onDrainedRecoveryContextCancelled?.();
+          return null;
+        }
         rememberChoices(memoryKey, { check: input.check, ability: input.ability, method: input.method });
       }
       // Field coercion and lookups registered for this dialog (module/rolls/dialogs/skill.mjs and rule modules).

@@ -83,7 +83,7 @@ export function validateNpcFeats(selections, catalog, { qualities = [] } = {}) {
       if (!target || treeKey(featData(target).tree) !== "basicskill")
         errors.push(`${name}: choose a Basic Skill feat.`);
     }
-    resolved.push({ name, choice, source, cost });
+    resolved.push({ name, choice, source, cost, ...(typeof selection.id === "string" ? { id: selection.id } : {}) });
   }
   const qualified = [];
   const pending = [...resolved];
@@ -135,6 +135,7 @@ export function validateNpcFeats(selections, catalog, { qualities = [] } = {}) {
     ok: errors.length === 0,
     errors,
     selections: resolved,
+    ...(selections.some(s => typeof s.id === "string") ? { qualifiedIds: qualified.map(f => f.id) } : {}),
     xp: resolved.reduce((sum, feat) => sum + feat.cost, 0)
   };
 }
