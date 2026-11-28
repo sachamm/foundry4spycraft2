@@ -42,6 +42,7 @@ import { finishGearAcquisition } from "../../apps/gear-acquisition.mjs";
 import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../services/gc-dice.mjs";
 import { criticalPlan } from "../../rules/criticals.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
+import { spendProfile } from "../../rules/gc/npc-state.mjs";
 import { applyCriticalChoice, criticalHitChoices, criticalMissChoices } from "../../rules/critical-effects.mjs";
 import {
   checkCandidates,
@@ -807,8 +808,18 @@ export const ActorOutcomes = Base =>
       } catch (error) {
         return refuse(error.message);
       }
-      const useGC = input.kind === "failure" && (input.payerId === "gc" || input.payer === "gc");
+      const npcSuccess = input.kind === "success" && this.type === "npc";
+      const useGC = (input.kind === "failure" || npcSuccess) && (input.payerId === "gc" || input.payer === "gc");
       if (useGC && !game.user?.isGM) return refuse(loc`Only the GC can spend GC action dice.`);
+      const npcCriticalAllowed = () => {
+        const profile = spendProfile(this);
+        return (
+          profile.type === "special" ||
+          (message.flags.spycraft2.checkKind === "attack" ? profile.treacherous : profile.prodigy)
+        );
+      };
+      if (npcSuccess && useGC && !npcCriticalAllowed())
+        return refuse(loc`A standard NPC needs Treacherous for critical hits or Prodigy for skill criticals (p.452).`);
       const controller = useGC ? gcDiceController({ required: false }) : null;
       const payer = useGC ? null : input.kind === "failure" ? (input.payer ?? game.actors?.get(input.payerId)) : this;
       if (!useGC && (payer?.type !== "agent" || !payer.isOwner))
@@ -841,6 +852,10 @@ export const ActorOutcomes = Base =>
       if (useGC && allocations?.length) return refuse(loc`GC action dice use one GC payment, not character wallets.`);
       const expectedShaken = useGC ? null : JSON.stringify(shakenRules(payer.actionDiceFundingSystem));
       const work = async () => {
+        if (npcSuccess && useGC && !npcCriticalAllowed())
+          return refuseStep(
+            loc`The NPC's critical-enabling quality changed before payment. Review its current profile.`
+          );
         if (getActionDieSettlementReview(this).needsReview)
           return refuseStep(
             loc`Review this character’s interrupted action-die settlement before activating another critical result.`
@@ -852,7 +867,11 @@ export const ActorOutcomes = Base =>
           );
         if (useGC) await refreshGCDiceTransaction(controller);
         const check = message.flags.spycraft2,
-          base = { ...input, baseCost: Number(input.baseCost ?? 1), samePayer: !useGC && payer.uuid === this.uuid };
+          base = {
+            ...input,
+            baseCost: Number(input.baseCost ?? 1),
+            samePayer: (npcSuccess && useGC) || (!useGC && payer.uuid === this.uuid)
+          };
         const quoteCritical = available =>
           criticalPlan(this.system, message.flags.spycraft2, {
             ...base,
@@ -914,10 +933,13 @@ export const ActorOutcomes = Base =>
             throw new Error(
               loc`The complete payment exceeds the campaign's ${plan.maximumCost}-die limit for this skill error.`
             );
-          const gain = hardKnocksGainPlan(this.system, check, {
-            kind: plan.kind,
-            careerDie: globalThis.CONFIG?.SPYCRAFT?.tables?.levels?.[this.system.level ?? 0]?.actionDie ?? 4
-          });
+          const gain =
+            this.type === "npc"
+              ? null
+              : hardKnocksGainPlan(this.system, check, {
+                  kind: plan.kind,
+                  careerDie: globalThis.CONFIG?.SPYCRAFT?.tables?.levels?.[this.system.level ?? 0]?.actionDie ?? 4
+                });
           const next = {
             ...check,
             ...(plan.vehicleMountDeclared || plan.targetStandardDeclared
@@ -973,7 +995,7 @@ export const ActorOutcomes = Base =>
           };
           const creditPath = "flags.spycraft2.hardKnocksCredit",
             previousCredit = structuredClone(this.flags?.spycraft2?.hardKnocksCredit),
-            beforeDice = this.system.actionDice.value;
+            beforeDice = this.system.actionDice?.value ?? 0;
           const credit = {
               id: paymentReceiptId,
               messageUuid: message.uuid ?? message.id,

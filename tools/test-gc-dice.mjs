@@ -130,6 +130,64 @@ test("GC critical activation charges the session pool rather than the acting cha
   assert.equal(gcDiceStatus().value, 8);
 });
 
+test("NPC criticals use shared pricing and atomic GC payment, including free Triumphs and failed delivery recovery", async () => {
+  settings = { usagePeriods: { session: "npc-critical" }, gcActionDice: { session: "npc-critical", value: 8 } };
+  const actor = new SpycraftActor();
+  actor.type = "npc";
+  actor.system = { npcType: "special", npcProfile: { enabled: false }, activeFeatNames: [] };
+  const make = (extra = {}, fail = false) => ({
+    uuid: "ChatMessage.npcCritical",
+    flags: {
+      spycraft2: {
+        actorUuid: actor.uuid,
+        checkKind: "attack",
+        threatConfirmed: true,
+        successConfirmed: true,
+        attackContext: { targetRole: { label: "Henchman", extraDiceToActivate: 1 } },
+        ...extra
+      }
+    },
+    async update(data) {
+      if (fail) throw Error("NPC effect delivery failed");
+      this.flags.spycraft2 = data["flags.spycraft2"];
+    }
+  });
+  const opts = { kind: "success", payerId: "gc", preset: "hit.wounds", effectConfirmed: true, beforeDamage: true };
+  const paid = make();
+  await actor.activateCritical(paid, opts);
+  assert.equal(paid.flags.spycraft2.criticalActivation.cost, 2);
+  assert.equal(paid.flags.spycraft2.criticalActivation.payerUuid, "GC");
+  assert.equal(gcDiceStatus().value, 6);
+  await actor.activateCritical(paid, opts);
+  assert.equal(gcDiceStatus().value, 6, "a confirmed activation cannot pay again");
+  const free = make({ triumphed: true, effectiveTotal: 80, attackContext: {} });
+  await actor.activateCritical(free, opts);
+  assert.equal(free.flags.spycraft2.criticalActivation.cost, 0);
+  assert.equal(gcDiceStatus().value, 6);
+  await assert.rejects(() => actor.activateCritical(make({}, true), opts), /NPC effect delivery failed/);
+  assert.equal(gcDiceStatus().value, 6, "failed card delivery restores the GC balance");
+  actor.system.npcType = "standard";
+  const blocked = make();
+  await actor.activateCritical(blocked, opts);
+  assert.equal(blocked.flags.spycraft2.criticalSuccess, undefined);
+  assert.equal(gcDiceStatus().value, 6);
+  actor.system.npcProfile = { enabled: true, qualities: [{ id: "treacherous" }] };
+  await actor.activateCritical(blocked, opts);
+  assert.equal(blocked.flags.spycraft2.criticalSuccess, true);
+  assert.equal(gcDiceStatus().value, 4);
+  let release;
+  actor._actionDieQueue = new Promise(resolve => {
+    release = resolve;
+  });
+  const stale = make(),
+    pending = actor.activateCritical(stale, opts);
+  actor.system.npcProfile.qualities = [];
+  release();
+  await pending;
+  assert.equal(stale.flags.spycraft2.criticalSuccess, undefined);
+  assert.equal(gcDiceStatus().value, 4, "losing the enabling quality while queued prevents payment");
+});
+
 test("malformed current GC balances block spending, awards and adjustments without changing records; correction requires explicit replacement", async () => {
   game.user.isGM = true;
   for (const value of [-1, 0.5, "4", null, undefined, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {

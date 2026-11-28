@@ -14,6 +14,10 @@ import { spendProfile } from "./npc-play.mjs";
 import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
+import { criticalHitChoices } from "../../rules/critical-effects.mjs";
+import { assertDamageNotStarted } from "../../documents/actor/damage-hits.mjs";
+import { systemDialog } from "../dialog-theme.mjs";
+import { esc } from "../../html.mjs";
 import { npcDefenseDeliveryControls } from "./npc-defense.mjs";
 import { npcHitDeliveryControls, validateNpcDefenseReroll } from "./post-hit-defense.mjs";
 import { acquireDeclaredDC, validateDeclaredDC, declaredDCControls } from "./declared-skill-dc.mjs";
@@ -89,23 +93,31 @@ export async function gcBoostCard(message, actor) {
 }
 
 /** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */
-export async function gcActivateThreat(message, actor) {
+export async function gcActivateThreat(message, actor, options = {}) {
+  if (!game.user?.isGM || actor?.type !== "npc" || !actor.isOwner || message.flags?.spycraft2?.actorUuid !== actor.uuid)
+    throw Error(loc`The GC activates the actual NPC's own confirmed threat.`);
+  assertDamageNotStarted(actor, message, { allowCover: true });
   if (message.flags?.spycraft2?.npcDefensePending)
     throw Error(loc`Finish the NPC Defense decision before activating a critical hit.`);
   const check = message.flags.spycraft2;
-  const result = await spendGCDice({
-    id: "activateThreat",
-    actor,
-    onCard: true,
-    dice: 1,
-    checkKind: check.checkKind === "attack" ? "attack" : "skill"
+  let input = options;
+  if (!Object.keys(input).length) {
+    const choices = criticalHitChoices(check);
+    input = await systemDialog.input({
+      window: { title: loc`Activate NPC critical result` },
+      rejectClose: false,
+      ok: { label: loc`Activate chosen effect` },
+      content: `<div class="spycraft2-roll-options">${check.coverAwaiting?.basis.directHits === 0 ? `<p>${loc`Critical target: ${check.coverAwaiting.criticalName}. This critical does not transfer to the protected character.`}</p>` : ""}${choices.length ? `<label>${loc`GC-confirmed critical effect`} <select name="preset" required><option value="">${loc`Choose…`}</option>${choices.map(c => `<option value="${esc(c.id)}">${esc(c.label)} (${c.cost})</option>`).join("")}</select></label>` : `<label>${loc`GC-confirmed effect`} <textarea name="effect" required></textarea></label><label>${loc`Base cost in action dice`} <input name="baseCost" type="number" min="1" step="1" value="1" required /></label>`}<p class="hint">${loc`The GC pool pays the final cost after applicable discounts and target-role adjustments. An attack Triumph includes a one-die critical; activate it before rolling damage.`}</p></div>`
+    });
+    if (!input) return null;
+  }
+  return actor.activateCritical(message, {
+    ...input,
+    kind: "success",
+    payerId: "gc",
+    effectConfirmed: true,
+    beforeDamage: true
   });
-  if (!result?.plan) return null;
-  await message.update({
-    "flags.spycraft2.criticalSuccess": true,
-    "flags.spycraft2.criticalActivation": { cost: result.plan.cost, payer: "gc" }
-  });
-  return true;
 }
 
 rollPipeline.register({

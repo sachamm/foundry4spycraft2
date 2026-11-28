@@ -2828,3 +2828,36 @@ Nonzero native penetration and the paid NPC reaction remain the next checks.
 
 Validation: **4,532 Node tests**, **988 engine fixtures**, **307 layout checks**,
 native schemas, lint, formatting, bundle and copied-text checks passed.
+
+## Pass 90: Shared NPC critical payments and complete native cover sequence
+
+Scores remain PC creation **9.9/10**, combat **9.8/10** pending the grapple
+benefit/cooperation review. NPC critical activation now chooses its applicable
+effect and uses the same pricing, before-damage check, actual target role,
+cover scope, atomic payment and interrupted-delivery protection as PC criticals.
+An included one-die Triumph critical costs no additional GC die. Standard NPCs
+retain their critical-enabling quality requirements; losing that quality while
+queued prevents payment. NPCs never acquire a PC action-die wallet or class credit.
+
+Native Foundry verified nonzero penetration on
+ChatMessage.5lwsEMa1eRrWJUnX: original damage 14 became seven remaining damage,
+reducing vitality from 100 to 93 while preserving wounds and the original dice.
+The final repeat, ChatMessage.VZqq1iGbg7ayh7PH, retained original damage 11 and
+delivered seven vitality damage. Each scenery save was actually rolled separately
+and referenced in the GC review; remaining damage was a declared GC decision.
+
+The dramatic reaction on ChatMessage.cexSsSO1knShqT7t preserved a successful
+cover contact at attack result 27. One actual paid GC die added seven Defense,
+raising the protected NPC to 34 and removing its hit. The GC pool changed 7→6,
+target vitality stayed 40, original damage dice remained unchanged, and damage
+delivery was refused. A special NPC's actual 112 attack on
+ChatMessage.gv1OAj11IQhcJ2VL activated its included critical through the real new
+GC choice form, recorded the GC as payer, and left the pool unchanged at six.
+Both cover settlements, health and NPC critical payment survived reload. No
+browser errors or unexpected diagnostics occurred.
+
+Validation: 4,533 Node tests and 988 engine fixtures, plus focused queued-quality
+loss coverage, lint, formatting, bundle and copied-text checks. Pass 89's 307
+layout checks and native schemas remain current; the changed critical form was
+also exercised natively. B-190 now retains map assistance and exceptional cover
+adjudication maintenance rather than the completed original-damage workflow.
