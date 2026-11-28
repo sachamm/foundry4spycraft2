@@ -139,7 +139,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
 | B-085 | **Scroll containers clip the focus ring** (filled buttons now take an ink ring, and checkboxes show one ring). | UX-33, CSS-09, C13 | S | live |
-| B-086 | **Keyboard order contradicts visual order** in the console (Previous turn before Next turn, Edit mission before Start mission, Spend dice) and on the NPC sheet, because CSS reorders them. Put the DOM in visual order. | DES-16, CX-N3, CX-U1 | S | live |
+| B-086 | **Keyboard order on the NPC sheet**: check that its grid places controls in markup order. (The console's main button and the agent Play reference now lead in the markup as on screen; no CSS `order` remains.) | DES-16, CX-N3, CX-U1 | S | live |
 | B-088 | **Names and roles**: special NPC health inputs read "Vitality / 16" and "Vitality /"; weapon buttons omit their numbers; defeat is styling only; mission row buttons have no row identity; headings skip levels (1 h2, 52 h3). | CX-U2, CX-U13, CX-U5, CX-U4, UX-35, C14, C3 | M | code |
 | B-089 | **Click targets**: button rows still mix 36px and 44px heights. (Section-bar controls, the console's row icons, round pips and the clock badge now meet the 28px and 44px sizes.) | DES-09, DES-12, CX-U18, CSS-14 | S | live |
 | B-091 | **Results are not announced**: no live region for request state, initiative results or search counts. | CX-U11, CX-U17, UX-35 | S | code |

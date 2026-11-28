@@ -400,6 +400,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
   _onRender(context, options) {
     super._onRender(context, options);
+    // The main button leads its row on screen, so it leads in the markup too and the keyboard reaches it first.
+    for (const primary of this.element.querySelectorAll(".controls > button.gc-primary"))
+      if (primary.parentElement.firstElementChild !== primary) primary.parentElement.prepend(primary);
     for (const details of this.element.querySelectorAll("details.gc-section[data-section]")) {
       const key = details.dataset.section,
         initial = context.sections?.[key]?.open;

@@ -8,10 +8,17 @@
 {{> "systems/spycraft2/templates/actor/play/dashboard.hbs"}}
 
   {{> "systems/spycraft2/templates/actor/play/identities.hbs"}}
+  {{!-- Play reads figures first, then the abilities; the markup follows the reading order, so the keyboard does too. --}}
   <div class="cols main-reference">
+    {{#if editMode}}
     {{> "systems/spycraft2/templates/actor/play/reference-abilities.hbs"}}
 
     {{> "systems/spycraft2/templates/actor/play/reference-combat.hbs"}}
+    {{else}}
+    {{> "systems/spycraft2/templates/actor/play/reference-combat.hbs"}}
+
+    {{> "systems/spycraft2/templates/actor/play/reference-abilities.hbs"}}
+    {{/if}}
   </div>
   <section class="combat-toolbox play-only" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CombatTools'}}">
     <div class="combat-tool-head">

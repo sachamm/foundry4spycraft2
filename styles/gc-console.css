@@ -63,7 +63,6 @@
 }
 .gc-console-body .controls button.gc-primary {
   grid-column: 1 / -1;
-  order: -1;
   font-weight: bold;
 }
 .gc-console-body h3 {

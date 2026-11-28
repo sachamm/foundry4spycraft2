@@ -330,9 +330,6 @@
   flex-direction: column;
   gap: 0;
 }
-.spycraft2.sheet.agent.play-mode .main-reference > .col:first-child {
-  order: 2;
-}
 .spycraft2.sheet.agent.play-mode .main-reference .stat-grid {
   grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
   gap: 6px;
