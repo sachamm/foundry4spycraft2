@@ -151,7 +151,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 | B-102 | Attribute checks never open a dialog; saves open one only for Reflex or certain feats; Initiative has none, so feat reminders cannot show and Shift has nothing to skip. A minimal dialog (modifier, visibility) with the same gestures. (Damage now takes Shift: no optional extras, no dialog.) | SG-D2, RW-137 | M | earlier |
 | B-104 | Attestation-length checkbox labels (159 `…Confirmed` names in 74 files); Fight Defensively still needs a confirm tick; Aim is an honour-system tick box with no Aim action. Effect labels ("Flanking +2") with the detail as a hint; defaults, not attestations. | SG-D5, LR-20b, LR-32 | L | earlier |
 | B-105 | Initiative offers no action-die boost. | LR-34b | S | earlier |
-| B-108 | One person, three names: sample agents are "Name — Class 1 (role)", and cards use the speaker name with no code name. | LR-27 | S | earlier |
 | B-109 | No one-step "New agent for player…" (create, own, assign) and no hint on a player's empty Actors tab. | LR-35 | S | earlier |
 | B-110 | `?` explanations for game terms on the console and NPC sheet, from one glossary; a `?` in each surface header that opens the matching doc page. | SGI-novice-gc R6, SGI-novice-gc R24, NGC-07 | M | earlier |
 | B-111 | Level-up as one guided path: after the vitality die, chain skill points, feat and choices, then return to Play. Feat and ability choices made inline on the row, not on the item sheet. | SGI-seasoned-player R16, SGI-seasoned-player R17, LR-24d | M | earlier |

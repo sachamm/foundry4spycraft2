@@ -9,28 +9,28 @@
       "key": "luc",
       "pack": "sample-agents",
       "source": "luc-moreau",
-      "name": "Luc Moreau — Faceman 1 (Social infiltrator)"
+      "name": "Luc Moreau"
     },
     {
       "_id": "aa77dc4ae4f90d10",
       "key": "jun",
       "pack": "sample-agents",
       "source": "jun-park",
-      "name": "Jun Park — Hacker 1 (Network intrusion specialist)"
+      "name": "Jun Park"
     },
     {
       "_id": "8cc8ed83d697cd42",
       "key": "mara",
       "pack": "sample-agents",
       "source": "mara-voss",
-      "name": "Mara Voss — Intruder 1 (Covert entry specialist)"
+      "name": "Mara Voss"
     },
     {
       "_id": "240bf1586c7cb8af",
       "key": "luka",
       "pack": "sample-agents",
       "source": "luka-petrov",
-      "name": "Luka Petrov — Soldier 1 (Close protection)"
+      "name": "Luka Petrov"
     },
     {
       "_id": "f761cba53c51ce5c",
@@ -85,28 +85,28 @@
         {
           "_id": "MR3GHWtfrvYqt0AU",
           "actor": "jun",
-          "name": "Jun Park — Hacker 1 (Network intrusion specialist)",
+          "name": "Patch (Jun Park)",
           "x": 576,
           "y": 832
         },
         {
           "_id": "UDCfe0yZCzLFjE9q",
           "actor": "luc",
-          "name": "Luc Moreau — Faceman 1 (Social infiltrator)",
+          "name": "Velvet (Luc Moreau)",
           "x": 640,
           "y": 832
         },
         {
           "_id": "tlSIjE3sqBD6GLGa",
           "actor": "luka",
-          "name": "Luka Petrov — Soldier 1 (Close protection)",
+          "name": "Breakwater (Luka Petrov)",
           "x": 832,
           "y": 832
         },
         {
           "_id": "P5E8bRKxok3FOvc8",
           "actor": "mara",
-          "name": "Mara Voss — Intruder 1 (Covert entry specialist)",
+          "name": "Latch (Mara Voss)",
           "x": 896,
           "y": 832
         }
