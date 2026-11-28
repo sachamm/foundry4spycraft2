@@ -7,6 +7,27 @@ const normal = value =>
   String(value ?? "")
     .trim()
     .toLowerCase();
+/** A stored field name in words: "kitGrade" reads "Kit grade", "name" reads "Name". */
+export const refreshFieldLabel = path => {
+  const words = path
+    .replace(/^system\./, "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+};
+/** A value summarised for the GC; lists and records give a count and the names they hold. */
+export const refreshValueSummary = value => {
+  if (value === undefined || value === null || value === "") return loc`Not set`;
+  if (typeof value === "boolean") return value ? loc`Yes` : loc`No`;
+  if (typeof value !== "object") return String(value);
+  const entries = Array.isArray(value) ? value : Object.values(value);
+  const names = entries
+    .map(entry => (typeof entry === "object" && entry ? (entry.name ?? entry.label ?? entry.identifier) : entry))
+    .filter(name => typeof name === "string" || typeof name === "number")
+    .slice(0, 6);
+  const count = entries.length === 1 ? loc`1 entry` : loc`${entries.length} entries`;
+  return names.length ? `${count}: ${names.join(", ")}${entries.length > names.length ? ", …" : ""}` : count;
+};
 export async function actorRulesRefreshPreview(actor) {
   const changes = [],
     unmatched = [];
@@ -64,7 +85,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
   const rows = changes
     .map(
       (change, index) =>
-        `<div class="sc2-refresh-change"><input type="checkbox" name="change${index}" checked aria-label="${esc(loc`Apply ${change.itemName}: ${change.path}`)}" /><details><summary>${esc(change.itemName)} — ${esc(change.path)}</summary><div><b>${loc`Current`}</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? "Not set")}</pre><b>${loc`Proposed`}</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? "Not set")}</pre></div></details></div>`
+        `<div class="sc2-refresh-change"><input type="checkbox" name="change${index}" checked aria-label="${esc(loc`Apply ${change.itemName}: ${refreshFieldLabel(change.path)}`)}" /><details><summary>${esc(change.itemName)}: ${esc(refreshFieldLabel(change.path))}</summary><dl><dt>${loc`Current`}</dt><dd>${esc(refreshValueSummary(change.before))}</dd><dt>${loc`Proposed`}</dt><dd>${esc(refreshValueSummary(change.after))}</dd></dl><details><summary>${loc`Stored data`}</summary><b>${loc`Current`}</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? loc`Not set`)}</pre><b>${loc`Proposed`}</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? loc`Not set`)}</pre></details></details></div>`
     )
     .join("");
   const input = await systemDialog.input({

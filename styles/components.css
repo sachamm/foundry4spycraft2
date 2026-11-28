@@ -918,6 +918,18 @@
   flex: 1 1 auto;
   min-width: 0;
 }
+.sc2-refresh-change dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 8px;
+  margin: 4px 0;
+}
+.sc2-refresh-change dt {
+  font-weight: 600;
+}
+.sc2-refresh-change dd {
+  margin: 0;
+}
 
 /* Text actions: buttons that read as words in a sentence (item sheets, the catalog list), as the links they replace did. */
 .spycraft2.application button.sc2-text-action {
