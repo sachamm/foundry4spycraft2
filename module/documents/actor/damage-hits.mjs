@@ -41,6 +41,8 @@ export function acquireDamageHit(ctx) {
       [actor],
       async () => {
         const check = flags(source);
+        if (check.coverInterception?.state === "complete")
+          throw Error(loc`Use the original reviewed cover-damage cards. No new hit damage is available.`);
         const basis = attackDamageBasis(check, { actorUuid: actor.uuid, weaponUuid: ctx.weaponUuid });
         let ledger = book(actor)[source.id];
         if (!ledger && check.damageHitsVersion !== 1)
@@ -121,7 +123,11 @@ export function damageHitCount(actor, attack) {
 
 export function assertDamageNotStarted(actor, message) {
   const check = flags(message);
-  if ((check?.checkKind === "attack" && damageHitCount(actor, message) > 0) || check?.damageApplicationStarted)
+  if (
+    (check?.checkKind === "attack" && damageHitCount(actor, message) > 0) ||
+    check?.damageApplicationStarted ||
+    check?.coverDamageFrozen
+  )
     throw Error(
       loc`Damage already started. Review its original hit and application receipts before changing this result.`
     );

@@ -1,11 +1,43 @@
 import { sameValues } from "./equal.mjs";
 import { loc } from "../i18n.mjs";
+import { validateCoverAttackBasis } from "./cover-interception.mjs";
 
 const identity = value => typeof value === "string" && value.length > 0;
 const STATES = new Set(["reserved", "started", "rolled", "posted", "needsReview", "consumed", "cancelled"]);
 
 /** The attack facts a damage roll cannot change after its hit was reserved. Critical activation is separate. */
 export function attackDamageBasis(check, { actorUuid, weaponUuid } = {}) {
+  const pending = check?.coverAwaiting;
+  if (pending) {
+    if (
+      pending.version !== 1 ||
+      !identity(pending.id) ||
+      check.superseded ||
+      check.criticalFailure ||
+      check.npcDefensePending ||
+      check.actorUuid !== actorUuid ||
+      check.weaponUuid !== weaponUuid ||
+      pending.basis?.actorUuid !== actorUuid ||
+      pending.basis?.weaponUuid !== weaponUuid ||
+      pending.basis?.interceptedHits < 1
+    )
+      throw Error(loc`Review the original cover interception before rolling its damage.`);
+    validateCoverAttackBasis(check, pending.basis);
+    const basis = pending.basis;
+    return {
+      version: 1,
+      actorUuid,
+      weaponUuid,
+      targetUuid: basis.targetUuid,
+      total: basis.total,
+      defense: basis.baseDefense,
+      hits: basis.potentialHits,
+      cover: { grade: basis.grade, bonus: basis.grade * 2 },
+      ranged: check.attackContext?.ranged === true,
+      fireAction: structuredClone(basis.fireAction),
+      coverPending: { version: 1, id: pending.id, basis: structuredClone(basis) }
+    };
+  }
   const r = check?.attackResolution;
   if (
     check?.checkKind !== "attack" ||

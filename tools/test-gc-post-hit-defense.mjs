@@ -329,6 +329,23 @@ test("an initial hit waits without settling effects, and the GC may finalize it 
   assert.equal(actionDieBoostPlan({}, ctx.attack.flags.spycraft2).blocked, true);
 });
 
+test("a single-hit Triumph cannot spend a new NPC Defense die and still finalizes above its attack total", async () => {
+  const ctx = appContext();
+  Object.assign(ctx.attack.flags.spycraft2, { rawTotal: 80, effectiveTotal: 80 });
+  Object.assign(ctx.original, { defense: 100, total: 80, margin: -20 });
+  await beginNpcDefenseReview(ctx.attack, ctx.attacker, ctx.npc, ctx.original);
+  const count = game.messages.length;
+  await assert.rejects(() => boostNpcHitDefense(ctx.attack), /cannot reduce/);
+  assert.equal(appRng, 0);
+  assert.equal(appSettings.gcActionDice.value, 10);
+  assert.equal(game.messages.length, count);
+  const result = await finish(ctx);
+  assert.equal(result.hit, true);
+  assert.equal(result.hits, 1);
+  assert.equal(result.defense, 100);
+  assert.deepEqual(ctx.confirmed, [true]);
+});
+
 test("a failed final cleanup resumes the confirmed outcome without confirming or paying twice", async () => {
   const ctx = appContext();
   await beginNpcDefenseReview(ctx.attack, ctx.attacker, ctx.npc, ctx.original);

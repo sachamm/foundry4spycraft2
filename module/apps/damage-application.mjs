@@ -823,6 +823,8 @@ export function standardReduction(kind, hit) {
 export async function applyDamage(message, options = {}) {
   const { check, weapon, attack, rolled, profile, attackKind: kindOfAttack, applied } = damageFacts(message);
   if (!message.flags?.spycraft2 || !Number.isFinite(rolled)) return null;
+  if (attack?.coverAwaiting && attack.coverInterception?.state !== "complete")
+    return refuse(loc`Finish the original cover-save review before applying this damage to the protected target.`);
   let input = options;
   const crit = criticalDamageDefaults(check.sourceAttack?.criticalSource ?? attack, message.id, {
     hitIndex: check.sourceAttack?.hitIndex

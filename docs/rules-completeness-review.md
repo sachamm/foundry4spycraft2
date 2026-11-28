@@ -2738,3 +2738,46 @@ in 1280×720; light/dark layout checks also passed. No browser errors occurred.
 Validation: 4,515 Node tests, 988 engine fixtures, 307 layouts, native schemas,
 lint, formatting, bundle and copied-text checks. B-190 now describes the remaining
 direct-cover and map-assistance work, rather than the corrected blast omissions.
+
+## Pass 87: Attack Triumphs and the cover-interception foundation
+
+**PC creation: 9.9/10. Combat: 9.8/10.** The connected GC cover workflow still
+needs implementation and native verification; its backend receives no new
+workflow-completeness credit yet.
+
+The source review found a separate hit-resolution defect: a 75+ attack could be
+reported as a miss against unusually high Defense, contradicting the included
+critical hit (pp.330–331). The resolver now retains at least one hit for a valid
+single, burst, two-shot or autofire attack Triumph. NPC reaction records accept
+that outcome. Raising Defense may reduce extra shots but cannot eliminate the
+remaining Triumph hit; the UI and pre-spend guard stop an ineffective further
+reaction before payment or dice. The card explains a hit despite higher Defense.
+
+Native Foundry verified an actual 105 result against Defense 200 on
+ChatMessage.WzPZSkivwbchtP5y, using a clone of the complete Pass-79 PC. It hit,
+retained its included one-die critical, paid zero additional action dice and
+survived reload; no target damage was applied. A dramatic-scene native review on
+ChatMessage.X3S7rUjIJ78CRp5n (111) and ChatMessage.broKjlc1tUEEsIss (104) also
+refused a useless boost without changing the GC pool or posting replacement dice.
+The actual decision form finalized one hit, explained Triumph in both themes
+and fit 1280×720 at 517.09px. No browser errors occurred.
+
+The cover foundation now distinguishes direct and intercepted shots individually
+(p.345), including a burst with direct hits and additional shots striking cover.
+Total cover intercepts even an otherwise successful shot. Reviewed damage retains
+the original card and amount, forbids invented increases, and keeps unreviewed
+saves pending. A changed original attack is refused. A raised NPC Defense can
+request an additional cover decision while preserving all original damage.
+
+The user's ruling is preserved: an attack Triumph strikes cover critically and
+still needs penetration to reach the protected character. The model distinguishes
+that cover critical from a protected-target critical. The pending damage bridge
+uses the existing once-per-hit reservation/history, retains its original basis
+across later adjudication, and blocks early protected-target damage and mutation
+of damage frozen for cover saves. The GC selection/review controls and complete
+remaining-damage delivery remain B-190; they are not yet exposed by the resolver.
+
+Validation: 4,526 Node tests, 988 engine fixtures, native schemas, lint,
+formatting, bundle and copied-text checks. The existing 307 layout checks were
+last run in Pass 86; this pass's changed NPC reaction form was verified natively
+in light and dark at 1280×720. Continue B-190 and B-186 before completing the goal.

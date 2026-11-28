@@ -701,6 +701,22 @@ test("a blast is applied to each character caught, halved by distance", async ()
   assert.equal(appliedDamageEntries(damage.flags.spycraft2).length, 2);
 });
 
+test("original cover damage cannot reach the protected target before its cover-save review is complete", async () => {
+  reset();
+  const target = character("CoverPendingTarget", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
+  const attack = card("cover-awaiting", { checkKind: "attack", coverAwaiting: { version: 1, id: "original-cover" } });
+  const damage = card("cover-original-damage", {
+    checkKind: "damage",
+    effectiveTotal: 10,
+    sourceAttack: { uuid: attack.uuid }
+  });
+  assert.equal(await applyDamage(damage, { targetUuid: target.uuid, damage: 10, kind: "lethal" }), false);
+  assert.equal(target.system.vitality.value, 40);
+  assert.equal(appliedDamageEntries(damage.flags.spycraft2).length, 0);
+  assert.ok(warnings.some(note => note.includes("cover-save review")));
+  assert.equal(posted.length, 0);
+});
+
 test("blast cover decisions preserve full ring damage after a failed cover save and exclude intact cover", async () => {
   reset();
   const open = character("BlastOpen", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });

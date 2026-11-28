@@ -28,14 +28,17 @@ export function attackOutcome({ total, defense, fireAction = null, feats = [] } 
   if (!Number.isFinite(total)) throw new Error(loc`This attack has no result to compare.`);
   if (!Number.isSafeInteger(defense) || defense < 0) throw new Error(loc`Enter the target's Defense, 0 or more.`);
   const margin = total - defense,
-    hit = margin >= 0;
+    hit = margin >= 0 || total >= 75;
   let hits = hit ? 1 : 0;
-  if (hit && fireAction?.action === "burst") hits = burstHits(total, defense);
-  else if (hit && fireAction?.action === "twoShotBurst") hits = burstHits(total, defense, 2);
+  if (hit && fireAction?.action === "burst") hits = Math.max(1, burstHits(total, defense));
+  else if (hit && fireAction?.action === "twoShotBurst") hits = Math.max(1, burstHits(total, defense, 2));
   else if (hit && fireAction?.action === "autofire")
-    hits = autofireHits(total, defense, fireAction.volleys, {
-      perPoints: feats.includes("Autofire Supremacy") ? 3 : 4
-    });
+    hits = Math.max(
+      Number.isSafeInteger(fireAction.volleys) && fireAction.volleys > 0 ? 1 : 0,
+      autofireHits(total, defense, fireAction.volleys, {
+        perPoints: feats.includes("Autofire Supremacy") ? 3 : 4
+      })
+    );
   return { hit, margin, hits };
 }
 
@@ -75,6 +78,8 @@ export function attackResolutionNote(check) {
   const base = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
   const against = r.cover ? loc`${base} (with ${r.cover.label} cover, +${r.cover.bonus})` : base;
   const note = r.specialistDodge ? " " + loc`Foibles adds 1 dodge to this Defense (p.49).` : "";
+  if (r.hit && check.effectiveTotal >= 75 && r.margin < 0)
+    return loc`Against ${against}: Triumph; the attack still hits despite the higher Defense.` + note;
   if (!r.hit && r.hitsCover) return loc`Against ${against}: a miss by ${-r.margin}. The shot hits the cover.` + note;
   if (!r.hit) return loc`Against ${against}: a miss by ${-r.margin}.` + note;
   return (

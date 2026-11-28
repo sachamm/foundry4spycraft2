@@ -1,6 +1,7 @@
 import {
   beginNpcHitDefense,
   npcHitDefenseOutcome,
+  npcHitDefenseCanBenefit,
   addNpcHitDefenseDie,
   npcDefenseRerollProof
 } from "../../rules/gc/post-hit-defense.mjs";
@@ -171,6 +172,8 @@ export async function boostNpcHitDefense(attack, { public: publicResult = false,
         pool = gcDiceStatus();
       if (!sameValues(ctx.review, expected))
         throw Error(loc`Another Defense decision changed this attack. Review the current state before spending.`);
+      if (!npcHitDefenseCanBenefit(ctx.review, ctx.check))
+        throw Error(loc`Further Defense cannot reduce this attack's remaining hit. Keep the actual attack result.`);
       if (ctx.review.state !== "pending" || !npcHitDefenseOutcome(ctx.review, ctx.check).hit)
         throw Error(loc`The attack must still hit before another NPC Defense die is spent.`);
       if (!isDramaticScene() || p.scene !== ctx.review.scene || p.session !== ctx.review.session)
@@ -254,7 +257,7 @@ export async function reviewNpcHitDefense(attack, { action, finalize } = {}) {
     const pool = gcDiceStatus(),
       canBoost =
         ctx.review.state === "pending" &&
-        result.hit &&
+        npcHitDefenseCanBenefit(ctx.review, ctx.check) &&
         isDramaticScene() &&
         periods().scene === ctx.review.scene &&
         periods().session === ctx.review.session &&
@@ -264,7 +267,7 @@ export async function reviewNpcHitDefense(attack, { action, finalize } = {}) {
       window: { title: loc`NPC Defense decision: ${ctx.npc.name}` },
       rejectClose: false,
       ok: { label: loc`Apply decision` },
-      content: `<p>${loc`Attack result ${ctx.check.effectiveTotal}; Defense ${result.defense}. This is ${result.hit ? loc`a hit` : loc`a miss`}${result.hits > 1 ? loc` (${result.hits} hits)` : ""}. Damage and on-hit effects wait for final settlement.`}</p><label>${loc`Decision`} <select name="action"><option value="finalize">${loc`Finalize the recorded outcome`}</option>${canBoost ? `<option value="boost">${loc`Spend 1 GC die on Defense against this attack only`}</option>` : ""}${ctx.review.state === "pending" && ctx.review.boosts.length === 0 ? `<option value="correct">${loc`Return the attack for a Defense correction (no dice spent)`}</option>` : ""}</select></label>`
+      content: `<p>${loc`Attack result ${ctx.check.effectiveTotal}; Defense ${result.defense}. This is ${result.hit ? loc`a hit` : loc`a miss`}${result.hits > 1 ? loc` (${result.hits} hits)` : ""}. Damage and on-hit effects wait for final settlement.`}</p>${ctx.check.effectiveTotal >= 75 ? `<p>${loc`Triumph preserves one critical hit. Defense may still reduce additional burst or autofire hits.`}</p>` : ""}<label>${loc`Decision`} <select name="action"><option value="finalize">${loc`Finalize the recorded outcome`}</option>${canBoost ? `<option value="boost">${loc`Spend 1 GC die on Defense against this attack only`}</option>` : ""}${ctx.review.state === "pending" && ctx.review.boosts.length === 0 ? `<option value="correct">${loc`Return the attack for a Defense correction (no dice spent)`}</option>` : ""}</select></label>`
     });
     if (!input) return null;
     action = input.action;

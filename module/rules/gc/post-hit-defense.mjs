@@ -27,7 +27,7 @@ function validateReview(review) {
     review.original.defense < 0 ||
     review.original.hit !== true ||
     !Number.isFinite(review.original.total) ||
-    review.original.total < review.original.defense ||
+    (review.original.total < review.original.defense && review.original.total < 75) ||
     (review.original.cover &&
       (!Number.isSafeInteger(review.original.cover.grade) ||
         review.original.cover.grade < 1 ||
@@ -123,6 +123,12 @@ export function npcHitDefenseOutcome(review, check) {
       sources: review.boosts.map(row => ({ id: row.id, sourceUuid: row.sourceUuid }))
     }
   };
+}
+
+/** Further Defense can reduce extra shots, but cannot remove the one hit guaranteed by an attack Triumph. */
+export function npcHitDefenseCanBenefit(review, check) {
+  const result = npcHitDefenseOutcome(review, check);
+  return result.hit && (check.effectiveTotal < 75 || result.hits > 1);
 }
 
 /** A legal failed-attack reroll keeps every paid Defense increase against that same attack. */
