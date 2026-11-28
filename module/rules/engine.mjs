@@ -2386,13 +2386,16 @@ function deriveWealthAndGear(state) {
       warnings.push(
         loc`${item.name}: not yet introduced in the campaign year, and a gadget of it would pass Caliber V, so it cannot be had under Historical (p.407).`
       );
+    // The allowance is the reserves' Caliber, or before reserves are allocated the running mission's (p.398).
+    const allowance = activeReserves?.caliber ?? (Number.isSafeInteger(sys.missionCaliber) ? sys.missionCaliber : null);
     if (
-      activeReserves &&
+      allowance &&
       era.available &&
       !managedAcquisition(sys, item) &&
-      caliber > campaignGearCaliber(activeReserves.caliber).caliber
+      caliber > campaignGearCaliber(allowance).caliber
     ) {
       const exception =
+        !!activeReserves &&
         bigStickMatches(sys, item) &&
         sys.bigStickMissionPick.missionCaliber === activeReserves.caliber &&
         sys.bigStickStatus.active &&

@@ -156,3 +156,39 @@ test("the sheet checks a mission pick at its gadget Caliber, and flags one past 
   });
   assert.deepEqual(warningsFor(2, car(2, "1970s")), [], "without the quality the year changes nothing");
 });
+
+test("before reserves are allocated, picks are checked against the running mission's Caliber (p.398)", () => {
+  const data = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))).find(
+    c => c.key === "wheelman"
+  );
+  const cls = {
+    id: "wheelman",
+    name: "Wheelman",
+    type: "class",
+    system: { ...structuredClone(data), identifier: "wheelman", vitalityDie: 10 }
+  };
+  const warningsFor = (missionCaliber, caliber) => {
+    const s = {
+      level: 1,
+      usagePeriods: { mission: "m" },
+      missionCaliber,
+      classLevels: { wheelman: 1 },
+      actionDice: { max: 3 },
+      missionCaliberPicks: {},
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10 }])),
+      progression: [{ classId: "wheelman", vitality: 5, skills: {} }],
+      misc: {}
+    };
+    const item = {
+      id: "car",
+      name: "Car",
+      type: "gear",
+      system: { gearCategory: "V", pick: "V", caliber, quantity: 1 }
+    };
+    computeAgent(s, [cls, item], cfg);
+    return s.warnings.filter(w => w.startsWith("Car:"));
+  };
+  assert.match(warningsFor(1, 3).join(" "), /allowance/);
+  assert.deepEqual(warningsFor(3, 3), []);
+  assert.deepEqual(warningsFor(null, 5), [], "no mission running: nothing to check against");
+});

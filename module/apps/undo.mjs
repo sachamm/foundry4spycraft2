@@ -241,7 +241,7 @@ export async function withUndo(actors, label, work, extra = {}) {
     // A step that failed part way still leaves a note for what it did write, without the extras it never reached.
     const more = failure ? {} : typeof extra === "function" ? extra(result) : extra;
     const named = failure ? loc`${label} (stopped part way)` : label;
-    if (entries.length || more?.gcDice) await postUndo(named, entries, more ?? {});
+    if (entries.length || more?.gcDice || more?.missionCaliber) await postUndo(named, entries, more ?? {});
   } catch (error) {
     console.warn("Field Agent's Handbook | No Undo note could be left for this step.", error);
   }
@@ -274,7 +274,8 @@ export function postUndo(
     missionRow = null,
     placedTokens = null,
     combatSurprise = null,
-    closeSaves = null
+    closeSaves = null,
+    missionCaliber = null
   } = {}
 ) {
   return ChatMessage.create({
@@ -302,6 +303,7 @@ export function postUndo(
           placedTokens,
           combatSurprise,
           closeSaves,
+          missionCaliber,
           done: false
         }
       }
@@ -485,6 +487,25 @@ async function undoRecord(message, record) {
         rows.splice(Math.min(Number(row.index) || 0, rows.length), 0, row.entry);
         return { [row.list]: rows };
       }).catch(error => ui.notifications.warn(loc`The mission row was not put back: ${error.message}`));
+  }
+  // A Caliber increase: the mission's Caliber goes back and the GC gives up the dice it brought, within the same run
+  // and only while no later step has changed the Caliber again.
+  const raised = record.missionCaliber;
+  if (raised && game.user.isGM) {
+    const { getMission, updateMission, missionEpoch } = await import("./gc/state.mjs");
+    if (raised.period !== missionEpoch() || getMission().caliber !== raised.now)
+      ui.notifications.warn(loc`The mission Caliber has changed since, so it was left as it is.`);
+    else {
+      await updateMission({ caliber: raised.was }).catch(error =>
+        ui.notifications.warn(loc`The mission Caliber was not put back: ${error.message}`)
+      );
+      if (raised.gained > 0) {
+        const { adjustGCDice } = await import("../services/gc-dice.mjs");
+        await adjustGCDice(-raised.gained, loc`Undo: ${record.label}`).catch(error =>
+          ui.notifications.warn(loc`The GC action dice were not taken back: ${error.message}`)
+        );
+      }
+    }
   }
   // A surprise round set from the console: the fight's mark goes back to what it was.
   const surprise = record.combatSurprise;

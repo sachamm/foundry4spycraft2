@@ -1615,6 +1615,11 @@ test("a mission Caliber increase reaches the team's reserves, with an Undo, and 
     const posted = messages.slice(start);
     const undo = posted.find(m => m.flags?.spycraft2?.undo);
     assert.equal(undo?.flags.spycraft2.undo.entries.length, 1, "an Undo note for the one agent changed");
+    assert.deepEqual(
+      (({ was, now }) => ({ was, now }))(undo.flags.spycraft2.undo.missionCaliber),
+      { was: 1, now: 3 },
+      "the same note puts the mission's Caliber back"
+    );
     assert.ok(posted.some(m => /Mission Caliber is now III/.test(m.content) && /p\.398/.test(m.content)));
   } finally {
     await state.setMission(saved);
