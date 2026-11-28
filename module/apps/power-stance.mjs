@@ -1,5 +1,5 @@
 import { worldMigrating } from "../migrations/index.mjs";
-import { primaryWriterFor } from "../writers.mjs";
+import { primaryWriterFor, writerQueue } from "../writers.mjs";
 import {
   stablePower as stable,
   powerStanceBonus,
@@ -347,27 +347,14 @@ export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
   };
 }
 export function installPowerStanceInitiativeHooks() {
-  const pending = new WeakMap();
+  const queue = writerQueue(reconcilePowerStanceInitiative, error =>
+    ui.notifications.warn(loc`Power Stance Count needs review: ${error.message}`)
+  );
   const schedule = actor => {
     if (!actor || actor.type !== "agent" || !actor.isOwner || !combatants(actor).length) return;
     if (primaryWriterFor(actor)?.id !== game.user.id) return;
     if (worldMigrating()) return;
-    const old = pending.get(actor);
-    if (old) {
-      old.again = true;
-      return;
-    }
-    const state = { again: true };
-    pending.set(actor, state);
-    state.promise = Promise.resolve()
-      .then(async () => {
-        do {
-          state.again = false;
-          await reconcilePowerStanceInitiative(actor);
-        } while (state.again);
-      })
-      .catch(error => ui.notifications.warn(loc`Power Stance Count needs review: ${error.message}`))
-      .finally(() => pending.delete(actor));
+    queue(actor);
   };
   Hooks.on("preCreateCombatant", c => {
     try {
