@@ -27,7 +27,6 @@ import {
   damageProfile,
   drForAttack,
   drWithoutWornArmor,
-  blastDamageAt,
   knockoutDuration,
   lethalHitLines,
   lethalHitPlan,
@@ -35,6 +34,8 @@ import {
   woundState
 } from "../rules/damage-application.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
+import { blastExposurePlan } from "../rules/blast-exposure.mjs";
+import { blastTargetRows, blastGeometryFields, measuredBlastActors } from "./blast-dialog.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { damageResistancePlan } from "../rules/resistances.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
@@ -1244,23 +1245,19 @@ export async function applyBlast(message, options = {}) {
   let input = options;
   if (!Array.isArray(input.targets)) {
     const caught = blastCaught(rolled, increment),
-      measured = new Map((caught ?? []).filter(row => row.actor).map(row => [row.actor.uuid, row]));
+      measured = measuredBlastActors(caught);
     const actors = [
       ...[...measured.values()].map(row => row.actor),
-      ...targetChoices().actors.filter(actor => !measured.has(actor.uuid))
+      ...targetChoices({ offScene: "fallback" }).actors.filter(actor => !measured.has(actor.uuid))
     ].filter(actor => actor.isOwner || gcAvailable());
     if (!actors.length) return refuse(loc`There is no character to apply the blast to.`);
-    const rows = actors
-      .map((actor, index) => {
-        const row = measured.get(actor.uuid);
-        return `<tr><td><label><input type="checkbox" name="hit${index}"${row && !row.behindWall ? " checked" : ""} /> ${esc(actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)}${row?.behindWall ? ` <i>${loc`(behind a wall)`}</i>` : ""}</label></td><td><input type="number" name="feet${index}" aria-label="${esc(loc`${actor.name}: feet from Ground Zero`)}" min="0" step="5" value="${row ? row.ring * increment : ""}" class="w-2" /></td><td>${row ? row.damage : ""}</td></tr>`;
-      })
-      .join("");
+    const rows = blastTargetRows(actors, measured, increment);
     const entered = await systemDialog.input({
       window: { title: loc`Blast of ${Math.max(0, rolled)}: who is caught` },
+      position: { width: 700 },
       rejectClose: false,
       ok: { label: loc`Apply to those ticked` },
-      content: `<div class="spycraft2-roll-options"><p>${caught ? loc`Distances are measured from the targeted token at Ground Zero. Blast increment ${increment} ft.` : loc`Target the one token at Ground Zero to measure from the scene, or tick each character caught and enter its distance. Blast increment ${increment} ft.`}</p><table><thead><tr><th>${loc`Character`}</th><th>${loc`Feet from Ground Zero`}</th><th>${loc`Damage`}</th></tr></thead><tbody>${rows}</tbody></table>${sharedFields(profile, attackKind)}<p class="hint">${loc`Anyone behind a wall is listed but not ticked: tick them if the wall failed its Damage save. Other cover is not taken into account. Each character is settled in turn, with its own save where one is called for.`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${caught ? loc`Distances are measured from the targeted token at Ground Zero. Blast increment ${increment} ft.` : loc`Target the one token at Ground Zero to measure from the scene, or tick each character caught and enter its distance. Blast increment ${increment} ft.`}</p><table><thead><tr><th>${loc`Character`}</th><th>${loc`Feet from Ground Zero`}</th><th>${loc`Before cover`}</th><th>${loc`Blast path`}</th></tr></thead><tbody>${rows}</tbody></table>${sharedFields(profile, attackKind)}${blastGeometryFields()}</div>`
     });
     if (!entered) return null;
     input = {
@@ -1269,19 +1266,42 @@ export async function applyBlast(message, options = {}) {
         .map((actor, index) => ({
           uuid: actor.uuid,
           ticked: entered[`hit${index}`] === true,
-          feet: entered[`feet${index}`]
+          feet: entered[`feet${index}`],
+          route: entered[`route${index}`],
+          coverNote: entered[`coverNote${index}`]
         }))
         .filter(row => row.ticked)
-        .map(row => ({ uuid: row.uuid, distanceFeet: Number(row.feet) || 0 }))
+        .map(row => ({
+          uuid: row.uuid,
+          distanceFeet: row.feet == null || (typeof row.feet === "string" && !row.feet.trim()) ? NaN : Number(row.feet),
+          route: row.route,
+          coverNote: row.coverNote
+        }))
     };
   }
   if (!input.targets.length) return refuse(loc`Tick at least one character caught in the blast.`);
-  const inputs = input.targets
-    .map(row => ({ row, at: blastDamageAt(rolled, row.distanceFeet, increment) }))
-    .filter(({ at }) => at.damage >= 1)
-    .map(({ row, at }) => ({
+  if (
+    damageFacts(message).rolled !== rolled ||
+    blastIncrementFeet(damageFacts(message).check.weaponQualities, currentCampaignRules().effects) !== increment
+  )
+    throw Error(
+      loc`The original blast result or increment changed during review. Review the actual card before applying it.`
+    );
+  const review = blastExposurePlan(rolled, input.targets, increment, input),
+    names = new Map();
+  for (const row of review.targets) {
+    const actor = await fromUuid(row.uuid);
+    if (!TARGET_TYPES.includes(actor?.type))
+      throw Error(loc`A selected blast target is unavailable. Review all targets before applying damage.`);
+    names.set(row.uuid, actor.name);
+  }
+  if (!(await markCard(message, "blastExposureReview", review, { quiet: true })))
+    return refuse(loc`Record the reviewed blast paths before changing any target.`);
+  const inputs = review.targets
+    .filter(row => row.damage >= 1)
+    .map(row => ({
       targetUuid: row.uuid,
-      damage: at.damage,
+      damage: row.damage,
       kind: input.kind ?? profile.kind,
       type: input.type ?? profile.type,
       attackKind: input.attackKind ?? attackKind,
@@ -1290,7 +1310,9 @@ export async function applyBlast(message, options = {}) {
       blast: true
     }));
   const { done, missed } = await applyDamageBatch(message, inputs);
-  await postBatchSummary(message, done, missed);
+  await postBatchSummary(message, done, missed, {
+    blocked: review.targets.filter(row => row.route === "blocked").map(row => names.get(row.uuid))
+  });
   return done;
 }
 
@@ -1335,15 +1357,16 @@ export async function applyDamageBatch(message, inputs) {
 }
 
 /** One line per outcome after a multi-target apply; a target the damage did not reach is always named. */
-async function postBatchSummary(message, done, missed) {
-  if (done.length + missed.length < 2 && !missed.length) return;
+async function postBatchSummary(message, done, missed, { blocked = [] } = {}) {
+  if (done.length + missed.length < 2 && !missed.length && !blocked.length) return;
   const lines = [
     ...(done.length > 1
       ? [loc`Damage applied to ${done.length} targets: ${done.join(", ")}.`]
       : done.length
         ? [loc`Damage applied to ${done[0]}.`]
         : []),
-    ...(missed.length ? [loc`Not applied to: ${missed.join(", ")}. Check the warnings and apply those by hand.`] : [])
+    ...(missed.length ? [loc`Not applied to: ${missed.join(", ")}. Check the warnings and apply those by hand.`] : []),
+    ...(blocked.length ? [loc`Cover stopped the blast for: ${blocked.join(", ")}.`] : [])
   ];
   await ChatMessage.create({
     speaker: message.speaker,

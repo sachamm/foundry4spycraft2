@@ -17,6 +17,7 @@
 import { readSetting } from "../settings.mjs";
 import { esc } from "../html.mjs";
 import { loc, locKey } from "../i18n.mjs";
+import { validBlastExposureReview } from "../rules/blast-exposure.mjs";
 import { markDamageApplicationStart } from "../documents/actor/damage-hits.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
@@ -170,6 +171,7 @@ export async function askGC(action, data = {}, { timeout = 120000 } = {}) {
 
 /** Flags a player may set on a card that reports on his own character, with the values each may take. */
 const MARKS = {
+  blastExposureReview: validBlastExposureReview,
   damageApplicationStarted: value => typeof value?.targetUuid === "string",
   "pendingSave.rolled": value => value === true,
   "hazardSave.resolved": value => value === true,
@@ -186,8 +188,11 @@ const MARKS = {
 // Each damage record gets its own key, so two applies close together both survive: rewriting one array from a stale
 // copy could drop the first (read them with appliedDamageEntries).
 const markUpdate = (message, key, value) =>
-  key === "damageAppliedEntry"
-    ? { [`flags.spycraft2.damageAppliedBy.${foundry.utils.randomID()}`]: value }
+  ["damageAppliedEntry", "blastExposureReview"].includes(key)
+    ? {
+        [`flags.spycraft2.${key === "damageAppliedEntry" ? "damageAppliedBy" : "blastExposureReviewsBy"}.${foundry.utils.randomID()}`]:
+          value
+      }
     : { [`flags.spycraft2.${key}`]: value };
 
 registerRelay("markCard", {

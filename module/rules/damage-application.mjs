@@ -457,9 +457,13 @@ export function wearOffPlan(total, rates = [], seconds = 0) {
 
 /** Blast damage at a distance from Ground Zero: halved for each whole increment out (p.343). */
 export function blastDamageAt(damage, distanceFeet, incrementFeet = 5) {
-  const step = Math.max(5, int(incrementFeet) || 5),
-    rings = Math.floor(Math.max(0, Number(distanceFeet) || 0) / step);
-  let value = Math.max(0, int(damage));
+  if (!Number.isSafeInteger(damage)) throw Error(loc`Review the actual whole-number blast damage.`);
+  if (!Number.isFinite(distanceFeet) || distanceFeet < 0 || distanceFeet > Number.MAX_SAFE_INTEGER)
+    throw Error(loc`Enter the actual nonnegative distance from Ground Zero.`);
+  if (!Number.isSafeInteger(incrementFeet) || incrementFeet < 5)
+    throw Error(loc`Review the actual blast increment of at least 5 feet.`);
+  const rings = Math.floor(distanceFeet / incrementFeet);
+  let value = Math.max(0, damage);
   for (let i = 0; i < rings && value > 0; i++) value = Math.floor(value / 2);
   return { rings, damage: value };
 }

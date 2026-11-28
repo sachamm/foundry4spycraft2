@@ -312,7 +312,7 @@ export async function blastOnMap(message) {
             `<li>${row.ring === 0 ? loc`${esc(row.name)} — Ground Zero: ${row.damage}` : loc`${esc(row.name)} — ${row.ring} increment(s) out: ${row.damage}`}${row.behindWall ? ` <i>${loc`(behind a wall)`}</i>` : ""}</li>`
         )
         .join("")}</ul>`,
-      loc`A wall between Ground Zero and a character is marked; the blast stops at cover that passes its Damage save. Other cover is not taken into account.`
+      loc`The map marks intervening walls. Confirm the shape, straight paths and all character or scenery cover when applying damage. A path through cover needs that cover's actual failed Damage save (p.343).`
     ]
       .map(line => (line.startsWith("<ul>") ? line : `<p>${line}</p>`))
       .join("")

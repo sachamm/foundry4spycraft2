@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { blastExposurePlan } from "../module/rules/blast-exposure.mjs";
 
 // The relay talks to Foundry globals; give it the few it needs before it loads.
 const updates = [];
@@ -100,6 +101,23 @@ test("an applied-damage entry is added to the ones already there", async () => {
   const [[path, value]] = Object.entries(updates[0]);
   assert.match(path, /^flags\.spycraft2\.damageAppliedBy\.id\d+$/);
   assert.deepEqual(value, entry);
+});
+
+test("blast reviews append separate validated evidence and refuse altered ring damage", async () => {
+  updates.length = 0;
+  const review = blastExposurePlan(20, [{ uuid: "Actor.target", distanceFeet: 5 }], 5, { routeConfirmed: true });
+  const data = { messageId: "m1", key: "blastExposureReview", value: review };
+  for (let i = 0; i < 2; i++)
+    assert.deepEqual(await handleRelay({ action: "markCard", userId: "owner", data }), { value: true });
+  const paths = updates.map(row => Object.keys(row)[0]);
+  assert.notEqual(paths[0], paths[1]);
+  assert.match(paths[0], /^flags\.spycraft2\.blastExposureReviewsBy\.id\d+$/);
+  const forged = { ...review, targets: [{ ...review.targets[0], damage: 20 }] };
+  assert.match(
+    (await handleRelay({ action: "markCard", userId: "owner", data: { ...data, value: forged } })).error,
+    /cannot be marked/
+  );
+  assert.equal(updates.length, 2);
 });
 
 test("the player whose character took the damage may record it on the attacker's card, and only that", async () => {

@@ -21,7 +21,8 @@ export default defineConfig({
     "attribute-abbreviations.spec.mjs",
     "chat-dice.spec.mjs",
     "acid-sources.spec.mjs",
-    "drained.spec.mjs"
+    "drained.spec.mjs",
+    "blast.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

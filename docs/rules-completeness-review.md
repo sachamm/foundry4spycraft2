@@ -2701,3 +2701,40 @@ ending at 489.5px; the pinned summary was 216.30px high. No browser errors.
 Validation: 4,508 Node tests, 988 engine fixtures, 305 layouts, native schema
 cleaning/preparation, lint, formatting, bundle and copied-text checks. B-257 is
 resolved. B-186 and B-190 remain the next core-play review targets.
+
+## Pass 86: Blast distances, cover and shared-token positions
+
+**PC creation: 9.9/10. Combat: 9.8/10.** Continue the direct-cover and grapple
+benefit paths before completing the requested review.
+
+Missing, nonfinite, negative or coerced distances no longer become Ground Zero.
+Blast application validates the complete target list before changing anyone's
+health. It requires the selected shape and direct paths to be confirmed, offers
+clear/blocked/breached routes, and records the cover and actual failed-save
+declaration for a breached route (p.343). Intact character or scenery cover can
+exclude a target; a failed cover save preserves the ordinary ring damage rather
+than introducing another damage half. Geometry, numeric cover saves and contained
+blast increases remain explicit GC adjudication, not fabricated dice.
+
+Each reviewed proposal is appended under its own source-card key, with strict
+relay validation of the computed ring damage. Original review records survive
+later proposals. A source result/increment changed while the form is open is
+refused. Missing targets and invalid later rows are refused before earlier rows
+can receive damage. Several linked tokens sharing one actor now require an
+actual position choice instead of letting the last outer-ring token overwrite
+that character's distance. The dialog prioritizes scene/combat targets and keeps
+off-scene fallback available when needed.
+
+Native Foundry verified the real form against three special NPCs and an actual
+12-point damage roll (ChatMessage.l6PZPzFuOORXGOEo). The clear path dealt 12,
+intact cover dealt zero, and a GC-declared breached path one increment away dealt
+6. The source roll, cone selection, three route records and health totals
+28/40/34 survived reload. The wall began excluded and marked as blocking cover;
+the GC explicitly reviewed the intact/breached save outcomes. These declarations
+did not generate or replace cover-save dice. An invalid later target changed no
+health, messages or application records. The real Apply control fit at 669.5px
+in 1280×720; light/dark layout checks also passed. No browser errors occurred.
+
+Validation: 4,515 Node tests, 988 engine fixtures, 307 layouts, native schemas,
+lint, formatting, bundle and copied-text checks. B-190 now describes the remaining
+direct-cover and map-assistance work, rather than the corrected blast omissions.

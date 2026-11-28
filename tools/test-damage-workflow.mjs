@@ -203,7 +203,12 @@ test("Blockbuster's tripled blast distance reaches actual multi-target health ap
       effectiveTotal: 40,
       weaponQualities: "BLS (5 ft.)"
     });
-    await applyBlast(damage, { targets: [{ uuid: target.uuid, distanceFeet: 15 }], kind: "lethal", type: "" });
+    await applyBlast(damage, {
+      routeConfirmed: true,
+      targets: [{ uuid: target.uuid, distanceFeet: 15 }],
+      kind: "lethal",
+      type: ""
+    });
     assert.equal(target.system.vitality.value, 80);
   } finally {
     game.settings = before;
@@ -684,6 +689,7 @@ test("a blast is applied to each character caught, halved by distance", async ()
     weaponQualities: "BLS (5 ft.)"
   });
   await applyBlast(damage, {
+    routeConfirmed: true,
     kind: "lethal",
     type: "",
     targets: [
@@ -693,6 +699,68 @@ test("a blast is applied to each character caught, halved by distance", async ()
   });
   assert.deepEqual([near.system.vitality.value, far.system.vitality.value], [20, 35]);
   assert.equal(appliedDamageEntries(damage.flags.spycraft2).length, 2);
+});
+
+test("blast cover decisions preserve full ring damage after a failed cover save and exclude intact cover", async () => {
+  reset();
+  const open = character("BlastOpen", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
+  const blocked = character("BlastCovered", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
+  const breached = character("BlastBreached", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
+  const source = card("reviewed-blast", { checkKind: "damage", effectiveTotal: 20, weaponQualities: "BLS (5 ft.)" });
+  await applyBlast(source, {
+    routeConfirmed: true,
+    shape: "cone",
+    kind: "lethal",
+    type: "",
+    targets: [
+      { uuid: open.uuid, distanceFeet: 0 },
+      { uuid: blocked.uuid, distanceFeet: 5, route: "blocked", coverNote: "GC confirmed intact scenery cover" },
+      {
+        uuid: breached.uuid,
+        distanceFeet: 5,
+        route: "breached",
+        coverNote: "GC confirmed scenery cover failed its original Damage save"
+      }
+    ]
+  });
+  assert.deepEqual(
+    [open.system.vitality.value, blocked.system.vitality.value, breached.system.vitality.value],
+    [20, 40, 30]
+  );
+  assert.equal(appliedDamageEntries(source.flags.spycraft2).length, 2);
+  const reviews = Object.values(source.flags.spycraft2.blastExposureReviewsBy);
+  assert.equal(reviews.length, 1);
+  assert.equal(reviews[0].shape, "cone");
+  assert.equal(reviews[0].targets[2].damage, 10);
+  assert.ok(posted.some(row => row.content?.includes("Cover stopped the blast")));
+});
+
+test("all blast declarations are validated before any selected target loses health or consumes damage dice", async () => {
+  for (const extra of [
+    { distanceFeet: "" },
+    { distanceFeet: undefined },
+    { distanceFeet: NaN },
+    { distanceFeet: -1 },
+    { route: "breached", coverNote: "" },
+    { uuid: "Actor.missing" }
+  ]) {
+    reset();
+    const first = character("BlastFirst", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
+    const second = character("BlastSecond", { vitality: { value: 40, max: 40 }, wounds: { value: 12, max: 12 } });
+    const source = card("invalid-blast", { checkKind: "damage", effectiveTotal: 20, weaponQualities: "BLS (5 ft.)" });
+    await assert.rejects(() =>
+      applyBlast(source, {
+        routeConfirmed: true,
+        targets: [
+          { uuid: first.uuid, distanceFeet: 0 },
+          { uuid: second.uuid, distanceFeet: 5, ...extra }
+        ]
+      })
+    );
+    assert.deepEqual([first.system.vitality.value, second.system.vitality.value], [40, 40]);
+    assert.equal(appliedDamageEntries(source.flags.spycraft2).length, 0);
+    assert.equal(source.flags.spycraft2.blastExposureReviewsBy, undefined);
+  }
 });
 
 test("a special damage type is handed to an agent's own rules, with the dialog offered for review", async () => {
