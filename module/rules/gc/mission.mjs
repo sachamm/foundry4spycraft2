@@ -39,6 +39,8 @@ export function defaultMission() {
     timeLimit: false,
     qualities: [],
     otherComplications: [],
+    // GC events the mission must bring in (pp.399–400), such as a Marked for Death event from a liquidation roll.
+    scriptedEvents: [],
     infractions: [],
     scenesPlayed: 0,
     standingPaid: {},

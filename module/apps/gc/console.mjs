@@ -907,6 +907,7 @@ export function consoleContext() {
       exposure: named(m.exposure, id => T.exposure.find(row => row.id === id)?.objective),
       bundle: named(m.bundle),
       otherComplications: named(m.otherComplications),
+      scriptedEvents: named(m.scriptedEvents),
       infractions: (m.infractions ?? []).map((entry, index) => ({
         ...entry,
         key: entry.id ?? `row-${index}`,

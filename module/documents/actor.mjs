@@ -2,6 +2,7 @@
  * The Actor document. Its behaviour is split by workflow into module/documents/actor/*.mjs; each file adds its
  * methods through a mixin, so everything is still called as actor.method().
  */
+import { standingBurnedAfter } from "../rules/standing.mjs";
 import { isResourceLock } from "../services/transactions.mjs";
 import { ActorRolls } from "./actor/rolls.mjs";
 import { ActorSkillRolls } from "./actor/skill-rolls.mjs";
@@ -62,8 +63,7 @@ export class SpycraftActor extends ActorRolls(
       // maximums, so a pool it had spent to 0 stays at 0 instead of being filled as if new. An import starts fresh.
       const carried = (data.flags?.spycraft2 ?? this.flags?.spycraft2 ?? {})[POOL_MAX_FLAG];
       const duplicate = !!(data._stats?.duplicateSource ?? this._source?._stats?.duplicateSource);
-      const recorded =
-        duplicate && carried && Object.values(carried).some(value => Number(value) > 0) ? carried : null;
+      const recorded = duplicate && carried && Object.values(carried).some(value => Number(value) > 0) ? carried : null;
       const flags = {
         ...(data.flags ?? this.flags ?? {}),
         spycraft2: {
@@ -118,6 +118,14 @@ export class SpycraftActor extends ActorRolls(
   /** An NPC's prototype token follows a rename while it still carries the old name. */
   async _preUpdate(changed, options, user) {
     if ((await super._preUpdate(changed, options, user)) === false) return false;
+    if (
+      this.type === "agent" &&
+      changed.system &&
+      ["reputation", "netWorth", "affiliationType"].some(k => k in changed.system)
+    ) {
+      const burned = standingBurnedAfter(this.system, changed.system);
+      if (burned !== undefined) changed.system.standingBurned = burned;
+    }
     // One unlinked token's own actor is renamed alone: its siblings keep their names.
     if (this.isToken) return;
     if (this.type !== "npc" || typeof changed.name !== "string" || changed.name === this.name) return;

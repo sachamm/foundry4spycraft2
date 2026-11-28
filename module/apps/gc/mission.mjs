@@ -439,6 +439,21 @@ export async function rollLiquidations(team) {
       const roll = await new Roll("1d20").evaluate(),
         check = liquidationCheck(missions, roll.total);
       results.push({ actor: actor.id, missions, total: roll.total, ...check });
+      // The event joins the mission record, where the GC sees it beside the mission's complications.
+      if (check.marked)
+        await updateMission(m => ({
+          scriptedEvents: [
+            // Starting the mission again rolls again: the earlier roll's event for this agent is replaced.
+            ...(m.scriptedEvents ?? []).filter(entry => !(entry.source === "liquidation" && entry.actor === actor.id)),
+            {
+              key: foundry.utils.randomID(),
+              id: "marked-for-death",
+              name: loc`Marked for Death: ${actor.name}`,
+              actor: actor.id,
+              source: "liquidation"
+            }
+          ]
+        }));
       await ChatMessage.create({
         speaker: { alias: loc`Game Control` },
         content: esc(

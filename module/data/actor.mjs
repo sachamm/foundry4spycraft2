@@ -490,6 +490,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       careerAgentRewards: record("careerAgentRewards", { initial: {} }),
       reputation: int(2),
       netWorth: int(0),
+      // Set while the standing the character pays in has gone below 0; cleared once it is above 0 again (p.440).
+      standingBurned: new BooleanField({ initial: false }),
 
       skills: new SchemaField(skills),
       proficiencies: new SchemaField(profs),

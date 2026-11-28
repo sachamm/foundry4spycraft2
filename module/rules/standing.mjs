@@ -19,7 +19,26 @@ export function standingStatus(system, moneyOptions) {
   const currency = system?.affiliationType === "freelance" ? "netWorth" : "reputation",
     value = Number(system?.[currency]) || 0,
     floor = currency === "netWorth" ? periodMoney(-1000000, moneyOptions) : -20;
-  return { currency, value, burned: value < 0, liquidation: value < floor };
+  // Burned below 0, and still burned at exactly 0 until the standing is back above it.
+  return {
+    currency,
+    value,
+    burned: value < 0 || (value === 0 && system?.standingBurned === true),
+    liquidation: value < floor
+  };
+}
+
+/**
+ * The standingBurned flag an update leaves: set when the paying standing goes below 0, cleared when it goes above 0,
+ * otherwise unchanged. Returns undefined when the flag does not change.
+ */
+export function standingBurnedAfter(system, changed = {}) {
+  const next = { ...system, ...changed },
+    { value } = standingStatus({ ...next, standingBurned: false }),
+    was = system?.standingBurned === true;
+  if (value < 0 && !was) return true;
+  if (value > 0 && was) return false;
+  return undefined;
 }
 
 /**

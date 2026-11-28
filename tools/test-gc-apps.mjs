@@ -1640,8 +1640,18 @@ test("a mission's start rolls liquidation for each targeted agent and keeps the 
     const posted = messages.slice(start);
     assert.ok(posted.some(m => /Marked for Death: a3 is the target/.test(m.content)));
     assert.ok(posted.some(m => m.flags?.spycraft2?.undo));
+    const events = state.getMission().scriptedEvents;
+    assert.deepEqual(
+      events.map(({ id, actor, source }) => ({ id, actor, source })),
+      [{ id: "marked-for-death", actor: "a3", source: "liquidation" }],
+      "the event joins the mission record"
+    );
+    dice(6);
+    await mission.rollLiquidations([a3]);
+    assert.equal(state.getMission().scriptedEvents.length, 1, "a second roll replaces the agent's earlier event");
     assert.deepEqual(await mission.rollLiquidations([a4]), [], "nothing to roll or clear");
   } finally {
+    await state.updateMission({ scriptedEvents: [] });
     a3.system.reputation = before.a3;
     a4.system.reputation = before.a4;
     a3.flags = before.flags3;

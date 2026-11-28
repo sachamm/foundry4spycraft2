@@ -217,6 +217,9 @@
         aria-label="{{localize 'SPYCRAFT.Console.EditNamed' name=name}}">{{localize "SPYCRAFT.Console.EditRow"}}</button>
       <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="otherComplications"
         data-key="{{key}}" data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
+    {{#each mission.scriptedEvents}}<li>{{localize "SPYCRAFT.Console.ScriptedEvent"}} {{name}} <small>(p.399)</small>
+      <button type="button" class="sc2-action gc-danger" data-action="entry" data-list="scriptedEvents"
+        data-key="{{key}}" data-change="remove" aria-label="{{localize 'SPYCRAFT.Console.RemoveNamed' name=name}}">{{localize "SPYCRAFT.Template.AppsGcConsole.Remove"}}</button></li>{{/each}}
     </ul>
   </details>
   <details class="gc-section" data-section="conflicts" data-view-hidden="{{hiddenSections.conflicts}}" data-state="{{sections.conflicts.state}}" {{#if sections.conflicts.open}}open{{/if}}>

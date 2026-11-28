@@ -153,6 +153,7 @@
    "free": "Free"
   },
   "Console": {
+   "ScriptedEvent": "GC event:",
    "Time": "Time",
    "MissionEnded": "ended",
    "ScenePeriod": "Story scene",
