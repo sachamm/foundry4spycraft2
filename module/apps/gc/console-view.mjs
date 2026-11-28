@@ -190,3 +190,56 @@ export const effectLabel = key =>
     .replace(/\bcaliber\b/g, "Caliber")
     .replace(/\bxp\b/g, "XP")
     .replace(/\bcqb\b/g, "CQB");
+
+/**
+ * One line on what each console button changes, for the buttons whose template gives none (style guide: a tooltip
+ * says what the control does, never repeats its label). Read when the console draws, so the words are translated.
+ */
+export const consoleButtonTips = () => ({
+  surprise: loc`Marks a surprise round for the side that won the opposed check; only its members act in it`,
+  fluidEvent: loc`Records something that moves a Count: now for Delay, Press and Ready, at the round's end for the rest`,
+  combatReference: loc`Opens the action, modifier and cover tables; changes nothing`,
+  addNpcToScene: loc`Places numbered copies of an NPC on the map, and can add them to the fight and the antagonist list`,
+  recordInfraction: loc`Adds exposure to the agents who were seen or caught; each row has an Undo`,
+  awardStanding: loc`Pays the mission's Reputation or Net Worth to each agent once; leaves an Undo note`,
+  refitDice: loc`Sets the GC's pool to what this mission's Caliber and the players present give`,
+  dramaticOff: loc`Ends the dramatic scene: GC dice stop exploding on a 1; Counts already doubled stay`,
+  doubleInitiative: loc`Doubles the Count of each opponent not yet doubled in this fight, to 50 at most`,
+  dramaticOn: loc`Opens the choice of a scripted or a paid dramatic scene, with the Counts that will double`,
+  clockStep: loc`Moves the game clock by this much; timers and timed effects follow`,
+  clockAdvance: loc`Moves the game clock by an amount you type`,
+  clockDate: loc`Sets the game clock's date and time outright`,
+  clockOpen: loc`Opens the clock's own window with its timers`,
+  editMission: loc`Opens the mission record: name, Caliber, team, Threat Level adjustment and XP extras`,
+  sceneAdvance: loc`Corrects the number of scenes counted toward XP; Next scene keeps it otherwise`,
+  "missionReport:false": loc`Posts what the mission has earned so far, with each part of the sum`,
+  "missionReport:true": loc`Posts what the mission would pay if every objective were met`,
+  recalculateTL: loc`Works the Threat Level out again from the team's levels as they are now`,
+  clearMission: loc`Empties the mission record; the agents keep what they were paid`,
+  caliberIncrease: loc`Raises the mission's Caliber by one: more reserves for the team and 2 more GC dice; leaves an Undo note`,
+  sessionDice: loc`Adds the Threat Level and campaign-quality changes to each agent's starting dice, once a session`,
+  addObjective: loc`Adds an objective with its grade; critical ones cost exposure if left undone`,
+  pasteObjectives: loc`Adds several objectives at once, one per line`,
+  quickObjective: loc`Adds the objective typed in the field beside it`,
+  addComplication: loc`Adds a complication or event to the mission; it counts toward XP at once`,
+  startConflict: loc`Starts a Dramatic Conflict (chase, infiltration and the rest) and tracks its Lead`,
+  seasonQualities: loc`Chooses the campaign qualities in force all season; the rules that read them follow at once`,
+  securityDevice: loc`Rolls up a lock, sensor or other device and posts its DCs`,
+  hazards: loc`Applies fire, falling, poison and other hazards to a character`,
+  events: loc`Rolls or picks a mission event and posts it to the GC`,
+  possessions: loc`Rolls what an NPC is carrying`,
+  npcKnowledge: loc`Looks up what an NPC of a given kind knows on a subject`,
+  openControls: loc`Opens Foundry's key bindings, where the console's shortcuts can be changed`
+});
+
+/** Give each console button without help of its own its one line; a button the template wrote help for is left. */
+export function applyConsoleButtonTips(root, tips = consoleButtonTips()) {
+  for (const button of root?.querySelectorAll?.("button[data-action]") ?? []) {
+    if (button.hasAttribute("data-tooltip") && !button.hasAttribute("data-sc2-tip-generated")) continue;
+    const action = button.dataset.action,
+      tip = tips[`${action}:${button.dataset.planned}`] ?? tips[action];
+    if (!tip) continue;
+    button.setAttribute("data-tooltip", tip);
+    button.removeAttribute("data-sc2-tip-generated");
+  }
+}

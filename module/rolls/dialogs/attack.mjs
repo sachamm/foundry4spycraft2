@@ -64,7 +64,7 @@ const parts = [
   ],
   // The measured-shot conditions the Gear tab's second attack button used to open a dialog of its own for: light,
   // fog, mounts, bracing and the rest. Folded shut, so a plain shot is still one glance.
-  [68, context => (rangedWeapon(context.item) ? measuredShotContent(context) : "")],
+  [68, context => measuredShotContent(context)],
   [70, () => `</div>`]
 ];
 
@@ -75,11 +75,17 @@ let nesting = false;
  * Built from the ranged dialog's own pieces, so a rule that adds a field there shows here without more work.
  */
 export function measuredShotContent(context) {
-  if (nesting) return "";
+  if (nesting || !rangedWeapon(context?.item)) return "";
   nesting = true;
   try {
     const { actor, item, options = {} } = context;
-    const preview = actor?.weaponAttack?.(item) ?? {};
+    // An unfinished character may have no figures to preview the weapon with: the section then leaves out fire modes.
+    let preview = {};
+    try {
+      preview = actor?.weaponAttack?.(item) ?? {};
+    } catch {
+      preview = {};
+    }
     const mine = fieldNames(rollPipeline.dialog({ ...context, dialog: "attack" }));
     const ranged = rollPipeline.dialog({ dialog: "rangedAttack", actor, item, options, preview, esc: escapeText });
     const labels = (ranged.match(/<label\b[\s\S]*?<\/label>/g) ?? []).filter(label => {

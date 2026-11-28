@@ -35,7 +35,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 1. **P0 table**, top to bottom: what is left there gives a GC a wrong result or loses work.
 2. **Finish the console turn**: combat setup and end inside the console (B-023), fluid initiative (B-025), half
    actions (B-026).
-3. **Console safety and stability**: what is left of B-030 to B-037, chiefly undo for a GC boost (B-037).
+3. **Console safety and stability**: what is left of B-035 to B-037, chiefly undo for a GC boost (B-037).
 4. **Dialogs** (B-040 to B-046): sizing, the focus ring and keeping values after a refusal.
 5. The rest of P1 by area, then P2 when a surface is touched anyway.
 
@@ -55,9 +55,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-030 | **The console redraws whole on every action.** Scroll, keyboard focus, the search text and open sub-lists are now kept across a redraw; still to do: redraw only the part that changed, and check the kept scroll position on a live sidebar. | DES-14, UX-34, NGC-02, CX-U7 | M | live |
-| B-031 | **Prep, Play and Wrap-up views exist; finish the tidy-up inside them.** One primary button per section (several sections still have a filled button each), move the guide and the search below Combat during a fight, and drop the "What the system does for you" paragraph from the console. | DES-01, DES-04, DES-05, UX-17, XGC-42, NGC-02, CX-D2, CX-U6, SGI-expert-gc R18 | L | live |
-| B-034 | **Tooltips**: 63 of 66 console controls get a generated tooltip; 30 repeat the label, 15 abbreviate it ("Surprise rd", "Fluid init") and 3 explain. They stay on screen after the control is pressed or redrawn and cover the next button. Write one line on what the button changes; never generate one from the label; dismiss on click and on redraw. | DES-15, UX-08, UX-24, NGC-05, XGC-40, SG-G9, LR-38a | M | live |
 | B-035 | **The console and the chat log share one sidebar slot**, so the GC cannot see a tool and its result together. The pop-out is hidden, opens 720×800 over the map and uses the width for nothing. Make the pop-out obvious, give it a two-column layout and a remembered place; echo results (XP report, Planned XP, Begin session done) where the GC is looking. | UX-16, DES-25, DES-24, NGC-29, NGC-40, XGC-41 | M | live |
 | B-244 | **First-session list, live pass.** A remembered view comes back in a later run of the same kind; search does not reach the view buttons. | NG2-02, NG2-03, NG2-13, NG2-14, NG2-22, NG2-28, DS2-09, DS2-10, DS2-11, DS2-12 | M | live |
 | B-245 | **Pickers, the rest.** Spend dice, the Fluid event dialog and the target lists now start on the fight in view, skip other scenes' fights and number shared names. Sidebar actors are still listed beside token copies in the Apply damage list when no token is on the scene. | UX2-08, UX2-09, UX2-10, UX2-22, XG2-30 | M | live |
@@ -236,6 +233,7 @@ Short passes in a running world. Delete a line when it has been seen working, or
   an agent and an NPC, then the result on an attack, skill, save and damage card; check the lines add up to the
   figure shown, that the tooltip does not cover the button being pressed, and that a player sees no parts on an
   NPC's card. (B-255)
+- The console keeps its scroll position across a redraw when it is docked in a live sidebar. (B-030)
 - The five from the old to-do file: the clock hidden when "Show the clock to players" is off; First Aid on another
   player's agent from the medic's own client; the save dialog from the player's button; a blast across a wall and its
   outline; a player without "Query users" getting a clear message. (RW-404 to RW-408)
@@ -269,6 +267,9 @@ were judged not worth doing, with the reason.
 | B-029 | Dramatic scene | Done | One button, "Make this scene dramatic…", opens a dialog that offers the scripted (free) and paid (4 GC dice) ways together, lists each opponent whose Count will double with its before and after, lets the GC untick any, doubles on OK and whispers what began to the GC. The status strip already shows the dramatic state. This follows the suggested answer to the open question on automating dramatic initiative. |
 | B-241 | Mob attack posts one card per member | Dropped | One card for a whole mob's attacks would take Resolve, damage and Undo away from the single attacks, which each need their own card. The group already asks once, attacks in one pass and posts one summary of who attacked whom (same reasoning as B-270, closed in PR 90). |
 | B-242 | Tracker and turn details | Done | While a combatant holds a readied action, the console shows "Readied action triggered: (name)" under the order, on anyone's turn, with the trigger in its tooltip and an Undo note. The tracker's right-click menu now uses the console's names for spending and giving back actions. |
+| B-034 | Tooltips | Done | Each console button has a written one-line tip on what it changes; a generated tooltip that repeats or abbreviates a button's visible words is no longer added (sheet-wide); tooltips close on press and on console redraw. |
+| B-031 | Prep, Play and Wrap-up views exist; finish the tidy-up inside them | Done | Already on main: each section has one primary button, the session block moves below Combat during a fight, and the explainer paragraph is gone. Checked 2026-11-28. |
+| B-030 | The console redraws whole on every action | Dropped | Scroll, focus, search text and open lists already survive a redraw, so a partial redraw would buy nothing a GC can see for a large rewrite. The live scroll check moved to Live checks owed. |
 
 ## Parked, with the reason
 

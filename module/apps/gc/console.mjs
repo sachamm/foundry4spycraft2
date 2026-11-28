@@ -35,6 +35,7 @@ import * as turn from "./console-turn.mjs";
 import {
   VIEWS,
   VIEW_SECTIONS,
+  applyConsoleButtonTips,
   consoleView,
   consoleSections,
   effectLabel,
@@ -418,6 +419,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
 
   _onRender(context, options) {
     super._onRender(context, options);
+    applyConsoleButtonTips(this.element);
+    // A tooltip left up from before the redraw would sit over whatever is drawn in its place.
+    globalThis.game?.tooltip?.deactivate?.();
     // The main button leads its row on screen, so it leads in the markup too and the keyboard reaches it first.
     for (const primary of this.element.querySelectorAll(".controls > button.gc-primary"))
       if (primary.parentElement.firstElementChild !== primary) primary.parentElement.prepend(primary);
