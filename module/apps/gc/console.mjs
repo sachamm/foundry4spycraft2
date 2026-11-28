@@ -289,7 +289,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return spend.spendGCDice({ preferActor: acting?.actor ?? null });
       }),
       dramaticOn: guard(async () => {
-        if (await spend.setDramaticScene(true)) ui.notifications.info(loc`This scene is now dramatic (no dice spent).`);
+        if (await spend.startDramaticScene(game.combat))
+          ui.notifications.info(loc`This scene is now dramatic. The details are in chat.`);
       }),
       dramaticOff: guard(async () => {
         if (await spend.setDramaticScene(false)) ui.notifications.info(loc`This scene is back to standard.`);
@@ -309,6 +310,14 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       }),
       fightEnd: guard(() => combat.endFight()),
       combatReference: guard(() => combat.combatReferenceDialog()),
+      // A readied action goes off on somebody else's turn, so its button sits with the order, not the acting block.
+      triggerReadied: guard((event, target) => {
+        const readied = game.combat?.combatants?.get(target.dataset.id);
+        if (!readied?.flags?.spycraft2?.readied) return null;
+        return withUndo([readied.actor], loc`Readied action triggered: ${readied.name}`, () =>
+          combat.triggerReadied(readied)
+        );
+      }),
       openCombatant: guard((event, target) =>
         turn.openCombatant(game.combat, target.dataset.id, { sheet: target.dataset.sheet === "true" || event.shiftKey })
       ),
@@ -974,6 +983,7 @@ export function consoleContext() {
           surprise: combatNow.flags?.spycraft2?.surprise ?? null,
           acting,
           combatants: turn.combatRows(combatNow),
+          readied: combatNow.started ? turn.readiedRows(combatNow) : [],
           // Before the fight begins a mob cannot attack, and it attacks on a member's turn: only the acting
           // combatant's own mob gets a button.
           mobs: started

@@ -50,9 +50,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-029 | **Dramatic scene**: starting one is silent; scripted (free) and paid entries sit apart; doubling the Counts already rolled is a separate action (Counts rolled later are now doubled as they come in). One place, a visible "Dramatic" state, and a preview of who will be doubled. (p.424) | UX-10, CX-D13, CX-N8, CX-E14 | M | live |
-| B-241 | **Mob attack posts one card per member.** The group now asks about Reach once, names who attacked whom and who was left out, attacks only with members on the acting Count, offers only the other side as targets and charges each member its action. Still open: one card for the group's attacks. | XG2-13 | M | live |
-| B-242 | **Tracker and turn details.** A readied trigger gives no way to run the action from the console; the tracker menu and the console name the same action differently. | XG2-17, XG2-29, UX2-23 | S | live |
 
 ### Console structure and stability
 
@@ -269,6 +266,9 @@ were judged not worth doing, with the reason.
 | B-025 | Fluid initiative | Done | The event dialog shows a line saying whether the chosen event moves the Count now or at the round's end, each combatant's pending sum with what the ±10 limit leaves of it, and a Corrections entry that takes back a recorded event (with Undo). Events were already grouped, fields shown per event, Press cleared when paid, and the tool offered only in a started fight. Also restored: Counts given up to Delay use up the same ±10 limit (p.324), which the 2026-11-27 merge had dropped from the end-of-round pass. |
 | B-026 | Half actions | Done | Each spent pip now says on hover what marked it (Attack, Reload, Total Defense, Disarm, the GC Console, Mob attack, or a click). A sheet action taken with too little of the turn left warns before it opens, not after. The strip's hint already lists which actions are counted, and a click on the last spent pip takes a mark back, which serves as the undo; skill checks and movement stay uncounted on purpose, since their cost varies by check. |
 | B-028 | The Gear tab's second attack button | Done | A ranged weapon's ordinary attack dialog now has a folded "Light, fog, mounts and bracing" section holding every field the older ranged dialog had and the attack dialog lacked, read by the same rules. The Gear tab's Measured attack button is gone; `rollRangedAttack` stays for macros. Also fixed in the old dialog: a rule's piece could land inside the ambient light list. Not seen live. |
+| B-029 | Dramatic scene | Done | One button, "Make this scene dramatic…", opens a dialog that offers the scripted (free) and paid (4 GC dice) ways together, lists each opponent whose Count will double with its before and after, lets the GC untick any, doubles on OK and whispers what began to the GC. The status strip already shows the dramatic state. This follows the suggested answer to the open question on automating dramatic initiative. |
+| B-241 | Mob attack posts one card per member | Dropped | One card for a whole mob's attacks would take Resolve, damage and Undo away from the single attacks, which each need their own card. The group already asks once, attacks in one pass and posts one summary of who attacked whom (same reasoning as B-270, closed in PR 90). |
+| B-242 | Tracker and turn details | Done | While a combatant holds a readied action, the console shows "Readied action triggered: (name)" under the order, on anyone's turn, with the trigger in its tooltip and an Undo note. The tracker's right-click menu now uses the console's names for spending and giving back actions. |
 
 ## Parked, with the reason
 

@@ -1131,8 +1131,8 @@ export async function readyCombatant(combatant) {
   });
   await say(
     trigger
-      ? loc`${esc(combatant.name)} readies an action: ${esc(trigger)}. When it happens, use Readied action triggered on its tracker row.`
-      : loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
+      ? loc`${esc(combatant.name)} readies an action: ${esc(trigger)}. When it happens, press Readied action triggered in the GC Console or on its tracker row.`
+      : loc`${esc(combatant.name)} readies an action. When its trigger happens, press Readied action triggered in the GC Console or on its tracker row.`,
     gcOnly(combatant)
   );
   if (input.endTurn && combat.combatant?.id === combatant.id) await combat.nextTurn();
@@ -1191,9 +1191,10 @@ export function trackerMenuEntries() {
     onClick: (_event, li) => run(rowCombatant(li))
   });
   return [
-    entry(loc`Spend a half action`, "fa-circle-half-stroke", mine, c => spendTurnAction(c, "half")),
-    entry(loc`Spend a full action`, "fa-circle", mine, c => spendTurnAction(c, "full")),
-    entry(loc`Give back this round's actions`, "fa-rotate-left", mine, c => spendTurnAction(c, "reset")),
+    // Named as the GC Console names the same steps, so the two read as one tool.
+    entry(loc`Spend half action`, "fa-circle-half-stroke", mine, c => spendTurnAction(c, "half")),
+    entry(loc`Spend full action`, "fa-circle", mine, c => spendTurnAction(c, "full")),
+    entry(loc`Give back this turn's actions`, "fa-rotate-left", mine, c => spendTurnAction(c, "reset")),
     entry(loc`Delay 1 Count`, "fa-arrow-down", started, c => delayCombatant(c, 1)),
     entry(loc`Delay…`, "fa-arrow-down-wide-short", started, c => delayCombatant(c)),
     entry(

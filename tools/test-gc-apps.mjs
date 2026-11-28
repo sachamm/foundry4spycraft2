@@ -1210,7 +1210,7 @@ test("the tracker menu entries use the Foundry 14 shape and act on the clicked r
   }
   const row = { dataset: { combatantId: "c-guard" } };
   const find = label => entries.find(entry => entry.label === label);
-  assert.equal(find("Spend a half action").visible(row), true);
+  assert.equal(find("Spend half action").visible(row), true);
   assert.equal(find("Readied action triggered").visible(row), false);
   await find("Delay 1 Count").onClick(null, row);
   const mook = fight.combatants.get("c-guard");
@@ -1816,6 +1816,34 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
     delete ui.gc;
     game.spycraft2.gc.console = null;
   }
+});
+
+test("starting a dramatic scene previews who doubles, lets the GC take one off and says so in chat (B-029)", async () => {
+  await state.setSceneState({ dramatic: false, source: null });
+  const fight = makeCombat([
+    ["d-guard", guard, 12, false],
+    ["d-boss", boss, 30, false],
+    ["d-a1", actors.get("a1"), 20, true]
+  ]);
+  assert.deepEqual(
+    spend.dramaticDoublingPreview(fight).map(row => [row.id, row.from, row.to]),
+    [
+      ["d-guard", 12, 24],
+      ["d-boss", 30, 50]
+    ]
+  );
+  const result = await spend.startDramaticScene(fight, { source: "scripted", "double-d-boss": false });
+  assert.equal(state.getSceneState().dramatic, true);
+  assert.equal(fight.combatants.get("d-guard").initiative, 24);
+  assert.equal(fight.combatants.get("d-boss").initiative, 30, "taken off the list by the GC");
+  assert.equal(fight.combatants.get("d-a1").initiative, 20);
+  assert.deepEqual(result.skipped, ["d-boss"]);
+  assert.match(lastMessage(), /Dramatic scene, scripted/);
+  assert.match(lastMessage(), /Left as they were: /);
+  // A later pass leaves the one the GC took off alone.
+  await spend.doubleOpponentInitiative(fight, { quiet: true });
+  assert.equal(fight.combatants.get("d-boss").initiative, 30);
+  await state.setSceneState({ dramatic: false, source: null });
 });
 
 test("a dramatic scene doubles hostile combatants only (p.424)", () => {

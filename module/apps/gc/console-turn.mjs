@@ -98,6 +98,24 @@ export async function actingOutcome(actor, step) {
   return settle(actor);
 }
 
+/** Combatants holding a readied action, with what sets it off, for the console's "triggered" buttons. */
+export function readiedRows(combat) {
+  const labels = combatantLabels(combat);
+  return [...(combat?.turns ?? [])]
+    .filter(combatant => combatant.flags?.spycraft2?.readied && !combatant.isDefeated && combatant.isOwner !== false)
+    .map(combatant => {
+      const name = labels.get(combatant.id) ?? combatant.name,
+        trigger = combatant.flags.spycraft2.readied.trigger ?? "";
+      return {
+        id: combatant.id,
+        label: loc`Readied action triggered: ${name}`,
+        hint: trigger
+          ? loc`"${trigger}". ${name} acts now, dropping to the acting Count if that is lower. Leaves an Undo note.`
+          : loc`${name} acts now, dropping to the acting Count if that is lower. Leaves an Undo note.`
+      };
+    });
+}
+
 /** What the console shows for the combatant whose turn it is; null before the fight starts. */
 export function actingBlock(combat) {
   const combatant = combat?.started ? combat.combatant : null,

@@ -339,7 +339,95 @@ export function doubleOpponentInitiative(combat = game.combat, options = {}) {
   return queueInitiative(() => doubleNow(combat, options));
 }
 
-async function doubleNow(combat, { quiet = false } = {}) {
+/**
+ * Who a dramatic scene would double in a fight as things stand, with the Count each would move to. `skip` marks the
+ * combatants the GC took off the list.
+ */
+export function dramaticDoublingPreview(combat) {
+  return [...(combat?.combatants ?? [])]
+    .filter(
+      combatant =>
+        dramaticOpponent(combatant) &&
+        Number.isFinite(combatant.initiative) &&
+        !combatant.flags?.spycraft2?.dramaticDoubled
+    )
+    .map(combatant => ({
+      id: combatant.id,
+      name: combatant.name,
+      from: combatant.initiative,
+      to: dramaticInitiative(combatant.initiative)
+    }));
+}
+
+/**
+ * Begin a dramatic scene from one dialog (p.424): scripted at no cost or declared now for GC action dice, with the
+ * opponents whose Counts will double listed first so the GC can take any off. Says in chat, to the GC, what began.
+ */
+export async function startDramaticScene(combat = game.combat, input = null) {
+  requireGC();
+  if (isDramaticScene()) return refuse(loc`The current scene is already dramatic.`);
+  const status = gcDiceStatus(),
+    cost = GC_SPENDS.find(spend => spend.id === "dramaticScene")?.cost ?? 4,
+    preview = dramaticDoublingPreview(combat?.started || combat?.combatants?.size ? combat : null);
+  if (!input) {
+    input = await formDialog({
+      title: loc`Make this scene dramatic`,
+      ok: loc`Begin the dramatic scene`,
+      intro: loc`In a dramatic scene the GC's action dice explode on a 1 as well as their maximum, up to 3 dice may boost one DC, and each opponent's Initiative Count doubles, to 50 at most (p.424).`,
+      fields: [
+        {
+          select: "source",
+          label: loc`How it comes about`,
+          options: [
+            ["scripted", loc`Scripted in the mission (no cost)`],
+            ["spent", loc`Declared now for ${cost} GC action dice (${status.current ? status.value : 0} left)`]
+          ]
+        },
+        raw(
+          preview.length
+            ? `<fieldset><legend>${esc(loc`Counts that double now`)}</legend>${preview
+                .map(
+                  row =>
+                    `<label><input type="checkbox" name="double-${esc(row.id)}" checked /> ${esc(row.name)}: ${row.from} → ${row.to}</label>`
+                )
+                .join(
+                  ""
+                )}<p class="hint">${esc(loc`Untick anyone who is not an opponent of the agents. An opponent who rolls later is doubled as its Count comes in.`)}</p></fieldset>`
+            : `<p class="hint">${esc(loc`No opponent has an Initiative Count yet. Each one is doubled as its Count comes in.`)}</p>`
+        )
+      ],
+      validate: values =>
+        values.source === "spent" && !(status.current && status.value >= cost)
+          ? loc`The GC's pool has fewer than ${cost} action dice: begin a session, or choose the scripted scene.`
+          : ""
+    });
+    if (!input) return null;
+  }
+  const skip = new Set(preview.filter(row => input[`double-${row.id}`] === false).map(row => row.id));
+  if (input.source === "spent") {
+    if (!(await spendGCDice({ id: "dramaticScene" })) || !isDramaticScene()) return null;
+  } else await setDramaticScene(true);
+  const changed = combat ? await doubleOpponentInitiative(combat, { quiet: true, skip, silent: true }) : [];
+  await ChatMessage.create({
+    speaker: { alias: loc`Game Control` },
+    content: `<b>${esc(input.source === "spent" ? loc`Dramatic scene, declared for ${cost} GC action dice.` : loc`Dramatic scene, scripted (no dice spent).`)}</b><br>${esc(loc`GC action dice explode on 1 and their maximum; up to 3 dice may boost one DC; opponents' Initiative Counts double, to 50 at most (p.424).`)}${
+      changed.length ? `<br>${esc(loc`Doubled now:`)} ${changed.map(esc).join("; ")}` : ""
+    }${
+      skip.size
+        ? `<br>${esc(
+            loc`Left as they were: ${preview
+              .filter(row => skip.has(row.id))
+              .map(row => row.name)
+              .join(", ")}.`
+          )}`
+        : ""
+    }`,
+    whisper: gmWhisper()
+  });
+  return { source: input.source, doubled: changed, skipped: [...skip] };
+}
+
+async function doubleNow(combat, { quiet = false, skip = null, silent = false } = {}) {
   if (!combat) return quiet ? [] : refuse(loc`There is no active combat.`);
   if (!isDramaticScene()) return quiet ? [] : refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
@@ -350,11 +438,16 @@ async function doubleNow(combat, { quiet = false } = {}) {
       combatant.flags?.spycraft2?.dramaticDoubled
     )
       continue;
+    // Taken off the list by the GC: marked as dealt with, so a later pass leaves the Count alone too.
+    if (skip?.has(combatant.id)) {
+      await combatant.update({ "flags.spycraft2.dramaticDoubled": true });
+      continue;
+    }
     const next = dramaticInitiative(combatant.initiative);
     await combatant.update({ initiative: next, "flags.spycraft2.dramaticDoubled": true });
     changed.push(`${combatant.name}: ${next}`);
   }
-  if (changed.length)
+  if (changed.length && !silent)
     await ChatMessage.create({
       speaker: { alias: loc`Game Control` },
       content: `${loc`Dramatic scene — opponents’ Initiative Counts doubled (maximum 50).`}<br>${changed.map(esc).join("<br>")}`,
