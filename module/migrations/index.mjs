@@ -2,6 +2,7 @@ import { loc } from "../i18n.mjs";
 import { FEAT_REMINDERS } from "../rules/tables.mjs";
 import { companionRetargets, deltaIsEmpty, isPersonalCharacter } from "../rules/token-delta.mjs";
 import { GEAR_YEARS, PERIOD_ITEMS } from "../data/gear-year-index.mjs";
+import { EARLIER_WEAPON_YEARS } from "../data/earlier-weapon-years.mjs";
 import { rescueTokenCharacters } from "../apps/token-links.mjs";
 /**
  * World data migrations.
@@ -22,12 +23,12 @@ import { rescueTokenCharacters } from "../apps/token-links.mjs";
  * safe to run on data that already has the new shape, because a failed run is retried on the next start.
  *
  * Schema version each release writes, so a world from any of them is brought forward by the migrations above it:
- * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5, 0.8.0 → 7, 0.8.7 → 7. Add the new release here when SCHEMA_VERSION changes
+ * 0.4.0 → 1, 0.5.x → 2, 0.6.0 → 3, 0.7.0 → 5, 0.8.0 → 7, 0.8.7 → 7, 0.8.8 → 8. Add the new release here when SCHEMA_VERSION changes
  * (tools/test-migrations.mjs checks the list).
  */
 
 /** The data schema version this build of the system writes. */
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 /** The schema version each published release wrote (see above). */
 export const RELEASE_SCHEMAS = Object.freeze({
@@ -37,7 +38,8 @@ export const RELEASE_SCHEMAS = Object.freeze({
   "0.6.0": 3,
   "0.7.0": 5,
   "0.8.0": 7,
-  "0.8.7": 7
+  "0.8.7": 7,
+  "0.8.8": 8
 });
 
 /**
@@ -139,6 +141,20 @@ export function gearYearUpdate(source, _parentSource, _context, index = GEAR_YEA
 }
 
 /**
+ * Version 8: weapons now carry the year printed in the weapon tables (pp.250–271). A weapon still holding the year
+ * version 6 gave it takes the corrected one; any other year, typed in or already corrected, is kept.
+ */
+export function weaponYearUpdate(source, _parentSource, _context, earlier = EARLIER_WEAPON_YEARS, index = GEAR_YEARS) {
+  if (source?.type !== "weapon" || !source.system?.year) return null;
+  const key = compendiumKey(source),
+    name = `weapon|${source.name}`;
+  const was = (key && earlier.byId[key]) || earlier.byName[name];
+  if (!was || source.system.year !== was) return null;
+  const now = (key && index.byId[key]) || index.byName[name];
+  return now && now !== was ? { "system.year": now } : null;
+}
+
+/**
  * Also version 6: the house items for period games are in the system's compendiums, where every world sees them.
  * A world that keeps its own copies of a gear compendium (world items imported from it) also gets copies of the new
  * entries, in the folder that holds most of its copies, unless it already has an item of that name.
@@ -180,7 +196,8 @@ export const MIGRATIONS = [
     version: 7,
     label: loc`characters kept on tokens moved to the Actors list`,
     world: world => rescueTokenCharacters(world)
-  }
+  },
+  { version: 8, label: loc`weapon years from the weapon tables`, item: weaponYearUpdate }
 ];
 
 /** Migrations still to run for a world at version `from`, oldest first. */
