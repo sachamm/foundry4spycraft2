@@ -3111,7 +3111,7 @@ test("Power Count review selector labels combat and Count without exposing inter
     globalThis.game = { ...oldGame, combats: [combat], user: { isGM: true } };
     await managePowerStanceInitiative(a);
     await render(page, 768);
-    await expect(page.locator("[name=combatant]")).toContainText("Actual scene combat — Count 34");
+    await expect(page.locator("[name=combatant]")).toContainText("Actual scene combat: 34");
     await expect(page.locator("body")).not.toContainText("private-combatant-id");
     await page.locator("#confirm").scrollIntoViewIfNeeded();
     const r = await page.locator("#confirm").boundingBox();

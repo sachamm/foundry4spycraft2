@@ -269,7 +269,7 @@ export async function managePowerStanceInitiative(actor, input = {}) {
       window: { title: loc`Review Power Stance Count` },
       rejectClose: false,
       content:
-        `<div class="spycraft2-roll-options"><label>${loc`Combatant and Initiative Count`} <select name="combatant">` +
+        `<div class="spycraft2-roll-options"><label>${loc`Fight and Initiative Count`} <select name="combatant">` +
         pending
           .map(
             p =>
