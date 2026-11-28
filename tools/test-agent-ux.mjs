@@ -213,3 +213,8 @@ test("tracker rows name flat-footed for all and the wound state only where healt
   const mook = { type: "npc", statuses: new Set(), system: { npcType: "standard", wounds: { value: 0 } } };
   assert.deepEqual(trackerRowStates(mook, { health: true }), []);
 });
+
+test("Improved Fortune teammates is offered only when there is a teammate to pick", () => {
+  assert.equal(combatToolVisibility({}, COMBAT_STANCES).fortuneTeammates, false);
+  assert.equal(combatToolVisibility({}, COMBAT_STANCES, { earned: { fortuneTeammates: true } }).fortuneTeammates, true);
+});

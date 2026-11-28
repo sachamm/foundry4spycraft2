@@ -33,6 +33,7 @@ import { manageThreadNeedle } from "../apps/thread-needle.mjs";
 import { takeStrikingAttack, reviewStrikingAttack } from "../apps/striking-stance.mjs";
 import { recordFendMovement } from "../apps/fend.mjs";
 import { takeCounterTrip, reviewCounterTrip, counterTripCandidates } from "../apps/counter-trip.mjs";
+import { pointmanLevel } from "../rules/action-dice.mjs";
 import { takeTripFinalAttack, reviewTripFinalAttack, tripFinalAttackCandidates } from "../apps/trip-final-attack.mjs";
 import { manageTripOutcomes } from "../apps/trip-outcomes.mjs";
 import { managePowerStanceInitiative } from "../apps/power-stance.mjs";
@@ -854,7 +855,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         showAll: game.user.isGM && this._showAllTools,
         earned: {
           counterTrip: counterTripCandidates(this.actor).length > 0,
-          tripFinalAttack: tripFinalAttackCandidates(this.actor).length > 0
+          tripFinalAttack: tripFinalAttackCandidates(this.actor).length > 0,
+          // Picking teammates matters only when another agent in the world has Improved Fortune, or some are picked.
+          fortuneTeammates:
+            (sys.fortuneTeammateIds?.length ?? 0) > 0 ||
+            [...(game.actors ?? [])].some(actor => actor.id !== this.actor.id && pointmanLevel(actor) >= 10)
         }
       })
     });

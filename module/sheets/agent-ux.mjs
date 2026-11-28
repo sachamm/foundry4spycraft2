@@ -151,7 +151,8 @@ export function combatToolVisibility(system = {}, stances = {}, { showAll = fals
     powerStance: feats.has("Great Sword Basics") || stanceKey === "power",
     // Earned by a critical result, so shown only while one is waiting to be used.
     counterTrip: !!earned.counterTrip,
-    tripFinalAttack: !!earned.tripFinalAttack
+    tripFinalAttack: !!earned.tripFinalAttack,
+    fortuneTeammates: !!earned.fortuneTeammates
   };
   // The GC can reveal every shortcut, for example to settle a record left by a feat the character has lost.
   if (showAll) for (const key of Object.keys(tools)) tools[key] = true;

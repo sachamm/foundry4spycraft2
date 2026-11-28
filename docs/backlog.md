@@ -145,7 +145,6 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-100 | Improved Fortune teammates is shown to every agent; show it only when a teammate or the agent has Improved Fortune. (Counter-Trip and the Trip final attack now show only while one is earned; Disarm and Cheap Shot are actions anyone may take, p.355.) | SG-A10 | S | earlier |
 | B-101 | Feat activations are keyed by item name in templates and appear only on Abilities. Declare activations in data; render them in "Abilities in play". | SG-A12 | M | earlier |
 | B-102 | Attribute checks never open a dialog; saves open one only for Reflex or certain feats; Initiative has none, so feat reminders cannot show and Shift has nothing to skip. A minimal dialog (modifier, visibility) with the same gestures. (Damage now takes Shift: no optional extras, no dialog.) | SG-D2, RW-137 | M | earlier |
 | B-104 | Attestation-length checkbox labels (159 `…Confirmed` names in 74 files); Fight Defensively still needs a confirm tick; Aim is an honour-system tick box with no Aim action. Effect labels ("Flanking +2") with the detail as a hint; defaults, not attestations. | SG-D5, LR-20b, LR-32 | L | earlier |
