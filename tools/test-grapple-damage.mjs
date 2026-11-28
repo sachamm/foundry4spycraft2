@@ -1,0 +1,177 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { grappleDamagePlan, grappleDamageAward } from "../module/rules/grapple-damage.mjs";
+import { grappleBenefitEligibility } from "../module/rules/combat-actions.mjs";
+import { damageApplicationKey } from "../module/rules/attack-damage-hits.mjs";
+import {
+  reserveGrappleDamage,
+  validateGrappleDamage,
+  recordGrappleDamageDice,
+  settleGrappleDamageRoll,
+  rememberGrappleDamage,
+  reviewGrappleDamage,
+  validateGrappleDamageDelivery
+} from "../module/documents/actor/grapple-damage.mjs";
+const system = (strength = 2) => ({
+  size: "Medium",
+  abilities: { str: { mod: strength } },
+  activeFeatNames: [],
+  classOptionSelections: [],
+  unarmed: { die: 4, extraDice: 1, damageBonus: strength + 3 },
+  proficiencyTotals: { unarmed: { proficient: true }, edged: { proficient: true } }
+});
+test("Sprawl, Throw and Injure preserve their actual base damage and the extra Strength minimum", () => {
+  for (const strength of [-4, -1, 0, 1, 4]) {
+    const s = system(strength),
+      injure = grappleDamagePlan(s, "injure"),
+      thrown = grappleDamagePlan(s, "throw");
+    assert.match(injure.formula, /2d4/);
+    assert.ok(thrown.formula.includes(`(${s.unarmed.damageBonus + Math.max(1, strength)})`));
+    assert.equal(thrown.profile.kind, "subdual");
+    assert.equal(grappleDamagePlan(s, "sprawl").formula, `max(0, 1d4 + (${strength}))`);
+  }
+  const weapon = {
+    id: "blade",
+    uuid: "Actor.winner.Item.blade",
+    type: "weapon",
+    system: { proficiency: "edged", damage: "1d6 lethal", sizeHands: "Tiny/1h", equipped: true }
+  };
+  assert.equal(grappleDamagePlan(system(), "injure", { weapon }).profile.kind, "lethal");
+  assert.throws(() => grappleDamagePlan(system(), "injure", { weapon, kind: "subdual" }), /conversion/);
+  assert.equal(
+    grappleDamagePlan(system(), "injure", { weapon, kind: "subdual", conversionConfirmed: true }).profile.kind,
+    "subdual"
+  );
+  assert.throws(() => grappleDamagePlan(system(), "throw", { weapon }), /standard unarmed/);
+  assert.throws(() => grappleDamagePlan(system(), "useWeapon"), /actual one-handed/);
+  weapon.system.sizeHands = "Medium/2h";
+  assert.throws(() => grappleDamagePlan(system(), "injure", { weapon }), /one-handed/);
+});
+test("ordered benefit prerequisites reject a free weapon attack or damage after releasing its target", () => {
+  assert.throws(() => grappleBenefitEligibility(["useWeapon"], { loserStatuses: ["held"] }), /actual held or pinned/);
+  assert.deepEqual(grappleBenefitEligibility(["pin", "useWeapon"], { loserStatuses: ["held"] }), [
+    { heldTarget: true, pinnedTarget: false },
+    { heldTarget: true, pinnedTarget: true }
+  ]);
+  assert.throws(
+    () => grappleBenefitEligibility(["throw", "injure"], { loserStatuses: ["held"] }),
+    /actual held or pinned/
+  );
+  assert.throws(() => grappleBenefitEligibility(["breakPin"]), /actual held or pinned/);
+});
+
+const registry = new Map(),
+  messages = [];
+function update(patch) {
+  for (const [path, value] of Object.entries(patch)) {
+    const keys = path.split(".");
+    let at = this;
+    for (const key of keys.slice(0, -1)) at = at[key] ??= {};
+    const last = keys.at(-1);
+    if (last.startsWith("-=")) delete at[last.slice(2)];
+    else at[last] = structuredClone(value);
+  }
+  return Promise.resolve(this);
+}
+let serial = 0;
+globalThis.game = { user: { isGM: true, id: "gc" }, messages, settings: { get: () => ({}) } };
+globalThis.foundry = { utils: { randomID: () => "claim" + ++serial, escapeHTML: String } };
+globalThis.fromUuid = async uuid => registry.get(uuid);
+globalThis.fromUuidSync = uuid => registry.get(uuid);
+globalThis.Roll = {
+  fromJSON: json => {
+    const r = JSON.parse(json);
+    return { ...r, toJSON: () => r };
+  }
+};
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  create: async data => {
+    const m = { ...data, id: "restored" + ++serial, uuid: "ChatMessage.restored" + serial, update };
+    messages.push(m);
+    registry.set(m.uuid, m);
+    return m;
+  }
+};
+function fixture() {
+  registry.clear();
+  messages.length = 0;
+  const actor = { uuid: "Actor.winner", isOwner: true, system: system(), flags: {}, update };
+  const source = {
+    id: "award",
+    uuid: "ChatMessage.award",
+    flags: {
+      spycraft2: {
+        actorUuid: actor.uuid,
+        checkKind: "grappleBenefits",
+        grappleBenefits: {
+          version: 1,
+          winnerUuid: actor.uuid,
+          loserUuid: "Actor.loser",
+          benefits: ["sprawl", "injure"],
+          eligibility: [
+            { heldTarget: true, pinnedTarget: false },
+            { heldTarget: true, pinnedTarget: false }
+          ]
+        }
+      }
+    }
+  };
+  registry.set(actor.uuid, actor);
+  registry.set(source.uuid, source);
+  return { actor, source };
+}
+test("each earned benefit reserves once, stores actual dice and restores deleted cards without RNG or a new application identity", async () => {
+  const { actor, source } = fixture(),
+    plan = grappleDamagePlan(actor.system, "sprawl");
+  const proof = await reserveGrappleDamage(actor, source, 0, plan, {});
+  await assert.rejects(() => reserveGrappleDamage(actor, source, 0, plan, {}), /already has original/);
+  await validateGrappleDamage(actor, proof, plan);
+  const check = {
+    checkKind: "damage",
+    actorUuid: actor.uuid,
+    grappleDamage: proof,
+    effectiveTotal: 5,
+    damageProfile: plan.profile
+  };
+  const roll = { toJSON: () => ({ formula: "1d4+2", total: 5, terms: [{ results: [{ result: 3 }] }] }) };
+  await recordGrappleDamageDice(actor, proof, { check, roll, alternativeRolls: [] });
+  await settleGrappleDamageRoll(actor, proof);
+  const restored = await reviewGrappleDamage(actor, proof.key);
+  assert.equal(restored.rolls[0].total, 5);
+  assert.equal(damageApplicationKey(restored.flags.spycraft2, restored.id), "grapple-" + proof.claimId);
+  assert.equal((await validateGrappleDamageDelivery(restored, "Actor.loser")).benefit, "sprawl");
+  await assert.rejects(() => validateGrappleDamageDelivery(restored, "Actor.other"), /recorded opponent/);
+  restored.flags.spycraft2.effectiveTotal = 7;
+  await assert.rejects(() => validateGrappleDamageDelivery(restored, "Actor.loser"), /original earned/);
+  await rememberGrappleDamage(actor, restored, restored.flags.spycraft2);
+  assert.equal((await validateGrappleDamageDelivery(restored, "Actor.loser")).benefit, "sprawl");
+  const stored = actor.flags.spycraft2.grappleDamage[proof.key];
+  restored.flags.spycraft2.damageApplicationStarted = { targetUuid: "Actor.loser" };
+  await rememberGrappleDamage(actor, restored, restored.flags.spycraft2);
+  messages.length = 0;
+  registry.delete(restored.uuid);
+  const again = await reviewGrappleDamage(actor, proof.key);
+  assert.equal(again.flags.spycraft2.damageApplicationStarted.targetUuid, "Actor.loser");
+  assert.equal(damageApplicationKey(again.flags.spycraft2, again.id), "grapple-" + proof.claimId);
+  assert.deepEqual(again.rolls[0].toJSON(), stored.actualRolls[0]);
+  const second = await reserveGrappleDamage(actor, source, 1, grappleDamagePlan(actor.system, "injure"), {});
+  assert.notEqual(second.claimId, proof.claimId);
+});
+test("changed awards or recipes reject before dice; an unknown started roll stays consumed until GC review", async () => {
+  const { actor, source } = fixture(),
+    plan = grappleDamagePlan(actor.system, "sprawl");
+  const proof = await reserveGrappleDamage(actor, source, 0, plan, {});
+  await assert.rejects(() => validateGrappleDamage(actor, proof, { ...plan, formula: "99d6" }), /changed/);
+  await validateGrappleDamage(actor, proof, plan);
+  await settleGrappleDamageRoll(actor, proof);
+  assert.equal(actor.flags.spycraft2.grappleDamage[proof.key].state, "needsReview");
+  await assert.rejects(() => reviewGrappleDamage(actor, proof.key), /no saved actual dice/);
+  await reviewGrappleDamage(actor, proof.key, {
+    decision: "keep",
+    note: "GC checked actual effects; original dice unknown"
+  });
+  await assert.rejects(() => reserveGrappleDamage(actor, source, 0, plan, {}), /already has original/);
+  source.flags.spycraft2.grappleBenefits.winnerUuid = "Actor.other";
+  assert.throws(() => grappleDamageAward(source, 1, actor.uuid), /actual winner/);
+});

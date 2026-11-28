@@ -23,7 +23,12 @@ export function npcSkillActionPlan(system, key, check, ability, input = {}, { pr
       restraintActionBlock(system, {
         passive,
         free: /free action/i.test(restraint.check?.time ?? ""),
-        escape: restraint.escape && ability === "str"
+        escape: restraint.escape && ability === "str",
+        grapple:
+          key === "athletics" &&
+          named.id === "grapple" &&
+          ability === "str" &&
+          input.grappleParticipantConfirmed === true
       }) ||
       attributeActionBlock(system, {
         kind: "skill",

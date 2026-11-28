@@ -279,6 +279,9 @@ export function rollEvidence(check) {
     ...(check.sourceAttack?.claimId
       ? [check.sourceAttack, check.damageProfile ?? null, check.damageApplicationStarted ?? null]
       : []),
+    ...(check.grappleDamage
+      ? [check.grappleDamage, check.damageProfile ?? null, check.damageApplicationStarted ?? null]
+      : []),
     ...(check.npcDefenseReroll ? [check.npcDefenseReroll] : []),
     ...(check.declaredSkillDC ? [check.declaredSkillDC] : []),
     ...(check.gcPostHitDefense ? [check.gcPostHitDefense] : []),
@@ -429,6 +432,7 @@ export function rollEvidenceMatches(evidence, check) {
   if (evidence === rollEvidence(check)) return true;
   if (
     check.npcDefenseReroll ||
+    check.grappleDamage ||
     check.coverAwaiting ||
     check.coverInterception?.record ||
     check.coverDamageFrozen ||

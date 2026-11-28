@@ -2486,6 +2486,16 @@ test("Throw's actual benefit report adds at least one extra damage even when Str
   reset();
   const grappler = character("Thrower", { abilities: { str: { mod: -2 } } }),
     foe = character("Thrown", {});
+  foe.statuses.add("held");
+  foe.effects.push({
+    id: "held-source",
+    statuses: new Set(["held"]),
+    toObject: () => ({ _id: "held-source", statuses: ["held"] })
+  });
+  foe.deleteEmbeddedDocuments = async () => {
+    foe.statuses.delete("held");
+    foe.effects.length = 0;
+  };
   await settleGrapple(grappler, { total: 30, opponentTotal: 1, opponentUuid: foe.uuid, benefits: ["throw"] });
   assert.match(posted.at(-1).content, /standard unarmed damage \+ 1 additional/);
   assert.equal(foe.statuses.has("held"), false);

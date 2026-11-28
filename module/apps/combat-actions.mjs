@@ -1,5 +1,6 @@
 /** Baseline combat actions in play: the dialog sections that declare them and the buttons that settle them. */
 import { esc } from "../html.mjs";
+import { grappleBenefitDamageContributor } from "./grapple-damage.mjs";
 import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
@@ -14,6 +15,7 @@ import {
   burstHits,
   coverFireDC,
   grappleBenefitChanges,
+  grappleBenefitEligibility,
   grappleBenefitText,
   grappleOutcome,
   grappleOpeningContext,
@@ -30,15 +32,17 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 
-const post = (actor, lines) =>
+const post = (actor, lines, flags = null) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
+    ...(flags ? { flags: { spycraft2: flags } } : {}),
     content: lines
       .filter(Boolean)
       .map(line => `<p>${line}</p>`)
       .join("")
   });
 const whole = value => (value === "" || value === null || value === undefined ? null : Math.trunc(Number(value)));
+rollPipeline.register(grappleBenefitDamageContributor);
 
 /* -------------------------------------------- */
 /*  Declaring a fire action                      */
@@ -391,6 +395,10 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     lines = [
       loc`${esc(winner?.name ?? loc`The opponent`)} takes: ${chosen.map(id => esc(grappleBenefitText(id)[0])).join(", ")}.`
     ];
+  const eligibility = grappleBenefitEligibility(chosen, {
+    winnerStatuses: winner?.statuses ?? [],
+    loserStatuses: loser?.statuses ?? []
+  });
   for (const change of grappleBenefitChanges(chosen)) {
     const who = change.side === "winner" ? winner : loser,
       label = labels[change.id] ?? change.id;
@@ -417,7 +425,7 @@ async function grappleBenefitsChosen(actor, input, outcome) {
         loc`Roll the selected legal weapon or unarmed damage once for this benefit and apply it before defenses. Any lethal/subdual conversion penalty belongs on the opposed Athletics check, with the actual feat waiver.`
       );
   }
-  return lines;
+  return { lines, chosen, winner, loser, eligibility };
 }
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */
@@ -501,6 +509,23 @@ export async function settleGrapple(actor, options = {}) {
     ...(await grappleConditions(actor, input, outcome))
   ]);
   const taken = await grappleBenefitsChosen(actor, input, outcome);
-  if (taken.length) await post(actor, taken);
+  if (taken?.lines?.length)
+    await post(
+      actor,
+      taken.lines,
+      taken.winner && taken.loser
+        ? {
+            actorUuid: taken.winner.uuid,
+            checkKind: "grappleBenefits",
+            grappleBenefits: {
+              version: 1,
+              winnerUuid: taken.winner.uuid,
+              loserUuid: taken.loser.uuid,
+              benefits: taken.chosen,
+              eligibility: taken.eligibility
+            }
+          }
+        : null
+    );
   return outcome;
 }

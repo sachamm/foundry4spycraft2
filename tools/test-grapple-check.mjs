@@ -20,6 +20,16 @@ const state = (feats, extra = {}) => ({
 const roll = (system, input = {}) =>
   resolveSkillCheck(system, "athletics", GRAPPLE_CHECK, { synergySkill: "none", gearStatus: "available", ...input });
 
+test("held and pinned participants may make their confirmed ongoing Grapple check without opening unrelated actions", () => {
+  for (const condition of ["held", "pinned"]) {
+    const s = state([], { conditionContext: { [condition]: true }, abilities: { str: { mod: 0 } } });
+    assert.match(roll(s).blockedReason, /Held|Pinned/);
+    const result = roll(s, { grappleParticipantConfirmed: true });
+    assert.equal(/Held|Pinned/.test(result.blockedReason), false);
+    assert.equal(result.grappleFeats.participantConfirmed, true);
+  }
+});
+
 test("Grapple is a named Athletics check", () => {
   assert.ok(grappleSkillChecks("athletics", []).some(c => c.id === "grapple"));
   assert.deepEqual(grappleSkillChecks("notice", []), []);

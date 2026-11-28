@@ -6,6 +6,20 @@ const check = (mode = "Active", id = "check") => ({ id, mode, time: "1 Full Acti
 const plan = (system = {}, options = {}, named = check(), ability = "wis", key = "notice", policy = {}) =>
   npcSkillActionPlan(system, key, named, ability, options, policy);
 
+test("an actual held or pinned grapple participant can oppose Athletics while other active NPC checks stay blocked", () => {
+  for (const condition of ["held", "pinned"]) {
+    const s = { conditionContext: { [condition]: true } };
+    assert.ok(plan(s, {}, check("Active", "grapple"), "str", "athletics").blockedReason);
+    assert.equal(
+      plan(s, { grappleParticipantConfirmed: true }, check("Active", "grapple"), "str", "athletics").blockedReason,
+      ""
+    );
+    assert.ok(
+      plan(s, { grappleParticipantConfirmed: true }, check("Active", "climb"), "str", "athletics").blockedReason
+    );
+  }
+});
+
 test("NPC check categories preserve passive/secret visibility and action-die restrictions, with explicit campaign conversion", () => {
   assert.equal(plan().actionDiceAllowed, true);
   const passive = plan({}, {}, check("Passive"));

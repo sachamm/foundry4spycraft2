@@ -6,6 +6,7 @@ import {
   damageHitClaim
 } from "../../rules/attack-damage-hits.mjs";
 import { loc } from "../../i18n.mjs";
+import { rememberGrappleDamage } from "./grapple-damage.mjs";
 
 const leases = new WeakMap();
 const book = actor => actor.flags?.spycraft2?.attackDamageHits ?? {};
@@ -189,6 +190,7 @@ export async function reviewDamageHits(actor, source, { legacyUsed, consumeClaim
 
 /** Called inside the spender's resource transaction after a paid damage boost. */
 export async function rememberDamageBoost(actor, message, check) {
+  await rememberGrappleDamage(actor, message, check);
   if (check.checkKind !== "damage" || !check.sourceAttack?.claimId) return;
   const source = await fromUuid(check.sourceAttack.uuid);
   const ledger = structuredClone(book(actor)[source?.id]);
@@ -201,7 +203,7 @@ export async function rememberDamageBoost(actor, message, check) {
 }
 
 export async function markDamageApplicationStart(message, value) {
-  if (!flags(message)?.sourceAttack?.claimId) {
+  if (!flags(message)?.sourceAttack?.claimId && !flags(message)?.grappleDamage?.claimId) {
     await message.update({ "flags.spycraft2.damageApplicationStarted": value });
     return true;
   }

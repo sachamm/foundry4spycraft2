@@ -137,16 +137,17 @@ export function damageHitsStarted(ledger) {
 
 /** A restored damage card keeps the same application identity on each actual target. */
 export function damageApplicationKey(check, messageId) {
-  const id = check?.sourceAttack?.claimId ?? messageId;
+  const id = check?.sourceAttack?.claimId ?? check?.grappleDamage?.claimId ?? messageId;
   if (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(id))
     throw Error(loc`Review the damage card's stable application identity.`);
-  return `${check?.sourceAttack?.claimId ? "hit" : "roll"}-${id}`;
+  return `${check?.sourceAttack?.claimId ? "hit" : check?.grappleDamage?.claimId ? "grapple" : "roll"}-${id}`;
 }
 
 /** The applied amount and defenses are fixed independently of a chat document's replacement id. */
 export function damageApplicationSignature(check, input) {
   return JSON.stringify([
     check.actorUuid,
+    ...(check.grappleDamage ? [check.grappleDamage] : []),
     check.sourceAttack?.uuid ?? "",
     check.sourceAttack?.claimId ?? "",
     check.sourceAttack?.hitIndex ?? null,

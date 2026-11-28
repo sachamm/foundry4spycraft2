@@ -5,16 +5,17 @@ import { same } from "./equal.mjs";
 export function restraintState(system) {
   return system.conditionContext?.pinned === true ? "pinned" : system.conditionContext?.held === true ? "held" : "";
 }
-export function restraintActionBlock(system, { passive = false, free = false, escape = false } = {}) {
+export function restraintActionBlock(system, { passive = false, free = false, escape = false, grapple = false } = {}) {
   if (system.restraintReleaseReview?.needsReview)
     return loc`The GC must review the interrupted grapple release before further actions.`;
   if ((system.pendingRestraintMoves ?? []).length && passive !== true)
     return loc`Complete the immediate Standard Move required by Escape Hold first.`;
   const state = restraintState(system);
-  if (!state || passive === true || escape === true || (state === "held" && free === true)) return "";
+  if (!state || passive === true || escape === true || grapple === true || (state === "held" && free === true))
+    return "";
   return state === "pinned"
-    ? loc`Pinned: no actions except the full-action Athletics escape check (p.342).`
-    : loc`Held: only free actions or the full-action Athletics escape check are available (p.342).`;
+    ? loc`Pinned: no actions except Athletics escape, or the opposed Athletics check of a confirmed grapple participant (pp.342,357).`
+    : loc`Held: only free actions, Athletics escape, or the opposed Athletics check of a confirmed grapple participant are available (pp.342,357).`;
 }
 export function restraintSkillChecks(system, key, checks = []) {
   const state = restraintState(system);

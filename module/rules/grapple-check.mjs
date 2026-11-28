@@ -40,6 +40,7 @@ export function grappleCheckPlan(
     grappleSecondOpponent = false,
     grappleHoldingTwo = false,
     grappleMuting = false,
+    grappleParticipantConfirmed = false,
     grappleDamageConversion = false,
     grappleConversionWeaponId = "",
     grappleConversionWeapon = null,
@@ -117,7 +118,7 @@ export function grappleCheckPlan(
   return {
     ...empty,
     evidence:
-      bonuses.length || garrote || conversion
+      bonuses.length || garrote || conversion || (inGrapple && grappleParticipantConfirmed === true)
         ? {
             version: 1,
             proneStance,
@@ -126,6 +127,7 @@ export function grappleCheckPlan(
             jointLock,
             second,
             muting,
+            ...(grappleParticipantConfirmed === true ? { participantConfirmed: true } : {}),
             conversion,
             conversionWeaponId: grappleConversionWeaponId,
             checkId: check?.id ?? ""
@@ -146,7 +148,7 @@ rollPipeline.register({
 
 export function grappleCircumstancesContent(actor) {
   const weapons = [...(actor?.items ?? [])].filter(i => i.type === "weapon" && i.system.equipped === true);
-  return `<fieldset><legend>${loc`Grapple circumstances (Athletics)`}</legend><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`This Grapple attempts a second opponent (−4)`}</label><label><input name="grappleHoldingTwo" type="checkbox" /> ${loc`I currently hold two opponents (−4 to Athletics; does not stack with the attempt penalty)`}</label><label><input name="grappleMuting" type="checkbox" /> ${loc`My Mute benefit still applies to this grapple check (−2)`}</label><label><input name="grappleDamageConversion" type="checkbox" /> ${loc`Convert damage for Injure or Use Opponent's Weapon (−4 unless an actual waiver applies)`}</label><label>${loc`My readied weapon for that conversion`} <select name="grappleConversionWeaponId"><option value="">${loc`Unarmed, or another participant's weapon (only my Bludgeon waiver)`}</option>${weapons.map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`).join("")}</select></label><label>${loc`Original damage type when no own weapon is selected`} <select name="grappleConversionFrom"><option value="subdual">${loc`Subdual`}</option><option value="lethal">${loc`Lethal`}</option></select></label><p>${loc`Confirm legal holds and the selected benefit at the table. Two opponents is the maximum; the second-opponent and Mute declarations describe the actual current situation.`}</p></fieldset>`;
+  return `<fieldset><legend>${loc`Grapple circumstances (Athletics)`}</legend><label><input name="grappleParticipantConfirmed" type="checkbox" /> ${loc`Held or pinned: the GC confirms I am a participant making the opposed Athletics check within an actual grapple (p.357).`}</label><label><input name="grappleSecondOpponent" type="checkbox" /> ${loc`This Grapple attempts a second opponent (−4)`}</label><label><input name="grappleHoldingTwo" type="checkbox" /> ${loc`I currently hold two opponents (−4 to Athletics; does not stack with the attempt penalty)`}</label><label><input name="grappleMuting" type="checkbox" /> ${loc`My Mute benefit still applies to this grapple check (−2)`}</label><label><input name="grappleDamageConversion" type="checkbox" /> ${loc`Convert damage for Injure or Use Opponent's Weapon (−4 unless an actual waiver applies)`}</label><label>${loc`My readied weapon for that conversion`} <select name="grappleConversionWeaponId"><option value="">${loc`Unarmed, or another participant's weapon (only my Bludgeon waiver)`}</option>${weapons.map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`).join("")}</select></label><label>${loc`Original damage type when no own weapon is selected`} <select name="grappleConversionFrom"><option value="subdual">${loc`Subdual`}</option><option value="lethal">${loc`Lethal`}</option></select></label><p>${loc`Confirm legal holds and the selected benefit at the table. Two opponents is the maximum; the second-opponent and Mute declarations describe the actual current situation.`}</p></fieldset>`;
 }
 
 rollPipeline.register({

@@ -37,6 +37,7 @@ import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { blastExposurePlan } from "../rules/blast-exposure.mjs";
 import { interceptedBasis, prepareCoverAttack, confirmPreparedCover, reviewCoverSaves } from "./cover-interception.mjs";
 import { coveredAttackOutcome, validateCoverAttack, coverDamageDelivery } from "../rules/cover-interception.mjs";
+import { validateGrappleDamageDelivery } from "../documents/actor/grapple-damage.mjs";
 import { blastTargetRows, blastGeometryFields, measuredBlastActors } from "./blast-dialog.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { damageResistancePlan } from "../rules/resistances.mjs";
@@ -946,6 +947,7 @@ export async function applyDamage(message, options = {}) {
     const choices = targetChoices(),
       selected =
         check.sourceAttack?.targetUuid ||
+        check.grappleDamage?.targetUuid ||
         check.sneakAttackTarget?.actorUuid ||
         check.attackDamageBenefit?.targetUuid ||
         choices.selected;
@@ -966,6 +968,21 @@ export async function applyDamage(message, options = {}) {
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (!target || !TARGET_TYPES.includes(target.type)) return refuse(loc`Choose a target.`);
+  try {
+    const grapple = await validateGrappleDamageDelivery(message, target.uuid);
+    if (
+      grapple &&
+      (Number(input.damage) > Math.max(0, rolled) ||
+        (input.kind ?? profile.kind) !== grapple.profile.kind ||
+        (input.type ?? profile.type ?? "") !== (grapple.profile.type ?? "") ||
+        input.critical === true)
+    )
+      return refuse(
+        loc`Use this benefit's original damage and confirmed type. Extra grapple benefits do not turn their damage into critical hits.`
+      );
+  } catch (error) {
+    return refuse(error.message);
+  }
   try {
     const delivery = coverDamageDelivery(attack, message.uuid, rolled, target.uuid);
     if (delivery && Number(input.damage) > delivery.amount)
@@ -1000,7 +1017,7 @@ export async function applyDamage(message, options = {}) {
     armorPiercingAll =
       input.armorPiercingAll === true ||
       (["agent", "npc"].includes(target.type) && DAMAGE_TYPES[type]?.armorPiercing === "all"),
-    critical = check.sourceAttack?.claimId ? crit.critical : input.critical === true,
+    critical = check.grappleDamage ? false : check.sourceAttack?.claimId ? crit.critical : input.critical === true,
     criticalDice = critical
       ? check.sourceAttack?.claimId
         ? crit.criticalDice
@@ -1535,7 +1552,10 @@ export function quickApplyInput(message, targetUuid, damage = null) {
 /** The target a damage card already names: the hit it came from, or the attack bonus it used. */
 export function damageCardTarget(check) {
   const uuid =
-    check.sourceAttack?.targetUuid || check.sneakAttackTarget?.actorUuid || check.attackDamageBenefit?.targetUuid;
+    check.sourceAttack?.targetUuid ||
+    check.grappleDamage?.targetUuid ||
+    check.sneakAttackTarget?.actorUuid ||
+    check.attackDamageBenefit?.targetUuid;
   const actor = uuid ? fromUuidSync(uuid) : null;
   return actor && TARGET_TYPES.includes(actor.type) && canSee(actor) ? actor : null;
 }

@@ -693,7 +693,13 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     free:
       /free action/i.test(check.time ?? "") ||
       (mode.includes("Passive") && method === "roll" && cunningPlan && !tenSecondSolution),
-    escape: restraint.escape && originalAbility === "str"
+    escape: restraint.escape && originalAbility === "str",
+    grapple:
+      key === "athletics" &&
+      check.id === "grapple" &&
+      originalAbility === "str" &&
+      input.grappleParticipantConfirmed === true &&
+      method === "roll"
   });
   if (restraintBlock) blockedReasons.push(restraintBlock);
   const incapacity = attributeActionBlock(system, {

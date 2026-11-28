@@ -406,6 +406,34 @@ export function grappleBenefitChanges(benefits = []) {
   return changes;
 }
 
+/** Check ordered prerequisites before any benefit changes conditions or rolls damage. */
+export function grappleBenefitEligibility(benefits, { winnerStatuses = [], loserStatuses = [] } = {}) {
+  const winner = new Set(winnerStatuses),
+    loser = new Set(loserStatuses),
+    result = [];
+  for (const id of benefits) {
+    if (!GRAPPLE_BENEFITS.some(b => b.id === id)) throw Error(loc`Choose a listed grapple benefit.`);
+    const held = loser.has("held") || loser.has("pinned"),
+      pinned = loser.has("pinned");
+    if (
+      (id === "breakPin" && !winner.has("pinned")) ||
+      (id === "escape" && !winner.has("held") && !winner.has("pinned")) ||
+      (id === "useWeapon" && !pinned) ||
+      (["injure", "pin", "mute", "sprawl", "throw"].includes(id) && !held)
+    )
+      throw Error(
+        loc`This benefit needs an actual held or pinned participant in the chosen order. Review the current grapple.`
+      );
+    result.push({ heldTarget: held, pinnedTarget: pinned });
+    for (const change of grappleBenefitChanges([id])) {
+      const statuses = change.side === "winner" ? winner : loser;
+      if (change.active) statuses.add(change.id);
+      else statuses.delete(change.id);
+    }
+  }
+  return result;
+}
+
 /** Names and one-line summaries of the grapple benefits, in the reader's language. */
 export function grappleBenefitText(id) {
   return {

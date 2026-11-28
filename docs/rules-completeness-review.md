@@ -2861,3 +2861,36 @@ loss coverage, lint, formatting, bundle and copied-text checks. Pass 89's 307
 layout checks and native schemas remain current; the changed critical form was
 also exercised natively. B-190 now retains map assistance and exceptional cover
 adjudication maintenance rather than the completed original-damage workflow.
+
+## Pass 91: Earned grapple damage and ongoing participant checks
+
+Scores remain PC creation **9.9/10**, combat **9.8/10** until cooperative
+grapples and the final native review finish. Chosen grapple benefits now record
+their winner, opponent, order and prerequisite state. Pin then Use Opponent's
+Weapon is legal; Throw then Injure is refused after release. Damage controls
+connect Injure, Sprawl, Throw and Use Opponent's Weapon to standard damage,
+actual readied one-handed weapons, the extra Strength minimum and declared
+Athletics conversion penalties/waivers. Counted weapon ammunition is reserved
+with its owner's resources before the original damage roll.
+
+Each earned benefit has one durable damage identity. Actual dice and paid boosts
+are saved, interrupted results can be recovered without new dice, unknown rolls
+stay consumed for GC review, and restored cards keep application identity and
+their application freeze. Only the recorded opponent and damage type are allowed;
+an Athletics critical grants benefits rather than critical damage. Shared damage
+receipts and Undo protect health changes.
+
+The native session found that Held/Pinned action restrictions also blocked the
+opposed Athletics check permitted to actual grapple participants (p.357). PC and
+NPC checks now accept explicit GC confirmation of that circumstance, record it,
+and continue blocking unrelated actions. Starting/ongoing grapple declarations
+remain subject to the existing Size, proficiency and participant review.
+
+Validation: **4,539 Node tests**, **988 engine fixtures**, schemas, lint,
+formatting, bundle and copied-text checks passed without increasing architecture
+limits. Native opposed checks 114 vs 13 produced benefit card
+ChatMessage.cxG0nxYgsGfbGFqM; its actual weapon-choice form was checked in both
+themes at 1280×720. The continuing native sequence has passed Injure delivery,
+deleted-card recovery, duplicate refusal, Undo and reapplication, and is checking
+Sprawl/Throw and reload. Final native results and cooperative grapple handling
+follow in the next pass before crediting the goal.
