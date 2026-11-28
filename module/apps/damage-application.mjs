@@ -1139,18 +1139,25 @@ rollPipeline.register({
     const rolled = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total;
     const amount = Math.max(0, Math.trunc(Number(rolled) || 0));
     const controls = [];
-    const targeted = targetedForDamage(),
-      named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
-    if (targeted.length > 1)
+    // The target the attack was resolved against comes first; the map's current targets only stand in without one.
+    const resolved = damageCardTarget(check),
+      targeted = resolved ? [] : targetedForDamage(),
+      named = resolved ?? (targeted.length === 1 ? targeted[0] : null);
+    // What a one-press apply takes as given, so the player knows when to open the full dialog instead.
+    const assumes = loc`Applies the rolled damage as the card shows it, with the target's armor and no further boost. To change any of that, use Apply damage to a target.`;
+    if (targeted.length > 1) {
+      // The recipients are fixed when the card is drawn and named on it: a target changed since does not join.
+      const recipients = [...targeted];
       controls.push({
-        label: loc`Apply ${amount} to ${targeted.length} targets`,
-        hint: loc`Apply ${amount} damage to each of the ${targeted.length} targeted tokens`,
+        label: loc`Apply ${amount} to ${recipients.length} targets`,
+        hint: `${loc`Apply ${amount} damage to each of: ${recipients.map(targetLabel).join(", ")}.`} ${assumes}`,
         emphasis: "primary",
-        run: () => applyDamageToEach(message, targetedForDamage())
+        run: () => applyDamageToEach(message, recipients)
       });
-    else if (named && !applied.some(entry => entry.targetUuid === named.uuid) && (named.isOwner || gcAvailable()))
+    } else if (named && !applied.some(entry => entry.targetUuid === named.uuid) && (named.isOwner || gcAvailable()))
       controls.push({
         label: loc`Apply ${amount} to ${targetLabel(named)}`,
+        hint: assumes,
         emphasis: "primary",
         run: () => applyDamage(message, quickApplyInput(message, named.uuid))
       });

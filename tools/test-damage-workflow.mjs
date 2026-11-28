@@ -661,10 +661,16 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     false,
     "not offered twice for one target"
   );
-  // With several tokens targeted, one button applies the damage to each and posts a summary.
+  // With several tokens targeted, one button applies the damage to each and posts a summary. A card resolved
+  // against one target keeps it: the map's targets do not override it.
   const second = character("Guard2", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
   game.user.targets = [{ actor: guard }, { actor: second }];
-  const each = controls(damage).find(c => c.label === "Apply 7 to 2 targets");
+  assert.equal(controls(damage).find(c => c.label === "Apply 7 to 2 targets"), undefined, "the resolved target stays");
+  const loose = card("q3", { actorUuid: attacker.uuid, checkKind: "damage", effectiveTotal: 7 });
+  const each = controls(loose).find(c => c.label === "Apply 7 to 2 targets");
+  assert.match(each.hint, /Guard \(not on the scene\), Guard2/, "the recipients are named");
+  // Targets changed after the card was drawn do not join the batch.
+  game.user.targets = [];
   await each.run();
   assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
   assert.match(posted.at(-1).content, /Damage applied to 2 targets/);
