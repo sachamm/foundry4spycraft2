@@ -1,4 +1,5 @@
 <section class="tab main play {{tab.cssClass}}" data-tab="play" data-pane="main" data-group="primary">
+  <h2 class="sc2-visually-hidden">{{localize "SPYCRAFT.Tab.Play"}}</h2>
 {{#each shakenInitiativeReviews}}<p
   class="bad">{{localize "SPYCRAFT.Review.ShakenInitiative" name=name count=count reason=reason}} {{#if @root.isGM}}<button type="button"
   class="sc2-action"

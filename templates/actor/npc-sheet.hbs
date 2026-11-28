@@ -36,6 +36,7 @@
       </div>{{/if}}{{/unless}}
     </div>
   </header>
+  {{#unless editMode}}<h2 class="sc2-visually-hidden">{{localize "SPYCRAFT.Tab.Play"}}</h2>{{/unless}}
   {{#if editMode}}
   {{!-- While editing, the numbers the choices produce stay in sight and the builder comes first. --}}
   <div class="npc-pinned" role="group" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
