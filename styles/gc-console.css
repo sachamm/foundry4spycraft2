@@ -48,7 +48,7 @@
   min-width: 0;
   overflow-wrap: anywhere;
   text-align: end;
-  font-size: 0.85em;
+  font-size: var(--sc2-text-s);
   opacity: 0.8;
 }
 .gc-console-body details.gc-section[open] {
@@ -79,7 +79,7 @@
 .gc-console-body h3 button {
   width: auto;
   display: inline-block;
-  font-size: 0.75em;
+  font-size: var(--sc2-text-s);
   line-height: 1.6;
   padding: 0 0.6em;
   margin-left: 0.5em;
@@ -141,7 +141,7 @@
   padding: 0.35em 0.5em;
 }
 .gc-console-body h2 {
-  font-size: 1.2em;
+  font-size: var(--sc2-text-l);
 }
 .gc-console-body h3 {
   flex-wrap: wrap;
@@ -197,7 +197,7 @@
 }
 .sc2-clock-now {
   margin: 0;
-  font-size: 1.25em;
+  font-size: var(--sc2-text-l);
   font-weight: bold;
   text-align: center;
 }
@@ -243,7 +243,7 @@
 .sc2-timer-controls button {
   width: auto;
   flex: 0 0 auto;
-  font-size: 0.85em;
+  font-size: var(--sc2-text-s);
   line-height: 1.6;
   min-height: 0;
   padding: 0 0.6em;
@@ -266,7 +266,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.9em;
+  font-size: var(--sc2-text-s);
 }
 .sc2-timer-new button {
   grid-column: 3;
@@ -285,7 +285,7 @@
   justify-content: flex-start;
   text-align: left;
   padding: 3px 8px;
-  font-size: 13px;
+  font-size: var(--sc2-text-s);
 }
 .gc-console-body .controls button.gc-primary {
   justify-content: center;
