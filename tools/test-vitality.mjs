@@ -284,18 +284,6 @@ test("review cancellation, invalid raw values and stale context do not alter leg
   await assert.rejects(reviewCareerVitality(a, 1), /source changed/);
   assert.equal(rng, 0);
 });
-test("removed/replaced career entries get a new identity and cannot reuse an older gain at the same index", async () => {
-  const a = actor();
-  await rollCareerVitality(a, 1);
-  const first = a.system.progression[1].vitalityRollId;
-  a.system.progression[1] = { classId: "soldier", vitality: 0, skills: {} };
-  raw = 7;
-  await rollCareerVitality(a, 1);
-  assert.notEqual(a.system.progression[1].vitalityRollId, first);
-  assert.equal(a.system.progression[1].vitality, 7);
-  assert.equal(rng, 2);
-  assert.equal(Object.keys(a.flags.spycraft2.vitalityRolls).length, 2);
-});
 test("conflicting or corrupt vitality evidence requires review and never triggers a replacement RNG result", async () => {
   let a = actor();
   await rollCareerVitality(a, 1);
@@ -323,4 +311,24 @@ test("normalizing a wrong roll result cannot fabricate a class gain", async () =
     assert.equal(a.system.progression[1].vitality, 0);
   }
   assert.equal(game.messages.length, 0);
+});
+test("a level removed and added again keeps its first vitality roll instead of rolling anew", async () => {
+  const a = actor();
+  await rollCareerVitality(a, 1);
+  assert.equal(rng, 1);
+  // The level is removed and the same class level added again: a fresh entry with no roll id.
+  a.system.progression[1] = { classId: "soldier", vitality: 0, skills: {} };
+  raw = 11;
+  const again = await rollCareerVitality(a, 1);
+  assert.equal(again.kept, true);
+  assert.equal(again.total, 4);
+  assert.equal(rng, 1, "no new die is rolled");
+  assert.equal(a.system.progression[1].vitality, 4);
+  // A different class at that level is a different roll.
+  a.items.push({ id: "other", name: "Other class", type: "class", system: { identifier: "other", vitalityDie: 6 } });
+  a.system.progression[1] = { classId: "other", vitality: 0, skills: {} };
+  raw = 3;
+  const other = await rollCareerVitality(a, 1);
+  assert.equal(other.total, 3);
+  assert.equal(rng, 2);
 });

@@ -1274,6 +1274,7 @@
    "CareerAgentWasActiveWhenThe_0q17nzc": "Career Agent was active when the mission ended",
    "CareerLevel1VitalityIsAutomatic_0pcnol1": "Career Level 1 vitality is automatic maximum; choose an existing higher career level (p.60).",
    "CareerLevelDCurrentRawValue_0jo93cr": "Career Level {0}, {1}, d{2}. Current raw value {3}. Record an external result or correct the existing record; this does not reroll the die.",
+   "CareerLevelKeepsItsEarlierVitality_0qzcb9r": "Career Level {0} keeps its earlier vitality roll of {1}; it is not rolled again.",
    "CareerLevelNeedsXPThisCharacter_1f35ce7": "Career Level {0} needs {1} XP; this character has {2}.",
    "CareerLevelOfUnrecordedFlankingAttacker_08uebvg": "Career level of unrecorded flanking attacker",
    "CareerLevelPointsAvailable_12i6sfy": "Career-level {0} points ({1} available)",

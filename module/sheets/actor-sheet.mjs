@@ -32,8 +32,8 @@ import { COMBAT_STANCES } from "../rules/combat-stance.mjs";
 import { manageThreadNeedle } from "../apps/thread-needle.mjs";
 import { takeStrikingAttack, reviewStrikingAttack } from "../apps/striking-stance.mjs";
 import { recordFendMovement } from "../apps/fend.mjs";
-import { takeCounterTrip, reviewCounterTrip } from "../apps/counter-trip.mjs";
-import { takeTripFinalAttack, reviewTripFinalAttack } from "../apps/trip-final-attack.mjs";
+import { takeCounterTrip, reviewCounterTrip, counterTripCandidates } from "../apps/counter-trip.mjs";
+import { takeTripFinalAttack, reviewTripFinalAttack, tripFinalAttackCandidates } from "../apps/trip-final-attack.mjs";
 import { manageTripOutcomes } from "../apps/trip-outcomes.mjs";
 import { managePowerStanceInitiative } from "../apps/power-stance.mjs";
 import { manageDrivingStance } from "../apps/driving-stance.mjs";
@@ -850,7 +850,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ),
       nonLethalMeters: nonLethalMeters(sys),
       showAllTools: game.user.isGM && this._showAllTools,
-      combatTools: combatToolVisibility(sys, COMBAT_STANCES, { showAll: game.user.isGM && this._showAllTools })
+      combatTools: combatToolVisibility(sys, COMBAT_STANCES, {
+        showAll: game.user.isGM && this._showAllTools,
+        earned: {
+          counterTrip: counterTripCandidates(this.actor).length > 0,
+          tripFinalAttack: tripFinalAttackCandidates(this.actor).length > 0
+        }
+      })
     });
 
     // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
@@ -1601,7 +1607,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     );
   }
   static #onRollDamage(event, target) {
-    return this.actor.rollDamage(this._item(target));
+    return this.actor.rollDamage(this._item(target), skipDialog(event) ? { quick: true } : {});
   }
   static #onRollInitiative() {
     return this.actor.rollInitiative({ createCombatants: true });
@@ -2188,7 +2194,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     return resolveQuickAttack(await this.actor.rollAttack(item, quickAttackOptions(this.actor, item)));
   }
   static #onRollDamage(event, target) {
-    return this.actor.rollDamage(this._item(target));
+    return this.actor.rollDamage(this._item(target), skipDialog(event) ? { quick: true } : {});
   }
   static #onItemEdit(event, target) {
     return this._item(target)?.sheet.render(true);

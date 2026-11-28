@@ -126,7 +126,7 @@ export function buildCreationTrack(tasks = []) {
 }
 
 /** These flags choose shortcuts only. The action controllers still decide legality. */
-export function combatToolVisibility(system = {}, stances = {}, { showAll = false } = {}) {
+export function combatToolVisibility(system = {}, stances = {}, { showAll = false, earned = {} } = {}) {
   const feats = new Set(system.activeFeatNames ?? []);
   const stanceKey = system.combatStance?.key;
   const earnedStances = Object.values(stances).filter(stance => feats.has(stance.feat));
@@ -148,7 +148,10 @@ export function combatToolVisibility(system = {}, stances = {}, { showAll = fals
     threadNeedle: feats.has("Staff Basics"),
     stanceDamage: feats.has("Flail Basics") || feats.has("Axe Basics") || ["punishing", "menacing"].includes(stanceKey),
     drivingStance: feats.has("Hammer Basics") || stanceKey === "driving",
-    powerStance: feats.has("Great Sword Basics") || stanceKey === "power"
+    powerStance: feats.has("Great Sword Basics") || stanceKey === "power",
+    // Earned by a critical result, so shown only while one is waiting to be used.
+    counterTrip: !!earned.counterTrip,
+    tripFinalAttack: !!earned.tripFinalAttack
   };
   // The GC can reveal every shortcut, for example to settle a record left by a feat the character has lost.
   if (showAll) for (const key of Object.keys(tools)) tools[key] = true;

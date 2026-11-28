@@ -119,22 +119,26 @@ export function validateTripFinalAttackProof(
   if (!attackCharacterTargetChoices().some(a => a.uuid === proof.opponentUuid))
     throw Error(loc`The actual Trip opponent is no longer observed.`);
 }
+/** The settled critical Trips that earned this agent a final attack. */
+export function tripFinalAttackCandidates(actor) {
+  return [...(game.messages ?? [])].filter(
+    m =>
+      m.visible !== false &&
+      m.isContentVisible !== false &&
+      (!m.blind || game.user.isGM) &&
+      m.flags?.spycraft2?.actorUuid === actor.uuid &&
+      [1, 2].includes(m.flags.spycraft2.tripAttack?.version) &&
+      m.flags.spycraft2.tripSettlement?.attackerUuid === actor.uuid &&
+      m.flags.spycraft2.tripSettlement?.criticalOpportunity === "finalAttack" &&
+      m.flags.spycraft2.tripSettlement.state === "applied"
+  );
+}
 export async function takeTripFinalAttack(actor, input = {}) {
   if (!actor.isOwner || actor.type !== "agent") return null;
   finalAttackOptions(input);
   if (!Object.hasOwn(input, "immediateConfirmed")) {
     const esc = foundry.utils.escapeHTML,
-      ms = [...game.messages].filter(
-        m =>
-          m.visible !== false &&
-          m.isContentVisible !== false &&
-          (!m.blind || game.user.isGM) &&
-          m.flags?.spycraft2?.actorUuid === actor.uuid &&
-          [1, 2].includes(m.flags.spycraft2.tripAttack?.version) &&
-          m.flags.spycraft2.tripSettlement?.attackerUuid === actor.uuid &&
-          m.flags.spycraft2.tripSettlement?.criticalOpportunity === "finalAttack" &&
-          m.flags.spycraft2.tripSettlement.state === "applied"
-      ),
+      ms = tripFinalAttackCandidates(actor),
       weapons = [...actor.items].filter(finalWeaponReady);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Critical Trip final attack` },

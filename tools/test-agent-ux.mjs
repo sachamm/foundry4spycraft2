@@ -156,6 +156,10 @@ test("feat-specific outcome tools appear only with their feat, unless the GC ask
   assert.equal(combatToolVisibility({ combatStance: { key: "power" } }, COMBAT_STANCES).powerStance, true);
   const all = combatToolVisibility({}, COMBAT_STANCES, { showAll: true });
   assert.ok(Object.values(all).every(value => value === true));
+  const none = combatToolVisibility({}, COMBAT_STANCES);
+  assert.equal(none.counterTrip, false, "a counter-Trip shows only once a critical defense has earned one");
+  assert.equal(none.tripFinalAttack, false);
+  assert.equal(combatToolVisibility({}, COMBAT_STANCES, { earned: { counterTrip: true } }).counterTrip, true);
 });
 
 test("the rail's stamps, flat-footed Defense and Defense boost state follow the character", async () => {

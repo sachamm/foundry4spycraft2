@@ -599,6 +599,15 @@ export const ActorAttackRolls = Base =>
             (sideHits.length === 1 && sideHits[0].proof.attackUuid === attackBonusHits[0].proof.attackUuid))
             ? attackBonusHits[0]
             : null;
+      // Shift-click: roll with what applies by itself (a single recorded attack bonus), and no optional extras.
+      if (options.quick === true && options.includeSneakAttack === undefined)
+        options = {
+          ...options,
+          includeSneakAttack: false,
+          ...(automaticAttackBonus && !options.attackDamageSourceUuid
+            ? { attackDamageSourceUuid: automaticAttackBonus.message.uuid }
+            : {})
+        };
       if (
         item.system.weaponCategory === "mortar" &&
         /\d*d\d+/i.test(item.system.damage) &&
