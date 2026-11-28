@@ -2660,3 +2660,44 @@ after dismissing Foundry's known minimum-resolution notice. No browser errors.
 Validation: 4,504 Node tests, 988 engine fixtures, 303 layouts, native schemas,
 lint, formatting, bundle and copied-text checks. B-256 is resolved. The next NPC
 condition-stat findings are tracked in B-257; continue those and B-186/B-190.
+
+## Pass 85: NPC fatigue, movement and recovery
+
+**PC creation: 9.9/10. Combat: 9.8/10.** Continue the blast/cover and grapple
+benefit review before raising combat's score.
+
+NPCs now project Fatigued/Exhausted Strength and Dexterity penalties from their
+original scores, with earned Guts and the shared +6 resistance-save benefits
+(pp.340–342). Native attribute effects remain included. Repeated preparation,
+condition removal and effect removal preserve the original scores. NPC Edit
+inputs retain source scores while Play and rolls use the current values, so
+submitting another field cannot save a temporary penalty as a new base score.
+
+PCs and NPCs now share the current movement projection. Healthy NPCs can use the
+existing Run controller; fatigue, exhaustion, entanglement, posture, restraint,
+blindness and incapacitation constrain movement consistently. Multiple Speed
+halves still require the same explicit GC ruling as PCs, rather than guessing.
+NPCs also use the existing idempotent fatigue application, ordinary rest/Drunk
+recovery and repeated-exhaustion sleep workflows. Stored history and review
+warnings remain visible; class-specific Mental Leap activation is unchanged.
+A Conditions and movement disclosure offers the applicable NPC tools.
+
+Native Foundry on Actor.eQI7nWpUmeJzjxh8 verified a legal 120-ft. Run, first
+fatigue, duplicate application refusal, exhaustion and blocked Run, then repeated
+exhaustion with Speed 0. ChatMessage.EddaAM9EmQ0gVGjX retained the real +6
+resistance save; ChatMessage.MQV8S7U6AP7lm6Uw retained an actual 8-hour sleep
+requirement. Repeating sleep preparation reused that requirement. Actual rest,
+sleep completion and reload restored Dexterity 18, Speed 30 and Run permission
+while retaining all three application records. Editing another sheet field while
+fatigued preserved the original Dexterity 18.
+
+A separate native effect cycle verified Dexterity 18 → 20 with an owned effect,
+18 with fatigue, 16 after removing only that effect, and 18 after actual recovery.
+Reload preserved the restored score and Run permission. Visual QA also corrected
+the narrow pinned Health tile: it now spans the available row. The real condition
+button was exposed to pointer and keyboard use in both themes at 1280×720,
+ending at 489.5px; the pinned summary was 216.30px high. No browser errors.
+
+Validation: 4,508 Node tests, 988 engine fixtures, 305 layouts, native schema
+cleaning/preparation, lint, formatting, bundle and copied-text checks. B-257 is
+resolved. B-186 and B-190 remain the next core-play review targets.

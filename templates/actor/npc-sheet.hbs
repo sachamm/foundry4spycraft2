@@ -35,8 +35,8 @@
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value">{{system.defense.total}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value">{{signed system.initiative.total}}</b></div>
     {{#each saves}}<div class="sc2-field"><span class="sc2-caption">{{label}}</span><b class="sc2-value">{{signed total}}</b></div>{{/each}}
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.PinnedHealth"}}</span><b class="sc2-value">{{healthChip}}</b></div>
     {{#if system.npcProfile.enabled}}<div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.PinnedXP"}}</span><b class="sc2-value">{{system.npcBuild.xp}}</b></div>{{/if}}
+    <div class="sc2-field npc-pinned-health"><span class="sc2-caption">{{localize "SPYCRAFT.Npc.PinnedHealth"}}</span><b class="sc2-value">{{healthChip}}</b></div>
   </div>
   {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
   <fieldset {{#unless editable}}disabled{{/unless}} class="npc-defense-extras">
@@ -117,7 +117,7 @@
     {{#each abilities}}
       <div class="ability"><button type="button" class="sc2-action" data-action="rollAbility" data-ability="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}" {{sc2tip tip}}><span class="ability-name">{{label}}</span><span class="ability-abbr">{{abbr}}</span></button>
         <b class="sc2-value play-only" {{sc2tip tip}}>{{signed mod}}</b><small class="play-only">{{value}}</small>
-        <input name="system.abilities.{{key}}.value" type="number" value="{{value}}" class="w-2 edit-only" aria-label="{{localize 'SPYCRAFT.Action.ScoreOf' name=label}}" /> <span class="mod edit-only">{{signed mod}}</span></div>
+        <input name="system.abilities.{{key}}.value" type="number" value="{{originalValue}}" class="w-2 edit-only" aria-label="{{localize 'SPYCRAFT.Action.ScoreOf' name=label}}" /> <span class="mod edit-only">{{signed mod}}</span></div>
     {{/each}}
   </div>
   {{#unless system.npcProfile.enabled}}

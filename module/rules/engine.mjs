@@ -1,3 +1,4 @@
+import { derivedMovementPlan } from "./derived-movement.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { computeDrainedAgent } from "./drained.mjs";
 import { classFeatureLevels, expertClassQualification } from "./class-features.mjs";
@@ -1835,12 +1836,6 @@ function deriveFinalTotals(state) {
       { source: loc`Fleet (net benefit replacing identical class/gear Speed)`, value: sys.fleetSpeed.qualityIncrease }
     ];
   for (const entry of sys.attributeCollapse.entries) warnings.push(`${entry.label} ${entry.score}: ${entry.text}`);
-  sys.incapacitatedForMovement =
-    sys.attributeCollapse.immobile ||
-    sys.mentalLeapState.unconscious ||
-    ["dead", "dazed", "stunned", "paralyzed", "bound", "sleeping", "held", "pinned"].some(
-      key => sys.conditionContext?.[key] === true
-    );
   const ordinarySpeed = Math.max(
     0,
     sys.fleetSpeed.baseSpeed +
@@ -1849,48 +1844,9 @@ function deriveFinalTotals(state) {
       sys.encumbrance.speed +
       (misc.speed ?? 0)
   );
-  const speedHalves =
-    Number(sys.mentalLeapState.exhausted) +
-    Number(sys.conditionPenalties.entangled) +
-    Number(sys.conditionContext?.blinded === true) +
-    Number(sys.conditionContext?.crouched === true);
-  sys.conditionSpeedReview = speedHalves > 1 && !sys.encumbrance.immobile && !sys.incapacitatedForMovement;
-  sys.speed =
-    sys.encumbrance.immobile || sys.incapacitatedForMovement
-      ? 0
-      : sys.conditionSpeedReview
-        ? null
-        : Math.floor(ordinarySpeed * (speedHalves ? 0.5 : 1));
+  Object.assign(sys, derivedMovementPlan(sys, ordinarySpeed));
   if (sys.conditionSpeedReview)
     warnings.push(loc`Multiple conditions halve Speed: the combined multiplier requires the pending GC ruling.`);
-  sys.canRun =
-    sys.mentalLeapState.canRun &&
-    !sys.incapacitatedForMovement &&
-    !sys.encumbrance.immobile &&
-    !sys.conditionPenalties.entangled &&
-    !sys.conditionPenalties.prone &&
-    !sys.conditionPenalties.sprawled;
-
-  sys.postureMovement = {
-    prone: sys.conditionPenalties.prone,
-    sprawled: sys.conditionPenalties.sprawled,
-    standardMove:
-      !sys.incapacitatedForMovement &&
-      !sys.encumbrance.immobile &&
-      !sys.conditionPenalties.prone &&
-      !sys.conditionPenalties.sprawled,
-    bullRush:
-      !sys.incapacitatedForMovement &&
-      !sys.encumbrance.immobile &&
-      !sys.conditionPenalties.prone &&
-      !sys.conditionPenalties.sprawled,
-    withdraw:
-      !sys.incapacitatedForMovement &&
-      !sys.encumbrance.immobile &&
-      !sys.conditionPenalties.prone &&
-      !sys.conditionPenalties.sprawled,
-    bonusStep: !sys.incapacitatedForMovement && !sys.encumbrance.immobile && !sys.conditionPenalties.sprawled
-  };
 
   // Vitality: max die at level 1, then rolls; Con modifier every level.
   let vit = 0;

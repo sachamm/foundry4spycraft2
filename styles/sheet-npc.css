@@ -230,3 +230,6 @@
   font-family: var(--sc2-num);
   overflow-wrap: anywhere;
 }
+.spycraft2.sheet.npc .npc-pinned-health {
+  grid-column: 1 / -1;
+}

@@ -1972,6 +1972,19 @@
    "Dodge": "Dodge modifier",
    "Vulnerable": "Vulnerable: Dexterity contribution {dex}; positive dodge Defense lost {lost}.",
    "BuiltInChoice": "For Augmented or Natural Attack, name the actual owned item in Details. Use distinct item names to identify separate choices."
+  },
+  "NPCConditions": {
+   "Title": "Conditions and movement",
+   "Speed": "Speed: {speed} ft.",
+   "ReviewSpeed": "Review the combined Speed reductions with the GC.",
+   "NoRun": "Run is unavailable in the current condition.",
+   "Apply": "Apply fatigue or exhaustion",
+   "BeginRest": "Begin ordinary fatigue recovery",
+   "CompleteRest": "Confirm completed fatigue recovery",
+   "BeginDrunkSleep": "Begin ordinary Drunk recovery",
+   "CompleteDrunkSleep": "Confirm completed Drunk recovery",
+   "BeginUnconsciousSleep": "Begin sleep after repeated exhaustion",
+   "CompleteUnconsciousSleep": "Confirm completed unconsciousness recovery"
   }
  }
 }

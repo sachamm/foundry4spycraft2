@@ -86,6 +86,24 @@ const apply = (a, id, extra = {}) => a.applyFatigue({ ...declare, id, ...extra }
     duration: { seconds: 800 },
     flags: { independent: { keep: "metadata" } }
   };
+
+test("owned NPCs use the shared idempotent fatigue stages and ordinary recovery workflow", async () => {
+  game.time.worldTime = 0;
+  const a = actor();
+  a.type = "npc";
+  const first = await apply(a, "npc-first");
+  assert.equal(first.after, "fatigued");
+  assert.equal((await apply(a, "npc-first")).id, first.id);
+  assert.equal(a.system.fatigueApplications.length, 1);
+  assert.equal((await apply(a, "npc-second")).after, "exhausted");
+  const begin = await a.beginFatigueRest({ confirmed: true, ordinaryRuleConfirmed: true });
+  assert.ok(begin);
+  game.time.worldTime = 3600;
+  a.derive();
+  assert.ok(await a.completeFatigueRest({ fullRecoveryConfirmed: true }));
+  assert.equal(a.statuses.has("exhausted"), false);
+  assert.equal(a.system.fatigueApplications.length, 2);
+});
 test("the actual workflow applies all three stages with exact attribute/Speed/save scopes, stable receipts and unchanged health/dice", async () => {
   const a = actor();
   assert.equal(await a.applyFatigue(), null);

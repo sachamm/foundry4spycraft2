@@ -4,6 +4,7 @@ import { defaultNpcProfile } from "../module/rules/npcs.mjs";
 import { SPYCRAFT } from "../module/config.mjs";
 import { creationPolicyRecord } from "../module/rules/creation-policy.mjs";
 import { startingAttributeRecord } from "../module/rules/starting-attributes.mjs";
+import { combatMovementPlan } from "../module/rules/combat-movement.mjs";
 class StubSheet {
   constructor(actor) {
     this.actor = actor;
@@ -49,6 +50,94 @@ const make = () => ({
   saves: { fort: { base: 0 }, ref: { base: 0 }, will: { base: 0 } },
   defense: { bonus: 0 },
   initiative: { bonus: 0 }
+});
+
+test("NPC conditions project fatigue scores, Speed, posture and Run from original values for every health model", () => {
+  for (const enabled of [true, false])
+    for (const npcType of ["standard", "special", "animal", "villain"]) {
+      const model = Object.assign(new NpcData(), make(), { npcType });
+      model.npcProfile.enabled = enabled;
+      model.parent = { items: [], flags: {}, statuses: new Set() };
+      model.prepareDerivedData();
+      assert.equal(model.canRun, true);
+      assert.doesNotThrow(() => combatMovementPlan(model, { action: "run", distanceFeet: 120, routeConfirmed: true }));
+      const normalDefense = model.defense.total;
+      for (const [condition, str, dex, speed] of [
+        ["fatigued", 8, 12, 30],
+        ["exhausted", 4, 8, 15]
+      ]) {
+        model.parent.statuses = new Set([condition]);
+        model.prepareDerivedData();
+        assert.equal(model.abilities.str.value, str);
+        assert.equal(model.abilities.dex.value, dex);
+        assert.equal(model.abilities.dex.originalValue, 14);
+        assert.equal(model.speed, speed);
+        assert.equal(model.canRun, false);
+        assert.throws(
+          () => combatMovementPlan(model, { action: "run", distanceFeet: speed, routeConfirmed: true }),
+          /cannot Run/
+        );
+        assert.equal(model.mentalLeapState.fatigueSaveBonus, 6);
+        const defense = model.defense.total;
+        model.prepareDerivedData();
+        assert.equal(model.defense.total, defense);
+        assert.equal(model.abilities.dex.value, dex);
+      }
+      for (const [condition, speed, standing] of [
+        ["held", 0, false],
+        ["entangled", 15, true],
+        ["blind", 15, true],
+        ["crouched", 15, true],
+        ["prone", 30, false],
+        ["sprawled", 30, false]
+      ]) {
+        model.parent.statuses = new Set([condition]);
+        model.prepareDerivedData();
+        assert.equal(model.speed, speed, condition);
+        assert.equal(model.postureMovement.standardMove, standing, condition);
+        if (!standing || condition === "entangled") assert.equal(model.canRun, false);
+      }
+      model.parent.statuses.clear();
+      model.prepareDerivedData();
+      assert.equal(model.abilities.dex.value, 14);
+      assert.equal(model.defense.total, normalDefense);
+      assert.equal(model.canRun, true);
+    }
+});
+
+test("NPC fatigue honors earned Guts and resolves collapse and combined Speed reductions conservatively", () => {
+  const model = Object.assign(new NpcData(), make());
+  model.parent = { items: [{ type: "feat", name: "Guts", system: {} }], flags: {}, statuses: new Set(["fatigued"]) };
+  model.prepareDerivedData();
+  assert.equal(model.abilities.dex.value, 14);
+  assert.equal(model.canRun, true);
+  model.parent.statuses = new Set(["exhausted", "blind"]);
+  model.prepareDerivedData();
+  assert.equal(model.abilities.dex.value, 8);
+  assert.equal(model.speed, null);
+  assert.equal(model.conditionSpeedReview, true);
+  model.parent.statuses = new Set(["exhausted"]);
+  model.abilities.str.value = 0; // The prepared score corresponds to an original Strength of 6.
+  model.prepareDerivedData();
+  assert.equal(model.abilities.str.originalValue, 6);
+  assert.equal(model.attributeCollapse.immobile, true);
+  assert.equal(model.speed, 0);
+});
+
+test("NPC fatigue preserves native effect-adjusted scores while its editor retains original source values", () => {
+  const model = Object.assign(new NpcData(), make());
+  model._source = { abilities: structuredClone(model.abilities) };
+  model.abilities.dex.value += 2;
+  model.parent = { items: [], flags: {}, statuses: new Set(["fatigued"]) };
+  model.prepareDerivedData();
+  assert.equal(model.abilities.dex.value, 14);
+  assert.equal(model.abilities.dex.originalValue, 14);
+  model.prepareDerivedData();
+  assert.equal(model.abilities.dex.value, 14);
+  model.parent.statuses.clear();
+  model.prepareDerivedData();
+  assert.equal(model.abilities.dex.value, 16);
+  assert.equal(model._source.abilities.dex.value, 14);
 });
 
 test("NPC Defense condition changes preserve saved adjustments and never accumulate on preparation", () => {

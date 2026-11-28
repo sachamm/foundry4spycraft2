@@ -73,6 +73,10 @@ import {
 import { actorConditionContext } from "../rules/condition-context.mjs";
 import { npcBuiltInPlan } from "../rules/npc-weapons.mjs";
 import { npcDefensePlan } from "../rules/npc-defense.mjs";
+import { mentalLeapState } from "../rules/mental-leap.mjs";
+import { attributeCollapsePlan, conditionRollPenalties } from "../rules/attributes.mjs";
+import { derivedMovementPlan } from "../rules/derived-movement.mjs";
+import { fatigueApplicationHistory, fatigueRestStatus } from "../rules/fatigue.mjs";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
@@ -257,6 +261,15 @@ export class NpcData extends BaseActorData {
     } catch (error) {
       this.drainedState = { needsReview: true, problem: error.message };
     }
+    this.mentalLeapState = mentalLeapState(this);
+    for (const [key, ability] of Object.entries(this.abilities)) {
+      const unconditioned = ability.value - (ability.temporaryBonus ?? 0);
+      ability.originalValue = this._source?.abilities?.[key]?.value ?? unconditioned;
+      ability.temporaryBonus = this.mentalLeapState.bonuses[key] ?? 0;
+      ability.value = unconditioned + ability.temporaryBonus;
+    }
+    this.attributeCollapse = attributeCollapsePlan(this);
+    this.conditionPenalties = conditionRollPenalties(this);
     // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
     this.qualityEffects = npcQualityEffects(this.npcProfile?.enabled ? this.npcProfile : null, {
       type: this.npcType === "villain" ? "special" : this.npcType,
@@ -359,6 +372,15 @@ export class NpcData extends BaseActorData {
   }
 
   reviewCreationRules() {
+    this.warnings.push(...this.mentalLeapState.warnings);
+    this.fatigueApplicationHistory = fatigueApplicationHistory(this);
+    this.fatigueRestState = fatigueRestStatus(this);
+    this.drunkSleepState = fatigueRestStatus({ ...this, fatigueRest: this.drunkSleep }, { restKind: "drunk" });
+    this.warnings.push(...this.fatigueApplicationHistory.warnings);
+    for (const state of [this.fatigueRestState, this.drunkSleepState])
+      if (state?.needsReview) this.warnings.push(state.warning);
+    if (this.conditionSpeedReview)
+      this.warnings.push(loc`Multiple conditions halve Speed: the combined multiplier requires the pending GC ruling.`);
     if (this.drainedState?.needsReview) this.warnings.push(this.drainedState.problem);
     if (this.drainedState?.manualStats)
       this.warnings.push(loc`Drained: the GC manages this NPC's manual statistics and their eventual restoration.`);
@@ -376,7 +398,12 @@ export class NpcData extends BaseActorData {
       return;
     }
     this.startingAttributeReview = startingAttributeReview(
-      this,
+      {
+        ...this,
+        abilities: Object.fromEntries(
+          Object.entries(this.abilities).map(([key, ability]) => [key, { ...ability, value: ability.originalValue }])
+        )
+      },
       [...(this.parent?.items ?? [])],
       this.parent?.flags?.spycraft2?.creationAttributes,
       cap
@@ -436,7 +463,10 @@ export class NpcData extends BaseActorData {
     this.saves.ref.total += equipment.reflex;
     if (Number.isFinite(this.qualityEffects?.speed))
       this.qualityEffects.speed = Math.max(5, this.qualityEffects.speed + equipment.speed);
-    this.speed = this.qualityEffects?.speed ?? 30;
+    Object.assign(
+      this,
+      derivedMovementPlan(this, Math.max(0, (this.qualityEffects?.speed ?? 30) + this.cheapShotSpeedPenalty))
+    );
     this.survivalStats = characterSurvivalStats(this);
     this.resistanceReview = qualityResistanceReview(this);
   }
@@ -455,6 +485,12 @@ export class NpcData extends BaseActorData {
         dodge: int(0, { min: -Number.MAX_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER })
       }),
       damageTrack: record("damageTrack", { nullable: true, initial: null }),
+      fatigueRest: record("fatigueRest", { nullable: true, initial: null }),
+      drunkSleep: record("drunkSleep", { nullable: true, initial: null }),
+      fatigueApplications: recordList("fatigueApplications"),
+      mentalLeapFatigueEvents: recordList("mentalLeapFatigueEvents"),
+      mentalLeapRecovery: record("mentalLeapRecovery", { nullable: true, initial: null }),
+      mentalLeapSleep: record("mentalLeapSleep", { nullable: true, initial: null }),
       disposition: record("disposition", { initial: () => ({ base: "neutral", toward: {} }) }),
       manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),
       npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain", "animal"] }),

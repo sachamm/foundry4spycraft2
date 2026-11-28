@@ -1954,6 +1954,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       // Buttons that call the Actor method of the same name.
       ...actorMethods(
         "manageTakedown",
+        "applyFatigue",
+        "beginFatigueRest",
+        "completeFatigueRest",
+        "beginDrunkSleep",
+        "completeDrunkSleep",
+        "startMentalLeapSleep",
+        "completeMentalLeapSleep",
         "applyShaken",
         "reviewShakenApplication",
         "applyBaffled",
@@ -2144,6 +2151,19 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       },
       hazards: hazardsView(this.actor),
       npcDrained: npcDrainedView(this.actor),
+      npcConditions: this.isEditable
+        ? {
+            speed: sys.speed,
+            reviewSpeed: sys.conditionSpeedReview,
+            canRun: sys.canRun,
+            fatigue: sys.conditionContext?.fatigued || sys.conditionContext?.exhausted,
+            fatigueRest: sys.fatigueRest?.completedAt === null,
+            drunk: sys.conditionContext?.drunk,
+            drunkSleep: sys.drunkSleep?.completedAt === null,
+            unconscious: sys.mentalLeapState?.recoveryAvailable,
+            unconsciousSleep: sys.mentalLeapSleep?.completedAt === null
+          }
+        : null,
       npcRestraints: {
         held: !!sys.conditionContext?.held || !!sys.conditionContext?.pinned,
         canEscape: this.actor.isOwner && (!!sys.conditionContext?.held || !!sys.conditionContext?.pinned),

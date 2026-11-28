@@ -29,6 +29,9 @@ export class SpycraftActor extends ActorRolls(
   /** @override */
   prepareData() {
     this._npcHealthEffects = { vitality: 0, wounds: 0 };
+    // Native preparation resets scores and then applies effects; no old condition adjustment survives that reset.
+    if (this.type === "npc")
+      for (const ability of Object.values(this.system.abilities ?? {})) delete ability.temporaryBonus;
     super.prepareData();
     if (this.type === "npc" && Number.isFinite(this.system.damageSave)) {
       const system = this.system,

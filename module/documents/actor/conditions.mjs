@@ -559,7 +559,7 @@ export const ActorConditions = Base =>
     }
 
     async beginFatigueRest(options = {}, restKind = "fatigue") {
-      if (this.type !== "agent" || !this.isOwner) return null;
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       if (!["fatigue", "drunk"].includes(restKind)) return null;
       const restKey = restKind === "drunk" ? "drunkSleep" : "fatigueRest";
       const available =
@@ -619,7 +619,7 @@ export const ActorConditions = Base =>
     }
 
     async completeFatigueRest(options = {}, restKind = "fatigue") {
-      if (this.type !== "agent" || !this.isOwner) return null;
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       if (!["fatigue", "drunk"].includes(restKind)) return null;
       const restKey = restKind === "drunk" ? "drunkSleep" : "fatigueRest";
       const expectedRest = JSON.stringify(this.system[restKey] ?? null);
@@ -717,7 +717,7 @@ export const ActorConditions = Base =>
     }
 
     async applyFatigue(options = {}) {
-      if (this.type !== "agent" || !this.isOwner) return null;
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       let input = options;
       const expectedState = fatigueStateSignature({ ...this.system, ...this.attributeRuleContext });
       if (!Object.keys(input).length) {
@@ -845,7 +845,7 @@ export const ActorConditions = Base =>
     }
 
     async recordFatigueEscalation(options = {}) {
-      if (this.type !== "agent" || !this.isOwner) return null;
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       let input = options;
       if (input.confirmed === undefined) {
         input = await systemDialog.input({
@@ -884,7 +884,8 @@ export const ActorConditions = Base =>
     }
 
     async startMentalLeapSleep(options = {}) {
-      if (this.type !== "agent" || !this.isOwner || !this.system.mentalLeapState?.recoveryAvailable) return null;
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner || !this.system.mentalLeapState?.recoveryAvailable)
+        return null;
       const causes = this.system.mentalLeapState.unconsciousCauses ?? [],
         expected = JSON.stringify(causes.map(c => c.key).sort()),
         beforeInput = this.system.mentalLeapSleep,
@@ -964,7 +965,7 @@ export const ActorConditions = Base =>
     }
 
     async completeMentalLeapSleep(options = {}) {
-      if (this.type !== "agent" || !this.isOwner) return null;
+      if (!["agent", "npc"].includes(this.type) || !this.isOwner) return null;
       let input = options;
       if (input.fullSleepConfirmed === undefined) {
         const sleep = this.system.mentalLeapSleep,

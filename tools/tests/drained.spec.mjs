@@ -5,6 +5,52 @@ const css = systemCss(),
   environment = createEnvironment();
 
 for (const theme of ["light", "dark"])
+  test(`NPC condition tools and pinned health remain usable in a narrow ${theme} sheet`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    const html = environment.render("systems/spycraft2/templates/actor/npc-sheet.hbs", {
+      actor: { name: "Condition review NPC" },
+      editable: true,
+      editMode: true,
+      system: {
+        npcProfile: { enabled: true },
+        npcBuild: { xp: 120 },
+        effectiveThreatLevel: 10,
+        bab: 10,
+        defense: { total: 24 },
+        initiative: { total: 8 },
+        defenseExtras: { misc: 1, dodge: 3 }
+      },
+      healthChip: "vitality 120/120 · wounds 18/18",
+      saves: [
+        { label: "Fortitude", total: 10 },
+        { label: "Reflex", total: 12 },
+        { label: "Will", total: 9 }
+      ],
+      npcConditions: { speed: 15, canRun: false, fatigue: true, fatigueRest: true }
+    });
+    await page.setContent(
+      `<style>${css} body { margin: 0; } main.application { width: 480px; height: 660px; margin: 8px; display: flex; flex-direction: column; overflow: hidden; } main.application > .window-content { display: block; flex: 1; min-height: 0; overflow: auto; padding: 12px; }</style><main class="application spycraft2 sheet actor npc theme-${theme}"><div class="window-content">${html}</div></main>`
+    );
+    const health = page.locator(".npc-pinned-health");
+    const grid = page.locator(".npc-pinned");
+    expect((await health.boundingBox()).width).toBeGreaterThan((await grid.boundingBox()).width * 0.8);
+    expect((await grid.boundingBox()).height).toBeLessThan(210);
+    const tools = page.locator(".npc-condition-tools");
+    await tools.locator("summary").click();
+    await expect(tools).toContainText("Speed: 15 ft.");
+    await expect(tools).toContainText("Run is unavailable");
+    const last = tools.locator('[data-action="completeFatigueRest"]');
+    await last.scrollIntoViewIfNeeded();
+    await last.focus();
+    await expect(last).toBeFocused();
+    const box = await last.boundingBox();
+    expect(box.y + box.height).toBeLessThanOrEqual(680);
+    expect(box.y).toBeGreaterThan((await grid.boundingBox()).y + (await grid.boundingBox()).height);
+    await expect(tools.locator('[data-action="completeMentalLeapSleep"]')).toHaveCount(0);
+    expect(await tools.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  });
+
+for (const theme of ["light", "dark"])
   for (const state of ["held", "pending", "review", "observer"])
     test(`NPC grapple ${state} controls respect ownership and fit in ${theme}`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 });

@@ -1,5 +1,15 @@
 {{!-- Contagions, fire and the other damage types at work on a character; shared by the agent and NPC sheets. --}}
 <div class="hazards">
+  {{#if npcConditions}}<details class="npc-condition-tools" data-key="npcConditions"><summary>{{localize "SPYCRAFT.NPCConditions.Title"}}</summary>
+    <p>{{#if npcConditions.reviewSpeed}}{{localize "SPYCRAFT.NPCConditions.ReviewSpeed"}}{{else}}{{localize "SPYCRAFT.NPCConditions.Speed" speed=npcConditions.speed}}{{/if}}{{#unless npcConditions.canRun}} {{localize "SPYCRAFT.NPCConditions.NoRun"}}{{/unless}}</p>
+    <button type="button" class="sc2-action" data-action="applyFatigue">{{localize "SPYCRAFT.NPCConditions.Apply"}}</button>
+    {{#if npcConditions.fatigue}}<button type="button" class="sc2-action" data-action="beginFatigueRest">{{localize "SPYCRAFT.NPCConditions.BeginRest"}}</button>{{/if}}
+    {{#if npcConditions.fatigueRest}}<button type="button" class="sc2-action" data-action="completeFatigueRest">{{localize "SPYCRAFT.NPCConditions.CompleteRest"}}</button>{{/if}}
+    {{#if npcConditions.drunk}}<button type="button" class="sc2-action" data-action="beginDrunkSleep">{{localize "SPYCRAFT.NPCConditions.BeginDrunkSleep"}}</button>{{/if}}
+    {{#if npcConditions.drunkSleep}}<button type="button" class="sc2-action" data-action="completeDrunkSleep">{{localize "SPYCRAFT.NPCConditions.CompleteDrunkSleep"}}</button>{{/if}}
+    {{#if npcConditions.unconscious}}<button type="button" class="sc2-action" data-action="startMentalLeapSleep">{{localize "SPYCRAFT.NPCConditions.BeginUnconsciousSleep"}}</button>{{/if}}
+    {{#if npcConditions.unconsciousSleep}}<button type="button" class="sc2-action" data-action="completeMentalLeapSleep">{{localize "SPYCRAFT.NPCConditions.CompleteUnconsciousSleep"}}</button>{{/if}}
+  </details>{{/if}}
     {{#if npcRestraints}}
       {{#if npcRestraints.held}}<section class="hazard npc-restraints"><h4>{{localize "SPYCRAFT.NPCRestraints.Title"}}</h4>
         <p>{{localize "SPYCRAFT.NPCRestraints.Held"}}</p>
