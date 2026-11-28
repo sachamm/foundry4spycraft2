@@ -24,7 +24,18 @@ export async function npcChoices({ actors = game.actors, packs = game.packs } = 
   const byName = (a, b) => a.name.localeCompare(b.name);
   const world = [...(actors ?? [])]
     .filter(actor => actor.type === "npc")
-    .map(actor => ({ uuid: actor.uuid, name: actor.name, source: loc`World`, kind: kindLabel(actor.system?.npcType) }))
+    .map(actor => ({
+      uuid: actor.uuid,
+      name: actor.name,
+      source: loc`World`,
+      // The reward its build is worth at the mission's Threat Level; a compendium entry has none until imported.
+      kind: [
+        kindLabel(actor.system?.npcType),
+        Number.isFinite(actor.system?.npcBuild?.xp) ? loc`${actor.system.npcBuild.xp} XP` : ""
+      ]
+        .filter(Boolean)
+        .join(", ")
+    }))
     .sort(byName);
   const fromPacks = [];
   for (const pack of packs ?? []) {
@@ -92,7 +103,8 @@ export function spreadCorners({
   height = 1,
   occupied = [],
   bounds = null,
-  blocked = () => false
+  blocked = () => false,
+  snap = null
 }) {
   const stepX = width * gridSize,
     stepY = height * gridSize;
@@ -106,12 +118,19 @@ export function spreadCorners({
     !taken.some(
       box => point.x < box.x + box.w && point.x + stepX > box.x && point.y < box.y + box.h && point.y + stepY > box.y
     );
-  const placed = [];
+  const placed = [],
+    seen = new Set();
   for (let ring = 0; placed.length < count && ring < 40; ring++)
     for (let dy = -ring; dy <= ring && placed.length < count; dy++)
       for (let dx = -ring; dx <= ring && placed.length < count; dx++) {
         if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
-        const point = { x: origin.x + dx * stepX, y: origin.y + dy * stepY };
+        // On a hex grid a square layout is moved onto the hexes as it is laid out, so two copies never share a hex
+        // and the group still comes out at full size.
+        const square = { x: origin.x + dx * stepX, y: origin.y + dy * stepY },
+          point = snap ? snap(square) : square,
+          key = `${Math.round(point.x)},${Math.round(point.y)}`;
+        if (snap && seen.has(key)) continue;
+        seen.add(key);
         if (point.x < 0 || point.y < 0 || !free(point)) continue;
         // Inside the scene's own rectangle, not its padding, and not behind a wall from the centre of the view.
         if (
@@ -198,20 +217,31 @@ export function placementData(
   prototype,
   { corners, names, disposition = "hostile", hidden = false, commanderIndex = null }
 ) {
-  return corners.map((corner, index) => ({
-    ...prototype,
-    ...corner,
-    name:
-      index === commanderIndex ? loc`${names[index] ?? prototype.name} (Commander)` : (names[index] ?? prototype.name),
-    // The squad's Commander is built at Threat Level +2 (p.447); the mark lives on this token's own data.
-    ...(index === commanderIndex ? { delta: { ...(prototype.delta ?? {}), system: { commander: true } } } : {}),
-    hidden,
-    ...(disposition in DISPOSITIONS ? { disposition: DISPOSITIONS[disposition] } : {}),
-    // Several copies of one NPC are separate people: each keeps its own damage.
-    ...(corners.length > 1 ? { actorLink: false } : {}),
-    // A numbered name is final: Foundry's own numbering is not added on top.
-    ...(names[index] && names[index] !== prototype.name ? { appendNumber: false } : {})
-  }));
+  return corners.map((corner, index) => {
+    const name =
+        index === commanderIndex
+          ? loc`${names[index] ?? prototype.name} (Commander)`
+          : (names[index] ?? prototype.name),
+      // Several copies of one NPC are separate people: each keeps its own damage.
+      unlinked = corners.length > 1 || prototype.actorLink === false,
+      // An unlinked copy's own sheet and chat cards carry the token's name, so one combatant never shows two names.
+      // The squad's Commander is built at Threat Level +2 (p.447); the mark lives on this token's own data.
+      delta = {
+        ...(unlinked && name !== prototype.name ? { name } : {}),
+        ...(index === commanderIndex ? { system: { commander: true } } : {})
+      };
+    return {
+      ...prototype,
+      ...corner,
+      name,
+      ...(Object.keys(delta).length ? { delta: { ...(prototype.delta ?? {}), ...delta } } : {}),
+      hidden,
+      ...(disposition in DISPOSITIONS ? { disposition: DISPOSITIONS[disposition] } : {}),
+      ...(corners.length > 1 ? { actorLink: false } : {}),
+      // A numbered name is final: Foundry's own numbering is not added on top.
+      ...(names[index] && names[index] !== prototype.name ? { appendNumber: false } : {})
+    };
+  });
 }
 
 /** Put new tokens into the running fight. One of a kind that has already rolled joins on that kind's Count. */
@@ -308,7 +338,8 @@ export async function addNpcToScene({ uuid = null } = {}) {
       height: prototype.height,
       occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height })),
       bounds: canvas.dimensions?.sceneRect ?? null,
-      blocked: wallBetween(origin, canvas.grid.size, prototype.width, prototype.height)
+      blocked: wallBetween(origin, canvas.grid.size, prototype.width, prototype.height),
+      snap: canvas.grid.isSquare === false ? point => canvas.grid.getTopLeftPoint?.(point) ?? point : null
     }),
     canvas.grid
   );

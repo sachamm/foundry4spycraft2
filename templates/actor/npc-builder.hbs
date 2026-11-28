@@ -27,7 +27,7 @@
       <label><input type="checkbox" name="system.npcProfile.group" {{checked npc.profile.group}} /> {{localize "SPYCRAFT.Template.ActorNpcBuilder.NPCGroup"}}</label>
       <strong>{{localize "SPYCRAFT.Template.ActorNpcBuilder.EffectiveTL"}} {{npc.result.effectiveLevel}}</strong>
     </div>
-    <div class="npc-grade-grid">{{#each npc.grades}}<label>{{label}}<select name="system.npcProfile.grades.{{key}}" data-dtype="Number">{{selectOptions options selected=value}}</select></label>{{/each}}</div>
+    <div class="npc-grade-grid">{{#each npc.grades}}<label>{{label}}{{#if gives}} <span class="npc-grade-gives">{{gives}}</span>{{/if}}<select name="system.npcProfile.grades.{{key}}" data-dtype="Number">{{selectOptions options selected=value}}</select></label>{{/each}}</div>
   </fieldset>
   {{#if npc.result.warnings}}<ul class="npc-warnings" role="status">{{#each npc.result.warnings}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
   <fieldset {{#unless editable}}disabled{{/unless}}>

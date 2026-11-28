@@ -2414,6 +2414,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
           key,
           label: key === "health" ? (result.type === "special" ? loc`Vitality / wounds` : loc`Damage save`) : label,
           value: profile.grades?.[key],
+          // What the grade is worth at this Threat Level, so the GC need not look the table up.
+          gives: npcGradeGives(key, result),
           options: key === "wealth" ? { 0: loc`None`, ...gradeOptions } : gradeOptions
         })),
       skills: (profile.skills ?? []).map((s, index) => ({
@@ -2554,4 +2556,15 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
   static #onItemDelete(event, target) {
     return this._item(target)?.deleteDialog();
   }
+}
+
+/** The figure a statistic's grade produces at the NPC's effective Threat Level, as text for the builder; "" if none. */
+export function npcGradeGives(key, result = {}) {
+  const sign = value => (Number.isFinite(value) ? (value >= 0 ? `+${value}` : `−${Math.abs(value)}`) : "");
+  if (key === "health")
+    return Array.isArray(result.health)
+      ? loc`${result.health[0]} vitality, ${result.health[1]} wounds`
+      : sign(result.health);
+  if (key === "competence") return sign(result.competence);
+  return sign(result.stats?.[key]);
 }

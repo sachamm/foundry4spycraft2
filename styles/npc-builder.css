@@ -52,6 +52,12 @@
   flex-direction: column;
   gap: 4px;
 }
+/* What the chosen grade is worth, beside the statistic's name. */
+.spycraft2 .npc-grade-gives {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--sc2-ink-strong);
+}
 .spycraft2 .npc-results {
   padding: 10px;
   background: var(--sc2-surface-sunk);

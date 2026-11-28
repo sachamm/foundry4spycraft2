@@ -365,6 +365,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         return pressActorCard(acting, "button.sc2-primary-action[data-roll-control]");
       }),
       mobAttack: guard((event, target) => turn.mobAttackDialog(game.combat, target.dataset.key)),
+      openSystemSettings: guard(() => game.settings.sheet?.render?.(true)),
       consoleView: guard((event, target) => rememberView(target.dataset.view, viewState())),
       startConflict: guard(() => conflicts.startConflictDialog()),
       addOrganization: guard(() => organizations.editOrganization()),
@@ -863,6 +864,17 @@ export function consoleContext() {
       session: dice.current ? (sessionAt ? loc`begun ${sessionAt}` : loc`begun`) : loc`not begun`
     },
     wrap: {
+      // What is still open is said first, since ending the mission settles XP on what is ticked now.
+      objectives: (open =>
+        !m.objectives.length
+          ? loc`No objectives recorded`
+          : !open
+            ? loc`Every objective is completed`
+            : open === 1
+              ? loc`1 objective is not completed; tick it in Objectives if the team achieved it`
+              : loc`${open} objectives are not completed; tick in Objectives those the team achieved`)(
+        m.objectives.filter(objective => !objective.complete).length
+      ),
       standing:
         team.length && paid >= team.length
           ? loc`Standing: everyone paid`

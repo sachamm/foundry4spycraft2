@@ -338,6 +338,12 @@ export function queueTokenLinkReview() {
   }, 750);
 }
 
+/** The name an unlinked token's own actor should take after the token was renamed, or null when nothing changes. */
+export function unlinkedRename(token, changed) {
+  if (typeof changed?.name !== "string" || !changed.name || token?.actorLink !== false) return null;
+  return token.actor && token.actor.name !== changed.name ? changed.name : null;
+}
+
 /** Register the setting and hooks. Call during `init`. */
 export function installTokenLinks() {
   game.settings.register(SYSTEM, DISMISSED_SETTING, { scope: "world", config: false, type: Object, default: {} });
@@ -354,5 +360,13 @@ export function installTokenLinks() {
   });
   Hooks.on("updateToken", (token, changed) => {
     if (changed.actorLink === false && isPersonalCharacter(token.baseActor)) queueTokenLinkReview();
+  });
+  // An unlinked token renamed on the map: its own actor takes the name, so its cards and sheet match the tracker.
+  Hooks.on("updateToken", (token, changed, _options, userId) => {
+    const name = unlinkedRename(token, changed);
+    if (name && userId === game.user?.id)
+      token.actor
+        .update({ name })
+        .catch(error => console.warn("Field Agent's Handbook | Token actor kept its name.", error));
   });
 }

@@ -12,6 +12,28 @@ export function agentTokenDefaults(given = {}) {
 }
 
 /**
+ * The prototype-token settings a new NPC takes unless the creator chose otherwise: hostile, its name and bars shown
+ * to the GC, and for a special character a linked token with vitality and wounds bars. A standard NPC stays unlinked,
+ * since each token is another one of its kind, and has no pool a bar could show. Null when nothing is added.
+ * @param {object} given    the prototype token in the creation data
+ * @param {string} npcType  "standard", "special", "villain" or "animal"
+ */
+export function npcTokenDefaults(given = {}, npcType = "standard") {
+  const out = {},
+    C = globalThis.CONST ?? {},
+    special = npcType === "special" || npcType === "villain";
+  if (given.disposition === undefined) out.disposition = C.TOKEN_DISPOSITIONS?.HOSTILE ?? -1;
+  if (given.displayName === undefined) out.displayName = C.TOKEN_DISPLAY_MODES?.OWNER_HOVER ?? 20;
+  if (special) {
+    if (given.actorLink === undefined) out.actorLink = true;
+    if (given.displayBars === undefined) out.displayBars = C.TOKEN_DISPLAY_MODES?.OWNER ?? 40;
+    if (given.bar1?.attribute === undefined) out.bar1 = { attribute: "vitality" };
+    if (given.bar2?.attribute === undefined) out.bar2 = { attribute: "wounds" };
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+/**
  * Character data imported from a file (the sheet's Import Data), with the prototype token linked when it is an agent's
  * or a companion's. An export from before linked tokens were the default would otherwise bring back an unlinked
  * prototype, and every token placed from it would keep its own copy of the character. Null when nothing changes.

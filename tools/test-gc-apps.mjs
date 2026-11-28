@@ -2318,3 +2318,9 @@ test("the chat log's right-click menu offers the ruling to the GC on a roll card
     game.user.isGM = before.isGM;
   }
 });
+
+test("the Damage save dialog shows the DC the new injury will be rolled against (B-068)", async () => {
+  const { damageSavePreview } = await import("../module/apps/gc/npc-damage-save.mjs");
+  assert.match(damageSavePreview(6, 9), /DC 17 \(10 \+ half of 15: 6 already taken this scene and 9 now\)/);
+  assert.match(damageSavePreview(6, ""), /Enter the damage/);
+});

@@ -36,7 +36,7 @@ export function healthLine(actor) {
   if (actor.type === "npc" && !npcIsSpecial(actor)) {
     const save = damageSaveState(actor);
     if (save.track.state && save.track.state !== "active") return loc`Out of the fight (${save.track.state})`;
-    return loc`Damage save ${signed(save.bonus)}, next DC ${save.nextDC}`;
+    return loc`Damage save ${signed(save.bonus)}, DC ${save.nextDC} before a new hit`;
   }
   return loc`Vitality ${system.vitality?.value ?? 0}/${system.vitality?.max ?? 0}, wounds ${system.wounds?.value ?? 0}/${system.wounds?.max ?? 0}`;
 }

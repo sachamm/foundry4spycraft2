@@ -78,7 +78,10 @@ export async function checkIncomingDefense(actor, known = {}) {
   const coverInput = `<fieldset><legend>${loc`Cover from this attacker`}</legend><p>${loc`Choose the best personal source and best scenery source on the attacker's side of the cover. Enter grades after any other separately adjudicated grade adjustments. Do not preapply the automatically selected Precision Takedown, CQB Supremacy or Sharpshooter Basics reductions. Other options modifying the cover Defense bonus itself remain separate, except Safe Attack below.`}</p>${Number.isSafeInteger(known.sceneryCover) ? `<p class="hint">${known.sceneryCover ? loc`Measured from the map: ${esc(COVER_GRADES[known.sceneryCover] ?? "")} cover from walls. Change it if the map has it wrong.` : loc`Measured from the map: no cover from walls.`}</p>` : ""}${["personal", "scenery"].map(kind => `<label>${loc`${kind === "personal" ? "Personal" : "Scenery"} cover`} <select name="${kind}Cover">${COVER_GRADES.map((label, i) => `<option value="${i}"${kind === "scenery" && i === known.sceneryCover ? " selected" : ""}>${esc(label)}</option>`).join("")}</select></label>`).join("")}${terrainCoverContent(actor.system)}${[...(game.actors ?? [])].some(a => a.system?.activeFeatNames?.includes("Horde Basics")) ? `<label>${loc`Horde Basics: this side’s advantage (raises personal cover)`} <select name="hordeAdvantage"><option value="">${loc`None or no Horde Basics on this side`}</option><option value="2">${loc`2-to-1: at least 1/4 personal cover`}</option><option value="3">${loc`3-to-1 or more: at least 1/2 personal cover`}</option></select></label>` : ""}<label>${loc`Ranged attacker and actual weapon (CQB Supremacy / Sharpshooter Basics; optional)`} <select name="coverAttacker"><option value="">${loc`No automatic ranged-feat reduction`}</option>${[...sources].map(([id, { attacker, weapon }]) => `<option value="${esc(id)}">${esc(attacker.name)} — ${esc(weapon.name)}</option>`).join("")}</select></label><label>${loc`Counter-Terrorist attacker (optional; automatic for the CQB attacker selected above)`} <select name="precisionAttacker"><option value="">${loc`No additional attacker selection`}</option>${[...precisionSources].map(([id, a]) => `<option value="${esc(id)}">${loc`${esc(a.name)} — Precision Takedown ${precisionTakedownGrade(a.system) === 2 ? "II" : "I"}`}</option>`).join("")}</select></label><label>${loc`Target distance in feet for CQB Supremacy`} <input name="coverDistance" type="number" min="0" step="any"${Number.isFinite(known.distanceFeet) ? ` value="${known.distanceFeet}"` : ""} /></label><label><input name="coverOpponent" type="checkbox" /> ${loc`This character is an opponent of the selected attacker`}</label><label>${loc`Remaining human-shield Defense bonus after cover-grade reductions`} <input name="humanShieldDefense" type="number" value="0" min="0" max="8" step="1" /></label><label><input name="humanShieldConfirmed" type="checkbox" /> ${loc`The GC confirmed this remaining component; it is supplied by a human shield`}</label><p>${loc`Use 0 without a human shield. The GC determines which component remains after grade reductions. An actual Counter-Terrorist level 4+ halves only this component with Safe Attack; other cover and penetration remain separate.`}</p></fieldset>`;
   const input = await formDialog({
     title: loc`Incoming attack — Defense`,
-    intro: loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`,
+    intro: Number.isFinite(actor.system.defense?.total)
+      ? loc`${actor.name}'s Defense is ${actor.system.defense.total} as the sheet stands, with current conditions and class benefits. Press the button to check it as it is; open Cover only when this attack is affected by it.`
+      : loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`,
+    ok: loc`Check Defense`,
     fields: [
       raw(
         actor.system.weaponSpecialist?.abilities?.includes("Foibles")
@@ -92,7 +95,10 @@ export async function checkIncomingDefense(actor, known = {}) {
               .join("")}</select></label>`
           : ""
       ),
-      raw(coverInput),
+      // Most attacks need none of this: it stays folded away unless the map already measured cover.
+      raw(
+        `<details class="sc2-defense-cover"${known.sceneryCover ? " open" : ""}><summary>${loc`Cover`}</summary>${coverInput}</details>`
+      ),
       raw(circlingInput),
       raw(ghostCoverContent(actor)),
       raw(

@@ -7,7 +7,15 @@ import { refuse } from "../../error-notices.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
 import { damageResistancePlan, subdualTypeSource } from "../../rules/resistances.mjs";
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, dialog = {}) => formDialog({ title, ok, dialog, fields: [raw(content)] });
+
+/** The line under the damage field: the DC this injury's save will be rolled against, with its sum shown. */
+export function damageSavePreview(accumulated, damage) {
+  const hit = Math.trunc(Number(damage));
+  if (!(hit >= 1)) return loc`Enter the damage to see the save's DC.`;
+  const total = accumulated + hit;
+  return loc`This save: DC ${damageSaveDC(total)} (10 + half of ${total}: ${accumulated} already taken this scene and ${hit} now).`;
+}
 const options = (rows, selected) =>
   rows
     .map(
@@ -39,8 +47,9 @@ export async function askNpcDamageSaveInput(actor) {
   return await ask(
     loc`${actor.name}: Damage save`,
     `
-      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction; prepared stress/subdual resistance is applied here.`}</p>
-      <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
+      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter the damage left after Damage Reduction: this dialog does not subtract it, unlike Apply damage on a chat card, which does. Prepared stress and subdual resistance are applied here.`}</p>
+      <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" required /></label>
+      <p class="hint" data-save-preview role="status">${esc(damageSavePreview(state.track.accumulated, null))}</p>
       <label>${loc`Type`} <select name="kind">${options(
         [
           ["lethal", loc`Lethal`],
@@ -52,7 +61,19 @@ export async function askNpcDamageSaveInput(actor) {
       ${campaignStressPolicy(actor.system.campaignEffects) ? `<label><input type="checkbox" name="campaignStressAdjusted" /> ${loc`Entered stress already includes campaign multipliers (leave unchecked for raw stress)`}</label>` : ""}<label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
       <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
       <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
-    loc`Roll Damage save`
+    loc`Roll Damage save`,
+    {
+      // The DC is shown before the roll and follows the damage typed.
+      render: (event, app) => {
+        const root = app?.element ?? event?.target,
+          field = root?.querySelector?.('[name="damage"]'),
+          line = root?.querySelector?.("[data-save-preview]");
+        if (!field || !line) return;
+        field.addEventListener("input", () => {
+          line.textContent = damageSavePreview(state.track.accumulated, field.value);
+        });
+      }
+    }
   );
 }
 
