@@ -81,6 +81,8 @@
    "ActionsHeading": "Actions",
    "ItemsAndNotes": "Items and notes",
    "PinnedResults": "What these choices give",
+   "AttackBaseHint": "Before the weapon: each weapon's Attack button adds its own bonuses and shows the full figure.",
+   "FollowingMission": "Set by the mission's Threat Level ({value}) while Follow mission TL is ticked.",
    "PinnedXP": "XP reward",
    "PinnedHealth": "Health",
    "DamageSave": "Damage save",

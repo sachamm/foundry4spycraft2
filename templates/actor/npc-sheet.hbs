@@ -16,7 +16,8 @@
         class="sc2-chip">{{healthChip}}</span>{{#each conditionStamps}}<span
         class="sc2-stamp">{{this}}</span>{{/each}}</div>
       <div class="summary edit-only">
-        <label>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{system.threatLevel}}" class="w-2" /></label>
+        {{!-- While the mission sets it, the typed number is greyed out and shows the one in force. --}}
+        <label{{#if system.usesMissionThreatLevel}} data-tooltip="{{localize 'SPYCRAFT.Npc.FollowingMission' value=system.effectiveThreatLevel}}"{{/if}}>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{#if system.usesMissionThreatLevel}}{{system.effectiveThreatLevel}}{{else}}{{system.threatLevel}}{{/if}}" class="w-2"{{#if system.usesMissionThreatLevel}} disabled{{/if}} /></label>
         <select name="system.npcType" aria-label="{{localize 'SPYCRAFT.Action.NpcType'}}">{{selectOptions npcTypes selected=system.npcType}}</select>
         <label
           data-tooltip="{{localize 'SPYCRAFT.Template.ActorNpcSheet.UseTheActiveMissionSThreat'}}"><input type="checkbox"
@@ -35,7 +36,7 @@
   {{!-- While editing, the numbers the choices produce stay in sight and the builder comes first. --}}
   <div class="npc-pinned" role="status" aria-label="{{localize 'SPYCRAFT.Npc.PinnedResults'}}">
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.ThreatLevel"}}</span><b class="sc2-value">{{system.effectiveThreatLevel}}</b></div>
-    <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Attack"}}</span><b class="sc2-value">{{signed system.bab}}</b></div>
+    <div class="sc2-field" data-tooltip="{{localize 'SPYCRAFT.Npc.AttackBaseHint'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Template.ActorNpcBuilder.AttackBase"}}</span><b class="sc2-value">{{signed system.bab}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value">{{system.defense.total}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value">{{signed system.initiative.total}}</b></div>
     {{#each saves}}<div class="sc2-field"><span class="sc2-caption">{{label}}</span><b class="sc2-value">{{signed total}}</b></div>{{/each}}
