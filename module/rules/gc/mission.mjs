@@ -92,9 +92,14 @@ export function threatBonusActionDice(tl, levels) {
 export function missionStanding(mission) {
   const row = M.reputationByCaliber.find(entry => entry.caliber === mission?.caliber);
   if (!row) return null;
-  const adjust =
-    whole(mission?.threatAdjust, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust) &&
-    !whole(mission?.threatOverride, 1, 20)
+  // Once a Threat Level is fixed, the reward follows the adjustment in it; a later edit counts once applied.
+  const applied =
+    whole(mission?.threatLevel, 1, 20) &&
+    whole(mission?.threatAdjustApplied, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust);
+  const adjust = applied
+    ? mission.threatAdjustApplied
+    : whole(mission?.threatAdjust, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust) &&
+        !whole(mission?.threatOverride, 1, 20)
       ? mission.threatAdjust
       : 0;
   return {

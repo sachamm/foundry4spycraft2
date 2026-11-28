@@ -114,6 +114,11 @@ test("Table 7.10 and Table 7.5 standing rewards", () => {
   assert.deepEqual(missionStanding({ caliber: 1 }), { reputation: 2, netWorth: 100000 });
   assert.deepEqual(missionStanding({ caliber: 5 }), { reputation: 20, netWorth: 1000000 });
   assert.deepEqual(missionStanding({ caliber: 3, threatAdjust: 2 }), { reputation: 12, netWorth: 600000 });
+  // A fixed Threat Level pays on the adjustment it was fixed with, until a new one is applied.
+  assert.deepEqual(
+    missionStanding({ caliber: 3, threatAdjust: 2, threatLevel: 4, threatAdjustApplied: 0 }).reputation,
+    10
+  );
   assert.deepEqual(missionStanding({ caliber: 3, threatAdjust: -1 }), { reputation: 9, netWorth: 450000 });
   assert.equal(missionStanding({ caliber: 6 }), null);
 });

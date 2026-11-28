@@ -142,6 +142,33 @@ export async function editMission() {
     notes: String(input.notes ?? ""),
     team: agents.filter(actor => input[`team-${actor.id}`]).map(actor => actor.id)
   });
+  // A running mission keeps the Threat Level fixed at its start. When the edit would change it, one question applies
+  // the new level, the starting dice and the reward together.
+  if (saved.active) {
+    const next = threatLevel(saved, teamLevels(saved)),
+      applied = Number.isSafeInteger(saved.threatAdjustApplied) ? saved.threatAdjustApplied : saved.threatAdjust;
+    if (next.value !== saved.threatLevel || (!next.override && next.adjust !== applied)) {
+      const following = [...(game.actors ?? [])].filter(actor => actor.type === "npc" && actor.system?.followMission);
+      const apply = await systemDialog.confirm({
+        window: { title: loc`Apply the new Threat Level?` },
+        rejectClose: false,
+        content: `<p>${esc(loc`The mission is running at Threat Level ${saved.threatLevel}. The record now works out to ${next.value}.`)}</p><p>${esc(
+          loc`Apply it now: the starting dice and the standing reward follow it${following.length ? loc`, and ${following.length} NPC(s) that follow the mission's Threat Level change their numbers` : ""}.`
+        )}</p>`,
+        yes: { label: loc`Apply Threat Level ${next.value}` },
+        no: { label: loc`Keep ${saved.threatLevel}` }
+      });
+      if (apply) {
+        const before = saved.threatLevel,
+          result = await fixThreatLevel();
+        if (gcDiceStatus().current) await applySessionDiceAdjustments({ quiet: true });
+        ui.notifications.info(
+          loc`Threat Level ${before} → ${result.value}.${following.length ? ` ${loc`NPCs following it: ${following.map(actor => actor.name).join(", ")}.`}` : ""}`
+        );
+        return getMission();
+      }
+    }
+  }
   // Said once saved, so the GC knows what the record now gives without reopening it.
   ui.notifications.info(
     loc`${saved.name || loc`Mission`} saved. ${saved.active ? loc`Threat Level ${saved.threatLevel} (fixed at Start mission; Recalculate in More tools).` : threatLine(teamLevels(saved), saved.threatAdjust, saved.threatOverride)}`

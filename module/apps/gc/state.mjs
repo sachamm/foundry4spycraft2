@@ -149,7 +149,15 @@ export async function fixThreatLevel() {
   const mission = getMission(),
     levels = teamLevels(mission),
     tl = threatLevel(mission, levels);
-  await setMission({ ...mission, threatLevel: tl.value, threatBase: tl.base, teamLevels: levels });
+  // The adjustment in the fixed level is kept beside it: the standing reward follows the level applied, not one
+  // typed into the record later and not yet applied.
+  await setMission({
+    ...mission,
+    threatLevel: tl.value,
+    threatBase: tl.base,
+    teamLevels: levels,
+    threatAdjustApplied: tl.override ? 0 : tl.adjust
+  });
   return { ...tl, bonusDice: threatBonusActionDice(tl.value, levels) };
 }
 
