@@ -3444,6 +3444,7 @@
    "FuriousStanceRaisesTheInitiativeCount_1l8kjae": "{0}: Furious Stance raises the Initiative Count by {1} for the melee attacks made in round {2} (p.177).",
    "GCActionDice2_1a3p516": "GC action dice: {0} + 2 × {1} = {2}.",
    "GCActionDiceCannotBePaid_0jixj09": "GC action dice cannot be paid with a character bonus grant.",
+   "GCActionDiceLeftChooseThe_1cizyg9": "GC action dice left: {0}. Choose the effect; who pays and from where are under the headings below.",
    "GCActionDiceLeft_0ddkd48": "GC action dice — {0} left{1}",
    "GCActionDicePlayerCharactersAt_108guuv": "GC action dice: player characters at the table + 2 × Caliber {0}.",
    "GCActionDiceResetToFor_1qcd9s6": "GC action dice reset to {0} for Caliber {1}.",

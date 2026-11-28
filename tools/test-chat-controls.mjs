@@ -128,6 +128,13 @@ test("confirmation, critical activation and a required bonus die appear in their
     after.some(label => label.startsWith("card:Activate critical")),
     false
   );
+  // An agent's error is the GC's to activate and pay for: the player who rolled is not offered it.
+  const error = message({ naturalDie: 1, errorConfirmed: true });
+  assert.equal(
+    labels(error).some(label => label.startsWith("card:Activate critical")),
+    false
+  );
+  assert.equal(labels(error, { isGM: true }).includes("card:Activate critical failure… (an opponent pays)"), true);
   assert.equal(after.includes("card:Spend required class bonus die"), false);
 });
 

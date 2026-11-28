@@ -161,6 +161,8 @@ core("criticalControl", 9130, ctx => {
   if (check.criticalSuccess || check.criticalFailure) return null;
   // An NPC's own threat is paid from the GC pool by its own button (module/apps/gc/npc-card-dice.mjs).
   if (actor.type === "npc" && !check.errorConfirmed) return null;
+  // An agent's error is activated by the GC, who pays for it: the player who rolled has nothing to spend here.
+  if (check.errorConfirmed && actor.type === "agent" && !(ctx.user ?? globalThis.game?.user)?.isGM) return null;
   // The label names what is being activated; the dialog works out the cost from the chosen effect.
   const label = check.threatConfirmed
     ? check.checkKind === "attack"
