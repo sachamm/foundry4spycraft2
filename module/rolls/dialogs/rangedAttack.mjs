@@ -2,6 +2,7 @@
  * The "rangedAttack" roll dialog as ordered parts. Each part is one piece of the form; a rule adds its own piece by
  * registering a `dialog` contributor for "rangedAttack" with an `at` between the parts it belongs with.
  * RANGED_ATTACK_DIALOG.anchors gives the position just inside the end of each named section.
+ * Each select is closed by the part that fills it, so a rule's piece placed between two parts never lands inside one.
  */
 import { rollPipeline } from "../../rules/roll-pipeline.mjs";
 import { FOG_SMOKE, AMBIENT_LIGHT } from "../../rules/senses.mjs";
@@ -37,11 +38,11 @@ const parts = [
     () =>
       Object.entries(FOG_SMOKE)
         .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-        .join("")
+        .join("") + "</select></label>"
   ],
   [
     50,
-    () => `</select></label>
+    () => `
             <label>${loc`Ambient light`} <select name="ambientLight"><option value="">${loc`Unspecified / resolve at table`}</option>`
   ],
   [
@@ -49,11 +50,11 @@ const parts = [
     () =>
       Object.entries(AMBIENT_LIGHT)
         .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-        .join("")
+        .join("") + "</select></label>"
   ],
   [
     70,
-    () => `</select></label>
+    () => `
         <label><input type="checkbox" name="blinded" /> ${loc`Additional blindness for this attack`}</label><label><input type="checkbox" name="deafened" /> ${loc`Additional deafness for this attack`}</label><label><input type="checkbox" name="targetCharacter" /> ${loc`Target is a character (Night Training's nearby hearing exception)`}</label>
         `
   ],

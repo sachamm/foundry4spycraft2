@@ -5,7 +5,7 @@ import { enrich } from "./enrich.mjs";
 import { chosenPicks, ruleTip } from "./rule-tips.mjs";
 import { abilityTip, agentBonusTips, npcSkillTip, saveTip, skillTip, weaponAttackTip } from "./bonus-tips.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
-import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
+import { HALF_ACTIONS_PER_TURN, actionBudget, pipSources, setActionsUsed } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { formDialog } from "../apps/dialog-kit.mjs";
@@ -493,7 +493,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         // Choosing the last spent pip frees it; choosing any other marks everything up to it as spent.
         const next = spent === index + 1 ? index : index + 1;
         // The same record the combat tracker's menu keeps, so the two always agree.
-        await combatant.update({ "flags.spycraft2.actions": { round: combat.round, used: next } });
+        const record = actionBudget(combatant.flags?.spycraft2?.actions, { round: combat.round });
+        await combatant.update({ "flags.spycraft2.actions": setActionsUsed(record, next, loc`a click on the pip`) });
         return this.render();
       },
       setupTask: SpycraftAgentSheet.#onSetupTask,
@@ -529,9 +530,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       markInjuryHealed(event, target) {
         return markInjuryHealed(this.actor, target.dataset.injury);
       },
-      takeTotalDefense: costsAction("full", function () {
-        return takeTotalDefense(this.actor);
-      }),
+      takeTotalDefense: costsAction(
+        "full",
+        function () {
+          return takeTotalDefense(this.actor);
+        },
+        () => loc`Total Defense`
+      ),
       takeCleaveBasics() {
         return takeDropFollowUp(this.actor, "cleaveBasics");
       },
@@ -565,9 +570,13 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       enterIdentity(event, target) {
         return enterIdentity(this.actor, target.dataset.id);
       },
-      rollDisarm: costsAction(attackActionCost, function () {
-        return rollDisarm(this.actor);
-      }),
+      rollDisarm: costsAction(
+        attackActionCost,
+        function () {
+          return rollDisarm(this.actor);
+        },
+        () => loc`Disarm`
+      ),
       rollDisarmResponse(event, target) {
         return rollDisarmResponse(this.actor, { weaponId: target.closest("[data-item-id]")?.dataset.itemId });
       },
@@ -709,16 +718,24 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       restoreRules() {
         return reviewActorRules(this.actor, { restore: true });
       },
-      reloadWeapon: costsAction("half", function (event, target) {
-        return reloadWeapon(this._item(target));
-      }),
+      reloadWeapon: costsAction(
+        "half",
+        function (event, target) {
+          return reloadWeapon(this._item(target));
+        },
+        () => loc`Reload`
+      ),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
-      rollAttack: costsAction(attackActionCost, SpycraftAgentSheet.#onRollAttack),
-      rollRangedAttack: costsAction(attackActionCost, function (event, target) {
-        return this.actor.rollRangedAttack(this._item(target));
-      }),
+      rollAttack: costsAction(attackActionCost, SpycraftAgentSheet.#onRollAttack, () => loc`Attack`),
+      rollRangedAttack: costsAction(
+        attackActionCost,
+        function (event, target) {
+          return this.actor.rollRangedAttack(this._item(target));
+        },
+        () => loc`Attack`
+      ),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
       pinPlaySkill: SpycraftAgentSheet.#onPinPlaySkill,
@@ -1574,9 +1591,23 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     const diceShown = Math.min(12, Math.max(diceHeld, Number(sys.actionDice?.max) || 0));
     context.actionDicePips = Array.from({ length: diceShown }, (_, index) => index < diceHeld);
     const halfSpent = this._roundActionsSpent();
+    const roundCombatant = this._roundCombatant(),
+      pipMarks = roundCombatant
+        ? pipSources(
+            actionBudget(roundCombatant.flags?.spycraft2?.actions, { round: roundCombatant.parent.round }),
+            halfSpent
+          )
+        : [];
     context.roundActions = Array.from({ length: this._roundActionLimit() }, (_, index) => ({
       index,
-      spent: index < halfSpent
+      spent: index < halfSpent,
+      // On hover, a spent pip says what marked it; a free one says what a click does.
+      tip:
+        index < halfSpent
+          ? pipMarks[index]
+            ? loc`Spent: marked by ${pipMarks[index]}. Click the last spent pip to free it.`
+            : loc`Spent. Click the last spent pip to free it.`
+          : loc`Free. Click to mark it spent for something this sheet did not count.`
     }));
     context.dying = woundState(Number(sys.wounds?.value), sys.deathThreshold) === "dying";
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
@@ -2134,9 +2165,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       npcRemoveRow: SpycraftNpcSheet.#onRemoveRow,
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
-      reloadWeapon: costsAction("half", function (event, target) {
-        return reloadWeapon(this._item(target));
-      }),
+      reloadWeapon: costsAction(
+        "half",
+        function (event, target) {
+          return reloadWeapon(this._item(target));
+        },
+        () => loc`Reload`
+      ),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
@@ -2167,7 +2202,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
       },
-      rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack),
+      rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack, () => loc`Attack`),
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
       itemDelete: SpycraftNpcSheet.#onItemDelete,

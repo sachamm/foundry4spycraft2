@@ -1117,6 +1117,31 @@ test("fluid initiative: record events, immediate actions, end-of-round applicati
   assert.equal((await combat.applyEndOfRound(fight, 1)).length, 0, "nothing is applied twice");
 });
 
+test("fluid initiative: Delay uses up the round's limit, and a mistaken event can be taken back", async () => {
+  const fight = makeCombat([["c-a1", actors.get("a1"), 30, true]]);
+  const hero = fight.combatants.get("c-a1");
+  await combat.recordFluidEvent(hero, "delay", { times: 8 });
+  assert.equal(hero.initiative, 22);
+  await combat.recordFluidEvent(hero, "finalAttack", { times: 3 });
+  await combat.recordFluidEvent(hero, "aim");
+  // The aim was a slip: taking it back leaves the Count alone and the other event recorded.
+  const aim = hero.flags.spycraft2.fluid.modifiers.findIndex(entry => entry.id === "aim");
+  await combat.removeFluidEvent(hero, aim, hero.flags.spycraft2.fluid.modifiers[aim]);
+  assert.deepEqual(
+    hero.flags.spycraft2.fluid.modifiers.map(entry => entry.id),
+    ["finalAttack"]
+  );
+  await assert.rejects(() => combat.removeFluidEvent(hero, 5), /no longer recorded/);
+  await combat.applyEndOfRound(fight, 1);
+  assert.equal(hero.initiative, 20, "8 Counts went to Delay, so only 2 of the 6 lost to final attacks still apply");
+  assert.match(combat.fluidPreviewLine("delay", { count: 22, immediate: true }), /at once/);
+  assert.match(combat.fluidPreviewLine("aim", { count: 22, due: { rows: [], count: 22, delta: 0 } }), /round ends/);
+  assert.match(
+    combat.fluidPreviewLine("aim", { count: 22, due: { rows: [{}], count: 12, delta: -10, capped: true } }),
+    /22 → 12 \(-10, limited to ±10\)/
+  );
+});
+
 test("delaying on your own turn hands the turn to whoever is next, so nobody is skipped (p.356)", async () => {
   const fight = makeCombat([
     ["c-a1", actors.get("a1"), 22, true],

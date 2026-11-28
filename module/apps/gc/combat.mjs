@@ -34,7 +34,14 @@ import {
 } from "../../rules/gc/combat-reference.mjs";
 import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc, locKey } from "../../i18n.mjs";
-import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
+import {
+  ACTION_COST,
+  HALF_ACTIONS_PER_TURN,
+  actionBudget,
+  resetActions,
+  setActionsUsed,
+  spendAction
+} from "../../rules/action-budget.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { woundState } from "../../rules/damage-application.mjs";
 import { npcIsSpecial } from "./npc-play.mjs";
@@ -44,7 +51,8 @@ import { settledCountEvents } from "../../documents/actor/count-shifts.mjs";
 import { postUndo, withUndo } from "../undo.mjs";
 import { isLeadGM } from "../../writers.mjs";
 
-const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null, dialog = undefined) =>
+  formDialog({ title, ok, validate, fields: [raw(content)], ...(dialog ? { dialog } : {}) });
 const options = (rows, selected) =>
   rows
     .map(
@@ -284,6 +292,43 @@ export function combatantLabels(combat) {
   );
 }
 
+/** The recorded event a "combatantId:index" choice names, or null when it is no longer there. */
+function removalOf(combat, choice) {
+  const [id, at] = String(choice ?? "").split(":"),
+    combatant = combat?.combatants?.get?.(id),
+    index = Number(at),
+    entry = combatant ? fluidForRound(combatant, combat.round).modifiers[index] : null;
+  return entry && combatant.isOwner ? { combatant, index, entry } : null;
+}
+/** Take one recorded end-of-round event off a combatant; nothing has been applied yet, so the Count stays. */
+export async function removeFluidEvent(combatant, index, expected = null) {
+  return queueResources(
+    [combatant?.actor],
+    async () => {
+      const fresh = combatant.parent?.combatants.get?.(combatant.id) ?? combatant,
+        state = fluidForRound(fresh, fresh.parent?.round),
+        entry = state.modifiers[index];
+      if (!entry || (expected && (entry.id !== expected.id || entry.amount !== expected.amount)))
+        throw Error(loc`That event is no longer recorded.`);
+      await fresh.update({
+        "flags.spycraft2.fluid": { ...state, modifiers: state.modifiers.filter((_, at) => at !== index) }
+      });
+      return entry;
+    },
+    { messages: [combatant?.parent].filter(Boolean) }
+  );
+}
+/** One line saying when the chosen event moves the Count: at once, or with the rest at the end of the round. */
+export function fluidPreviewLine(id, { count, due, immediate } = {}) {
+  if (id === "remove") return loc`Nothing has been applied yet: the event just stops counting at the end of the round.`;
+  if (immediate) return loc`Changes the Count at once${Number.isFinite(count) ? loc` (now ${count})` : ""}.`;
+  if (!due || !Number.isFinite(count)) return loc`Applies when the round ends.`;
+  const sign = value => `${value > 0 ? "+" : ""}${value}`;
+  return due.rows.length
+    ? loc`Applies when the round ends. As recorded so far: ${count} → ${due.count} (${sign(due.delta)}${due.capped ? loc`, limited to ±10` : ""}).`
+    : loc`Applies when the round ends; nothing is recorded for this combatant yet.`;
+}
+
 export async function fluidEventDialog(combat = game.combat, preset = null) {
   const pendingRounds = [
     ...new Set(
@@ -301,33 +346,61 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
       .filter(combatant => combatant.isOwner)
       .sort((a, b) => (b.id === combat.combatant?.id) - (a.id === combat.combatant?.id));
   if (!mine.length) return refuse(loc`You control no combatant in this fight.`);
+  const signedCount = value => `${value > 0 ? "+" : ""}${value}`;
+  // What the round's end will do to each Count as things stand: the raw sum, and what the ±10 limit leaves of it.
+  const outlook = combatant => {
+    const state = fluidForRound(combatant, combat.round);
+    return endOfRound(combatant.initiative, state.modifiers, { alreadyApplied: -(Number(state.delayed) || 0) });
+  };
   const rows = mine.map(combatant => {
-    const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
+    const due = outlook(combatant),
+      raw = due.rows.reduce((sum, entry) => sum + entry.amount, 0);
     return [
       combatant.id,
-      `${labels.get(combatant.id) ?? combatant.name}: ${combatant.initiative ?? loc`not rolled`}${pending ? loc` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
+      `${labels.get(combatant.id) ?? combatant.name}: ${combatant.initiative ?? loc`not rolled`}${
+        raw
+          ? due.capped
+            ? loc` (${signedCount(raw)} pending, ${signedCount(due.delta)} after the ±10 limit)`
+            : loc` (${signedCount(raw)} pending)`
+          : ""
+      }`
     ];
   });
+  // Events already recorded this round, so a mistaken one can be taken back.
+  const recorded = mine.flatMap(combatant =>
+    fluidForRound(combatant, combat.round).modifiers.map((entry, index) => [
+      `${combatant.id}:${index}`,
+      `${labels.get(combatant.id) ?? combatant.name}: ${entry.label} (${signedCount(entry.amount)})`
+    ])
+  );
   const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
-  const eventOptions = groups
-    .map(
-      group =>
-        `<optgroup label="${esc(group)}">${options(FLUID_EVENTS.filter(event => event.group === group).map(event => [event.id, `${event.label}${event.amount === null ? "" : ` (${event.amount > 0 ? "+" : ""}${event.amount})`}`]))}</optgroup>`
-    )
-    .join("");
+  const eventOptions =
+    groups
+      .map(
+        group =>
+          `<optgroup label="${esc(group)}">${options(FLUID_EVENTS.filter(event => event.group === group).map(event => [event.id, `${event.label}${event.amount === null ? "" : ` (${event.amount > 0 ? "+" : ""}${event.amount})`}`]))}</optgroup>`
+      )
+      .join("") +
+    (recorded.length
+      ? `<optgroup label="${esc(loc`Corrections`)}">${options([["remove", loc`Take back a recorded event`]])}</optgroup>`
+      : "");
+  const immediate = new Set(["delay", "press", "ready"]);
   const input = await ask(
     loc`Fluid initiative — Table 5.2`,
     `
     <p>${loc`Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.`}</p>
     <label>${loc`Combatant and Initiative Count`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
     <label>${loc`Event`} <select name="id">${eventOptions}</select></label>
-    <label data-when="id!=press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup">${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
+    <p class="hint" data-fluid-preview aria-live="polite"></p>
+    ${recorded.length ? `<label data-when="id=remove">${loc`Recorded event to take back`} <select name="removal">${options(recorded)}</select></label>` : ""}
+    <label data-when="id!=press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup|remove">${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
     <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
     <label data-when="id=unproficient">${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
     <label data-when="id=ready">${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`,
     loc`Record event`,
     // Refused inside the dialog, so the combatant and event chosen stay chosen.
     values => {
+      if (values.id === "remove") return removalOf(combat, values.removal) ? "" : loc`Choose the event to take back.`;
       if (values.id === "diversion" && !(Number(values.amount) >= 1))
         return loc`Enter the rolled Count loss for Diversion.`;
       const timed = !/^(press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup)$/.test(
@@ -335,9 +408,46 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
       );
       if (timed && !(Number(values.times) >= 1)) return loc`Times it applies must be 1 or more.`;
       return fluidEventRefusal(combat.combatants.get(values.combatantId), values.id, values);
+    },
+    {
+      // One line under the event says when the Count moves: now, or with the rest when the round ends.
+      render: (event, app) => {
+        const root = app?.element ?? event?.target,
+          line = root?.querySelector?.("[data-fluid-preview]"),
+          who = root?.querySelector?.('[name="combatantId"]'),
+          what = root?.querySelector?.('[name="id"]');
+        if (!line || !who || !what) return;
+        const show = () => {
+          const combatant = combat.combatants.get(who.value);
+          line.textContent = fluidPreviewLine(what.value, {
+            count: combatant?.initiative,
+            due: combatant ? outlook(combatant) : null,
+            immediate: immediate.has(what.value)
+          });
+        };
+        for (const field of [who, what]) field.addEventListener("change", show);
+        show();
+      }
     }
   );
   if (!input) return null;
+  if (input.id === "remove") {
+    const removal = removalOf(combat, input.removal);
+    if (!removal) return refuse(loc`That event is no longer recorded.`);
+    try {
+      await withUndo(
+        [removal.combatant.actor],
+        loc`Fluid initiative: ${removal.combatant.name}, ${removal.entry.label} taken back`,
+        () => removeFluidEvent(removal.combatant, removal.index, removal.entry)
+      );
+      await say(
+        loc`${esc(removal.combatant.name)}: ${esc(removal.entry.label)} (${signedCount(removal.entry.amount)}) taken back; it no longer counts at the end of the round.`
+      );
+      return { removed: removal.entry };
+    } catch (error) {
+      return refuse(error.message);
+    }
+  }
   const combatant = combat.combatants.get(input.combatantId);
   try {
     // The Undo note puts the Count and the round's fluid record back, as long as nothing changed them since.
@@ -366,11 +476,11 @@ export const halfActionsLeft = combatant =>
   HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
 
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
-export async function spendTurnAction(combatant, kind, { quiet = false } = {}) {
+export async function spendTurnAction(combatant, kind, { quiet = false, label = loc`the GC Console` } = {}) {
   if (!combatant) return null;
   const state = actionsOf(combatant);
   if (kind === "reset") return combatant.update({ "flags.spycraft2.actions": resetActions(state) });
-  const result = spendAction(state, kind, { extra: extraHalfActions(combatant) });
+  const result = spendAction(state, kind, { extra: extraHalfActions(combatant), label });
   if (!result.ok) {
     // As with an attack that goes over: what is left is used up and the GC is told, rather than nothing recorded.
     if (!quiet)
@@ -378,11 +488,32 @@ export async function spendTurnAction(combatant, kind, { quiet = false } = {}) {
         loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
       );
     if (result.left > 0)
-      await combatant.update({ "flags.spycraft2.actions": { ...state, used: state.used + result.left } });
+      await combatant.update({
+        "flags.spycraft2.actions": setActionsUsed(state, state.used + result.left, label)
+      });
     return null;
   }
   await combatant.update({ "flags.spycraft2.actions": result.state });
   return result;
+}
+
+/**
+ * Before an action from the sheet: say so when the acting character's turn has too little left for it, so the
+ * warning comes before the roll and not after. `need` is the half actions the action takes at least.
+ * @returns {boolean} whether a warning was shown
+ */
+export function warnBeforeOverspend(actor, need = 1) {
+  const combat = actor?.participatingCombat;
+  const combatant = combat?.started ? combat.combatant : null;
+  if (!combatant || combatant.actor?.uuid !== actor.uuid) return false;
+  const left = halfActionsLeft(combatant);
+  if (left >= need) return false;
+  ui.notifications.warn(
+    left > 0
+      ? loc`${combatant.name} has ${left} half action left this turn, and this takes ${need}. The GC decides whether it stands.`
+      : loc`${combatant.name} has no half actions left this turn. The GC decides whether this stands.`
+  );
+  return true;
 }
 
 /**
@@ -393,22 +524,24 @@ export async function spendTurnAction(combatant, kind, { quiet = false } = {}) {
  * @param {"half"|"full"} kind
  * @returns {Promise<object|null>} the spend, or null when nothing was marked
  */
-export async function markActionSpent(actor, kind) {
+export async function markActionSpent(actor, kind, { label = "", warned = false } = {}) {
   const combat = actor?.participatingCombat;
   const combatant = combat?.started ? combat.combatant : null;
   if (!combatant || combatant.actor?.uuid !== actor.uuid || !combatant.isOwner) return null;
-  const result = spendAction(actionsOf(combatant), kind, { extra: extraHalfActions(combatant) });
+  const result = spendAction(actionsOf(combatant), kind, { extra: extraHalfActions(combatant), label });
   if (!result.ok) {
-    // The action stands, as the GC ruled by taking it; the turn is recorded as used up (the same as a Spend).
-    ui.notifications.warn(
-      game.user?.isGM
-        ? loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
-        : loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. The GC decides whether it stands.`
-    );
+    // The action stands, as the GC ruled by taking it; the turn is recorded as used up (the same as a Spend). When
+    // the sheet already said so before the action, it is not said twice.
+    if (!warned)
+      ui.notifications.warn(
+        game.user?.isGM
+          ? loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
+          : loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. The GC decides whether it stands.`
+      );
     // The turn is recorded as used up, so anything further this turn warns as well.
     if (result.left > 0)
       await combatant.update({
-        "flags.spycraft2.actions": { ...actionsOf(combatant), used: actionsOf(combatant).used + result.left }
+        "flags.spycraft2.actions": setActionsUsed(actionsOf(combatant), actionsOf(combatant).used + result.left, label)
       });
     return null;
   }
@@ -420,11 +553,15 @@ export async function markActionSpent(actor, kind) {
  * Wrap a sheet action so that, once it goes through, it marks its time on the actor's turn. `kind` is the time, or a
  * function that reads it from the action's result (an attack's cost depends on what was declared).
  */
-export const costsAction = (kind, handler) =>
+export const costsAction = (kind, handler, label = "") =>
   async function (event, target) {
+    // A fixed cost is known before the action; one read from the result takes a half action at least. `label`
+    // names the action on the pip it marks; an action that may cost nothing (no label) is not warned about.
+    const warned = label ? warnBeforeOverspend(this.actor, typeof kind === "string" ? ACTION_COST[kind] : 1) : false;
     const result = await handler.call(this, event, target);
     const spent = typeof kind === "function" ? kind(result) : kind;
-    if (result && spent && (await markActionSpent(this.actor, spent))) this.render?.();
+    const name = typeof label === "function" ? label() : label;
+    if (result && spent && (await markActionSpent(this.actor, spent, { label: name, warned }))) this.render?.();
     return result;
   };
 
@@ -448,7 +585,10 @@ async function endOfRoundWork(combat, endedRound) {
         if (prior?.round === endedRound && prior.state === "complete") return;
         const state = fluid(combatant);
         if ((state.round !== null && state.round !== endedRound) || !Number.isFinite(combatant.initiative)) return;
-        const result = endOfRound(combatant.initiative, state.round === endedRound ? state.modifiers : []);
+        // Counts given up to Delay this round use up the same ±10 limit (p.324).
+        const result = endOfRound(combatant.initiative, state.round === endedRound ? state.modifiers : [], {
+          alreadyApplied: state.round === endedRound ? -(Number(state.delayed) || 0) : 0
+        });
         const pieces = result.rows.map(row => `${row.label} ${row.amount > 0 ? "+" : ""}${row.amount}`);
         if (!result.delta && !result.reeling && !result.mustPress) {
           if (state.modifiers.length || state.delayed || state.pressed)

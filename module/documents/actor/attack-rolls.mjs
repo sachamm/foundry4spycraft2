@@ -33,6 +33,7 @@ import { queueResources, isResourceLock } from "../../services/transactions.mjs"
 import { specialistApplies } from "../../rules/weapon-specialist.mjs";
 import { weaponDamage, cleanAndPolishedApplies } from "../../rules/gear.mjs";
 import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";
+import { measuredShotFields } from "../../rolls/dialogs/attack.mjs";
 import { choiceKey, rememberChoices, restoreChoices } from "../../apps/remembered-choices.mjs";
 import { measureInto, meleeReach } from "../../apps/map.mjs";
 import { esc } from "../../html.mjs";
@@ -91,6 +92,20 @@ const targetKey = () =>
     .map(token => token.id)
     .sort()
     .join(",");
+
+/**
+ * The measured-shot fields of the attack dialog (light, fog, mounts, bracing), read as the ranged dialog's own
+ * rules read them. Only fields the dialog showed and the player changed from blank are passed on.
+ */
+function measuredShotInput(actor, item, needsCQB, input) {
+  const names = measuredShotFields({ actor, item, needsCQB, options: {} });
+  const entered = Object.fromEntries(
+    Object.entries(input ?? {}).filter(([name, value]) => names.has(name) && value !== "" && value !== false)
+  );
+  if (!Object.keys(entered).length) return {};
+  const read = rollPipeline.read({ dialog: "rangedAttack", actor, item }, { ...entered });
+  return Object.fromEntries(Object.entries(read).filter(([name]) => names.has(name) && name in entered));
+}
 
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
@@ -206,6 +221,7 @@ export const ActorAttackRolls = Base =>
         // What was entered, as roll options: each group of fields is read by the rule that owns it.
         options = {
           ...options,
+          ...measuredShotInput(this, item, needsCQB, input),
           ...rollPipeline.read({ dialog: "attack", actor: this, item, needsCQB, entered: input }, {})
         };
       }

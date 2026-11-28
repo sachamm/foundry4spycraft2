@@ -1,7 +1,7 @@
   <div class="play-dashboard play-only">
     {{#if startedCharacterCombat}}<div class="round-tracker" role="group" aria-label="{{localize 'SPYCRAFT.Round.Title'}}">
       <span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.Round.Hint'}}">{{localize "SPYCRAFT.Round.Title"}}</span>
-      {{#each roundActions}}<button type="button" class="round-pip{{#if spent}} spent{{/if}}" data-sc2-display="text" data-action="toggleHalfAction" data-index="{{index}}" aria-pressed="{{spent}}">{{localize "SPYCRAFT.Round.Half"}}</button>{{/each}}
+      {{#each roundActions}}<button type="button" class="round-pip{{#if spent}} spent{{/if}}" data-sc2-display="text" data-action="toggleHalfAction" data-index="{{index}}" aria-pressed="{{spent}}" data-tooltip="{{tip}}">{{localize "SPYCRAFT.Round.Half"}}</button>{{/each}}
     </div>{{/if}}
     <div class="pinned-tools tool-actions" aria-label="{{localize 'SPYCRAFT.Pins.Title'}}" hidden></div>
     <div class="ability-strip" aria-label="{{localize 'SPYCRAFT.Attributes'}}">

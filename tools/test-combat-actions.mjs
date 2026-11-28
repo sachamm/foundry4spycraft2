@@ -441,3 +441,34 @@ test("an animal cannot open a second grapple even with the earned benefit and re
     false
   );
 });
+
+test("a ranged weapon's attack dialog folds in the measured-shot fields and reads them (B-028)", async () => {
+  await import("../module/rolls/index.mjs");
+  const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+  const { measuredShotFields } = await import("../module/rolls/dialogs/attack.mjs");
+  globalThis.foundry ??= { utils: { escapeHTML: String } };
+  globalThis.game ??= { user: { targets: new Set() }, actors: [], scenes: [], canvas: null };
+  const item = { name: "Carbine", system: { ammo: "30 box", range: 100, qualities: "", weaponCategory: "rifle" } };
+  const actor = {
+    system: { activeFeatNames: [], classLevels: {} },
+    items: [],
+    weaponAttack: () => ({ firearm: true, modes: ["single", "auto"], fireMode: "single", range: 100 })
+  };
+  const html = rollPipeline.dialog({ dialog: "attack", actor, item, options: {} });
+  assert.match(html, /<details class="sc2-measured-shot">/);
+  for (const name of ["ambientLight", "obscurant", "vehicleMounted", "braced", "fireMode"])
+    assert.match(html, new RegExp(`name="${name}"`), name);
+  // No field appears twice: the distance, the target boxes and the fire action stay the attack dialog's own.
+  for (const name of ["distanceFeet", "targetFlanked", "fireAction", "calledShot"])
+    assert.equal(html.split(`name="${name}"`).length - 1, 1, name);
+  const names = measuredShotFields({ actor, item, options: {} });
+  assert.ok(names.has("ambientLight") && !names.has("distanceFeet"));
+  // A melee weapon has no such section.
+  const club = rollPipeline.dialog({
+    dialog: "attack",
+    actor,
+    item: { name: "Club", system: { qualities: "" } },
+    options: {}
+  });
+  assert.doesNotMatch(club, /sc2-measured-shot/);
+});

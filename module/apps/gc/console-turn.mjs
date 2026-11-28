@@ -340,7 +340,7 @@ export async function attackWith(actor, itemId, event = null, combatant = null) 
 /** A rolled attack marks its time on the attacker's turn, as one made from the sheet does; a cancelled one does not. */
 async function attackMade(actor, message, quick = true) {
   if (!message) return null;
-  await markActionSpent(actor, attackActionCost(message));
+  await markActionSpent(actor, attackActionCost(message), { label: loc`an attack from the GC Console` });
   return quick ? resolveQuickAttack(message) : message;
 }
 
@@ -531,8 +531,9 @@ export async function mobAttackDialog(combat, key = null) {
         continue;
       }
       // Each member that attacked spends the time on its own turn record, the acting one as from the sheet.
-      if (attacker.id === combat.combatant?.id) await markActionSpent(actor, attackActionCost(message));
-      else await spendTurnAction(attacker, attackActionCost(message), { quiet: true });
+      if (attacker.id === combat.combatant?.id)
+        await markActionSpent(actor, attackActionCost(message), { label: loc`Mob attack` });
+      else await spendTurnAction(attacker, attackActionCost(message), { quiet: true, label: loc`Mob attack` });
       await resolveQuickAttack(message);
       attacked.push(loc`${attacker.name} → ${target.name}`);
     }

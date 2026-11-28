@@ -27,7 +27,6 @@
           aria-hidden="true"></i> {{localize "SPYCRAFT.Weapon.UntrainedWord"}}</span>{{/if}}
         <button type="button" class="sc2-action" data-action="rollDamage"
           aria-label="{{localize 'SPYCRAFT.Action.RollDamageFor' name=item.name}} {{item.system.damage}}">{{item.system.damage}}</button>
-        {{#if attack.range}}<button type="button" class="sc2-action" data-action="rollRangedAttack" aria-label="{{localize 'SPYCRAFT.Action.MeasuredAttackWith' name=item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.MeasuredAttack"}}</button>{{/if}}
       </div>
       <dl class="inventory-stats">
         {{#if attack.firearm}}<div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.FireMode"}}</dt><dd>{{attack.fireModeLabel}}</dd></div>{{/if}}
