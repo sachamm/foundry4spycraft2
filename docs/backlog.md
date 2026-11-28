@@ -43,7 +43,7 @@ The reports are kept outside the repository, in the project's `reviews/` folder 
 
 | ID | Item | Sources | Effort | Evidence |
 | --- | --- | --- | --- | --- |
-| B-222 | **Undo and cards.** The changed-since check covers characters and combatants but not the cards a step marked, so Undo can clear a card mark set again by a later step; and marks on cards older than the note's own are not freed. Key every card mark to its step, as damage marks are. (A player's note is now held to that player's characters and character paths, a failed step leaves a note, GC dice come back first, and Undo takes back a critical shot and closes the save card the damage called for.) | CX2-U05, CU-08 | M | code |
+| B-222 | **Undo and old cards.** Marks on cards older than the Undo note's own are not freed when the chat log is trimmed. (Each mark now records the value its step left, and Undo clears it only while no later step has set it again.) | CX2-U05, CU-08 | S | live |
 | B-237 | **Next scene has no way back.** The status strip says when the session began, Begin session stops being the main button once it has and states what the Threat Level gives, and Next scene names every standard NPC whose damage it clears. Still open: an Undo for Next scene (the scene period, the scene count and the dramatic state). | NG2-04, NG2-05, NG2-25 | M | live |
 
 ## P1: running the game

@@ -251,6 +251,14 @@ export async function withUndo(actors, label, work, extra = {}) {
 // A document step (a mission XP settlement) leaves its Undo note through this.
 undoHook.run = withUndo;
 
+/** The value a card mark holds now, or undefined. */
+function markValue(mark) {
+  const card = mark?.messageId ? globalThis.game?.messages?.get?.(mark.messageId) : null;
+  return String(mark?.key ?? "")
+    .split(".")
+    .reduce((value, key) => value?.[key], card?.flags?.spycraft2);
+}
+
 /** Leave the Undo note: one line, seen only by whoever took the step. */
 export function postUndo(
   label,
@@ -287,7 +295,8 @@ export function postUndo(
           antagonist,
           dcBoost,
           standingPaid,
-          cardMarks,
+          // Each mark with the value the step left, so Undo clears it only while no later step has set it again.
+          cardMarks: (cardMarks ?? null)?.map?.(mark => ({ ...mark, left: markValue(mark) })) ?? null,
           addedInfractions,
           missionRow,
           placedTokens,
@@ -521,6 +530,8 @@ async function undoRecord(message, record) {
     const keys = String(mark.key).split("."),
       last = keys.pop(),
       holder = keys.reduce((value, key) => value?.[key], marked.flags?.spycraft2);
+    // Set again by a later step since: that step's mark stays.
+    if ("left" in mark && mark.left !== undefined && !same(holder?.[last], mark.left)) continue;
     if (holder?.[last] !== undefined)
       await marked.update({ [`flags.spycraft2.${[...keys, `-=${last}`].join(".")}`]: null }).catch(() => null);
   }

@@ -665,7 +665,11 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
   // against one target keeps it: the map's targets do not override it.
   const second = character("Guard2", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
   game.user.targets = [{ actor: guard }, { actor: second }];
-  assert.equal(controls(damage).find(c => c.label === "Apply 7 to 2 targets"), undefined, "the resolved target stays");
+  assert.equal(
+    controls(damage).find(c => c.label === "Apply 7 to 2 targets"),
+    undefined,
+    "the resolved target stays"
+  );
   const loose = card("q3", { actorUuid: attacker.uuid, checkKind: "damage", effectiveTotal: 7 });
   const each = controls(loose).find(c => c.label === "Apply 7 to 2 targets");
   assert.match(each.hint, /Guard \(not on the scene\), Guard2/, "the recipients are named");
@@ -865,7 +869,12 @@ test("rest, a dying roll, Stabilize, a hazard save's result and a grapple each l
   assert.equal(dying.system.wounds.value, 0);
   assert.ok(medic.flags.spycraft2.stabilized);
   const stabilize = undoNotes.at(-1);
-  assert.deepEqual(stabilize.flags.spycraft2.undo.cardMarks, [{ messageId: "st1", key: "stabilized" }]);
+  assert.deepEqual(
+    stabilize.flags.spycraft2.undo.cardMarks.map(({ messageId, key }) => ({ messageId, key })),
+    [{ messageId: "st1", key: "stabilized" }]
+  );
+  // The note keeps what the step left, so a later step's mark is not cleared.
+  assert.equal(stabilize.flags.spycraft2.undo.cardMarks[0].left.name, "Faller");
   await applyUndo(noteOf(stabilize));
   assert.equal(dying.system.wounds.value, -4);
   assert.equal(medic.flags.spycraft2.stabilized, undefined, "the card can be used again");
