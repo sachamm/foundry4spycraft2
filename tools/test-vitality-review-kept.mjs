@@ -11,7 +11,7 @@ test("a stored vitality roll brings back its latest GC review", () => {
       spycraft2: {
         vitalityReviews: {
           r1: { id: "aaaaaaaaaaaaaaaa", levelId: "lvl1", value: 3, at: 10 },
-          r2: { id: "bbbbbbbbbbbbbbbb", levelId: "lvl1", value: 2, at: 20 },
+          r2: { id: "bbbbbbbbbbbbbbbb", levelId: "lvl1", value: 2, at: 10, previousReviewId: "aaaaaaaaaaaaaaaa" },
           r3: { id: "cccccccccccccccc", levelId: "other", value: 6, at: 30 }
         }
       }

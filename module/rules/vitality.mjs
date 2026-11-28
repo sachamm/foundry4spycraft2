@@ -50,14 +50,17 @@ export function keptVitalityRoll(actor, source) {
       .sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null
   );
 }
-/** The latest GC review of a stored vitality roll (reviews are kept by the roll's level id), or null. */
+/**
+ * The latest GC review of a stored vitality roll (reviews are kept by the roll's level id), or null. Each review names
+ * the one it replaced, and several can share a world time, so the latest is the one no other review replaced.
+ */
 export function latestVitalityReview(actor, levelId) {
   if (!levelId) return null;
-  return (
-    Object.values(actor.flags?.spycraft2?.vitalityReviews ?? {})
-      .filter(review => review?.levelId === levelId && validId(review.id) && Number.isSafeInteger(review.value))
-      .sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null
+  const reviews = Object.values(actor.flags?.spycraft2?.vitalityReviews ?? {}).filter(
+    review => review?.levelId === levelId && validId(review.id) && Number.isSafeInteger(review.value)
   );
+  const replaced = new Set(reviews.map(review => review.previousReviewId).filter(Boolean));
+  return reviews.filter(review => !replaced.has(review.id)).sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null;
 }
 export function vitalityRollRecord(actor, source, roll, at) {
   if (

@@ -118,6 +118,15 @@ const cardReminders = message => {
   return one ? { combatId: one.combatId, round: one.round, items: [one], grouped: false } : null;
 };
 
+const cardWrites = new Map();
+/** Run one write to a card after any earlier one on the same card has settled. */
+function queueCardWrite(id, write) {
+  const next = (cardWrites.get(id) ?? Promise.resolve()).catch(() => {}).then(write);
+  cardWrites.set(id, next);
+  next.finally(() => cardWrites.get(id) === next && cardWrites.delete(id)).catch(() => {});
+  return next;
+}
+
 /** Add each line's button for whoever owns that character. */
 async function renderButton(message, html) {
   const card = cardReminders(message);
@@ -136,14 +145,19 @@ async function renderButton(message, html) {
     button.dataset.spycraft2RoundReminder = reminder.kind;
     button.textContent = BUTTON[reminder.kind]();
     if (card.grouped) button.setAttribute("aria-label", `${BUTTON[reminder.kind]()}: ${actor.name}`);
+    // Writes to one card go one after another, each from the card as it is then, so two buttons pressed together
+    // do not undo each other's mark.
     const markDone = () =>
       card.grouped
-        ? message.update({
-            "flags.spycraft2.roundReminders.items": card.items.map((item, at) =>
-              at === index ? { ...item, done: true } : item
-            )
-          })
+        ? queueCardWrite(message.id, () =>
+            message.update({
+              "flags.spycraft2.roundReminders.items": (cardReminders(message)?.items ?? card.items).map((item, at) =>
+                at === index ? { ...item, done: true } : item
+              )
+            })
+          )
         : message.update({ "flags.spycraft2.roundReminder.done": true });
+    const doneNow = () => !!cardReminders(message)?.items?.[index]?.done;
     button.addEventListener("click", async event => {
       event.preventDefault();
       button.disabled = true;
@@ -155,6 +169,7 @@ async function renderButton(message, html) {
           const combat = game.combats?.get?.(card.combatId);
           if (card.combatId && (!combat?.started || combat.round !== card.round))
             return refuse(loc`That Stratagem card is from an earlier round.`);
+          if (doneNow()) return refuse(loc`That Stratagem was already applied this round.`);
           if (await applyStratagem(actor)) await markDone();
         } else await burningRound(actor);
       } finally {
