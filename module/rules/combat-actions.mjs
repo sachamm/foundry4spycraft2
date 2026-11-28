@@ -12,6 +12,7 @@
  *
  * This module is pure. The fire actions join an attack as a term of its plan (module/rules/roll-pipeline.mjs).
  */
+import { campaignRules } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { specialtyAttackAction, specialtyAttackBonus } from "./specialty-attacks.mjs";
@@ -269,7 +270,7 @@ export function blastProfile(damage, incrementFeet = 5) {
 }
 
 /** A blast increment in feet from a weapon's qualities ("BLS (25 ft.)"), or the default single square. */
-export function blastIncrementFeet(qualities = "", campaignEffects = {}) {
+export function blastIncrementFeet(qualities = "", campaignEffects = campaignRules()) {
   const match = String(qualities).match(/\bBLS\s*\((\d[\d,]*)\s*ft\.?/i);
   const multiplier = campaignEffects.blastIncrementMultiplier ?? 1;
   if (!Number.isFinite(multiplier) || multiplier < 1)

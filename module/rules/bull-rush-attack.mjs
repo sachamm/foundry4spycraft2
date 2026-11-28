@@ -49,7 +49,7 @@ export function bullRushAttackPlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (key !== "athletics" || check?.id !== "bull-rush") return empty;
   if (method !== "roll")
-    return reject(loc`Bull Rush is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
+    return reject(loc`Bull Rush is an opposed combat action; taking 10/20 is unavailable (pp.91,352).`);
   if (!validOwnCountClock(bullRushAttackCombat) || bullRushAttackCombat.turn !== bullRushAttackCombat.ownTurnIndex)
     return reject(loc`Take this normal full-action Bull Rush during your Initiative Count in a started combat.`);
   if (

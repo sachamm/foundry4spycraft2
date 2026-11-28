@@ -7,7 +7,20 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
-export async function settleFeintOutcome(actor, actingMessage, defendingMessage, input = {}) {
+import { withUndo } from "./undo.mjs";
+/** The settlement, with one Undo note for both characters; Undo also clears the card's settled mark. */
+export function settleFeintOutcome(actor, actingMessage, defendingMessage, input = {}) {
+  const actors = [actor, globalThis.fromUuidSync?.(defendingMessage?.flags?.spycraft2?.actorUuid ?? "")].filter(
+    Boolean
+  );
+  return withUndo(
+    actors,
+    loc`Feint: ${actor.name}`,
+    () => settleFeintOutcomeWork(actor, actingMessage, defendingMessage, input),
+    { cardMarks: [actingMessage, defendingMessage].map(m => ({ messageId: m?.id, key: "feintSettlement" })) }
+  );
+}
+async function settleFeintOutcomeWork(actor, actingMessage, defendingMessage, input = {}) {
   const acting = actingMessage?.flags?.spycraft2,
     defending = defendingMessage?.flags?.spycraft2,
     opponent = attackCharacterTargetChoices().find(a => a.uuid === acting?.feint?.opponentUuid);

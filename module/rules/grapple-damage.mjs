@@ -1,3 +1,4 @@
+import { npcWeaponTraining } from "./npc-weapons.mjs";
 import { weaponDamage } from "./gear.mjs";
 import { damageProfile } from "./damage-application.mjs";
 import { weaponGrip } from "./weapon-use.mjs";
@@ -43,7 +44,11 @@ export function grappleDamagePlan(
       throw Error(loc`This grapple benefit requires an actual readied one-handed weapon.`);
     source = { ...weapon.system, id: weapon.id, name: weapon.name };
   } else {
-    const u = system.unarmed ?? { die: 3, extraDice: 0, damageBonus: strength };
+    const trained =
+      actorType === "npc"
+        ? npcWeaponTraining(system, { proficiency: "unarmed" }).trained
+        : system.proficiencyTotals?.unarmed?.proficient === true;
+    const u = system.unarmed ?? { die: trained ? 4 : 3, extraDice: 0, damageBonus: strength };
     if (
       ![3, 4, 6, 8, 10, 12, 20].includes(u.die) ||
       !Number.isSafeInteger(u.extraDice ?? 0) ||
@@ -53,13 +58,13 @@ export function grappleDamagePlan(
       throw Error(loc`Review the winner's standard unarmed damage before rolling this benefit.`);
     source = {
       proficiency: "unarmed",
-      damage: `${1 + (u.extraDice ?? 0)}d${u.die} subdual`,
+      damage: `${1 + (u.extraDice ?? 0)}d${u.die} ${trained ? "lethal" : "subdual"}`,
       sizeHands: "Tiny/1h",
       equipped: true,
       carried: true,
       name: loc`Unarmed`
     };
-    adjustment = u.damageBonus - strength + (benefit === "throw" ? Math.max(1, strength) : 0);
+    adjustment = u.damageBonus - strength;
   }
   const damage = weaponDamage(system, source, { attackDamageBonus: adjustment }, actorType);
   if (!damage?.formula || damage.blocked)
@@ -76,7 +81,7 @@ export function grappleDamagePlan(
     );
   return {
     benefit,
-    formula: damage.formula,
+    formula: benefit === "throw" ? `${damage.formula} + (${Math.max(1, strength)})` : damage.formula,
     profile: { ...profile, kind: desired },
     weaponProficiency: source.proficiency,
     weaponUuid: weapon?.uuid ?? null,

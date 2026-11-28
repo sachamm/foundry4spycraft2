@@ -3,11 +3,13 @@ import {
   criticalInjuryResult,
   validateCriticalInjuryRecord,
   recoveredInjuryRollJSON,
+  surgeryDCNow,
   CRITICAL_INJURY_HEALING_NOTE
 } from "../rules/critical-injuries.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { formDialog } from "./dialog-kit.mjs";
+import { withUndo } from "./undo.mjs";
 const history = a => a.flags?.spycraft2?.criticalInjuryRolls ?? {};
 const saved = (a, id) => history(a)[id];
 const proof = (a, r) => {
@@ -56,7 +58,7 @@ async function deliver(a, r) {
     roll = Roll.fromData(JSON.parse(r.rollJSON));
   const data = {
     speaker: ChatMessage.getSpeaker({ actor: a }),
-    flavor: `${loc`Table of Ouch — ${esc(result.name)}`}<br><small>${loc`${esc(r.source)}; damage suffered ${r.damage}; ${r.die === 10 ? loc`Guts: d10` : loc`standard d20`}. ${result.listed ? loc`Surgery DC ${result.surgeryDC}; healing ${esc(result.healingTime)}. ` : ""}${esc(result.notes)} ${esc(CRITICAL_INJURY_HEALING_NOTE)} Apply injury effects and any stress/healing rolls at the table.`}</small>`,
+    flavor: `${loc`Table of Ouch — ${esc(result.name)}`}<br><small>${loc`${esc(r.source)}; damage suffered ${r.damage}; ${r.die === 10 ? loc`Guts: d10` : loc`standard d20`}. ${result.listed ? loc`Surgery DC ${surgeryDCNow(result)}; healing ${esc(result.healingTime)}. ` : ""}${esc(result.notes)} ${esc(CRITICAL_INJURY_HEALING_NOTE)} Apply injury effects and any stress/healing rolls at the table.`}</small>`,
     flags: {
       spycraft2: { actorUuid: a.uuid, checkKind: "criticalInjury", actionDiceAllowed: false, criticalInjuryRoll: r }
     }
@@ -69,6 +71,74 @@ async function deliver(a, r) {
     throw error;
   }
 }
+/** What has been done for each rolled injury: successful Surgery checks and whether it has healed. */
+const careOf = (actor, id) => actor.flags?.spycraft2?.criticalInjuryCare?.[id] ?? {};
+
+/**
+ * One sheet row per rolled Table of Ouch injury (pp.329, 332): its name, effect, healing time and Surgery DC, and
+ * what Surgery (p.142) has taken off. A record that still needs the GC is left to `criticalInjuryReviews`.
+ */
+export function criticalInjuryRows(actor) {
+  return Object.entries(history(actor)).flatMap(([id, record]) => {
+    let result;
+    try {
+      ({ result } = validateCriticalInjuryRecord(record));
+    } catch {
+      return [];
+    }
+    if (!result) return [];
+    const care = careOf(actor, id),
+      surgeries = Math.max(0, Math.trunc(Number(care.surgeries) || 0));
+    return [
+      {
+        id,
+        name: result.name,
+        effect: result.notes,
+        source: record.source,
+        facts: result.listed
+          ? loc`Total ${result.total} · Surgery DC ${surgeryDCNow(result)} · healing ${result.healingTime}`
+          : loc`Total ${result.total}`,
+        surgery: surgeries ? loc`Surgery has taken ${surgeries * 2} off the healing time.` : "",
+        canSurgery: result.listed && care.healed !== true,
+        healed: care.healed === true
+      }
+    ];
+  });
+}
+
+const careUpdate = (actor, id, change) => actor.update({ [`flags.spycraft2.criticalInjuryCare.${id}`]: change });
+const rolledInjury = (actor, id) => criticalInjuryRows(actor).find(row => row.id === id) ?? null;
+
+/** A successful Surgery check at the injury's DC: its healing time drops by 2 (p.142). */
+export async function recordInjurySurgery(actor, id) {
+  const row = actor?.isOwner ? rolledInjury(actor, id) : null;
+  if (!row?.canSurgery) return null;
+  const care = careOf(actor, id);
+  return withUndo([actor], loc`Surgery on ${row.name}: ${actor.name}`, async () => {
+    await careUpdate(actor, id, { ...care, surgeries: Math.max(0, Math.trunc(Number(care.surgeries) || 0)) + 1 });
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: `<div class="spycraft2 chat-note"><p>${loc`Surgery on ${foundry.utils.escapeHTML(row.name)}: the healing time drops by 2. At 0 it has healed (p.142).`}</p></div>`
+    });
+    return true;
+  });
+}
+
+/** The injury's healing time has run out, by time or by Surgery: it no longer shows as open. */
+export async function markInjuryHealed(actor, id) {
+  const row = actor?.isOwner ? rolledInjury(actor, id) : null;
+  if (!row || row.healed) return null;
+  return withUndo([actor], loc`Injury healed: ${row.name}`, async () => {
+    await careUpdate(actor, id, { ...careOf(actor, id), healed: true });
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      content: `<div class="spycraft2 chat-note"><p>${loc`${foundry.utils.escapeHTML(actor.name)}'s ${foundry.utils.escapeHTML(row.name)} has healed. Remove any effect it left by hand.`}</p></div>`
+    });
+    return true;
+  });
+}
+
+/** Saved injury records that still need the GC: an interrupted roll or a record that no longer checks out. */
 export const criticalInjuryReviews = actor =>
   Object.entries(history(actor)).map(([id, r]) => ({
     id,

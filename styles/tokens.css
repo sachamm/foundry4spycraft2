@@ -112,10 +112,16 @@ body.theme-dark
   --sc2-action-strong: #7fcac7;
   --sc2-on-action: #0b1414;
   --sc2-action-tint: rgba(88, 179, 176, 0.14);
-  --sc2-danger: #e2646c;
-  --sc2-danger-tint: rgba(226, 100, 108, 0.14);
+  /* 5.1:1 on the raised surface, where chat cards and dialogs show refusals. */
+  --sc2-danger: #e8737a;
+  --sc2-danger-tint: rgba(232, 115, 122, 0.14);
   --sc2-good: #6fbf8a;
   --sc2-warn: #d8b25a;
   --sc2-rule: #3a4343;
   --sc2-rule-strong: #6e7876;
+  /* The creation track's cool and red hues, lifted to 3:1 on the dark surfaces. */
+  --sc2-step-6: #d14333;
+  --sc2-step-7: #4e70cc;
+  --sc2-step-8: #905fc3;
+  --sc2-step-9: #bc44a6;
 }

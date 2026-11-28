@@ -23,7 +23,7 @@ const roll = (system, input = {}) =>
     gearStatus: "available",
     grappleProficient: true,
     grappleContextConfirmed: true,
-    grappleSizeDifference: 0,
+    grappleSizeDifference: input.grappleOpponentSize === undefined ? 0 : -Number(input.grappleOpponentSize),
     ...input
   });
 
@@ -249,4 +249,116 @@ test("Clobber rides the Grapple check; Joint Lock hampers escape; Berserker Supr
   const { frenzySaveBonus } = await import("../module/rules/berserker.mjs");
   assert.equal(frenzySaveBonus({ activeFeatNames: ["Berserker Supremacy"] }, { resistFrenzy: true }), 4);
   assert.equal(frenzySaveBonus({ activeFeatNames: [] }, { resistFrenzy: true }), 0);
+});
+
+test("Grapple Size limits, the bigger side's +4, the second-opponent and Mute penalties (pp.357–358)", () => {
+  const sys = {
+    activeFeatNames: [],
+    abilities: { str: { mod: 2 } },
+    unarmed: { die: 4, extraDice: 0, damageBonus: 2 }
+  };
+  const check = { ...GRAPPLE_CHECK };
+  assert.match(grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: 2 }).blockedReason, /at most 1 Size/);
+  const smaller = grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: "-2" });
+  assert.deepEqual(
+    smaller.bonuses.map(b => b.value),
+    [8]
+  );
+  const bigger = grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: 1 });
+  assert.ok(bigger.notes.some(note => note.includes("gains +4")));
+  const both = grappleCheckPlan(sys, "athletics", check, { grappleSecondOpponent: true, grappleMute: true });
+  assert.deepEqual(
+    both.bonuses.map(b => b.value),
+    [-4, -2]
+  );
+  assert.ok(
+    both.notes.some(
+      note =>
+        note ===
+        "Benefits that deal damage: Injure 1d4+2 (or a 1-handed weapon's); Throw 1d4+4, and the opponent is sprawled and free; Sprawl 1d4+2 subdual, and you become prone."
+    )
+  );
+  const escape = grappleCheckPlan(sys, "athletics", { id: "restraint-escape" }, { grappleOpponentSize: 2 });
+  assert.equal(escape.blockedReason, "");
+});
+
+test("Grapple: 2, 4 or 8 grapplers at most, by the target's Size (p.357)", () => {
+  const sys = {
+    activeFeatNames: [],
+    abilities: { str: { mod: 0 } },
+    unarmed: { die: 4, extraDice: 0, damageBonus: 0 }
+  };
+  const check = { ...GRAPPLE_CHECK };
+  assert.match(
+    grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: -1, grappleOthers: 2 }).blockedReason,
+    /At most 2/
+  );
+  assert.equal(grappleCheckPlan(sys, "athletics", check, { grappleOthers: "3" }).blockedReason, "");
+  assert.match(grappleCheckPlan(sys, "athletics", check, { grappleOthers: 4 }).blockedReason, /At most 4/);
+  assert.equal(
+    grappleCheckPlan(sys, "athletics", check, { grappleOpponentSize: 1, grappleOthers: 7 }).blockedReason,
+    ""
+  );
+});
+
+test("Omni-Competent halves the grapple penalties too (p.408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const plain = roll(state([])).total;
+  assert.equal(roll(state([]), { grappleSecondOpponent: true }).total, plain - 4);
+  setCampaignRulesSource(() => ({ halveSkillPenalties: true }));
+  try {
+    assert.equal(roll(state([]), { grappleSecondOpponent: true }).total, plain - 2);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+});
+
+test("a Grapple check records its Size on the card, and the card's facts give the bonus already in the total (U7)", async () => {
+  const { grappleCardFacts } = await import("../module/rules/grapple-check.mjs");
+  const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+  const bigger = roll(state([]), { grappleOpponentSize: -2 });
+  assert.equal(bigger.grappleFeats.sizeDifference, -2);
+  assert.deepEqual(
+    rollPipeline.flags({ options: { grappleFeats: bigger.grappleFeats } }).grappleFeats,
+    bigger.grappleFeats
+  );
+  assert.deepEqual(
+    grappleCardFacts({
+      effectiveTotal: 25,
+      checkId: "grapple",
+      grappleFeats: bigger.grappleFeats,
+      criticalSuccess: true
+    }),
+    { total: 25, critical: true, criticalFailure: false, grapple: true, convertDamage: false, sizeBonus: 8 }
+  );
+  assert.equal(grappleCardFacts({ effectiveTotal: 14, checkId: "grapple" }).sizeBonus, 0);
+  assert.equal(grappleCardFacts({ checkId: "grapple" }), null);
+});
+
+test("Injure and Throw may switch between lethal and subdual for −4 on the Grapple check (p.345)", async () => {
+  const { grappleBenefitDamage, grappleCheckPlan, grappleCardFacts } =
+    await import("../module/rules/grapple-check.mjs");
+  const str = { abilities: { str: { mod: 1 } } };
+  assert.equal(grappleBenefitDamage(str, "injure", { convert: true }).kind, "lethal");
+  assert.throws(() => grappleBenefitDamage(str, "throw", { proficient: true, convert: true }), /Throw retains/);
+  assert.equal(grappleBenefitDamage(str, "sprawl", { proficient: true, convert: true }).kind, "subdual");
+  const plan = grappleCheckPlan(
+    { activeFeatNames: [] },
+    "athletics",
+    { id: "grapple" },
+    { grappleConvertDamage: true }
+  );
+  assert.deepEqual(plan.bonuses, [{ source: "Grapple damage conversion", value: -4 }]);
+  assert.equal(plan.evidence.convertDamage, true);
+  const escape = grappleCheckPlan(
+    { activeFeatNames: [] },
+    "athletics",
+    { id: "restraint-escape" },
+    { grappleConvertDamage: true }
+  );
+  assert.deepEqual(escape.bonuses, [], "only on the Grapple check itself");
+  assert.equal(
+    grappleCardFacts({ checkId: "grapple", effectiveTotal: 15, grappleFeats: { convertDamage: true } }).convertDamage,
+    true
+  );
 });

@@ -40,3 +40,10 @@ test("a check outside the tables falls back to its name", () => {
   assert.equal(checkFocus("science", { name: "Chemistry Check" }), "Chemistry");
   assert.equal(isHideCheck("sneak", { name: "Hide" }), true);
 });
+
+test("Size modifies Blend's Stealth check as well as Sneak's Hide check (p.349)", async () => {
+  const { sizeStealthCheck } = await import("../module/rules/check-identity.mjs");
+  assert.equal(sizeStealthCheck("blend", { id: "stealth" }), true);
+  assert.equal(sizeStealthCheck("sneak", { id: "hide" }), true);
+  assert.equal(sizeStealthCheck("blend", { id: "other" }), false);
+});

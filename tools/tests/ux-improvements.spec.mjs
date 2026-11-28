@@ -18,7 +18,11 @@ const browserSource = data(
     .replace('import { describe } from "../rules/prerequisites.mjs";', 'const describe = () => "";')
     .replace('import { VEHICLE_RULES } from "../rules/tables.mjs";', "const VEHICLE_RULES = {};")
     .replace('import { clockYear } from "./game-clock.mjs";', "const clockYear = () => null;")
-    .replace('"../rules/gear-era.mjs"', JSON.stringify(data(read("module/rules/gear-era.mjs"))))
+    .replace(
+      'import { availableIn, historicalCaliber } from "../rules/gear-era.mjs";',
+      "const availableIn = () => true;\nconst historicalCaliber = system => ({ caliber: Number(system?.caliber), gadget: false, available: true });"
+    )
+    .replace('import { campaignRules } from "../rules/campaign-rules.mjs";', "const campaignRules = () => ({});")
     .replace('"../i18n.mjs"', JSON.stringify(i18n))
 );
 const tooltips = data(

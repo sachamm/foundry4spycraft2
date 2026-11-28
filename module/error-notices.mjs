@@ -1,3 +1,4 @@
+import { loc } from "./i18n.mjs";
 /**
  * Sheet buttons, dialogs and chat-card buttons run async handlers whose refusals ("roll the save first", "the
  * ledger changed") are thrown as errors. Foundry does not catch a rejected action handler, so without this the
@@ -13,6 +14,7 @@ const SYSTEM_PATH = "/systems/spycraft2/";
  * @returns {false}
  */
 export function refuse(message) {
+  message = plainErrorMessage(message);
   refusals++;
   lastRefusal = message;
   globalThis.ui?.notifications?.warn(message);
@@ -62,11 +64,22 @@ export class Refusal extends Error {
   }
 }
 
+/**
+ * A rejection's text in words a GC can act on. The server's own messages name internal document ids ("The _id
+ * [sc2ResourceLock1] already exists…"), which say nothing to the person who pressed the button.
+ */
+export function plainErrorMessage(reason) {
+  const text = String(reason?.message ?? reason ?? "");
+  if (/_id \[[^\]]*\] already exists/.test(text))
+    return loc`Another client was changing the same character at that moment. Try again.`;
+  return text;
+}
+
 /** The message to show for a rejection, or null when it did not come from this system's code. */
 export function systemErrorNotice(reason) {
   if (!(reason instanceof Error) || !reason.message) return null;
   if (!String(reason.stack ?? "").includes(SYSTEM_PATH)) return null;
-  return reason.message;
+  return plainErrorMessage(reason);
 }
 
 /**

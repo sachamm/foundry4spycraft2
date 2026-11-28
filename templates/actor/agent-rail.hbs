@@ -37,6 +37,15 @@
     class="sc2-stamp"{{#if tip}}
     data-tooltip="{{tip}}" tabindex="0"{{/if}}>{{label}}</span>{{/each}}</div>{{/if}}
 
+  {{#if system.standingStatus.burned}}<div class="rail-conditions" role="status">{{#if system.standingStatus.liquidation}}<span
+    class="sc2-stamp" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentMain.LiquidationHint'}}" tabindex="0">{{localize "SPYCRAFT.Template.ActorAgentMain.Liquidation"}}</span>{{else}}<span
+    class="sc2-stamp" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentMain.BurnedHint'}}" tabindex="0">{{localize "SPYCRAFT.Template.ActorAgentMain.Burned"}}</span>{{/if}}</div>{{/if}}
+
+  {{!-- A cover identity in use stays in view on every tab, with the way out of it. --}}
+  {{#if system.activeIdentityState}}<div class="rail-conditions rail-identity" role="status"><span
+    class="sc2-stamp">{{localize "SPYCRAFT.Template.ActorAgentMain.InCharacterAs"}} {{system.activeIdentityState.name}}</span>{{#if editable}}
+    <button type="button" class="sc2-action" data-action="leaveIdentity">{{localize "SPYCRAFT.Template.ActorAgentMain.LeaveIdentity"}}</button>{{/if}}</div>{{/if}}
+
   <div class="rail-block resources">
     <label class="res sc2-meter vitality"><span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.VitalityWhat'}}">{{localize "SPYCRAFT.Vitality"}} <i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>
       <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /> <span class="sc2-meter-max" {{sc2tip tips.vitality}}>/ {{system.vitality.max}}</span>

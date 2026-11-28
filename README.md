@@ -299,7 +299,7 @@ NPC actors now offer opt-in graded creation, source-backed core tables, equipmen
 
 ## Game Control tools
 
-The GC Console (the first sidebar tab, marked with a spy icon) covers the mission record and XP, GC action dice, dramatic scenes, fluid initiative, standard NPC Damage saves, disposition, Dramatic Conflicts, campaign qualities and the security, hazard and possession tables. See [Game Control tools](docs/gc-tools.md) for what each does and what remains manual.
+The GC Console (Alt+G, or the sidebar tab after Combat, marked with a spy icon) covers the mission record and XP, GC action dice, dramatic scenes, fluid initiative, standard NPC Damage saves, disposition, Dramatic Conflicts, campaign qualities and the security, hazard and possession tables. See [Game Control tools](docs/gc-tools.md) for what each does and what remains manual.
 
 ## Character sheet views
 

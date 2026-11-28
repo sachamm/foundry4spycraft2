@@ -71,7 +71,10 @@ const { hazardSaveResolvers, resolveHazardSave } = await import("../module/apps/
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
 const { settleGrapple } = await import("../module/apps/combat-actions.mjs");
 const { restAndRecover } = await import("../module/apps/healing.mjs");
-const { reloadWeapon, spendWeaponShots, weaponAmmunition } = await import("../module/apps/ammunition-use.mjs");
+const { reloadWeapon, spendWeaponShots, weaponAmmunition, weaponShotsLeft } =
+  await import("../module/apps/ammunition-use.mjs");
+const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+const { fireActionContent } = await import("../module/apps/combat-actions.mjs");
 const { compareOpposed, recentResults } = await import("../module/apps/opposed-checks.mjs");
 
 const set = (object, path, value) => {
@@ -295,7 +298,7 @@ test("damage cards apply Foibles from the saved attack proficiency even without 
   const damage = card("foibles-damage", { checkKind: "damage", effectiveTotal: 10, weaponProficiency: "rifle" });
   await applyDamage(damage, { targetUuid: target.uuid, damage: 10, kind: "lethal", attackKind: "rangedWeapon" });
   assert.equal(target.system.vitality.value, 13);
-  assert.match(posted.at(-1).content, /Foibles/);
+  assert.match(onCard(damage), /Foibles/);
 });
 
 test("an attack is settled against the target's listed Defense and its outcome confirmed", async () => {
@@ -338,6 +341,9 @@ test("an attack that cannot be confirmed keeps no resolution, and a resolved one
   assert.match(warnings.at(-1), /already been resolved/);
 });
 
+/** The outcome lines a damage card keeps for its newest apply. */
+const onCard = message => (appliedDamageEntries(message.flags.spycraft2).at(-1)?.report ?? []).join(" ");
+
 test("lethal damage comes off a special character's vitality and wounds and sets the conditions", async () => {
   reset();
   const kevin = character("Kevin", {
@@ -349,14 +355,17 @@ test("lethal damage comes off a special character's vitality and wounds and sets
   await applyDamage(damage, { targetUuid: kevin.uuid, damage: 11, kind: "lethal", attackKind: "rangedWeapon" });
   assert.deepEqual([kevin.system.vitality.value, kevin.system.wounds.value], [0, 9]);
   assert.equal(kevin.statuses.has("fatigued"), true);
-  assert.match(posted.at(-1).content, /takes 9 damage \(11 less damage reduction 2\)/);
+  // A plain outcome is kept on the damage card, not posted as a card of its own.
+  assert.equal(posted.length, 0);
+  assert.match(onCard(damage), /takes 9 damage \(11 less damage reduction 2\)/);
   const note = undoNotes.at(-1).flags.spycraft2.undo;
   assert.equal(note.label, "11 lethal damage applied to Kevin");
   assert.ok(note.entries[0].restore.some(([path]) => path.startsWith("system.vitality")));
   assert.equal(note.damageCard.targetUuid, note.entries[0].uuid);
-  assert.deepEqual(appliedDamageEntries(damage.flags.spycraft2), [
-    { targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }
-  ]);
+  assert.deepEqual(
+    appliedDamageEntries(damage.flags.spycraft2).map(({ report, ...entry }) => entry),
+    [{ targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }]
+  );
   // A critical hit while vitality remains goes to wounds; armor-piercing lowers the DR.
   await assert.rejects(applyDamage(damage, { targetUuid: kevin.uuid, damage: 11, kind: "lethal" }), /already reached/);
   kevin.system.vitality.value = 10;
@@ -436,6 +445,26 @@ test("attacks spend counted shots and Reload draws on the reserve", async () => 
   assert.equal(weaponAmmunition(pistol), null);
   game.settings.get = () => true;
   assert.equal(weaponAmmunition(document({ type: "weapon", parent: owner, system: { ammo: "—" } })), null);
+});
+
+test("Bottomless Clip gives fire actions a full load and spends no shots", async () => {
+  reset();
+  const owner = character("Kevin", {});
+  const rifle = document({ type: "weapon", name: "Rifle", isOwner: true, parent: owner, system: { ammo: "30M2" } });
+  setCampaignRulesSource(() => ({ bottomlessClip: true }));
+  try {
+    assert.equal(weaponAmmunition(rifle), null);
+    assert.equal(weaponShotsLeft(rifle), 30);
+    assert.equal(await spendWeaponShots(rifle, 9), null);
+    assert.equal(rifle.system.shotsLoaded, undefined, "no shots are taken");
+    const html = fireActionContent({ firearm: true, modes: ["auto"] }, rifle, owner);
+    assert.match(html, /name="shotsRemaining"[^>]*value="30" readonly/);
+    assert.match(html, /Bottomless Clip/);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+  assert.equal(weaponShotsLeft(rifle), 30, "a counted weapon reports what it holds");
+  assert.equal(weaponShotsLeft(document({ type: "weapon", parent: owner, system: { ammo: "—" } })), null);
 });
 
 test("an opposed check is compared with the other side's posted result and both are confirmed", async () => {
@@ -607,7 +636,8 @@ test("a special NPC's stress and subdual damage is totalled and its threshold sa
   const damage = card("d4", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 8 });
   await applyDamage(damage, { targetUuid: boss.uuid, damage: 8, kind: "subdual" });
   assert.deepEqual(nonLethalTotals(boss), { stress: 0, subdual: 8 });
-  assert.equal(posted.at(-1).flags, undefined, "below the threshold: no save");
+  assert.equal(posted.length, 0, "below the threshold: the report stays on the damage card");
+  assert.ok(onCard(damage));
   const nextDamage = card("d4-next", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 6 });
   await applyDamage(nextDamage, { targetUuid: boss.uuid, damage: 6, kind: "subdual" });
   assert.equal(nonLethalTotals(boss).subdual, 14);
@@ -2396,7 +2426,7 @@ test("Animal Partner weapon and typed hits consume vitality instead of standard 
 test("grapple benefits the winner takes change conditions on both sides", async () => {
   reset();
   const kevin = character("Grappler", { activeFeatNames: [] });
-  const foe = character("Foe", {});
+  const foe = character("Foe", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 } });
   const remove = who => async () => who.statuses.clear();
   foe.deleteEmbeddedDocuments = remove(foe);
   await settleGrapple(kevin, {
@@ -2426,7 +2456,26 @@ test("grapple benefits the winner takes change conditions on both sides", async 
     benefits: ["sprawl"]
   });
   assert.deepEqual([foe.statuses.has("sprawled"), kevin.statuses.has("prone")], [true, true]);
-  assert.match(posted.at(-1).content, /1d4 \+ Strength subdual/);
+  assert.match(posted.at(-1).content, /roll 1d4 \+ Strength subdual/);
+  const before = foe.system.vitality.value;
+  kevin.system.proficiencyTotals = { unarmed: { proficient: true } };
+  await settleGrapple(kevin, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: foe.uuid,
+    benefits: ["injure"]
+  });
+  assert.equal(foe.system.vitality.value, before, "an earned benefit waits for its original damage roll");
+  assert.deepEqual(posted.at(-1).flags.spycraft2.grappleBenefits.benefits, ["injure"]);
+  const { grappleBenefitDamage } = await import("../module/rules/grapple-check.mjs");
+  const str = { abilities: { str: { mod: 2 } } };
+  assert.deepEqual(grappleBenefitDamage(str, "injure"), { formula: "max(1, 1d3 + (2))", kind: "subdual", minimum: 1 });
+  assert.deepEqual(grappleBenefitDamage(str, "throw", { proficient: true }), {
+    formula: "max(1, 1d4 + (2)) + (2)",
+    kind: "lethal",
+    minimum: 3
+  });
 });
 
 function grappleParticipant(name, statuses = []) {
@@ -2696,21 +2745,36 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     false,
     "not offered twice for one target"
   );
-  // With several tokens targeted, one button applies the damage to each and posts a summary.
+  // With several tokens targeted, one button applies the damage to each and posts a summary. A card resolved
+  // against one target keeps it: the map's targets do not override it.
   const second = character("Guard2", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
   game.user.targets = [{ actor: guard }, { actor: second }];
-  const each = controls(damage).find(c => c.label === "Apply 7 to 2 targets");
+  assert.equal(
+    controls(damage).find(c => c.label === "Apply 7 to 2 targets"),
+    undefined,
+    "the resolved target stays"
+  );
+  const loose = card("q3", { actorUuid: attacker.uuid, checkKind: "damage", effectiveTotal: 7 });
+  const each = controls(loose).find(c => c.label === "Apply 7 to 2 targets");
+  assert.match(each.hint, /Guard \(not on the scene\), Guard2/, "the recipients are named");
+  // Targets changed after the card was drawn do not join the batch.
+  game.user.targets = [];
   await each.run();
-  assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [13, 13]);
-  assert.match(posted.at(-1).content, /Damage applied to Guard2/);
-  assert.match(posted.at(-1).content, /Not applied to: Guard/);
+  assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
+  assert.match(posted.at(-1).content, /Damage applied to 2 targets: Guard/);
+  await applyDamageToEach(loose, [guard, second]);
+  assert.deepEqual(
+    [guard.system.vitality.value, second.system.vitality.value],
+    [6, 13],
+    "this actual second damage card cannot apply twice"
+  );
   game.user.targets = [];
   // A target the damage cannot reach is named as not applied, never counted as done.
   const crate = document({ uuid: "Actor.Crate", name: "Crate", type: "loot", isOwner: true, system: {}, flags: {} });
   registry.set(crate.uuid, crate);
-  const done = await applyDamageToEach(damage, [second, crate]);
+  const done = await applyDamageToEach(loose, [second, crate]);
   assert.deepEqual(done, []);
-  assert.match(posted.at(-1).content, /Not applied to: Guard2.*Crate/);
+  assert.match(posted.at(-1).content, /Not applied to:.*Crate/);
 });
 
 test("wound loss from applied damage records its end-of-round Initiative change", async () => {
@@ -2725,7 +2789,7 @@ test("wound loss from applied damage records its end-of-round Initiative change"
   const modifiers = combatant.flags.spycraft2.fluid.modifiers;
   assert.equal(modifiers.length, 1);
   assert.equal(modifiers[0].amount, -2);
-  assert.match(posted.at(-1).content, /Initiative -2 at the end of the round/);
+  assert.match(onCard(damage), /Initiative -2 at the end of the round/);
   game.combat = undefined;
 });
 
@@ -2818,9 +2882,11 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
     distanceFeet: 40
   });
   assert.equal(incomingFacts({ attackContext: { distanceFeet: null } }).distanceFeet, null);
-  // Once the attack is settled there is nothing left to answer on it.
-  attack.flags.spycraft2.attackResolution = { hit: true };
-  assert.deepEqual(ids(attack), []);
+  // Once the attack is settled, the target's row stays, disabled, and says how it went.
+  attack.flags.spycraft2.attackResolution = { hit: true, defense: 12, margin: 7, targetName: "Latch" };
+  assert.deepEqual(ids(attack), ["targetResolved"]);
+  const [settled] = targetResponseControls({ message: attack, check: attack.flags.spycraft2, user: player });
+  assert.match(settled.disabled, /Latch's Defense 12/);
   // Someone else's agent, or an attack that names itself, offers nothing.
   const other = character("Vector", {}, { isOwner: false });
   const elsewhere = card("t2", {
@@ -2849,4 +2915,263 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
     ouch: { targetUuid: mine.uuid, name: "Latch", damage: 6, kind: "lethal", ouch: true, net: 6 }
   };
   assert.deepEqual(ids(damage), ["ouchInjury"]);
+});
+
+test("rest, a dying roll, Stabilize, a hazard save's result and a grapple each leave an Undo note (U1)", async () => {
+  reset();
+  undoNotes.length = 0;
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  const { applyStabilize, rollDying } = await import("../module/apps/healing.mjs");
+  const { resolveHazardSave } = await import("../module/apps/hazards.mjs");
+  const cards = new Map();
+  const keptMessages = game.messages;
+  game.messages = Object.assign([], { get: id => cards.get(id) });
+  const noteOf = data => document({ id: `n${undoNotes.length}`, flags: structuredClone(data.flags) });
+
+  const rester = character("Sleeper", {
+    vitality: { value: 4, max: 30 },
+    wounds: { value: 10, max: 12 },
+    abilities: { con: { value: 12 }, wis: { value: 10 } },
+    effectiveThreatLevel: 3,
+    npcType: "special"
+  });
+  rester.type = "npc";
+  await restAndRecover(rester, { hours: 2, days: 0 });
+  assert.ok(rester.system.vitality.value > 4);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Rest: Sleeper");
+  await applyUndo(noteOf(undoNotes.at(-1)));
+  assert.equal(rester.system.vitality.value, 4, "Undo puts the vitality back");
+
+  const dying = character("Faller", {
+    vitality: { value: 0, max: 30 },
+    wounds: { value: -3, max: 12 },
+    deathThreshold: -10,
+    abilities: { con: { value: 12 } }
+  });
+  await rollDying(dying);
+  assert.equal(undoNotes.at(-1).flags.spycraft2.undo.label, "Dying roll: Faller");
+
+  const medic = card("st1", { actorUuid: "Actor.Medic", checkKind: "skill", successConfirmed: true });
+  cards.set(medic.id, medic);
+  dying.system.wounds.value = -4;
+  await applyStabilize(medic, { patient: dying });
+  assert.equal(dying.system.wounds.value, 0);
+  assert.ok(medic.flags.spycraft2.stabilized);
+  const stabilize = undoNotes.at(-1);
+  assert.deepEqual(
+    stabilize.flags.spycraft2.undo.cardMarks.map(({ messageId, key }) => ({ messageId, key })),
+    [{ messageId: "st1", key: "stabilized" }]
+  );
+  // The note keeps what the step left, so a later step's mark is not cleared.
+  assert.equal(stabilize.flags.spycraft2.undo.cardMarks[0].left.name, "Faller");
+  await applyUndo(noteOf(stabilize));
+  assert.equal(dying.system.wounds.value, -4);
+  assert.equal(medic.flags.spycraft2.stabilized, undefined, "the card can be used again");
+
+  // A failed Coup de Grace save, applied from its card: the wounds and the card's mark both go back.
+  const victim = character("Victim", { vitality: { value: 0, max: 30 }, wounds: { value: 5, max: 12 } });
+  const save = card("cg1", {
+    actorUuid: victim.uuid,
+    checkKind: "save",
+    resolved: true,
+    effectiveTotal: 3,
+    successConfirmed: false,
+    hazardSave: { kind: "coupDeGrace", label: "Coup de Grace", dc: 10 }
+  });
+  cards.set(save.id, save);
+  await resolveHazardSave(victim, save);
+  assert.equal(victim.system.wounds.value, -10);
+  assert.equal(save.flags.spycraft2.hazardSave.resolved, true);
+  await applyUndo(noteOf(undoNotes.at(-1)));
+  assert.equal(victim.system.wounds.value, 5);
+  assert.equal(
+    save.flags.spycraft2.hazardSave.resolved,
+    true,
+    "Undo restores effects while the actual hazard result stays consumed"
+  );
+  await resolveHazardSave(victim, save);
+  assert.equal(victim.system.wounds.value, 5, "a consumed hazard cannot replay secondary effects");
+
+  // A grapple: both wrestlers' conditions are on one note.
+  const tracked = name => {
+    const who = character(name, {});
+    who.createEmbeddedDocuments = async (kind, rows) => {
+      for (const row of rows) {
+        for (const status of row.statuses) who.statuses.add(status);
+        const id = `${name}-${who.effects.length}`;
+        who.effects.push({ id, ...row, toObject: () => ({ _id: id, ...row }) });
+      }
+      return rows;
+    };
+    return who;
+  };
+  CONFIG.statusEffects.push({ id: "vulnerable", name: "vulnerable", img: "" });
+  const grappler = tracked("Holder"),
+    held = tracked("Held");
+  await settleGrapple(grappler, {
+    opening: true,
+    total: 20,
+    opponentTotal: 12,
+    opponentUuid: held.uuid,
+    benefits: [],
+    grappleContextConfirmed: true,
+    sizeDifference: 0
+  });
+  const grapple = undoNotes.at(-1).flags.spycraft2.undo;
+  assert.equal(grapple.label, "Grapple: Holder");
+  assert.deepEqual(grapple.entries.map(entry => entry.name).sort(), ["Held", "Holder"]);
+  game.messages = keptMessages;
+});
+
+test("a grapple is settled from the two check cards, with the Size bonus read once from inside the total (U7)", async () => {
+  reset();
+  const keptMessages = game.messages;
+  const big = character("Big", { activeFeatNames: [] }),
+    small = character("Small", {});
+  // Big is a category larger: its card's 21 already holds the +4 (p.357).
+  const mine = card("g1", {
+      actorUuid: big.uuid,
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "grapple",
+      rawTotal: 21,
+      effectiveTotal: 21,
+      grappleFeats: { version: 1, sizeDifference: -1, checkId: "grapple" }
+    }),
+    theirs = card("g2", {
+      actorUuid: small.uuid,
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "grapple",
+      rawTotal: 19,
+      effectiveTotal: 19,
+      criticalSuccess: true
+    });
+  mine.speaker = { alias: "Big" };
+  theirs.speaker = { alias: "Small" };
+  game.messages = [mine, theirs];
+  const { grappleInputFromCards } = await import("../module/apps/combat-actions.mjs");
+  const { recentResults } = await import("../module/apps/opposed-checks.mjs");
+  const filled = grappleInputFromCards({ cardUuid: mine.uuid, opponentCardUuid: theirs.uuid }, recentResults());
+  assert.deepEqual(
+    [filled.total, filled.opponentTotal, filled.opponentCritical, filled.opponentUuid, filled.cardSizeBonus],
+    [21, 19, true, small.uuid, 4]
+  );
+  const outcome = await settleGrapple(big, {
+    cardUuid: mine.uuid,
+    opponentCardUuid: theirs.uuid,
+    opening: false,
+    benefits: []
+  });
+  assert.equal(outcome.winner, "actor", "21 against 19: the Size bonus is not counted twice");
+  assert.match(posted.find(data => /Grapple: 21 against 19/.test(data.content)).content, /includes \+4/);
+  // A side with no card is typed.
+  const typed = grappleInputFromCards({ cardUuid: "", opponentCardUuid: theirs.uuid, total: "15" }, recentResults());
+  assert.deepEqual([typed.total, typed.opponentTotal, typed.critical], [15, 19, false]);
+  // A Climb card is not a Grapple check: it is not taken as the character's own result.
+  const climb = card("g3", {
+    actorUuid: big.uuid,
+    checkKind: "skill",
+    skillKey: "athletics",
+    checkId: "climb",
+    rawTotal: 30,
+    effectiveTotal: 30
+  });
+  climb.speaker = { alias: "Big" };
+  game.messages = [mine, theirs, climb];
+  const wrong = grappleInputFromCards(
+    { cardUuid: climb.uuid, opponentCardUuid: theirs.uuid, total: "" },
+    recentResults()
+  );
+  assert.ok(Number.isNaN(wrong.total));
+  game.messages = keptMessages;
+});
+
+test("NPC Grapple awards retain actual participants and leave damage to their original tracked roll", async () => {
+  reset();
+  const { grappleDamagePlan } = await import("../module/rules/grapple-damage.mjs");
+  const { npcWeaponTraining } = await import("../module/rules/npc-weapons.mjs");
+  const victim = character("Victim", { vitality: { value: 30, max: 30 }, wounds: { value: 12, max: 12 } });
+  victim.statuses.add("held");
+  for (const [name, type, qualities, kind] of [
+    ["Clerk", "standard", [{ id: "non-combatant" }], "subdual"],
+    ["Dog", "animal", [], "subdual"],
+    ["Thug", "standard", [], "lethal"]
+  ]) {
+    const winner = character(name, {
+      npcType: type,
+      npcProfile: { enabled: true, qualities },
+      activeFeatNames: [],
+      abilities: { str: { mod: 0 } }
+    });
+    winner.type = "npc";
+    await settleGrapple(winner, { total: 22, opponentTotal: 12, opponentUuid: victim.uuid, benefits: ["injure"] });
+    const award = posted.at(-1).flags.spycraft2.grappleBenefits;
+    assert.equal(award.winnerUuid, winner.uuid);
+    assert.equal(award.loserUuid, victim.uuid);
+    assert.deepEqual(award.benefits, ["injure"]);
+    assert.equal(grappleDamagePlan(winner.system, "injure", { actorType: "npc" }).profile.kind, kind);
+    assert.equal(victim.system.vitality.value, 30, "taking a benefit does not invent damage dice");
+    assert.equal(npcWeaponTraining(winner.system, { proficiency: "unarmed" }).trained, kind === "lethal");
+  }
+  const { askGC } = await import("../module/apps/gc-relay.mjs");
+  await assert.rejects(askGC("grappleDamage", { actorUuid: victim.uuid, amount: 4, kind: "lethal" }));
+  assert.equal(victim.system.vitality.value, 30, "a bare amount cannot bypass the original damage receipt");
+});
+
+test("round-3 council: a player's grapple Undo note leaves out an opponent the player does not own", async () => {
+  reset();
+  undoNotes.length = 0;
+  const holder = character("Owner", {}),
+    other = character("Unowned", {});
+  other.isOwner = false;
+  const user = game.user,
+    users = game.users;
+  game.user = { ...user, id: "player", isGM: false };
+  game.users = { activeGM: { query: async () => ({ value: true }) }, get: () => null };
+  try {
+    await settleGrapple(holder, {
+      opening: true,
+      total: 20,
+      opponentTotal: 12,
+      opponentUuid: other.uuid,
+      benefits: []
+    });
+  } finally {
+    game.user = user;
+    game.users = users;
+  }
+  const note = undoNotes.at(-1)?.flags.spycraft2.undo;
+  assert.ok(!note || !note.entries.some(entry => entry.name === "Unowned"));
+});
+
+test("the grapple's Undo note does not take in changes made while the benefit dialog is open (Codex)", async () => {
+  reset();
+  undoNotes.length = 0;
+  const winner = character("Picker", { vitality: { value: 10, max: 10 } }),
+    loser = character("Picked", {});
+  const dialogs = foundry.applications.api.DialogV2,
+    input = dialogs.input;
+  dialogs.input = async () => {
+    winner.system.vitality.value = 5;
+    return null;
+  };
+  try {
+    await settleGrapple(winner, { opening: false, total: 22, opponentTotal: 12, opponentUuid: loser.uuid });
+  } finally {
+    dialogs.input = input;
+  }
+  assert.equal(winner.system.vitality.value, 5);
+  const note = undoNotes.at(-1)?.flags.spycraft2.undo;
+  assert.ok(!note || !JSON.stringify(note.entries).includes('"vitality"'), "the vitality loss is not on the note");
+});
+
+test("an outcome on a whispered damage card keeps a card of its own", async () => {
+  reset();
+  const kevin = character("Kevin", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
+  const damage = card("dw", { actorUuid: "Actor.Guard", checkKind: "damage", effectiveTotal: 5 });
+  damage.whisper = ["gm"];
+  await applyDamage(damage, { targetUuid: kevin.uuid, damage: 5, kind: "lethal" });
+  assert.match(posted.at(-1).content, /Kevin/);
+  assert.equal(appliedDamageEntries(damage.flags.spycraft2).at(-1).report, undefined);
 });

@@ -75,7 +75,7 @@ test("NPC conditions project fatigue scores, Speed, posture and Run from origina
         assert.equal(model.canRun, false);
         assert.throws(
           () => combatMovementPlan(model, { action: "run", distanceFeet: speed, routeConfirmed: true }),
-          /cannot Run/
+          /stops this character from running/
         );
         assert.equal(model.mentalLeapState.fatigueSaveBonus, 6);
         const defense = model.defense.total;
@@ -369,4 +369,26 @@ test("graded NPC and legacy manual combat values apply Shaken save/initiative/at
       assert.equal(model.npcBuild?.xp, before.xp);
     }
   }
+});
+test("a feat's vitality and wounds move a standard NPC's Damage save instead (p.452)", () => {
+  const model = Object.assign(new NpcData(), make());
+  model.npcProfile.grades = { ...model.npcProfile.grades, health: 5 };
+  const items = [
+    {
+      type: "feat",
+      name: "Tough feat",
+      system: {
+        ranks: 1,
+        bonuses: [
+          { target: "vitality", value: "5" },
+          { target: "wounds", value: "1" }
+        ]
+      }
+    }
+  ];
+  Object.defineProperty(model, "parent", { value: { items }, configurable: true });
+  model.prepareDerivedData();
+  assert.equal(damageSaveState({ system: model }).bonus, 11, "+2 for 5 vitality and +1 for 1 wound on the table's +8");
+  assert.equal(model.featEffects.damageSaveHealth.applied, 3);
+  assert.equal(model.vitality.max, 0);
 });

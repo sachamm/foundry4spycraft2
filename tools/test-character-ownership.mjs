@@ -181,3 +181,35 @@ test("a player is told on their own screen when the GC makes them an agent's own
   delete globalThis.game;
   delete globalThis.ui;
 });
+
+test("New agent for a player creates an agent the player owns, assigns it and opens it", async () => {
+  const { newAgentForPlayer } = await import("../module/apps/character-ownership.mjs");
+  const created = [],
+    updates = [],
+    notes = [];
+  const player = { ...sacha, update: async data => updates.push(data) };
+  const previous = { game: globalThis.game, Actor: globalThis.Actor, ui: globalThis.ui, foundry: globalThis.foundry };
+  globalThis.foundry = { utils: { escapeHTML: String } };
+  globalThis.ui = { notifications: { info: note => notes.push(note), warn: note => notes.push(note) } };
+  globalThis.Actor = {
+    create: async data => {
+      const actor = { id: "new1", ...data, sheet: { render: () => (actor.opened = true) } };
+      created.push(actor);
+      return actor;
+    }
+  };
+  const list = [gm, player];
+  globalThis.game = { user: gm, users: Object.assign(list, { get: id => list.find(u => u.id === id) }) };
+  try {
+    const actor = await newAgentForPlayer({ userId: "u1", name: "" });
+    assert.equal(actor.name, "Sacha's agent");
+    assert.equal(actor.type, "agent");
+    assert.equal(actor.ownership.u1, OWNERSHIP.OWNER);
+    assert.deepEqual(updates, [{ character: "new1" }]);
+    assert.equal(actor.opened, true);
+    globalThis.game.user = sacha;
+    assert.equal(await newAgentForPlayer({ userId: "u1" }), null, "only the GC creates agents for players");
+  } finally {
+    Object.assign(globalThis, previous);
+  }
+});

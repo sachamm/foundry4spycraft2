@@ -1,3 +1,4 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { preparedResistanceSource } from "./resistances.mjs";
 import { loc } from "../i18n.mjs";
 import { campaignStressPolicy, campaignStressDamage } from "./campaign-combat.mjs";
@@ -6,8 +7,8 @@ export function stressDefenseSource(system) {
   return {
     ...preparedResistanceSource(system, "stress"),
     noFear: structuredClone(system.survivalStats.noFear ?? null),
-    ...(campaignStressPolicy(system.campaignEffects)
-      ? { campaignStressPolicy: campaignStressPolicy(system.campaignEffects) }
+    ...(campaignStressPolicy(system.campaignEffects ?? campaignRules())
+      ? { campaignStressPolicy: campaignStressPolicy(system.campaignEffects ?? campaignRules()) }
       : {})
   };
 }
@@ -49,6 +50,9 @@ export function stressDefensePlan(system, rawDamage, { fromFire = false, campaig
             rounding: "down"
           }
         }
+      : {}),
+    ...(source.campaignStressPolicy && !campaignAdjusted
+      ? { campaignQuality: { multiplier: campaign.multiplier, before: rawDamage, after: adjustedDamage } }
       : {}),
     armorPiercing: "all",
     damageReductionApplied: 0,

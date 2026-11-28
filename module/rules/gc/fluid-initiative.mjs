@@ -60,7 +60,12 @@ export function endOfRound(countNow, modifiers = [], { alreadyApplied = 0 } = {}
   const pending = modifiers.filter(entry => !entry.immediate);
   const raw = pending.filter(entry => !entry.uncapped).reduce((sum, entry) => sum + entry.amount, 0);
   // Immediate capped changes this round (Delay) count toward the same ±10 limit.
-  const room = { up: F.roundCap - Math.max(0, alreadyApplied), down: -F.roundCap - Math.min(0, alreadyApplied) };
+  // A Delay past the limit stands (p.356's own example), but it never turns the remaining room into a change the
+  // other way: the room left only shrinks to zero.
+  const room = {
+    up: Math.max(0, F.roundCap - Math.max(0, alreadyApplied)),
+    down: Math.min(0, -F.roundCap - Math.min(0, alreadyApplied))
+  };
   const capped = Math.max(room.down, Math.min(room.up, raw));
   const uncapped = pending.filter(entry => entry.uncapped).reduce((sum, entry) => sum + entry.amount, 0);
   const result = thresholds(countNow + capped + uncapped);

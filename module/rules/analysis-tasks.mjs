@@ -1,3 +1,4 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { analysisChallengeCount } from "./forensic-genius.mjs";
 import { taskPressureState, taskPressureUseSpec, taskPressureUseProof } from "./task-pressure.mjs";
 import { rollEvidence, errorDecisionPending } from "./outcomes.mjs";
@@ -33,7 +34,13 @@ export function analysisTaskValid(t) {
     (t.forensicsOnly !== undefined && typeof t.forensicsOnly !== "boolean") ||
     (t.forensicsOnly === true && typeof t.trackingMastery !== "boolean") ||
     (t.forensicsOnly !== true && t.trackingMastery !== undefined) ||
-    t.requiredChallenges !== Math.max(1, t.baseChallenges - (t.forensicGenius ? 2 : 0) - (t.trackingMastery ? 1 : 0)) ||
+    (t.campaignChallenges !== undefined && !Number.isSafeInteger(t.campaignChallenges)) ||
+    t.requiredChallenges !==
+      Math.max(
+        1,
+        Math.max(1, t.baseChallenges - (t.forensicGenius ? 2 : 0) - (t.trackingMastery ? 1 : 0)) +
+          (t.campaignChallenges ?? 0)
+      ) ||
     !whole(t.revision) ||
     !Array.isArray(t.events) ||
     t.revision !== t.events.length
@@ -151,13 +158,16 @@ export function createAnalysisTaskPlan(
       loc`Enter a whole unmodified Challenge count of at least 2 (pp.99–100); apply feat reductions afterward.`
     );
   const forensicGenius = forensicTaskSource(system),
-    counts = analysisChallengeCount(system, baseChallenges, { forensics: forensicsOnlyConfirmed });
+    counts = analysisChallengeCount(system, baseChallenges, { forensics: forensicsOnlyConfirmed }),
+    campaignShift = Math.trunc(Number(campaignRules().complexTaskChallenges) || 0);
   return {
     version: 1,
     id,
     title: title.trim(),
     baseChallenges,
-    requiredChallenges: counts.required,
+    // Speed-Frame needs 1 Challenge fewer and Thriller 1 more (p.408), fixed when the task begins.
+    requiredChallenges: Math.max(1, counts.required + campaignShift),
+    ...(campaignShift ? { campaignChallenges: campaignShift } : {}),
     forensicGenius,
     ...(forensicsOnlyConfirmed ? { forensicsOnly: true, trackingMastery: counts.trackingMastery } : {}),
     ...(pressuredConfirmed === true ? { pressured: true, pressureAttempts: [] } : {}),

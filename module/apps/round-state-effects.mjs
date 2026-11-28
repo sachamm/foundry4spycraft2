@@ -6,6 +6,7 @@
  * character, and this module adds or removes the matching effect whenever that record or the combat clock changes.
  * Only the active GM's client writes, so two clients never create the same effect.
  */
+import { isLeadGM } from "../writers.mjs";
 import { readSetting } from "../settings.mjs";
 import { combatExpertiseState } from "../rules/combat-expertise.mjs";
 import { fightDefensivelyState } from "../rules/fight-defensively.mjs";
@@ -168,7 +169,7 @@ async function applyRoundStateEffects(actor, { states = ROUND_STATES } = {}) {
 const enabled = () => {
   return readSetting("roundStateEffects", false) !== false;
 };
-const mine = actor => enabled() && ["agent", "npc"].includes(actor?.type) && game.users?.activeGM?.isSelf === true;
+const mine = actor => enabled() && ["agent", "npc"].includes(actor?.type) && isLeadGM();
 const report = error => console.error(loc`Field Agent's Handbook | Could not update round-state effects`, error);
 
 /** Register the setting and the hooks. Call during `init`. */
@@ -196,7 +197,7 @@ export function installRoundStateEffects() {
         actor.reset?.();
         renderOpenSheet(actor);
       }
-    if (!game.users?.activeGM?.isSelf || !enabled()) return;
+    if (!isLeadGM() || !enabled()) return;
     for (const actor of actors) {
       if (!["agent", "npc"].includes(actor.type)) continue;
       if (mirrorEffects(actor).length || activeRoundStates(actor.system).length)

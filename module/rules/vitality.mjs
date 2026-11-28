@@ -32,6 +32,42 @@ export function vitalitySource(actor, index, { allowInvalidValue = false } = {})
   };
 }
 export const vitalitySourceEvidence = source => JSON.stringify(source);
+/**
+ * A level that was removed and added again keeps its first roll: the stored roll for the same career level, class and die
+ * that no current level points at.
+ */
+export function keptVitalityRoll(actor, source) {
+  const rolls = actor.flags?.spycraft2?.vitalityRolls ?? {},
+    inUse = new Set((actor.system.progression ?? []).map(entry => entry?.vitalityRollId).filter(Boolean));
+  return (
+    Object.values(rolls)
+      .filter(
+        record =>
+          record &&
+          validId(record.id) &&
+          !inUse.has(record.id) &&
+          record.index === source.index &&
+          record.classId === source.classId &&
+          record.die === source.die &&
+          Number.isSafeInteger(record.value) &&
+          record.value >= 1 &&
+          record.value <= source.die
+      )
+      .sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null
+  );
+}
+/**
+ * The latest GC review of a stored vitality roll (reviews are kept by the roll's level id), or null. Each review names
+ * the one it replaced, and several can share a world time, so the latest is the one no other review replaced.
+ */
+export function latestVitalityReview(actor, levelId) {
+  if (!levelId) return null;
+  const reviews = Object.values(actor.flags?.spycraft2?.vitalityReviews ?? {}).filter(
+    review => review?.levelId === levelId && validId(review.id) && Number.isSafeInteger(review.value)
+  );
+  const replaced = new Set(reviews.map(review => review.previousReviewId).filter(Boolean));
+  return reviews.filter(review => !replaced.has(review.id)).sort((a, b) => (b.at ?? 0) - (a.at ?? 0))[0] ?? null;
+}
 export function vitalityRollRecord(actor, source, roll, at) {
   if (
     !validId(source.levelId) ||

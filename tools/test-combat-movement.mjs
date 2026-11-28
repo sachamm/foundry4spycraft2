@@ -123,7 +123,7 @@ test("movement declarations enforce actual Speed, posture, Run permissions, coun
   assert.throws(() => combatMovementPlan(s, input()), /Speed/);
   s.conditionSpeedReview = false;
   s.canRun = false;
-  assert.throws(() => combatMovementPlan(s, { ...input(), action: "run" }), /cannot Run/);
+  assert.throws(() => combatMovementPlan(s, { ...input(), action: "run" }), /stops this character from running/);
   s.postureMovement.standardMove = false;
   assert.throws(() => combatMovementPlan(s, input()), /posture/);
   assert.equal(combatMovementPlan(s, { ...input(), action: "totalDefense", distanceFeet: 0 }).dodgeBonus, 4);

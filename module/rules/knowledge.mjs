@@ -17,6 +17,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { underwaterCheckPlan } from "./environment.mjs";
 import { tenSecondSolutionEligible, cunningPlanEffect } from "./class-checks.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignRules } from "./campaign-rules.mjs";
 import { campaignSkillChecks } from "./campaign-skills.mjs";
 const normal = value =>
   String(value ?? "")
@@ -62,7 +63,11 @@ export function resolveKnowledgeCheck(
       blockedReason: loc`Choose the one skill the GC considers relevant to the Knowledge check.`
     };
   const cardShark = cardSharkKnowledgePlan(system, { gamblingKnowledge, topic });
-  const campaignChecks = campaignSkillChecks(system, skill, { id: "knowledge" });
+  const campaignChecks = campaignSkillChecks(
+    { ...system, campaignEffects: system.campaignEffects ?? campaignRules() },
+    skill,
+    { id: "knowledge" }
+  );
   active = campaignChecks.policy?.active || active === true || cardShark.active;
   const photo = system.activeFeatNames?.includes("Photographic Memory"),
     taking = method === "take10" || method === "take20";

@@ -143,23 +143,14 @@
 .spycraft2 .sc2-track i.on:is(.mark-broken, .mark-destroyed) {
   background: var(--sc2-danger);
 }
-/* Figures first: attributes and statistics sit directly under the name, ahead of the action lists. */
+/* Figures first: the template puts attributes and statistics directly under the name (after the builder in Edit),
+   so what is seen first is also what Tab reaches first. */
 .spycraft2.sheet.npc .spycraft2-sheet.npc {
   display: flex;
   flex-direction: column;
 }
 .spycraft2.sheet.npc .spycraft2-sheet.npc > * {
   flex: 0 0 auto;
-  order: 3;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .sheet-header {
-  order: 0;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > .abilities-row {
-  order: 1;
-}
-.spycraft2.sheet.npc .spycraft2-sheet.npc > :is(.npc-graded-play, .stat-grid) {
-  order: 2;
 }
 .spycraft2.sheet.npc .npc-results .sc2-caption {
   letter-spacing: 0.02em;
@@ -177,6 +168,9 @@
 
 .spycraft2.sheet.npc .npc-damage-save .npc-results {
   margin-bottom: var(--sc2-space-1);
+}
+.spycraft2.sheet.npc .npc-damage-save > h3:first-child {
+  margin-top: var(--sc2-space-3);
 }
 .spycraft2.sheet.npc .sheet-header .summary {
   display: flex;
@@ -212,24 +206,62 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(5.5em, 1fr));
-  gap: 2px 8px;
+  /* Caption and value side by side, wrapping whole: two short lines at most, so the builder keeps the room. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  max-height: 4.2em;
+  overflow-y: auto;
   margin: 4px 0;
-  padding: 4px 8px;
+  padding: 3px 8px;
+  font-size: var(--sc2-text-s);
   background: var(--sc2-surface-raised);
   border: 1px solid var(--sc2-rule, color-mix(in srgb, currentColor 30%, transparent));
   border-radius: var(--sc2-radius);
 }
 .spycraft2.sheet.npc .npc-pinned .sc2-field {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
   min-width: 0;
+  white-space: nowrap;
+}
+.spycraft2.sheet.npc .npc-pinned .sc2-caption {
+  font-size: var(--sc2-text-s);
 }
 .spycraft2.sheet.npc .npc-pinned .sc2-value {
   font-family: var(--sc2-num);
-  overflow-wrap: anywhere;
+  font-size: var(--sc2-text-m);
+}
+/* Keyboard focus never lands on a field hidden under the pinned strip. */
+.spycraft2.sheet.npc .window-content {
+  scroll-padding-top: 5em;
+}
+
+/* Items and notes fold under a summary drawn as a section bar, so every section on the sheet has the same label. */
+.spycraft2.sheet.npc .npc-notes > summary {
+  margin: var(--sc2-space-3) 0 var(--sc2-space-2);
+  align-content: center;
+  padding: 4px 8px;
+  /* The shared touch-size floor for a summary (ui-style-guide 6.6), not the section bar's own 26px. */
+  min-height: 44px;
+  font: 600 14px/1.4 var(--font-primary, sans-serif);
+  letter-spacing: 0.02em;
+  color: var(--sc2-on-bar);
+  background: var(--sc2-bar);
+  box-shadow: inset 0 0 0 1px var(--sc2-bar-edge);
+  cursor: pointer;
+}
+
+/* The GC-only switch sits with the header chips and reads as one of them. */
+.spycraft2.sheet.npc .npc-gc-only {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  margin-left: 4px;
+  font-size: var(--sc2-text-s);
 }
 .spycraft2.sheet.npc .npc-pinned-health {
-  grid-column: 1 / -1;
+  flex-basis: 100%;
 }

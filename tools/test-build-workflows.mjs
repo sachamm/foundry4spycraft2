@@ -121,7 +121,8 @@ test("adding a level snapshots permanent INT after its class increase while excl
     })),
     skills: {},
     focuses: {},
-    misc: {}
+    misc: {},
+    xp: 1000000
   };
   computeAgent(actor.system, actor.items, cfg);
   actor.syncGrantedFeats = async () => {};
@@ -219,4 +220,40 @@ test("expert entry is blocked before item creation and cannot use its own BAB to
   await actor.addClassLevel(expert, { promptVitality: false });
   assert.equal(created, 0);
   assert.equal(actor.system.progression.length, 4);
+});
+
+test("past level 1 a level needs its XP and comes one per mission break, unless the GC grants it (p.27)", async () => {
+  const actor = new SpycraftActor(),
+    c = classes.find(c => c.key === "scientist"),
+    cls = { id: "sci", type: "class", name: c.name, system: { ...c, identifier: c.key, vitalityDie: c.vitality } };
+  actor.uuid = "Actor.level-test";
+  const beforeSettings = game.settings;
+  game.settings = {
+    get: (_id, key) =>
+      key === "usagePeriods"
+        ? { mission: "m", missionCareerLevels: { version: 1, mission: "m", levels: { [actor.uuid]: 1 } } }
+        : key === "mission"
+          ? { active: false }
+          : beforeSettings?.get?.(_id, key)
+  };
+  actor.items = [cls];
+  actor.system = {
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10 }])),
+    progression: [{ classId: "scientist", vitality: 1, skills: {}, intelligenceModifier: 0 }],
+    skills: {},
+    focuses: {},
+    misc: {},
+    xp: 0
+  };
+  computeAgent(actor.system, actor.items, cfg);
+  actor.syncGrantedFeats = async () => {};
+  assert.equal(await actor.addClassLevel(cls, { promptVitality: false }), null);
+  assert.equal(actor.system.progression.length, 1, "not enough XP");
+  actor.system.xp = 1000000;
+  await actor.addClassLevel(cls, { promptVitality: false });
+  assert.equal(actor.system.progression.length, 2);
+  assert.equal(actor.system.progression[1].mission, "m");
+  assert.equal(await actor.addClassLevel(cls, { promptVitality: false }), null);
+  assert.equal(actor.system.progression.length, 2, "one level between missions");
+  game.settings = beforeSettings;
 });

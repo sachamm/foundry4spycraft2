@@ -403,6 +403,7 @@ test("current temporary INT qualifies live prerequisite checks but never rewrite
   assert.equal(a.system.focusPicks.generic.available, focus);
   assert.equal(a.checkPrerequisites({ type: "ability", key: "int", min: 20 }, { classEntry: true }).ok, true);
   a.syncGrantedFeats = async () => {};
+  await a.update({ "system.xp": 1000000 });
   await a.addClassLevel(
     a.items.find(i => i.id === "schemer"),
     { promptVitality: false }

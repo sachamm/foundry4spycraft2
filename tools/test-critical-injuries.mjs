@@ -280,3 +280,47 @@ test("GC recovery validates original die range, evidence, role and stale history
   assert.equal(posts.length, 0);
   assert.equal(draws, 1);
 });
+
+test("a rolled injury is a sheet row with its name, effect, healing time and Surgery DC; Surgery and Healed leave Undo notes (U6)", async () => {
+  const { criticalInjuryRows, recordInjurySurgery, markInjuryHealed, criticalInjuryReviews } =
+    await import("../module/apps/critical-injuries.mjs");
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  const a = actor();
+  dieResult = 12;
+  await rollCriticalInjury(a, input());
+  // Any write from here on is a plain path update.
+  a.update = async function (patch) {
+    for (const [path, value] of Object.entries(patch)) {
+      const keys = path.split(".");
+      let target = this;
+      for (const key of keys.slice(0, -1)) target = target[key] ??= {};
+      const last = keys.at(-1);
+      if (last.startsWith("-=")) delete target[last.slice(2)];
+      else target[last.replace(/^==/, "")] = structuredClone(value);
+    }
+  };
+  a.name = "Latch";
+  const notes = [];
+  ChatMessage.create = async data => (notes.push(data), data);
+  game.combats = [];
+  globalThis.fromUuid = async () => a;
+  const [row] = criticalInjuryRows(a);
+  assert.deepEqual(
+    [row.name, row.facts, row.canSurgery, row.healed],
+    ["Internal rupture", "Total 42 · Surgery DC 25 · healing 1d4 missions", true, false]
+  );
+  assert.match(row.effect, /Permanent/);
+  assert.equal(criticalInjuryReviews(a).length, 1, "the review list still holds every saved record");
+
+  await recordInjurySurgery(a, "injury");
+  assert.equal(criticalInjuryRows(a)[0].surgery, "Surgery has taken 2 off the healing time.");
+  const undo = notes.find(note => note.flags?.spycraft2?.undo);
+  assert.equal(undo.flags.spycraft2.undo.label, "Surgery on Internal rupture: Latch");
+  await applyUndo({ id: "u1", flags: structuredClone(undo.flags), update: async () => null });
+  assert.equal(criticalInjuryRows(a)[0].surgery, "", "Undo takes the Surgery back");
+
+  await markInjuryHealed(a, "injury");
+  assert.deepEqual([criticalInjuryRows(a)[0].healed, criticalInjuryRows(a)[0].canSurgery], [true, false]);
+  assert.equal(await recordInjurySurgery(a, "injury"), null, "no Surgery on a healed injury");
+  delete ChatMessage.create;
+});

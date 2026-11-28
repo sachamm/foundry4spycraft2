@@ -26,7 +26,7 @@ export function checkGuidance(check) {
       ? {
           tone: "neutral",
           title: loc`Damage applied`,
-          note: loc`Check who has already taken this damage (listed below) before applying it to anyone else.`
+          note: loc`Check who has already taken this damage before applying it to anyone else.`
         }
       : {
           tone: check.resolved ? "neutral" : "pending",
@@ -67,7 +67,10 @@ export function checkGuidance(check) {
     Number.isFinite(check.effectiveTotal) && check.effectiveTotal !== check.rawTotal
       ? `${check.rawTotal} → ${check.effectiveTotal}`
       : "";
-  return { title, note, tone, change };
+  // A cap is named, so the change it made is not taken for an action die's (p.88).
+  const cap = Object.hasOwn(check, "boostCap") ? check.boostCap : check.cap,
+    capped = check.capped && Number.isFinite(cap) ? loc`Result capped at ${cap} (p.88).` : "";
+  return { title, note, tone, change, capped };
 }
 
 const TONE_ICONS = { good: "fa-check", bad: "fa-xmark", pending: "fa-hourglass-half", neutral: "fa-flag-checkered" };
@@ -101,5 +104,11 @@ export function renderCheckGuidance(message, check, html, user) {
   hint.dataset.tooltip = guidance.note;
   title.append(" ", hint);
   box.append(title);
+  if (guidance.capped) {
+    const cap = document.createElement("p");
+    cap.className = "hint sc2-guide-cap";
+    cap.textContent = guidance.capped;
+    box.append(cap);
+  }
   content.prepend(box);
 }

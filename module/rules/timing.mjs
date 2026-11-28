@@ -1,10 +1,11 @@
 import { loc } from "../i18n.mjs";
+import { campaignTake10Time } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 /** User ruling: p.329 additive multipliers, with one reducing effect under p.102. */
 export function skillTimingPlan({
   method = "roll",
   take10Normal = false,
-  take10Base = 2,
+  take10Base = campaignTake10Time(2),
   falseStart = false,
   professional = false,
   classEffect = {},

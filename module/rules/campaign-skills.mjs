@@ -1,9 +1,10 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { skillPenaltyDivisor } from "./skill-penalties.mjs";
 
 export function campaignSkillPolicy(system) {
-  const effects = system.campaignEffects ?? {};
+  const effects = system.campaignEffects ?? campaignRules();
   const penaltyDivisor = skillPenaltyDivisor(system);
   for (const key of ["uncappedSkills", "activeSkillChecks"])
     if (![undefined, 0, 1].includes(effects[key]))
@@ -25,7 +26,7 @@ export function campaignSkillChecks(
   { surprise = false, shiftingDisposition = false, persuadingAction = false } = {}
 ) {
   const policy = campaignSkillPolicy(system),
-    effects = system.campaignEffects ?? {},
+    effects = system.campaignEffects ?? campaignRules(),
     special =
       !system.npcType ||
       ["special", "villain"].includes(system.npcType) ||

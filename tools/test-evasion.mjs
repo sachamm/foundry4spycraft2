@@ -1,3 +1,4 @@
+import { savingThrowDamagePlan } from "../module/rules/defense.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -348,4 +349,37 @@ test("cover save outcome evidence preserves ordinary legacy checks but rejects c
   assert.equal(rollEvidenceMatches(rollEvidence(legacy), c), false);
   assert.equal(rollEvidenceMatches(e, legacy), false);
   assert.equal(rollEvidenceMatches(rollEvidence(legacy), legacy), true);
+});
+test("Blockbuster: a player character's successful half-damage save resists all of it (p.406)", () => {
+  const half = savingThrowDamagePlan(check(0), { ...declare, damage: 17, normalSuccessDamage: 8, succeeded: true });
+  assert.equal(half.total, 8);
+  const resisted = savingThrowDamagePlan(
+    { ...check(0), campaignSaveContext: { version: 1, ignoreSuccessfulHalfSave: true } },
+    {
+      ...declare,
+      damage: 17,
+      normalSuccessDamage: 8,
+      succeeded: true,
+      successHalves: true
+    }
+  );
+  assert.deepEqual([resisted.total, resisted.blockbuster], [0, true]);
+  const failed = reflexDamagePlan(check(0), {
+    ...declare,
+    damage: 17,
+    normalSuccessDamage: 8,
+    succeeded: false,
+    blockbuster: true
+  });
+  assert.equal(failed.total, 17, "only a successful save");
+});
+test("Tense forbids Evasion III's take 10 on a Reflex save too (p.408)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  setCampaignRulesSource(() => ({ noTakeTen: true }));
+  try {
+    await assert.rejects(actor().rollSave("ref", { checkMethod: "take10", reflexReducesDamage: true }), /Tense/);
+  } finally {
+    setCampaignRulesSource(null);
+  }
+  assert.notEqual(await actor().rollSave("ref", { checkMethod: "take10", reflexReducesDamage: true }), false);
 });

@@ -97,6 +97,23 @@ test("post-multiplier XP is an explicit GC amount; settlement is once per missio
   for (const patch of [{ missionCompleteConfirmed: false }, { baseXP: -1 }, { threatLevel: 0 }, { modifierReason: "" }])
     assert.throws(() => missionXPPlan(sys(), { ...options, ...patch }));
 });
+test("a settlement reopened by Resume takes awards again and settles only the difference", () => {
+  const s = sys();
+  s.actionDieAwards.m = { count: 1, mission: "m" };
+  const options = { baseXP: 100, threatLevel: 3, mission: "m", missionCompleteConfirmed: true };
+  const first = missionXPPlan(s, options);
+  s.missionXPRewards.m = { ...first.record, reopened: true };
+  s.xp = first.xp;
+  assert.equal(actionDieAwardSummary(s).settled, false);
+  // An award after the resume is accepted.
+  const more = actionDieAwardPlan(s, award);
+  s.actionDieAwards.m = more.record;
+  const second = missionXPPlan(s, options);
+  assert.equal(second.record.previousTotalXP, first.record.totalXP);
+  assert.equal(second.record.gainedXP, second.record.totalXP - first.record.totalXP);
+  assert.equal(second.xp, first.xp + second.record.gainedXP);
+  assert.equal(second.record.reopened, undefined, "the new record is settled again");
+});
 let settings,
   posts,
   failPost = false,
@@ -164,6 +181,8 @@ globalThis.ChatMessage = {
 };
 globalThis.ui = { notifications: { warn: () => null } };
 const { SpycraftActor } = await import("../module/documents/actor.mjs");
+// Registers the Undo note a settlement leaves.
+const { applyUndo } = await import("../module/apps/undo.mjs");
 test("document awards transfer both balances, retain provenance and escape the recorded reason", async () => {
   reset();
   const actor = new SpycraftActor();
@@ -192,6 +211,22 @@ test("a failed GC-setting write refunds the character and does not retain an awa
   assert.equal(actor.system.actionDice.value, 3);
   assert.equal(settings.gcActionDice.value, 5);
   assert.equal(Object.hasOwn(actor.system.actionDieAwards, "m"), false);
+});
+test("a mission XP settlement leaves an Undo note that takes the XP and the settled mark back off (U5)", async () => {
+  reset();
+  const actor = new SpycraftActor();
+  globalThis.fromUuid = async uuid => (uuid === actor.uuid ? actor : null);
+  const options = { baseXP: 100, threatLevel: 3, missionCompleteConfirmed: true };
+  await actor.settleMissionXP(options);
+  assert.equal(actor.system.xp, 310);
+  const data = posts.find(post => post.flags?.spycraft2?.undo);
+  assert.equal(data.flags.spycraft2.undo.label, "Mission XP settled: Award Agent");
+  const note = { id: "undo", flags: structuredClone(data.flags), update: async () => null };
+  await applyUndo(note);
+  assert.equal(actor.system.xp, 10);
+  assert.equal(Object.hasOwn(actor.system.missionXPRewards, "m"), false, "the mission can be settled again");
+  await actor.settleMissionXP({ ...options, baseXP: 200 });
+  assert.equal(actor.system.xp, 610);
 });
 test("settlement applies the p.440 total once, records its components and excludes later awards until a new mission", async () => {
   reset();
@@ -543,7 +578,7 @@ test("a mission XP receipt committed before an error retains one reward and cann
     const r = await a.settleMissionXP(xpOptions);
     assert.ok(r.settlementId);
     assert.equal(a.system.xp, 310);
-    assert.equal(posts.length, 1);
+    assert.equal(posts.filter(post => !post.flags?.spycraft2?.undo).length, 1);
     await assert.rejects(a.settleMissionXP(xpOptions), /already settled/);
     assert.equal(a.system.xp, 310);
   } finally {
@@ -556,12 +591,15 @@ test("a failed XP post preserves unrelated later XP and reconciles committed rol
     const a = new SpycraftActor(),
       create = ChatMessage.create,
       update = a.update.bind(a);
-    if (variant === "laterXP")
-      ChatMessage.create = async () => {
+    if (variant === "laterXP") {
+      // Only the XP post itself: the Undo note a failed step still leaves is posted after it.
+      let posts = 0;
+      ChatMessage.create = async data => {
+        if (posts++) return data;
         a.system.xp += 7;
         throw Error("post rejected");
       };
-    else {
+    } else {
       failPost = true;
       a.update = async patch => {
         await update(patch);

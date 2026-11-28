@@ -1,4 +1,7 @@
 import { installUndo } from "./module/apps/undo.mjs";
+import { installIdentitySpeaker } from "./module/apps/flawless-identity.mjs";
+import { installNpcImport } from "./module/apps/npc-import.mjs";
+import { installCheckRequests } from "./module/apps/gc/request-check.mjs";
 import { renderOpenSheet } from "./module/services/refresh.mjs";
 import { installUITooltipHooks } from "./module/apps/ui-tooltips.mjs";
 import { installSampleAgentHooks } from "./module/sample-agents.mjs";
@@ -22,6 +25,7 @@ import { registerGmLocks } from "./module/rules/gm-locks.mjs";
 import { registerMapSettings } from "./module/apps/map.mjs";
 import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs";
 import { installRoundReminders } from "./module/apps/round-reminders.mjs";
+import { installInitiativeBoost } from "./module/apps/initiative-boost.mjs";
 import { installTargetNotices } from "./module/apps/target-response.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import { compactChatCard } from "./module/rolls/chat-compact.mjs";
@@ -52,6 +56,8 @@ import {
   missionXP
 } from "./module/apps/gc/state.mjs";
 import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
+import { installDramaticInitiative } from "./module/apps/gc/spend.mjs";
+import { installLateInitiative } from "./module/apps/gc/late-initiative.mjs";
 import { registerKeybindings } from "./module/apps/keybindings.mjs";
 import {
   installFluidInitiativeHooks,
@@ -87,7 +93,7 @@ import { registerFastPathSetting } from "./module/apps/remembered-choices.mjs";
 import { registerQuickResolveSetting } from "./module/apps/damage-application.mjs";
 import { installTurnCue } from "./module/apps/turn-cue.mjs";
 import { installHotbar, rollFromMacro } from "./module/apps/hotbar.mjs";
-import { installCharacterOwnership } from "./module/apps/character-ownership.mjs";
+import { installCharacterOwnership, newAgentForPlayer } from "./module/apps/character-ownership.mjs";
 import { installTokenLinks } from "./module/apps/token-links.mjs";
 
 /** Conditions this system adds to the token HUD: [id, label, icon]. Labels are read once the language is known. */
@@ -232,7 +238,13 @@ Hooks.once("init", () => {
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
+  installLateInitiative();
+  installDramaticInitiative();
   installRoundReminders();
+  installInitiativeBoost();
+  installIdentitySpeaker();
+  installNpcImport();
+  installCheckRequests();
   installTargetNotices();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();
@@ -274,7 +286,8 @@ Hooks.once("init", () => {
         disposition: manageDisposition
       },
       campaign: { qualities: qualitiesInForce, effects: currentCampaignEffects },
-      tables: gcTables
+      tables: gcTables,
+      newAgentForPlayer
     },
     resourceLocks: nativeResourceLocks,
     SpycraftBrowser,

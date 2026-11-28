@@ -10,6 +10,7 @@ import { checkPrerequisites, prerequisitesUseSkills } from "../../rules/prerequi
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
+
 import { esc } from "../../html.mjs";
 import { currentCampaignRules } from "../../rules/gc/campaign.mjs";
 import { skillPurchasePolicyRecord } from "../../rules/skill-purchase-policy.mjs";
@@ -544,6 +545,7 @@ export const ActorProgression = Base =>
         ...sys.progression.map(p => ({ ...p })),
         {
           classId: ident,
+          mission: advancement.mission,
           careerEntryId: foundry.utils.randomID(),
           vitality: 0,
           skills: {},

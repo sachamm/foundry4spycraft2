@@ -1,4 +1,5 @@
 import { classFeatureLevels } from "./class-features.mjs";
+import { actionDieTerm } from "./action-die-formula.mjs";
 import { loc } from "../i18n.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 /** Sniper p.80: firearm and hurled categories are narrower than the shared heavy-weapon firing workflow. */
@@ -22,7 +23,7 @@ export function eagleEyeDiePlan(system) {
     !Number.isSafeInteger(bonus)
   )
     throw new Error(loc`Review the default action die before using Eagle Eye.`);
-  return { die, explodeAt, bonus, formula: `1d${die}x>=${explodeAt} + ${bonus}` };
+  return { die, explodeAt, bonus, formula: `${actionDieTerm(die, explodeAt, ad)} + ${bonus}` };
 }
 export function eagleEyeRecord(system, plan, roll, { scene = "initial" } = {}) {
   const result = roll.total,

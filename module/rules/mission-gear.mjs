@@ -1,6 +1,7 @@
 import { classFeatureLevels } from "./class-features.mjs";
 import { equipmentCategory, bigStickMatches, bigStickStatus, armorGrantStatus } from "./gear.mjs";
 import { currentReserves, missionEpoch, reserveAllocations } from "./gear-acquisition.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
 import { loc } from "../i18n.mjs";
 import { campaignPickCaliber } from "./campaign-gear.mjs";
 /** Reviewed mission-pick exceptions. Upgrade buying/effects at Caliber V remain separate. */
@@ -100,7 +101,8 @@ export function missionCaliberMatches(system, item) {
     recordItemIds(record).slice(0, missionCaliberLimit(system, stamp.source)).includes(item.id) &&
     record.missionCaliber === mission.caliber &&
     eligibleItem(system, item, source) &&
-    item.system.caliber <= campaignPickCaliber(Math.min(5, mission.caliber + 1), system.campaignEffects).caliber
+    (historicalCaliber(item.system).caliber ?? 6) <=
+      campaignPickCaliber(Math.min(5, mission.caliber + 1), system.campaignEffects).caliber
   );
 }
 export function missionCaliberOptions(system, items = []) {

@@ -102,7 +102,7 @@ export const SAMPLE_COMPANIONS = [
         "base": "helpful",
         "toward": {}
       },
-      "biography": "<p>Bracken is a four-year-old working German Shepherd trained for search and rescue. She follows Tomas patiently, alerts quietly to a located person, and waits for a release signal before approaching.</p><p>Medium animal partner of Tomas Aalto — Scout 1 (Tracker and animal handler). Counted XP before two free trained qualities: 39; cap 40. Free training: Rescue and Seek on Command. Wolf Pack Mastery is the free Medium-size companion grant, not a purchased quality. Health is one grade higher; Threat Level is owner level minus 2, minimum 1. No action dice; the owner may spend theirs.</p>"
+      "biography": "<p>Bracken is a four-year-old working German Shepherd trained for search and rescue. She follows Tomas patiently, alerts quietly to a located person, and waits for a release signal before approaching.</p><p>Medium animal partner of Tomas Aalto. Counted XP before two free trained qualities: 39; cap 40. Free training: Rescue and Seek on Command. Wolf Pack Mastery is the free Medium-size companion grant, not a purchased quality. Health is one grade higher; Threat Level is owner level minus 2, minimum 1. No action dice; the owner may spend theirs.</p>"
     },
     "prototypeToken": {
       "name": "Bracken",
@@ -166,7 +166,7 @@ export const SAMPLE_COMPANIONS = [
         "_stats": {
           "coreVersion": "14.370",
           "systemId": "spycraft2",
-          "systemVersion": "0.8.7"
+          "systemVersion": "0.8.8"
         }
       },
       {
@@ -203,7 +203,7 @@ export const SAMPLE_COMPANIONS = [
         "_stats": {
           "coreVersion": "14.370",
           "systemId": "spycraft2",
-          "systemVersion": "0.8.7"
+          "systemVersion": "0.8.8"
         }
       }
     ],
@@ -226,7 +226,7 @@ export const SAMPLE_COMPANIONS = [
     "_stats": {
       "coreVersion": "14.370",
       "systemId": "spycraft2",
-      "systemVersion": "0.8.7"
+      "systemVersion": "0.8.8"
     }
   }
 ];

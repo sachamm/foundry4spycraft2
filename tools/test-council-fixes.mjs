@@ -405,6 +405,20 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
   assert.ok(!corners.some(c => (c.x === 200 && c.y === 200) || (c.x === 100 && c.y === 100)), "taken squares skipped");
   assert.deepEqual(spreadCorners({ origin: { x: 0, y: 0 }, count: 1, gridSize: 100 }), [{ x: 0, y: 0 }]);
   assert.ok(spreadCorners({ origin: { x: 0, y: 0 }, count: 5, gridSize: 100 }).every(c => c.x >= 0 && c.y >= 0));
+  // The scene's rectangle bounds the spread, and a square behind a wall is skipped.
+  const bounded = spreadCorners({
+    origin: { x: 200, y: 200 },
+    count: 6,
+    gridSize: 100,
+    bounds: { x: 200, y: 200, width: 300, height: 300 },
+    blocked: point => point.x === 300 && point.y === 200
+  });
+  assert.equal(bounded.length, 6);
+  assert.ok(
+    bounded.every(c => c.x >= 200 && c.y >= 200 && c.x + 100 <= 500 && c.y + 100 <= 500),
+    "inside the scene"
+  );
+  assert.ok(!bounded.some(c => c.x === 300 && c.y === 200), "not behind the wall");
 
   assert.deepEqual(numberedNames("Guard", 1), ["Guard"]);
   assert.deepEqual(numberedNames("Guard", 3), ["Guard 1", "Guard 2", "Guard 3"]);
@@ -438,6 +452,22 @@ test("Add NPC spreads copies over free squares, numbers them, sets the side and 
   );
   assert.deepEqual([kept[0].actorLink, kept[0].disposition], [true, 1]);
   assert.equal("appendNumber" in kept[0], false, "a name left alone keeps the token's own setting");
+  // A Minion squad's Commander is marked on its own token (p.447), and its name still counts for numbering.
+  const squad = placementData(
+    { name: "Guard", actorLink: false, disposition: -1 },
+    {
+      corners: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 }
+      ],
+      names: ["Guard 1", "Guard 2"],
+      commanderIndex: 0
+    }
+  );
+  assert.equal(squad[0].name, "Guard 1 (Commander)");
+  assert.deepEqual(squad[0].delta, { system: { commander: true } });
+  assert.equal("delta" in squad[1], false);
+  assert.deepEqual(numberedNames("Guard", 1, ["Guard 1 (Commander)", "Guard 2"]), ["Guard 3"]);
 
   const created = [];
   const fight = {
@@ -461,6 +491,20 @@ test("an NPC sheet may be narrower than an agent sheet", async () => {
   assert.equal(sheetPlacement({ width: 860, height: 760 }, { ...room, width: 1000 }, "agent").width, 640);
   assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "npc").width, 420);
   assert.equal(rememberedPlacement({ left: 0, top: 0, width: 300, height: 500 }, room, "agent").width, 640);
+  // The GC Console in its own window at the left: a new sheet opens beside it when the map has room for both.
+  const wide = { ...room, width: 1920, height: 1080 };
+  assert.equal(
+    sheetPlacement({ width: 480, height: 640 }, { ...wide, avoid: { left: 110, width: 720 } }, "npc").left,
+    842
+  );
+  assert.equal(
+    sheetPlacement({ width: 480, height: 640 }, { ...room, avoid: { left: 110, width: 720 } }, "npc").left,
+    110
+  );
+  assert.equal(
+    sheetPlacement({ width: 480, height: 640 }, { ...wide, avoid: { left: 1200, width: 300 } }, "npc").left,
+    110
+  );
 });
 
 test("a dialog field marked for one choice shows only while that choice is made", async () => {
@@ -489,6 +533,10 @@ test("a renamed NPC takes its tokens along unless the GC named them by hand", as
   assert.equal(renamedTokenName("The Broker", "Guard", "Sentry"), null);
   assert.equal(renamedTokenName("Guard", "Guard", "Guard"), null);
   assert.equal(renamedTokenName(undefined, "Guard", "Sentry"), null);
+  assert.equal(renamedTokenName("Guard (2)", "Guard", "Sentry"), "Sentry (2)", "Foundry's own numbering follows");
+  const { renamedFromAny } = await import("../module/rules/creation-defaults.mjs");
+  assert.equal(renamedFromAny("Guard 2", ["Sentry", "Guard"], "Watch"), "Watch 2", "a token behind a quick rename");
+  assert.equal(renamedFromAny("Bob", ["Sentry", "Guard"], "Watch"), null);
 });
 
 test("a dialog's Cancel button answers like closing the dialog", async () => {
@@ -521,4 +569,32 @@ test("a hidden field's limits are set aside so it cannot hold the dialog, and co
   const cancel = {};
   freeCancel({ querySelectorAll: () => [cancel] });
   assert.equal(cancel.formNoValidate, true);
+});
+
+test("Add NPC: a stale import is not reused, and a hex grid's corners land on the grid", async () => {
+  const { importedCopy, onGrid } = await import("../module/apps/gc/add-npc.mjs");
+  const uuid = "Compendium.spycraft2.core-npcs.Actor.x";
+  const actors = [{ name: "Anton", _stats: { compendiumSource: uuid, createdTime: 100 } }];
+  assert.equal(importedCopy(uuid, actors, { _stats: { modifiedTime: 50 } }).name, "Anton");
+  assert.equal(importedCopy(uuid, actors, { _stats: { modifiedTime: 200 } }), null, "rebuilt since the import");
+  const square = [{ x: 0, y: 0 }];
+  assert.equal(onGrid(square, { isSquare: true }), square);
+  const hex = {
+    isSquare: false,
+    getTopLeftPoint: p => ({ x: Math.round(p.x / 87) * 87, y: Math.round(p.y / 100) * 100 })
+  };
+  assert.deepEqual(
+    onGrid(
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 10, y: 0 }
+      ],
+      hex
+    ),
+    [
+      { x: 0, y: 0 },
+      { x: 87, y: 0 }
+    ]
+  );
 });

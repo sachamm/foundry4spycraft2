@@ -1,6 +1,6 @@
 import { renderOpenSheet } from "../services/refresh.mjs";
 import { worldMigrating } from "../migrations/index.mjs";
-import { primaryWriterFor } from "../writers.mjs";
+import { primaryWriterFor, writerQueue } from "../writers.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { preferredInitiativeRoll } from "./initiative-choice.mjs";
 import { uncannyDodgePlan } from "../rules/defense.mjs";
@@ -262,27 +262,14 @@ export const shakenCombatantClass = Base =>
     }
   };
 export function installShakenInitiativeHooks() {
-  const pending = new WeakMap();
+  const queue = writerQueue(reconcileShakenInitiative, error =>
+    ui.notifications.warn(loc`Shaken Initiative Count needs review: ${error.message}`)
+  );
   const schedule = actor => {
     if (!actor || !["agent", "npc"].includes(actor.type) || !actor.isOwner || !combatants(actor).length) return;
     if (primaryWriterFor(actor)?.id !== game.user.id) return;
     if (worldMigrating()) return;
-    const queued = pending.get(actor);
-    if (queued) {
-      queued.again = true;
-      return;
-    }
-    const state = { again: true };
-    pending.set(actor, state);
-    state.promise = Promise.resolve()
-      .then(async () => {
-        do {
-          state.again = false;
-          await reconcileShakenInitiative(actor);
-        } while (state.again);
-      })
-      .catch(error => ui.notifications.warn(loc`Shaken Initiative Count needs review: ${error.message}`))
-      .finally(() => pending.delete(actor));
+    queue(actor);
   };
   Hooks.on("preCreateCombatant", c => {
     try {

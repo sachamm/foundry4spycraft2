@@ -33,7 +33,8 @@ import {
   automaticSkillSuccessSources,
   automaticSkillSuccessPlan,
   manualAdjustmentPlan,
-  cunningPlanCheck
+  cunningPlanCheck,
+  withoutFlanking
 } from "../../rules/class-checks.mjs";
 import { queueResources } from "../../services/transactions.mjs";
 import { assertDamageNotStarted } from "./damage-hits.mjs";
@@ -64,12 +65,25 @@ function criticalPresetContent(check) {
   const esc = foundry.utils.escapeHTML,
     group = (label, choices) =>
       choices.length
-        ? `<optgroup label="${esc(label)}">${choices.map(c => `<option value="${esc(c.id)}">${esc(loc`${c.cost} die/dice — ${c.label}`)}</option>`).join("")}</optgroup>`
+        ? `<optgroup label="${esc(label)}">${choices.map(c => `<option value="${esc(c.id)}">${esc(`${c.cost === 1 ? loc`Base 1 die` : loc`Base ${c.cost} dice`} — ${c.label}`)}</option>`).join("")}</optgroup>`
         : "";
   const hits = check.threatConfirmed ? criticalHitChoices(check) : [],
     misses = check.errorConfirmed ? criticalMissChoices(check) : [];
   if (!hits.length && !misses.length) return "";
-  return `<label>${loc`Ready-made effect (sets the effect and base cost; match it to the result chosen above)`} <select name="preset"><option value="">${loc`None — describe the effect below`}</option>${group(loc`Critical hit`, hits)}${group(loc`Critical miss (one per error; needs the listed error range)`, misses)}</select></label>`;
+  // With a single ready-made effect on offer it is chosen already; the GC only changes it to describe another.
+  const only = criticalOnlyPreset(check);
+  const markup = `<label>${loc`Ready-made effect (sets the effect and base cost; match it to the result chosen above)`} <select name="preset"><option value="">${loc`None — describe the effect below`}</option>${group(loc`Critical hit`, hits)}${group(loc`Critical miss (one per error; needs the listed error range)`, misses)}</select></label>`;
+  return only
+    ? markup.replace(`<option value="${esc(only.id)}">`, `<option value="${esc(only.id)}" selected>`)
+    : markup;
+}
+/** The one ready-made effect a result offers, when there is exactly one. */
+export function criticalOnlyPreset(check) {
+  const all = [
+    ...(check.threatConfirmed ? criticalHitChoices(check) : []),
+    ...(check.errorConfirmed ? criticalMissChoices(check) : [])
+  ];
+  return all.length === 1 ? all[0] : null;
 }
 
 export const ActorOutcomes = Base =>
@@ -752,7 +766,11 @@ export const ActorOutcomes = Base =>
             });
           },
           content: `<div class="spycraft2-roll-options">
-        <p class="hint">${loc`Action dice left: ${this.system.actionDice?.value ?? 0}. Choose the effect; who pays and from where are under the headings below.`}</p>
+        <p class="hint">${
+          defaultGC
+            ? loc`GC action dice left: ${gcDiceStatus().value}. Choose the effect; who pays and from where are under the headings below.`
+            : loc`Action dice left: ${this.system.actionDice?.value ?? 0}. Choose the effect; who pays and from where are under the headings below.`
+        }</p>
         <label>${loc`Result`} <select name="kind">${check.threatConfirmed ? `<option value="success">${check.checkKind === "attack" ? loc`Critical hit (you pay)` : loc`Critical success (you pay)`}</option>` : ""}${check.errorConfirmed ? `<option value="failure"${errorOnly ? " selected" : ""}>${check.checkKind === "attack" ? loc`Critical miss (an opponent pays)` : loc`Critical failure (an opponent pays)`}</option>` : ""}</select></label>
         ${message.flags.spycraft2.checkKind === "attack" && typeof message.flags.spycraft2.attackContext?.vehicleMounted !== "boolean" && (this.system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Most Lethal") ? `<label><input type="checkbox" name="vehicleMountedConfirmed" /> ${loc`Unrecorded attack platform: confirm this weapon was vehicle-mounted when the attack was rolled (Most Lethal)`}</label>` : ""}
         ${cleaveLegacyTargetEligible(this.system, check) ? `<label><input type="checkbox" name="legacyStandardTargetConfirmed" /> ${loc`Unrecorded original target: the GC confirms this melee attack was against a standard character (Cleave Supremacy)`}</label>` : ""}
@@ -760,7 +778,7 @@ export const ActorOutcomes = Base =>
         <label>${loc`Or describe the effect`} <textarea name="effect"></textarea></label>
         <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
           ${check.checkKind === "attack" ? `<label><input type="checkbox" name="criticalInjuryConfirmed" /> ${loc`The custom effect inflicts a critical injury`}</label><p class="hint">${loc`Ready-made injury effects apply campaign costs automatically; use this box for a custom injury effect.`}</p>` : ""}
-        <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
+        <label><input type="checkbox" name="effectConfirmed"${criticalOnlyPreset(check) ? " checked" : ""} /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
         ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage"${damageRolled ? "" : " checked"} /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
         <details${errorOnly ? " open" : ""}><summary>${check.checkKind === "attack" ? loc`Who pays for a critical miss` : loc`Who pays for a critical failure`}</summary>
         <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc"${defaultGC ? " selected" : ""}>${loc`GC action dice`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
@@ -1246,6 +1264,53 @@ export const ActorOutcomes = Base =>
         if (plan) await this.update(plan.updates);
         return plan;
       });
+    }
+
+    /** Take a flanking bonus off an open attack card: the GC, or the roller, rules the attacker was not flanking. */
+    async removeFlanking(message) {
+      const check = message.flags?.spycraft2;
+      if (!check || check.actorUuid !== this.uuid || !(message.isAuthor || game.user?.isGM))
+        return refuse(loc`Only the roller or the GC can change this attack.`);
+      const expected = rollEvidence(check);
+      return queueResources(
+        [this],
+        async () => {
+          const current = message.flags.spycraft2;
+          if (rollEvidence(current) !== expected)
+            return refuseStep(loc`This attack changed while flanking was being taken off. Review the card.`);
+          let next;
+          try {
+            next = withoutFlanking(current);
+          } catch (error) {
+            return refuseStep(error.message);
+          }
+          // The card as it was rides along, so "Flanking after all" can put it back while nothing else has changed.
+          const marked = { ...next, flankingRestore: { check: current, evidence: rollEvidence(next) } };
+          await message.update({ "flags.spycraft2": marked, flavor: checkFlavor(next) });
+          return marked;
+        },
+        { messages: [message] }
+      );
+    }
+
+    /** Put back a flanking bonus "Not flanking" took off, while the attack is still open and otherwise unchanged. */
+    async restoreFlanking(message) {
+      const check = message.flags?.spycraft2;
+      if (!check || check.actorUuid !== this.uuid || !(message.isAuthor || game.user?.isGM))
+        return refuse(loc`Only the roller or the GC can change this attack.`);
+      return queueResources(
+        [this],
+        async () => {
+          const { flankingRestore: saved, ...current } = message.flags.spycraft2 ?? {};
+          if (!saved?.check || rollEvidence(current) !== saved.evidence)
+            return refuseStep(loc`This attack changed after flanking was taken off. Review the card.`);
+          if (typeof current.successConfirmed === "boolean" || current.attackResolution || current.resolved)
+            return refuseStep(loc`The attack has been resolved, so its flanking bonus stays off.`);
+          await message.update({ "flags.==spycraft2": saved.check, flavor: checkFlavor(saved.check) });
+          return saved.check;
+        },
+        { messages: [message] }
+      );
     }
 
     async useManualAdjustment(message, options = {}) {

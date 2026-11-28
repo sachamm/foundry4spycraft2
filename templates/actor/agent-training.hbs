@@ -7,7 +7,26 @@
     <p><b>{{localize "SPYCRAFT.Template.ActorAgentTraining.Profession"}}</b> {{professionText}}</p>
     <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.SkillFortes"}}</h3><ul class="plain">{{#each system.skillFortes}}<li>{{skill}} · {{focus}} · {{forte}}</li>{{/each}}</ul>
     <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Interests"}}</h3><p>{{system.interests}}</p>
-    <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Contacts"}}</h3><ul class="plain">{{#each system.contacts}}<li><b>{{name}}</b> · {{lookup ../contactGrades rank}} {{notes}}</li>{{else}}<li>{{localize "SPYCRAFT.Template.ActorAgentTraining.NoContactsRecorded"}}</li>{{/each}}</ul>
+    <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Contacts"}}</h3>
+    <ul class="plain">
+      {{#each system.contacts}}
+      <li><b>{{name}}</b> · {{lookup ../contactGrades rank}} {{notes}}
+        <button type="button" class="sc2-action" data-action="editContactPeople" data-index="{{@index}}"
+          data-tooltip="{{localize "SPYCRAFT.Template.ActorAgentTraining.ContactPeopleHint"}}">
+          {{localize "SPYCRAFT.Template.ActorAgentTraining.ContactPeople"}}</button>
+        {{#with (lookup @root.contactPeople @index)}}{{#if people.length}}<ul class="plain">
+          {{#each people}}<li>{{label}}
+            {{#if used}}<span class="muted">{{localize "SPYCRAFT.Template.ActorAgentTraining.CalledThisMission"}}</span>
+            {{else}}<button type="button" class="sc2-action" data-action="summonContactPerson"
+              data-index="{{../index}}" data-person="{{index}}"
+              data-tooltip="{{localize "SPYCRAFT.Template.ActorAgentTraining.SummonHint"}}">
+              {{localize "SPYCRAFT.Template.ActorAgentTraining.Summon"}}</button>{{/if}}</li>{{/each}}
+        </ul>{{/if}}{{/with}}
+      </li>
+      {{else}}
+      <li>{{localize "SPYCRAFT.Template.ActorAgentTraining.NoContactsRecorded"}}</li>
+      {{/each}}
+    </ul>
     <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Subplots"}}</h3>
     <ul class="plain">
       {{#each subplotRows}}
@@ -57,7 +76,7 @@
       <ul class="rows">
         {{#each subplotRows}}
           <li class="subplot-row"><input type="checkbox" name="subplots.{{@index}}.complete" {{checked complete}} aria-label="{{@root.subplotCompleteLabel}}" />
-            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="{{@root.appId}}-subplots" aria-label="{{@root.subplotNameLabel}}" />
+            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="{{@root.appId}}-subplots" placeholder="{{localize 'SPYCRAFT.BioExample.subplot'}}" aria-label="{{@root.subplotNameLabel}}" />
             <select name="subplots.{{@index}}.kind" aria-label="{{@root.subplotKindLabel}}">
               {{#each kinds}}
                 <option value="{{value}}" {{#if selected}}selected{{/if}} {{#if disabled}}disabled{{/if}}>{{label}}</option>

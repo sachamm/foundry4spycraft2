@@ -1,6 +1,25 @@
 /* Shared components. Text carries data; pictograms carry verbs.
  * Loaded after the base and dossier styles, and built on styles/tokens.css. */
 
+/* One rule for the hidden attribute: a component's own display value never brings a hidden element back. */
+:is(.spycraft2, .spycraft2-roll-options, .sc2-card) [hidden],
+.spycraft2[hidden] {
+  display: none !important;
+}
+
+/* Read by a screen reader, not drawn: live lines that say what changed (the console's turn, the NPC strip). */
+.sc2-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---------- Buttons ---------- */
 /* Secondary: the resting look of every action in a sheet or console. */
 .spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action),
@@ -23,10 +42,29 @@
   text-shadow: none;
   color: var(--sc2-teal);
   background: var(--sc2-paper-raised);
-  border: 1px solid var(--sc2-rule);
+  /* The strong rule: a button's edge is what marks it as one, so it needs 3:1. */
+  border: 1px solid var(--sc2-rule-strong);
   border-radius: var(--sc2-radius);
   box-shadow: none;
   cursor: pointer;
+}
+/* Disabled (not now): muted text, a dashed edge and no hover change, so it never reads as live. */
+.spycraft2.application :is(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action):disabled,
+.gc-console-body :is(button, .sc2-icon-button):disabled,
+.spycraft2.application :is(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action):disabled:hover,
+.gc-console-body :is(button, .sc2-icon-button):disabled:hover {
+  color: var(--sc2-ink-muted);
+  background: var(--sc2-paper-sunk);
+  border-color: var(--sc2-rule-strong);
+  border-style: dashed;
+  font-weight: inherit;
+  cursor: not-allowed;
+}
+/* A disabled row verb stays a ghost; its faded glyph carries the state. */
+.spycraft2.application .sc2-icon-button[data-sc2-mode="icon"]:disabled,
+.gc-console-body .sc2-icon-button[data-sc2-mode="icon"]:disabled {
+  background: transparent;
+  border-color: transparent;
 }
 .spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn):hover,
 .spycraft2.application:is(.npc, .vehicle) :where(a[data-action]):hover,
@@ -372,7 +410,8 @@
   color: var(--sc2-on-bar);
 }
 .spycraft2.application h3 .controls button {
-  min-height: 22px;
+  /* The compact minimum: nothing interactive is under 28px. */
+  min-height: 28px;
   padding: 1px 8px;
   font-size: var(--sc2-text-s);
   color: var(--sc2-on-bar);
@@ -385,7 +424,7 @@
   border-color: var(--sc2-on-bar);
 }
 .spycraft2.application h3 input {
-  height: 20px;
+  height: 28px;
   min-height: 0;
 }
 
@@ -771,10 +810,21 @@
 .spycraft2 .sc2-tool-search input {
   width: 100%;
   min-height: 36px;
+  padding: 0 var(--sc2-space-2);
+  border: 1px solid var(--sc2-rule-strong);
+  border-radius: var(--sc2-radius);
+  background: var(--sc2-surface-raised);
+  color: var(--sc2-ink);
+  font-size: var(--sc2-text-m);
 }
 .spycraft2 .sc2-tool-search > span {
   flex-basis: 100%;
   font-size: var(--sc2-text-s);
+}
+/* A control the search matched: an outline, not a colour change, so it reads in both themes. */
+.spycraft2 .sc2-search-hit {
+  outline: 2px dashed var(--sc2-action);
+  outline-offset: 2px;
 }
 .spycraft2 .sc2-tool-section {
   margin: 8px 0;
@@ -787,9 +837,6 @@
   font-weight: 600;
   min-height: 36px;
   align-content: center;
-}
-.spycraft2 :is(.sc2-tool-section, .gc-section)[hidden] {
-  display: none !important;
 }
 .spycraft2 .sc2-next-setup {
   display: grid;
@@ -822,6 +869,15 @@
 .spycraft2.gc-console-body :is(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
   outline: 3px solid var(--sc2-focus-color, var(--sc2-action));
   outline-offset: 3px;
+  box-shadow: none;
+}
+/* A teal ring beside a teal button is invisible; filled buttons take the ink colour instead. */
+.spycraft2.application :is(.sc2-primary-action, .sc2-btn.primary):focus-visible,
+.gc-console-body button.gc-primary:focus-visible {
+  outline-color: var(--sc2-ink-strong);
+}
+/* A checkbox or radio shows the one ring above, not Foundry's own glow as well. */
+.spycraft2 :is(input[type="checkbox"], input[type="radio"]):focus-visible {
   box-shadow: none;
 }
 .spycraft2.application summary,
@@ -883,6 +939,18 @@
 .sc2-refresh-change > details {
   flex: 1 1 auto;
   min-width: 0;
+}
+.sc2-refresh-change dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 8px;
+  margin: 4px 0;
+}
+.sc2-refresh-change dt {
+  font-weight: 600;
+}
+.sc2-refresh-change dd {
+  margin: 0;
 }
 
 /* Text actions: buttons that read as words in a sentence (item sheets, the catalog list), as the links they replace did. */
@@ -968,6 +1036,13 @@
 }
 
 /* A pick list keeps the rows its size asks for; Foundry's one-line select height would cut it to a single row. */
+/* A long list of tick boxes (organization goals, turning points, Sites) in columns. */
+.spycraft2-roll-options .sc2-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--sc2-space-1) var(--sc2-space-3);
+}
+
 .spycraft2-roll-options select.sc2-pick-list {
   height: auto;
   min-height: 15em;
@@ -983,7 +1058,24 @@
 }
 
 /* A field that belongs to another choice stays out of the way until that choice is made. */
-.spycraft2.application .spycraft2-roll-options [data-when][hidden],
-.spycraft2-roll-options [data-when][hidden] {
-  display: none;
+
+/* The Actors tab's line for a new agent: the GC's button, or a player's note when nothing is theirs yet. */
+.sc2-directory-help {
+  margin: 4px 8px;
+}
+.sc2-directory-help button {
+  width: 100%;
+}
+.sc2-directory-help p {
+  margin: 0;
+  font-size: var(--font-size-13, 13px);
+}
+
+/* Round reminders: one card, a line per character, each with its own button. */
+.sc2-round-reminders {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.sc2-round-reminders li + li {
+  margin-top: 4px;
 }

@@ -1,0 +1,11 @@
+  {{!-- During a fight only Add NPC to scene stays: a new session or scene waits until the fight is over. --}}
+  <p class="controls gc-session-steps">{{#unless combat.started}}
+    {{#if session.begun}}<button type="button" data-action="beginSession" data-tooltip="{{localize 'SPYCRAFT.Console.BeginSessionHint'}}">{{localize "SPYCRAFT.Console.BeginNewSession"}}</button>
+    {{else}}
+      <button type="button" class="{{#if (eq @root.primary "beginSession")}}gc-primary{{/if}}" data-action="beginSession"
+        data-tooltip="{{localize 'SPYCRAFT.Console.BeginSessionHint'}}">{{localize "SPYCRAFT.Console.BeginSession"}}</button>{{/if}}
+    <button type="button" class="{{#if (eq @root.primary "nextScene")}}gc-primary{{/if}}" data-action="nextScene"
+      data-tooltip="{{localize 'SPYCRAFT.Console.NextSceneHint'}}">{{localize "SPYCRAFT.Console.NextScene"}}</button>
+    {{/unless}}<button type="button" data-action="addNpcToScene">{{localize "SPYCRAFT.Template.AppsGcConsole.AddNpcToScene"}}</button>
+    <button type="button" data-action="requestCheck" data-tooltip="{{localize 'SPYCRAFT.Console.RequestCheckHint'}}">{{localize "SPYCRAFT.Console.RequestCheck"}}</button>
+  </p>

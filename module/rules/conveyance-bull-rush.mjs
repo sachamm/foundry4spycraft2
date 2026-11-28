@@ -92,7 +92,7 @@ export function conveyanceBullRushPlan(
   const profile = CONVEYANCE_BULL_RUSH_PROFILES[key];
   if (!profile) return reject(loc`Choose the appropriate Acrobatics, Drive, Survival or Tactics operator skill.`);
   if (method !== "roll")
-    return reject(loc`Bull Rush is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
+    return reject(loc`Bull Rush is an opposed combat action; taking 10/20 is unavailable (pp.91,352).`);
   if (
     !validOwnCountClock(conveyanceBullRushCombat) ||
     conveyanceBullRushCombat.turn !== conveyanceBullRushCombat.ownTurnIndex

@@ -59,7 +59,7 @@ export function npcWeaponTraining(system, weapon = {}) {
     unresolved = !!nonCombatant && (system.npcBuiltIn?.unresolved?.length ?? 0) > 0;
   return {
     nonCombatant: !!nonCombatant,
-    trained: !nonCombatant || !!source,
+    trained: (!nonCombatant && system.npcType !== "animal") || !!source,
     builtIn,
     source: source ? { ...source } : null,
     blockedReason: unresolved

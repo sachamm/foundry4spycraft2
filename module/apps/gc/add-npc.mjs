@@ -7,9 +7,11 @@ import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { esc } from "../../html.mjs";
 import { loc } from "../../i18n.mjs";
-import { cancellable, cancelButton, freeCancel } from "../dialog-kit.mjs";
-import { antagonistRecorded, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
-import { getMission } from "./state.mjs";
+import { cancellable, cancelButton, freeCancel, holdUntilValid } from "../dialog-kit.mjs";
+import { antagonistRecorded, antagonistRowFor, markAntagonistsFaced, recordAntagonist } from "./mission.mjs";
+import { getMission, missionEpoch, teamActors } from "./state.mjs";
+import { minionSquad } from "../../rules/npc-qualities.mjs";
+import { postUndo } from "../undo.mjs";
 
 const kindLabel = type =>
   ({ standard: loc`standard`, special: loc`special`, villain: loc`special`, animal: loc`animal` })[type] ?? "";
@@ -42,13 +44,32 @@ export async function npcChoices({ actors = game.actors, packs = game.packs } = 
   return [...world, ...fromPacks];
 }
 
-/** A world actor already imported from this compendium entry, so it can be placed again without a copy. */
-export function importedCopy(uuid, actors = game.actors) {
+/**
+ * A world actor already imported from this compendium entry, so it can be placed again without a copy. One imported
+ * before the GC last changed the entry is out of date and is not reused: the entry is imported afresh.
+ */
+export function importedCopy(uuid, actors = game.actors, entry = null) {
+  const changed = Number(entry?._stats?.modifiedTime) || 0;
   return (
     [...(actors ?? [])].find(
-      actor => actor._stats?.compendiumSource === uuid || actor.flags?.core?.sourceId === uuid
+      actor =>
+        (actor._stats?.compendiumSource === uuid || actor.flags?.core?.sourceId === uuid) &&
+        !(changed && (Number(actor._stats?.createdTime) || 0) < changed)
     ) ?? null
   );
+}
+
+/** Corners moved onto the grid in use: a hex or gridless scene is not laid out in squares. */
+export function onGrid(corners, grid) {
+  if (!grid || grid.isSquare !== false) return corners;
+  const snap = point => grid.getTopLeftPoint?.(point) ?? point;
+  const seen = new Set();
+  return corners.map(snap).filter(point => {
+    const key = `${Math.round(point.x)},${Math.round(point.y)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /** The top-left corner that puts a token of this many grid squares at the centre of the view, on the grid. */
@@ -60,9 +81,19 @@ export function viewCentreCorner({ centre, gridSize, width = 1, height = 1, snap
  * Top-left corners for a number of tokens, starting at the origin square and working outward ring by ring, skipping
  * squares something already stands on. All values are in pixels; the origin is already on the grid.
  * @param {{origin: {x:number,y:number}, count: number, gridSize: number, width?: number, height?: number,
- *   occupied?: {x:number,y:number,width?:number,height?:number}[]}} facts
+ *   occupied?: {x:number,y:number,width?:number,height?:number}[], bounds?: {x:number,y:number,width:number,
+ *   height:number}, blocked?: (point: {x:number,y:number}) => boolean}} facts
  */
-export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, occupied = [] }) {
+export function spreadCorners({
+  origin,
+  count,
+  gridSize,
+  width = 1,
+  height = 1,
+  occupied = [],
+  bounds = null,
+  blocked = () => false
+}) {
   const stepX = width * gridSize,
     stepY = height * gridSize;
   const taken = occupied.map(token => ({
@@ -82,10 +113,33 @@ export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, 
         if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
         const point = { x: origin.x + dx * stepX, y: origin.y + dy * stepY };
         if (point.x < 0 || point.y < 0 || !free(point)) continue;
+        // Inside the scene's own rectangle, not its padding, and not behind a wall from the centre of the view.
+        if (
+          bounds &&
+          (point.x < bounds.x ||
+            point.y < bounds.y ||
+            point.x + stepX > bounds.x + bounds.width ||
+            point.y + stepY > bounds.y + bounds.height)
+        )
+          continue;
+        if (ring && blocked(point)) continue;
         placed.push(point);
         taken.push({ x: point.x, y: point.y, w: stepX, h: stepY });
       }
   return placed;
+}
+
+/** Whether a wall stands between the first square and another, for spreadCorners; never true without walls. */
+function wallBetween(origin, gridSize, width = 1, height = 1) {
+  const centre = point => ({ x: point.x + (width * gridSize) / 2, y: point.y + (height * gridSize) / 2 });
+  const backend = globalThis.CONFIG?.Canvas?.polygonBackends?.move;
+  return point => {
+    try {
+      return !!backend?.testCollision?.(centre(origin), centre(point), { type: "move", mode: "any" });
+    } catch {
+      return false;
+    }
+  };
 }
 
 /**
@@ -93,11 +147,20 @@ export function spreadCorners({ origin, count, gridSize, width = 1, height = 1, 
  * the next free number, so the tracker, the map and the chat cards can tell them apart.
  */
 export function numberedNames(name, count, existing = []) {
-  const pattern = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?: (\\d+))?$`);
+  // A squad's Commander carries a mark after its number, and still counts.
+  const pattern = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?: (\\d+))?(?: \\(.+\\))?$`);
   const used = existing.map(other => pattern.exec(other)).filter(Boolean);
   if (count === 1 && !used.length) return [name];
   let next = Math.max(0, ...used.map(match => Number(match[1] ?? 1))) + 1;
   return Array.from({ length: count }, () => `${name} ${next++}`);
+}
+
+/** The list is as tall as what it shows, up to ten rows: two matches do not sit in a ten-row box. */
+function fitList(list) {
+  const rows =
+    [...list.options].filter(option => !option.hidden).length +
+    [...list.querySelectorAll("optgroup")].filter(group => !group.hidden).length;
+  list.size = Math.max(2, Math.min(10, rows));
 }
 
 function filterList(dialog) {
@@ -119,7 +182,9 @@ function filterList(dialog) {
     // With no match nothing stays selected, so the dialog cannot place an NPC the list no longer shows.
     if (!first) list.value = "";
     else if (list.selectedOptions[0]?.hidden !== false) list.value = first.value;
+    fitList(list);
   });
+  fitList(list);
   search.focus();
 }
 
@@ -129,11 +194,17 @@ const DISPOSITIONS = { hostile: -1, neutral: 0, friendly: 1 };
  * Token data for a placement: where each copy goes, what it is called and how it stands toward the team.
  * @returns {object[]} One creation object per token.
  */
-export function placementData(prototype, { corners, names, disposition = "hostile", hidden = false }) {
+export function placementData(
+  prototype,
+  { corners, names, disposition = "hostile", hidden = false, commanderIndex = null }
+) {
   return corners.map((corner, index) => ({
     ...prototype,
     ...corner,
-    name: names[index] ?? prototype.name,
+    name:
+      index === commanderIndex ? loc`${names[index] ?? prototype.name} (Commander)` : (names[index] ?? prototype.name),
+    // The squad's Commander is built at Threat Level +2 (p.447); the mark lives on this token's own data.
+    ...(index === commanderIndex ? { delta: { ...(prototype.delta ?? {}), system: { commander: true } } } : {}),
     hidden,
     ...(disposition in DISPOSITIONS ? { disposition: DISPOSITIONS[disposition] } : {}),
     // Several copies of one NPC are separate people: each keeps its own damage.
@@ -161,7 +232,7 @@ export async function joinFight(combat, tokens) {
   );
 }
 
-export async function addNpcToScene() {
+export async function addNpcToScene({ uuid = null } = {}) {
   if (!game.user.isGM) return null;
   if (!canvas?.ready || !canvas.scene) return refuse(loc`View a scene first, then add the NPC to it.`);
   const sceneId = canvas.scene.id;
@@ -179,22 +250,27 @@ export async function addNpcToScene() {
     buttons: [cancelButton()],
     render: (_event, dialog) => {
       freeCancel(dialog?.element);
+      // An entry with no NPC picked stays open with the reason, so the search and the other choices are kept.
+      holdUntilValid(dialog?.element, values =>
+        values.uuid ? "" : loc`No NPC is chosen. Clear the search or pick one from the list.`
+      );
       return filterList(dialog);
     },
     content: `<div class="spycraft2-roll-options"><label>${loc`Search`} <input name="search" type="search" autocomplete="off" autofocus /></label><label>${loc`NPC`} <select name="uuid" size="10" class="sc2-pick-list">${[
       ...groups
     ]
       .map(
-        ([source, rows], g) =>
-          `<optgroup label="${esc(source)}">${rows.map((row, i) => `<option value="${esc(row.uuid)}"${g === 0 && i === 0 ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
+        ([source, rows]) =>
+          `<optgroup label="${esc(source)}">${rows.map(row => `<option value="${esc(row.uuid)}"${uuid && row.uuid === uuid ? " selected" : ""}>${esc(row.name)}${row.kind ? ` (${esc(row.kind)})` : ""}</option>`).join("")}</optgroup>`
       )
       .join("")}</select></label>
-      <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" value="1" /></label>
+      <label>${loc`How many`} <input name="copies" type="number" min="1" max="20" placeholder="${esc(loc`1, or a Minion squad`)}" /></label>
       <label>${loc`Stands toward the team as`} <select name="disposition"><option value="hostile" selected>${loc`Hostile`}</option><option value="neutral">${loc`Neutral`}</option><option value="friendly">${loc`Friendly`}</option><option value="keep">${loc`As its own token is set`}</option></select></label>
       <label><input type="checkbox" name="hidden" /> ${loc`Hidden from the players`}</label>
+      <label><input type="checkbox" name="fresh" /> ${loc`A compendium NPC already in this world: import a fresh copy instead of reusing it`}</label>
       ${fight ? `<label><input type="checkbox" name="join" checked /> ${loc`Join the fight on the tracker`}</label>` : ""}
       ${mission.name || mission.active ? `<label><input type="checkbox" name="record" /> ${loc`Also record it for mission XP, if its type is not listed yet`}</label>` : ""}
-      <p class="hint">${loc`A compendium NPC is imported the first time and reused after that. Tokens go on free squares around the centre of your view, numbered when there is more than one.`}</p></div>`
+      <p class="hint">${loc`A compendium NPC is imported the first time and reused after that. Tokens go on free squares around the centre of your view, numbered when there is more than one.`} ${loc`Left blank, a Minion comes as a squad the team's size (twice that with Horde), one of them its Commander if it has that quality (pp.447–448).`}</p></div>`
   });
   if (!input) return null;
   if (!input.uuid) return refuse(loc`No NPC is chosen. Clear the search or pick one from the list.`);
@@ -204,10 +280,17 @@ export async function addNpcToScene() {
     return refuse(loc`The scene changed while the dialog was open. Nothing was added.`);
   let actor = await fromUuid(input.uuid);
   if (actor?.pack)
-    actor = importedCopy(input.uuid) ?? (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id));
+    actor =
+      (input.fresh ? null : importedCopy(input.uuid, game.actors, actor)) ??
+      (await game.actors.importFromCompendium(game.packs.get(actor.pack), actor.id, {}, { spycraft2Placing: true }));
   if (actor?.type !== "npc") return refuse(loc`That NPC could not be found.`);
   const prototype = await actor.getTokenDocument();
-  const count = Math.min(20, Math.max(1, Math.trunc(Number(input.copies)) || 1));
+  // A Minion squad has as many members as the team, twice as many under Horde (pp.447–448).
+  const squad = actor.system?.npcProfile?.enabled
+      ? minionSquad(actor.system.npcProfile.qualities, teamActors(mission).length)
+      : null,
+    typed = Math.trunc(Number(input.copies)) || 0;
+  const count = Math.min(20, Math.max(1, typed || squad?.size || 1));
   const origin = viewCentreCorner({
     centre: canvas.stage.pivot,
     gridSize: canvas.grid.size,
@@ -216,43 +299,92 @@ export async function addNpcToScene() {
     snap: point => canvas.grid.getTopLeftPoint?.(point) ?? point
   });
   const others = [...scene.tokens];
-  const corners = spreadCorners({
-    origin,
-    count,
-    gridSize: canvas.grid.size,
-    width: prototype.width,
-    height: prototype.height,
-    occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height }))
-  });
+  const corners = onGrid(
+    spreadCorners({
+      origin,
+      count,
+      gridSize: canvas.grid.size,
+      width: prototype.width,
+      height: prototype.height,
+      occupied: others.map(token => ({ x: token.x, y: token.y, width: token.width, height: token.height })),
+      bounds: canvas.dimensions?.sceneRect ?? null,
+      blocked: wallBetween(origin, canvas.grid.size, prototype.width, prototype.height)
+    }),
+    canvas.grid
+  );
   if (!corners.length) return refuse(loc`There is no free square near the centre of the view.`);
   const names = numberedNames(
     prototype.name || actor.name,
     corners.length,
     others.filter(token => token.actorId === actor.id).map(token => token.name)
   );
+  // A linked NPC already on the scene would share one health record with the new copy: the copy is its own person.
+  const source = prototype.toObject();
+  if (source.actorLink && others.some(token => token.actorId === actor.id)) source.actorLink = false;
   const tokens = await scene.createEmbeddedDocuments(
     "Token",
-    placementData(prototype.toObject(), {
+    placementData(source, {
       corners,
       names,
       disposition: input.disposition,
-      hidden: !!input.hidden
+      hidden: !!input.hidden,
+      commanderIndex: squad?.commander && corners.length > 1 ? 0 : null
     })
   );
-  const done = [loc`${tokens.length} × ${actor.name} added to ${scene.name}`];
-  let joined = false;
+  // Named as the map shows them: the tokens' own names, which can differ from the actor's.
+  const placedNames = tokens.map(token => token.name).filter(Boolean);
+  // Whole sentences, one after another: each part says one thing the placing did.
+  const done = [
+    placedNames.length && placedNames.length <= 3
+      ? loc`Added ${placedNames.join(", ")} to ${scene.name}.`
+      : loc`Added ${tokens.length} copies of ${placedNames[0] ?? actor.name} to ${scene.name}.`
+  ];
+  if (!typed && squad) done.push(loc`They are a Minion squad the size of the team.`);
+  else if (!typed) done.push(loc`How many was left blank, so one was placed.`);
+  if (squad?.commander && corners.length > 1)
+    done.push(loc`The first token is the squad's Commander, at Threat Level +2.`);
+  let joined = false,
+    combatants = null,
+    recorded = null;
   if (input.join && fight) {
     // A fight deleted meanwhile leaves the tokens placed; the notice says they did not join.
-    joined = !!game.combats?.get?.(fight.id) && !!(await joinFight(fight, tokens).catch(() => null));
-    done.push(joined ? loc`joined the fight` : loc`the fight is gone, so they did not join it`);
+    combatants = game.combats?.get?.(fight.id) ? await joinFight(fight, tokens).catch(() => null) : null;
+    joined = !!combatants;
+    done.push(joined ? loc`They joined the fight.` : loc`The fight has ended, so they did not join it.`);
   }
   if (input.record && !antagonistRecorded(actor)) {
     // An NPC that walks straight into a fight has been faced.
-    const entry = await recordAntagonist(actor, { encountered: joined });
-    done.push(entry?.xp ? loc`recorded for mission XP` : loc`recorded for mission XP with 0 XP: enter its reward`);
+    recorded = await recordAntagonist(actor, { encountered: joined });
+    const entry = recorded;
+    done.push(
+      entry?.xp
+        ? loc`It counts toward mission XP.`
+        : loc`It counts toward mission XP, at 0 XP until you enter its reward.`
+    );
   }
-  // A type already on the list is faced once it walks into a fight.
+  // A type already on the list is faced once it walks into a fight; Undo takes that mark back with the tokens.
+  const rowBefore = !recorded && joined ? antagonistRowFor(actor) : null,
+    wasOpen = rowBefore && !rowBefore.encountered ? structuredClone(rowBefore) : null;
   if (joined) await markAntagonistsFaced([actor]).catch(() => 0);
-  ui.notifications.info(`${done.join("; ")}.`);
+  ui.notifications.info(done.join(" "));
+  // A slip (the wrong NPC, too many) is taken back from the note: the tokens go, and their combatants with them.
+  await postUndo(
+    tokens.length === 1 ? loc`Placed ${actor.name}` : loc`Placed ${tokens.length} copies of ${actor.name}`,
+    [],
+    {
+      // The antagonist row this placing recorded goes too; a row that was there before stays.
+      ...(recorded ? { antagonist: { id: recorded.id, entry: null, period: missionEpoch() } } : {}),
+      // A row that was there before stays, but loses the faced mark this placing gave it.
+      ...(wasOpen && antagonistRowFor(actor)?.encountered
+        ? { antagonist: { id: wasOpen.id, entry: wasOpen, period: missionEpoch() } }
+        : {}),
+      placedTokens: {
+        scene: scene.id,
+        ids: tokens.map(token => token.id),
+        combat: joined ? fight.id : null,
+        combatants: (combatants ?? []).map(combatant => combatant.id)
+      }
+    }
+  ).catch(() => null);
   return tokens.length === 1 ? tokens[0] : tokens;
 }

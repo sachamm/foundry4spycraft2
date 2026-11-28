@@ -26,11 +26,18 @@ import { parseAmmunitionCode } from "../rules/ammunition.mjs";
 import { grappleTrickLines } from "../rules/grapple-tricks.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
-import { spendWeaponShots, weaponAmmunition, weaponHasUnlimitedAmmunition } from "./ammunition-use.mjs";
-import { recentResultsHint } from "./opposed-checks.mjs";
+import {
+  spendWeaponShots,
+  weaponAmmunition,
+  weaponHasUnlimitedAmmunition,
+  weaponShotsLeft
+} from "./ammunition-use.mjs";
+import { recentResults, recentResultsHint } from "./opposed-checks.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { grappleCardFacts } from "../rules/grapple-check.mjs";
+import { withUndo } from "./undo.mjs";
 
 const post = (actor, lines, flags = null) =>
   ChatMessage.create({
@@ -54,13 +61,15 @@ export function fireActionContent(preview, item, actor = null) {
   if (!preview?.firearm) return "";
   const modes = preview.modes ?? [],
     counted = weaponAmmunition(item),
+    known = weaponShotsLeft(item),
+    bottomless = !counted && known !== null,
     capacity = weaponHasUnlimitedAmmunition(item)
-      ? ""
+      ? (weaponShotsLeft(item) ?? parseAmmunitionCode(item.system.ammo)?.capacity ?? "")
       : counted
         ? counted.loaded
-        : (parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "");
+        : (known ?? parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "");
   const option = (value, label, show = true) => (show ? `<option value="${value}">${label}</option>` : "");
-  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="100" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}"${counted ? " readonly" : ""} /></label><p class="hint">${counted ? loc`Burst, Autofire and Strafe set the fire mode they need. The shots fired are taken from the weapon.` : loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
+  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="100" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}"${known !== null || counted || weaponHasUnlimitedAmmunition(item) ? " readonly" : ""} /></label><p class="hint">${counted ? loc`Burst, Autofire and Strafe set the fire mode they need. The shots fired are taken from the weapon.` : bottomless ? loc`Bottomless Clip: this weapon retains its ammunition.` : loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
 }
 
 /** Steel Rain's hurled-weapon fire actions: the Burst trick, Cover Fire and Suppressive Fire. */
@@ -95,6 +104,25 @@ rollPipeline.register({
   order: 9740,
   dialog: ({ preview, item, actor }) => [{ at: 175, html: fireActionContent(preview, item, actor) }],
   read: (context, input) => fireActionInput(input)
+});
+
+// The same section on the ordinary attack dialog, so an NPC's or a Play-tab attack reaches Burst, Autofire, Strafe,
+// Cover Fire and Suppressive Fire from its one attack button.
+rollPipeline.register({
+  id: "fireActionContent:attack",
+  dialogs: ["attack"],
+  order: 9740,
+  dialog: ({ actor, item }) => {
+    let preview = null;
+    try {
+      preview = actor?.weaponAttack?.(item) ?? null;
+    } catch {
+      return null;
+    }
+    const html = fireActionContent(preview, item, actor);
+    return html ? [{ at: 65, html }] : null;
+  },
+  read: ({ entered }) => fireActionInput(entered ?? {})
 });
 
 /** Pummel on the quick attack dialog, for unarmed attacks. */
@@ -310,7 +338,9 @@ registerRelay("grappleCondition", {
     if (!who || !GRAPPLE_CONDITIONS.includes(id)) throw new Error(loc`A grapple cannot change that condition.`);
     // The label is free text from the player's client: keep it only when it is a short plain name.
     const plain = typeof label === "string" && /^[\p{L}\p{N} '’-]{1,60}$/u.test(label) ? label : id;
-    await setConditionStatus(who, id, active === true, { label: plain });
+    await withUndo([who], loc`Grapple: ${who.name} ${plain}`, () =>
+      setConditionStatus(who, id, active === true, { label: plain })
+    );
     return true;
   }
 });
@@ -323,7 +353,8 @@ async function changeGrappleCondition(who, id, active, label) {
   const name = esc(who?.name ?? loc`The other character`);
   if (!who) return active ? loc`${name}: set ${label} by hand.` : loc`${name}: clear ${label} by hand.`;
   try {
-    if (who.isOwner) await setConditionStatus(who, id, active, { label });
+    if (who.isOwner)
+      await withUndo([who], loc`Grapple: ${who.name} ${label}`, () => setConditionStatus(who, id, active, { label }));
     else if (gcAvailable()) await askGC("grappleCondition", { actorUuid: who.uuid, id, active, label });
     else return active ? loc`${name}: set ${label} by hand.` : loc`${name}: clear ${label} by hand.`;
     return active ? loc`${name} is now ${label.toLowerCase()}.` : loc`${name} is no longer ${label.toLowerCase()}.`;
@@ -427,21 +458,27 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     recipients: recipients.map(a => ({ uuid: a?.uuid, statuses: a?.statuses ?? [] })),
     recipientsConfirmed
   });
-  for (const [index, id] of chosen.entries()) {
-    const recipient = recipients[index];
-    if (["breakPin", "escape"].includes(id))
-      lines.push(loc`${esc(grappleBenefitText(id)[0])}: ${esc(recipient?.name ?? loc`The winner`)}.`);
-    for (const change of grappleBenefitChanges([id])) {
-      const who = change.side === "winner" ? (["breakPin", "escape"].includes(id) ? recipient : winner) : loser,
-        label = labels[change.id] ?? change.id;
-      if (!change.active && who && !who.statuses?.has(change.id)) continue;
-      lines.push(await changeGrappleCondition(who, change.id, change.active, label));
+  await withUndo(
+    [...new Set([winner, loser, ...recipients])].filter(who => who?.isOwner),
+    loc`Grapple: ${actor.name}`,
+    async () => {
+      for (const [index, id] of chosen.entries()) {
+        const recipient = recipients[index];
+        if (["breakPin", "escape"].includes(id))
+          lines.push(loc`${esc(grappleBenefitText(id)[0])}: ${esc(recipient?.name ?? loc`The winner`)}.`);
+        for (const change of grappleBenefitChanges([id])) {
+          const who = change.side === "winner" ? (["breakPin", "escape"].includes(id) ? recipient : winner) : loser,
+            label = labels[change.id] ?? change.id;
+          if (!change.active && who && !who.statuses?.has(change.id)) continue;
+          lines.push(await changeGrappleCondition(who, change.id, change.active, label));
+        }
+        if (id === "escape")
+          lines.push(
+            loc`${esc(recipient?.name ?? loc`The freed participant`)} must immediately make a Standard Move of at least 5 ft., up to Speed. The GC reviews other holds, the group's exits in Initiative order and clearing Vulnerable when the grapple ends (p.357).`
+          );
+      }
     }
-    if (id === "escape")
-      lines.push(
-        loc`${esc(recipient?.name ?? loc`The freed participant`)} must immediately make a Standard Move of at least 5 ft., up to Speed. The GC reviews other holds, the group's exits in Initiative order and clearing Vulnerable when the grapple ends (p.357).`
-      );
-  }
+  );
   const strength = winner?.system?.abilities?.str?.mod;
   for (const id of chosen) {
     if (id === "sprawl")
@@ -465,15 +502,61 @@ async function grappleBenefitsChosen(actor, input, outcome) {
 }
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */
+const GRAPPLE_CARD_CHECKS = ["grapple", "restraint-escape"];
+
+/** Recent check cards a grapple can be settled from: this character's Grapple checks, and everyone else's results. */
+function grappleCards(actor) {
+  const rows = recentResults().filter(row => row.check),
+    grappleFirst = (a, b) => Number(b.check.checkId === "grapple") - Number(a.check.checkId === "grapple");
+  return {
+    // Only this character's Grapple or escape checks, so a later Climb or Jump is never the default.
+    mine: rows.filter(row => row.check.actorUuid === actor.uuid && GRAPPLE_CARD_CHECKS.includes(row.check.checkId)),
+    theirs: rows.filter(row => row.check.actorUuid !== actor.uuid).sort(grappleFirst)
+  };
+}
+
+const cardOption = row =>
+  `<option value="${esc(row.uuid)}">${esc(row.name)} — ${row.total}${row.title ? ` (${esc(row.title)})` : ""}</option>`;
+
+/**
+ * Fill the totals, criticals and opponent from the picked check cards (U7). A card's total already holds its Size
+ * bonus (p.357), so the bonus is reported, never added again. Typed fields stand in for a side with no card.
+ */
+export function grappleInputFromCards(input, rows) {
+  const card = uuid => (uuid ? rows.find(row => row.uuid === uuid) : null),
+    // The character's own card must be a Grapple or escape check; any other result is left for the typed total.
+    found = card(input.cardUuid),
+    mine = GRAPPLE_CARD_CHECKS.includes(found?.check?.checkId) ? found : null,
+    theirs = card(input.opponentCardUuid),
+    own = grappleCardFacts(mine?.check),
+    other = grappleCardFacts(theirs?.check);
+  const typed = value => (value === "" || value === null || value === undefined ? NaN : Number(value));
+  return {
+    ...input,
+    total: own ? own.total : typed(input.total),
+    opponentTotal: other ? other.total : typed(input.opponentTotal),
+    critical: own ? own.critical : input.critical === true,
+    criticalFailure: own ? own.criticalFailure : input.criticalFailure === true,
+    opponentCritical: other ? other.critical : input.opponentCritical === true,
+    opponentCriticalFailure: other ? other.criticalFailure : input.opponentCriticalFailure === true,
+    opponentUuid: input.opponentUuid || theirs?.check?.actorUuid || "",
+    sizeDifference: Number(input.sizeDifference) || 0,
+    cardSizeBonus: own || other ? Math.max(own?.sizeBonus ?? 0, other?.sizeBonus ?? 0) : null,
+    convertDamage: own ? own.convertDamage : input.convertDamage === true,
+    opponentConvertDamage: other ? other.convertDamage : input.opponentConvertDamage === true
+  };
+}
+
 export async function settleGrapple(actor, options = {}) {
   if (!actor?.isOwner) return null;
   let input = options;
-  if (input.total === undefined) {
+  if (input.total === undefined && !input.cardUuid && !input.opponentCardUuid) {
+    const cards = grappleCards(actor);
     input = await systemDialog.input({
       window: { title: loc`Grapple: settle the opposed check` },
       rejectClose: false,
       ok: { label: loc`Settle` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Both sides roll Athletics (Str); the Grasp tag and the Armor Check Penalty tag apply. The bigger character adds +4 for each Size category of difference (p.356). Enter the two results.`}</p><p class="hint">${recentResultsHint()}</p><label>${loc`Opponent (to set conditions on a character you own)`} <select name="opponentUuid"><option value="">${loc`Not listed`}</option>${attackCharacterTargetChoices()
+      content: `<div class="spycraft2-roll-options"><label>${loc`Your Grapple check card`} <select name="cardUuid"><option value="">${loc`Enter result below`}</option>${cards.mine.map(cardOption).join("")}</select></label><label>${loc`Opponent check card`} <select name="opponentCardUuid"><option value="">${loc`Enter result below`}</option>${cards.theirs.map(cardOption).join("")}</select></label><p>${loc`Both sides roll Athletics (Str); the Grasp tag and the Armor Check Penalty tag apply. The bigger character adds +4 for each Size category of difference (p.356). Enter the two results.`}</p><p class="hint">${recentResultsHint()}</p><label>${loc`Opponent (to set conditions on a character you own)`} <select name="opponentUuid"><option value="">${loc`Not listed`}</option>${attackCharacterTargetChoices()
         .filter(a => a.uuid !== actor.uuid)
         .map(
           a =>
@@ -481,7 +564,7 @@ export async function settleGrapple(actor, options = {}) {
         )
         .join(
           ""
-        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size difference when a participant has no recorded Size (negative when smaller)`} <input type="number" name="sizeDifference" value="0" min="-9" max="9" step="1" /></label><label>${loc`Opponents I already hold`} <input name="heldOpponents" type="number" value="0" min="0" max="2" step="1" /></label><label><input name="secondOpponentBenefit" type="checkbox" /> ${loc`This opening uses an earned second-opponent benefit; my current opponent is held, not pinned, and my result includes the −4 Athletics penalty`}</label><label>${loc`Other characters already grappling this target`} <input name="otherGrapplers" type="number" value="0" min="0" max="7" step="1" /></label><p>${loc`Target smaller than you: at most 2 grapplers; same Size: 4; one Size larger: 8. The GC checks every participant when Sizes differ.`}</p><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`For an opening grapple, the GC confirms adjacency, current Sizes and the actual other-grappler count; recorded character Sizes take precedence`}</label></div>`
+        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size difference when a participant has no recorded Size (negative when smaller)`} <input type="number" name="sizeDifference" value="0" min="-9" max="9" step="1" /></label><label>${loc`Opponents I already hold`} <input name="heldOpponents" type="number" value="0" min="0" max="2" step="1" /></label><label><input name="secondOpponentBenefit" type="checkbox" /> ${loc`This opening uses an earned second-opponent benefit; my current opponent is held, not pinned, and my result includes the −4 Athletics penalty`}</label><label>${loc`Other characters already grappling this target`} <input name="otherGrapplers" type="number" value="0" min="0" max="7" step="1" /></label><p>${loc`Target smaller than you: at most 2 grapplers; same Size: 4; one Size larger: 8. The GC checks every participant when Sizes differ.`}</p><label><input name="grappleContextConfirmed" type="checkbox" /> ${loc`For an opening grapple, the GC confirms adjacency, current Sizes and the actual other-grappler count; recorded character Sizes take precedence`}</label></div>`
     });
     if (!input) return null;
     input = {
@@ -493,6 +576,11 @@ export async function settleGrapple(actor, options = {}) {
       heldOpponents: Number(input.heldOpponents ?? 0)
     };
   }
+  if (input.cardUuid || input.opponentCardUuid)
+    input = grappleInputFromCards(
+      input,
+      recentResults().filter(row => row.check)
+    );
   let outcome, openingContext;
   try {
     if (input.opening) {
@@ -514,7 +602,7 @@ export async function settleGrapple(actor, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  const sizeBonus = grappleSizeBonus(Math.abs(input.sizeDifference ?? 0));
+  const sizeBonus = input.cardSizeBonus ?? grappleSizeBonus(Math.abs(input.sizeDifference ?? 0));
   const benefits = outcome.benefits
     ? [
         loc`Grapple benefits to choose from:`,
@@ -542,7 +630,11 @@ export async function settleGrapple(actor, options = {}) {
     ...outcome.effects.map(esc),
     sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
     ...benefits,
-    ...(await grappleConditions(actor, input, outcome))
+    ...(await withUndo(
+      [actor, input.opponentUuid ? await fromUuid(input.opponentUuid) : null].filter(who => who?.isOwner),
+      loc`Grapple: ${actor.name}`,
+      () => grappleConditions(actor, input, outcome)
+    ))
   ]);
   const taken = await grappleBenefitsChosen(actor, input, outcome);
   if (taken?.lines?.length)

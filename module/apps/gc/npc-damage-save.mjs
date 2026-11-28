@@ -34,21 +34,11 @@ export function damageSaveState(actor) {
 }
 
 /** Roll a standard NPC's Damage save for one injury and record the result. */
-export async function npcDamageSave(actor, input = null) {
-  if (!actor.isOwner) return null;
-  if (npcIsSpecial(actor))
-    return refuse(
-      loc`Special NPCs lose vitality and wounds like player characters; Damage saves are for standard NPCs and animals (p.452).`
-    );
+export async function askNpcDamageSaveInput(actor) {
   const state = damageSaveState(actor);
-  if (state.track.state !== "active")
-    return refuse(
-      loc`${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
-    );
-  if (!input) {
-    input = await ask(
-      loc`${actor.name}: Damage save`,
-      `
+  return await ask(
+    loc`${actor.name}: Damage save`,
+    `
       <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction; prepared stress/subdual resistance is applied here.`}</p>
       <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
       <label>${loc`Type`} <select name="kind">${options(
@@ -62,8 +52,24 @@ export async function npcDamageSave(actor, input = null) {
       ${campaignStressPolicy(actor.system.campaignEffects) ? `<label><input type="checkbox" name="campaignStressAdjusted" /> ${loc`Entered stress already includes campaign multipliers (leave unchecked for raw stress)`}</label>` : ""}<label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
       <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
       <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`,
-      loc`Roll Damage save`
+    loc`Roll Damage save`
+  );
+}
+
+export async function npcDamageSave(actor, input = null) {
+  if (!globalThis.game?.user?.isGM) return refuse(loc`The GC rolls a standard NPC Damage save.`);
+  if (!actor.isOwner) return null;
+  if (npcIsSpecial(actor))
+    return refuse(
+      loc`Special NPCs lose vitality and wounds like player characters; Damage saves are for standard NPCs and animals (p.452).`
     );
+  const state = damageSaveState(actor);
+  if (state.track.state !== "active")
+    return refuse(
+      loc`${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
+    );
+  if (!input) {
+    input = await askNpcDamageSaveInput(actor);
     if (!input) return null;
   }
   input = { ...input, kind: input.kind ?? "lethal" };
@@ -182,7 +188,8 @@ export async function npcDamageSave(actor, input = null) {
     }
     for (const combat of game.combats ?? [])
       for (const combatant of combat.combatants)
-        if (combatant.actor === actor && !combatant.defeated) await combatant.update({ defeated: true });
+        if (combatant.actor === actor && !combatant.defeated)
+          await combatant.update({ defeated: true, "flags.spycraft2.defeatedByDamageSave": true });
   }
   return {
     ...result,

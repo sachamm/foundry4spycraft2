@@ -45,6 +45,7 @@ const makeActor = (id, type, system, extra = {}) => ({
   type,
   system,
   flags: {},
+  items: [],
   isOwner: true,
   hasPlayerOwner: type === "agent",
   statuses: new Set(),
@@ -97,7 +98,8 @@ globalThis.foundry = {
       DialogV2: {
         input: async () => {
           if (!dialogAnswers.length) throw new Error("Unexpected dialog");
-          return dialogAnswers.shift();
+          const answer = dialogAnswers.shift();
+          return typeof answer === "function" ? answer() : answer;
         },
         confirm: async () => {
           const answer = confirmAnswers.length ? confirmAnswers.shift() : true;
@@ -247,7 +249,7 @@ const lastMessage = () => messages.at(-1)?.content ?? "";
 
 test("mission record: Threat Level is fixed at mission start and feeds the XP defaults", async () => {
   assert.equal(state.missionThreatLevel(), null);
-  assert.deepEqual(missionSettlementDefaults(), { baseXP: 0, threatLevel: null });
+  assert.deepEqual(missionSettlementDefaults(), { baseXP: 0, threatLevel: null, triumph: false });
   answer({
     name: "Cold Open",
     caliber: 3,
@@ -289,7 +291,7 @@ test("mission record: Threat Level is fixed at mission start and feeds the XP de
   await mission.changeEntry("objectives", m.objectives[0].id, "complete");
   await mission.changeEntry("antagonists", m.antagonists[1].id, "encountered");
   assert.equal(state.missionXP().total, 50 + 75 + 200);
-  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6 });
+  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6, triumph: false });
   await mission.missionReport();
   assert.match(lastMessage(), /\(325 \+ 25\) × 5 = <b>1750<\/b>/);
 });
@@ -325,6 +327,23 @@ test("exposure infractions reduce standing at once; standing award pays the Cali
   await mission.recordInfraction();
   assert.equal(actors.get("a1").system.reputation, -2);
   assert.match(lastMessage(), /Negative standing/);
+  // A row can be taken off again, and the agent gets back what it cost.
+  const rows = state.getMission().infractions;
+  assert.ok(
+    rows.every(row => row.id),
+    "each row has its own id"
+  );
+  assert.ok(
+    messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions),
+    "an Undo note"
+  );
+  await mission.removeInfraction(rows.at(-1).id);
+  assert.equal(actors.get("a1").system.reputation, 0);
+  assert.equal(state.getMission().infractions.length, rows.length - 1);
+  assert.equal(await mission.removeInfraction("gone"), false);
+  answer({ actor: "a1", infraction: "adhere-to-honor-code|1", currency: "reputation", preventing: true, honor: false });
+  await mission.recordInfraction();
+  assert.equal(actors.get("a1").system.reputation, -2);
   answer({ currency: "reputation" });
   assert.equal(await mission.awardStanding(), 12, "Caliber III is 10, +2 for a Threat Level raised by 2");
   assert.equal(actors.get("a2").system.reputation, 14);
@@ -343,10 +362,13 @@ test("the standing award pays each agent once per mission; a correction pays aga
   await mission.awardStanding();
   assert.equal(actors.get("a2").system.reputation, 14, "paid agents are skipped on a retry");
   assert.equal(actors.get("a3").system.reputation, 26);
-  assert.match(lastMessage(), /to a3, a4\./);
+  assert.match(lastMessage(), /awarded: a3 \(Reputation \+12\), a4 \(Reputation \+12\)\./);
   answer({ currency: "reputation", again: true });
   await mission.awardStanding();
   assert.equal(actors.get("a2").system.reputation, 26, "the correction pays everyone");
+  const paidNote = messages.findLast(message => message.flags?.spycraft2?.undo?.standingPaid)?.flags.spycraft2.undo;
+  assert.equal(paidNote.standingPaid.period, state.missionEpoch(), "Undo is tied to the mission that paid");
+  assert.ok(paidNote.standingPaid.marks.a2, "the earlier marks are kept for Undo");
   for (const id of ["a2", "a3", "a4"]) await actors.get(id).update({ "system.reputation": 14 });
 });
 
@@ -421,14 +443,31 @@ test("Hybrid standing pays each affiliation's currency and conflicting Faction s
 });
 
 test("End mission asks first, keeps the record for settlement, and Resume reopens it unchanged", async () => {
-  confirmAnswers.push(false);
+  dialogAnswers.push(null);
   assert.equal(await mission.endMission(), null);
   assert.equal(state.getMission().active, true, "cancelled");
+  dialogAnswers.push({ countFinalScene: false });
   assert.equal(await mission.endMission(), true);
   let m = state.getMission();
   assert.deepEqual([m.active, m.ended], [false, true]);
   assert.match(lastMessage(), /ended/);
-  assert.deepEqual(missionSettlementDefaults(), { baseXP: 325, threatLevel: 6 }, "settlement still has the totals");
+  assert.deepEqual(
+    missionSettlementDefaults(),
+    { baseXP: 325, threatLevel: 6, triumph: false },
+    "settlement still has the totals"
+  );
+  // The figures are kept with the ended mission: a season quality added later does not move them.
+  const season = game.settings.get("spycraft2", "campaign");
+  await game.settings.set("spycraft2", "campaign", {
+    ...season,
+    qualities: [...(season?.qualities ?? []), "cakewalk"]
+  });
+  assert.equal(missionSettlementDefaults().baseXP, 325);
+  const kept = state.getMission().settlementFigures;
+  await state.updateMission({ settlementFigures: null });
+  assert.notEqual(missionSettlementDefaults().baseXP, 325, "without the kept figures the quality would count");
+  await state.updateMission({ settlementFigures: kept });
+  await game.settings.set("spycraft2", "campaign", season);
   assert.equal(consoleContext().mission.ended, true);
   await mission.resumeMission();
   m = state.getMission();
@@ -441,9 +480,9 @@ test("a change made while End mission is asking is kept; a record ended by an ol
   const id = state.getMission().objectives[0].id;
   await mission.changeEntry("objectives", id, "complete");
   assert.equal(state.getMission().objectives[0].complete, false);
-  confirmAnswers.push(async () => {
+  dialogAnswers.push(async () => {
     await mission.changeEntry("objectives", id, "complete");
-    return true;
+    return { countFinalScene: false };
   });
   await mission.endMission();
   assert.equal(state.getMission().objectives[0].complete, true, "ticked while the question was open");
@@ -455,11 +494,18 @@ test("a change made while End mission is asking is kept; a record ended by an ol
 });
 
 test("starting an ended mission again asks, then clears the last run's results", async () => {
+  const scenes = state.getMission().scenesPlayed ?? 0;
+  dialogAnswers.push({ countFinalScene: true });
   await mission.endMission();
+  assert.equal(state.getMission().scenesPlayed, scenes + 1, "the scene being played is counted");
   confirmAnswers.push(false);
   assert.equal(await mission.startMission(), null);
   assert.equal(state.getMission().objectives[0].complete, true, "cancelled: nothing cleared");
+  // Asked about the exposure losses: kept.
+  const reputation = actors.get("a1").system.reputation;
+  confirmAnswers.push(true, false);
   await mission.startMission();
+  assert.equal(actors.get("a1").system.reputation, reputation, "the losses stay when the GC keeps them");
   const m = state.getMission();
   assert.deepEqual([m.active, m.ended, m.infractions.length, m.scenesPlayed], [true, false, 0, 0]);
   assert.equal(m.objectives[0].complete, false);
@@ -482,7 +528,40 @@ test("dice that could not be taken at 0 are not handed back when the change goes
   await state.setCampaign({ qualities: [] });
   await mission.applySessionDiceAdjustments({ quiet: true });
   assert.equal(a1.system.actionDice.value, 1, "only the one die really taken comes back");
+  // A wrong adjustment is undone from its note: the dice and the adjusted mark go back, so it can run again (U5).
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 0);
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo);
+  assert.equal(note.flags.spycraft2.undo.label, "Starting action dice adjusted");
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  await applyUndo({ id: "dice-undo", flags: structuredClone(note.flags), update: async () => null });
+  assert.equal(a1.system.actionDice.value, 1);
+  assert.equal(a1.flags.spycraft2.sessionDiceAdjusted, undefined);
+  await state.setCampaign({ qualities: [] });
   a1.system.actionDice.value = kept.value;
+  if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
+  else delete a1.flags.spycraft2.sessionDiceAdjusted;
+});
+
+test("an agent whose dice convert gains or loses the converted number (Fortune Favors the Bold)", async () => {
+  const a1 = actors.get("a1"),
+    kept = {
+      value: a1.system.actionDice.value,
+      max: a1.system.actionDice.max,
+      flag: a1.flags.spycraft2?.sessionDiceAdjusted
+    };
+  Object.assign(a1.system.actionDice, { value: 6, max: 6, gainMultiplier: 2 });
+  a1.flags.spycraft2 ??= {};
+  delete a1.flags.spycraft2.sessionDiceAdjusted;
+  await state.setCampaign({ qualities: ["bleak"] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  assert.equal(a1.system.actionDice.value, 2, "two d6 for each die Bleak takes");
+  await state.setCampaign({ qualities: [] });
+  await mission.applySessionDiceAdjustments({ quiet: true });
+  delete a1.system.actionDice.gainMultiplier;
+  Object.assign(a1.system.actionDice, { value: kept.value, max: kept.max });
   if (kept.flag) a1.flags.spycraft2.sessionDiceAdjusted = kept.flag;
   else delete a1.flags.spycraft2.sessionDiceAdjusted;
 });
@@ -522,7 +601,7 @@ test("NPC skill check uses Competence or the skilled bonus plus the attribute", 
   roll = await npc.rollNpcSkill(guard);
   assert.equal(roll.data.total, 4);
   assert.equal(roll.options.cap, 30);
-  assert.equal(roll.options.rollMode, "gmroll");
+  assert.equal(roll.options.rollMode, "blindroll");
 });
 
 test("NPC ordinary Grapple records actual proficiency time, error and Size without inventing an attack penalty", async () => {
@@ -692,20 +771,151 @@ test("the actual GC boost API refuses passive and fixed-result NPC cards before 
     assert.deepEqual([...settings], before);
   }
 });
+test("Comedy of Errors widens an NPC's error range on its lowest attribute (p.406)", async () => {
+  const abilities = guard.system.abilities;
+  guard.system.abilities = Object.fromEntries(
+    Object.entries(abilities).map(([key, value]) => [key, { ...value, value: key === "wis" ? 8 : 14 }])
+  );
+  await state.setCampaign({ qualities: ["comedy-of-errors"] });
+  try {
+    answer({ key: "notice", ability: "wis", modifier: 0, error: 1, secret: false });
+    assert.equal((await npc.rollNpcSkill(guard)).options.error, 3);
+    answer({ key: "notice", ability: "int", modifier: 0, error: 1, secret: false });
+    assert.equal((await npc.rollNpcSkill(guard)).options.error, 1);
+  } finally {
+    guard.system.abilities = abilities;
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
+test("an NPC skill check is posted as the named check, with that check's own error range (p.88)", async () => {
+  answer({ skillCheck: "medicine:surgery", ability: "", modifier: 0, error: "", secret: false });
+  let roll = await npc.rollNpcSkill(guard);
+  assert.equal(roll.options.checkKind, "skill");
+  assert.equal(roll.options.skillKey, "medicine");
+  assert.equal(roll.options.checkId, "surgery");
+  assert.equal(roll.options.error, 4);
+  // The sheet's quick roll names only the skill: its first check, at that check's error range.
+  roll = await npc.rollNpcSkill(guard, { key: "acrobatics", ability: "", modifier: 0 });
+  assert.equal(roll.options.checkId, "balance");
+  assert.equal(roll.options.error, 1);
+  roll = await npc.rollNpcSkill(guard, { key: "acrobatics", check: "falling", ability: "", modifier: 0 });
+  assert.equal(roll.options.error, 3);
+  // A typed error range still wins.
+  roll = await npc.rollNpcSkill(guard, { key: "medicine", check: "surgery", modifier: 0, error: 2 });
+  assert.equal(roll.options.error, 2);
+});
+
+test("an NPC's conditions and Size reach its skill checks, halved under Omni-Competent (pp.340–342, 349, 408)", async () => {
+  const system = guard.system;
+  try {
+    system.conditionContext = { sickened: true };
+    let roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", modifier: 0 });
+    assert.equal(roll.data.total, 9 + 2 - 2);
+    system.conditionContext = {};
+    system.sizeHideModifier = -4;
+    roll = await npc.rollNpcSkill(guard, { key: "blend", check: "stealth", ability: "dex", modifier: 0 });
+    assert.equal(roll.data.total, 4 - 4);
+    roll = await npc.rollNpcSkill(guard, { key: "sneak", check: "hide", ability: "dex", modifier: 0 });
+    assert.equal(roll.data.total, 4 - 4);
+    delete system.sizeHideModifier;
+    await state.setCampaign({ qualities: ["omni-competent"] });
+    roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", modifier: -4 });
+    assert.equal(roll.data.total, 9 + 2 - 2);
+  } finally {
+    delete system.conditionContext;
+    delete system.sizeHideModifier;
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
+test("Paranoid gives a special NPC its surprise bonus on a Hide check (p.408)", async () => {
+  const kept = guard.system.npcType;
+  guard.system.npcType = "special";
+  await state.setCampaign({ qualities: ["paranoid"] });
+  try {
+    const roll = await npc.rollNpcSkill(guard, { key: "sneak", check: "hide", ability: "dex", surprise: true });
+    assert.equal(roll.data.total, 4 + 4);
+    const plain = await npc.rollNpcSkill(guard, { key: "sneak", check: "hide", ability: "dex" });
+    assert.equal(plain.data.total, 4);
+  } finally {
+    guard.system.npcType = kept;
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
+test("Omni-Competent halves Paranoid's persuasion penalty on an NPC check (p.408)", async () => {
+  await state.setCampaign({ qualities: ["paranoid"] });
+  try {
+    let roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", paranoidPersuasion: true });
+    assert.equal(roll.data.total, 9 + 2 - 4);
+    await state.setCampaign({ qualities: ["paranoid", "omni-competent"] });
+    roll = await npc.rollNpcSkill(guard, { key: "notice", check: "awareness", paranoidPersuasion: true });
+    assert.equal(roll.data.total, 9 + 2 - 2);
+  } finally {
+    await state.setCampaign({ qualities: [] });
+  }
+});
+
+test("an animal's trained qualities steady its Morale, and a check off its list warns (p.445)", async () => {
+  const system = guard.system,
+    kept = { type: system.npcType, effects: system.qualityEffects };
+  system.npcType = "animal";
+  system.qualityEffects = { skillOptions: [], trainedQualities: 2 };
+  try {
+    const roll = await npc.rollNpcSkill(guard, { key: "resolve", check: "morale", modifier: 0, riderCharisma: 2 });
+    assert.equal(roll.data.total, 4 + 2 + 2);
+    assert.equal(roll.options.error, 0);
+    assert.equal(roll.options.cap, npc.npcSkillPlan(guard, "resolve").cap + 4);
+    system.qualityEffects = { skillOptions: [], trainedQualities: 1 };
+    const one = await npc.rollNpcSkill(guard, { key: "resolve", check: "morale", modifier: 0, riderCharisma: 2 });
+    assert.equal(one.options.error, 1);
+    assert.equal(one.options.cap, npc.npcSkillPlan(guard, "resolve").cap);
+    const before = warnings.length;
+    await npc.rollNpcSkill(guard, { key: "medicine", check: "surgery" });
+    assert.match(warnings.at(-1), /Review this animal/);
+    await npc.rollNpcSkill(guard, { key: "athletics", check: "swim" });
+    assert.equal(warnings.length, before + 1);
+  } finally {
+    system.npcType = kept.type;
+    system.qualityEffects = kept.effects;
+  }
+});
 
 test("standard NPC Damage saves accumulate, kill and reset; special NPCs are refused", async () => {
   dice(12);
   let result = await npc.npcDamageSave(guard, { damage: 8, kind: "lethal" });
   assert.deepEqual([result.dc, result.failed, guard.system.damageTrack.accumulated], [14, false, 8]);
-  dice(3);
-  result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
-  assert.deepEqual([result.dc, result.state], [19, "dead"]);
-  assert.ok(guard.statuses.has("dead"));
-  assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
-  assert.match(warnings.at(-1), /already dead/);
-  await npc.resetDamageTrack(guard);
-  assert.equal(guard.system.damageTrack.state, "active");
-  assert.ok(!guard.statuses.has("dead"));
+  const combatant = (actor, defeated = false) => ({
+      actor,
+      defeated,
+      flags: {},
+      async update(change) {
+        if ("defeated" in change) this.defeated = change.defeated;
+        if (change["flags.spycraft2.defeatedByDamageSave"]) this.flags.spycraft2 = { defeatedByDamageSave: true };
+        if ("flags.spycraft2.-=defeatedByDamageSave" in change) delete this.flags.spycraft2?.defeatedByDamageSave;
+      }
+    }),
+    saved = combatant(guard),
+    byHand = combatant(guard, true),
+    keptCombats = game.combats;
+  game.combats = [{ combatants: [saved] }, { combatants: [byHand] }];
+  try {
+    dice(3);
+    result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
+    assert.deepEqual([result.dc, result.state], [19, "dead"]);
+    assert.ok(guard.statuses.has("dead"));
+    assert.equal(saved.defeated, true);
+    assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
+    assert.match(warnings.at(-1), /already dead/);
+    await npc.resetDamageTrack(guard);
+    assert.equal(guard.system.damageTrack.state, "active");
+    assert.ok(!guard.statuses.has("dead"));
+    // Reset clears the defeat the save set, and leaves the one marked by hand.
+    assert.deepEqual([saved.defeated, byHand.defeated], [false, true]);
+  } finally {
+    game.combats = keptCombats;
+  }
   await npc.npcDamageSave(boss, { damage: 5, kind: "lethal" });
   assert.match(warnings.at(-1), /Special NPCs/);
 });
@@ -772,6 +982,31 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   await spend.spendGCDice({ id: "promote", actor: guard });
   assert.equal(gcDiceStatus().value, 6);
   assert.ok(npc.npcIsSpecial(guard), "promoted for the current mission");
+  const promotedRow = () =>
+    state.getMission().antagonists.find(entry => entry.uuid === guard.uuid || entry.typeKey === guard.uuid);
+  assert.deepEqual([promotedRow().promoted, promotedRow().scenes], [true, 1], "its XP is counted per scene");
+  const promoteNote = messages.findLast(message => message.flags?.spycraft2?.undo)?.flags.spycraft2.undo;
+  assert.equal(promoteNote.antagonist.id, promotedRow().id, "the Undo note can put the antagonist row back");
+  assert.equal(promotedRow().encountered, true, "a promoted NPC is in play, so it has been faced");
+  assert.notEqual(promoteNote.antagonist.entry?.promoted, true);
+  assert.equal(promoteNote.antagonist.period, state.missionEpoch());
+  {
+    // Undone after a later run of the mission has begun: the row that run keeps is left alone.
+    const { applyUndo } = await import("../module/apps/undo.mjs");
+    const periods = game.settings.get("spycraft2", "usagePeriods"),
+      rowsBefore = structuredClone(state.getMission().antagonists);
+    await game.settings.set("spycraft2", "usagePeriods", { ...periods, mission: "a-later-run" });
+    const stale = structuredClone({ ...promoteNote, entries: [], gcDice: 0 });
+    await applyUndo({ id: "stale-promotion", flags: { spycraft2: { undo: stale } }, update: async () => null });
+    assert.deepEqual(state.getMission().antagonists, rowsBefore);
+    assert.match(warnings.at(-1), /later mission has begun/);
+    await game.settings.set("spycraft2", "usagePeriods", periods);
+  }
+  await mission.changeEntry("antagonists", promotedRow().id, "scenesUp");
+  assert.equal(promotedRow().scenes, 2);
+  await mission.changeEntry("antagonists", promotedRow().id, "scenesDown");
+  await mission.changeEntry("antagonists", promotedRow().id, "scenesDown");
+  assert.equal(promotedRow().scenes, 1, "never below one scene");
   await guard.update({ "system.promotion": null });
   await npc.npcDamageSave(guard, { damage: 9, kind: "lethal" }).catch(() => {});
   await spend.spendGCDice({ id: "dramaticScene" });
@@ -789,6 +1024,23 @@ test("GC action dice: die type, cost, dramatic scene, promotion and healing", as
   assert.equal(state.isDramaticScene(), false);
 });
 
+test("a GC spend heals a special NPC's vitality or 2 wounds on the sheet, under the spend's Undo (U9)", async () => {
+  await initializeGCDice({ playersPresent: 4, caliber: 3, replaceExisting: true });
+  const kept = { vitality: boss.system.vitality, wounds: boss.system.wounds };
+  boss.system.vitality = { value: 5, max: 30 };
+  boss.system.wounds = { value: 9, max: 10 };
+  dice(6);
+  await spend.spendGCDice({ id: "healNpc", actor: boss });
+  assert.equal(boss.system.vitality.value, 11, "vitality equal to the die by default");
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo).flags.spycraft2.undo;
+  assert.ok(note.entries[0].restore.some(([path, value]) => path === "system.vitality.value" && value === 5));
+  dice(3);
+  await spend.spendGCDice({ id: "healNpc", actor: boss, healAs: "wounds" });
+  assert.equal(boss.system.wounds.value, 10, "2 wounds, never past the maximum");
+  assert.equal(boss.system.vitality.value, 11);
+  Object.assign(boss.system, kept);
+});
+
 const makeCombat = list => {
   const combatants = new Map();
   const fight = {
@@ -799,6 +1051,8 @@ const makeCombat = list => {
     flags: {},
     combatants: {
       get: id => combatants.get(id),
+      set: (id, combatant) => combatants.set(id, combatant),
+      delete: id => combatants.delete(id),
       find: fn => [...combatants.values()].find(fn),
       filter: fn => [...combatants.values()].filter(fn),
       [Symbol.iterator]: () => combatants.values()
@@ -893,6 +1147,31 @@ test("group initiative rolls NPCs only and names an agent nobody owns instead of
   assert.match(lastMessage(), /Not rolled, no player owns them: Absent/);
 });
 
+test("group initiative takes its d20 from the first member's own roll and holds back a member under Shaken review (F5)", async () => {
+  const twin = makeActor("guard-twin", "npc", npcSystem({ initiative: { total: 5 } }), { name: "Guard twin" });
+  const fight = makeCombat([
+    ["g1", guard, null, false],
+    ["g2", twin, null, false],
+    ["g3", twin, null, false]
+  ]);
+  let asked = 0;
+  // The first member's roll stands in for Combatant#getInitiativeRoll: a kept d20 of 14 (as Lightning Reflexes may
+  // choose), plus its own bonus.
+  fight.combatants.get("g1").getInitiativeRoll = () => ({
+    evaluate: async () => (asked++, { total: 14 + 3, dice: [{ total: 14 }] })
+  });
+  fight.combatants.get("g2").getInitiativeRoll = () => ({ evaluate: async () => ({ total: 0, dice: [] }) });
+  fight.combatants.get("g3").getInitiativeRoll = () => {
+    throw new Error("Review the Shaken sources before rolling Initiative.");
+  };
+  assert.equal(await combat.rollGroupInitiative(fight, { single: true }), 1);
+  assert.equal(asked, 1, "one roll for the group");
+  assert.equal(fight.combatants.get("g1").initiative, 14 + 3);
+  assert.equal(fight.combatants.get("g2").initiative, 14 + 5, "each member adds its own bonus");
+  assert.equal(fight.combatants.get("g3").initiative, null);
+  assert.match(lastMessage(), /Guard twin: not rolled \(Review the Shaken sources/);
+});
+
 test("the tracker menu entries use the Foundry 14 shape and act on the clicked row", async () => {
   const fight = makeCombat([
     ["c-a1", actors.get("a1"), 22, true],
@@ -916,8 +1195,9 @@ test("the tracker menu entries use the Foundry 14 shape and act on the clicked r
   assert.equal(mook.flags.spycraft2?.readied, undefined);
   fight.turn = 1;
   assert.equal(fight.combatant, mook);
+  answer({ trigger: "the door opens", endTurn: false });
   await find("Ready an action").onClick(null, row);
-  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round });
+  assert.deepEqual(mook.flags.spycraft2.readied, { round: fight.round, trigger: "the door opens" });
   assert.equal(combat.halfActionsLeft(mook), 1);
   assert.equal(find("Ready an action").visible(row), false);
   assert.equal(find("Readied action triggered").visible(row), true);
@@ -942,12 +1222,36 @@ test("group initiative makes one roll per NPC type; tie-breaks are stored", asyn
     ["g1", "g2", "b", "h"].map(id => fight.combatants.get(id).initiative),
     [13, 13, 18, null]
   );
+  assert.match(lastMessage(), /Guard Count 13/);
+  // A late guard joins the guards' Count without a roll.
+  const late = makeActor("g9", "combatant", null, {
+    name: "Guard",
+    actor: guard,
+    initiative: null,
+    parent: fight,
+    actorId: guard.id
+  });
+  fight.combatants.set("g9", late);
+  assert.equal(await combat.rollGroupInitiative(fight), 1);
+  assert.equal(late.initiative, 13);
+  assert.match(lastMessage(), /joins/);
+  fight.combatants.delete?.("g9");
   dice(4, 17);
   assert.equal(await combat.rollTiebreaks(fight), 2);
   const sorted = [fight.combatants.get("g1"), fight.combatants.get("g2")].sort(
     (a, b) => b.flags.spycraft2.tiebreak - a.flags.spycraft2.tiebreak
   );
   assert.equal(sorted[0].id, "g2");
+  // A third joins the tie: only the newcomer rolls, so the first two keep their places.
+  const kept = sorted.map(c => c.flags.spycraft2.tiebreak);
+  const third = makeActor("g3", "combatant", null, { name: "Guard", actor: guard, initiative: 13, parent: fight });
+  fight.combatants.set("g3", third);
+  dice(9);
+  assert.equal(await combat.rollTiebreaks(fight), 1);
+  assert.deepEqual(
+    sorted.map(c => c.flags.spycraft2.tiebreak),
+    kept
+  );
   const Sorted = combat.fluidCombatClass(class {});
   const order = [
     { id: "x", initiative: 12, actor: { system: { initiative: { total: 1 } } }, flags: {} },
@@ -1012,12 +1316,221 @@ test("console context summarises everything without throwing", async () => {
   const context = consoleContext();
   assert.equal(context.mission.threatLevel, 6);
   assert.equal(context.mission.caliberLabel, "III");
-  assert.equal(context.xp.earned, 325);
+  assert.equal(context.xp.earned, 625, "the promoted guard counts 300 for its scene");
   assert.equal(context.dice.expected, 10);
   assert.equal(context.scene.dramatic, false);
   assert.ok(Array.isArray(context.conflicts));
   if (process.env.GC_CONTEXT_OUT)
     (await import("node:fs")).writeFileSync(process.env.GC_CONTEXT_OUT, JSON.stringify(context));
+});
+
+test("removing a mission row leaves an Undo note that puts it back in its place", async () => {
+  const before = state.getMission().objectives;
+  assert.ok(before.length, "the test world has objectives");
+  const extra = { id: "obj-extra", name: "Photograph the plans", grade: 2, complete: false, critical: false };
+  await state.updateMission(m => ({ objectives: [extra, ...m.objectives] }));
+  await mission.changeEntry("objectives", "obj-extra", "remove", { notify: true });
+  assert.ok(!state.getMission().objectives.some(entry => entry.id === "obj-extra"));
+  const note = messages.findLast(message => message.flags?.spycraft2?.undo?.missionRow);
+  assert.equal(note.flags.spycraft2.undo.label, "Removed from the mission: Photograph the plans");
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  await applyUndo({ id: "row-undo", flags: structuredClone(note.flags), update: async () => null });
+  assert.equal(state.getMission().objectives[0].id, "obj-extra", "back where it was");
+  await state.updateMission(m => ({ objectives: m.objectives.filter(entry => entry.id !== "obj-extra") }));
+  assert.deepEqual(state.getMission().objectives, before);
+});
+
+test("planning the next mission files the ended one in a journal entry and keeps the team and Caliber", async () => {
+  const kept = structuredClone(state.getMission());
+  const made = [];
+  const previous = { Folder: CONFIG.Folder, JournalEntry: CONFIG.JournalEntry, folders: game.folders };
+  CONFIG.Folder = { documentClass: { create: async data => (made.push(["folder", data]), { id: "f1", ...data }) } };
+  CONFIG.JournalEntry = { documentClass: { create: async data => (made.push(["journal", data]), data) } };
+  game.folders = [];
+  try {
+    await state.setMission({ ...kept, active: true, ended: false });
+    assert.equal(await mission.planNextMission(), false, "an active mission is ended first");
+    await state.setMission({ ...kept, active: false, ended: true, name: "Cold <Open>" });
+    const entry = await mission.planNextMission();
+    assert.equal(entry.name, "Cold <Open>");
+    assert.equal(entry.folder, "f1");
+    assert.match(entry.pages[0].text.content, /Cold &lt;Open&gt;|Objectives/);
+    assert.doesNotMatch(entry.pages[0].text.content, /<Open>/, "names are escaped");
+    const fresh = state.getMission();
+    assert.equal(fresh.name, "");
+    assert.deepEqual(fresh.team, kept.team);
+    assert.equal(fresh.caliber, kept.caliber);
+    assert.deepEqual(fresh.objectives, []);
+  } finally {
+    Object.assign(CONFIG, { Folder: previous.Folder, JournalEntry: previous.JournalEntry });
+    game.folders = previous.folders;
+    await state.setMission(kept);
+  }
+});
+
+test("the console starts a fight with the selected tokens and adds late arrivals once", async () => {
+  const { addSelectedToFight } = await import("../module/apps/gc/combat.mjs");
+  const previous = { canvas: globalThis.canvas, Combat: CONFIG.Combat, combats: game.combats };
+  const created = [];
+  const fight = {
+    scene: { id: "s1" },
+    active: true,
+    combatants: [],
+    async createEmbeddedDocuments(type, rows) {
+      created.push(...rows);
+      this.combatants.push(...rows);
+      return rows;
+    }
+  };
+  CONFIG.Combat = { documentClass: { create: async () => fight } };
+  game.combats = [];
+  const token = id => ({ document: { id, name: `Token ${id}`, actorId: "guard", hidden: false } });
+  try {
+    globalThis.canvas = { scene: { id: "s1" }, tokens: { controlled: [] } };
+    warnings.length = 0;
+    assert.equal(await addSelectedToFight(), false, "nothing selected");
+    assert.match(warnings.at(-1), /Select the tokens/);
+    globalThis.canvas.tokens.controlled = [token("t1"), token("t2")];
+    assert.equal(await addSelectedToFight(), fight);
+    assert.deepEqual(
+      created.map(row => row.tokenId),
+      ["t1", "t2"]
+    );
+    game.combats = [fight];
+    globalThis.canvas.tokens.controlled = [token("t2"), token("t3")];
+    await addSelectedToFight();
+    assert.deepEqual(
+      created.map(row => row.tokenId),
+      ["t1", "t2", "t3"],
+      "a token already in the fight is not added twice"
+    );
+  } finally {
+    globalThis.canvas = previous.canvas;
+    CONFIG.Combat = previous.Combat;
+    game.combats = previous.combats;
+  }
+});
+
+test("season qualities save what is ticked and keep the campaign's others out", async () => {
+  const kept = structuredClone(state.getCampaign());
+  try {
+    const id = (await import("../module/rules/gc-tables.mjs")).GC_DATA.campaignQualities[0].id;
+    answer({ [`q-${id}`]: true, qualitySearch: "" });
+    await mission.editSeasonQualities();
+    assert.deepEqual(state.getCampaign().qualities, [id]);
+  } finally {
+    await state.setCampaign(kept);
+  }
+});
+
+test("Undo after Add NPC takes the placed tokens and their combatants off, and nothing else", async () => {
+  const { applyUndo } = await import("../module/apps/undo.mjs");
+  const deleted = [];
+  const holder = (type, ids) => ({
+    get: id => (ids.includes(id) ? { id } : null),
+    ids
+  });
+  const scene = {
+    tokens: holder("Token", ["t1", "t2", "keep"]),
+    deleteEmbeddedDocuments: async (type, ids) => deleted.push([type, ids])
+  };
+  const fight = {
+    combatants: holder("Combatant", ["c1"]),
+    deleteEmbeddedDocuments: async (type, ids) => deleted.push([type, ids])
+  };
+  const previous = { scenes: game.scenes, combats: game.combats };
+  game.scenes = { get: id => (id === "s1" ? scene : null) };
+  game.combats = Object.assign([fight], { get: id => (id === "f1" ? fight : null) });
+  try {
+    const flags = {
+      spycraft2: {
+        undo: {
+          label: "Placed 2 copies of Guard",
+          entries: [],
+          placedTokens: { scene: "s1", ids: ["t1", "t2", "gone"], combat: "f1", combatants: ["c1", "c9"] }
+        }
+      }
+    };
+    await applyUndo({ id: "placed", flags, update: async () => null });
+    assert.deepEqual(deleted, [
+      ["Combatant", ["c1"]],
+      ["Token", ["t1", "t2"]]
+    ]);
+  } finally {
+    game.scenes = previous.scenes;
+    game.combats = previous.combats;
+  }
+});
+
+test("the acting block names damage only when its newest card is damage nobody applied", async () => {
+  const { pendingDamageTarget } = await import("../module/apps/gc/console-turn.mjs");
+  const previous = game.messages;
+  const combatant = { tokenId: "t1", actor: { id: "guard" } };
+  const card = flags => ({ speaker: { token: "t1" }, flags: { spycraft2: flags } });
+  try {
+    game.messages = [card({ checkKind: "attack" })];
+    assert.equal(pendingDamageTarget(combatant), "", "an attack card is not damage");
+    game.messages = [card({ checkKind: "damage", damageApplied: { a: { amount: 4 } }, superseded: true })];
+    assert.equal(pendingDamageTarget(combatant), "", "a replaced card is passed over");
+    game.messages = [card({ checkKind: "damage" }), { speaker: { token: "t1" }, flags: {} }];
+    assert.equal(pendingDamageTarget(combatant), "", "only the newest card counts");
+    // Several targeted tokens: those already hit on the card drop out, and none left means nothing pending.
+    const a = { uuid: "Actor.ta", name: "Guard A", type: "npc", isOwner: true };
+    const b = { uuid: "Actor.tb", name: "Guard B", type: "npc", isOwner: true };
+    const keepTargets = game.user.targets;
+    game.user.targets = new Set([{ actor: a }, { actor: b }]);
+    try {
+      game.messages = [card({ checkKind: "damage" })];
+      assert.equal(pendingDamageTarget(combatant), "2 targets");
+      game.messages = [card({ checkKind: "damage", damageAppliedBy: { x: { targetUuid: "Actor.ta" } } })];
+      assert.equal(pendingDamageTarget(combatant), "Guard B");
+      game.messages = [
+        card({ checkKind: "damage", damageAppliedBy: { x: { targetUuid: "Actor.ta" }, y: { targetUuid: "Actor.tb" } } })
+      ];
+      assert.equal(pendingDamageTarget(combatant), "", "every target already took the damage");
+    } finally {
+      game.user.targets = keepTargets;
+    }
+  } finally {
+    game.messages = previous;
+  }
+});
+
+test("each view has one filled button, chosen from the state", async () => {
+  const { primaryAction } = await import("../module/apps/gc/console-view.mjs");
+  const base = { checklistShown: false, missionActive: true, missionEnded: false, diceCurrent: true, combat: null };
+  assert.equal(primaryAction({ ...base, view: "prep", checklistShown: true }), "checklist");
+  assert.equal(primaryAction({ ...base, view: "prep", missionActive: false }), "startMission");
+  assert.equal(primaryAction({ ...base, view: "prep" }), "editMission");
+  assert.equal(primaryAction({ ...base, view: "prep", missionActive: false, missionEnded: true }), "planNextMission");
+  assert.equal(primaryAction({ ...base, view: "play", diceCurrent: false }), "beginSession");
+  assert.equal(primaryAction({ ...base, view: "play" }), "nextScene");
+  assert.equal(primaryAction({ ...base, view: "play", combat: { started: false, unrolled: 2 } }), "groupInitiative");
+  assert.equal(primaryAction({ ...base, view: "play", combat: { started: false, unrolled: 0 } }), "nextTurn");
+  assert.equal(primaryAction({ ...base, view: "wrap", combat: { started: true } }), "nextTurn");
+  assert.equal(primaryAction({ ...base, view: "wrap" }), "endMission");
+  assert.equal(primaryAction({ ...base, view: "wrap", missionActive: false, missionEnded: true }), "missionReport");
+});
+
+test("an acting button drawn for one combatant does nothing once the turn has moved", async () => {
+  const calls = [];
+  const acting = { id: "c2", name: "Colonel Dragan", actor: { uuid: "Actor.d", items: { get: () => null } } };
+  const previous = game.combat;
+  game.combat = { started: true, combatant: acting, nextTurn: () => calls.push("next") };
+  try {
+    const warned = [];
+    const keep = ui.notifications.warn;
+    ui.notifications.warn = message => warned.push(message);
+    await GCConsole.DEFAULT_OPTIONS.actions.actingDelay.call(
+      { render: () => null },
+      { detail: 1 },
+      { dataset: { combatant: "c1" } }
+    );
+    ui.notifications.warn = keep;
+    assert.deepEqual(warned, ["The turn has moved to Colonel Dragan; nothing was done."]);
+  } finally {
+    game.combat = previous;
+  }
 });
 
 test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's choice for that state", async () => {
@@ -1039,7 +1552,7 @@ test("the console picks Prep, Play or Wrap-up from the state and keeps the GC's 
   assert.equal(context.view, "play");
   assert.equal(context.hiddenSections.combat, false);
   assert.equal(context.hiddenSections.campaign, true);
-  assert.match(context.status.dice, /left of 10|not set up/);
+  assert.match(context.status.dice, /left of 10|none until Begin session/);
   assert.equal(context.status.missionState, "active");
 
   const blank = firstSessionChecklist({ mission: { objectives: [] }, diceCurrent: false, npcActors: 0 });
@@ -1077,6 +1590,12 @@ test("the Combat section names the acting combatant, words each row and finds th
   assert.equal(acting.name, "a1");
   assert.equal(acting.halfActions, "2 half actions left");
   assert.equal(acting.npc, false);
+  // The combat outcomes the sheets offer, each settled by a function of that name (U2).
+  assert.deepEqual(
+    acting.outcomes.map(row => row.step),
+    turnTools.ACTING_OUTCOMES.map(([step]) => step)
+  );
+  for (const [step, , load] of turnTools.ACTING_OUTCOMES) assert.equal(typeof (await load())[step], "function", step);
   const rows = turnTools.combatRows(fight);
   assert.deepEqual(
     rows.map(row => [row.id, row.count, row.current]),
@@ -1086,6 +1605,11 @@ test("the Combat section names the acting combatant, words each row and finds th
       ["g2", "Count 15", false],
       ["b", "not rolled", false]
     ]
+  );
+  // Two combatants named alike are numbered in turn order; a unique name stays as it is.
+  assert.deepEqual(
+    rows.map(row => row.name),
+    ["a1", "Guard #1", "Guard #2", fight.combatants.get("b").name]
   );
   const mobs = turnTools.mobGroups(fight);
   assert.deepEqual(
@@ -1110,6 +1634,44 @@ test("the Combat section names the acting combatant, words each row and finds th
   assert.equal(await turnTools.passGroup(fight, [fight.combatants.get("g1"), fight.combatants.get("g2")]), 2);
   assert.equal(fight.combatant.id, "b"); // Off the group's own turn the mob does not attack.
   assert.ok(!(await turnTools.mobAttackDialog(fight, "guard")), "the turn is someone else's");
+  // Weapons are matched by item, and a member who lacks the weapon is named.
+  const knife = { id: "w1", name: "Knife", type: "weapon", system: { proficiency: "edged" } };
+  guard.items = [knife];
+  twin.items = [];
+  const [weapon] = turnTools.mobWeapons([fight.combatants.get("g1"), fight.combatants.get("g2")]);
+  assert.equal(weapon.items.get("g1"), knife);
+  assert.deepEqual(
+    weapon.without.map(member => member.id),
+    ["g2"]
+  );
+  // Only the members on the acting Count attack now; one on a later Count acts on its own turn.
+  fight.turn = 1;
+  assert.deepEqual(
+    turnTools.mobAttackers(fight, turnTools.mobGroups(fight)[0]).map(member => member.id),
+    ["g1", "g2"]
+  );
+  fight.combatants.get("g2").initiative = 10;
+  assert.deepEqual(
+    turnTools.mobAttackers(fight, { members: [fight.combatants.get("g1"), fight.combatants.get("g2")] }).map(m => m.id),
+    ["g1"]
+  );
+  fight.combatants.get("g2").initiative = 15;
+  // Allies on the mob's side are not offered as targets.
+  for (const [id, disposition] of [
+    ["h", 1],
+    ["g1", -1],
+    ["g2", -1],
+    ["b", -1]
+  ])
+    fight.combatants.get(id).token = { id: `t-${id}`, disposition };
+  assert.deepEqual(
+    turnTools.mobFoes(fight, turnTools.mobGroups(fight)[0]).map(foe => foe.id),
+    ["h"]
+  );
+  assert.equal(turnTools.mobAttackBlocked(fight, turnTools.mobGroups(fight)[0]), "");
+  delete guard.items;
+  delete twin.items;
+  for (const id of ["h", "g1", "g2", "b"]) delete fight.combatants.get(id).token;
 });
 
 test("a Count that changes off-turn leaves the turn with the character who was acting", async () => {
@@ -1145,6 +1707,12 @@ test("a Count that changes off-turn leaves the turn with the character who was a
   fight.turns = ["q", "x", "r", "b"].map(id => ({ id }));
   await keepActingTurn(fight);
   assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
+  // A Delay names the place it left: the lead GM moves the turn there and starts that turn.
+  fight.turns = ["x", "r", "b", "q"].map(id => ({ id }));
+  fight.turn = 3;
+  await keepActingTurn(fight, { handOver: true, handOverTurn: 0 });
+  assert.deepEqual(fight.updates.at(-1), [{ turn: 0 }, true]);
+  assert.equal(fight.combatant.id, "x");
 });
 
 test("console sections open for the state in play and keep the GC's choice until that state changes", () => {
@@ -1159,7 +1727,8 @@ test("console sections open for the state in play and keep the GC's choice until
   // Closing Combat during a fight sticks for that fight, but the next combat opens it again.
   const closed = { combat: { state: "running", open: false }, clock: { state: "always", open: true } };
   assert.equal(consoleSections({ missionActive: true, combat: true }, closed).combat.open, false);
-  assert.equal(consoleSections({ missionActive: true, combat: false }, closed).combat.open, false);
+  // Between fights Combat opens again, so Start a fight is in sight.
+  assert.equal(consoleSections({ missionActive: true, combat: false }, closed).combat.open, true);
   assert.equal(
     consoleSections({ missionActive: true, combat: true }, { combat: { state: "idle", open: false } }).combat.open,
     true
@@ -1188,7 +1757,8 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
     registerGCConsoleTab();
     registerGCConsoleTab();
     assert.equal(CONFIG.ui.gc, GCConsole);
-    assert.deepEqual(Object.keys(CONFIG.ui.sidebar.TABS), ["gc", "chat", "combat", "scenes"]);
+    // Beside the tracker it works with; Chat keeps its place at the front.
+    assert.deepEqual(Object.keys(CONFIG.ui.sidebar.TABS), ["chat", "combat", "gc", "scenes"]);
     assert.equal(CONFIG.ui.sidebar.TABS.gc.gmOnly, true);
     const calls = [];
     ui.gc = {
@@ -1199,9 +1769,18 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
         calls.push(["activate"]);
       }
     };
+    // With no pop-out to offer, the console opens in the sidebar.
     assert.equal(await openGCConsole(), ui.gc);
     assert.equal(game.spycraft2.gc.console, ui.gc);
     assert.deepEqual(calls, [["render", { force: true }], ["activate"]]);
+    // By default it opens as a window, so the chat log stays in the sidebar.
+    const popout = { bringToFront: () => calls.push(["front"]) };
+    ui.gc.renderPopout = async () => (calls.push(["popout"]), popout);
+    assert.equal(await openGCConsole(), popout);
+    assert.deepEqual(calls.slice(2), [["popout"], ["front"]]);
+    assert.equal(await openGCConsole({ window: false }), ui.gc);
+    calls.splice(2);
+    delete ui.gc.renderPopout;
     game.user.isGM = false;
     assert.equal(GCConsole.prototype._canRender({}), false);
     await openGCConsole();
@@ -1212,4 +1791,426 @@ test("GC console registers a GM-only sidebar tab and opens the shared sidebar in
     delete ui.gc;
     game.spycraft2.gc.console = null;
   }
+});
+
+test("a dramatic scene doubles hostile combatants only (p.424)", () => {
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: -1 } }), true);
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: 1 } }), false, "an ally");
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false, token: { disposition: 0 } }), false, "neutral");
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: true, token: { disposition: -1 } }), false);
+  assert.equal(spend.dramaticOpponent({ hasPlayerOwner: false }), true, "no token: any NPC");
+});
+
+test("an agent's Triumph since the mission began ticks the settlement's Triumph box (p.331)", async () => {
+  const saved = state.getMission();
+  await state.updateMission({ active: true, startedAt: 1000 });
+  try {
+    game.messages = [{ timestamp: 2000, speaker: { actor: "guard" }, flags: { spycraft2: { triumphed: true } } }];
+    assert.equal(missionSettlementDefaults().triumph, false, "an NPC's Triumph does not count");
+    game.messages.push({ timestamp: 500, speaker: { actor: "a1" }, flags: { spycraft2: { triumphed: true } } });
+    assert.equal(missionSettlementDefaults().triumph, false, "one from before the mission does not count");
+    game.messages.push({ timestamp: 2000, speaker: { actor: "a1" }, flags: { spycraft2: { triumphed: true } } });
+    assert.equal(missionSettlementDefaults().triumph, true);
+    // An agent who is not on the mission's team does not count.
+    await state.updateMission({ team: ["a2"] });
+    assert.equal(missionSettlementDefaults().triumph, false, "a1 is not on this team");
+    await state.updateMission({ team: ["a1", "a2"] });
+    assert.equal(missionSettlementDefaults().triumph, true);
+    // One the GC's client recorded counts though this client cannot read its card (a whispered or blind roll).
+    game.messages = Object.assign([], { get: () => undefined });
+    assert.equal(missionSettlementDefaults().triumph, false);
+    await state.updateMission({ triumphMessageId: "hidden" });
+    assert.equal(missionSettlementDefaults().triumph, true, "recorded on the mission");
+    // A recorded card this client can read, whose Triumph was taken back, no longer counts.
+    const undone = {
+      id: "hidden",
+      timestamp: 2000,
+      speaker: { actor: "a1" },
+      flags: { spycraft2: { triumphed: false } }
+    };
+    game.messages = Object.assign([undone], { get: id => (id === "hidden" ? undone : undefined) });
+    assert.equal(missionSettlementDefaults().triumph, false);
+  } finally {
+    delete game.messages;
+    await state.setMission(saved);
+  }
+});
+
+test("End mission can record exposure for a critical objective left undone (pp.435–436)", async () => {
+  const saved = state.getMission(),
+    before = actors.get("a1").system.reputation;
+  await state.setMission({
+    ...saved,
+    active: true,
+    ended: false,
+    objectives: [{ id: "c1", name: "Recover the ledger", grade: 2, critical: true, complete: false, scenes: 1 }],
+    infractions: []
+  });
+  try {
+    dialogAnswers.push({ countFinalScene: false, recordCritical: true });
+    assert.equal(await mission.endMission(), true);
+    assert.equal(actors.get("a1").system.reputation, before - 2, "Grade II costs 2 Reputation");
+    assert.equal(state.getMission().infractions.length, state.teamActors().length);
+    // Resume and End again: the objective already charged is not charged a second time.
+    await mission.resumeMission();
+    dialogAnswers.push({ countFinalScene: false, recordCritical: true });
+    assert.equal(await mission.endMission(), true);
+    assert.equal(actors.get("a1").system.reputation, before - 2, "charged once per mission");
+    assert.equal(state.getMission().infractions.length, state.teamActors().length);
+    // Undo gives the standing back and takes off only the rows it added, so End can charge them again.
+    await state.updateMission(m => ({ infractions: [...m.infractions, { id: "other", actor: "a2", penalty: -1 }] }));
+    const note = messages.findLast(message => message.flags?.spycraft2?.undo?.addedInfractions);
+    const { applyUndo } = await import("../module/apps/undo.mjs");
+    await applyUndo({ id: "exposure-undo", flags: structuredClone(note.flags), update: async () => null });
+    assert.equal(actors.get("a1").system.reputation, before);
+    assert.deepEqual(
+      state.getMission().infractions.map(entry => entry.id),
+      ["other"]
+    );
+    await mission.resumeMission();
+    dialogAnswers.push({ countFinalScene: false, recordCritical: true });
+    await mission.endMission();
+    assert.equal(actors.get("a1").system.reputation, before - 2, "charged again after Undo");
+    // An objective ticked complete while the End dialog is open is not charged.
+    for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
+    await state.setMission({ ...state.getMission(), active: true, ended: false, infractions: [] });
+    dialogAnswers.push(async () => {
+      await state.updateMission(m => ({ objectives: m.objectives.map(o => ({ ...o, complete: true })) }));
+      return { countFinalScene: false, recordCritical: true };
+    });
+    await mission.endMission();
+    assert.equal(actors.get("a1").system.reputation, before, "completed while the dialog was open");
+    assert.deepEqual(state.getMission().infractions, []);
+  } finally {
+    for (const actor of state.teamActors()) await actor.update({ "system.reputation": before });
+    await state.setMission(saved);
+  }
+});
+
+test("a mission Caliber increase reaches the team's reserves, with an Undo, and reminds them of the swap (p.398)", async () => {
+  const saved = state.getMission(),
+    a1 = actors.get("a1"),
+    a2 = actors.get("a2"),
+    before = { a1: structuredClone(a1.system), a2: structuredClone(a2.system) };
+  try {
+    await state.setMission({ ...saved, active: true, ended: false, caliber: 1, team: ["a1", "a2"] });
+    a1.system.usagePeriods = { mission: "m1" };
+    a1.system.missionReserves = { epoch: "m1", caliber: 1, picks: { W: 1 }, spent: {}, common: 0 };
+    a2.system.usagePeriods = { mission: "m1" };
+    delete a2.system.missionReserves;
+    const start = messages.length;
+    assert.equal(await spend.recordCaliberIncrease(3), 2);
+    assert.equal(state.getMission().caliber, 3);
+    assert.equal(a1.system.missionReserves.caliber, 3);
+    assert.equal(a2.system.missionReserves, undefined, "no reserves yet: nothing to raise");
+    const posted = messages.slice(start);
+    const undo = posted.find(m => m.flags?.spycraft2?.undo);
+    assert.equal(undo?.flags.spycraft2.undo.entries.length, 1, "an Undo note for the one agent changed");
+    assert.deepEqual(
+      (({ was, now }) => ({ was, now }))(undo.flags.spycraft2.undo.missionCaliber),
+      { was: 1, now: 3 },
+      "the same note puts the mission's Caliber back"
+    );
+    assert.ok(posted.some(m => /Mission Caliber is now III/.test(m.content) && /p\.398/.test(m.content)));
+  } finally {
+    await state.setMission(saved);
+    a1.system = before.a1;
+    a2.system = before.a2;
+  }
+});
+
+test("a mission's start rolls liquidation for each targeted agent and keeps the count, with an Undo (p.440)", async () => {
+  const a3 = actors.get("a3"),
+    a4 = actors.get("a4"),
+    before = { a3: a3.system.reputation, a4: a4.system.reputation, flags3: a3.flags, flags4: a4.flags };
+  try {
+    a3.system.reputation = -25;
+    a3.flags = { spycraft2: { liquidationMissions: 1 } };
+    a4.flags = { spycraft2: { liquidationMissions: 2 } };
+    const start = messages.length;
+    dice(6);
+    const results = await mission.rollLiquidations([a3, a4]);
+    assert.deepEqual(results, [{ actor: "a3", missions: 2, total: 6, target: 6, marked: true }]);
+    assert.equal(a3.flags.spycraft2.liquidationMissions, 2);
+    assert.equal(a4.flags.spycraft2.liquidationMissions, 0, "no longer targeted: the run of missions ends");
+    const posted = messages.slice(start);
+    assert.ok(posted.some(m => /Marked for Death: a3 is the target/.test(m.content)));
+    assert.ok(posted.some(m => m.flags?.spycraft2?.undo));
+    const events = state.getMission().scriptedEvents;
+    assert.deepEqual(
+      events.map(({ id, actor, source }) => ({ id, actor, source })),
+      [{ id: "marked-for-death", actor: "a3", source: "liquidation" }],
+      "the event joins the mission record"
+    );
+    dice(6);
+    await mission.rollLiquidations([a3]);
+    assert.equal(state.getMission().scriptedEvents.length, 1, "a second roll replaces the agent's earlier event");
+    assert.deepEqual(await mission.rollLiquidations([a4]), [], "nothing to roll or clear");
+  } finally {
+    await state.updateMission({ scriptedEvents: [] });
+    a3.system.reputation = before.a3;
+    a4.system.reputation = before.a4;
+    a3.flags = before.flags3;
+    a4.flags = before.flags4;
+  }
+});
+
+test("round-3 council: an NPC card's critical is priced like an agent's, a free one spends nothing, and the card text is rebuilt", async () => {
+  const { gcActivateThreat } = await import("../module/apps/gc/npc-card-dice.mjs");
+  const { ActorOutcomes } = await import("../module/documents/actor/outcomes.mjs");
+  const methods = ActorOutcomes(class {}).prototype;
+  boss.usagePeriods = { session: "initial", mission: "initial" };
+  guard.usagePeriods = { session: "initial", mission: "initial" };
+  boss.syncRollErrorEffect = guard.syncRollErrorEffect = async () => {};
+  boss.activateCritical = methods.activateCritical;
+  guard.activateCritical = methods.activateCritical;
+  const card = check => ({
+    id: `critical-${++idCounter}`,
+    isOwner: true,
+    isAuthor: true,
+    flags: {
+      spycraft2: {
+        checkKind: "attack",
+        actorUuid: boss.uuid,
+        successConfirmed: true,
+        naturalDie: 20,
+        threatConfirmed: true,
+        rawTotal: 20,
+        effectiveTotal: 20,
+        ...check
+      }
+    },
+    async update(patch) {
+      this.patch = patch;
+      for (const [path, value] of Object.entries(patch))
+        if (path === "flags.spycraft2") this.flags.spycraft2 = value;
+        else if (path.startsWith("flags.spycraft2.")) this.flags.spycraft2[path.slice(16)] = value;
+    }
+  });
+  const before = gcDiceStatus().value;
+  // Laser damage takes the 1-die wounds critical to 0: recorded without a spend.
+  const laser = card({ attackContext: { laser: true } });
+  assert.equal((await gcActivateThreat(laser, boss, { preset: "hit.wounds" })).cost, 0);
+  assert.equal(laser.flags.spycraft2.criticalActivation.cost, 0);
+  assert.deepEqual(laser.flags.spycraft2.criticalActivation.sources, ["Laser damage –1"]);
+  assert.equal(typeof laser.patch.flavor, "string", "the card's text is rebuilt");
+  assert.equal(gcDiceStatus().value, before);
+  // Tough Luck adds a die to what the GC pays.
+  const marked = card({ blackCat: { toughLuck: true } });
+  assert.equal((await gcActivateThreat(marked, boss, { preset: "hit.wounds" })).cost, 2);
+  assert.equal(marked.flags.spycraft2.criticalActivation.cost, 2);
+  assert.equal(gcDiceStatus().value, before - 2);
+  // A standard NPC without treacherous gets no laser discount and no critical.
+  const plain = card({ actorUuid: guard.uuid, attackContext: { laser: true } });
+  assert.equal(await gcActivateThreat(plain, guard, { preset: "hit.wounds" }), false);
+  assert.equal(plain.flags.spycraft2.criticalSuccess, undefined);
+});
+
+// Last: it begins a session, which later tests do not expect.
+test("Begin session sets the GC pool from the player characters present, not the whole team", async () => {
+  const { gcDiceStatus } = await import("../module/services/gc-dice.mjs");
+  answer({ present: 1 });
+  assert.equal(await mission.beginSession(), true);
+  assert.equal(gcDiceStatus().playersPresent, 1);
+  assert.equal(gcDiceStatus().value, 1 + 2 * state.getMission().caliber);
+});
+
+test("Previous turn passes over a defeated combatant", async () => {
+  const { stepBackTurn } = await import("../module/apps/gc/combat.mjs");
+  const calls = [];
+  const fight = {
+    started: true,
+    round: 2,
+    turn: 2,
+    turns: [{ isDefeated: false }, { isDefeated: true }, { isDefeated: false }],
+    update: async (change, options) => calls.push(["update", change, options]),
+    previousTurn: async () => calls.push(["previous"])
+  };
+  await stepBackTurn(fight);
+  assert.deepEqual(calls, [["update", { turn: 0 }, { direction: -1 }]]);
+  fight.turn = 0;
+  await stepBackTurn(fight);
+  assert.deepEqual(calls.at(-1), ["previous"]);
+});
+
+test("an NPC dropped on an organization row is linked once and can be unlinked", async () => {
+  const orgs = await import("../module/apps/gc/organizations.mjs");
+  const id = await (async () => {
+    const all = state.getOrganizations();
+    const key = "orgLinkTest";
+    await state.saveOrganization(key, { ...(Object.values(all)[0] ?? {}), name: "Directorate", npcs: [] });
+    return key;
+  })();
+  const npc = { type: "npc", uuid: "Actor.linkme", name: "Handler" };
+  assert.equal(await orgs.linkOrganizationNpc(id, npc), "Actor.linkme");
+  assert.equal(await orgs.linkOrganizationNpc(id, npc), null);
+  assert.deepEqual(state.getOrganizations()[id].npcs, [{ uuid: "Actor.linkme", name: "Handler" }]);
+  assert.deepEqual(orgs.organizationRows().find(row => row.id === id).npcs, [
+    { uuid: "Actor.linkme", name: "Handler" }
+  ]);
+  await orgs.unlinkOrganizationNpc(id, "Actor.linkme");
+  assert.deepEqual(state.getOrganizations()[id].npcs, []);
+  await state.saveOrganization(id, null);
+});
+
+test("Edit on a mission row replaces that row in place and keeps its marks", async () => {
+  const objective = { id: "objEdit", name: "Old", grade: 1, critical: false, complete: true, scenes: 1 };
+  const row = {
+    id: "antEdit",
+    uuid: null,
+    typeKey: null,
+    name: "Thug",
+    xp: 10,
+    type: "standard",
+    full: false,
+    scenes: 1,
+    encountered: true
+  };
+  await state.updateMission(m => ({ objectives: [...m.objectives, objective], antagonists: [...m.antagonists, row] }));
+  answer({ sample: "", name: "Steal the plans", grade: 3, critical: true });
+  await mission.editObjective("objEdit");
+  const saved = state.getMission().objectives.find(entry => entry.id === "objEdit");
+  assert.deepEqual([saved.name, saved.grade, saved.critical, saved.complete], ["Steal the plans", 3, true, true]);
+  answer({ uuid: "", name: "Enforcer", xp: 40, type: "special", full: false, scenes: 1 });
+  await mission.editAntagonist("antEdit");
+  const edited = state.getMission().antagonists.find(entry => entry.id === "antEdit");
+  assert.deepEqual([edited.name, edited.xp, edited.type, edited.encountered], ["Enforcer", 40, "special", true]);
+  assert.equal(state.getMission().antagonists.filter(entry => entry.id === "antEdit").length, 1);
+  // A row recorded from a compendium NPC keeps its link through a name-only edit.
+  const linked = { ...row, id: "antPack", uuid: "Compendium.x.npcs.Actor.p1", typeKey: "Compendium.x.npcs.Actor.p1" };
+  await state.updateMission(m => ({ antagonists: [...m.antagonists, linked] }));
+  answer({ uuid: "", name: "Renamed", xp: 10, type: "", full: false, scenes: 1 });
+  await mission.editAntagonist("antPack");
+  const kept = state.getMission().antagonists.find(entry => entry.id === "antPack");
+  assert.deepEqual([kept.name, kept.uuid, kept.typeKey], ["Renamed", linked.uuid, linked.typeKey]);
+  await state.updateMission(m => ({
+    objectives: m.objectives.filter(entry => entry.id !== "objEdit"),
+    antagonists: m.antagonists.filter(entry => !["antEdit", "antPack"].includes(entry.id))
+  }));
+});
+
+test("campaign qualities say whether the system applies them, and effect keys read as words", async () => {
+  const { qualityHandling, effectLabel } = await import("../module/apps/gc/console-view.mjs");
+  assert.equal(qualityHandling({ effects: { gearCaliberShift: 1, wealthBonus: 4 } }), "auto");
+  assert.equal(qualityHandling({ effects: { goodAndEvil: true } }), "hand");
+  assert.equal(qualityHandling({ effects: { goodAndEvil: true, attackModifier: 1 } }), "partly");
+  assert.equal(effectLabel("gearCaliberShift"), "gear Caliber shift");
+});
+
+test("the fluid event dialog finds an event's refusal before closing", async () => {
+  const { fluidEventRefusal } = await import("../module/apps/gc/combat.mjs");
+  const fight = { round: 1 };
+  const unrolled = { name: "Guard", isOwner: true, initiative: null, parent: fight, flags: {} };
+  assert.match(fluidEventRefusal(unrolled, "press", {}), /not rolled Initiative/);
+  assert.match(fluidEventRefusal({ ...unrolled, isOwner: false }, "press", {}), /do not control/);
+  const pressed = {
+    ...unrolled,
+    initiative: 30,
+    flags: { spycraft2: { fluid: { round: 1, pressed: true, modifiers: [] } } }
+  };
+  assert.notEqual(fluidEventRefusal(pressed, "press", {}), "");
+  assert.equal(fluidEventRefusal({ ...pressed, flags: {} }, "press", {}), "");
+});
+
+test("objectives typed as lines read a leading grade and a closing ! for critical", async () => {
+  assert.deepEqual(
+    mission.parseObjectiveLines("3 Steal the plans !\n- Photograph the courier\n\n5: Free the asset\n9 lives"),
+    [
+      { name: "Steal the plans", grade: 3, critical: true },
+      { name: "Photograph the courier", grade: 1, critical: false },
+      { name: "Free the asset", grade: 5, critical: false },
+      { name: "9 lives", grade: 1, critical: false }
+    ]
+  );
+  const before = state.getMission().objectives.length;
+  assert.equal(await mission.addObjectiveLines("2 Tap the line\n4 Burn the files !"), 2);
+  const added = state.getMission().objectives.slice(before);
+  assert.deepEqual(
+    added.map(entry => [entry.name, entry.grade, entry.critical, entry.complete]),
+    [
+      ["Tap the line", 2, false, false],
+      ["Burn the files", 4, true, false]
+    ]
+  );
+  assert.equal(await mission.addObjectiveLines("   \n"), 0);
+  await state.updateMission(m => ({ objectives: m.objectives.slice(0, before) }));
+});
+
+test("an objective half typed in the inline field survives a console redraw", async () => {
+  const { captureConsoleState, restoreConsoleState } = await import("../module/apps/gc/console.mjs");
+  const keep = globalThis.document;
+  globalThis.document = { activeElement: null };
+  try {
+    const root = field => ({
+      querySelector: selector => (selector === "input[name='quickObjective']" ? field : null),
+      querySelectorAll: () => [],
+      contains: () => false,
+      scrollHeight: 0,
+      clientHeight: 0
+    });
+    const kept = captureConsoleState(root({ value: "3 Tap the line" }));
+    assert.equal(kept.draft, "3 Tap the line");
+    const fresh = { value: "" };
+    restoreConsoleState(root(fresh), kept);
+    assert.equal(fresh.value, "3 Tap the line");
+  } finally {
+    globalThis.document = keep;
+  }
+});
+
+test("the inline objective gives its words back when the save fails", async () => {
+  const field = { value: "2 Tap the line", focus() {} };
+  const target = { closest: () => ({ querySelector: () => field }) };
+  const context = { element: { querySelector: () => field }, render() {} };
+  const warned = [];
+  const warn = ui.notifications.warn;
+  ui.notifications.warn = message => warned.push(message);
+  const settings = game.settings.set;
+  game.settings.set = async () => {
+    throw new Error("Setting refused");
+  };
+  try {
+    await GCConsole.DEFAULT_OPTIONS.actions.quickObjective.call(context, { detail: 0 }, target);
+  } finally {
+    game.settings.set = settings;
+    ui.notifications.warn = warn;
+  }
+  assert.equal(field.value, "2 Tap the line");
+  assert.deepEqual(warned, ["Setting refused"]);
+});
+
+test("a pool set up for another Caliber, and untouched since, offers one button that brings it in step", async () => {
+  const before = game.settings.get("spycraft2", "gcActionDice"),
+    m = state.getMission();
+  await state.updateMission({ caliber: 2 });
+  await game.settings.set("spycraft2", "gcActionDice", {
+    value: 4,
+    session: String(game.settings.get("spycraft2", "usagePeriods")?.session ?? "initial"),
+    playersPresent: 2,
+    caliber: 1,
+    lastReason: "Session start"
+  });
+  const stale = consoleContext().dice.stale;
+  assert.match(stale.line, /Caliber I;.*Caliber II\./);
+  assert.match(stale.button, /Reset to 6 dice/);
+  await game.settings.set("spycraft2", "gcActionDice", { ...gcDiceStatus(), lastReason: "Helpful hint" });
+  assert.equal(consoleContext().dice.stale, null, "once a die has moved, the GC adjusts by hand");
+  await state.updateMission({ caliber: m.caliber });
+  await game.settings.set("spycraft2", "gcActionDice", before);
+});
+
+test("the console's live line says who is still to roll Initiative, then whose turn it is", () => {
+  const live = { className: "", textContent: "", setAttribute() {} };
+  const self = {
+    isPopout: true,
+    element: { querySelector: () => live, append() {} }
+  };
+  const say = combat => (GCConsole.prototype._announceTurn.call(self, { combat }), live.textContent);
+  assert.equal(
+    say({ started: false, unrolled: 2, unrolledNames: "Ana, Guard" }),
+    "Still to roll Initiative: Ana, Guard."
+  );
+  assert.equal(say({ started: false, unrolled: 0, unrolledNames: "" }), "Every combatant has an Initiative Count.");
+  assert.equal(say({ started: true, round: 1, acting: { name: "Ana" } }), "Round 1: Ana's turn.");
+  assert.equal(say(null), "");
 });

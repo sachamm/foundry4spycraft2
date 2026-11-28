@@ -3,6 +3,7 @@
   {{#if cakewalk}}<div class="sc2-panel"><p><b>{{cakewalk.label}}:</b> {{cakewalk.selected}}</p>{{#if cakewalk.warning}}<p class="bad">{{cakewalk.warning}}</p>{{/if}}{{#if cakewalk.canChoose}}<button type="button" class="sc2-action" data-action="selectCakewalkSkills">{{cakewalk.action}}</button>{{/if}}</div>{{/if}}
   {{#if canReviewSkillPurchasePolicy}}<p class="edit-only"><button type="button" class="sc2-action" data-action="reviewSkillPurchasePolicy">{{skillPurchasePolicyLabel}}</button></p>{{/if}}
   {{#if skillPurchasePolicyHint}}<p class="edit-only {{#if skillPurchasePolicyNeedsReview}}bad{{else}}muted{{/if}}">{{skillPurchasePolicyHint}}</p>{{/if}}
+  <h2 class="sc2-visually-hidden">{{localize "SPYCRAFT.Tab.Skills"}}</h2>
   {{#if skillLevel}}
   <div class="skill-levels edit-only">
     <span>{{localize "SPYCRAFT.Skill.SpendAtLevel"}}:</span>
@@ -29,7 +30,10 @@
     <tbody>
     {{#each skills}}
       <tr data-skill-name="{{name}} {{abilityLabel}}" data-trained="{{#if ranks}}true{{else}}false{{/if}}" class="{{#if isClass}}class-skill{{/if}} {{#if classAtLevel}}class-at-level{{/if}}">
-        <th><button type="button" class="sc2-action" data-action="rollSkill" data-skill="{{key}}" aria-label="{{rollLabel}}">{{name}}</button>{{#if focus}}<span class="sc2-focus-mark" data-tooltip="{{localize 'SPYCRAFT.Skill.FocusHint'}}" aria-label="{{localize 'SPYCRAFT.Skill.FocusHint'}}" tabindex="0">*</span>{{/if}} <span class="muted">{{abilityLabel}}</span></th>
+        <th><button type="button" class="sc2-action" data-action="rollSkill" data-skill="{{key}}" aria-label="{{rollLabel}}">{{name}}</button>{{#if focus}}<span class="sc2-focus-mark" data-tooltip="{{localize 'SPYCRAFT.Skill.FocusHint'}}" aria-label="{{localize 'SPYCRAFT.Skill.FocusHint'}}" tabindex="0">*</span>{{/if}} <span class="muted">{{abilityLabel}}</span>{{#unless ranks}}<button type="button"
+          class="sc2-action sc2-pin-skill" data-action="pinPlaySkill" data-skill="{{key}}" data-sc2-display="icon"
+          aria-pressed="{{#if pinned}}true{{else}}false{{/if}}" aria-label="{{localize 'SPYCRAFT.Skill.PinNamed' name=name}}"
+          data-tooltip="{{localize 'SPYCRAFT.Skill.PinHint'}}"><i class="fa-solid fa-thumbtack" aria-hidden="true"></i></button>{{/unless}}</th>
         <td class="edit-only"><input type="checkbox" name="system.skills.{{key}}.classSkill" {{checked classOverride}} aria-label="{{localize 'SPYCRAFT.Action.ClassSkillOf' name=name}}" /></td>
         <td class="edit-only">{{#if ../skillLevel}}<input type="number" name="skillpts.{{key}}" value="{{points}}" class="w-2" min="0" aria-label="{{localize 'SPYCRAFT.Action.SkillPointsIn' name=name}}" />{{/if}}</td>
         <td class="{{#if overMax}}bad{{/if}}">{{ranks}} / {{maxRanks}}{{#if ../skillLevel}}<br class="edit-only"/><small class="muted edit-only">{{localize "SPYCRAFT.Template.ActorAgentSkills.AtLevel"}} {{../skillLevel}}: {{historicalRanks}} / {{purchaseMaxRanks}}</small>{{/if}}</td>

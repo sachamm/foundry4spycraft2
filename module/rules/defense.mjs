@@ -1,6 +1,7 @@
 import { classFeatureLevels } from "./class-features.mjs";
 import { uncannyDodgePlan, reflexDamagePlan } from "./save-avoidance.mjs";
 export { uncannyDodgePlan, evasionPlan, evasionSaveContext, reflexDamagePlan } from "./save-avoidance.mjs";
+import { gladiatorsDefense } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
@@ -80,7 +81,7 @@ export function incomingDefensePlan(system, options = {}) {
       : invisibleAttacker && !uncanny.retainDexterity
         ? Math.min(0, system.abilities.dex.mod)
         : system.abilities.dex.mod;
-  const ignoreDodge = vulnerable || options.damageType === "laser";
+  const ignoreDodge = vulnerable || options.damageType === "laser" || options.laser === true;
   const dodgeLost = ignoreDodge ? (system.defense.dodgeBonuses ?? 0) : 0;
   const securityBonus = securityDevice ? uncanny.securityBonus : 0;
   const triggerman = classFeatureLevels(system)?.triggerman ?? 0,
@@ -104,8 +105,10 @@ export function incomingDefensePlan(system, options = {}) {
     // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
     anticipate =
       ignoreDodge || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
+  const gladiators = gladiatorsDefense(system, ranged);
   const total =
-    -circling.dodgeReduction -
+    gladiators -
+    circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
     whateversHandy +
@@ -149,6 +152,8 @@ export function incomingDefensePlan(system, options = {}) {
     anticipate,
     // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
     stickyFingersDR: stickyFingers ? 5 : 0,
+    foibles,
+    gladiators,
     listedDR:
       (stickyFingers || foibles.damageReduction) && system.armorDRByAttack
         ? Object.fromEntries(

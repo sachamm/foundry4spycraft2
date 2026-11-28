@@ -22,6 +22,7 @@ import { enhanceDamageDialog } from "./dialog-sections.mjs";
 import {
   attackKindOf,
   appliedDamageEntries,
+  reportText,
   attackOutcome,
   criticalDamageDefaults,
   damageProfile,
@@ -33,6 +34,9 @@ import {
   reducedDamage,
   woundState
 } from "../rules/damage-application.mjs";
+import { specialistDefense } from "../rules/weapon-specialist.mjs";
+import { campaignStress } from "../rules/campaign-rules.mjs";
+import { resolvedTargetRole } from "../rules/npc-qualities.mjs";
 import { blastIncrementFeet } from "../rules/combat-actions.mjs";
 import { blastExposurePlan } from "../rules/blast-exposure.mjs";
 import { interceptedBasis, prepareCoverAttack, confirmPreparedCover, reviewCoverSaves } from "./cover-interception.mjs";
@@ -41,18 +45,18 @@ import { validateGrappleDamageDelivery } from "../documents/actor/grapple-damage
 import { blastTargetRows, blastGeometryFields, measuredBlastActors } from "./blast-dialog.mjs";
 import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { damageResistancePlan } from "../rules/resistances.mjs";
-import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
+import { criticalInjuryResult, criticalInjuryRollPlan, surgeryDCNow } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration, setCondition as condition, woundConditions } from "./wound-conditions.mjs";
 import { nonLethalDamage } from "./nonlethal-damage.mjs";
-export { accumulatedDamageLines, nonLethalTotals } from "./nonlethal-damage.mjs";
+export { accumulatedDamageLines, nonLethalTotals, nonLethalDamage } from "./nonlethal-damage.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
 import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
 import { sufferTypedDamage } from "./damage-types.mjs";
 import { rollCriticalInjury } from "./critical-injuries.mjs";
-import { blastCaught } from "./map.mjs";
+import { blastCaught, coverBetween } from "./map.mjs";
 import { rollObjectDamageSave } from "./vehicle-play.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { gunplayCountGain, juggernautConversion } from "../rules/class-combat.mjs";
@@ -61,7 +65,7 @@ import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from ".
 import { loc, locKey } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 import { COVER_GRADES } from "../rules/cover.mjs";
-import { specialistDefense } from "../rules/weapon-specialist.mjs";
+
 import { currentInjuryEffects, currentCampaignRules } from "../rules/gc/campaign.mjs";
 import { applyShaken } from "./shaken-application.mjs";
 import { applyNpcStressDrained } from "./stress-drained.mjs";
@@ -95,7 +99,7 @@ export const tokenInView = actor => {
 const canSee = actor =>
   actor?.isOwner === true || game.user?.isGM === true || actor?.visible === true || tokenInView(actor);
 /** Post a report. `pendingSave` makes it a card with a button that rolls the save it calls for. */
-const post = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
+export const postDamageReport = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
     content: `<div class="spycraft2 chat-note">${lines
@@ -105,6 +109,8 @@ const post = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
     ...(rolls.length ? { rolls } : {}),
     ...(pendingSave ? { flags: { spycraft2: { actorUuid: actor.uuid, checkKind: "note", pendingSave } } } : {})
   });
+
+const post = postDamageReport;
 
 /**
  * Characters and vehicles an attack or its damage can be settled against: targeted tokens first.
@@ -121,7 +127,12 @@ export function targetChoices({ exclude = "", offScene = "always" } = {}) {
   const add = actor => {
     if (allowed(actor) && canSee(actor) && !actors.has(actor.uuid)) actors.set(actor.uuid, actor);
   };
-  for (const combat of values(game.combats)) for (const turn of combat.turns ?? []) add(turn.actor);
+  // The fight in view, then any other fight on the scene in view: a fight on another scene is not offered.
+  const sceneId = globalThis.canvas?.scene?.id ?? null;
+  for (const turn of game.combat?.turns ?? []) add(turn.actor);
+  for (const combat of values(game.combats))
+    if (!sceneId || !combat.scene || combat.scene.id === sceneId)
+      for (const turn of combat.turns ?? []) add(turn.actor);
   // Tokens on the scene in view, then characters with no token there, which are marked as not on the scene.
   for (const token of values(globalThis.canvas?.scene?.tokens)) add(token.actor);
   if (offScene === "always" || !actors.size) for (const actor of values(game.actors)) add(actor);
@@ -253,6 +264,13 @@ export async function resolveAttack(message, options = {}) {
   if (input.defense === undefined && input.targetUuid === undefined) {
     const choices = targetChoices({ exclude: attacker.uuid, offScene: "fallback" }),
       selected = (declared !== attacker.uuid && declared) || choices.selected;
+    let mapCover = null;
+    try {
+      const chosen = selected ? fromUuidSync(selected) : null;
+      mapCover = chosen ? coverBetween(attacker, chosen, { tokenId: message.speaker?.token }) : null;
+    } catch {
+      mapCover = null;
+    }
     input = await systemDialog.input({
       window: { title: loc`Attack result ${check.effectiveTotal}: against Defense` },
       rejectClose: false,
@@ -264,13 +282,18 @@ export async function resolveAttack(message, options = {}) {
           const defense = actor.isOwner || game.user?.isGM || defenseVisibleToPlayers() ? defenseOf(actor) : null;
           return defense === null ? targetLabel(actor) : loc`${targetLabel(actor)} — Defense ${defense}`;
         }
-      )}</select></label><label>${loc`Cover between attacker and target`} <select name="cover">${COVER_GRADES.map(
-        (label, grade) => `<option value="${grade}">${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`
+      )}</select></label><label>${loc`Cover between attacker and target`}${Number.isSafeInteger(mapCover) ? ` <span class="hint">${mapCover >= 4 ? loc`(the map shows total cover)` : loc`(measured from the map)`}</span>` : ""} <select name="cover">${COVER_GRADES.map(
+        (label, grade) =>
+          `<option value="${grade}"${grade === Math.min(4, mapCover ?? 0) ? " selected" : ""}>${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`
       ).join(
         ""
       )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Cover adds to the Defense used, and a miss that only the cover caused hits the cover (p.345). Enter a different Defense for a declared defense or another circumstance; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
     });
     if (!input) return null;
+    // The cover shown was measured for the target first selected: when another target is chosen and the cover was
+    // left as shown, it is measured again for the new one.
+    if (input.targetUuid !== (selected || "") && Number(input.cover) === Math.min(3, mapCover ?? 0))
+      input = { ...input, cover: undefined };
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (target && target.uuid === attacker.uuid)
@@ -280,7 +303,16 @@ export async function resolveAttack(message, options = {}) {
   const baseDefense = entered ? defenseOf(target, check.weaponProficiency, { laser }) : Number(input.defense);
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
-  const cover = coverOnResolution(input.cover);
+  // With no cover chosen, the walls the map shows between the two tokens count (p.345); the card says so.
+  let measured = null;
+  if (input.cover === undefined && target)
+    try {
+      measured = coverBetween(attacker, target, { tokenId: message.speaker?.token });
+    } catch {
+      measured = null;
+    }
+  const cover = coverOnResolution(input.cover ?? (measured > 0 ? measured : undefined));
+  if (cover && input.cover === undefined) cover.measured = true;
   if (cover && !target)
     return refuse(loc`Choose the actual protected target so its original cover damage can be tracked.`);
   const defense = baseDefense + (cover?.bonus ?? 0);
@@ -295,6 +327,20 @@ export async function resolveAttack(message, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
+  // A villain role belongs to the target actually hit, not the one declared (pp.447–448): its threat range and
+  // critical cost are read again for the target chosen here.
+  if (target && !cover) {
+    const roleChange = resolvedTargetRole(check, target.system);
+    if (roleChange) {
+      await message.update({
+        "flags.spycraft2.threat": roleChange.threat,
+        "flags.spycraft2.attackContext.targetRole": roleChange.role
+      });
+      check.threat = roleChange.threat;
+      check.attackContext = { ...check.attackContext, targetRole: roleChange.role };
+    }
+  }
+  const before = check.attackResolution ?? null;
   const resolution = {
     targetUuid: target?.uuid ?? "",
     targetName: target?.name ?? "",
@@ -306,7 +352,7 @@ export async function resolveAttack(message, options = {}) {
     total: check.effectiveTotal,
     // Updates merge, so resolving again without cover clears what an earlier resolution recorded.
     cover: cover ?? null,
-    hitsCover: cover ? !outcome.hit && check.effectiveTotal >= baseDefense : false,
+    hitsCover: cover ? !outcome.hit && check.effectiveTotal >= defense - cover.bonus : false,
     // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
@@ -695,7 +741,7 @@ const typeLabel = type =>
   type === "flashBang" ? loc`Flash and bang` : type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type);
 
 /** Take a lethal hit off a special character's vitality and wounds and set the conditions that follow. */
-async function lethalOnSpecial(target, hit, source) {
+export async function lethalOnSpecial(target, hit, source) {
   const plan = await queueResources([target], async () => {
     const system = target.system;
     const plan = lethalHitPlan(
@@ -785,7 +831,9 @@ rollPipeline.register({
 /** A hit of 25 or more (p.331): a failed save means a critical injury, and –9 wounds for a hit of 50 or more. */
 hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded) => {
   if (succeeded)
-    return post(actor, [loc`${esc(actor.name)} makes the save against massive damage: no critical injury.`]);
+    return postDamageReport(actor, [
+      loc`${esc(actor.name)} makes the save against massive damage: no critical injury.`
+    ]);
   const lines = [loc`${esc(actor.name)} fails the save against massive damage.`],
     rolls = [];
   const reference = `massive-${message?.id ?? foundry.utils.randomID(8)}`,
@@ -800,7 +848,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     rolls.push(roll);
     lines.push(
       result.listed
-        ? loc`Critical injury (${result.total}): ${esc(result.name)}. Surgery DC ${result.surgeryDC}.`
+        ? loc`Critical injury (${result.total}): ${esc(result.name)}. Surgery DC ${surgeryDCNow(result)}.`
         : loc`Critical injury (${result.total}): ${esc(result.name)}.`
     );
   }
@@ -812,7 +860,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
       ...(await woundConditions(actor, woundState(wounds, actor.system.deathThreshold)))
     );
   }
-  return post(actor, lines, { rolls });
+  return postDamageReport(actor, lines, { rolls });
 });
 
 /** A stress or subdual threshold on a character without a ledger (pp.339–340). */
@@ -854,7 +902,7 @@ hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded,
     ]);
   }
   const time = knockoutDuration(save.knockoutBase, save.dc, Number(check?.effectiveTotal));
-  return post(actor, [
+  return postDamageReport(actor, [
     time
       ? loc`${esc(actor.name)} fails the save and is unconscious for ${time.count} ${time.unit}(s). The game clock ends it.`
       : loc`${esc(actor.name)} fails the save and is unconscious; the GC sets how long.`,
@@ -918,7 +966,8 @@ export function standardReduction(kind, hit) {
       dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, hit.dr - hit.armorPiercing),
       armorPiercing: 0
     });
-  return reducedDamage({ damage: hit.damage });
+  // Stress ignores DR; Tense and Mellow scale it (pp.407–408).
+  return reducedDamage({ damage: campaignStress(hit.damage).amount });
 }
 
 /**
@@ -1238,6 +1287,28 @@ export async function applyDamage(message, options = {}) {
       lines.push(
         loc`Foibles supplies 1 class damage reduction against this weapon; natural quality defenses, armor piercing and damage-type rules still apply (p.49).`
       );
+    const report = reportText(lines),
+      inline =
+        !failed && !pendingSave && !rolls.length && report.length > 0 && !message.blind && !message.whisper?.length;
+    let reportCard = null;
+    if (!inline && lines.filter(Boolean).length)
+      reportCard = await postDamageReport(target, lines, { pendingSave, rolls });
+    if (failed) return null;
+    const entryId = foundry.utils.randomID();
+    const marked = await markCard(
+      message,
+      "damageAppliedEntry",
+      {
+        targetUuid: target.uuid,
+        name: target.name,
+        damage,
+        kind,
+        ...(ouch ? { ouch: true, net: result.net } : {}),
+        ...(inline ? { report } : {})
+      },
+      { quiet: true, entryId }
+    );
+    if (inline && !marked) reportCard = await postDamageReport(target, lines, { pendingSave, rolls });
     const entry = failed ? null : undoEntry(target, beforeDamage, snapshot(target));
     if (!failed) {
       await finishDamageApplication(application, true, {
@@ -1247,20 +1318,11 @@ export async function applyDamage(message, options = {}) {
       completed = true;
       if (entry)
         await postUndo(loc`${damage} ${kind} damage applied to ${target.name}`, [entry], {
-          damageCard: { messageId: message.id, targetUuid: target.uuid },
+          damageCard: { messageId: message.id, targetUuid: target.uuid, entryId },
+          ...(pendingSave && reportCard?.id ? { closeSaves: [reportCard.id] } : {}),
           damageApplicationUndo: damageApplicationUndo(application)
         });
     }
-    if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
-    // Nothing was written, so the card is not marked: its Apply button stays for another try.
-    if (failed) return null;
-    // When the card cannot be marked the report above is the record.
-    await markCard(
-      message,
-      "damageAppliedEntry",
-      { targetUuid: target.uuid, name: target.name, damage, kind, ...(ouch ? { ouch: true, net: result.net } : {}) },
-      { quiet: true }
-    );
     // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
     // become normal hits.
     const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
@@ -1561,7 +1623,7 @@ export function damageCardTarget(check) {
 }
 
 /** Characters targeted on the canvas that damage can be applied to (this user's own, or any through the GC). */
-const targetedForDamage = () =>
+export const targetedForDamage = () =>
   values(game.user?.targets)
     .map(token => token.actor)
     .filter(actor => actor && TARGET_TYPES.includes(actor.type) && (actor.isOwner || gcAvailable()));
@@ -1591,18 +1653,25 @@ rollPipeline.register({
     const rolled = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total;
     const amount = Math.max(0, Math.trunc(Number(rolled) || 0));
     const controls = [];
-    const targeted = targetedForDamage(),
-      named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
-    if (targeted.length > 1)
+    // The target the attack was resolved against comes first; the map's current targets only stand in without one.
+    const resolved = damageCardTarget(check),
+      targeted = resolved ? [] : targetedForDamage(),
+      named = resolved ?? (targeted.length === 1 ? targeted[0] : null);
+    // What a one-press apply takes as given, so the player knows when to open the full dialog instead.
+    const assumes = loc`Applies the rolled damage as the card shows it, with the target's armor and no further boost. To change any of that, use Apply damage to a target.`;
+    if (targeted.length > 1) {
+      // The recipients are fixed when the card is drawn and named on it: a target changed since does not join.
+      const recipients = [...targeted];
       controls.push({
-        label: loc`Apply ${amount} to ${targeted.length} targets`,
-        hint: loc`Apply ${amount} damage to each of the ${targeted.length} targeted tokens`,
+        label: loc`Apply ${amount} to ${recipients.length} targets`,
+        hint: `${loc`Apply ${amount} damage to each of: ${recipients.map(targetLabel).join(", ")}.`} ${assumes}`,
         emphasis: "primary",
-        run: () => applyDamageToEach(message, targetedForDamage())
+        run: () => applyDamageToEach(message, recipients)
       });
-    else if (named && !applied.some(entry => entry.targetUuid === named.uuid) && (named.isOwner || gcAvailable()))
+    } else if (named && !applied.some(entry => entry.targetUuid === named.uuid) && (named.isOwner || gcAvailable()))
       controls.push({
         label: loc`Apply ${amount} to ${targetLabel(named)}`,
+        hint: assumes,
         emphasis: "primary",
         run: () => applyDamage(message, quickApplyInput(message, named.uuid))
       });

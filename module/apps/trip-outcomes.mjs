@@ -11,6 +11,7 @@ const sweepFor = uuid => globalThis.fromUuidSync?.(uuid)?.system?.activeFeatName
 import { endCombatStance } from "./combat-stance.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
+import { withUndo } from "./undo.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -86,7 +87,16 @@ async function stamp(a, d, prepared, result = {}) {
   for (const m of [a, d]) await m.update({ "flags.spycraft2.tripSettlement": final });
   return final;
 }
-export async function settleTripOutcome(actor, a, d, input = {}) {
+/** The settlement, with one Undo note for both characters; Undo also clears the card's settled mark. */
+export function settleTripOutcome(actor, a, d, input = {}) {
+  const actors = [actor, ...[a, d].map(m => globalThis.fromUuidSync?.(m?.flags?.spycraft2?.actorUuid ?? ""))].filter(
+    Boolean
+  );
+  return withUndo(actors, loc`Trip: ${actor.name}`, () => settleTripOutcomeWork(actor, a, d, input), {
+    cardMarks: [a, d].map(m => ({ messageId: m?.id, key: "tripSettlement" }))
+  });
+}
+async function settleTripOutcomeWork(actor, a, d, input = {}) {
   const opponent = participants(actor, a, d);
   if (a.flags.spycraft2.tripAttack?.version === 2) validateCounterTripReceipt(actor, a);
   if (input.opposedConfirmed !== true) throw Error(loc`Confirm these checks belong to the same ordinary opposed Trip.`);

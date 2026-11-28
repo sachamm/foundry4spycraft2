@@ -106,7 +106,8 @@ const SKILL_PLAN_FIELDS = [
   "fogSmoke",
   "ambientLight",
   "nest",
-  "breakthrough"
+  "breakthrough",
+  "grappleFeats"
 ];
 
 /** Plan fields whose sources have to be the same when the check is posted as when it was planned. */

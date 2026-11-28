@@ -5134,7 +5134,734 @@ export const GC_DATA = {
     "where": "Events: Endangered Bystanders (p.399)",
     "comment": "Bystander count is rolled on d12s regardless of the GC action die type; overall limit is still 4 dice."
    }
-  ]
+  ],
+  "organizations": {
+   "page": 389,
+   "pages": [
+    389,
+    395
+   ],
+   "ratings": [
+    "goals",
+    "history",
+    "image",
+    "sites",
+    "tools"
+   ],
+   "goalDicePerGoal": 2,
+   "turningPointMorale": 2,
+   "siteRequestBonus": 4,
+   "toolsBaseCaliber": 2,
+   "toolsIncreasesPerPoint": 2,
+   "maxCaliber": 5,
+   "gearCategories": [
+    "E",
+    "G",
+    "R",
+    "S",
+    "T",
+    "V",
+    "W"
+   ],
+   "goals": [
+    {
+     "id": "anarchy",
+     "name": "Anarchy",
+     "supports": {
+      "kind": "event",
+      "event": "thief"
+     }
+    },
+    {
+     "id": "conquest",
+     "name": "Conquest",
+     "supports": {
+      "kind": "event",
+      "event": "surprise-combat"
+     }
+    },
+    {
+     "id": "counter",
+     "name": "Counter",
+     "supports": {
+      "kind": "event",
+      "event": "shoddy-worthless-item"
+     }
+    },
+    {
+     "id": "credibility",
+     "name": "Credibility",
+     "supports": {
+      "kind": "check",
+      "label": "Persuasion checks"
+     }
+    },
+    {
+     "id": "destruction",
+     "name": "Destruction",
+     "supports": {
+      "kind": "event",
+      "event": "endangered-bystanders"
+     }
+    },
+    {
+     "id": "enlightened-evolution",
+     "name": "Enlightened Evolution",
+     "supports": {
+      "kind": "other",
+      "label": "Critical successes"
+     }
+    },
+    {
+     "id": "genocide",
+     "name": "Genocide",
+     "supports": {
+      "kind": "event",
+      "event": "hazards"
+     }
+    },
+    {
+     "id": "grail",
+     "name": "Grail",
+     "supports": {
+      "kind": "event",
+      "event": "surprise-chase"
+     }
+    },
+    {
+     "id": "greed",
+     "name": "Greed",
+     "supports": {
+      "kind": "check",
+      "label": "Bribe checks"
+     }
+    },
+    {
+     "id": "meddling",
+     "name": "Meddling",
+     "supports": {
+      "kind": "event",
+      "event": "under-review"
+     }
+    },
+    {
+     "id": "megalomania",
+     "name": "Megalomania",
+     "supports": {
+      "kind": "check",
+      "label": "Opposed skill checks"
+     }
+    },
+    {
+     "id": "protection",
+     "name": "Protection",
+     "supports": {
+      "kind": "event",
+      "event": "wanted"
+     }
+    },
+    {
+     "id": "reconstruction",
+     "name": "Reconstruction",
+     "supports": {
+      "kind": "event",
+      "event": "rival-approach"
+     }
+    },
+    {
+     "id": "redemption",
+     "name": "Redemption",
+     "supports": {
+      "kind": "event",
+      "event": "responsibility"
+     }
+    },
+    {
+     "id": "revelation",
+     "name": "Revelation",
+     "supports": {
+      "kind": "event",
+      "event": "undesired-attention"
+     }
+    },
+    {
+     "id": "secrecy",
+     "name": "Secrecy",
+     "supports": {
+      "kind": "check",
+      "label": "Falsify checks"
+     }
+    },
+    {
+     "id": "stability",
+     "name": "Stability",
+     "supports": {
+      "kind": "other",
+      "label": "Defense bonuses"
+     }
+    },
+    {
+     "id": "takeover",
+     "name": "Takeover",
+     "supports": {
+      "kind": "check",
+      "label": "Intimidate checks"
+     }
+    },
+    {
+     "id": "terrorism",
+     "name": "Terrorism",
+     "supports": {
+      "kind": "event",
+      "event": "marked-for-death"
+     }
+    },
+    {
+     "id": "visionaries",
+     "name": "Visionaries",
+     "supports": {
+      "kind": "check",
+      "label": "Impress checks"
+     }
+    }
+   ],
+   "turningPoints": [
+    {
+     "id": "accomplishment",
+     "name": "Accomplishment",
+     "check": "Resolve/Morale"
+    },
+    {
+     "id": "allies",
+     "name": "Allies",
+     "check": "Networking/Contact"
+    },
+    {
+     "id": "betrayal",
+     "name": "Betrayal",
+     "check": "Sense Motive/Detect Lie"
+    },
+    {
+     "id": "changing-of-the-guard",
+     "name": "Changing of the Guard",
+     "check": "Networking/Mediation"
+    },
+    {
+     "id": "coup",
+     "name": "Coup",
+     "check": "Sense Motive/Resist Manipulate"
+    },
+    {
+     "id": "dark-days",
+     "name": "Dark Days",
+     "check": "Resolve/Resist Intimidate"
+    },
+    {
+     "id": "decline",
+     "name": "Decline",
+     "check": "Tactics/Ambush"
+    },
+    {
+     "id": "enemies",
+     "name": "Enemies",
+     "check": "Networking/Slander"
+    },
+    {
+     "id": "foolishness",
+     "name": "Foolishness",
+     "check": "Resolve/Resist Impress"
+    },
+    {
+     "id": "golden-age",
+     "name": "Golden Age",
+     "check": "Profession/Accomplishment"
+    },
+    {
+     "id": "great-leader",
+     "name": "Great Leader",
+     "check": "Tactics/Rally"
+    },
+    {
+     "id": "growth",
+     "name": "Growth",
+     "check": "Science (Economy)"
+    },
+    {
+     "id": "prophecy",
+     "name": "Prophecy",
+     "check": "Investigation/Research"
+    },
+    {
+     "id": "persecuted",
+     "name": "Persecuted",
+     "check": "Bluff/Deception"
+    },
+    {
+     "id": "rise-from-the-ashes",
+     "name": "Rise from the Ashes",
+     "check": "Resolve/R&R"
+    },
+    {
+     "id": "respected",
+     "name": "Respected",
+     "check": "Impress/Influence"
+    },
+    {
+     "id": "revolt",
+     "name": "Revolt",
+     "check": "Intimidate/Domination"
+    },
+    {
+     "id": "rivals",
+     "name": "Rivals",
+     "check": "Impress/Performance"
+    },
+    {
+     "id": "triumphant",
+     "name": "Triumphant",
+     "check": "",
+     "chooseCheck": true
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "check": "Resolve/Concentration"
+    }
+   ],
+   "image": {
+    "levels": [
+     {
+      "id": "renowned",
+      "name": "Renowned",
+      "cost": 2,
+      "canvass": {
+       "dc": 25,
+       "error": 4
+      },
+      "research": {
+       "dc": 0,
+       "error": 0
+      },
+      "cover": {
+       "leaders": 0,
+       "members": 0
+      },
+      "immunity": {
+       "leaders": 7,
+       "members": 6
+      }
+     },
+     {
+      "id": "prominent",
+      "name": "Prominent",
+      "cost": 1,
+      "canvass": {
+       "dc": 15,
+       "error": 2
+      },
+      "research": {
+       "dc": 5,
+       "error": 0
+      },
+      "cover": {
+       "leaders": 0,
+       "members": 0
+      },
+      "immunity": {
+       "leaders": 3,
+       "members": 2
+      }
+     },
+     {
+      "id": "recorded",
+      "name": "On Record",
+      "cost": 0,
+      "canvass": {
+       "dc": 10,
+       "error": 0
+      },
+      "research": {
+       "dc": 10,
+       "error": 0
+      },
+      "cover": {
+       "leaders": 0,
+       "members": 0
+      },
+      "immunity": {
+       "leaders": 0,
+       "members": 0
+      }
+     },
+     {
+      "id": "secretive",
+      "name": "Secretive",
+      "cost": 1,
+      "canvass": {
+       "dc": 5,
+       "error": 0
+      },
+      "research": {
+       "dc": 15,
+       "error": 2
+      },
+      "cover": {
+       "leaders": 3,
+       "members": 2
+      },
+      "immunity": {
+       "leaders": 0,
+       "members": 0
+      }
+     },
+     {
+      "id": "mysterious",
+      "name": "Mysterious",
+      "cost": 2,
+      "canvass": {
+       "dc": 0,
+       "error": 0
+      },
+      "research": {
+       "dc": 25,
+       "error": 4
+      },
+      "cover": {
+       "leaders": 7,
+       "members": 5
+      },
+      "immunity": {
+       "leaders": 0,
+       "members": 0
+      }
+     }
+    ],
+    "facets": [
+     {
+      "id": "goals",
+      "name": "Goals"
+     },
+     {
+      "id": "methods",
+      "name": "Methods"
+     },
+     {
+      "id": "leaders",
+      "name": "Leaders"
+     },
+     {
+      "id": "members",
+      "name": "Members"
+     },
+     {
+      "id": "sites",
+      "name": "Sites"
+     }
+    ],
+    "default": "recorded"
+   },
+   "sites": [
+    {
+     "id": "advanced-garage",
+     "name": "Advanced Garage",
+     "request": "Gadget requests (vehicle Housings)",
+     "category": "G"
+    },
+    {
+     "id": "advanced-lab",
+     "name": "Advanced Lab",
+     "request": "Gadget requests (non-vehicle Housings)",
+     "category": "G"
+    },
+    {
+     "id": "airstrip",
+     "name": "Airstrip",
+     "request": "Aircraft requests",
+     "category": "V"
+    },
+    {
+     "id": "armory",
+     "name": "Armory",
+     "request": "Armor requests",
+     "category": "S"
+    },
+    {
+     "id": "classroom",
+     "name": "Classroom",
+     "request": "Skill training requests",
+     "category": "R"
+    },
+    {
+     "id": "cloning-lab",
+     "name": "Cloning Lab",
+     "request": "Cloning requests",
+     "category": "R"
+    },
+    {
+     "id": "comsec-center",
+     "name": "COMSEC Center",
+     "request": "Code requests",
+     "category": "T"
+    },
+    {
+     "id": "dojo",
+     "name": "Dojo",
+     "request": "Close range weapon requests",
+     "category": "W"
+    },
+    {
+     "id": "firing-range",
+     "name": "Firing Range",
+     "request": "Firearm requests",
+     "category": "W"
+    },
+    {
+     "id": "harbor",
+     "name": "Harbor",
+     "request": "Watercraft requests",
+     "category": "V"
+    },
+    {
+     "id": "hospital",
+     "name": "Hospital",
+     "request": "Medical assistance requests",
+     "category": "R"
+    },
+    {
+     "id": "hot-lab",
+     "name": "Hot Lab",
+     "request": "Contagion requests",
+     "category": "T"
+    },
+    {
+     "id": "law-offices",
+     "name": "Law Offices",
+     "request": "Legal requests",
+     "category": "T"
+    },
+    {
+     "id": "media-studio",
+     "name": "Media Studio",
+     "request": "Invitation requests",
+     "category": "R"
+    },
+    {
+     "id": "military-depot",
+     "name": "Military Depot",
+     "request": "Heavy and vehicle weapon requests",
+     "category": "W/V"
+    },
+    {
+     "id": "motor-pool",
+     "name": "Motor Pool",
+     "request": "Ground vehicle requests",
+     "category": "V"
+    },
+    {
+     "id": "prison",
+     "name": "Prison",
+     "request": "Detention requests",
+     "category": "T"
+    },
+    {
+     "id": "records-office",
+     "name": "Records Office",
+     "request": "Dossier requests",
+     "category": "T"
+    },
+    {
+     "id": "satellite-network",
+     "name": "Satellite Network",
+     "request": "Reconnaissance requests",
+     "category": "R"
+    },
+    {
+     "id": "training-ground",
+     "name": "Training Ground",
+     "request": "Feat training requests",
+     "category": "R"
+    }
+   ],
+   "ratingPools": [
+    {
+     "min": 11,
+     "max": 20,
+     "summary": "A fledgling agency, or a big one cut off and surrounded"
+    },
+    {
+     "min": 21,
+     "max": 30,
+     "summary": "A small nation's front-line service, or a great power's support agency"
+    },
+    {
+     "min": 31,
+     "max": 40,
+     "summary": "A great power's front-line service, or a well-backed multinational one"
+    },
+    {
+     "min": 41,
+     "max": null,
+     "summary": "A worldwide agency or conspiracy with near-limitless reach"
+    }
+   ],
+   "growth": {
+    "summary": "One Rating goes up by 1 for each quarter to half-year that passes in the campaign",
+    "page": 395
+   }
+  },
+  "npcKnowledge": {
+   "page": 460,
+   "rulesPage": 458,
+   "nonVillainMax": 3,
+   "villainMax": 7,
+   "knowsNothingCost": {
+    "standard": 1,
+    "minion": 1,
+    "special": 2,
+    "henchman": 2
+   },
+   "footnotes": [
+    "Each grade includes everything below it.",
+    "Grades I–III may be wrong or a red herring, as the GC decides."
+   ],
+   "rows": [
+    {
+     "grade": 1,
+     "min": 0,
+     "max": 4,
+     "ratings": 0,
+     "needs": null,
+     "label": "A description of one suspicious person seen within 10 miles in the last day"
+    },
+    {
+     "grade": 2,
+     "min": 5,
+     "max": 8,
+     "ratings": 0,
+     "needs": null,
+     "label": "Where one suspicious event took place within 10 miles in the last day"
+    },
+    {
+     "grade": 3,
+     "min": 9,
+     "max": 12,
+     "ratings": 0,
+     "needs": null,
+     "label": "The name and outline of the organization thought to be behind a recent nearby event"
+    },
+    {
+     "grade": 4,
+     "min": 13,
+     "max": 16,
+     "ratings": 1,
+     "needs": "villain",
+     "label": "The nearest enemy installation (within 25 miles)"
+    },
+    {
+     "grade": 5,
+     "min": 17,
+     "max": 20,
+     "ratings": 2,
+     "needs": "villain",
+     "label": "Their immediate superior's Career Level and classes"
+    },
+    {
+     "grade": 6,
+     "min": 21,
+     "max": 25,
+     "ratings": 3,
+     "needs": "villain",
+     "label": "Where the nearest enemy henchman is (within 50 miles)"
+    },
+    {
+     "grade": 7,
+     "min": 26,
+     "max": 30,
+     "ratings": 4,
+     "needs": "villain",
+     "label": "Their immediate superior's full statistics"
+    },
+    {
+     "grade": 8,
+     "min": 31,
+     "max": 35,
+     "ratings": 4,
+     "needs": "henchman",
+     "label": "Every enemy installation within 100 miles, and the mastermind's Career Level and classes"
+    },
+    {
+     "grade": 9,
+     "min": 36,
+     "max": 40,
+     "ratings": 5,
+     "needs": "henchman",
+     "label": "The mastermind's full statistics"
+    },
+    {
+     "grade": 10,
+     "min": 41,
+     "max": null,
+     "ratings": 5,
+     "needs": "henchman",
+     "label": "Access codes for every enemy installation within 100 miles"
+    }
+   ]
+  },
+  "historicalMoney": {
+   "page": 407,
+   "rows": [
+    {
+     "from": 1875,
+     "to": 1900,
+     "modifier": 0.01
+    },
+    {
+     "from": 1901,
+     "to": 1909,
+     "modifier": 0.025
+    },
+    {
+     "from": 1910,
+     "to": 1919,
+     "modifier": 0.03
+    },
+    {
+     "from": 1920,
+     "to": 1929,
+     "modifier": 0.05
+    },
+    {
+     "from": 1930,
+     "to": 1949,
+     "modifier": 0.06
+    },
+    {
+     "from": 1950,
+     "to": 1959,
+     "modifier": 0.1
+    },
+    {
+     "from": 1960,
+     "to": 1969,
+     "modifier": 0.2
+    },
+    {
+     "from": 1970,
+     "to": 1979,
+     "modifier": 0.3
+    },
+    {
+     "from": 1980,
+     "to": 1989,
+     "modifier": 0.6
+    },
+    {
+     "from": 1990,
+     "to": null,
+     "modifier": 1
+    }
+   ]
+  }
  },
  "conflicts": {
   "leadMin": 0,
@@ -10485,7 +11212,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Every character and NPC is labelled Good or Evil. At GC discretion, actions or attacks meant to harm or hinder the opposite side gain +2, and an exemplary act fitting one's nature earns 1 action die.",
-   "effects": {}
+   "effects": {
+    "goodAndEvil": true
+   }
   },
   {
    "id": "bleak",
@@ -10578,7 +11307,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "1/session, on rolling a threat (attack or skill), a player/special character may deliver a signature line as a free action. Effect: morale bonus on Defense and Resist checks = 2x Charisma bonus (at least +1), lasting half his career level in rounds (round up).",
-   "effects": {}
+   "effects": {
+    "catchPhrase": true
+   }
   },
   {
    "id": "the-circuit",
@@ -10640,7 +11371,9 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "No GC action dice may be spent to flag characters as honorable in bribes. Honor-code breaches cost half the usual Reputation / Net Worth exposure penalty (round down).",
-   "effects": {}
+   "effects": {
+    "honorExposureMultiplier": 0.5
+   }
   },
   {
    "id": "diplomatic",
@@ -10674,6 +11407,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "All player characters serve one large organization and use the Faction gear rules. They earn only Reputation, never Net Worth. Cannot be combined with Freelance.",
+   "excludes": [
+    "freelance"
+   ],
    "effects": {
     "gearRules": "faction"
    }
@@ -10775,6 +11511,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "PCs are independents backed by a web of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
+   "excludes": [
+    "faction"
+   ],
    "effects": {
     "gearRules": "freelance"
    }
@@ -10788,7 +11527,9 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "CQB range covers Melee Range through 20 ft. All characters (NPCs too) gain +1 Defense vs. ranged attacks per Melee or Unarmed Combat feat they hold. Stand Offs cannot be interrupted or joined.",
    "effects": {
-    "cqbRange": 20
+    "cqbRange": 20,
+    "meleeFeatRangedDefense": true,
+    "closedStandOffs": true
    }
   },
   {
@@ -10855,7 +11596,10 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "Pick a year for the season. Gear that did not exist yet is available only as a gadget (Housing or effect), at +1 Caliber (cap V). Table 7.4 scales monetary values and actual costs by era: x0.01 for 1875-1900 rising to x1 from 1990.",
-   "effects": {}
+   "effects": {
+    "historicalMoney": true,
+    "historicalGear": true
+   }
   },
   {
    "id": "hybrid",
@@ -10979,7 +11723,9 @@ export const GC_DATA = {
    "xp": 0,
    "gcDice": null,
    "summary": "A PC killed in a standard scene, body still whole, can return when the next mission begins for 200 Reputation or $10,000,000.",
-   "effects": {}
+   "effects": {
+    "revolvingDoor": true
+   }
   },
   {
    "id": "routine",
@@ -11002,7 +11748,8 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "Every gear pick for any character, NPCs included, drops 1 Caliber; a pick pushed below Caliber I is lost. Each PC starts with a Debt Subplot.",
    "effects": {
-    "gearCaliberShift": -1
+    "gearCaliberShift": -1,
+    "debtSubplot": true
    }
   },
   {
@@ -11098,7 +11845,10 @@ export const GC_DATA = {
    "xp": -25,
    "gcDice": 1,
    "summary": "Complex Tasks need 1 fewer Challenge (minimum 1). In Dramatic Conflicts, every Lead Advantage has its effect raised by 1.",
-   "effects": {}
+   "effects": {
+    "complexTaskChallenges": -1,
+    "leadAdvantageShift": 1
+   }
   },
   {
    "id": "spirited",
@@ -11109,7 +11859,9 @@ export const GC_DATA = {
    "gcDice": null,
    "summary": "PCs open every session with +2 action dice (class ability use counts based on starting dice unchanged). PC action dice explode on a natural 1 as well, and each die type is 1 step bigger (d4 becomes d6, d6 becomes d8, etc.).",
    "effects": {
-    "startingActionDice": 2
+    "startingActionDice": 2,
+    "actionDiceExplodeLow": true,
+    "actionDieStep": 1
    }
   },
   {
@@ -11171,7 +11923,10 @@ export const GC_DATA = {
    "xp": 25,
    "gcDice": null,
    "summary": "Complex Tasks need 1 more Challenge (may exceed 10). In Dramatic Conflicts, every Lead result has its effect lowered by 1 (minimum 0).",
-   "effects": {}
+   "effects": {
+    "complexTaskChallenges": 1,
+    "leadAdvantageShift": -1
+   }
   },
   {
    "id": "violent",
@@ -11193,7 +11948,9 @@ export const GC_DATA = {
    "xp": 25,
    "gcDice": 1,
    "summary": "Honor-code breaches cost double the usual Reputation / Net Worth exposure penalty.",
-   "effects": {}
+   "effects": {
+    "honorExposureMultiplier": 2
+   }
   },
   {
    "id": "wire-fu",

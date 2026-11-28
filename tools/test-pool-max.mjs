@@ -193,6 +193,18 @@ test("new/imported agent creation records empty pools, preserves other flags and
   assert.deepEqual(a.source.flags, data.flags);
 });
 
+test("a duplicate of an NPC spent to 0 vitality keeps its recorded maximums instead of filling", async () => {
+  const a = new SpycraftActor(),
+    data = {
+      type: "npc",
+      _stats: { duplicateSource: "Actor.original" },
+      system: { vitality: { value: 0 }, wounds: { value: 12 } },
+      flags: { spycraft2: { poolMax: { vitality: 30, wounds: 12 } } }
+    };
+  await a._preCreate(data, {}, {});
+  assert.deepEqual(data.flags.spycraft2.poolMax, { vitality: 30, wounds: 12 });
+});
+
 test("a new or imported agent starts with a zero stress and subdual ledger, and keeps one it already has", async () => {
   const a = new SpycraftActor();
   a.system.accumulatedDamage = null;
@@ -345,4 +357,35 @@ test("a maximum that falls and comes back restores the damage taken instead of h
     rules
   );
   assert.equal(healed["system.vitality.value"], 18);
+});
+
+test("an unlinked token gets its own copy of the recorded maximums, once", async () => {
+  const { ownPoolRecord } = await import("../module/apps/pool-max.mjs");
+  globalThis.foundry ??= {};
+  globalThis.foundry.utils ??= {};
+  globalThis.foundry.utils.deepClone ??= value => structuredClone(value);
+  const actor = {
+    id: "npc",
+    type: "npc",
+    isToken: true,
+    flags: { spycraft2: { poolMax: { vitality: 20, wounds: 10 } } }
+  };
+  const scene = { id: "scene", tokens: new Map() },
+    liveToken = { id: "token", actor, parent: scene };
+  actor.token = liveToken;
+  scene.tokens.set(liveToken.id, liveToken);
+  globalThis.game.scenes = new Map([[scene.id, scene]]);
+  assert.deepEqual(ownPoolRecord({ actorLink: false, actor, delta: { _source: { flags: {} } } }), {
+    "flags.spycraft2.poolMax": { vitality: 20, wounds: 10 }
+  });
+  assert.equal(ownPoolRecord({ actorLink: true, actor }), null, "a linked token is the actor itself");
+  assert.equal(
+    ownPoolRecord({
+      actorLink: false,
+      actor,
+      delta: { _source: { flags: { spycraft2: { poolMax: { vitality: 5 } } } } }
+    }),
+    null,
+    "already has its own"
+  );
 });

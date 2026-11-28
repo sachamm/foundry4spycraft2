@@ -1,3 +1,6 @@
+import { grappleDamagePlan } from "./grapple-damage.mjs";
+import { npcWeaponTraining } from "./npc-weapons.mjs";
+import { grapplerLimit } from "./combat-actions.mjs";
 /**
  * The Grapple action's opposed Athletics (Str) check as a named check (p.357), so grapple feats apply to it:
  * - Prone Stance (Submission Basics, p.188): +1 on skill checks made as part of a Grapple action.
@@ -30,6 +33,52 @@ export function grappleSkillChecks(key, checks = []) {
   return key === "athletics" ? [...checks.filter(c => c.id !== "grapple"), { ...GRAPPLE_CHECK }] : checks;
 }
 
+/** The damage of the grapple benefits that deal it (pp.357–358), worked out for this character. */
+export function grappleDamageNote(system) {
+  const str = Number(system?.abilities?.str?.mod) || 0,
+    trained = system.npcType
+      ? npcWeaponTraining(system, { proficiency: "unarmed" }).trained
+      : system.proficiencyTotals?.unarmed?.proficient === true,
+    unarmed = system?.unarmed ?? { die: trained ? 4 : 3, extraDice: 0, damageBonus: str },
+    dice = `${1 + (unarmed.extraDice ?? 0)}d${unarmed.die ?? 3}`,
+    signedValue = n => (n < 0 ? `−${-n}` : `+${n}`);
+  return loc`Benefits that deal damage: Injure ${dice}${signedValue(unarmed.damageBonus ?? str)} (or a 1-handed weapon's); Throw ${dice}${signedValue((unarmed.damageBonus ?? str) + Math.max(1, str))}, and the opponent is sprawled and free; Sprawl 1d4${signedValue(str)} subdual, and you become prone.`;
+}
+
+/**
+ * The roll for a grapple benefit that deals damage (pp.357–358). Injure is the winner's unarmed damage: 1d4 lethal
+ * with the Unarmed proficiency, otherwise 1d3 subdual, plus Strength (p.329). Throw adds the Strength modifier again
+ * (at least 1). Sprawl is 1d4 + Strength subdual. Null for any other benefit, and for Use Weapon, whose damage comes
+ * from the weapon's own card. `proficient` overrides the sheet's Unarmed proficiency (an NPC has no such record).
+ * `convert` switches Injure and Throw between lethal and subdual (p.345); Sprawl stays subdual.
+ */
+export function grappleBenefitDamage(system, id, { proficient, convert = false } = {}) {
+  if (!["injure", "throw", "sprawl"].includes(id)) return null;
+  if (id === "throw" && convert)
+    throw Error(loc`Throw retains standard unarmed damage; conversion belongs to benefits that explicitly allow it.`);
+  const data = {
+    activeFeatNames: [],
+    classOptionSelections: [],
+    ...system,
+    ...(typeof proficient === "boolean"
+      ? { proficiencyTotals: { ...system.proficiencyTotals, unarmed: { proficient } } }
+      : {})
+  };
+  const actorType = typeof proficient === "boolean" ? "agent" : system.npcType ? "npc" : "agent";
+  let plan = grappleDamagePlan(data, id, { actorType });
+  if (id === "injure" && convert)
+    plan = grappleDamagePlan(data, id, {
+      actorType,
+      kind: plan.profile.kind === "lethal" ? "subdual" : "lethal",
+      conversionConfirmed: true
+    });
+  return {
+    formula: plan.formula,
+    kind: plan.profile.kind,
+    minimum: id === "sprawl" ? 0 : id === "throw" ? 1 + Math.max(1, system.abilities.str.mod) : 1
+  };
+}
+
 export function grappleCheckPlan(
   system,
   key,
@@ -41,6 +90,10 @@ export function grappleCheckPlan(
     grappleSecondOpponent = false,
     grappleHoldingTwo = false,
     grappleMuting = false,
+    grappleMute = false,
+    grappleOpponentSize = null,
+    grappleOthers = null,
+    grappleConvertDamage = false,
     grappleParticipantConfirmed = false,
     grappleDamageConversion = false,
     grappleConversionWeaponId = "",
@@ -52,8 +105,36 @@ export function grappleCheckPlan(
   if (key !== "athletics") return empty;
   const inGrapple = ["grapple", "restraint-escape"].includes(check?.id);
   if (!inGrapple && !grappleHoldingTwo) return empty;
+  let legacySizeBonus = 0,
+    legacySize = null;
+  if (inGrapple && grappleOpponentSize !== null) {
+    legacySize = Number(grappleOpponentSize);
+    if (!Number.isSafeInteger(legacySize) || Math.abs(legacySize) > 20)
+      return { ...empty, blockedReason: loc`Confirm the actual Size difference.` };
+    if (check.id === "grapple" && legacySize > 1)
+      return { ...empty, blockedReason: loc`Opening: the opponent may be at most 1 Size category larger.` };
+    if (check.grappleProficiency && check.grappleProficiency.sizeDifference !== -legacySize)
+      return { ...empty, blockedReason: loc`The declared Size differs from the recorded Grapple context.` };
+    legacySizeBonus = check.grappleProficiency ? 0 : 4 * Math.max(0, -legacySize);
+  }
+  if (check?.id === "grapple" && grappleOthers !== null) {
+    const others = Number(grappleOthers),
+      limit = grapplerLimit(legacySize ?? 0);
+    if (!Number.isSafeInteger(others) || others < 0 || others >= limit)
+      return { ...empty, blockedReason: loc`At most ${limit} participants may grapple this target at these Sizes.` };
+  }
+  if (grappleConvertDamage === true && check?.id === "grapple") {
+    grappleDamageConversion = true;
+    grappleConversionFrom = (
+      system.npcType
+        ? npcWeaponTraining(system, { proficiency: "unarmed" }).trained
+        : system.proficiencyTotals?.unarmed?.proficient === true
+    )
+      ? "lethal"
+      : "subdual";
+  }
   const second = grappleHoldingTwo === true || (inGrapple && grappleSecondOpponent === true),
-    muting = inGrapple && grappleMuting === true;
+    muting = inGrapple && (grappleMuting === true || grappleMute === true);
   let conversion = null;
   if (inGrapple && grappleDamageConversion === true) {
     if (!["lethal", "subdual"].includes(grappleConversionFrom))
@@ -91,6 +172,7 @@ export function grappleCheckPlan(
       ...(proneStance ? [{ source: "Prone Stance (Grapple)", value: 1 }] : []),
       ...(horde ? [{ source: "Horde Mastery (Grapple)", type: "morale", value: 1 }] : []),
       ...(jointLock ? [{ source: "Joint Lock", value: -4 }] : []),
+      ...(legacySizeBonus ? [{ source: loc`Size (Grapple)`, value: legacySizeBonus }] : []),
       ...(second ? [{ source: loc`Second grapple opponent`, value: -4 }] : []),
       ...(muting ? [{ source: loc`Mute grapple benefit`, value: -2 }] : []),
       ...(conversion?.attackPenalty
@@ -112,6 +194,8 @@ export function grappleCheckPlan(
         ? [loc`Garrote Basics: threat range +2 with the readied garrote; an opponent you hold becomes mute (p.178).`]
         : []),
       ...(jointLock ? [loc`Joint Lock: −4 on this escape check (p.188).`] : []),
+      ...(legacySize === 1 ? [loc`The larger opponent gains +4 on its own check.`] : []),
+      ...(check?.id === "grapple" ? [grappleDamageNote(system)] : []),
       ...(second
         ? [loc`Attempting a second hold or holding two opponents: −4 to Athletics, applied once (p.357).`]
         : []),
@@ -131,6 +215,7 @@ export function grappleCheckPlan(
       garrote ||
       conversion ||
       check?.grappleProficiency ||
+      legacySize !== null ||
       (inGrapple && grappleParticipantConfirmed === true)
         ? {
             version: 1,
@@ -138,6 +223,8 @@ export function grappleCheckPlan(
             horde,
             garrote,
             jointLock,
+            ...(legacySize !== null ? { sizeDifference: legacySize } : {}),
+            ...(grappleConvertDamage ? { convertDamage: true } : {}),
             second,
             muting,
             ...(grappleParticipantConfirmed === true ? { participantConfirmed: true } : {}),
@@ -152,6 +239,30 @@ export function grappleCheckPlan(
     threatIncrease: garrote ? 2 : 0
   };
 }
+
+/**
+ * What settling a grapple needs from a posted check: its total, its activated criticals and the Size bonus already
+ * inside the total (p.357), so the bonus is never added a second time.
+ */
+export function grappleCardFacts(check) {
+  if (!check || !Number.isFinite(check.effectiveTotal)) return null;
+  const recorded = check.grappleFeats?.proficiency?.sizeDifference;
+  const difference = Number.isSafeInteger(recorded)
+    ? -recorded
+    : Math.trunc(Number(check.grappleFeats?.sizeDifference) || 0);
+  return {
+    total: check.effectiveTotal,
+    critical: check.criticalSuccess === true,
+    criticalFailure: check.criticalFailure === true,
+    grapple: check.checkId === "grapple",
+    convertDamage:
+      check.checkId === "grapple" && (check.grappleFeats?.convertDamage === true || !!check.grappleFeats?.conversion),
+    sizeBonus: check.checkId === "grapple" && difference < 0 ? 4 * -difference : 0
+  };
+}
+
+// The Grapple feats' record, Size included, goes on the check card for the grapple to be settled from it.
+rollPipeline.register({ id: "grappleRecord", order: 9238, record: ["grappleFeats"] });
 
 rollPipeline.register({
   id: "grappleChecks",

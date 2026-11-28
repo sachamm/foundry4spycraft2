@@ -5,10 +5,18 @@
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";
 import { crossroadsMissionXPBonus } from "../crossroads-xp.mjs";
+import { periodMoney } from "../period-money.mjs";
 
 const M = GC_DATA.core.mission;
 const whole = (value, min, max) => Number.isSafeInteger(value) && value >= min && value <= max;
 const count = value => (whole(value, 0, 1000) ? value : 0);
+
+/** p.452: what one standard or special antagonist adds to the mission reward (a special one counts 4 times). */
+export function antagonistReward(entry) {
+  const xp = Math.max(0, Math.trunc(Number(entry?.xp) || 0)),
+    multiplier = entry?.type === "special" ? M.specialMultiplier : 1;
+  return { xp, multiplier, total: xp * multiplier, special: multiplier > 1 };
+}
 
 export function defaultMission() {
   return {
@@ -32,6 +40,8 @@ export function defaultMission() {
     timeLimit: false,
     qualities: [],
     otherComplications: [],
+    // GC events the mission must bring in (pp.399–400), such as a Marked for Death event from a liquidation roll.
+    scriptedEvents: [],
     infractions: [],
     scenesPlayed: 0,
     standingPaid: {},
@@ -85,14 +95,20 @@ export function threatBonusActionDice(tl, levels) {
 export function missionStanding(mission) {
   const row = M.reputationByCaliber.find(entry => entry.caliber === mission?.caliber);
   if (!row) return null;
-  const adjust =
-    whole(mission?.threatAdjust, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust) &&
-    !whole(mission?.threatOverride, 1, 20)
+  // Once a Threat Level is fixed, the reward follows the adjustment in it; a later edit counts once applied.
+  const applied =
+    whole(mission?.threatLevel, 1, 20) &&
+    whole(mission?.threatAdjustApplied, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust);
+  const adjust = applied
+    ? mission.threatAdjustApplied
+    : whole(mission?.threatAdjust, -M.threatLevel.maxAdjust, M.threatLevel.maxAdjust) &&
+        !whole(mission?.threatOverride, 1, 20)
       ? mission.threatAdjust
       : 0;
   return {
     reputation: row.reputation + adjust * M.threatLevel.reputationPerStep,
-    netWorth: row.netWorth + adjust * M.threatLevel.netWorthPerStep
+    // Table 7.4 under the Historical quality (p.407).
+    netWorth: periodMoney(row.netWorth + adjust * M.threatLevel.netWorthPerStep)
   };
 }
 
@@ -255,13 +271,32 @@ export function characterMissionXP({ baseXP, awards = 0, level, threatLevel: tl,
  * Exposure (p.435): an infraction costs its listed penalty; committed to stop an equal or worse
  * infraction it costs half, rounded up. Penalties are negative numbers in the data.
  */
-export function exposurePenalty(infraction, { preventing = false, halve = false } = {}) {
+export function exposurePenalty(infraction, { preventing = false, halve = false, honorMultiplier = 1 } = {}) {
   const scale = value => {
     if (!Number.isFinite(value) || value === 0) return 0;
     let magnitude = Math.abs(value);
     if (preventing) magnitude = Math.ceil(magnitude / 2);
     if (halve) magnitude = Math.floor(magnitude / 2); // Corrupt campaign quality
+    // An honor-code breach: doubled under Virtuous, halved (rounded down) under Corrupt (p.408).
+    if (Number.isFinite(honorMultiplier) && honorMultiplier > 0 && honorMultiplier !== 1)
+      magnitude = Math.floor(magnitude * honorMultiplier);
     return -magnitude;
   };
-  return { reputation: scale(infraction?.reputation), netWorth: scale(infraction?.netWorth) };
+  // Net Worth is in modern dollars; under Historical it follows Table 7.4 like every other amount.
+  return { reputation: scale(infraction?.reputation), netWorth: periodMoney(scale(infraction?.netWorth)) };
+}
+
+/**
+ * What one antagonist row will add to the mission's XP, in words, for the Record for XP dialog: the same arithmetic as
+ * missionXP (p.452), so the line matches the report.
+ */
+export function antagonistPreview({ xp, special = false, full = false, scenes = 1 } = {}) {
+  if (full) {
+    const n = Math.max(1, Math.trunc(Number(scenes) || 1));
+    return loc`Adds ${M.fullSpecialXPPerScene * n} XP: ${M.fullSpecialXPPerScene} for each of ${n} scene(s).`;
+  }
+  if (!Number.isFinite(Number(xp)) || Number(xp) < 0) return loc`Enter the NPC's XP reward.`;
+  return special
+    ? loc`Adds ${Number(xp) * M.specialMultiplier} XP: ${Number(xp)} × ${M.specialMultiplier} for a special NPC, once per mission.`
+    : loc`Adds ${Number(xp)} XP, once per mission however many appear.`;
 }

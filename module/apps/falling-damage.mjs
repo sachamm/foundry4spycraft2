@@ -1,3 +1,4 @@
+import { registerFallingDamageHandler } from "./falling-dispatch.mjs";
 import { fallingDamagePlan } from "../rules/falling-damage.mjs";
 import { campaignFallingDamageDivisor, campaignStressPolicy } from "../rules/campaign-combat.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
@@ -323,3 +324,5 @@ export function fallingDamageControls({ actor, message, check }) {
     return null;
   return [{ label: loc`Resolve falling damage`, run: () => resolveFallingDamage(actor, message) }];
 }
+
+registerFallingDamageHandler(recordUncontrolledFall);

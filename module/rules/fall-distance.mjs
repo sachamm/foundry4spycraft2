@@ -2,6 +2,7 @@ import { classFeatureLevels } from "./class-features.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { stable } from "./equal.mjs";
+
 /** Equilibrium Basics p.194 and soft/ yielding landing p.336: damage-distance calculation only. */
 export function fallDistancePlan(
   system,

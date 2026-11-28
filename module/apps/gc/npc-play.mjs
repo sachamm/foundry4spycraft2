@@ -13,11 +13,12 @@ import {
   shiftDisposition,
   loyaltyDecision,
   joinsCombat,
+  persuadeJoinPlan,
   dispositionCheckModifier
 } from "../../rules/gc/disposition.mjs";
-import { spendProfile } from "../../rules/gc/npc-state.mjs";
+import { npcIsSpecial, spendProfile } from "../../rules/gc/npc-state.mjs";
 export { npcIsSpecial, isPromoted, spendProfile } from "../../rules/gc/npc-state.mjs";
-import { damageSaveState, npcDamageSave } from "./npc-damage-save.mjs";
+import { damageSaveState, npcDamageSave, askNpcDamageSaveInput } from "./npc-damage-save.mjs";
 export { damageSaveState, npcDamageSave } from "./npc-damage-save.mjs";
 import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { campaignSkillChecks, campaignSkillPolicy, moraleSkillPenalty } from "../../rules/campaign-skills.mjs";
@@ -29,6 +30,10 @@ import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { readSetting } from "../../settings.mjs";
+import { campaignRules, campaignSkillPlan, omniPenalty } from "../../rules/campaign-rules.mjs";
+import { skillConditionCheckPenalty } from "../../rules/skill-conditions.mjs";
+import { sizeStealthCheck } from "../../rules/check-identity.mjs";
+
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { manageSceneDisposition } from "../scene-disposition.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
@@ -40,7 +45,7 @@ import { cooperativeContent, cooperativeInput } from "../cooperative.mjs";
 import { restraintSkillChecks, restraintSourceSnapshot } from "../../rules/restraints.mjs";
 import { npcSkillActionPlan } from "../../rules/npc-skill-checks.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -72,31 +77,73 @@ const npcNamedChecks = (skill, system = {}) =>
     check => !check.optionalRule || (check.optionalRule === "linguistics" && readSetting("linguistics", false) === true)
   );
 
-/** The part of the NPC skill check dialog that comes from its qualities. */
+/** The part of the NPC skill check dialog that comes from its qualities: the boxes for situational ones. */
 export function qualityCheckContent(effects) {
   if (!effects) return "";
-  const kinds = [
-    ...(effects.moraleModifier
-      ? [["morale", loc`Resolve/Morale (${signed(effects.moraleModifier)} from qualities)`]]
-      : []),
-    ...(effects.resistModifier
-      ? [
-          ["resist-impress", loc`Resolve/Resist Impress (${signed(effects.resistModifier)})`],
-          ["resist-intimidate", loc`Resolve/Resist Intimidate (${signed(effects.resistModifier)})`],
-          ["resist-manipulate", loc`Sense Motive/Resist Manipulate (${signed(effects.resistModifier)})`]
-        ]
-      : [])
-  ];
   const boxes = effects.skillOptions
     .map(option => `<label><input type="checkbox" name="quality-${esc(option.id)}" /> ${esc(option.label)}</label>`)
     .join("");
-  if (!kinds.length && !boxes) return "";
-  return `<fieldset><legend>${loc`Qualities`}</legend>${
-    kinds.length
-      ? `<label>${loc`This check is`} <select name="qualityCheck">${options([["", loc`another check`], ...kinds], "")}</select></label>`
-      : ""
-  }${boxes}</fieldset>`;
+  const rider =
+    effects.trainedQualities >= 2
+      ? `<label data-when="skillCheck=resolve:morale">${loc`Rider's Charisma modifier`} <input type="number" name="riderCharisma" value="0" /></label>`
+      : "";
+  if (!boxes && !rider) return "";
+  return `<fieldset><legend>${loc`Qualities`}</legend>${rider}${boxes}</fieldset>`;
 }
+
+/** The named check of a skill an NPC makes: the one asked for, or else the skill's first. */
+export function npcSkillCheck(skillKey, checkId = "") {
+  const checks = CONFIG.SPYCRAFT?.skills?.[skillKey]?.checks ?? [];
+  return checks.find(check => check.id === checkId) ?? checks[0] ?? null;
+}
+
+/** Whether a check's result takes the Size table's Stealth/Hide modifier (p.349). */
+/**
+ * The parts of an NPC skill check that come from its conditions, its Size and the campaign's qualities: labelled rows
+ * and an error range change (pp.340–342, 349, 406–408). Omni-Competent halves the penalties.
+ */
+export function npcSkillCheckRows(system, skillKey, check, { ability, modifier = 0, ...input } = {}) {
+  const halve = omniPenalty(),
+    rows = [];
+  const conditions = skillConditionCheckPenalty(system, ability);
+  if (conditions) rows.push({ label: loc`Conditions`, value: halve(conditions) });
+  if (sizeStealthCheck(skillKey, check) && system.sizeHideModifier)
+    rows.push({ label: loc`Size`, value: halve(system.sizeHideModifier) });
+  if (Number(modifier)) rows.push({ label: loc`Situational modifier`, value: halve(Number(modifier)) });
+  const campaign = campaignSkillPlan(system, skillKey, check ?? {}, { ...input, ability });
+  for (const bonus of campaign.bonuses) rows.push({ label: bonus.source, value: halve(bonus.value) });
+  return { rows, errorIncrease: campaign.errorIncrease };
+}
+
+/** Whether an animal may make this check (p.445). */
+export const animalMayMake = (skillKey, checkId) => ANIMAL_CHECKS.includes(`${skillKey}:${checkId}`);
+const ANIMAL_CHECKS = [
+  "tactics:ambush",
+  "notice:awareness",
+  "acrobatics:balance",
+  "athletics:climb",
+  "intimidate:coercion",
+  "athletics:escape",
+  "acrobatics:falling",
+  "survival:foraging",
+  "athletics:forced-march",
+  "acrobatics:jump",
+  "sneak:hide",
+  "athletics:maneuver",
+  "resolve:morale",
+  "athletics:power-lifting",
+  "resolve:resist-impress",
+  "resolve:resist-intimidate",
+  "senseMotive:resist-manipulate",
+  "search:perception",
+  "athletics:smash",
+  "athletics:speed-push",
+  "sneak:stash-item",
+  "blend:stealth",
+  "athletics:swim",
+  "acrobatics:tumble",
+  "survival:tracking"
+];
 
 /** Ask the characters who meet this NPC for the save one of its qualities forces. */
 export async function callQualitySave(actor, id) {
@@ -193,6 +240,11 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     );
     if (!input) return null;
   }
+  if (input.skillCheck) input = { ...input, key: String(input.skillCheck).replace(":", "/") };
+  if (input.paranoidPersuasion === true) input = { ...input, persuadingAction: true };
+  if (input.qualityCheck && !input.check) input = { ...input, check: input.qualityCheck };
+  if (input.check && typeof input.key === "string" && !input.key.includes("/"))
+    input = { ...input, key: input.key + "/" + input.check };
   input = {
     ...input,
     grappleProficient:
@@ -218,7 +270,9 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
       ? skill.checks.find(c => c.id === "persuasion")
       : chosenCheck
         ? npcNamedChecks(skill, actor.system).find(c => c.id === chosenCheck)
-        : null;
+        : input.dispositionTargetUuid
+          ? null
+          : (npcNamedChecks(skill, actor.system)[0] ?? null);
   if ((chosenCheck && !namedCheck) || (context.combatPersuasion && chosenCheck && chosenCheck !== "persuasion"))
     throw Error(loc`Choose a valid named check for this skill and combat attempt.`);
   if (context.combatPersuasion && (skill.key !== "impress" || (input.ability && input.ability !== "cha")))
@@ -231,6 +285,8 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     !actor.system.npcBuild?.skills?.some(entry => entry.key === skill.key)
   )
     ui.notifications.info(loc`Animals have no Competence: only their listed skills carry a bonus (p.445).`);
+  if (actor.system.npcType === "animal" && namedCheck && !animalMayMake(skill.key, namedCheck.id))
+    ui.notifications.warn(loc`Review this animal’s training before using the selected check (p.445).`);
   const plan = graded
     ? npcSkillPlan(actor, skill.key)
     : { bonus: Number(input.manualBonus) || 0, cap: stepLookup(TABLES.skillCap, Number(input.manualBonus) || 0) };
@@ -259,6 +315,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     throw Error(loc`Confirm that all current restraint sources belong to this same grapple before rolling.`);
   // Qualities: Fearless, Meek and Strong-Minded by the kind of check, the rest by the boxes ticked.
   const quality = npcSkillQualityPlan(actor.system.qualityEffects ?? { skillOptions: [] }, {
+    riderCharisma: Number(input.riderCharisma) || 0,
     skillKey: skill.key,
     checkId: namedCheck?.id ?? input.qualityCheck ?? "",
     chosen: Object.keys(input)
@@ -270,6 +327,7 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     actor.system,
     Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0)
   );
+  if (plan.cap !== null) plan.cap += quality.capBonus ?? 0;
   const rawQualityRows = quality.rows;
   quality.rows = skillPenaltyEntries(actor.system, rawQualityRows);
   quality.modifier = quality.rows.reduce((n, row) => n + row.value, 0);
@@ -367,11 +425,19 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
     namedPenalty +
     conditionModifier +
     action.restraint.sizeBonus;
+  const campaignError = campaignSkillPlan(
+    actor.system,
+    skill.key,
+    namedCheck ?? { attributes: [ability] },
+    { ability },
+    actor.system.campaignEffects ?? campaignRules()
+  ).errorIncrease;
   const checkError =
       (input.error == null || input.error === "" ? (namedCheck?.error ?? 1) : Math.max(0, Number(input.error) || 0)) +
       quality.errorIncrease +
       disposition.errorIncrease +
-      action.restraint.errorIncrease,
+      action.restraint.errorIncrease +
+      campaignError,
     recoveryPlan = context.drainedRecovery
       ? drainedNpcCheckOptions(actor.system, context.drainedRecovery, input, checkError)
       : null;
@@ -488,14 +554,33 @@ export async function rollNpcSkill(actor, input = null, context = {}) {
 }
 
 /** The same save, from a sheet or the console, leaving an Undo note for what it changed. */
-export const npcDamageSaveWithUndo = (actor, input = null) =>
-  withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
+export async function npcDamageSaveWithUndo(actor, input = null) {
+  // The dialog is answered before the "before" picture is taken, so Undo does not also take back whatever else
+  // changed while it was open (an Initiative roll, a new condition).
+  if (
+    !input &&
+    actor?.isOwner &&
+    game.user?.isGM &&
+    !npcIsSpecial(actor) &&
+    damageSaveState(actor).track.state === "active"
+  ) {
+    input = await askNpcDamageSaveInput(actor);
+    if (!input) return null;
+  }
+  return withUndo([actor], loc`Damage save: ${actor?.name ?? ""}`, () => npcDamageSave(actor, input));
+}
 
 export async function resetDamageTrack(actor, { heal = null } = {}) {
   if (!actor.isOwner) return null;
   const state = damageSaveState(actor);
   const track = heal === null ? { ...currentDamageTrack(null, sceneEpoch()) } : healDamageTrack(state.track, heal);
   await actor.update({ "system.damageTrack": track });
+  if (track.state === "active")
+    // Clear only the defeat a failed Damage save set; a defeat the GC marked by hand stays.
+    for (const combat of game.combats ?? [])
+      for (const combatant of combat.combatants ?? [])
+        if (combatant.actor === actor && combatant.defeated && combatant.flags?.spycraft2?.defeatedByDamageSave)
+          await combatant.update({ defeated: false, "flags.spycraft2.-=defeatedByDamageSave": null });
   if (heal === null)
     for (const id of ["dead", "unconscious"])
       if (actor.statuses?.has(id)) {
@@ -551,7 +636,7 @@ export async function manageDisposition(actor) {
         ["set", loc`Set a grade (GC ruling)`],
         ["loyalty", loc`Roll a Loyalty decision`],
         ["combat", loc`Roll whether the NPC joins a fight`],
-        ["persuade", loc`Persuade the NPC to join combat`]
+        ["persuade", loc`A side tries to talk the NPC into the fight (once per combat)`]
       ],
       "show"
     )}</select></label>
@@ -561,8 +646,31 @@ export async function manageDisposition(actor) {
       DISPOSITIONS.map(grade => [grade.id, grade.name]),
       "neutral"
     )}</select></label>
+    <label data-when="action=persuade">${loc`That side's Impress/Persuasion result (standard or cooperative)`} <input type="number" name="persuasion" min="0" /></label>
+    <label data-when="action=persuade"><input type="checkbox" name="triumph" /> ${loc`The check was a Triumph (an Adversarial NPC needs one)`}</label>
     <label data-when="action=loyalty|combat">${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`,
-    loc`Apply`
+    loc`Apply`,
+    // Refused inside the dialog, so the target and the figures typed stay.
+    values => {
+      if (values.action === "shift" && !(Number.isInteger(Number(values.steps)) && Number(values.steps) !== 0))
+        return loc`Enter a whole number of grades to shift, other than 0.`;
+      if (["loyalty", "combat"].includes(values.action)) {
+        const foil = Number(values.foil);
+        if (!Number.isInteger(foil) || foil < -5 || foil > 5) return loc`The Foil modifier runs from −5 to +5.`;
+      }
+      if (values.action === "persuade") {
+        const side = values.target || "",
+          plan = persuadeJoinPlan(actor.flags?.spycraft2?.persuadedJoin ?? null, {
+            combatId: game.combat?.started ? game.combat.id : "",
+            side,
+            gradeId: side ? dispositionToward(record, side) : record.base,
+            result: values.persuasion === "" || values.persuasion === null ? NaN : Number(values.persuasion),
+            triumph: values.triumph === true
+          });
+        if (!plan.allowed) return plan.reason;
+      }
+      return null;
+    }
   );
   if (!input) return null;
   const targetId = input.target || "",
@@ -611,6 +719,29 @@ export async function manageDisposition(actor) {
           flavor: loc`Loyalty (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${step.total} against ${step.target} — ${step.success ? loc`sides with them` : loc`sides against them`}.`
         },
         messageModeOption("gmroll")
+      );
+    }
+    if (input.action === "persuade") {
+      const combatId = game.combat?.started ? game.combat.id : "";
+      const plan = persuadeJoinPlan(actor.flags?.spycraft2?.persuadedJoin ?? null, {
+        combatId,
+        side: targetId,
+        gradeId: gradeNow,
+        result: input.persuasion === "" || input.persuasion === null ? NaN : Number(input.persuasion),
+        triumph: input.triumph === true
+      });
+      if (!plan.allowed) return refuse(plan.reason);
+      // An Undo note gives the attempt back if the GC recorded the wrong result or side.
+      await withUndo([actor], loc`Persuade to join: ${actor.name}`, () =>
+        actor.setFlag("spycraft2", "persuadedJoin", plan.record)
+      );
+      const against = plan.needsTriumph ? loc`a Triumph` : loc`DC ${plan.dc}`;
+      return say(
+        actor,
+        plan.success
+          ? loc`${esc(actor.name)} (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}) is won over against ${against} and joins ${esc(name)}'s side for this fight. No other side may try (p.458).`
+          : loc`${esc(actor.name)} (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}) is not won over against ${against}. That side cannot try again this fight (p.458).`,
+        { whisper: true }
       );
     }
     if (input.action === "combat") {

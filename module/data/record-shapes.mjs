@@ -665,6 +665,9 @@ export const RECORD_SHAPES = {
   gearPickLosses: {
     "*": "any"
   },
+  gearRestrictionLosses: {
+    "*": "any"
+  },
   inheritedChoices: {
     "*": "any"
   },
@@ -866,14 +869,21 @@ export const RECORD_SHAPES = {
       baseXP: "number",
       combinedBase: "number",
       coreXP: "number",
+      crossroadsPercent: "number",
+      crossroadsXP: "number",
+      gainedXP: "number",
       level: "number",
       mission: "string",
       modifierReason: "string",
       multiplier: "number",
+      previousTotalXP: "number",
+      reopened: "boolean",
       settlementId: "string",
       source: "string",
       threatLevel: "number",
-      totalXP: "number"
+      totalXP: "number",
+      triumphPercent: "number",
+      triumphXP: "number"
     }
   },
   noFearBoost: {

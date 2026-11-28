@@ -136,7 +136,8 @@ export function damageLedgerEventPlan(
     weaponProficiency = "",
     armorPiercing = 0,
     armorPiercingAll = false,
-    typedDamageType = null
+    typedDamageType = null,
+    proficiency = ""
   } = {},
   id,
   at
@@ -174,7 +175,8 @@ export function damageLedgerEventPlan(
           ...(typedDamageType !== null ? { typedDamageType } : {}),
           ...(weaponProficiency ? { weaponProficiency } : {}),
           armorPiercing: armorPiercingAll ? 0 : armorPiercing,
-          armorPiercingAll
+          armorPiercingAll,
+          ...(proficiency ? { proficiency } : {})
         }
       : {})
   };
@@ -210,7 +212,8 @@ export function damageLedgerEventPlan(
           armorPiercing,
           armorPiercingAll,
           criticalHit,
-          typedDamageType
+          typedDamageType,
+          proficiency
         })
       : null;
   if (defenseContext?.criticalBruisingReview)

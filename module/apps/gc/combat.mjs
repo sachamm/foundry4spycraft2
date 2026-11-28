@@ -32,6 +32,7 @@ import {
   senseLimit,
   surfaceMove
 } from "../../rules/gc/combat-reference.mjs";
+import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc, locKey } from "../../i18n.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
@@ -40,8 +41,10 @@ import { npcIsSpecial } from "./npc-play.mjs";
 import { markAntagonistsFaced } from "./mission.mjs";
 import { queueResources } from "../../services/transactions.mjs";
 import { settledCountEvents } from "../../documents/actor/count-shifts.mjs";
+import { postUndo, withUndo } from "../undo.mjs";
+import { isLeadGM } from "../../writers.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -58,7 +61,6 @@ const fluidForRound = (combatant, round) => {
   return saved.round === round ? saved : { round, modifiers: [], delayed: 0, pressed: false };
 };
 const bonusOf = combatant => combatant.actor?.system?.initiative?.total ?? 0;
-const isLeadGM = () => game.users?.activeGM?.id === game.user.id;
 const say = (content, { whisper = false } = {}) =>
   ChatMessage.create({
     speaker: { alias: loc`Game Control` },
@@ -132,6 +134,37 @@ export function fluidCombatClass(Base) {
   };
 }
 
+/**
+ * What recordFluidEvent would refuse for these values, worked out without writing anything, so the dialog can say it
+ * and stay open with the choices kept. "" when the event can be recorded.
+ */
+export function fluidEventRefusal(combatant, id, input = {}) {
+  if (!combatant) return loc`Choose a combatant.`;
+  if (!combatant.isOwner) return loc`You do not control that combatant.`;
+  const count = combatant.initiative;
+  if (!Number.isFinite(count)) return loc`${combatant.name} has not rolled Initiative yet: roll it first.`;
+  const state = fluidForRound(combatant, combatant.parent?.round);
+  try {
+    if (id === "delay")
+      delay(count, Number(input.times) || 1, { initiativeBonus: bonusOf(combatant), usedThisRound: state.delayed });
+    else if (id === "press") press(count, { pressedThisRound: state.pressed });
+    else if (id === "ready") readyTrigger(count, Number(input.triggerCount));
+    else {
+      const modifier = fluidModifier(id, {
+        times: Number(input.times) || 1,
+        amount: input.amount === undefined || input.amount === "" ? null : Number(input.amount),
+        weapon: input.weapon ?? "",
+        intBonus: Math.max(0, combatant.actor?.system?.abilities?.int?.mod ?? 0)
+      });
+      const added = addFluidModifier(state.modifiers, modifier);
+      if (!added.added) return added.reason;
+    }
+  } catch (error) {
+    return error.message;
+  }
+  return "";
+}
+
 /** Record one Table 5.2 event against a combatant for the current round; immediate ones change the Count now. */
 export async function recordFluidEvent(combatant, id, input = {}) {
   return queueResources(
@@ -157,17 +190,13 @@ async function recordFluidEventLocked(combatant, id, input = {}) {
     const wasActing = combat?.started && combat.combatant?.id === combatant.id,
       turnBefore = combat?.turn;
     // The acting character stepping down hands the turn on; anyone else's Count change leaves the turn where it is.
+    // The delaying character steps down the order; the turn goes to whoever now stands in that place, so the
+    // characters between the old and the new Count still act this round (p.356). The lead GM moves the turn and
+    // starts the next one (keepActingTurn), so a player who delays needs no right to change the fight.
     await combatant.update(
       { initiative: result.count, "flags.spycraft2.fluid": { ...state, delayed: result.used } },
-      wasActing ? { spycraft2HandOver: true } : {}
+      wasActing && Number.isInteger(turnBefore) ? { spycraft2HandOver: true, spycraft2HandOverTurn: turnBefore } : {}
     );
-    // The delaying character steps down the order; the turn goes to whoever now stands in that place, so the
-    // characters between the old and the new Count still act this round (p.356).
-    if (wasActing && Number.isInteger(turnBefore)) {
-      combat.setupTurns?.();
-      const now = combat.turns?.findIndex?.(c => c.id === combatant.id) ?? -1;
-      if (now > turnBefore) await combat.update({ turn: turnBefore });
-    }
     return { count: result.count };
   }
   if (id === "press") {
@@ -236,6 +265,25 @@ export function registerAutomaticFluidSetting() {
 }
 
 /** Dialog: choose a combatant and an event. */
+/**
+ * Each combatant's name as the console shows it: a name several combatants share gets "#1", "#2"… in turn order, so
+ * three "Guard" rows, the acting heading and a notice can be told apart.
+ */
+export function combatantLabels(combat) {
+  const turns = [...(combat?.turns ?? [])],
+    totals = new Map(),
+    seen = new Map();
+  for (const combatant of turns) totals.set(combatant.name, (totals.get(combatant.name) ?? 0) + 1);
+  return new Map(
+    turns.map(combatant => {
+      if (totals.get(combatant.name) < 2) return [combatant.id, combatant.name];
+      const number = (seen.get(combatant.name) ?? 0) + 1;
+      seen.set(combatant.name, number);
+      return [combatant.id, `${combatant.name} #${number}`];
+    })
+  );
+}
+
 export async function fluidEventDialog(combat = game.combat, preset = null) {
   const pendingRounds = [
     ...new Set(
@@ -247,13 +295,17 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
   ];
   for (const round of pendingRounds) await applyEndOfRound(combat, round);
   if (!combat?.started) return refuse(loc`Start the combat first.`);
-  const mine = combat.combatants.filter(combatant => combatant.isOwner);
+  // The acting combatant first, then the rest in turn order, numbered when they share a name.
+  const labels = combatantLabels(combat),
+    mine = (combat.turns ?? [...combat.combatants])
+      .filter(combatant => combatant.isOwner)
+      .sort((a, b) => (b.id === combat.combatant?.id) - (a.id === combat.combatant?.id));
   if (!mine.length) return refuse(loc`You control no combatant in this fight.`);
   const rows = mine.map(combatant => {
     const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
     return [
       combatant.id,
-      `${combatant.name} — Count ${combatant.initiative ?? "—"}${pending ? ` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
+      `${labels.get(combatant.id) ?? combatant.name}: ${combatant.initiative ?? loc`not rolled`}${pending ? loc` (${pending > 0 ? "+" : ""}${pending} pending)` : ""}`
     ];
   });
   const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
@@ -267,19 +319,32 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     loc`Fluid initiative — Table 5.2`,
     `
     <p>${loc`Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.`}</p>
-    <label>${loc`Combatant`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
+    <label>${loc`Combatant and Initiative Count`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
     <label>${loc`Event`} <select name="id">${eventOptions}</select></label>
     <label data-when="id!=press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup">${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
     <label data-when="id=diversion">${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
     <label data-when="id=unproficient">${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
     <label data-when="id=ready">${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`,
-    loc`Record event`
+    loc`Record event`,
+    // Refused inside the dialog, so the combatant and event chosen stay chosen.
+    values => {
+      if (values.id === "diversion" && !(Number(values.amount) >= 1))
+        return loc`Enter the rolled Count loss for Diversion.`;
+      const timed = !/^(press|ready|bleeding|fatigued|exhausted|shaken2|criticalInjury|diversion|regroup)$/.test(
+        values.id
+      );
+      if (timed && !(Number(values.times) >= 1)) return loc`Times it applies must be 1 or more.`;
+      return fluidEventRefusal(combat.combatants.get(values.combatantId), values.id, values);
+    }
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
   try {
-    const result = await recordFluidEvent(combatant, input.id, input);
-    const label = FLUID_EVENTS.find(event => event.id === input.id).label;
+    // The Undo note puts the Count and the round's fluid record back, as long as nothing changed them since.
+    const label = FLUID_EVENTS.find(event => event.id === input.id)?.label ?? input.id;
+    const result = await withUndo([combatant.actor], loc`Fluid initiative: ${combatant.name}, ${label}`, () =>
+      recordFluidEvent(combatant, input.id, input)
+    );
     await say(
       `${esc(combatant.name)}: ${esc(label)} — ${result.pending === undefined ? `${loc`Initiative Count is now`} <b>${result.count}</b>.` : loc`${result.pending > 0 ? "+" : ""}${result.pending} pending at the end of the round.`}${result.note ? ` ${esc(result.note)}` : ""}`
     );
@@ -301,13 +366,19 @@ export const halfActionsLeft = combatant =>
   HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
 
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
-export async function spendTurnAction(combatant, kind) {
+export async function spendTurnAction(combatant, kind, { quiet = false } = {}) {
   if (!combatant) return null;
   const state = actionsOf(combatant);
   if (kind === "reset") return combatant.update({ "flags.spycraft2.actions": resetActions(state) });
   const result = spendAction(state, kind, { extra: extraHalfActions(combatant) });
   if (!result.ok) {
-    ui.notifications.warn(loc`${combatant.name} has ${result.left} half action(s) left this turn.`);
+    // As with an attack that goes over: what is left is used up and the GC is told, rather than nothing recorded.
+    if (!quiet)
+      ui.notifications.warn(
+        loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
+      );
+    if (result.left > 0)
+      await combatant.update({ "flags.spycraft2.actions": { ...state, used: state.used + result.left } });
     return null;
   }
   await combatant.update({ "flags.spycraft2.actions": result.state });
@@ -328,8 +399,11 @@ export async function markActionSpent(actor, kind) {
   if (!combatant || combatant.actor?.uuid !== actor.uuid || !combatant.isOwner) return null;
   const result = spendAction(actionsOf(combatant), kind, { extra: extraHalfActions(combatant) });
   if (!result.ok) {
+    // The action stands, as the GC ruled by taking it; the turn is recorded as used up (the same as a Spend).
     ui.notifications.warn(
-      loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. Check with the GC.`
+      game.user?.isGM
+        ? loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more, and the turn is now used up.`
+        : loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. The GC decides whether it stands.`
     );
     // The turn is recorded as used up, so anything further this turn warns as well.
     if (result.left > 0)
@@ -355,7 +429,11 @@ export const costsAction = (kind, handler) =>
   };
 
 /** Apply every combatant's recorded modifiers for the round that just ended. */
-export async function applyEndOfRound(combat, endedRound) {
+export function applyEndOfRound(combat, endedRound) {
+  // Queued with the dramatic-scene doubling, so each reads the Count the other wrote.
+  return queueInitiative(() => endOfRoundWork(combat, endedRound));
+}
+async function endOfRoundWork(combat, endedRound) {
   const lines = [];
   for (const candidate of [...combat.combatants]) {
     await queueResources(
@@ -415,8 +493,19 @@ async function finishFluidConditions(combatant, settlement) {
   await combatant.update({ "flags.spycraft2.fluidSettlement.state": "complete" });
 }
 
-/** Break remaining ties (same Count and bonus) with a d20 roll-off stored on the combatants. */
-export async function rollTiebreaks(combat = game.combat) {
+/**
+ * Break remaining ties (same Count and bonus) with a d20 roll-off stored on the combatants. Only members with no
+ * stored roll-off roll, so two tied combatants never swap places when a third joins them; one pass runs at a time
+ * for each fight.
+ */
+const tiebreakRuns = new Map();
+export function rollTiebreaks(combat = game.combat) {
+  const key = combat?.id ?? "";
+  const run = (tiebreakRuns.get(key) ?? Promise.resolve()).catch(() => 0).then(() => rollTiebreaksNow(combat));
+  tiebreakRuns.set(key, run);
+  return run;
+}
+async function rollTiebreaksNow(combat) {
   const groups = new Map();
   for (const combatant of combat?.combatants ?? []) {
     if (!Number.isFinite(combatant.initiative)) continue;
@@ -425,9 +514,10 @@ export async function rollTiebreaks(combat = game.combat) {
   }
   let rolled = 0;
   for (const tied of groups.values()) {
-    if (tied.length < 2 || tied.every(combatant => Number.isFinite(combatant.flags?.spycraft2?.tiebreak))) continue;
-    const seen = new Set();
-    for (const combatant of tied) {
+    const stored = combatant => Number.isFinite(combatant.flags?.spycraft2?.tiebreak);
+    if (tied.length < 2 || tied.every(stored)) continue;
+    const seen = new Set(tied.filter(stored).map(combatant => combatant.flags.spycraft2.tiebreak));
+    for (const combatant of tied.filter(entry => !stored(entry))) {
       let value;
       do {
         value = (await new Roll("1d20").evaluate()).total + Math.random();
@@ -441,6 +531,8 @@ export async function rollTiebreaks(combat = game.combat) {
 }
 
 /** One Initiative check for a set of NPCs (p.323): by default every unrolled non-player combatant, grouped by actor. */
+const combatantsOf = combat => [...(combat?.combatants ?? [])];
+
 export async function rollGroupInitiative(combat = game.combat, { single = false } = {}) {
   if (!game.user.isGM) return null;
   if (!combat) return refuse(loc`There is no active combat.`);
@@ -462,10 +554,53 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     groups.set(key, [...(groups.get(key) ?? []), combatant]);
   }
   const lines = [];
-  for (const members of groups.values()) {
-    const roll = await new Roll("1d20").evaluate();
-    for (const combatant of members) await combatant.update({ initiative: roll.total + bonusOf(combatant) });
-    lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${roll.total}`);
+  let rolled = 0;
+  const keyOf = combatant =>
+    combatant.actor?.isToken ? (combatant.token?.baseActor?.id ?? combatant.actorId) : combatant.actorId;
+  for (const [key, group] of groups) {
+    // A late arrival of a kind already rolled joins that kind's Count instead of rolling its own (p.323).
+    const rolledKin = single
+      ? null
+      : combatantsOf(combat).find(
+          other => Number.isFinite(other.initiative) && other.actor?.type === "npc" && keyOf(other) === key
+        );
+    if (rolledKin) {
+      for (const combatant of group) await combatant.update({ initiative: rolledKin.initiative });
+      lines.push(
+        loc`${esc(group.map(member => member.name).join(", "))}: joins ${esc(rolledKin.name)} on Count ${rolledKin.initiative}`
+      );
+      rolled += 1;
+      continue;
+    }
+    // Each member's own Initiative roll is asked for first, so a Shaken source waiting for review holds that member
+    // back, as it would on a roll of its own.
+    const members = [],
+      held = [];
+    for (const combatant of group) {
+      try {
+        combatant.getInitiativeRoll?.();
+        members.push(combatant);
+      } catch (error) {
+        held.push(loc`${esc(combatant.name)}: not rolled (${esc(error.message)})`);
+      }
+    }
+    lines.push(...held);
+    if (!members.length) continue;
+    // The group's d20 comes from the first member's own roll, so Lightning Reflexes (roll twice, keep one) applies.
+    let roll;
+    try {
+      roll = await (members[0].getInitiativeRoll?.() ?? new Roll("1d20")).evaluate();
+    } catch (error) {
+      lines.push(loc`${esc(members.map(member => member.name).join(", "))}: not rolled (${esc(error.message)})`);
+      continue;
+    }
+    const d20 = Number.isFinite(roll.dice?.[0]?.total) ? roll.dice[0].total : roll.total - bonusOf(members[0]);
+    for (const combatant of members) await combatant.update({ initiative: d20 + bonusOf(combatant) });
+    // The card gives each member's Count, with the shared die beside it.
+    lines.push(
+      loc`d20 ${d20}: ${esc(members.map(member => loc`${member.name} Count ${member.initiative}`).join(", "))}`
+    );
+    rolled += 1;
   }
   if (left.length)
     lines.push(
@@ -473,7 +608,7 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     );
   if (lines.length) await say(`<b>${loc`Group Initiative`}</b><br>${lines.join("<br>")}`, { whisper: true });
   else ui.notifications?.info(loc`Every NPC in this fight already has an Initiative Count.`);
-  return lines.length - (left.length ? 1 : 0);
+  return rolled;
 }
 
 /** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */
@@ -517,9 +652,12 @@ export async function surpriseRoundDialog(combat = game.combat) {
   } catch (error) {
     return refuse(error.message);
   }
+  const was = combat.flags?.spycraft2?.surprise ?? null;
   await combat.update({
     "flags.spycraft2.surprise": result.occurs ? { winners: result.winners, round: combat.round } : null
   });
+  // Undo sets the fight's surprise mark back to what it was before.
+  await postUndo(loc`Surprise round set`, [], { combatSurprise: { combat: combat.id, was } }).catch(() => null);
   await say(
     result.occurs
       ? `<b>${loc`Surprise round:`}</b> ${loc`${result.winners[0] === "players" ? "the player characters" : "the opponents"} act — 1 free, half or full action each, in Initiative order. Everyone else waits for round 1.`}`
@@ -557,11 +695,19 @@ const actingIn = new Map(),
  * would pass to whoever now stands in the old place. Unless the acting character stepped down on purpose, the
  * lead GM points the turn back at the same character.
  */
-export async function keepActingTurn(combat, { handOver = false } = {}) {
+export async function keepActingTurn(combat, { handOver = false, handOverTurn = null } = {}) {
   if (!combat?.started || settling.has(combat.id)) return null;
   combat.setupTurns?.();
   const expected = actingIn.get(combat.id);
   const index = expected ? (combat.turns?.findIndex?.(entry => entry.id === expected) ?? -1) : -1;
+  if (handOver && Number.isInteger(handOverTurn)) {
+    // The acting character delayed: whoever now stands in its old place acts next, with its turn start.
+    if (combat.turn !== handOverTurn)
+      await combat.update({ turn: handOverTurn }, { spycraft2KeepTurn: true, turnEvents: false });
+    actingIn.set(combat.id, combat.combatant?.id ?? null);
+    await turnStart(combat, combat.combatant);
+    return null;
+  }
   if (handOver || index < 0) {
     actingIn.set(combat.id, combat.combatant?.id ?? null);
     return null;
@@ -570,6 +716,28 @@ export async function keepActingTurn(combat, { handOver = false } = {}) {
   return combat.update({ turn: index }, { spycraft2KeepTurn: true, turnEvents: false });
 }
 
+/**
+ * What happens as a combatant's turn begins, whichever way the turn reached it (Next turn, a Delay handing it on): a
+ * readied action left from an earlier round lapses, and flat-footedness ends (p.342).
+ */
+export async function turnStart(combat, combatant) {
+  const actor = combatant?.actor;
+  if (!combat?.started || !combatant) return;
+  const readied = combatant.flags?.spycraft2?.readied;
+  if (readied && readied.round !== combat.round) await combatant.update({ "flags.spycraft2.readied": null });
+  if (!actor?.statuses?.has?.("flat-footed")) return;
+  const facts = { round: combat.round, surprise: combat.flags?.spycraft2?.surprise ?? null };
+  if (!flatFootedEndsOnTurn(facts, { playerSide: actor.hasPlayerOwner === true })) return;
+  try {
+    await setConditionStatus(actor, "flat-footed", false, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
+  } catch {
+    /* supplied by another source: left for the GC */
+  }
+}
+
+/** Fights whose start has already made everyone flat-footed: the pass runs once per fight. */
+const flatFootedFights = new Set();
+
 export function installFluidInitiativeHooks() {
   // Everyone starts a fight flat-footed unless he joins it deliberately after it begins (p.323).
   // The start is read from the combat's own update, which every client sees: the lead GM marks the fight whoever
@@ -577,6 +745,9 @@ export function installFluidInitiativeHooks() {
   Hooks.on("updateCombat", (combat, changed, options) => {
     if (changed?.round !== 1 || options?.direction < 0) return;
     if (!isLeadGM() || !setting("startFlatFooted")) return;
+    // Round 1 can be entered twice (back to round 0 and forward again): the fight starts flat-footed once.
+    if (flatFootedFights.has(combat.id)) return;
+    flatFootedFights.add(combat.id);
     startPass = (async () => {
       for (const combatant of combat.combatants) await condition(combatant.actor, "flat-footed", "Flat-footed");
     })();
@@ -597,7 +768,10 @@ export function installFluidInitiativeHooks() {
     if (Object.hasOwn(changed, "turn") || Object.hasOwn(changed, "round"))
       actingIn.set(combat.id, combat.combatant?.id ?? null);
   });
-  Hooks.on("deleteCombat", combat => actingIn.delete(combat.id));
+  Hooks.on("deleteCombat", combat => {
+    actingIn.delete(combat.id);
+    flatFootedFights.delete(combat.id);
+  });
   // After a reload the lead GM learns who is acting before any Count can move.
   const learn = () => {
     for (const combat of game.combats ?? []) if (combat.started) actingIn.set(combat.id, combat.combatant?.id ?? null);
@@ -609,24 +783,16 @@ export function installFluidInitiativeHooks() {
     if (!Object.hasOwn(changed, "turn") && !Object.hasOwn(changed, "round")) return;
     // The same character is still acting: only its place in the order moved.
     if (options?.direction < 0 || options?.spycraft2KeepTurn) return;
+    // Who this turn belongs to is read now: a quick second Next turn must not make this pass act on someone else.
+    const captured = combat.combatant;
     await startPass;
     if (Object.hasOwn(changed, "round")) {
       await null;
       await fluidRoundSettled();
+      // A new round may have been reordered; its first turn is whoever leads the new order.
+      return turnStart(combat, combat.combatant);
     }
-    const combatant = combat.combatant,
-      actor = combatant?.actor;
-    // A readied action that never went off is lost when the character's next turn comes round.
-    const readied = combatant?.flags?.spycraft2?.readied;
-    if (readied && readied.round !== combat.round) await combatant.update({ "flags.spycraft2.readied": null });
-    if (!actor?.statuses?.has?.("flat-footed")) return;
-    const facts = { round: combat.round, surprise: combat.flags?.spycraft2?.surprise ?? null };
-    if (!flatFootedEndsOnTurn(facts, { playerSide: actor.hasPlayerOwner === true })) return;
-    try {
-      await setConditionStatus(actor, "flat-footed", false, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
-    } catch {
-      /* supplied by another source: left for the GC */
-    }
+    return turnStart(combat, captured);
   });
   Hooks.on("updateCombat", async (combat, changed, options) => {
     if (!isLeadGM() || !Object.hasOwn(changed, "round") || !setting("fluidInitiative")) return;
@@ -637,12 +803,16 @@ export function installFluidInitiativeHooks() {
     settling.add(combat.id);
     try {
       const changedCounts = await applyEndOfRound(combat, previous);
-      await rollTiebreaks(combat);
-      // The new round starts from the top of the revised order, not from whoever led the last one.
-      if (changedCounts.length) {
-        combat.setupTurns?.();
-        if (combat.turn !== 0) await combat.update({ turn: 0 });
-      }
+      // Tiebreaks and the turn reset wait their place on the Initiative queue, behind any dramatic doubling the
+      // pass set off, so the new order already holds the doubled Counts.
+      await queueInitiative(async () => {
+        await rollTiebreaks(combat);
+        // The new round starts from the top of the revised order, not from whoever led the last one.
+        if (changedCounts.length) {
+          combat.setupTurns?.();
+          if (combat.turn !== 0) await combat.update({ turn: 0 });
+        }
+      });
       ui.combat?.render();
     } catch (error) {
       ui.notifications.warn(loc`Fluid initiative needs review: ${error.message}`);
@@ -658,7 +828,10 @@ export function installFluidInitiativeHooks() {
     if (!isLeadGM()) return;
     const moved = Object.hasOwn(changed, "initiative");
     if (moved || Object.hasOwn(changed.flags?.spycraft2 ?? {}, "tiebreak"))
-      keepActingTurn(combatant.parent, { handOver: options?.spycraft2HandOver === true }).catch(() => {});
+      keepActingTurn(combatant.parent, {
+        handOver: options?.spycraft2HandOver === true,
+        handOverTurn: options?.spycraft2HandOverTurn
+      }).catch(() => {});
     if (moved) rollTiebreaks(combatant.parent).catch(() => {});
   });
   // Beside each name: what is left of the acting combatant's turn, and the states that change how it is attacked.
@@ -680,7 +853,10 @@ export function installFluidInitiativeHooks() {
       if (!notes.length) continue;
       const badge = document.createElement("span");
       badge.className = "spycraft2-actions-left spycraft2-row-state";
-      badge.textContent = ` (${notes.join(", ")})`;
+      // One line beside the name; a narrow tracker cuts it short and the tooltip keeps the whole of it.
+      badge.textContent = notes.join(" · ");
+      badge.dataset.tooltip = notes.join(", ");
+      name.classList.add("spycraft2-row-name");
       name.append(badge);
     }
   });
@@ -730,17 +906,33 @@ export async function delayCombatant(combatant, counts = null) {
     );
   let times = counts;
   if (times === null) {
+    // The GC names the Count to act on; the ones still to come this round are listed to choose from.
+    const now = combatant.initiative ?? 0,
+      later = (combatant.parent?.turns ?? []).filter(
+        other => other.id !== combatant.id && Number.isFinite(other.initiative) && other.initiative < now
+      ),
+      suggested = later.length ? later[0].initiative - 1 : now - 1;
+    const stepsFor = values => now - Math.trunc(Number(values.count));
     const input = await formDialog({
-      title: loc`Delay — ${combatant.name}`,
-      ok: loc`Delay`,
+      title: loc`Delay: ${combatant.name}`,
+      ok: loc`Delay to this Count`,
       fields: [
         raw(
-          `<label>${loc`Counts to step down (now at ${combatant.initiative ?? "—"})`} <input type="number" name="times" min="1" value="1" /></label>`
+          `<label>${loc`Act on Count (now ${now})`} <input type="number" name="count" max="${now - 1}" value="${suggested}" /></label>${
+            later.length
+              ? `<p class="hint">${esc(loc`Still to act this round: ${later.map(other => `${other.name} ${other.initiative}`).join(", ")}. One below a Count acts after that character.`)}</p>`
+              : ""
+          }`
         )
-      ]
+      ],
+      validate: values => {
+        const steps = stepsFor(values);
+        if (!Number.isSafeInteger(steps) || steps < 1) return loc`Choose a Count below ${now}.`;
+        return fluidEventRefusal(combatant, "delay", { times: steps });
+      }
     });
     if (!input) return null;
-    times = Number(input.times) || 1;
+    times = stepsFor(input);
   }
   return quickFluidEvent(combatant, "delay", { times }, loc`Delay`);
 }
@@ -755,6 +947,10 @@ export function stepBackTurn(combat) {
     ui.notifications.info(loc`This is the first turn of the fight.`);
     return null;
   }
+  // A defeated combatant takes no turn, so stepping back passes over it to the one who acted before.
+  const turns = combat.turns ?? [];
+  for (let index = (combat.turn ?? 0) - 1; index >= 0; index--)
+    if (!turns[index]?.isDefeated) return combat.update({ turn: index }, { direction: -1 });
   return combat.previousTurn();
 }
 
@@ -769,15 +965,37 @@ export async function readyCombatant(combatant) {
     return refuse(loc`${combatant.name} can ready an action only on its own turn.`);
   const spend = spendAction(actionsOf(combatant), "half", { extra: extraHalfActions(combatant) });
   if (!spend.ok) return refuse(loc`${combatant.name} has no half action left this turn to ready with.`);
+  // What sets it off and what it does are written down, so the trigger can be recognised when it comes.
+  const input = await formDialog({
+    title: loc`Ready an action: ${combatant.name}`,
+    ok: loc`Ready the action`,
+    fields: [
+      raw(`<label>${loc`Trigger and action`} <input type="text" name="trigger" placeholder="${esc(loc`e.g. fire at the first guard through the door`)}" /></label>
+      <label><input type="checkbox" name="endTurn" checked /> ${loc`Then end the turn`}</label>`)
+    ]
+  });
+  if (!input) return null;
+  // The dialog may have stayed open while the turn moved on or a half action was spent elsewhere: check again, and
+  // take the half action from the budget as it stands now.
+  if (combat.combatant?.id !== combatant.id || combatant.flags?.spycraft2?.readied)
+    return refuse(loc`${combatant.name}'s turn changed while the dialog was open. Nothing was readied.`);
+  const now = spendAction(actionsOf(combatant), "half", { extra: extraHalfActions(combatant) });
+  if (!now.ok) return refuse(loc`${combatant.name} has no half action left this turn to ready with.`);
+  const trigger = String(input.trigger ?? "")
+    .trim()
+    .slice(0, 200);
   // One write for the half action and the readied mark, so a second press finds the mark already there.
   await combatant.update({
-    "flags.spycraft2.actions": spend.state,
-    "flags.spycraft2.readied": { round: combat.round }
+    "flags.spycraft2.actions": now.state,
+    "flags.spycraft2.readied": { round: combat.round, ...(trigger ? { trigger } : {}) }
   });
   await say(
-    loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
+    trigger
+      ? loc`${esc(combatant.name)} readies an action: ${esc(trigger)}. When it happens, use Readied action triggered on its tracker row.`
+      : loc`${esc(combatant.name)} readies an action. When its trigger happens, use Readied action triggered on its tracker row.`,
     gcOnly(combatant)
   );
+  if (input.endTurn && combat.combatant?.id === combatant.id) await combat.nextTurn();
   return true;
 }
 
@@ -786,23 +1004,31 @@ export async function triggerReadied(combatant) {
   if (!combatant) return null;
   const combat = combatant.parent,
     at = combat?.combatant?.initiative ?? combatant.initiative;
-  const acted = hasActed(combatant);
-  const result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
-  if (!result) return result;
+  const acted = hasActed(combatant),
+    readied = combatant.flags?.spycraft2?.readied ?? null;
+  // The marker comes off before the Count moves and the card posts, so nobody sees a readied action that went off.
+  await combatant.update({ "flags.spycraft2.readied": null });
+  let result;
+  try {
+    result = await quickFluidEvent(combatant, "ready", { triggerCount: at }, loc`Readied action triggered`);
+  } catch (error) {
+    await combatant.update({ "flags.spycraft2.readied": readied });
+    throw error;
+  }
+  if (!result) {
+    await combatant.update({ "flags.spycraft2.readied": readied });
+    return result;
+  }
   // The readied action was this round's action. If the new Count puts the combatant ahead of the turn pointer
   // again, its turn is marked as used up so the tracker and console show nothing left to do.
   const again = acted && !hasActed(combatant) && combat.combatant?.id !== combatant.id;
-  await combatant.update({
-    "flags.spycraft2.readied": null,
-    ...(again
-      ? {
-          "flags.spycraft2.actions": {
-            round: combat.round,
-            used: HALF_ACTIONS_PER_TURN + Math.max(0, extraHalfActions(combatant))
-          }
-        }
-      : {})
-  });
+  if (again)
+    await combatant.update({
+      "flags.spycraft2.actions": {
+        round: combat.round,
+        used: HALF_ACTIONS_PER_TURN + Math.max(0, extraHalfActions(combatant))
+      }
+    });
   if (again)
     ui.notifications.info(
       loc`${combatant.name} has acted this round: pass its turn when it comes up again at the new Count.`
@@ -889,7 +1115,18 @@ export async function combatReferenceDialog() {
     ])}</select></label>
     <label data-when="tool=surface">${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
     <label data-when="tool=surface">${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`,
-    loc`Look up`
+    loc`Look up`,
+    // Refused inside the dialog, so the tool and the figures chosen stay; nothing is quietly clamped.
+    values => {
+      const whole = (value, min, max = Infinity) =>
+        Number.isInteger(Number(value)) && Number(value) >= min && Number(value) <= max && String(value).trim() !== "";
+      if (values.tool === "deviation" && !whole(values.increment, 1, 10))
+        return loc`Enter a range increment from 1 to 10.`;
+      if (values.tool === "gas" && !whole(values.rounds, 0))
+        return loc`Enter the whole rounds since release, 0 or more.`;
+      if (values.tool === "surface" && !whole(values.speed, 0)) return loc`Enter the Speed in feet, 0 or more.`;
+      return null;
+    }
   );
   if (!input) return null;
   const roll = async formula => new Roll(formula).evaluate();
@@ -938,4 +1175,42 @@ export async function combatReferenceDialog() {
       : loc`${SURFACE_LABELS[input.surface]}: a ${Number(input.speed) || 0} ft. move covers ${move.feet} ft.${move.bonusStep ? "" : loc` No bonus 5-ft. step across it.`}`,
     { whisper: true }
   );
+}
+
+/**
+ * Put the selected tokens into a fight on this scene, starting one when there is none: the console's way into a fight,
+ * so the GC does not need Foundry's tracker for it. Tokens already in that fight are left alone.
+ */
+export async function addSelectedToFight() {
+  const scene = globalThis.canvas?.scene,
+    tokens = [...(globalThis.canvas?.tokens?.controlled ?? [])].map(token => token.document).filter(Boolean);
+  if (!scene) return refuse(loc`Open a scene first.`);
+  if (!tokens.length) return refuse(loc`Select the tokens to add on the map first (click, or drag a box round them).`);
+  // The fight the GC is viewing comes first, linked to a scene or not; only with none is one looked for or made here.
+  let fight =
+    game.combat ?? [...(game.combats ?? [])].find(entry => entry.scene?.id === scene.id && entry.active) ?? null;
+  fight ??= await CONFIG.Combat.documentClass.create({ scene: scene.id, active: true });
+  if (!fight) return null;
+  const present = new Set([...(fight.combatants ?? [])].map(combatant => combatant.tokenId));
+  const fresh = tokens.filter(token => !present.has(token.id));
+  if (!fresh.length) {
+    ui.notifications.info(loc`Every selected token is already in the fight.`);
+    return fight;
+  }
+  await fight.createEmbeddedDocuments(
+    "Combatant",
+    fresh.map(token => ({ tokenId: token.id, sceneId: scene.id, actorId: token.actorId, hidden: token.hidden }))
+  );
+  ui.notifications.info(
+    fresh.length === 1
+      ? loc`${fresh[0].name} joins the fight.`
+      : loc`${fresh.length} join the fight: ${fresh.map(token => token.name).join(", ")}.`
+  );
+  return fight;
+}
+
+/** End the fight the console runs; Foundry's own end-combat question confirms it. */
+export async function endFight(fight = game.combat) {
+  if (!fight) return refuse(loc`No fight is running.`);
+  return fight.endCombat();
 }

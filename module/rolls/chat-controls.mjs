@@ -172,6 +172,41 @@ core("cunningPlanControl", 9100, ctx => {
   return card("Cunning Plan", () => actor.useCunningPlan(message));
 });
 
+// A flanking bonus the map or the dialog ticked stays a choice until the attack is resolved (p.341).
+core("removeFlankingControl", 9105, ctx => {
+  const { message, check, actor } = ctx,
+    flanking = check.attackContext?.flanking;
+  if (!open(ctx) || check.checkKind !== "attack" || !flanking?.declared || flanking.blocked || flanking.removed)
+    return null;
+  if (!(flanking.attackBonus > 0) || typeof check.successConfirmed === "boolean" || check.attackResolution) return null;
+  return [
+    {
+      label: loc`Not flanking (−${flanking.attackBonus})`,
+      hint: loc`Not flanking (−${flanking.attackBonus}): take the flanking bonus off this attack`,
+      run: () => actor.removeFlanking(message),
+      placement: "card",
+      emphasis: "quiet"
+    }
+  ];
+});
+
+// "Not flanking" pressed by mistake: the bonus goes back while the attack is still open.
+core("restoreFlankingControl", 9106, ctx => {
+  const { message, check, actor } = ctx,
+    flanking = check.flankingRestore?.check?.attackContext?.flanking;
+  if (!open(ctx) || check.checkKind !== "attack" || !check.attackContext?.flanking?.removed || !flanking) return null;
+  if (typeof check.successConfirmed === "boolean" || check.attackResolution) return null;
+  return [
+    {
+      label: loc`Flanking after all (+${flanking.attackBonus})`,
+      hint: loc`Flanking after all (+${flanking.attackBonus}): put the flanking bonus back on this attack`,
+      run: () => actor.restoreFlanking(message),
+      placement: "card",
+      emphasis: "quiet"
+    }
+  ];
+});
+
 core("manualAdjustmentControl", 9110, ctx => {
   const { message, check, actor } = ctx;
   if (!open(ctx) || !manualAdjustment(ctx)) return null;
@@ -193,6 +228,8 @@ core("criticalControl", 9130, ctx => {
   if (check.criticalSuccess || check.criticalFailure) return null;
   // An NPC's own threat is paid from the GC pool by its own button (module/apps/gc/npc-card-dice.mjs).
   if (actor.type === "npc" && !check.errorConfirmed) return null;
+  // An agent's error is activated by the GC, who pays for it: the player who rolled has nothing to spend here.
+  if (check.errorConfirmed && actor.type === "agent" && !(ctx.user ?? globalThis.game?.user)?.isGM) return null;
   // The label names what is being activated; the dialog works out the cost from the chosen effect.
   const label = check.threatConfirmed
     ? check.checkKind === "attack"
@@ -298,6 +335,12 @@ function button(control) {
   element.setAttribute("data-tooltip", full);
   element.dataset.rollControl = control.id;
   if (control.key) element.dataset.rollKey = control.key;
+  // A control that is not legal now is shown disabled with its reason (style guide 8.6), and does nothing.
+  if (control.disabled) {
+    element.disabled = true;
+    element.setAttribute("data-tooltip", `${full}: ${control.disabled}`);
+    return element;
+  }
   element.addEventListener("click", () => runChatAction(element, () => control.run()));
   return element;
 }
@@ -345,6 +388,28 @@ function row(controls) {
   return element;
 }
 
+/**
+ * What applying a damage card did, under its total: one line per target, from the report kept on the card. Written
+ * as text, never as markup. Records from before reports were kept, or whose outcome had its own card, show nothing.
+ */
+export function renderDamageResults(check, html) {
+  if (check?.checkKind !== "damage" || html.querySelector?.(".sc2-damage-results")) return;
+  const entries = appliedDamageEntries(check).filter(entry => Array.isArray(entry?.report) && entry.report.length);
+  if (!entries.length) return;
+  const doc = html.ownerDocument ?? document;
+  const section = doc.createElement("section");
+  section.className = "spycraft2 sc2-damage-results";
+  section.setAttribute("aria-label", loc`Damage applied`);
+  for (const entry of entries)
+    for (const line of entry.report) {
+      if (typeof line !== "string" || !line) continue;
+      const p = doc.createElement("p");
+      p.textContent = line.slice(0, 400);
+      section.append(p);
+    }
+  (html.querySelector(".message-content") ?? html).append(section);
+}
+
 /** Add this system's buttons to a rendered chat message (the `renderChatMessageHTML` hook). */
 export function renderCheckControls(message, html) {
   const check = message.flags?.spycraft2;
@@ -363,6 +428,7 @@ export function renderCheckControls(message, html) {
   const translated = viewerFlavor(check, game.i18n?.lang);
   const flavor = translated ? html.querySelector(".flavor-text") : null;
   if (flavor) flavor.replaceChildren(safeFlavor(translated, flavor.ownerDocument));
+  renderDamageResults(check, html);
   const actor = fromUuidSync(check.actorUuid);
   // The player whose agent is the target answers from the same card.
   const response = targetResponseControls({ message, check, user: game.user });

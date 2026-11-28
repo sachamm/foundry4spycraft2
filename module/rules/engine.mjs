@@ -1,4 +1,10 @@
+import { campaignRules, campaignActionDice } from "./campaign-rules.mjs";
 import { derivedMovementPlan } from "./derived-movement.mjs";
+import { periodMoney } from "./period-money.mjs";
+import { historicalCaliber } from "./gear-era.mjs";
+import { applyGearRestrictions, gearRestrictionsInForce } from "./gear-restrictions.mjs";
+import { standingStatus } from "./standing.mjs";
+import { reviewContactPeople } from "./contact-people.mjs";
 import { originRuleName, ruleName } from "./rule-name.mjs";
 import { computeDrainedAgent } from "./drained.mjs";
 import { classFeatureLevels, expertClassQualification } from "./class-features.mjs";
@@ -123,6 +129,17 @@ import { loc } from "../i18n.mjs";
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const GEAR = ["R", "T", "V", "S", "G", "W", "E"];
+/** The categories' names, for messages a player reads (a letter alone means nothing to them). */
+const gearName = key =>
+  ({
+    R: loc`Resources`,
+    T: loc`Tradecraft`,
+    V: loc`Vehicles`,
+    S: loc`Security`,
+    G: loc`Gadgets`,
+    W: loc`Weapons`,
+    E: loc`Electronics`
+  })[key] ?? key;
 const mod = score => Math.floor((score - 10) / 2);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const miscActionDice = sys => sys.misc?.actionDice ?? 0;
@@ -237,10 +254,11 @@ function startPass(state) {
   }
   const creationPolicy = characterCampaignPolicy(
     sys,
-    options.campaignEffects ?? sys.campaignEffects ?? {},
+    options.campaignEffects ?? sys.campaignEffects ?? campaignRules(),
     sys.creationPolicy
   );
   sys.campaignEffects = creationPolicy.effects;
+
   if (
     sys.creationPolicy ||
     creationPolicy.needsReview ||
@@ -329,6 +347,11 @@ function startPass(state) {
   );
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   const todo = [];
+  if ((sys.featTrades?.purchased ?? 0) !== 0 || (sys.featTrades?.modular ?? 0) !== 0) {
+    const text = loc`Legacy feat trade counts need GC review against the original XP receipts and Modular creation record; counters alone grant no choices.`;
+    warnings.push(text);
+    todo.push({ order: 21, tab: "feats", error: true, always: true, text });
+  }
   if (creationPolicy.needsReview) {
     const text = loc`The GC must review which creation-only campaign qualities applied when this character was created.`;
     warnings.push(text);
@@ -340,6 +363,7 @@ function startPass(state) {
     todo.push({ order: 1, always: true, tab: "main", text: affiliationProblem });
   }
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  // Table 1.3, with the growth season qualities applied (p.407).
   const levelRow = l => T.levels[clamp(l, 0, 20)];
   Object.assign(state, { allItems, items, shaken, T, warnings, legalFeatIds, activeFeatIds, todo, plural, levelRow });
 }
@@ -838,7 +862,8 @@ function deriveAttributes(state) {
     tb
   } = state;
   const abilityBonus = new Bonuses(),
-    nonCandidateBonus = new Bonuses();
+    nonCandidateBonus = new Bonuses(),
+    originAbility = new Map();
   sys.unrestrictedBonusPools = unrestrictedBonusPools(sys);
   for (const pool of sys.unrestrictedBonusPools) if (pool.needsReview) warnings.push(pool.reason);
   sys.drunkRepositionState = drunkRepositionHistory(sys);
@@ -877,6 +902,7 @@ function deriveAttributes(state) {
           key = b.target.slice(10);
         abilityBonus.add(key, amount, s.name, b.bonusType);
         if (!s.candidate) nonCandidateBonus.add(key, amount, s.name, b.bonusType);
+        if (s.origin) originAbility.set(key, (originAbility.get(key) ?? 0) + (Number(amount) || 0));
       }
     }
   // Berserker rage, pp.183–184: Strength and Constitution rise while it runs.
@@ -1055,6 +1081,8 @@ function deriveAttributes(state) {
     const override = sys.skills?.[key];
     return (
       item.system.classSkills?.includes(key) ||
+      (!sys.companionOf?.ownerUuid &&
+        skillPurchasePolicy(progression[career - 1], career, sys.campaignEffects).allSkillsClass) ||
       (item.system.identifier === "schemer" && (stageAt(career).classLevels.schemer ?? 0) >= 6) ||
       stageAt(career).bonus(`skills.${key}.classSkill`) > 0 ||
       (override?.classSkill && career >= (override.classSkillAt ?? 1))
@@ -1926,6 +1954,8 @@ function deriveFinalTotals(state) {
     if (sys.actionDice.die === 12) {
       sys.actionDice.die = 6;
       sys.actionDice.max *= 2;
+      // Each die gained from now on arrives as two d6 (p.181), session adjustments included.
+      sys.actionDice.gainMultiplier = 2;
     } else sys.actionDice.die += 2;
   }
   // Personal Lieutenant (p.204): always exactly 1 action die.
@@ -1944,6 +1974,12 @@ function deriveFinalTotals(state) {
   sys.combatMovement = combatMovementRules(sys);
   sys.senses = baseSensoryRanges(sys);
   sys.cqbRange = campaignCQBRange(sys.activeFeatNames, sys.campaignEffects);
+  const campaignDice = sys.companionOf?.ownerUuid
+    ? { step: 0, noExplode: false, explodeLow: false }
+    : campaignActionDice();
+  if (campaignDice.step > 0) sys.actionDice.die = Math.min(12, sys.actionDice.die + 2 * campaignDice.step);
+  sys.actionDice.explodes = !campaignDice.noExplode;
+  sys.actionDice.explodeLow = campaignDice.explodeLow;
   sys.actionDice.explodeAt = sys.activeFeatNames.includes("Lady Luck's Smile")
     ? sys.actionDice.die - 1
     : sys.actionDice.die;
@@ -2075,6 +2111,7 @@ function deriveSkillTotals(state) {
         order: 29,
         always: true,
         error: true,
+        over: ranks - skillMaxRanks,
         tab: "skills",
         text: loc`${sd.name} is over its rank maximum (${ranks} / ${skillMaxRanks}): remove ${ranks - skillMaxRanks}.`
       });
@@ -2126,6 +2163,7 @@ function deriveSkillTotals(state) {
         order: 29,
         always: true,
         error: true,
+        over: -sp.remaining,
         tab: "skills",
         skillLevel: idx + 1,
         text: loc`Level ${idx + 1} skill points overspent by ${-sp.remaining}: lower a skill.`
@@ -2207,8 +2245,8 @@ function deriveFeatSlots(state) {
   if (campaignAllocation.replacements.length) sys.feats.campaignReplacements = campaignAllocation.replacements;
   if (overflow > slots.any) warnings.push(loc`${overflow - slots.any} more feat(s) taken than available.`);
   const unusedTree = Object.entries(trees)
-    .filter(([, v]) => v.slots > v.spent)
-    .map(([t, v]) => `${v.slots - v.spent} ${cfg.featTrees[t]}`);
+    .filter(([, v]) => v.slots > v.spent + (v.lent ?? 0))
+    .map(([t, v]) => `${v.slots - v.spent - (v.lent ?? 0)} ${cfg.featTrees[t]}`);
   sys.feats.unusedTreeSlots = unusedTree;
   if (sys.feats.any.remaining > 0)
     todo.push({
@@ -2356,6 +2394,7 @@ function deriveProficiencies(state) {
     warnings.push(text);
     todo.push({ order: 53, tab: "training", error: true, always: true, text });
   }
+  for (const contact of sys.contacts ?? []) warnings.push(...reviewContactPeople(contact).problems);
   if (contactsUsed < contactsAvail)
     todo.push({
       order: 53,
@@ -2389,6 +2428,16 @@ function deriveProficiencies(state) {
     warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);
     todo.push({ order: 54, tab: "training", text: loc`Trouble Magnet: keep at least one unfinished Subplot in play.` });
   }
+  if (
+    sys.campaignEffects.debtSubplot &&
+    !sys.companionOf?.ownerUuid &&
+    !(sys.subplots ?? []).some(row => /\bdebt\b/i.test(String(row.name ?? "")))
+  )
+    todo.push({
+      order: 54,
+      tab: "training",
+      text: loc`Record the Debt Subplot required by Shoe String Budget (pp.55,408).`
+    });
   if (sys.subplotPicks.used > sys.subplotPicks.available) {
     const text = loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`;
     warnings.push(text);
@@ -2434,7 +2483,8 @@ function deriveWealthAndGear(state) {
       appearanceFeatBonus: B.get("appearance")
     },
     possessions: { rank: possessions, picks: posRow?.picks },
-    spendingCash: { rank: cash, amount: 100 * cash * cash }
+    // Table 7.4 under the Historical quality (p.407).
+    spendingCash: { rank: cash, amount: periodMoney(100 * cash * cash) }
   };
   if (sys.companionOf?.feat === PERSONAL_LIEUTENANT) {
     sys.wealth.lifestyle = { rank: 0, appearanceMod: B.get("appearance"), appearanceFeatBonus: B.get("appearance") };
@@ -2458,7 +2508,23 @@ function deriveWealthAndGear(state) {
   picks.CHA = { available: sys.companionOf?.feat === PERSONAL_LIEUTENANT ? 0 : Math.max(0, abil.cha.mod), spent: 0 };
   for (const i of items) {
     const p = i.system?.pick;
-    if (p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i)) picks[p].spent += i.system?.pickCount ?? 1;
+    if (!(p && picks[p] && i.type !== "class" && !managedAcquisition(sys, i))) continue;
+    const count = i.system?.pickCount ?? 1;
+    picks[p].spent += count;
+  }
+  const missionReserves = currentReserves(sys);
+  // Shoe String Budget (p.408): a pick that falls below Caliber I is lost, so a Caliber I mission's picks buy nothing.
+  if (
+    missionReserves &&
+    Number.isSafeInteger(missionReserves.caliber) &&
+    missionReserves.caliber >= 1 &&
+    missionReserves.caliber <= 5 &&
+    campaignPickCaliber(missionReserves.caliber, sys.campaignEffects).lost
+  ) {
+    for (const key of Object.keys(picks)) picks[key].available = 0;
+    warnings.push(
+      loc`Shoe String Budget: this mission's gear picks fall below Caliber I, so they are lost and buy no gear (p.408).`
+    );
   }
   const reservedAllocations = reserveAllocations(sys);
   for (const key of Object.keys(picks)) picks[key].spent += reservedAllocations[key] ?? 0;
@@ -2479,13 +2545,18 @@ function deriveWealthAndGear(state) {
   const lost = sys.gearPickLosses ?? {};
   const lostTotal = GEAR.reduce((n, key) => n + (lost[key] ?? 0), 0);
   if (lostTotal !== penalty)
-    warnings.push(loc`Charisma requires removing ${penalty} mission gear pick(s); currently ${lostTotal} assigned.`);
+    warnings.push(
+      loc`Charisma ${abil.cha.mod} costs ${penalty} mission gear pick(s); ${lostTotal} chosen so far. Choose which on the Gear tab.`
+    );
   for (const key of GEAR) {
-    const value = lost[key] ?? 0;
-    if (value > gearBase[key]) warnings.push(loc`Charisma pick loss: ${key} may only lose class-granted picks.`);
+    const value = lost[key] ?? 0,
+      name = gearName(key);
+    if (value > gearBase[key])
+      warnings.push(loc`Charisma loss: only class-granted ${name} picks can be given up. Choose another category.`);
     picks[key].available = Math.max(0, picks[key].available - value);
     picks[key].remaining = picks[key].available - picks[key].spent;
-    if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
+    if (picks[key].remaining < 0)
+      warnings.push(loc`After the Charisma loss, more ${name} picks are spent than remain. Return one ${name} item.`);
   }
   if (
     sys.campaignEffects.gearCaliberShift ||
@@ -2494,6 +2565,31 @@ function deriveWealthAndGear(state) {
     sys.campaignMissionBonusPicks = campaignMissionBonusPicks(sys, items);
     warnings.push(...sys.campaignMissionBonusPicks.warnings);
   } else delete sys.campaignMissionBonusPicks;
+  // Negative standing (p.440): a burned agent keeps only personal Possessions, so no mission gear may be held.
+  sys.standingStatus = standingStatus(sys);
+  if (sys.standingStatus.burned) {
+    const held = items.filter(
+      i => ["weapon", "armor", "gear"].includes(i.type) && i.system?.pick && !i.system.possessionSource
+    ).length;
+    warnings.push(
+      sys.standingStatus.liquidation
+        ? loc`Targeted for liquidation (p.440): no mission gear, Requests or Gear checks, only personal Possessions.`
+        : loc`Burned (p.440): no mission gear, Requests or Gear checks, only personal Possessions, until standing is back above 0.`
+    );
+    if (held) warnings.push(loc`Burned: ${held} mission gear pick(s) are still on this sheet (p.440).`);
+  }
+  // Gear Restrictions (Table 7.8, p.437): the mission's lost picks, in the categories chosen at Intel, and any list of
+  // allowed weapons or Mechanisms the GC keeps with the mission.
+  const restriction = gearRestrictionsInForce(),
+    restrictionLosses = sys.gearRestrictionLosses ?? {};
+  warnings.push(...applyGearRestrictions(picks, restrictionLosses, items, restriction));
+  sys.gearRestriction = {
+    picks: restriction?.picks ?? 0,
+    chooser: restriction?.chooser ?? "player",
+    lists: restriction?.lists ?? [],
+    // Shown while picks are lost, or while an earlier mission's losses are left to clear.
+    show: (restriction?.picks ?? 0) > 0 || Object.values(restrictionLosses).some(value => Number(value) > 0)
+  };
   sys.ammunitionConfigurations = {};
   for (const item of items.filter(i => i.type === "weapon")) {
     const configuration = ammunitionConfiguration(item.system);
@@ -2531,14 +2627,26 @@ function deriveWealthAndGear(state) {
     item => ["weapon", "armor", "gear", "vehicle"].includes(item.type) && item.system.pick
   )) {
     const category = equipmentCategory(item),
-      pick = item.system.pick;
+      pick = item.system.pick,
+      // Historical (p.407): an item newer than the campaign year is a gadget one Caliber higher, never past V.
+      era = historicalCaliber(item.system),
+      caliber = era.caliber ?? 6;
+    if (!era.available && !managedAcquisition(sys, item))
+      warnings.push(
+        loc`${item.name}: not yet introduced in the campaign year, and a gadget of it would pass Caliber V, so it cannot be had under Historical (p.407).`
+      );
+    // The allowance is the reserves' Caliber, or before reserves are allocated the running mission's (p.398).
+    const allowance = activeReserves?.caliber ?? (Number.isSafeInteger(sys.missionCaliber) ? sys.missionCaliber : null);
     if (
-      activeReserves &&
-      validMissionCaliber &&
+      Number.isSafeInteger(allowance) &&
+      allowance >= 1 &&
+      allowance <= 5 &&
+      era.available &&
       !managedAcquisition(sys, item) &&
-      item.system.caliber > campaignPickCaliber(activeReserves.caliber, sys.campaignEffects).caliber
+      caliber > campaignPickCaliber(allowance, sys.campaignEffects).caliber
     ) {
       const exception =
+        !!activeReserves &&
         bigStickMatches(sys, item) &&
         sys.bigStickMissionPick.missionCaliber === activeReserves.caliber &&
         sys.bigStickStatus.active &&
@@ -2552,11 +2660,12 @@ function deriveWealthAndGear(state) {
         !item.system.common &&
         !item.system.ammunitionOnly &&
         !item.system.reserve &&
-        item.system.caliber <=
-          campaignPickCaliber(Math.min(5, activeReserves.caliber + 1), sys.campaignEffects).caliber;
+        caliber <= campaignPickCaliber(Math.min(5, activeReserves.caliber + 1), sys.campaignEffects).caliber;
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
-          loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
+          era.gadget
+            ? loc`${item.name}: not yet introduced in the campaign year, so it is a Caliber ${["I", "II", "III", "IV", "V"][caliber - 1]} gadget (Historical, p.407), above this mission’s allowance.`
+            : loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
         );
     }
 

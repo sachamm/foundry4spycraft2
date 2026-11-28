@@ -182,6 +182,13 @@ test("confirmation, critical activation and a required bonus die appear in their
     after.some(label => label.startsWith("card:Activate critical")),
     false
   );
+  // An agent's error is the GC's to activate and pay for: the player who rolled is not offered it.
+  const error = message({ naturalDie: 1, errorConfirmed: true });
+  assert.equal(
+    labels(error).some(label => label.startsWith("card:Activate critical")),
+    false
+  );
+  assert.equal(labels(error, { isGM: true }).includes("card:Activate critical failure… (an opponent pays)"), true);
   assert.equal(after.includes("card:Spend required class bonus die"), false);
 });
 
@@ -332,7 +339,13 @@ test("the GC spends the session pool from an NPC's card; the NPC's own threat is
   const gc = { isGM: true };
   assert.deepEqual(labels(message({ checkKind: "attack" }), gc).slice(0, 1), ["card:GC boost (+1d4)"]);
   const threat = labels(message({ checkKind: "attack", threatConfirmed: true }), gc);
-  assert.deepEqual(threat.slice(0, 2), ["card:GC: activate threat", "card:GC boost (+1d4)"]);
+  assert.deepEqual(threat.slice(0, 2), ["card:Activate threat (GC dice)", "card:GC boost (+1d4)"]);
+  // A standard NPC without treacherous may not activate it: the button is shown disabled with the reason (p.452).
+  const threatCard = message({ checkKind: "attack", threatConfirmed: true });
+  const activate = rollPipeline
+    .chatControls({ message: threatCard, check: threatCard.flags.spycraft2, actor, user: gc, checkKind: "attack" })
+    .find(c => c.label === "Activate threat (GC dice)");
+  assert.match(activate.disabled, /treacherous/);
   assert.equal(
     threat.some(label => label.startsWith("card:Activate critical")),
     false
@@ -452,6 +465,35 @@ test("a card shortcut presses the newest enabled matching button, skipping cards
   assert.equal(newestCardButton({ querySelectorAll: () => [] }, "button"), null);
 });
 
+test("the console's next step presses only the acting combatant's newest card and says which", async () => {
+  const { pressActorCard } = await import("../module/apps/keybindings.mjs");
+  const pressed = [];
+  const button = name => ({ disabled: false, textContent: name, click: () => pressed.push(name) });
+  const card = (id, buttons) => ({ dataset: { messageId: id }, querySelectorAll: () => buttons });
+  const cards = [card("g1", [button("Roll damage")]), card("p1", [button("Apply")]), card("g2", [])];
+  const speakers = { g1: { actor: "guard", token: "t1" }, p1: { actor: "agent", token: "t9" }, g2: { token: "t1" } };
+  const previous = { document: globalThis.document, game: globalThis.game, ui: globalThis.ui };
+  const notes = [];
+  globalThis.document = { querySelector: () => ({ querySelectorAll: () => cards }) };
+  globalThis.game = { messages: { get: id => ({ speaker: speakers[id] }) } };
+  globalThis.ui = { notifications: { info: message => notes.push(message) }, chat: {} };
+  try {
+    const guard = { name: "Guard (Rook)", tokenId: "t1", actor: { id: "guard" } };
+    // Its newest card has no step left, so an older card's step is not pressed a second time.
+    assert.equal(pressActorCard(guard, "button"), false);
+    assert.deepEqual(pressed, []);
+    notes.length = 0;
+    cards.pop();
+    assert.equal(pressActorCard(guard, "button"), true);
+    assert.deepEqual(pressed, ["Roll damage"], "the agent's newer card is passed over");
+    assert.deepEqual(notes, ["Roll damage: Guard (Rook)."]);
+    assert.equal(pressActorCard({ name: "Driver", tokenId: "t5", actor: { id: "driver" } }, "button"), false);
+    assert.equal(notes.at(-1), "No card of Driver is waiting for a next step.");
+  } finally {
+    Object.assign(globalThis, previous);
+  }
+});
+
 test("the GC boost shortcut takes the card under the pointer, else the newest card this user posted", async () => {
   const { boostCardButton } = await import("../module/apps/keybindings.mjs");
   const card = (id, buttons) => ({ dataset: { messageId: id }, querySelectorAll: () => buttons });
@@ -471,6 +513,16 @@ test("the GC boost shortcut takes the card under the pointer, else the newest ca
     boostCardButton(root(), () => false),
     null
   );
+  const { boostRefusal } = await import("../module/apps/keybindings.mjs");
+  const pointed = button => ({
+    querySelector: selector => (selector.includes("message-id") ? { querySelector: () => button } : null)
+  });
+  assert.match(boostRefusal(pointed(null)), /has no GC boost/);
+  assert.match(
+    boostRefusal(pointed({ dataset: { tooltip: "Already boosted." } })),
+    /cannot be boosted: Already boosted\./
+  );
+  assert.match(boostRefusal({ querySelector: () => null }), /None of your cards/);
 });
 
 test("a mouse click lets go of a button so shortcuts keep working; a keyboard press keeps its focus", async () => {
@@ -494,4 +546,60 @@ test("a mouse click lets go of a button so shortcuts keep working; a keyboard pr
   assert.equal(releaseFocusAfterClick({ detail: 1, target: inDialog }, inDialog), false, "dialogs keep focus");
   assert.equal(releaseFocusAfterClick({ detail: 1, target: sheetButton }, {}), false, "focus already moved");
   assert.equal(blurred, 1);
+});
+
+test("the focus release leaves Foundry's own sidebar buttons alone", async () => {
+  const { releaseFocusAfterClick } = await import("../module/apps/keybindings.mjs");
+  const tab = {
+    blur() {},
+    closest: selector => (selector.startsWith("button") ? tab : selector.includes("#sidebar") ? {} : null)
+  };
+  assert.equal(releaseFocusAfterClick({ detail: 1, target: tab }, tab), false);
+});
+
+test("a damage card shows what applying it did, as text, one line per outcome", async () => {
+  const { renderDamageResults } = await import("../module/rolls/chat-controls.mjs");
+  const html = new Element("li");
+  renderDamageResults(
+    {
+      checkKind: "damage",
+      damageAppliedBy: {
+        a: { targetUuid: "Actor.k", name: "Kevin", damage: 9, kind: "lethal", report: ["Kevin takes 9 damage."] },
+        b: {
+          targetUuid: "Actor.g",
+          name: "Guard",
+          damage: 4,
+          kind: "lethal",
+          report: ["<img src=x onerror=alert(1)>"]
+        },
+        c: { targetUuid: "Actor.n", name: "Old", damage: 2, kind: "lethal" }
+      }
+    },
+    html
+  );
+  const section = html.content.children[0];
+  assert.equal(section.className, "spycraft2 sc2-damage-results");
+  assert.deepEqual(
+    section.children.map(p => [p.tag, p.textContent, p.innerHTML]),
+    [
+      ["p", "Kevin takes 9 damage.", undefined],
+      ["p", "<img src=x onerror=alert(1)>", undefined]
+    ]
+  );
+  const none = new Element("li");
+  renderDamageResults({ checkKind: "attack", damageAppliedBy: { a: { report: ["x"] } } }, none);
+  assert.equal(none.content, undefined);
+});
+
+test("a damage report kept on the card is plain text within its limits", async () => {
+  const { reportText, validReport } = await import("../module/rules/damage-application.mjs");
+  assert.deepEqual(reportText(["<b>Kevin</b> &amp; Co take 9 damage.", "", 3, "  two   spaces "]), [
+    "Kevin & Co take 9 damage.",
+    "two spaces"
+  ]);
+  assert.equal(reportText(Array(20).fill("x")).length, 12);
+  assert.equal(validReport(undefined), true);
+  assert.equal(validReport(["ok"]), true);
+  assert.equal(validReport([{}]), false);
+  assert.equal(validReport(["x".repeat(401)]), false);
 });

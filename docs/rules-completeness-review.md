@@ -2984,3 +2984,45 @@ schemas, lint, formatting, bundle and copied-text checks pass. A fresh upstream
 fetch discovered main had advanced to 75b2b1b. Preserve this completed change in
 its own commit, then resolve the upstream overlap and repeat validation before
 final scoring. No upstream work has been published or merged into main here.
+
+## Pass 95: Integrate current main and repeat the rules checks
+
+Fetched and integrated origin/main 75b2b1b into the task branch, bringing the
+system to 0.8.8 without changing the integration checkout. Retained upstream
+GC tools, contact people, organization support, historical gear years, initiative
+controls and schema improvements. Resolved overlapping campaign and Grapple
+implementations around the captured creation history and original-dice records.
+No task work was published or merged into main.
+
+The integration review found and fixed these concrete problems:
+
+- Removed duplicate campaign modifiers and Laser critical discounts; injury
+  choices retain their printed base cost so campaign surcharges apply once.
+- Standard unarmed benefit damage now respects actual proficiency: trained
+  characters use lethal damage, untrained characters use subdual. Animals gain
+  proficiency with their actual granted weapon, not every weapon in its family.
+- Throw first calculates standard unarmed damage, including its minimum, then
+  adds its additional Strength bonus (minimum one). Throw retains the standard
+  damage type; Injure and Use Weapon retain their explicit conversion workflow.
+- NPC Damage save health bonuses apply once. Actual named checks keep their
+  timing, secrecy and campaign effects; a general disposition-targeted roll does
+  not silently select a named check.
+- Historical gear checks use the running mission allowance before reserve
+  allocation. Big Budget extras still require a funded same-category item link;
+  an arbitrary pair does not become free. Legacy feat counters cannot replace
+  XP receipts or a confirmed Modular creation record.
+- Broke two import cycles without duplicating falling or mission rules. Hazard
+  Undo restores health while retaining consumed original secondary outcomes.
+- Removed duplicate NPC sheet sections created by moved upstream blocks and
+  restored the pinned health row in a narrow sheet.
+
+Reviewed golden changes are limited to explicit action-die explosion fields,
+numeric overspend in advanced skill setup entries, the new gear restriction and
+standing status fields, and upstream sample actor names. No unexplained combat
+or creation value differences were accepted.
+
+Validation: **4,779 Node tests**, **988 independent engine fixtures**,
+**308 layout checks**, **13 built-pack checks**, native schemas, lint at the
+existing warning caps, formatting, bundle and copied-text checks pass. A further
+24 template checks pass after removing the duplicated sheet sections. Native
+integration scenarios and the final scoring review follow in the next pass.

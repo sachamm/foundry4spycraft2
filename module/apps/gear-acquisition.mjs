@@ -32,9 +32,32 @@ import {
   officeGossipTake10
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
+import { organizationSite, siteForRequest } from "../rules/gc/organization.mjs";
+import { agencyOrganization, getMission } from "./gc/state.mjs";
 import { loc } from "../i18n.mjs";
 import { sameValues as same } from "../rules/equal.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { campaignRules } from "../rules/campaign-rules.mjs";
+import { gearYearByName } from "../rules/gear-era.mjs";
+
+/** The Agency's Sites a Request may go through (p.394): +4 and half the delivery time. */
+function agencySiteSelect() {
+  const sites = (agencyOrganization()?.sites ?? []).map(organizationSite).filter(Boolean);
+  if (!sites.length) return "";
+  return `<label>${loc`Agency Site`} <select name="agencySite"><option value="">${loc`None`}</option>${sites
+    .map(site => `<option value="${esc(site.id)}">${esc(loc`${site.name}: ${site.request} (+4, half time)`)}</option>`)
+    .join("")}</select></label>`;
+}
+/** The Caliber of the mission under way in the GC's record (p.398), or null when none is running. */
+function runningMissionCaliber() {
+  try {
+    const mission = getMission();
+    return mission.active && !mission.ended && Number.isSafeInteger(mission.caliber) ? mission.caliber : null;
+  } catch {
+    return null;
+  }
+}
+const chosenSite = id => (id ? siteForRequest(agencyOrganization(), id) : null);
 import { postedReceipt } from "../services/message-lookup.mjs";
 const queued = (actor, work, options) => queueResources([actor], work, options);
 const crossQueued = (actor, actors, work) => queueResources([actor, ...actors], work);
@@ -42,6 +65,7 @@ const owned = actor => actor?.type === "agent" && actor.isOwner;
 export async function allocateMissionReserves(actor, options = {}) {
   if (!owned(actor)) return null;
   let input = options;
+  const missionCaliber = runningMissionCaliber();
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Unassigned mission reserves` },
@@ -51,7 +75,11 @@ export async function allocateMissionReserves(actor, options = {}) {
    ${PICK_CATEGORIES.map(key => `<label>${loc`${key} picks (${actor.system.gearPicks?.[key]?.remaining ?? 0} unchosen)`} <input type="number" name="pick_${key}" min="0" value="0" /></label>`).join("")}
    <details><summary>${loc`Categories for reserved Charisma picks (set during Intel)`}</summary>${(actor.system.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"]).map(k => `<label>${loc`CHA → ${k}`} <input type="number" name="cha_${k}" min="0" value="0" /></label>`).join("")}</details>
    <label>${loc`Reserve Common Items`} <input type="number" name="common" min="0" value="0" /></label>
-   <label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
+   ${
+     missionCaliber
+       ? `<p>${loc`Mission Caliber: ${CONFIG.SPYCRAFT.calibers[missionCaliber]}, as the GC set it for this mission.`}</p><input type="hidden" name="caliber" value="${missionCaliber}" />`
+       : `<label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>`
+   }
    <label><input type="checkbox" name="procureAtIntel" /> ${loc`Procure: Intel takes place in a city of 10,000+ people with quick contact; hold two additional reserves`}</label>
    <label><input type="checkbox" name="intelComplete" /> ${loc`The Intel Phase is complete; these are this mission’s unchosen reserves`}</label></div>`
     });
@@ -66,7 +94,12 @@ export async function allocateMissionReserves(actor, options = {}) {
     const record = reserveInitialization(
         actor.system,
         actor.items.filter(i => !isResourceLock(i)),
-        { ...input, common: Number(input.common ?? 0), caliber: Number(input.caliber ?? 1) }
+        {
+          ...input,
+          common: Number(input.common ?? 0),
+          caliber: Number(input.caliber ?? missionCaliber ?? 1),
+          missionCaliber
+        }
       ),
       before = actor.system.missionReserves;
     const changes = { "system.missionReserves": record };
@@ -132,6 +165,7 @@ export async function rollGearAcquisition(actor, options = {}) {
    <label>${loc`Free origin Resource`} <select name="originResource"><option value="">${loc`Select only with Privileged or Rescuer`}</option><option value="legalImmunity">${loc`Privileged: Caliber II legal immunity`}</option><option value="medicalAssistance">${loc`Rescuer: Caliber II medical assistance`}</option></select></label>
    <label><input type="checkbox" name="originResourceConfirmed" /> ${loc`The GC confirms the exact Resource and its Caliber II source. This benefit works in any mission and consumes no Reserve pick.`}</label>
    <label>${loc`Exact item or option`} <input name="name" required /></label>
+   ${campaignRules().historicalGear ? `<label>${loc`Year introduced (Historical; leave blank to look it up by name)`} <input name="itemYear" /></label>` : ""}
    <label>${loc`Reserve pick`} <select name="pick"><option value="">${loc`No Reserve pick (free origin benefit only)`}</option>${PICK_CATEGORIES.map(k => `<option value="${k}">${loc`${k}: ${record.picks[k] ?? 0} remaining`}</option>`).join("")}</select></label>
    <label>${loc`Requested category`} <select name="category">${PICK_CATEGORIES.filter(k => k !== "CHA")
      .map(k => `<option value="${k}">${k}</option>`)
@@ -141,6 +175,7 @@ export async function rollGearAcquisition(actor, options = {}) {
      .map(([key, d]) => `<option value="${key}">${esc(d.label)}: ${d.formula} ${d.unit}</option>`)
      .join("")}</select></label>
    <label><input type="checkbox" name="notIntel" /> ${loc`We are in the field, after the Intel Phase`}</label>
+   ${agencySiteSelect()}
    <label><input type="checkbox" name="homeTurf" /> ${loc`Request is within my home turf: five-block urban radius or one-mile wilderness radius of home (Local Hero)`}</label>
    <label><input type="checkbox" name="rapidCommunication" /> ${loc`Request: rapid communication is available`}</label>
    <label><input type="checkbox" name="minuteAvailable" /> ${loc`Request: spend one full minute communicating`}</label>
@@ -179,8 +214,11 @@ export async function rollGearAcquisition(actor, options = {}) {
       ])
       .filter(f => f.count);
   }
+  // Historical (p.407): an item the campaign year has not reached yet is Requested as a gadget one Caliber higher.
+  input.itemYear = String(input.itemYear ?? "").trim() || gearYearByName(input.name);
   const preview = gearAcquisitionPlan(actor.system, {
       ...input,
+      agencySite: chosenSite(input.agencySite),
       caliber: Number(input.caliber ?? 1),
       availableFunding: Number.MAX_SAFE_INTEGER
     }),
@@ -243,6 +281,7 @@ export async function rollGearAcquisition(actor, options = {}) {
       }
       const plan = gearAcquisitionPlan(actor.system, {
           ...input,
+          agencySite: chosenSite(input.agencySite),
           caliber: Number(input.caliber ?? 1),
           availableFunding: funding.reduce((n, f) => n + f.count, 0)
         }),
@@ -264,6 +303,8 @@ export async function rollGearAcquisition(actor, options = {}) {
         pick: plan.pick ?? "",
         category: plan.category ?? "",
         caliber: plan.caliber ?? 0,
+        // Historical (p.407): the catalog item's own Caliber, when it is Requested as a gadget one Caliber higher.
+        ...(plan.historicalGadget ? { itemCaliber: plan.ownCaliber, historicalGadget: true } : {}),
         cost: plan.cost,
         baseCost: plan.baseCost ?? 0,
         surcharge: plan.surcharge ?? 0,
@@ -839,7 +880,7 @@ export async function claimGearAcquisition(actor, options = {}) {
       initial.kind === "common"
         ? d.system.common && d.system.caliber === 0
         : (equipmentCategory(d) === initial.category || (d.type === "gear" && d.system.kitGrade > 0)) &&
-          d.system.caliber === initial.caliber
+          d.system.caliber === (initial.itemCaliber ?? initial.caliber)
     );
     if (doc) {
       input.itemData = doc.toObject();
@@ -864,7 +905,7 @@ export async function claimGearAcquisition(actor, options = {}) {
           quantity: 1,
           weight: Number(spec.weight),
           description: `<p>${esc(spec.description)}</p>`,
-          caliber: initial.caliber,
+          caliber: initial.itemCaliber ?? initial.caliber,
           common: initial.kind === "common",
           gearCategory: initial.category,
           ...(initial.politicalPowerRating !== null && initial.politicalPowerRating !== undefined
@@ -911,7 +952,8 @@ export async function claimGearAcquisition(actor, options = {}) {
     }
     if (
       attempt.kind === "request" &&
-      (equipmentCategory(data) !== attempt.category || data.system?.caliber !== attempt.caliber)
+      (equipmentCategory(data) !== attempt.category ||
+        data.system?.caliber !== (attempt.itemCaliber ?? attempt.caliber))
     )
       throw new Error(loc`The claimed item must match the requested equipment category and Caliber.`);
     const bundle = Number(data.system.bundleSize ?? 1),

@@ -289,6 +289,7 @@ test("a period change during posting restores the purchase and a final purchase 
   }
   assert.equal(left, 0);
   await a.update({ "system.progression": [{ classId: "scientist", vitality: 6, skills: alloc }] });
+  a.system.xp = 1000000;
   a.syncGrantedFeats = async () => {};
   a.flags ??= {};
   a.flags.spycraft2 ??= {};

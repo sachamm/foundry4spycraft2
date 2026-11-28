@@ -1,6 +1,7 @@
 /** Attacks and damage. */
-import { targetRoleCriticalRules, threatAgainstRole } from "../../rules/npc-qualities.mjs";
+import { targetRoleCriticalRules, threatAgainstRole, targetRoleNote } from "../../rules/npc-qualities.mjs";
 import { refuse } from "../../error-notices.mjs";
+import { laserWeapon } from "../../rules/damage-types.mjs";
 import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { enhanceAttackDialog } from "../../apps/attack-dialog-ux.mjs";
@@ -22,7 +23,7 @@ import {
   observedAttackTargetChoices
 } from "../../apps/character-target.mjs";
 import { validateFinalRoundReservation } from "../../rules/final-round.mjs";
-import { cqbRangePlan, recordedAttackDistance } from "../../rules/cqb.mjs";
+import { cqbRangePlan, cqbRangedWeapon, recordedAttackDistance } from "../../rules/cqb.mjs";
 import { damageTargetChoices, resolveDamageTarget, sneakAttackTargetSnapshot } from "../../apps/damage-target.mjs";
 import { unnervingGrade, unnervingEligible, unnervingPlan } from "../../rules/unnerving.mjs";
 import { hasSneakAttackSource, sneakAttackDamagePlan } from "../../rules/sneak-attack.mjs";
@@ -42,9 +43,54 @@ import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/st
 import { kickDamageWeapon, unarmedWeapon } from "../../rules/kick.mjs";
 import { inClosedStance } from "../../rules/boxing.mjs";
 import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
-import { spendWeaponShots, weaponAmmunition, weaponHasUnlimitedAmmunition } from "../../apps/ammunition-use.mjs";
+import {
+  spendWeaponShots,
+  weaponAmmunition,
+  weaponHasUnlimitedAmmunition,
+  weaponShotsLeft
+} from "../../apps/ammunition-use.mjs";
 import { loc } from "../../i18n.mjs";
 import { breakdownRows, weaponAttackBreakdown } from "../../rules/bonus-breakdown.mjs";
+
+/** Tell the GC alone what the target's villain role does to this attack. */
+async function whisperTargetRole(role, threat) {
+  try {
+    await ChatMessage.create({
+      speaker: { alias: loc`Game Control` },
+      whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id),
+      content: `<p>${foundry.utils.escapeHTML(targetRoleNote(role, threat))}</p>`
+    });
+  } catch {
+    /* the note is a courtesy; the attack card already carries the rules */
+  }
+}
+
+/** The beyond-Reach line for a GC's melee attack, measured from the map when its dialog opens, or "". */
+function beyondReachAtOpen(actor, item, options) {
+  if (
+    !game.user?.isGM ||
+    options.freeFinalAttack ||
+    options.reachConfirmed === true ||
+    !item.system?.isMelee ||
+    cqbRangedWeapon(item.system)
+  )
+    return "";
+  let extra = 0;
+  try {
+    extra = reachIncreaseFeet(item.system.qualities ?? "");
+  } catch {
+    /* a Reach quality that needs review adds nothing here */
+  }
+  const reach = meleeReach(actor, 5 + extra);
+  return reach && !reach.within
+    ? loc`${reach.targetName} is ${reach.distanceFeet} ft. away, beyond the ${reach.reachFeet} ft. Reach of ${item.name} (p.327).`
+    : "";
+}
+const targetKey = () =>
+  [...(game.user?.targets ?? [])]
+    .map(token => token.id)
+    .sort()
+    .join(",");
 
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
@@ -117,31 +163,57 @@ export const ActorAttackRolls = Base =>
             (initialCQB.mastery && initialCQB.within && typeof options.targetOpponentConfirmed !== "boolean")))
       ) {
         const needsCQB = cqbRangePlan(this.system, item.system, options).active;
+        // A GC's melee attack on a target beyond Reach is settled here, in the same dialog, not by a second one after.
+        const beyond = beyondReachAtOpen(this, item, options),
+          targetsAtOpen = targetKey();
         const input = await systemDialog.input({
-          window: { title: loc`Attack circumstances` },
+          // The dialog names the attack it rolls, in its title and on its main button.
+          window: { title: loc`${this.name}: ${item.name} attack` },
           position: { width: 560 },
           rejectClose: false,
-          ok: { label: loc`Roll attack` },
+          ok: { label: loc`Roll ${item.name} attack` },
           render: (event, dialog) => {
             restoreChoices(choiceKey("attack", this, item.id), dialog?.element ?? event?.target);
-            measureInto(this)(event, dialog);
+            measureInto(this, {
+              melee: !cqbRangedWeapon(item.system),
+              reachFeet: 5 + (reachIncreaseFeet(item.system.qualities ?? "") || 0)
+            })(event, dialog);
             enhanceAttackDialog(event, dialog);
           },
-          content: rollPipeline.dialog({
-            dialog: "attack",
-            actor: this,
-            item,
-            needsCQB,
-            options: { attackAction: "standard", ...options }
-          })
+          content:
+            rollPipeline.dialog({
+              dialog: "attack",
+              actor: this,
+              item,
+              needsCQB,
+              options: { attackAction: "standard", ...options }
+            }) +
+            (beyond
+              ? `<label class="sc2-check"><input type="checkbox" name="beyondReach" checked /> ${foundry.utils.escapeHTML(beyond)} ${loc`Attack anyway.`}</label>`
+              : "")
         });
         if (!input) return null;
+        if (beyond) {
+          if (input.beyondReach !== true) return null;
+          options = { ...options, reachConfirmed: true };
+        }
+        // The dialog's own target choice stands; a target changed on the map while it was open is said, not used.
+        if (targetKey() !== targetsAtOpen)
+          ui.notifications?.info?.(
+            loc`Your map target changed while the attack dialog was open; the attack uses the target chosen in the dialog.`
+          );
         rememberChoices(choiceKey("attack", this, item.id), input);
         // What was entered, as roll options: each group of fields is read by the rule that owns it.
         options = {
           ...options,
           ...rollPipeline.read({ dialog: "attack", actor: this, item, needsCQB, entered: input }, {})
         };
+      }
+      // Cover Fire and Suppressive Fire, chosen in the attack dialog, take the action without an attack check.
+      if (options.fireAction === "coverFire" || options.fireAction === "suppressiveFire") {
+        const left = weaponShotsLeft(item),
+          fire = { ...options, ...(left !== null ? { shotsRemaining: left } : {}) };
+        return options.fireAction === "coverFire" ? coverFire(this, item, fire) : suppressiveFire(this, item, fire);
       }
       if (
         options.disarm?.role !== "defender" &&
@@ -200,14 +272,17 @@ export const ActorAttackRolls = Base =>
         if (reach && !reach.within) {
           const text = loc`${reach.targetName} is ${reach.distanceFeet} ft. away, beyond the ${reach.reachFeet} ft. Reach of ${item.name} (p.327).`;
           if (!game.user?.isGM) return refuse(loc`${text} Move closer first, or ask the GC.`);
-          const go = await systemDialog.confirm({
-            window: { title: loc`Target beyond Reach` },
-            rejectClose: false,
-            // The attacker is named: a group attack asks once for each member.
-            content: `<p>${esc(loc`${this.name}:`)} ${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`,
-            yes: { label: loc`Attack anyway`, default: true },
-            no: { label: loc`Cancel` }
-          });
+          // A mob attack asks the GC once for the whole group, in its own dialog.
+          const go =
+            options.reachConfirmed === true ||
+            (await systemDialog.confirm({
+              window: { title: loc`Target beyond Reach` },
+              rejectClose: false,
+              // The attacker is named: a group attack asks once for each member.
+              content: `<p>${esc(loc`${this.name}:`)} ${esc(text)}</p><p>${loc`Make this melee attack anyway?`}</p>`,
+              yes: { label: loc`Attack anyway`, default: true },
+              no: { label: loc`Cancel` }
+            }));
           if (!go) return null;
         }
       }
@@ -351,7 +426,7 @@ export const ActorAttackRolls = Base =>
             { label: loc`Situational modifier`, value: situational }
           ]),
           featReminders: options.featReminders,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}${targetRole ? `<br><small>${loc`Target is a ${targetRole.label}: threat range ${targetRole.threatRangeReduction} narrower, a critical costs ${targetRole.extraDiceToActivate} more.`}${threatAgainstRole(atk.threat, targetRole) > 20 ? loc` This attack cannot threaten.` : ""}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${situational ? loc` — situational modifier ${situational > 0 ? `+${situational}` : `−${-situational}`}` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,
@@ -361,6 +436,8 @@ export const ActorAttackRolls = Base =>
           validateFinalAttack: options.validateFinalAttack,
           validateAttackContext,
           threat: threatAgainstRole(atk.threat, targetRole),
+          // A forward observer's relay is a hard ceiling, not a skill result cap (p.300).
+          resultCeiling: atk.cap ?? null,
           error: cunning?.error ?? atk.error,
           cunningPlan: cunning ?? !!options.cunningPlan,
           chooseTwice: millionDollar,
@@ -380,6 +457,7 @@ export const ActorAttackRolls = Base =>
             campaignAttackPolicy: atk.campaignAttackPolicy,
             ...(/\blaser\b/i.test(w.damage ?? "") ? { damageType: "laser" } : {}),
             ...(options.underwater === true ? { underwater: true } : {}),
+            laser: laserWeapon(w),
             reach: atk.reach,
             reachAdjacent: options.reachAdjacent ?? null,
             reachGeometryConfirmed: options.reachGeometryConfirmed === true,
@@ -411,6 +489,8 @@ export const ActorAttackRolls = Base =>
             combatStance: combatStanceProof(this.system, { ranged: atk.ranged }),
             targetActorUuid: declaredTargetUuid,
             targetRole,
+            // The threat number before any villain role, so Resolve can re-read the role of the actual target.
+            baseThreat: atk.threat,
             missTrickSources: atk.missTrickSources,
             cheapShot: atk.cheapShot?.active ? atk.cheapShot : null,
             quirky,
@@ -474,6 +554,8 @@ export const ActorAttackRolls = Base =>
           improvised: !!item.system.improvised
         }
       );
+      // A villain role is the GC's knowledge: the note goes to the GC alone (pp.447–448).
+      if (message && targetRole) await whisperTargetRole(targetRole, atk.threat);
       if (message && shotsFired) await spendWeaponShots(item, shotsFired);
       return message;
     }
@@ -584,6 +666,15 @@ export const ActorAttackRolls = Base =>
             (sideHits.length === 1 && sideHits[0].proof.attackUuid === attackBonusHits[0].proof.attackUuid))
             ? attackBonusHits[0]
             : null;
+      // Shift-click: roll with what applies by itself (a single recorded attack bonus), and no optional extras.
+      if (options.quick === true && options.includeSneakAttack === undefined)
+        options = {
+          ...options,
+          includeSneakAttack: false,
+          ...(automaticAttackBonus && !options.attackDamageSourceUuid
+            ? { attackDamageSourceUuid: automaticAttackBonus.message.uuid }
+            : {})
+        };
       if (
         item.system.weaponCategory === "mortar" &&
         /\d*d\d+/i.test(item.system.damage) &&

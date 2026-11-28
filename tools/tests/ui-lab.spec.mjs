@@ -47,6 +47,15 @@ for (const theme of ["light", "dark"])
     const app = page.locator(`.lab-app[data-theme="${theme}"]`);
     const colours = await app.evaluate(root => {
       const style = (selector, property) => getComputedStyle(root.querySelector(selector))[property];
+      // A token read as a computed colour, so hex and rgb values compare alike.
+      const token = name => {
+        const probe = document.createElement("span");
+        probe.style.color = `var(${name})`;
+        root.querySelector(".window-content").append(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      };
       return {
         surface: style(".window-content", "backgroundColor"),
         text: style(".window-content", "color"),
@@ -55,7 +64,12 @@ for (const theme of ["light", "dark"])
         caption: style(".sc2-caption", "color"),
         primary: style(".sc2-primary-action", "backgroundColor"),
         onPrimary: style(".sc2-primary-action", "color"),
-        stamp: style(".sc2-stamp", "color")
+        stamp: style(".sc2-stamp", "color"),
+        raised: token("--sc2-surface-raised"),
+        good: token("--sc2-good"),
+        warn: token("--sc2-warn"),
+        danger: token("--sc2-danger"),
+        buttonEdge: style("button.sc2-action", "borderTopColor")
       };
     });
     expect(contrast(colours.text, colours.surface), "text: " + JSON.stringify(colours)).toBeGreaterThanOrEqual(7);
@@ -68,6 +82,12 @@ for (const theme of ["light", "dark"])
       "onPrimary: " + JSON.stringify(colours)
     ).toBeGreaterThanOrEqual(4.5);
     expect(contrast(colours.stamp, colours.surface), "stamp: " + JSON.stringify(colours)).toBeGreaterThanOrEqual(4.5);
+    // Status colours are read as text on both the page and the raised cards and dialogs.
+    for (const role of ["good", "warn", "danger"])
+      for (const ground of ["surface", "raised"])
+        expect(contrast(colours[role], colours[ground]), `${role} on ${ground}`).toBeGreaterThanOrEqual(4.5);
+    // A secondary button's edge is what marks it as a button.
+    expect(contrast(colours.buttonEdge, colours.raised), "button edge").toBeGreaterThanOrEqual(3);
     // Verbs carry a single-colour glyph; names and numbers stay text.
     await expect(app.locator('[data-action="itemDelete"]')).toHaveAttribute("data-sc2-sheet", "glyph");
     await expect(app.locator('[data-action="itemDelete"] .sc2-button-icon')).toHaveClass(/fa-trash/);

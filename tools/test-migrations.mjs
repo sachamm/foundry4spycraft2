@@ -240,3 +240,31 @@ test("an actor's items go in one request, one failed item is retried alone, and 
   assert.equal(world.version, 3);
   assert.ok(items.every(item => item.updates.length === 0));
 });
+
+test("version 8 moves a weapon from the year version 6 gave it to the weapon tables' year, and keeps any other", async () => {
+  const { weaponYearUpdate } = await import("../module/migrations/index.mjs");
+  const earlier = { byId: { "p.w.a": "1990s" }, byName: { "weapon|Carbine": "1990s" } };
+  const index = { byId: { "p.w.a": "1960s" }, byName: { "weapon|Carbine": "1960s" } };
+  const copy = {
+    type: "weapon",
+    name: "Renamed",
+    system: { year: "1990s" },
+    _stats: { compendiumSource: "Compendium.p.w.Item.a" }
+  };
+  assert.deepEqual(weaponYearUpdate(copy, null, null, earlier, index), { "system.year": "1960s" });
+  assert.deepEqual(
+    weaponYearUpdate({ type: "weapon", name: "Carbine", system: { year: "1990s" } }, null, null, earlier, index),
+    {
+      "system.year": "1960s"
+    }
+  );
+  assert.equal(
+    weaponYearUpdate({ type: "weapon", name: "Carbine", system: { year: "1975" } }, null, null, earlier, index),
+    null
+  );
+  assert.equal(
+    weaponYearUpdate({ type: "gear", name: "Carbine", system: { year: "1990s" } }, null, null, earlier, index),
+    null
+  );
+  assert.equal(weaponYearUpdate({ type: "weapon", name: "Carbine", system: {} }, null, null, earlier, index), null);
+});

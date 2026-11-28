@@ -1,3 +1,4 @@
+import { sizeStealthCheck } from "./check-identity.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock, restraintSkillContext } from "./restraints.mjs";
 import { skillConditionCheckPenaltyEntries } from "./skill-conditions.mjs";
@@ -60,6 +61,7 @@ export function npcSkillActionPlan(system, key, check, ability, input = {}, { pr
       ? { rollMode: "blindroll" }
       : {}),
     penalties: [
+      { label: loc`Size (Stealth/Hide)`, value: sizeStealthCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0 },
       ...skillConditionCheckPenaltyEntries(system, ability).filter(row => row.key !== "shaken"),
       { label: loc`One-handed Hands-On check`, value: tags.handPenalty },
       { label: loc`Sight/hearing condition`, value: senses.skillModifier }

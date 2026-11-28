@@ -1,3 +1,4 @@
+import { criticalInjuryCostShift } from "./campaign-rules.mjs";
 /**
  * Ready-made critical effects for attack checks (pp.329–330).
  *
@@ -89,16 +90,27 @@ export function criticalMissChoices(check) {
 }
 
 /** The critical hit effects (p.329), for every kind of target; the GC picks the one that fits. */
-export function criticalHitChoices(check) {
+export function criticalHitChoices(check, { injuryCostShift = criticalInjuryCostShift() } = {}) {
   if (check?.checkKind !== "attack") return [];
+  // Bulletproof (+1) and Gritty (−1, minimum 0) change what a Table of Ouch injury costs (p.406).
+  const ouch = base => Math.max(0, base + injuryCostShift),
+    shifted = injuryCostShift
+      ? loc` (campaign quality ${injuryCostShift > 0 ? "+" : "−"}${Math.abs(injuryCostShift)})`
+      : "";
   return [
     { id: "hit.wounds", cost: 1, label: loc`Special character with vitality left: the damage goes to wounds` },
     {
       id: "hit.ouch",
-      cost: 2,
-      label: loc`Special character with vitality left, damage above Constitution: a Table of Ouch injury`
+      baseCost: 2,
+      cost: ouch(2),
+      label: `${loc`Special character with vitality left, damage above Constitution: a Table of Ouch injury`}${shifted}`
     },
-    { id: "hit.ouchAtZero", cost: 1, label: loc`Special character at 0 vitality: also a Table of Ouch injury` },
+    {
+      id: "hit.ouchAtZero",
+      baseCost: 1,
+      cost: ouch(1),
+      label: `${loc`Special character at 0 vitality: also a Table of Ouch injury`}${shifted}`
+    },
     ...[1, 2, 3, 4].map(n => ({
       id: `hit.saves${n}`,
       cost: n,
@@ -121,5 +133,36 @@ export function applyCriticalChoice(check, input = {}) {
   const choice = criticalEffectChoices(check, input.kind).find(c => c.id === input.preset);
   if (!choice) throw new Error(loc`That ready-made effect does not apply to this result.`);
   const extra = String(input.effect ?? "").trim();
-  return { ...input, baseCost: choice.cost, effect: extra ? `${choice.label} — ${extra}` : choice.label };
+  return {
+    ...input,
+    baseCost: choice.baseCost ?? choice.cost,
+    effect: extra ? `${choice.label} — ${extra}` : choice.label
+  };
+}
+
+/**
+ * What the GC pays to activate an NPC's critical: the effect's table cost (1 for a skill check), less 1 for laser
+ * damage (p.338, only for an NPC allowed to activate attack criticals), plus 1 against a Black Cat's Tough Luck and
+ * the extra dice for a Henchman or Mastermind target (pp.447–448), never below 0. Under Bloodbath (p.406) a special
+ * character's attack critical is free. `sources` names each change, as on an agent's activation.
+ */
+export function npcCriticalPrice(check, baseCost = 1, { laser = false, bloodbath = false } = {}) {
+  const attack = check?.checkKind === "attack";
+  if (attack && bloodbath) return { cost: 0, baseCost, sources: [loc`Bloodbath: a critical hit at no cost (p.406)`] };
+  const sources = [];
+  let adjustment = 0;
+  if (attack && laser) {
+    adjustment--;
+    sources.push(loc`Laser damage –1`);
+  }
+  if (check?.blackCat?.toughLuck === true) {
+    adjustment++;
+    sources.push(loc`Tough Luck (Black Cat target) +1`);
+  }
+  const role = check?.attackContext?.targetRole;
+  if (attack && Number.isSafeInteger(role?.extraDiceToActivate) && role.extraDiceToActivate > 0) {
+    adjustment += role.extraDiceToActivate;
+    sources.push(loc`${role.label} target +${role.extraDiceToActivate}`);
+  }
+  return { cost: Math.max(0, baseCost + adjustment), baseCost, sources };
 }

@@ -21,7 +21,9 @@ import { nonLethalTotals, targetChoices } from "./damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { campaignMedicineDC } from "../rules/campaign-rules.mjs";
 import { refuse } from "../error-notices.mjs";
+import { withUndo } from "./undo.mjs";
 
 const isSpecial = actor => actor.type === "agent" || (actor.type === "npc" && npcIsSpecial(actor));
 const healthOf = actor => ({
@@ -102,21 +104,23 @@ export async function restAndRecover(actor, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  if (plan.vitalityGain || plan.woundGain)
-    await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
-  const lines = [
-    loc`${esc(actor.name)} rests ${hours} hour(s) and ${days} day(s): vitality +${plan.vitalityGain} (now ${plan.vitality}), wounds +${plan.woundGain} (now ${plan.wounds}).`
-  ];
-  lines.push(...(await wearOff(actor, rates, hours * 3600 + days * 86400)));
-  // Fatigue from lost vitality or wounds lifts after 8 hours of rest (p.341).
-  if (hours + days * 24 >= 8) lines.push(await clear(actor, "fatigued", loc`Fatigued`));
-  if (plan.wounds > 0) {
-    lines.push(await clear(actor, "dying", loc`Dying`));
-    // Back above 0 wounds a character wakes, unless a knockout still has time to run.
-    if (plan.wounds - plan.woundGain <= 0) lines.push(await wake(actor));
-  }
-  await post(actor, lines);
-  return plan;
+  return withUndo([actor], loc`Rest: ${actor.name}`, async () => {
+    if (plan.vitalityGain || plan.woundGain)
+      await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
+    const lines = [
+      loc`${esc(actor.name)} rests ${hours} hour(s) and ${days} day(s): vitality +${plan.vitalityGain} (now ${plan.vitality}), wounds +${plan.woundGain} (now ${plan.wounds}).`
+    ];
+    lines.push(...(await wearOff(actor, rates, hours * 3600 + days * 86400)));
+    // Fatigue from lost vitality or wounds lifts after 8 hours of rest (p.341).
+    if (hours + days * 24 >= 8) lines.push(await clear(actor, "fatigued", loc`Fatigued`));
+    if (plan.wounds > 0) {
+      lines.push(await clear(actor, "dying", loc`Dying`));
+      // Back above 0 wounds a character wakes, unless a knockout still has time to run.
+      if (plan.wounds - plan.woundGain <= 0) lines.push(await wake(actor));
+    }
+    await post(actor, lines);
+    return plan;
+  });
 }
 
 /**
@@ -173,6 +177,10 @@ export async function rollDying(actor) {
   } catch (error) {
     return refuse(error.message);
   }
+  return withUndo([actor], loc`Dying roll: ${actor.name}`, () => settleDying(actor, plan, roll));
+}
+
+async function settleDying(actor, plan, roll) {
   await actor.update({ "system.wounds.value": plan.wounds });
   const lines = [
     plan.stabilized
@@ -289,6 +297,12 @@ export async function applyFirstAid(message, options = {}) {
   const scene = String(sceneEpoch());
   if (patient.flags?.spycraft2?.firstAidScene === scene)
     return refuse(loc`${patient.name} has already had First Aid this scene.`);
+  return withUndo([patient], loc`First Aid: ${patient.name}`, () => treatFirstAid(message, check, patient, scene), {
+    cardMarks: [{ messageId: message.id, key: "firstAid" }]
+  });
+}
+
+async function treatFirstAid(message, check, patient, scene) {
   const lines = [],
     rolls = [];
   if (isSpecial(patient)) {
@@ -329,8 +343,9 @@ export async function applyFirstAid(message, options = {}) {
       loc`First Aid on ${esc(patient.name)}: accumulated damage ${state.track.accumulated} → ${plan.accumulated}.`
     );
   }
-  // The same check at DC 20 also stops bleeding (p.340).
-  if (Number(check.effectiveTotal) >= 20) lines.push(await clear(patient, "bleeding", loc`Bleeding`));
+  // The same check at DC 20 also stops bleeding (p.340), a DC the campaign's qualities move.
+  if (Number(check.effectiveTotal) >= campaignMedicineDC(20))
+    lines.push(await clear(patient, "bleeding", loc`Bleeding`));
   await patient.update({ "flags.spycraft2.firstAidScene": scene });
   await post(patient, lines, rolls);
   await markCard(message, "firstAid", { patientUuid: patient.uuid, name: patient.name });
@@ -348,13 +363,20 @@ export async function applyStabilize(message, options = {}) {
   if (!patient.isOwner) return relayHealing("stabilize", message, patient);
   if (woundState(patient.system.wounds?.value ?? 0, patient.system.deathThreshold) !== "dying")
     return refuse(loc`${patient.name} is not dying (below 0 wounds, above the death threshold).`);
-  await patient.update({ "system.wounds.value": 0 });
-  await post(patient, [
-    loc`${esc(patient.name)} is stabilized at 0 wounds and stays unconscious.`,
-    await clear(patient, "dying", loc`Dying`)
-  ]);
-  await markCard(message, "stabilized", { patientUuid: patient.uuid, name: patient.name });
-  return true;
+  return withUndo(
+    [patient],
+    loc`Stabilize: ${patient.name}`,
+    async () => {
+      await patient.update({ "system.wounds.value": 0 });
+      await post(patient, [
+        loc`${esc(patient.name)} is stabilized at 0 wounds and stays unconscious.`,
+        await clear(patient, "dying", loc`Dying`)
+      ]);
+      await markCard(message, "stabilized", { patientUuid: patient.uuid, name: patient.name });
+      return true;
+    },
+    { cardMarks: [{ messageId: message.id, key: "stabilized" }] }
+  );
 }
 
 rollPipeline.register({

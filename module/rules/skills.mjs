@@ -1,5 +1,6 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { classFeatureLevels } from "./class-features.mjs";
-import { checkFocus, isHideCheck } from "./check-identity.mjs";
+import { checkFocus, sizeStealthCheck } from "./check-identity.mjs";
 import { campaignSkillDCPolicy } from "./campaign-skill-dc.mjs";
 import { cakewalkSkillSelected } from "./cakewalk.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
@@ -89,6 +90,11 @@ import { planTerms, planTotal } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Rules common to the 100 named checks (pp.87–169). Context tags remain explicit. */
 export function resolveSkillCheck(system, key, check, input = {}) {
+  if (system.campaignEffects === undefined) {
+    const descriptors = Object.getOwnPropertyDescriptors(system);
+    descriptors.campaignEffects = { value: campaignRules(), enumerable: true, writable: true, configurable: true };
+    system = Object.create(Object.getPrototypeOf(system), descriptors);
+  }
   const {
     ability,
     modifier = 0,
@@ -325,8 +331,6 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     grappleContextConfirmed
   });
   check = restraint.check;
-  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
-  const terms = planTerms("skill", { system, skillKey: key, check, method, input });
   const conditionSystem =
     bound === true ? { ...system, conditionContext: { ...system.conditionContext, bound: true } } : system;
   const originalAbility =
@@ -334,6 +338,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const accordingEligible = (classFeatureLevels(system)?.schemer ?? 0) >= 4;
   const substituted = !!allAccordingToPlan && accordingEligible,
     selected = substituted ? "int" : originalAbility;
+  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
+  // They see the attribute the check actually uses, after any substitution.
+  const terms = planTerms("skill", { system, skillKey: key, check, method, input, ability: selected });
   const originalRow = skill.totals.find(t => t.ability === originalAbility),
     originalTotal =
       originalRow?.normalSkillBonus ?? originalRow?.total - skillConditionCheckPenalty(system, originalAbility);
@@ -603,8 +610,10 @@ export function resolveSkillCheck(system, key, check, input = {}) {
       ambush.errorIncrease +
       tracking.errorIncrease +
       medical.errorIncrease +
+      terms.sum("errorIncrease") +
       Math.max(0, Math.trunc(Number(vehicleErrorIncrease) || 0)) +
-      ((skill.ranks === 0 && !hailMaryUntrained) || missingFocus ? 2 : 0)
+      // A check without the needed focus is made untrained (p.98), so the 1-die Hail Mary lifts its +2 as well.
+      ((skill.ranks === 0 || missingFocus) && !hailMaryUntrained ? 2 : 0)
   );
   const zeroReduction =
     classEffects.errorReductionZero +
@@ -731,7 +740,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   if (crossCheckActive && !crossCheckAvailable) blockedReasons.push(loc`This check does not have the Cross-Check tag.`);
   if (hailMaryActive && !originallySecret && !check.mode.includes("Passive"))
     blockedReasons.push(loc`This Hail Mary option applies only to passive or secret checks.`);
-  if (hailMaryUntrained && skill.ranks > 0)
+  if (hailMaryUntrained && skill.ranks > 0 && !missingFocus)
     blockedReasons.push(loc`This Hail Mary option applies only to untrained checks.`);
   if (synergy.reason) blockedReasons.push(synergy.reason);
   if (cap !== null && cap < 5)
@@ -856,7 +865,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
   const checkPenaltyRows = [
     ...skillConditionCheckPenaltyEntries(conditionSystem, selected).filter(row => row.key !== "shaken"),
     { label: loc`Target disposition`, value: disposition.penalty },
-    { label: loc`Size (Hide)`, value: isHideCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0 },
+    { label: loc`Size (Hide)`, value: sizeStealthCheck(key, check) ? (system.sizeHideModifier ?? 0) : 0 },
     { label: loc`Forte`, value: hasForte ? 1 : 0 },
     { label: loc`Armor/load`, value: armor },
     { label: loc`Vision`, value: vision },

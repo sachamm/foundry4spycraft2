@@ -47,7 +47,8 @@ export function subdualDefensePlan(
   {
     rawDamage,
     attackKind,
-    weaponProficiency = "",
+    proficiency = "",
+    weaponProficiency = proficiency,
     armorPiercing = 0,
     armorPiercingAll = false,
     criticalHit = false,
@@ -82,6 +83,7 @@ export function subdualDefensePlan(
     ...source,
     armorPiercing: armorPiercingAll ? 0 : armorPiercing,
     armorPiercingAll,
+    foibles: specialistDRIncrement(system, attackKind, weaponProficiency),
     temporaryDR,
     effectiveDR,
     afterDR,

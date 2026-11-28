@@ -5,7 +5,7 @@ import { availableIn, introductionYear } from "../module/rules/gear-era.mjs";
 import { gearYearUpdate, importPeriodGear } from "../module/migrations/index.mjs";
 import { GEAR_YEARS, PERIOD_ITEMS } from "../module/data/gear-year-index.mjs";
 import { buildPacks } from "./lib/pack-docs.mjs";
-import { bookWeaponYear } from "./lib/period-gear.mjs";
+import { bookWeaponYear, dateGear } from "./lib/period-gear.mjs";
 
 const read = file => JSON.parse(readFileSync(new URL(`../src/data/${file}`, import.meta.url), "utf8"));
 const { packs } = buildPacks();
@@ -42,6 +42,27 @@ test("our dates never replace a date the book prints", () => {
     );
   for (const value of Object.values(years).flatMap(group => (typeof group === "object" ? Object.values(group) : [])))
     assert.ok(value === "always" || introductionYear(value) !== null, `bad year label ${value}`);
+});
+
+test("a weapon's printed year reaches its compendium entry, and our list cannot override one", () => {
+  const equipment = read("equipment.json");
+  const printed = equipment.weapons.filter(w => w.year);
+  assert.ok(printed.length >= 360, `${printed.length} weapons carry the Year column`);
+  for (const w of printed) assert.match(w.year, /^\d{3,4}s?$/, `${w.name}: a bare year label`);
+  const built = new Map(packs.weapons.docs.map(d => [d.name, d.system.year]));
+  for (const w of printed) assert.equal(built.get(w.name), w.year, w.name);
+  // Two rows the review found carrying our date in place of the printed one (pp.255, 259).
+  assert.equal(built.get("Distinject Model 35 13mm dart"), "1950");
+  assert.equal(built.get("CZ Skorpion 9x18mm"), "1984");
+  const data = {
+    equipment: { weapons: [structuredClone(printed[0])], armor: [] },
+    gear: { electronics: [], gadgets: [], resources: [], security: [], tradecraft: [] },
+    vehicles: { vehicles: [], upgrades: [] },
+    upgrades: { weapons: [], armor: [], detonators: [] },
+    kits: [],
+    ammunition: []
+  };
+  assert.throws(() => dateGear(data, { weapons: { [printed[0].name]: "1999" } }), /dates 1 weapons the book dates/);
 });
 
 test("every firearm, and every armor piece, has a year", () => {
@@ -110,11 +131,11 @@ test("the version 6 migration dates items from their compendium entry, then by n
     system: { year: "" },
     _stats: { compendiumSource: `Compendium.spycraft2.weapons.Item.${weapon._id}` }
   });
-  assert.deepEqual(byId, { "system.year": "1924" });
+  assert.deepEqual(byId, { "system.year": "1911" });
   assert.deepEqual(gearYearUpdate({ type: "weapon", name: "Colt M1911A1 .45 ACP", system: { year: "" } }), {
-    "system.year": "1924"
+    "system.year": "1911"
   });
-  assert.equal(gearYearUpdate({ type: "weapon", name: "Colt M1911A1 .45 ACP", system: { year: "1911" } }), null);
+  assert.equal(gearYearUpdate({ type: "weapon", name: "Colt M1911A1 .45 ACP", system: { year: "1924" } }), null);
   assert.equal(gearYearUpdate({ type: "feat", name: "Colt M1911A1 .45 ACP", system: {} }), null);
   assert.equal(gearYearUpdate({ type: "gear", name: "Something homemade", system: { year: "" } }), null);
   assert.ok(Object.keys(GEAR_YEARS.byId).length > 900);

@@ -286,7 +286,15 @@ test("flags merge, chat controls are collected and named checks are threaded thr
     { id: "hide" }
   ]);
   pipeline.register({ id: "badFlags", flags: () => [] });
-  assert.throws(() => pipeline.flags({}), /flags must return an object/);
+  const warn = console.warn,
+    warned = [];
+  console.warn = message => warned.push(message);
+  try {
+    assert.equal(typeof pipeline.flags({}), "object");
+  } finally {
+    console.warn = warn;
+  }
+  assert.match(warned.join("\n"), /flags must return an object/);
   pipeline.register({ id: "badControl", chatControls: () => [{ label: "No handler" }] });
   assert.throws(() => pipeline.chatControls({}), /label and a run function/);
   pipeline.register({ id: "badChecks", kinds: ["skill"], skillChecks: () => null });
@@ -433,6 +441,7 @@ const EXPECTED_ORDER = [
   "calledShotContent:attack",
   "bounceContent:rangedAttack",
   "underwaterAttackContent",
+  "indirectFireContent:rangedAttack",
   "recordFields",
   "sneakAttackTarget",
   "meleeArmorPiercing",
@@ -538,6 +547,8 @@ const EXPECTED_ORDER = [
   "cqbRangeAttackTerm",
   "flankingAttackTerm",
   "cunningPlanControl",
+  "removeFlankingControl",
+  "restoreFlankingControl",
   "gameHunterAttackTerm",
   "manualAdjustmentControl",
   "sniperAttackTerm",
@@ -569,6 +580,7 @@ const EXPECTED_ORDER = [
   "bounceAttackTerm",
   "intenseStanceAttackTerm",
   "underwaterAttackTerm",
+  "indirectFireAttackTerm",
   "stalkingStanceSkillTerm",
   "feintSkillTerm",
   "meleeSkillFeatsSkillTerm",
@@ -579,6 +591,7 @@ const EXPECTED_ORDER = [
   "containmentSkillTerm",
   "skillTrickSkillTerm",
   "grappleSkillTerm",
+  "grappleRecord",
   "revolverIntimidateSkillTerm",
   "stoneColdIntimidateTerm",
   "conveyanceBullRushSkillTerm",
@@ -593,6 +606,7 @@ const EXPECTED_ORDER = [
   "bugConcealmentSkillTerm",
   "combatOptionSkillTerm",
   "documentationSkillTerm",
+  "dispositionSkillTerm",
   "polyglotSkillTerm",
   "gutsSkillTerm",
   "cardSharkSkillTerm",
@@ -651,13 +665,16 @@ const EXPECTED_ORDER = [
   "requestsRecord",
   "fallingDamageControl",
   "restraintsRecord",
+  "dispositionRecord",
   "npcSkillContextRecord",
   "sensesRecord",
   "fireActionContent:rangedAttack",
+  "fireActionContent:attack",
   "damageConversionContent:rangedAttack",
   "allOrNothingContent:rangedAttack",
   "allOrNothingContent:skill",
   "allOrNothingContent:knowledge",
+  "dispositionContent:skill",
   "skillConditionsRecord",
   "campaignSkillChecksRecord",
   "skillFeatTermsRecord",
@@ -711,6 +728,8 @@ const EXPECTED_CHAT_CONTROLS = [
   "restraintEscapeControl",
   "gearAcquisitionControl",
   "cunningPlanControl",
+  "removeFlankingControl",
+  "restoreFlankingControl",
   "manualAdjustmentControl",
   "requiredBonusControl",
   "criticalControl",

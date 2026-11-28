@@ -1,6 +1,7 @@
 import { characterTargetPlan, characterTargetsEqual } from "../rules/character-target.mjs";
 import { finesseMeleeWeapon } from "../rules/finesse.mjs";
 import { loc } from "../i18n.mjs";
+import { isSpecialCharacter } from "../rules/campaign-rules.mjs";
 import { formDialog, raw as rawHtml } from "./dialog-kit.mjs";
 const canRead = a =>
   !!a &&
@@ -11,7 +12,8 @@ const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.i
 const data = a => ({
   uuid: a.uuid,
   type: a.type,
-  npcType: a.system.npcType,
+  // A villain is special, and so is a standard NPC or animal promoted for this mission (p.398).
+  npcType: a.type !== "npc" ? a.system.npcType : isSpecialCharacter(a.system) ? "special" : a.system.npcType,
   createdTime: a._stats?.createdTime ?? null
 });
 export const cleaveTargetRequired = (actor, weapon) =>

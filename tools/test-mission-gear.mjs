@@ -309,3 +309,69 @@ test("legacy single-pick records remain valid, malformed extra slots fail closed
   assert.deepEqual(plan.record.additionalItemIds, []);
   assert.equal(plan.record.epoch, "next");
 });
+
+test("Big Budget (p.405): a Caliber V pick's extra Caliber I item of the same type uses no pick", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const data = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))).find(
+    c => c.key === "wheelman"
+  );
+  const cls = {
+    id: "wheelman",
+    name: "Wheelman",
+    type: "class",
+    system: { ...structuredClone(data), identifier: "wheelman", vitalityDie: 10 }
+  };
+  const build = () => ({
+    ...system(5),
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10 }])),
+    progression: [{ classId: "wheelman", vitality: 5, skills: {} }],
+    misc: {}
+  });
+  const pair = [car({ caliber: 5 }), { ...car({ caliber: 1 }), id: "car2" }];
+  let s = build();
+  computeAgent(s, [cls, ...pair], cfg);
+  assert.equal(s.gearPicks.V.spent, 2, "two picks without Big Budget");
+  setCampaignRulesSource(() => ({ gearCaliberShift: 1 }));
+  try {
+    s = build();
+    computeAgent(s, [cls, ...pair], cfg);
+    assert.equal(s.gearPicks.V.spent, 2, "unlinked items still spend their own picks");
+    pair[1].system.campaignBonusOf = pair[0].id;
+    pair[1].system.pick = "";
+    s = build();
+    computeAgent(s, [cls, ...pair], cfg);
+    assert.equal(s.gearPicks.V.spent, 1);
+    assert.equal(s.campaignMissionBonusPicks.assignments[0].funded, 1);
+    // The free item must be of the same equipment category: a Caliber I weapon on the same pick is not free.
+    s = build();
+    computeAgent(
+      s,
+      [cls, pair[0], { ...pair[1], type: "weapon", system: { ...pair[1].system, gearCategory: "" } }],
+      cfg
+    );
+    assert.equal(s.campaignMissionBonusPicks.assignments[0].funded, 0);
+    assert.ok(s.campaignMissionBonusPicks.warnings.some(w => /same-category/.test(w)));
+    assert.equal(s.gearPicks.V.spent, 1, "invalid free item is flagged rather than silently paid");
+  } finally {
+    setCampaignRulesSource(null);
+  }
+});
+
+test("Shoe String Budget (p.408): a Caliber I mission's picks fall below I and buy no gear", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  const s = {
+    ...system(1),
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10 }])),
+    progression: [],
+    misc: {}
+  };
+  setCampaignRulesSource(() => ({ gearCaliberShift: -1 }));
+  try {
+    computeAgent(s, [car({ caliber: 1 })], cfg);
+  } finally {
+    setCampaignRulesSource(null);
+  }
+  assert.equal(s.gearPicks.V.available, 0);
+  assert.ok(s.gearPicks.V.remaining < 0);
+  assert.ok(s.warnings.some(w => /Shoe String Budget/.test(w)));
+});

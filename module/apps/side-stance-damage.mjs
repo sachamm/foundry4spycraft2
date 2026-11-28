@@ -56,7 +56,7 @@ export function sideStanceDamageSource(actor, attack, item, { targetUuid } = {})
     item?.uuid !== c.weaponUuid
   )
     throw Error(
-      loc`Choose a resolved successful Standard Attack with this exact weapon and its recorded Side Stance die.`
+      loc`Side Stance damage needs a ranged Standard Attack with this weapon that hit and recorded its Side Stance die. Roll that attack from the weapon first.`
     );
   const owned = actor.items?.get?.(item.id) ?? values(actor.items).find(i => i.id === item.id);
   if (

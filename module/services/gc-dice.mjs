@@ -144,6 +144,7 @@ export function initializeGCDice({ playersPresent, caliber, replaceExisting = fa
           playersPresent,
           caliber,
           lastReason: "Session start",
+          startedAt: Date.now(),
           ...(before.current && before.undoRefunds ? { undoRefunds: structuredClone(before.undoRefunds) } : {})
         },
         controller

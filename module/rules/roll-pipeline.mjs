@@ -20,7 +20,7 @@ import { skillPenaltyEntries, skillPenaltyDivisor } from "./skill-penalties.mjs"
  *     stage: 'plan',                 // when `modifiers` applies: 'plan' (part of the previewed total) or 'roll' (default)
  *     flags(ctx),                    // return an object merged into the chat message's check record
  *     record: ['takedown'],          // roll options copied onto that record as they are (null when absent)
- *     chatControls(ctx)              // return [{label, run, placement?, emphasis?}] buttons for a posted check;
+ *     chatControls(ctx)              // return [{label, run, placement?, emphasis?, disabled?}] buttons for a posted check;
  *                                    // emphasis "primary" marks the card's next step, "quiet" a minor one
  *   }
  *
@@ -247,8 +247,10 @@ export class RollPipeline {
     for (const c of this.#active("flags", ctx)) {
       const result = c.flags(ctx);
       if (result === undefined || result === null) continue;
+      // A contributor's mistake is for the console, not the table: its flags are left off and the roll goes on.
       if (typeof result !== "object" || Array.isArray(result)) {
-        throw new TypeError(loc`Roll contributor "${c.id}": flags must return an object.`);
+        console.warn(`Field Agent's Handbook | Roll contributor "${c.id}": flags must return an object.`);
+        continue;
       }
       Object.assign(merged, result);
     }
@@ -275,6 +277,8 @@ export class RollPipeline {
           ...(typeof control.labelKey === "string" && control.labelKey ? { labelKey: control.labelKey } : {}),
           ...(typeof control.hint === "string" && control.hint ? { hint: control.hint } : {}),
           ...(typeof control.key === "string" && control.key ? { key: control.key } : {}),
+          // A reason the control is not legal now: it is shown disabled with that reason (style guide 8.6).
+          ...(typeof control.disabled === "string" && control.disabled ? { disabled: control.disabled } : {}),
           ...(["primary", "quiet"].includes(control.emphasis) ? { emphasis: control.emphasis } : {})
         });
       }

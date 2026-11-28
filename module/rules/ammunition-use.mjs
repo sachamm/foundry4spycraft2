@@ -6,6 +6,7 @@
  * and then hold the counts.
  */
 import { ammunitionConfiguration } from "./ammunition.mjs";
+import { campaignRules } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 
 /** Bottomless Clip uses the printed stockpile, without changing its saved supply. */
@@ -18,12 +19,15 @@ const SINGLE_FED_SHOTS = 3;
 
 /**
  * @param {object} weapon  a weapon's system data
- * @returns {{tracked: false}|{tracked: true, capacity, loaded, spare, containerType, counted}}
+ * @returns {{tracked: false, bottomless?: true, capacity?}|{tracked: true, capacity, loaded, spare, containerType, counted}}
  *          counted is false while the weapon still has its printed supply untouched
  */
 export function ammunitionState(weapon = {}) {
   const code = weapon.ammunitionOnly ? null : ammunitionConfiguration(weapon).selected;
   if (!code || !whole(code.capacity) || code.capacity < 1) return { tracked: false };
+  // Bottomless Clip (p.405): a weapon that holds 5 or more shots never runs out, so its shots are not counted.
+  if (code.capacity >= 5 && campaignRules().bottomlessClip)
+    return { tracked: false, bottomless: true, capacity: code.capacity };
   const capacity = code.capacity,
     counted = whole(weapon.shotsLoaded) || whole(weapon.shotsSpare);
   return {

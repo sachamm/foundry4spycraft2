@@ -49,6 +49,7 @@ import { damageResistancePlan, damageResistanceSource } from "../rules/resistanc
 import { fireExposurePlan, legacyFireSourcePlan, readFireSource } from "../rules/fire-sources.mjs";
 import { rollFireSourceSave, markFireSourceScarring } from "./fire-sources.mjs";
 import { acidInjuryDue } from "../rules/acid-sources.mjs";
+import { withUndo } from "./undo.mjs";
 
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
@@ -215,6 +216,10 @@ export async function sufferLethal(actor, amount, hitContext = {}) {
   return { ...plan, notes: notes.filter(Boolean) };
 }
 
+/** An animal takes twice the stress that bang, fire or flash damage causes (p.445). */
+export const animalStressMultiplier = (actor, cause) =>
+  actor?.type === "npc" && actor.system?.npcType === "animal" && ["bang", "fire", "flash"].includes(cause) ? 2 : 1;
+
 /** The one subdual point left by DR (p.332), already past DR and before subdual resistance. */
 export async function sufferBruise(actor, hitContext = {}, originalSource = undefined, eventSource = "") {
   const context = typedHitContext(hitContext);
@@ -253,8 +258,11 @@ export async function sufferBruise(actor, hitContext = {}, originalSource = unde
 }
 
 /** Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure. */
-export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance") {
+export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance", { cause = "" } = {}) {
   if (!amount) return "";
+  const doubled = animalStressMultiplier(actor, cause) === 2;
+  if (doubled) amount *= 2;
+  const prefix = doubled ? `${loc`An animal takes double stress from ${source} (p.445).`} ` : "";
   if (actor.type !== "agent") {
     amount = campaignStressDamage(
       amount,
@@ -266,15 +274,21 @@ export async function sufferStress(actor, amount, source, damageMode = "stressBe
     // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
     if (!(Number(actor.system.vitality?.max) > 0)) {
       if (damageSaveState(actor).track.state !== "active")
-        return loc`${amount} stress damage after campaign modifiers; no further Damage save while the standard character is already out of the fight.`;
+        return (
+          prefix +
+          loc`${amount} stress damage after campaign modifiers; no further Damage save while the standard character is already out of the fight.`
+        );
       if (amount > 0 && !(await npcDamageSave(actor, { damage: amount, kind: "stress", campaignStressAdjusted: true })))
         throw Error(
           loc`The standard character's stress Damage save was not recorded. Review its actual damage before retrying.`
         );
-      return loc`${amount} stress damage after campaign modifiers; the standard character's Damage save is recorded separately.`;
+      return (
+        prefix +
+        loc`${amount} stress damage after campaign modifiers; the standard character's Damage save is recorded separately.`
+      );
     }
     await postNonLethalDamage(actor, "stress", amount, source, { campaignStressAdjusted: true });
-    return loc`${amount} stress damage recorded; any required Will save is on its damage report.`;
+    return prefix + loc`${amount} stress damage recorded; any required Will save is on its damage report.`;
   }
   try {
     await applyAccumulatedDamage(actor, {
@@ -383,17 +397,19 @@ export async function exposeToContagion(actor, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  await writeHazards(actor, plan.hazards);
-  await post(
-    actor,
-    [
-      plan.added
-        ? loc`Exposed to ${esc(plan.entry.label)}: Fortitude save DC ${plan.entry.primary.saveDC} in ${rolled.total} ${onset.unit}(s).`
-        : loc`Another dose of ${esc(plan.entry.label)}: ${plan.entry.doses} doses, saves at ${dosePenalty(plan.entry.doses)}.`
-    ],
-    plan.added ? [rolled.roll] : []
-  );
-  return plan.entry;
+  return withUndo([actor], loc`Contagion: ${actor.name}`, async () => {
+    await writeHazards(actor, plan.hazards);
+    await post(
+      actor,
+      [
+        plan.added
+          ? loc`Exposed to ${esc(plan.entry.label)}: Fortitude save DC ${plan.entry.primary.saveDC} in ${rolled.total} ${onset.unit}(s).`
+          : loc`Another dose of ${esc(plan.entry.label)}: ${plan.entry.doses} doses, saves at ${dosePenalty(plan.entry.doses)}.`
+      ],
+      plan.added ? [rolled.roll] : []
+    );
+    return plan.entry;
+  });
 }
 
 /** Roll the Fortitude save a contagion calls for. The posted save carries a button that applies its result. */
@@ -426,9 +442,11 @@ export async function cureHazard(actor, id) {
   const state = hazardState(actor.system),
     entry = state.contagions[id];
   if (!entry) return null;
-  await writeHazards(actor, cureContagion(state, id));
-  await post(actor, [loc`${esc(entry.label)} ended (antidote or GC ruling).`]);
-  return true;
+  return withUndo([actor], loc`Contagion ended: ${actor.name}`, async () => {
+    await writeHazards(actor, cureContagion(state, id));
+    await post(actor, [loc`${esc(entry.label)} ended (antidote or GC ruling).`]);
+    return true;
+  });
 }
 
 async function resolveContagionSave(actor, message, save, succeeded) {
@@ -528,7 +546,7 @@ async function sufferFire(actor, state, damage, reduction, label, hitContext = {
   ];
   if (bruise) lines.push(bruise);
   const lost = loss.standard ? loss.damage : loss.vitalityLoss + loss.woundLoss;
-  lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses"));
+  lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses", { cause: "fire" }));
   if (plan.scarSaveDue)
     lines.push(
       loc`This fire has now done ${tracked?.source?.suffered ?? plan.fire.suffered} damage: make the Fortitude save (DC ${SCAR_SAVE_DC}) against scarring from the sheet.`
@@ -660,13 +678,15 @@ export async function fightFire(actor, method) {
     next = reduceFire(state, rolled.total);
     line = loc`The fire is fought (${reduction.formula}): −${rolled.total}.`;
   }
-  await writeHazards(actor, next);
-  await post(
-    actor,
-    [line, next.fire ? loc`The fire now does ${next.fire.damage} damage.` : loc`The fire is out.`],
-    [roll]
-  );
-  return next.fire;
+  return withUndo([actor], loc`Fire fought: ${actor.name}`, async () => {
+    await writeHazards(actor, next);
+    await post(
+      actor,
+      [line, next.fire ? loc`The fire now does ${next.fire.damage} damage.` : loc`The fire is out.`],
+      [roll]
+    );
+    return next.fire;
+  });
 }
 
 /** The Will save a burning character needs to act freely, or the Fortitude save against scarring. */
@@ -699,9 +719,11 @@ export async function extinguish(actor) {
   if (!owned(actor)) return null;
   const state = hazardState(actor.system);
   if (!state.fire) return null;
-  await writeHazards(actor, { ...state, fire: null });
-  await post(actor, [loc`The fire is out.`]);
-  return true;
+  return withUndo([actor], loc`Fire put out: ${actor.name}`, async () => {
+    await writeHazards(actor, { ...state, fire: null });
+    await post(actor, [loc`The fire is out.`]);
+    return true;
+  });
 }
 
 /* -------------------------------------------- */
@@ -741,46 +763,49 @@ export async function resolveHazardSave(actor, message) {
   check = message.flags.spycraft2;
   save = check.hazardSave;
   succeeded = check.successConfirmed;
-  if (hazardSaveResolvers.has(save.kind))
-    await hazardSaveResolvers.get(save.kind)(actor, message, save, succeeded, check);
-  else if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);
-  else if (save.kind === "fire") {
-    if (succeeded) await post(actor, [loc`The save succeeds: the character does not catch fire.`]);
-    else {
-      if (save.fireSourceId) readFireSource(hazardState(actor.system), save.fireSourceId);
-      await writeHazards(
-        actor,
-        ignitePlan(hazardState(actor.system), {
-          damage: save.damage,
-          ap: save.ap,
-          worldTime: now(),
-          sourceId: save.fireSourceId
-        })
-      );
+  // Undo restores effects while the original outcome stays consumed; retry never rolls secondary dice anew.
+  return withUndo([actor], loc`${save.label || loc`Save result`}: ${actor.name}`, async () => {
+    if (hazardSaveResolvers.has(save.kind))
+      await hazardSaveResolvers.get(save.kind)(actor, message, save, succeeded, check);
+    else if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);
+    else if (save.kind === "fire") {
+      if (succeeded) await post(actor, [loc`The save succeeds: the character does not catch fire.`]);
+      else {
+        if (save.fireSourceId) readFireSource(hazardState(actor.system), save.fireSourceId);
+        await writeHazards(
+          actor,
+          ignitePlan(hazardState(actor.system), {
+            damage: save.damage,
+            ap: save.ap,
+            worldTime: now(),
+            sourceId: save.fireSourceId
+          })
+        );
+        await post(actor, [
+          loc`The save fails: the character is on fire and takes ${save.damage} fire damage as each round begins.`
+        ]);
+      }
+    } else if (save.kind === "coverFire") {
+      const outcome = coverFireOutcome(save.dc, check.effectiveTotal);
       await post(actor, [
-        loc`The save fails: the character is on fire and takes ${save.damage} fire damage as each round begins.`
+        !outcome.failed
+          ? loc`Cover Fire: the save succeeds; no penalty.`
+          : outcome.finalAttack
+            ? loc`Cover Fire: the save fails by 5 or more. –4 to attack and skill checks for a round, and ${esc(save.attackerName ?? loc`the attacker`)} may spend an action die on a final attack.`
+            : loc`Cover Fire: the save fails. –4 to attack and skill checks for a round.`
       ]);
+    } else if (save.kind === "scar") {
+      const state = hazardState(actor.system);
+      if (save.fireSourceId) await markFireSourceScarring(actor, save);
+      else if (state.fire) await writeHazards(actor, scarChecked(state));
+      if (succeeded) await post(actor, [loc`The save succeeds: no scarring.`]);
+      else {
+        const result = await sufferAttributeLoss(actor, { ability: "cha", permanent: "all" }, 1, loc`Fire scarring`);
+        await post(actor, [loc`The save fails: scarring.`, ...result.lines]);
+      }
     }
-  } else if (save.kind === "coverFire") {
-    const outcome = coverFireOutcome(save.dc, check.effectiveTotal);
-    await post(actor, [
-      !outcome.failed
-        ? loc`Cover Fire: the save succeeds; no penalty.`
-        : outcome.finalAttack
-          ? loc`Cover Fire: the save fails by 5 or more. –4 to attack and skill checks for a round, and ${esc(save.attackerName ?? loc`the attacker`)} may spend an action die on a final attack.`
-          : loc`Cover Fire: the save fails. –4 to attack and skill checks for a round.`
-    ]);
-  } else if (save.kind === "scar") {
-    const state = hazardState(actor.system);
-    if (save.fireSourceId) await markFireSourceScarring(actor, save);
-    else if (state.fire) await writeHazards(actor, scarChecked(state));
-    if (succeeded) await post(actor, [loc`The save succeeds: no scarring.`]);
-    else {
-      const result = await sufferAttributeLoss(actor, { ability: "cha", permanent: "all" }, 1, loc`Fire scarring`);
-      await post(actor, [loc`The save fails: scarring.`, ...result.lines]);
-    }
-  }
-  return finishHazardResolution(actor, message, lease);
+    return finishHazardResolution(actor, message, lease);
+  });
 }
 
 rollPipeline.register({

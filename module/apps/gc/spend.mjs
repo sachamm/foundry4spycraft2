@@ -1,5 +1,5 @@
 /** Spending GC action dice (pp.397–399, 424, 452): pay from the session pool, roll the right die and apply what can be applied. */
-import { snapshot, undoEntry, postUndo } from "../undo.mjs";
+import { snapshot, undoEntry, postUndo, withUndo } from "../undo.mjs";
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
 import { adjustGCDice, gcDiceStatus } from "../../services/gc-dice.mjs";
@@ -14,16 +14,20 @@ import {
   isDramaticScene,
   getMission,
   updateMission,
-  qualitiesInForce
+  qualitiesInForce,
+  teamActors,
+  missionEpoch
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
+import { antagonistRowFor, markAntagonistPromoted } from "./mission.mjs";
+import { queueInitiative } from "../../services/combat-queue.mjs";
 import { loc } from "../../i18n.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
 import { boostNpcDefense } from "./npc-defense.mjs";
 import { spendPostHitDefenseForNPC } from "./post-hit-defense.mjs";
 import { declareSkillDC } from "./declared-skill-dc.mjs";
 
-const ask = (title, content, ok) => formDialog({ title, ok, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
 const options = (rows, selected) =>
   rows
     .map(
@@ -46,13 +50,65 @@ export async function rollGCDie(faces, { explodeLow = false } = {}) {
   return { faces, rolls, rollObjects, total: rolls.reduce((sum, value) => sum + value, 0) };
 }
 
-const npcActors = () => {
-  const controlled = (canvas?.tokens?.controlled ?? [])
-    .map(token => token.actor)
-    .filter(actor => actor?.type === "npc");
-  const all = [...(game.actors ?? [])].filter(actor => actor.type === "npc");
-  return [...new Set([...controlled, ...all])];
-};
+/**
+ * The NPCs a spend can name, in the order a GC looks for them: the one asked for (the acting NPC), the NPCs in the
+ * viewed fight with their Count, the selected tokens, then the rest of the world under their own label. A token copy
+ * and its sidebar actor are told apart by that label.
+ * @returns {Array<[string, string, Actor]>} uuid, label, actor
+ */
+export function npcChoices(preferActor = null) {
+  const rows = new Map();
+  const add = (actor, label) => {
+    if (actor?.type !== "npc" || rows.has(actor.uuid)) return;
+    rows.set(actor.uuid, [actor.uuid, label, actor]);
+  };
+  if (preferActor) add(preferActor, loc`${preferActor.name} (acting)`);
+  for (const combatant of game.combat?.turns ?? [])
+    add(
+      combatant.actor,
+      Number.isFinite(combatant.initiative)
+        ? loc`${combatant.name} · Count ${combatant.initiative}`
+        : loc`${combatant.name} · in this fight`
+    );
+  for (const token of canvas?.tokens?.controlled ?? [])
+    add(token.actor, loc`${token.name ?? token.actor?.name} · selected`);
+  const inFight = rows.size > 0;
+  for (const actor of game.actors ?? []) add(actor, inFight ? loc`${actor.name} (not in this fight)` : actor.name);
+  return [...rows.values()];
+}
+
+/** Why a spend dialog's entry would be refused, or "" when it can go ahead. Read before the dialog closes. */
+function spendRefusal(values, { dramatic, status }) {
+  const spend = GC_SPENDS.find(entry => entry.id === values.id);
+  if (!spend) return loc`Choose a use for the action dice.`;
+  const actor = spend.needsNpc && values.actorId ? globalThis.fromUuidSync?.(values.actorId) : null;
+  if (spend.needsNpc && actor?.type !== "npc") return loc`Choose the NPC this applies to.`;
+  if (values.id === "boostDC" && !String(values.dcCheck ?? "").trim())
+    return loc`Name the check whose DC rises, so its earlier boosts are counted.`;
+  try {
+    const quality = values.id === "campaignQuality" ? campaignQuality(values.qualityId) : null;
+    const plan = planSpend(values.id, {
+      npc: actor ? spendProfile(actor) : null,
+      dramatic,
+      dice: Number(values.dice) || 1,
+      checkKind: values.checkKind,
+      alreadyBoostedDC:
+        values.id === "boostDC"
+          ? Number(getSceneState().dcBoostsByCheck?.[String(values.dcCheck).trim().toLowerCase()]?.count) || 0
+          : 0,
+      eventCost: Number(values.eventCost) || 1,
+      triggered: !!values.triggered,
+      free: !!values.free,
+      qualityCost: quality?.gcDice ?? null,
+      fromDeath: !values.fromCapture,
+      inCombat: !!game.combat?.started
+    });
+    if (plan.cost > status.value) return loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`;
+  } catch (error) {
+    return error.message;
+  }
+  return "";
+}
 
 /**
  * Spend GC action dice on one of the listed uses. `input` may pre-fill the dialog:
@@ -65,7 +121,7 @@ export async function spendGCDice(input = {}) {
   const dramatic = isDramaticScene(),
     scene = getSceneState();
   if (!input.id) {
-    const actors = npcActors();
+    const actors = npcChoices(input.preferActor ?? null);
     const uses = GC_SPENDS.filter(spend => dramatic || !spend.dramaticOnly).map(spend => [
       spend.id,
       `${spend.label} (p.${spend.page})`
@@ -78,8 +134,8 @@ export async function spendGCDice(input = {}) {
       loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
       <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
-      <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
-      <label data-when="id=activateThreat">${loc`Threat scored with`} <select name="checkKind">${options(
+      <label data-when="id=boostRoll|boostDefense|boostDefenseAfterHit|boostInitiative|activateThreat|healNpc|promote|saveNpc|knowsNothing">${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(([uuid, label]) => [uuid, label])], actors[0]?.[0] ?? "")}</select></label>
+      <label data-when="id=activateThreat|activateError">${loc`Threat or error scored with`} <select name="checkKind">${options(
         [
           ["attack", "an attack"],
           ["skill", "a skill check"]
@@ -87,14 +143,24 @@ export async function spendGCDice(input = {}) {
         "attack"
       )}</select></label>
       <label data-when="id=activateThreat|activateError">${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
+      <label data-when="id=boostDC">${loc`Check whose DC rises (each DC takes only so many dice)`} <input name="dcCheck" list="sc2-dc-checks" placeholder="${loc`e.g. the vault door's Security check`}" /></label>
+      <datalist id="sc2-dc-checks">${Object.values(scene.dcBoostsByCheck ?? {})
+        .map(entry => `<option value="${esc(entry.name)}"></option>`)
+        .join("")}</datalist>
       <label data-when="id=event">${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
       <label data-when="id=event">${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
       <label data-when="id=event"><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
       <label data-when="id=event"><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
       <label data-when="id=campaignQuality">${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
+      <label data-when="id=healNpc">${loc`A special NPC regains`} <select name="healAs">${options([
+        ["vitality", loc`Vitality equal to the die`],
+        ["wounds", loc`2 wounds`]
+      ])}</select></label>
       <label data-when="id=saveNpc"><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
       <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`,
-      loc`Spend dice`
+      loc`Spend dice`,
+      // A spend that would be refused keeps the dialog open with the reason, so nothing typed is lost.
+      values => spendRefusal(values, { dramatic, status })
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };
@@ -107,6 +173,16 @@ export async function spendGCDice(input = {}) {
   if (input.id === "boostDefense") return boostNpcDefense(actor, input);
   if (input.id === "boostDefenseAfterHit") return spendPostHitDefenseForNPC(actor, input);
   const quality = input.id === "campaignQuality" ? campaignQuality(input.qualityId) : null;
+  // DC boosts are counted per named check for this scene, so the limit of pp.397 and 424 holds (B-010).
+  const dcCheck = String(input.dcCheck ?? "").trim();
+  if (input.id === "boostDC" && !dcCheck && input.alreadyBoostedDC === undefined)
+    return refuse(loc`Name the check whose DC rises, so its earlier boosts are counted.`);
+  const dcKey = dcCheck.toLowerCase();
+  const earlierBoosts =
+    input.alreadyBoostedDC !== undefined
+      ? Number(input.alreadyBoostedDC) || 0
+      : // Read again now the dialog is closed: a boost made while it was open counts too.
+        Number(getSceneState().dcBoostsByCheck?.[dcKey]?.count) || 0;
   let plan;
   try {
     if (quality) qualityAddition(quality.id, { scope: "spend", active: qualitiesInForce() });
@@ -115,7 +191,7 @@ export async function spendGCDice(input = {}) {
       dramatic,
       dice: Number(input.dice) || 1,
       checkKind: input.checkKind,
-      alreadyBoostedDC: input.id === "boostDC" ? Number(input.alreadyBoostedDC ?? 0) : 0,
+      alreadyBoostedDC: input.id === "boostDC" ? earlierBoosts : 0,
       eventCost: Number(input.eventCost) || 1,
       triggered: !!input.triggered,
       free: !!input.free,
@@ -132,6 +208,8 @@ export async function spendGCDice(input = {}) {
   // A spend made from a chat card changes that card's own result, which a note cannot take back: no note is left.
   const undoable = !input.onCard && !["dramaticScene", "campaignQuality"].includes(input.id),
     beforeSpend = actor && undoable ? snapshot(actor) : null;
+  let antagonistBefore = null,
+    dcBoostMade = null;
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
   if (plan.cost > 0) {
@@ -145,7 +223,9 @@ export async function spendGCDice(input = {}) {
   const die = plan.die ? await rollGCDie(plan.die, { explodeLow: plan.explodeLow }) : null;
   const lines = [
     `<b>${esc(reason)}</b>`,
-    loc`Cost: ${plan.cost} GC action di${plan.cost === 1 ? "e" : "ce"} (p.${plan.page}).`
+    plan.cost === 1
+      ? loc`Cost: 1 GC action die (p.${plan.page}).`
+      : loc`Cost: ${plan.cost} GC action dice (p.${plan.page}).`
   ];
   if (die)
     lines.push(
@@ -169,13 +249,28 @@ export async function spendGCDice(input = {}) {
         lines.push(esc(quality.summary));
         break;
       case "promote":
+        // Undo puts the antagonist row back as it was, or takes it off when the promotion recorded it.
+        // The mission period is kept, so Undo puts the row back only within this run of the mission.
+        antagonistBefore = { entry: antagonistRowFor(actor), period: missionEpoch() };
         await actor.update({
           "system.promotion": { mission: String(actor.system.usagePeriods?.mission ?? "initial") }
         });
+        // A promoted antagonist's XP is worked out as a full special NPC's, per scene (pp.398, 452).
+        lines.push(await markAntagonistPromoted(actor));
+        antagonistBefore.id = antagonistRowFor(actor)?.id ?? null;
         break;
       case "healNpc": {
-        if (npcIsSpecial(actor)) lines.push(loc`Restore ${die.total} vitality or 2 wounds on the sheet.`);
-        else {
+        if (npcIsSpecial(actor)) {
+          // Vitality equal to the die, or 2 wounds, as an agent heals with an action die (pp.62, 398); never past the
+          // maximum. The spend's Undo note puts it back.
+          const pool = input.healAs === "wounds" ? "wounds" : "vitality",
+            now = Math.trunc(Number(actor.system[pool]?.value) || 0),
+            max = Number(actor.system[pool]?.max),
+            raised = now + (pool === "wounds" ? 2 : die.total),
+            value = Number.isFinite(max) ? Math.max(now, Math.min(max, raised)) : raised;
+          await actor.update({ [`system.${pool}.value`]: value });
+          lines.push(pool === "wounds" ? loc`Wounds ${now} → ${value}.` : loc`Vitality ${now} → ${value}.`);
+        } else {
           await resetDamageTrack(actor, { heal: die.total });
           lines.push(loc`Accumulated damage is now ${damageSaveState(actor).track.accumulated}.`);
         }
@@ -208,7 +303,11 @@ export async function spendGCDice(input = {}) {
     try {
       const entry = beforeSpend ? undoEntry(actor, beforeSpend, snapshot(actor)) : null;
       if (entry || plan.cost > 0)
-        await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], { gcDice: plan.cost });
+        await postUndo(loc`GC action dice spent: ${reason}`, entry ? [entry] : [], {
+          gcDice: plan.cost,
+          antagonist: antagonistBefore?.id ? antagonistBefore : null,
+          dcBoost: dcBoostMade
+        });
     } catch (error) {
       console.warn("Field Agent's Handbook | No Undo note could be left for this spend.", error);
     }
@@ -222,15 +321,31 @@ export async function setDramaticScene(dramatic, { source = "scripted" } = {}) {
   return getSceneState();
 }
 
+/**
+ * An opponent of the agents for the dramatic-scene doubling (p.424): a hostile token, or, with no token to say, a
+ * combatant no player owns. Allied and neutral NPCs keep their Counts.
+ */
+export function dramaticOpponent(combatant) {
+  if (combatant.hasPlayerOwner) return false;
+  const disposition = combatant.token?.disposition;
+  const hostile = globalThis.CONST?.TOKEN_DISPOSITIONS?.HOSTILE ?? -1;
+  return Number.isFinite(disposition) ? disposition === hostile : true;
+}
+
 /** Dramatic scene: double each opponent's current Initiative Count, to at most 50 (p.424). Each combatant is doubled once per combat. */
-export async function doubleOpponentInitiative(combat = game.combat) {
+export function doubleOpponentInitiative(combat = game.combat, options = {}) {
   requireGC();
-  if (!combat) return refuse(loc`There is no active combat.`);
-  if (!isDramaticScene()) return refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
+  // On the Initiative queue, so a doubling never lands in the middle of the end-of-round pass (p.424).
+  return queueInitiative(() => doubleNow(combat, options));
+}
+
+async function doubleNow(combat, { quiet = false } = {}) {
+  if (!combat) return quiet ? [] : refuse(loc`There is no active combat.`);
+  if (!isDramaticScene()) return quiet ? [] : refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
   for (const combatant of combat.combatants) {
     if (
-      combatant.hasPlayerOwner ||
+      !dramaticOpponent(combatant) ||
       !Number.isFinite(combatant.initiative) ||
       combatant.flags?.spycraft2?.dramaticDoubled
     )
@@ -248,14 +363,48 @@ export async function doubleOpponentInitiative(combat = game.combat) {
   return changed;
 }
 
+/** An opponent who joins or rolls once the scene is dramatic is doubled when it first has a Count (p.424). */
+export function installDramaticInitiative() {
+  Hooks.on("updateCombatant", (combatant, changed) => {
+    if (game.users?.activeGM?.id !== game.user.id || !Object.hasOwn(changed, "initiative")) return;
+    if (!Number.isFinite(changed.initiative) || combatant.flags?.spycraft2?.dramaticDoubled) return;
+    if (!isDramaticScene() || !dramaticOpponent(combatant)) return;
+    doubleOpponentInitiative(combatant.combat, { quiet: true }).catch(error =>
+      console.warn("Field Agent's Handbook | A dramatic Initiative Count was not doubled.", error)
+    );
+  });
+}
+
 /** Mission Caliber increase (p.398): the stored Caliber follows the pool's +2 dice per step. */
 export async function recordCaliberIncrease(caliber) {
   requireGC();
   const mission = getMission();
   if (!Number.isSafeInteger(caliber) || caliber <= mission.caliber || caliber > 5)
     return refuse(loc`Choose a higher Caliber, up to V.`);
-  const steps = caliber - mission.caliber;
-  if (gcDiceStatus().current) await adjustGCDice(2 * steps, `Mission Caliber increased to ${caliber}`);
-  await updateMission({ caliber });
+  const steps = caliber - mission.caliber,
+    was = mission.caliber,
+    gained = gcDiceStatus().current ? 2 * steps : 0;
+  // The raised Caliber caps every pick and Request for the rest of the mission, so it reaches the team's reserves.
+  // Loaded here, not at the top, so the console does not change the order the roll contributors register in.
+  const { reserveCaliberIncrease } = await import("../../rules/gear-acquisition.mjs");
+  const roman = CONFIG.SPYCRAFT.calibers[caliber],
+    team = teamActors().filter(actor => reserveCaliberIncrease(actor.system, caliber));
+  // One Undo puts back the team's reserves, the mission's Caliber and the GC dice it gave.
+  await withUndo(
+    team,
+    loc`Mission Caliber raised to ${roman}`,
+    async () => {
+      if (gained) await adjustGCDice(gained, `Mission Caliber increased to ${caliber}`);
+      await updateMission({ caliber });
+      await Promise.all(team.map(actor => actor.update(reserveCaliberIncrease(actor.system, caliber))));
+    },
+    () => ({ missionCaliber: { was, now: caliber, gained, period: missionEpoch() } })
+  );
+  await ChatMessage.create({
+    speaker: { alias: loc`Game Control` },
+    content: esc(
+      loc`Mission Caliber is now ${roman}. At the end of this scene, agents may trade mission gear for new picks at Caliber ${roman}, and it caps every Request for the rest of the mission (p.398).`
+    )
+  });
   return steps;
 }

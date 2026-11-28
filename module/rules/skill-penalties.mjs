@@ -1,7 +1,8 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 
 export function skillPenaltyDivisor(system) {
-  const value = system?.campaignEffects?.skillPenaltyDivisor ?? 1;
+  const value = (system?.campaignEffects ?? campaignRules()).skillPenaltyDivisor ?? 1;
   if (![1, 2].includes(value)) throw Error(loc`Review the campaign's skill penalty reduction.`);
   return value;
 }

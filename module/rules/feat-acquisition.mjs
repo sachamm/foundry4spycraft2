@@ -1,3 +1,4 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 import { featAcquisitionLevel } from "./career-zero.mjs";
 import { campaignFeatReplacementAllowed } from "./campaign-creation.mjs";
@@ -35,7 +36,7 @@ export function classFeatSources(items, progression) {
   return sources;
 }
 
-export function featAcquisition(feat, sources, items, { preview = false, campaignEffects = {} } = {}) {
+export function featAcquisition(feat, sources, items, { preview = false, campaignEffects = campaignRules() } = {}) {
   const key = feat.system.acquisitionSource;
   if (!key || feat.system.granted) return { ok: true, levelAllowance: 0 };
   const source = sources.find(s => s.id === key),

@@ -108,10 +108,23 @@ test("two independent clients cannot both spend the same die; server-side embedd
     runNativeResourceTransaction([actor], () => payLockedActionDice(actor, 1, async () => ++performed));
   const results = await Promise.allSettled([run(a), run(b)]);
   assert.equal(results.filter(r => r.status === "fulfilled").length, 1);
-  assert.ok(results.some(r => r.status === "rejected" && r.reason instanceof ResourceBusyError));
+  // The second client waits for the first and asks once more; by then the die is spent, so it is refused.
+  assert.ok(results.some(r => r.status === "rejected"));
   assert.equal(performed, 1);
   assert.equal(records.get("Actor.a").system.actionDice.value, 0);
   assert.equal(records.get("Actor.a").items.length, 0);
+});
+test("a lock another client took a moment earlier is waited out and asked for once more", async () => {
+  reset();
+  const actor = new NativeActor("a");
+  // The other client's lock is on the server but has not reached this client yet; it is released shortly.
+  records.get(actor.uuid).items.push(copy(lock("other")));
+  setTimeout(() => {
+    records.get(actor.uuid).items = [];
+  }, 50);
+  const result = await runNativeResourceTransaction([actor], async () => "done");
+  assert.equal(result, "done");
+  assert.equal(records.get(actor.uuid).items.length, 0);
 });
 test("a bookkeeping lock left by a closed client is cleared by the next transaction; an action's lock is not", async () => {
   reset();
@@ -722,4 +735,12 @@ test("native rule-message refresh rejects changed actor identity and newly secre
     assert.equal(performed, false);
     assert.equal(records.get(a.uuid).items.length, 0);
   }
+});
+
+test("a server id collision reads as a plain retry message", async () => {
+  const { plainErrorMessage } = await import("../module/error-notices.mjs");
+  const text = plainErrorMessage(new Error("The _id [sc2ResourceLock1] already exists within the parent collection"));
+  assert.doesNotMatch(text, /sc2ResourceLock1|_id/);
+  assert.match(text, /Try again/);
+  assert.equal(plainErrorMessage("Roll the save first."), "Roll the save first.");
 });

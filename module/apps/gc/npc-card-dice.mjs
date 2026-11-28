@@ -4,13 +4,15 @@
  * NPCs have no action dice of their own; the GC spends from the session pool (pp.397–399, 452). On an NPC's open
  * attack, skill or save card the GC gets two buttons:
  *  - "GC boost (+1dN)" pays one die, rolls the NPC's die type and adds it to the card's total;
- *  - "GC: activate threat" pays for a confirmed threat and marks the card as a critical success, so the damage roll
+ *  - "Activate threat (GC dice)" pays for a confirmed threat and marks the card as a critical success, so the damage roll
  *    and its application carry the critical hit on.
  * Both go through spendGCDice, which checks the pool, the NPC's qualities and posts the spend to the GC.
  */
+import { triumphAt } from "../../rules/check-candidates.mjs";
 import { rollPipeline } from "../../rules/roll-pipeline.mjs";
 import { gcDieType } from "../../rules/gc/gc-spend.mjs";
 import { spendProfile } from "./npc-play.mjs";
+
 import { spendGCDice } from "./spend.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
@@ -21,6 +23,7 @@ import { esc } from "../../html.mjs";
 import { npcDefenseDeliveryControls } from "./npc-defense.mjs";
 import { npcHitDeliveryControls, validateNpcDefenseReroll } from "./post-hit-defense.mjs";
 import { acquireDeclaredDC, validateDeclaredDC, declaredDCControls } from "./declared-skill-dc.mjs";
+import { checkFlavor } from "../../rules/outcomes.mjs";
 
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
@@ -80,16 +83,40 @@ export async function gcBoostCard(message, actor) {
     resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
       cap: check.cap ?? null,
       threat: check.threat ?? 0,
-      actionDieBonus: boostTotal
+      actionDieBonus: boostTotal,
+      triumphAt: triumphAt(check),
+      ceiling: check.resultCeiling ?? null
     });
   await message.update({
     "flags.spycraft2.effectiveTotal": resolved.total,
     "flags.spycraft2.boostTotal": boostTotal,
     "flags.spycraft2.capped": resolved.limited,
     "flags.spycraft2.potentialTriumph": ["skill", "knowledge", "attack"].includes(check.checkKind) && resolved.triumph,
-    "flags.spycraft2.gcBoosts": [...(check.gcBoosts ?? []), result.die.total]
+    "flags.spycraft2.gcBoosts": [...(check.gcBoosts ?? []), result.die.total],
+    flavor: checkFlavor({
+      ...check,
+      effectiveTotal: resolved.total,
+      boostTotal,
+      capped: resolved.limited,
+      gcBoosts: [...(check.gcBoosts ?? []), result.die.total]
+    })
   });
   return resolved.total;
+}
+
+function criticalRefusal(check, actor) {
+  let profile;
+  try {
+    profile = spendProfile(actor);
+  } catch {
+    return "";
+  }
+  if (profile.type === "special") return "";
+  const attack = check.checkKind === "attack";
+  if (attack ? profile.treacherous === true : profile.prodigy === true) return "";
+  return attack
+    ? loc`A standard NPC needs the treacherous quality for a critical hit (p.452)`
+    : loc`A standard NPC needs the prodigy quality for a critical success (p.452)`;
 }
 
 /** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */
@@ -144,8 +171,9 @@ rollPipeline.register({
       : [];
     if (check.threatConfirmed && !check.criticalSuccess && !check.criticalFailure)
       controls.unshift({
-        label: loc`GC: activate threat`,
+        label: loc`Activate threat (GC dice)`,
         placement: "card",
+        disabled: criticalRefusal(check, actor),
         run: () => gcActivateThreat(message, actor)
       });
     return controls.length ? controls : null;

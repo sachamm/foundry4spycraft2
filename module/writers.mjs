@@ -19,3 +19,30 @@ export function primaryWriterFor(actor, game = globalThis.game) {
       .sort((a, b) => a.id.localeCompare(b.id))[0] ?? null
   );
 }
+
+/**
+ * A per-character queue for reconcile hooks: `work(actor)` runs soon, once for any number of calls in a row, and
+ * again if another call arrives while it runs. Callers check first that this client is the one that writes.
+ */
+export function writerQueue(work, onError = () => {}) {
+  const pending = new WeakMap();
+  return actor => {
+    const queued = pending.get(actor);
+    if (queued) {
+      queued.again = true;
+      return queued.promise;
+    }
+    const state = { again: true };
+    pending.set(actor, state);
+    state.promise = Promise.resolve()
+      .then(async () => {
+        do {
+          state.again = false;
+          await work(actor);
+        } while (state.again);
+      })
+      .catch(onError)
+      .finally(() => pending.delete(actor));
+    return state.promise;
+  };
+}

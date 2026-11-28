@@ -34,6 +34,7 @@ export function characterTargetPlan(target, { targetCharacterType = "", targetNa
     (target.type === "npc" && !["standard", "special", "villain", "animal"].includes(target.npcType))
   )
     throw new Error(loc`Review the actual target’s character type.`);
+  // A villain (the legacy special type) is a special character.
   const known =
     target.type === "agent" || target.npcType === "villain"
       ? "special"

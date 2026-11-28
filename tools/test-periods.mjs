@@ -543,3 +543,16 @@ test("an unresolved Grapple release or required Escape Hold move prevents changi
     assert.equal(periods.scene, "scene");
   }
 });
+
+test("a period change refreshes unlinked NPC tokens too, though only agent tokens are locked for it", async () => {
+  reset();
+  const { periodResourceActors } = await import("../module/services/transactions.mjs");
+  const minion = actor("minion", 0, 0, "npc");
+  minion.isToken = true;
+  game.scenes = [{ tokens: [{ actor: minion }] }];
+  const calls = [];
+  for (const a of [...game.actors, minion]) a.reset = () => calls.push(a.id);
+  refreshUsagePeriodActors();
+  assert.ok(calls.includes("minion"));
+  assert.ok(!periodResourceActors().some(a => a.id === "minion"));
+});

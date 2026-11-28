@@ -125,6 +125,12 @@
   font-weight: 400;
   color: var(--sc2-ink-muted);
 }
+/* The line that names a result cap, under the title. */
+.spycraft2.sc2-result-guide .sc2-guide-cap {
+  margin: var(--sc2-space-1) 0 0;
+  font-size: var(--sc2-text-s);
+  color: var(--sc2-ink-muted);
+}
 /* The outcome is told by the word and its icon; the edge colour only repeats it. */
 .spycraft2.sc2-result-guide.sc2-outcome-good {
   border-left-color: var(--sc2-good);
@@ -160,6 +166,16 @@
   font-style: italic;
 }
 
+/* What applying the damage did, under its total, so a hit reads on its own card. */
+.chat-message .spycraft2.sc2-damage-results {
+  margin: var(--sc2-space-1) 0 0;
+  padding-top: var(--sc2-space-1);
+  border-top: 1px solid var(--sc2-rule);
+}
+.chat-message .spycraft2.sc2-damage-results p {
+  margin: 0 0 2px;
+}
+
 /* One surface for the whole card. The card takes its paper and ink from the same tokens as the sheets, so the two
  * always pair: without this the card kept Foundry's own background under this system's text colours, which left
  * the dice formula and secondary text too faint to read in the dark theme. */
@@ -179,6 +195,7 @@
   color: var(--sc2-action);
 }
 .chat-message.sc2-card .spycraft2.chat-note,
+.chat-message.sc2-card .spycraft2.sc2-damage-results,
 .chat-message.sc2-card .spycraft2.sc2-secret-note {
   color: var(--sc2-ink);
 }
@@ -232,4 +249,11 @@
 .chat-message .spycraft2.sc2-card-details .sc2-card-guide {
   padding-top: 2px;
   border-top: 1px solid var(--sc2-rule);
+}
+
+/* The card a key or console button just pressed, marked for a moment (keybindings.mjs showPressed). */
+.chat-message.sc2-pressed,
+[data-message-id].sc2-pressed {
+  outline: 2px solid var(--sc2-action);
+  outline-offset: -2px;
 }

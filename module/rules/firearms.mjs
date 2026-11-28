@@ -1,3 +1,4 @@
+import { campaignRules } from "./campaign-rules.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
@@ -335,7 +336,7 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
     );
   }
   const multiplier = factors.length ? 1 + factors.reduce((n, f) => n + f - 1, 0) : 1;
-  const campaign = system.campaignEffects?.rangeIncrementMultiplier ?? 1;
+  const campaign = (system.campaignEffects ?? campaignRules()).rangeIncrementMultiplier ?? 1;
   if (!Number.isFinite(campaign) || campaign < 1)
     throw new Error(loc`Review the campaign's range-increment multiplier.`);
   const combinedMultiplier = multiplier + campaign - 1;
@@ -351,7 +352,7 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
     flat,
     errorReduction,
     notes,
-    cqbRange: campaignCQBRange([...feats], system.campaignEffects)
+    cqbRange: campaignCQBRange([...feats], system.campaignEffects ?? campaignRules())
   };
 }
 

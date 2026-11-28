@@ -81,7 +81,8 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
   ]);
   assert.deepEqual(entry.unset, ["flags.spycraft2.nonLethal"]);
   assert.deepEqual(entry.created, ["e1"]);
-  assert.deepEqual(entry.combatants, [{ combat: "fight", id: "c1", defeated: false, initiative: 14, fluid: null }]);
+  // Only the field the step changed, with what it left: the Count and fluid state are not part of this step.
+  assert.deepEqual(entry.combatants, [{ combat: "fight", id: "c1", defeated: false, left: { defeated: true } }]);
   assert.deepEqual(restoreUpdate(entry), {
     "system.vitality.value": 20,
     "system.wounds.value": 12,
@@ -118,6 +119,27 @@ test("a step's writes, new conditions and tracker changes are put back by Undo",
   assert.deepEqual(note.changed, { "flags.spycraft2.undo.done": true });
   note.flags.spycraft2.undo.done = true;
   assert.equal(await applyUndo(note), null, "a note undoes once");
+  // A note that recorded its own mark takes that one off, not the newest mark for the same target.
+  await actor.update({ "system.vitality.value": 0 });
+  card.updates = [];
+  card.flags.spycraft2.damageAppliedBy = {
+    first00001: { targetUuid: "Actor.g" },
+    later00002: { targetUuid: "Actor.g" }
+  };
+  const own = {
+    flags: {
+      spycraft2: {
+        undo: {
+          label: "7 lethal",
+          entries: [undoEntry(actor, before, snapshot(actor))],
+          damageCard: { messageId: "m", targetUuid: "Actor.g", entryId: "first00001" }
+        }
+      }
+    },
+    async update() {}
+  };
+  await applyUndo(own);
+  assert.deepEqual(card.updates, [{ "flags.spycraft2.damageAppliedBy.-=first00001": null }]);
 });
 
 test("Undo notices a value that moved again after the step", () => {
@@ -189,7 +211,7 @@ test("two presses of one Undo run once; a fluid initiative event the step record
   const [first, second] = await Promise.all([applyUndo(note), applyUndo(note)]);
   assert.deepEqual([first, second], [["Guard"], null]);
   assert.equal(marked, 1);
-  assert.deepEqual(combatant.updates, [{ defeated: false, initiative: 10, "flags.spycraft2.-=fluid": null }]);
+  assert.deepEqual(combatant.updates, [{ "flags.spycraft2.-=fluid": null }]);
   game.combats = [];
 });
 
@@ -223,4 +245,119 @@ test("a pool that moved again gets back what the step took, not its old number",
   // Untouched since the step: the plain restore stands.
   const still = { system: { vitality: { value: 0, max: 6 }, wounds: { value: 15, max: 19 } } };
   assert.deepEqual(poolsGivenBack(entry, still), {});
+});
+
+test("undoing a first spend leaves a later spend on the same turn in place", async () => {
+  const actor = makeActor({ vitality: { value: 20 } });
+  const combatant = {
+    id: "c1",
+    name: "Guard",
+    actor,
+    parent: { id: "fight" },
+    defeated: false,
+    initiative: 10,
+    flags: { spycraft2: { actions: { half: 2 } } },
+    updates: [],
+    async update(change) {
+      this.updates.push(change);
+    }
+  };
+  const fight = { id: "fight", combatants: Object.assign([combatant], { get: () => combatant }) };
+  game.combats = Object.assign([fight], { get: () => fight });
+  const before = snapshot(actor);
+  combatant.flags = { spycraft2: { actions: { half: 1 } } };
+  const entry = undoEntry(actor, before, snapshot(actor));
+  // A second spend after the step: the first one's Undo must not hand both half actions back.
+  combatant.flags = { spycraft2: { actions: { half: 0 } } };
+  globalThis.fromUuid = async () => actor;
+  game.messages = { get: () => null };
+  let warned = 0;
+  globalThis.ui = { notifications: { warn: () => (warned += 1), info: () => null } };
+  const note = { id: "note2", flags: { spycraft2: { undo: { label: "x", entries: [entry] } } }, async update() {} };
+  await applyUndo(note);
+  assert.equal(warned, 1);
+  assert.ok(combatant.updates.every(change => !Object.keys(change).some(key => key.includes("actions"))));
+  game.combats = [];
+});
+
+test("undoing an action spend leaves a later Count change and fluid event in place", async () => {
+  const actor = makeActor({ vitality: { value: 20 } });
+  const combatant = {
+    id: "c1",
+    name: "Guard",
+    actor,
+    parent: { id: "fight" },
+    defeated: false,
+    initiative: 12,
+    flags: { spycraft2: { actions: { half: 2 } } },
+    updates: [],
+    async update(change) {
+      this.updates.push(change);
+    }
+  };
+  const fight = { id: "fight", combatants: Object.assign([combatant], { get: () => combatant }) };
+  game.combats = Object.assign([fight], { get: () => fight });
+  const before = snapshot(actor);
+  combatant.flags = { spycraft2: { actions: { half: 1 } } };
+  const entry = undoEntry(actor, before, snapshot(actor));
+  // Later in the turn a fluid event moves the Count; the spend's Undo must keep it.
+  combatant.initiative = 8;
+  combatant.flags.spycraft2.fluid = { modifiers: [{ id: "x", value: -4 }] };
+  globalThis.fromUuid = async () => actor;
+  game.messages = { get: () => null };
+  globalThis.ui = { notifications: { warn: () => null, info: () => null } };
+  const note = { id: "note3", flags: { spycraft2: { undo: { label: "x", entries: [entry] } } }, async update() {} };
+  await applyUndo(note);
+  assert.deepEqual(combatant.updates, [{ "flags.spycraft2.==actions": { half: 2 } }]);
+  game.combats = [];
+});
+
+test("a player's note restores only that player's characters and character paths, never mission-wide parts", async () => {
+  const { trustedRecord } = await import("../module/apps/undo.mjs");
+  const player = { id: "p", isGM: false };
+  globalThis.fromUuidSync = uuid => ({
+    testUserPermission: (user, level) => uuid === "Actor.mine" && level === "OWNER"
+  });
+  const record = {
+    label: "x",
+    gcDice: 3,
+    placedTokens: { ids: ["t"] },
+    entries: [
+      {
+        uuid: "Actor.mine",
+        restore: [
+          ["system.vitality.value", 5],
+          ["ownership.default", 3]
+        ],
+        expect: [],
+        unset: ["name"]
+      },
+      { uuid: "Actor.theirs", restore: [["system.vitality.value", 5]], expect: [] }
+    ]
+  };
+  const kept = trustedRecord(record, player);
+  assert.equal(kept.gcDice, undefined);
+  assert.equal(kept.placedTokens, undefined);
+  assert.deepEqual(
+    kept.entries.map(entry => [entry.uuid, entry.restore, entry.unset]),
+    [["Actor.mine", [["system.vitality.value", 5]], []]]
+  );
+  assert.equal(trustedRecord(record, { isGM: true }), record, "a GC's own note is taken as written");
+  delete globalThis.fromUuidSync;
+});
+
+test("a step that fails part way still leaves a note for what it wrote, then reports the failure", async () => {
+  const { withUndo } = await import("../module/apps/undo.mjs");
+  const actor = makeActor({ vitality: { value: 10 } });
+  const posted = [];
+  globalThis.ChatMessage = { create: async data => (posted.push(data), data), getWhisperRecipients: () => [] };
+  await assert.rejects(
+    withUndo([actor], "Spend", async () => {
+      actor.system.vitality.value = 4;
+      throw new Error("second write refused");
+    }),
+    /second write refused/
+  );
+  assert.equal(posted.length, 1);
+  assert.match(posted[0].flags.spycraft2.undo.label, /stopped part way/);
 });

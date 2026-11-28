@@ -27,3 +27,7 @@ export function isHideCheck(skillKey, check) {
     (check?.id === "hide" || (check?.id === undefined && /^Hide(?: Check)?$/.test(check?.name ?? "")))
   );
 }
+
+/** A check the Size table modifies (Table 5.13, p.349): Blend's Stealth check and Sneak's Hide check. */
+export const sizeStealthCheck = (skillKey, check) =>
+  (skillKey === "blend" && check?.id === "stealth") || isHideCheck(skillKey, check);

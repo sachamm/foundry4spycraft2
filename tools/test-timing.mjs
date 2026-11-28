@@ -399,3 +399,14 @@ test("actual Actor skill entry preserves Professional context and rejects a sour
   await assert.rejects(a.rollSkill("analysis", "int", opts), /changed/);
   assert.equal(posted, 1);
 });
+
+test("Comedy of Errors makes taking 10 take four times as long (p.406)", async () => {
+  const { setCampaignRulesSource } = await import("../module/rules/campaign-rules.mjs");
+  assert.equal(skillTimingPlan({ method: "take10" }).timeMultiplier, 2);
+  setCampaignRulesSource(() => ({ take10TimeMultiplier: 4 }));
+  try {
+    assert.equal(skillTimingPlan({ method: "take10" }).timeMultiplier, 4);
+  } finally {
+    setCampaignRulesSource(() => ({}));
+  }
+});

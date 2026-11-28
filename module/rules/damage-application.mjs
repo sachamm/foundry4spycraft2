@@ -5,6 +5,8 @@
  * armor-piercing value, and what a hit does to a special character's vitality and wounds. The Foundry side is in
  * module/apps/damage-application.mjs.
  */
+import { campaignRules } from "./campaign-rules.mjs";
+
 import { autofireHits, burstHits } from "./combat-actions.mjs";
 import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
@@ -76,7 +78,9 @@ export function attackResolutionNote(check) {
     return r.hits > 1 ? loc`Against ${who}: a hit; ${r.hits} shots hit.` : loc`Against ${who}: a hit.`;
   }
   const base = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
-  const against = r.cover ? loc`${base} (with ${r.cover.label} cover, +${r.cover.bonus})` : base;
+  const against = r.cover
+    ? loc`${base} (with ${r.cover.label}${r.cover.measured ? loc` measured from the map` : ""} cover, +${r.cover.bonus})`
+    : base;
   const note = r.specialistDodge ? " " + loc`Foibles adds 1 dodge to this Defense (p.49).` : "";
   if (r.hit && check.effectiveTotal >= 75 && r.margin < 0)
     return loc`Against ${against}: Triumph; the attack still hits despite the higher Defense.` + note;
@@ -130,6 +134,33 @@ export function criticalDamageDefaults(attack, damageMessageId = "", { hitIndex 
   return { critical: true, criticalDice: dice, ouch: false, laterShot: false };
 }
 
+const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", "#039": "'", nbsp: " " };
+/**
+ * A damage report's lines as plain text, at most 12 lines of 400 characters, for keeping on the damage card itself.
+ * Tags are dropped and entities read back, so the card can show them as text and nothing in them is run as markup.
+ */
+export function reportText(lines) {
+  return (Array.isArray(lines) ? lines : [])
+    .filter(line => typeof line === "string")
+    .map(line =>
+      line
+        .replace(/<[^>]*>/g, "")
+        .replace(/&(amp|lt|gt|quot|#0?39|nbsp);/g, (_, key) => ENTITIES[key])
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 400)
+    )
+    .filter(Boolean)
+    .slice(0, 12);
+}
+
+/** Whether a damage record's report is fit to show: plain strings within the limits reportText keeps to. */
+export const validReport = report =>
+  report === undefined ||
+  (Array.isArray(report) &&
+    report.length <= 12 &&
+    report.every(line => typeof line === "string" && line.length <= 400));
+
 /**
  * Every "damage applied" record on a damage card. Records used to be one array, rewritten whole on each apply, so two
  * close applies could drop one; new records are keyed under damageAppliedBy, and old cards keep their array.
@@ -160,8 +191,10 @@ export function woundState(wounds, death = -10) {
  * @param {object} facts  { vitality, wounds, woundsMax }
  * @param {object} hit    { damage, dr, armorPiercing, armorPiercingAll, critical }
  */
-export function lethalHitPlan(facts = {}, hit = {}, campaignEffects = {}) {
-  const thresholds = injuryThresholds(campaignEffects);
+export function lethalHitPlan(facts = {}, hit = {}, campaignEffects = campaignRules()) {
+  const thresholds = hit.injuryBand
+    ? { criticalInjuryMin: hit.injuryBand.min, massiveDamage: hit.injuryBand.massive }
+    : injuryThresholds(campaignEffects);
   const vitality = Math.max(0, int(facts.vitality)),
     wounds = int(facts.wounds),
     woundsMax = int(facts.woundsMax),
@@ -194,8 +227,12 @@ export function lethalHitPlan(facts = {}, hit = {}, campaignEffects = {}) {
       net >= thresholds.criticalInjuryMin
         ? {
             dc: Math.floor(net / 2),
+            min: thresholds.criticalInjuryMin,
+            threshold: thresholds.massiveDamage,
             toMinusNine: net >= thresholds.massiveDamage,
-            ...(thresholds.criticalInjuryMin !== 25 || thresholds.massiveDamage !== 50 ? { thresholds } : {})
+            ...(!hit.injuryBand && (thresholds.criticalInjuryMin !== 25 || thresholds.massiveDamage !== 50)
+              ? { thresholds }
+              : {})
           }
         : null
   };
@@ -231,6 +268,8 @@ export function lethalHitLines(name, plan) {
 
 /** Which DR column an attack uses: armor lists one value against melee and another against everything else. */
 export function drForAttack(system = {}, attackKind = "other", weaponProficiency = "") {
+  if (weaponProficiency && typeof weaponProficiency === "object")
+    weaponProficiency = weaponProficiency.proficiency ?? "";
   const extra = specialistDRIncrement(system, attackKind, weaponProficiency);
   const listed = system.armorDRByAttack?.[attackKind];
   if (whole(listed)) return listed + extra;
@@ -392,7 +431,8 @@ export function nonLethalHitPlan(system, totals = {}, hit = {}) {
       : reducedDamage({
           damage: hit.campaignStressAdjusted
             ? hit.damage
-            : campaignStressDamage(hit.damage, campaignStressPolicy(system.campaignEffects)).adjustedDamage
+            : campaignStressDamage(hit.damage, campaignStressPolicy(system.campaignEffects ?? campaignRules()))
+                .adjustedDamage
         });
   const bruising = kind === "subdual" && reduced.stopped ? 1 : 0,
     resistance = damageResistancePlan(system, kind, reduced.net + bruising),

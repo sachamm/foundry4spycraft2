@@ -41,7 +41,7 @@ export function bullRushDefensePlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (key !== "athletics" || check?.id !== "resist-bull-rush") return empty;
   if (method !== "roll")
-    return reject(loc`Bull Rush is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).`);
+    return reject(loc`Bull Rush is opposed and part of a combat action; taking 10/20 is unavailable (pp.91,352).`);
   if (
     typeof bullRushOpponentName !== "string" ||
     !bullRushOpponentName.trim() ||

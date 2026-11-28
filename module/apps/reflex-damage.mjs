@@ -1,6 +1,7 @@
 import { refuse } from "../error-notices.mjs";
 import { savingThrowDamagePlan } from "../rules/defense.mjs";
 import { loc } from "../i18n.mjs";
+
 import { formDialog, raw } from "./dialog-kit.mjs";
 /** Read-only save adjustment; health and other mitigation are separate. */
 export async function checkReflexDamage(actor) {

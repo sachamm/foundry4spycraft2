@@ -3,7 +3,7 @@ import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { getRestraintReleaseReview, getPendingRestraintMoves } from "../rules/restraints.mjs";
 import { getReserveReview } from "../rules/reserve-transactions.mjs";
 import { getBaffledReview } from "../rules/baffled.mjs";
-import { queueResources, periodResourceActors } from "./transactions.mjs";
+import { queueResources, periodResourceActors, periodRefreshActors } from "./transactions.mjs";
 import { withGCPeriodLock } from "./gc-dice.mjs";
 import { loc } from "../i18n.mjs";
 import { same } from "../rules/equal.mjs";
@@ -491,7 +491,7 @@ export async function reviewUsagePeriod(options = {}) {
 
 /** Refresh linked and unlinked actors when an epoch changes on any client. */
 export function refreshUsagePeriodActors() {
-  for (const actor of periodResourceActors())
+  for (const actor of periodRefreshActors())
     try {
       actor.reset?.();
       renderOpenSheet(actor);

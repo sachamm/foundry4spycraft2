@@ -32,8 +32,10 @@ import { COMBAT_STANCES } from "../rules/combat-stance.mjs";
 import { manageThreadNeedle } from "../apps/thread-needle.mjs";
 import { takeStrikingAttack, reviewStrikingAttack } from "../apps/striking-stance.mjs";
 import { recordFendMovement } from "../apps/fend.mjs";
-import { takeCounterTrip, reviewCounterTrip } from "../apps/counter-trip.mjs";
-import { takeTripFinalAttack, reviewTripFinalAttack } from "../apps/trip-final-attack.mjs";
+import { takeCounterTrip, reviewCounterTrip, counterTripCandidates } from "../apps/counter-trip.mjs";
+import { pointmanLevel } from "../rules/action-dice.mjs";
+import { announceChanges } from "./change-announcer.mjs";
+import { takeTripFinalAttack, reviewTripFinalAttack, tripFinalAttackCandidates } from "../apps/trip-final-attack.mjs";
 import { manageTripOutcomes } from "../apps/trip-outcomes.mjs";
 import { managePowerStanceInitiative } from "../apps/power-stance.mjs";
 import { manageDrivingStance } from "../apps/driving-stance.mjs";
@@ -121,7 +123,12 @@ import { rollCheapShot } from "../apps/cheap-shot.mjs";
 import { rollDisarm } from "../apps/disarm.mjs";
 import { declareTwoWeapon, reviewTwoWeapon, takeTwoWeaponFinalAttack } from "../apps/two-weapon.mjs";
 import { checkNumericalAdvantage } from "../apps/numerical-advantage.mjs";
-import { criticalInjuryReviews } from "../apps/critical-injuries.mjs";
+import {
+  criticalInjuryReviews,
+  criticalInjuryRows,
+  markInjuryHealed,
+  recordInjurySurgery
+} from "../apps/critical-injuries.mjs";
 import { takeTotalDefense } from "../apps/total-defense.mjs";
 import { checkCombatMovement } from "../apps/combat-movement.mjs";
 import { activateCombatExpertise } from "../apps/combat-expertise.mjs";
@@ -152,6 +159,7 @@ import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-cond
 import { ownedNpcProfile } from "../rules/npc-drained.mjs";
 import { applyNpcDrained, reviewNpcDrainedHistory, npcDrainedView } from "../apps/npc-drained.mjs";
 import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
+import { organizationChoices } from "../rules/npc-organization.mjs";
 import { reviewActorRules } from "../apps/rules-refresh.mjs";
 import { classSkillSelections, orderedClassChoices } from "../rules/class-skills.mjs";
 import { armorSlot } from "../rules/gear.mjs";
@@ -177,6 +185,9 @@ import { featActions } from "./feat-actions.mjs";
 import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
 
+import { contactPeopleRows, editContactPeople, summonContactPerson } from "../apps/contact-people.mjs";
+import { buyFeatWithXP, featTradeContext } from "../apps/feat-purchase.mjs";
+
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 const TPL = "systems/spycraft2/templates/actor";
@@ -191,6 +202,15 @@ function weaponShots(item) {
   return state ? { ...state, label: ammunitionLabel(state), empty: state.loaded === 0 } : null;
 }
 /** What an NPC's feat items add, as the sheet shows it. */
+/** What a campaign budget quality does to one NPC pick (pp.405, 408), or "" when the pick is carried as chosen. */
+function npcPickBudgetNote(pick) {
+  if (!pick || (!pick.lost && !pick.pastV && pick.carried === pick.caliber)) return "";
+  const roman = n => NPC_RULES.grades[n - 1] ?? String(n);
+  if (pick.lost) return loc`Lost under Shoe-String Budget`;
+  if (pick.pastV) return loc`Carried at V, with an extra Caliber I item`;
+  return loc`Carried at Caliber ${roman(pick.carried)}`;
+}
+
 function npcFeatPlay(effects) {
   if (!effects?.rows?.length && !effects?.uncounted?.length) return null;
   const signed = value => (value >= 0 ? `+${value}` : `${value}`);
@@ -503,6 +523,12 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       reviewCriticalInjury(event, target) {
         return this.actor.reviewCriticalInjury(target.dataset.injury);
       },
+      recordInjurySurgery(event, target) {
+        return recordInjurySurgery(this.actor, target.dataset.injury);
+      },
+      markInjuryHealed(event, target) {
+        return markInjuryHealed(this.actor, target.dataset.injury);
+      },
       takeTotalDefense: costsAction("full", function () {
         return takeTotalDefense(this.actor);
       }),
@@ -605,6 +631,15 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       reviewLimitedUseCounter(event, target) {
         return this.actor.reviewLimitedUseCounter(target.dataset.resource);
       },
+      editContactPeople(event, target) {
+        return editContactPeople(this.actor, Number(target.dataset.index));
+      },
+      buyFeatWithXP() {
+        return buyFeatWithXP(this.actor);
+      },
+      summonContactPerson(event, target) {
+        return summonContactPerson(this.actor, Number(target.dataset.index), Number(target.dataset.person));
+      },
       chooseTemporaryFocuses(event, target) {
         return this.actor.chooseTemporaryFocuses({ featId: target.dataset.itemId });
       },
@@ -686,6 +721,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       }),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
+      pinPlaySkill: SpycraftAgentSheet.#onPinPlaySkill,
       rollVitality: SpycraftAgentSheet.#onRollVitality,
       reviewVitality(event, target) {
         return this.actor.reviewVitality(Number(target.dataset.index));
@@ -773,6 +809,7 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
         ].map(name => `${TPL}/play/${name}.hbs`),
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/parts/use-counter.hbs`
       ],
       scrollable: [""]
@@ -905,7 +942,17 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ),
       nonLethalMeters: nonLethalMeters(sys),
       showAllTools: game.user.isGM && this._showAllTools,
-      combatTools: combatToolVisibility(sys, COMBAT_STANCES, { showAll: game.user.isGM && this._showAllTools })
+      combatTools: combatToolVisibility(sys, COMBAT_STANCES, {
+        showAll: game.user.isGM && this._showAllTools,
+        earned: {
+          counterTrip: counterTripCandidates(this.actor).length > 0,
+          tripFinalAttack: tripFinalAttackCandidates(this.actor).length > 0,
+          // Picking teammates matters only when another agent in the world has Improved Fortune, or some are picked.
+          fortuneTeammates:
+            (sys.fortuneTeammateIds?.length ?? 0) > 0 ||
+            [...(game.actors ?? [])].some(actor => actor.id !== this.actor.id && pointmanLevel(actor) >= 10)
+        }
+      })
     });
 
     // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
@@ -1310,7 +1357,11 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       r => loc`Campaign feat replacement: ${cfg.featTrees[r.source]} → ${cfg.featTrees[r.target]}; ${r.count} used.`
     );
     context.coreAbilities = sys.coreAbilities ?? [];
-    context.criticalInjuryReviews = criticalInjuryReviews(this.actor);
+    // A rolled injury is a row with its effect and care; only a record that needs the GC stays a review line.
+    context.criticalInjuries = criticalInjuryRows(this.actor);
+    context.criticalInjuryReviews = criticalInjuryReviews(this.actor).filter(
+      review => !context.criticalInjuries.some(row => row.id === review.id)
+    );
     context.startedCharacterCombat = this.actor.participatingCombat?.started === true;
     context.mobileOffense = uses.find(s => s.id === "mobileOffense");
     context.contempt = uses.find(s => s.id === "contempt");
@@ -1479,6 +1530,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
       ...[...contactMilestones].sort((a, b) => a - b).map(n => [n, "Networking " + n + " purchased ranks"])
     ]);
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
+    context.contactPeople = contactPeopleRows(sys);
+    context.featTrades = featTradeContext(sys);
 
     // Gear
     context.weapons = byType("weapon").map(w => ({
@@ -1493,6 +1546,8 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }));
     for (const row of context.weapons) {
       row.untrained = row.attack?.trained === false;
+      // Said before the click: the attack goes ahead, with a notice, from a weapon not in hand.
+      row.notEquipped = row.item.system?.equipped === false;
       row.attackTip = weaponAttackTip(row.attack);
       row.facts = weaponFacts(row.attack);
       row.threatLabel = formatRange("threat", row.attack?.threat);
@@ -1500,7 +1555,16 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     }
     // Play: the skills the character is trained in, one click from a roll.
     context.miscLabels = miscModifierLabels(cfg);
-    context.playSkills = context.skills.filter(skill => skill.ranks > 0);
+    // An untrained skill the player pinned from the Skills tab joins them.
+    const pinned = new Set(actor.getFlag?.("spycraft2", "playSkills") ?? []);
+    for (const skill of context.skills) skill.pinned = pinned.has(skill.key);
+    context.playSkills = context.skills
+      .filter(skill => skill.ranks > 0 || skill.pinned)
+      .map(skill => ({
+        ...skill,
+        // A widened error range is said on the button, before the roll.
+        errorLabel: skill.errorFloor > 1 ? loc`error ${formatRange("error", skill.errorFloor)}` : ""
+      }));
     context.activeEffects = activeEffectLines(sys);
     context.ownTurn =
       actor.participatingCombat?.started === true && actor.participatingCombat.combatant?.actor?.uuid === actor.uuid;
@@ -1757,10 +1821,18 @@ export class SpycraftAgentSheet extends KeepPlace(HandlebarsApplicationMixin(Sav
     );
   }
   static #onRollDamage(event, target) {
-    return this.actor.rollDamage(this._item(target));
+    return this.actor.rollDamage(this._item(target), skipDialog(event) ? { quick: true } : {});
   }
   static #onRollInitiative() {
     return this.actor.rollInitiative({ createCombatants: true });
+  }
+  /** Pin an untrained skill to the Play tab, or take it off again. */
+  static #onPinPlaySkill(event, target) {
+    const key = target.dataset.skill,
+      pinned = new Set(this.actor.getFlag("spycraft2", "playSkills") ?? []);
+    if (pinned.has(key)) pinned.delete(key);
+    else pinned.add(key);
+    return this.actor.setFlag("spycraft2", "playSkills", [...pinned]);
   }
   static #onRollVitality(event, target) {
     return this.actor.rollVitality(Number(target.dataset.index));
@@ -1984,7 +2056,16 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         sufferTypedDamage,
         survivalSave,
         exposureFailedSave,
-        endTypedExposure
+        endTypedExposure,
+        // The same combat outcomes as the agent's Play tab, so the GC can settle them for an NPC.
+        manageTripOutcomes,
+        manageFeintOutcomes,
+        settleGrapple,
+        recordAnticipate,
+        standOff,
+        tireResult,
+        coupDeGraceSave,
+        cancelReady
       }),
       toggleEditMode() {
         if (!this.isEditable) return;
@@ -2003,7 +2084,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       rollNpcSkill(event, target) {
         // A skill named on the sheet rolls at once with the usual defaults; "Skill check" opens the full dialog.
         const key = target?.dataset?.skill;
-        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0, error: 1 } : null);
+        // No error range is named, so the skill's first check rolls with its own.
+        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0 } : null);
       },
       applyNpcDrained() {
         return applyNpcDrained(this.actor);
@@ -2088,7 +2170,17 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack),
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
-      itemDelete: SpycraftNpcSheet.#onItemDelete
+      itemDelete: SpycraftNpcSheet.#onItemDelete,
+      // The Weapons heading's Browse and Add, as on the agent's Gear tab: a new NPC gets its gun from here.
+      browse(event, target) {
+        return new SpycraftBrowser({ actor: this.actor, itemType: target.dataset.type }).render(true);
+      },
+      createItem(event, target) {
+        const type = target.dataset.type;
+        return this.actor.createEmbeddedDocuments("Item", [
+          { name: game.i18n.format("DOCUMENT.New", { type: game.i18n.localize(`TYPES.Item.${type}`) }), type }
+        ]);
+      }
     }
   };
 
@@ -2098,6 +2190,8 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       templates: [
         `${TPL}/parts/hazards.hbs`,
         `${TPL}/parts/weapon-row.hbs`,
+        `${TPL}/parts/gear-heading.hbs`,
+        `${TPL}/parts/combat-outcome-buttons.hbs`,
         `${TPL}/npc-graded-play.hbs`,
         `${TPL}/npc-builder.hbs`,
         "systems/spycraft2/templates/parts/editor.hbs"
@@ -2120,6 +2214,11 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       isGM: game.user.isGM,
       config: CONFIG.SPYCRAFT,
       editable: this.isEditable,
+      // Commander (p.447) marks one token of a Minion squad; a linked NPC is one character for every token.
+      commanderMark:
+        sys.npcProfile?.enabled && (sys.npcProfile.qualities ?? []).some(entry => entry?.id === "commander")
+          ? { token: !!this.actor.isToken }
+          : null,
       abilities: Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => ({
         key,
         label: game.i18n.localize(label),
@@ -2200,7 +2299,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       manualRoles: { "": loc`None`, minion: loc`Minion`, henchman: loc`Henchman`, mastermind: loc`Mastermind` },
       healthChip: npcIsSpecial(this.actor)
         ? loc`vitality ${sys.vitality?.value ?? 0}/${sys.vitality?.max ?? 0} · wounds ${sys.wounds?.value ?? 0}/${sys.wounds?.max ?? 0}`
-        : loc`Damage save: ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
+        : loc`damage track ${damageStateLabel(damageSaveState(this.actor).track.state)}`,
       // The conditions set on the token or the actor, by their Spycraft names.
       conditionStamps: [...(this.actor.statuses ?? [])]
         .map(id => CONFIG.statusEffects?.find(effect => effect.id === id)?.name)
@@ -2223,6 +2322,18 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     super._onRender(context, options);
     this.element.classList.toggle("play-mode", !context.editMode);
     this.element.classList.toggle("edit-mode", !!context.editMode);
+    // Disclosures keep their state across redraws, per view: Items and notes opens in Edit, and stays as the GC left it.
+    this._open ??= {};
+    const mode = context.editMode ? "edit" : "play";
+    for (const details of this.element.querySelectorAll("details[data-key]")) {
+      const key = `${mode}:${details.dataset.key}`;
+      if (Object.hasOwn(this._open, key)) details.open = this._open[key];
+      details.addEventListener("toggle", () => {
+        this._open[key] = details.open;
+      });
+    }
+    // The pinned figures are redrawn whole; only the ones that changed are said.
+    announceChanges(this, this.element, this.element.querySelector(".npc-pinned"));
     enableHotbarDrag(this.element, this.actor);
   }
 
@@ -2254,6 +2365,13 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
         ])
       ),
       caliberOptions: Object.fromEntries(NPC_RULES.grades.slice(0, 5).map((g, i) => [i + 1, g])),
+      // Tools (p.394): the organization this NPC serves caps its gear Calibers.
+      organizationOptions: organizationChoices().length
+        ? { "": loc`None recorded`, ...Object.fromEntries(organizationChoices()) }
+        : null,
+      organizationCapsNote: result.organizationCaps
+        ? loc`${result.organizationCaps.name}'s Tools: weapons up to Caliber ${NPC_RULES.grades[result.organizationCaps.weapons - 1]}, gear up to ${NPC_RULES.grades[result.organizationCaps.gear - 1]}, vehicles up to ${NPC_RULES.grades[result.organizationCaps.vehicles - 1]}.`
+        : "",
       skillOptions,
       grades: Object.entries(NPC_STATS)
         .filter(([key]) => !(result.type === "animal" && ["competence", "wealth"].includes(key)))
@@ -2271,7 +2389,12 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
       })),
       equipment: NPC_CATEGORIES.map(category => ({
         category,
-        picks: (profile.equipment?.[category] ?? []).map((caliber, index) => ({ caliber, index, category }))
+        picks: (profile.equipment?.[category] ?? []).map((caliber, index) => ({
+          caliber,
+          index,
+          category,
+          budget: npcPickBudgetNote(result.carriedEquipment?.[category]?.picks?.[index])
+        }))
       })),
       qualityOptions: Object.fromEntries(
         NPC_RULES.qualities
@@ -2388,7 +2511,7 @@ export class SpycraftNpcSheet extends KeepPlace(HandlebarsApplicationMixin(SaveF
     return resolveQuickAttack(await this.actor.rollAttack(item, quickAttackOptions(this.actor, item)));
   }
   static #onRollDamage(event, target) {
-    return this.actor.rollDamage(this._item(target));
+    return this.actor.rollDamage(this._item(target), skipDialog(event) ? { quick: true } : {});
   }
   static #onItemEdit(event, target) {
     return this._item(target)?.sheet.render(true);

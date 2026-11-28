@@ -102,6 +102,7 @@ test("the surprise bonus uses ordinary morale stacking and does not affect non-s
 });
 test("actual NPC skill path applies role-scoped surprise and shared Shaken/social penalties with saved check evidence", async () => {
   globalThis.CONFIG = { SPYCRAFT: cfg };
+  globalThis.game = { user: { isGM: true, id: "gc" } };
   const actor = {
     isOwner: true,
     system: { ...state(), npcType: "standard", npcProfile: { enabled: true }, competence: 5 },

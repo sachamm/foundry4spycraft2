@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { npcWeaponTraining } from "../module/rules/npc-weapons.mjs";
+import { criticalPlan } from "../module/rules/criticals.mjs";
 import { grappleDamagePlan, grappleDamageAward } from "../module/rules/grapple-damage.mjs";
 import { grappleBenefitEligibility } from "../module/rules/combat-actions.mjs";
 import { damageApplicationKey } from "../module/rules/attack-damage-hits.mjs";
@@ -26,8 +28,12 @@ test("Sprawl, Throw and Injure preserve their actual base damage and the extra S
       injure = grappleDamagePlan(s, "injure"),
       thrown = grappleDamagePlan(s, "throw");
     assert.match(injure.formula, /2d4/);
-    assert.ok(thrown.formula.includes(`(${s.unarmed.damageBonus + Math.max(1, strength)})`));
-    assert.equal(thrown.profile.kind, "subdual");
+    assert.equal(
+      thrown.formula,
+      `${injure.formula} + (${Math.max(1, strength)})`,
+      "Throw adds its Strength bonus after standard unarmed minimum damage"
+    );
+    assert.equal(thrown.profile.kind, "lethal");
     assert.equal(grappleDamagePlan(s, "sprawl").formula, `max(0, 1d4 + (${strength}))`);
   }
   const weapon = {
@@ -112,6 +118,51 @@ test("assisted release and opponent benefits share the same ordered participant 
   );
 });
 
+test("standard Grapple damage follows actual proficiency for PCs, ordinary NPCs, Non-Combatants and animals", () => {
+  for (const [actorType, fields, kind, die] of [
+    ["agent", { proficiencyTotals: { unarmed: { proficient: true } } }, "lethal", 4],
+    ["agent", {}, "subdual", 3],
+    ["npc", { npcType: "standard", npcProfile: { enabled: true, qualities: [] } }, "lethal", 4],
+    ["npc", { npcType: "standard", npcProfile: { enabled: true, qualities: [{ id: "non-combatant" }] } }, "subdual", 3],
+    ["npc", { npcType: "animal", npcProfile: { enabled: true, qualities: [] } }, "subdual", 3]
+  ]) {
+    const s = { abilities: { str: { mod: 2 } }, activeFeatNames: [], ...fields };
+    for (const benefit of ["injure", "throw"]) {
+      const p = grappleDamagePlan(s, benefit, { actorType });
+      assert.equal(p.profile.kind, kind);
+      assert.match(p.formula, new RegExp("1d" + die));
+    }
+  }
+});
+test("animals receive proficiency only for their own granted weapon, not its entire proficiency family", () => {
+  const s = {
+    npcType: "animal",
+    npcProfile: { enabled: true, qualities: [{ id: "natural-attack", details: "Claw" }] },
+    npcBuiltIn: { sources: [{ key: "natural-attack", itemType: "weapon", itemId: "claw" }] }
+  };
+  assert.equal(npcWeaponTraining(s, { id: "claw", proficiency: "unarmed" }).trained, true);
+  assert.equal(npcWeaponTraining(s, { id: "fist", proficiency: "unarmed" }).trained, false);
+  assert.equal(npcWeaponTraining(s, { id: "pistol", proficiency: "handgun" }).trained, false);
+});
+test("legacy and current Laser flags apply one critical discount", () => {
+  const check = {
+    checkKind: "attack",
+    successConfirmed: true,
+    threatConfirmed: true,
+    effectiveTotal: 20,
+    attackContext: { laser: true, damageType: "laser" }
+  };
+  const plan = criticalPlan({}, check, {
+    baseCost: 3,
+    effect: "Reviewed effect",
+    effectConfirmed: true,
+    beforeDamage: true,
+    available: 10
+  });
+  assert.equal(plan.blocked, false, plan.reason);
+  assert.equal(plan.cost, 2);
+  assert.equal(plan.sources.filter(s => s.includes("Laser")).length, 1);
+});
 const registry = new Map(),
   messages = [];
 function update(patch) {

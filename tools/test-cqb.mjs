@@ -262,3 +262,14 @@ test("cancelling an automatically requested attack context restores all actually
   assert.equal(a.system.resourceUses.first.used, 1);
   assert.equal(a.system.resourceUses.second.used, 1);
 });
+test("Shift-click damage skips the optional benefits dialog and adds no optional extras", async () => {
+  let a = actor();
+  a.system.activeFeatNames.push("Horde Supremacy");
+  assert.equal(await a.rollDamage(a.items[0], { distanceFeet: 10 }), null, "a plain click asks");
+  assert.equal(dialogs, 1);
+  a = actor();
+  a.system.activeFeatNames.push("Horde Supremacy");
+  const m = await a.rollDamage(a.items[0], { quick: true, distanceFeet: 10 });
+  assert.equal(dialogs, 0);
+  assert.ok(m);
+});

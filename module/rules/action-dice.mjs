@@ -1,3 +1,6 @@
+import { campaignTriumphXPPercent } from "./campaign-rules.mjs";
+import { actionDieTerm } from "./action-die-formula.mjs";
+import { triumphAt } from "./check-candidates.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./check-candidates.mjs";
@@ -90,7 +93,9 @@ export function actionDieBoostPlan(
         kind === "save" ||
         kind === "damage"),
     intelligence: system.abilities?.int?.mod ?? 0,
-    formula: Array(rolls).fill(`1d${die}x>=${explodeAt}`).join(" + "),
+    formula: Array(rolls)
+      .fill(actionDieTerm(die, explodeAt, system.actionDice))
+      .join(" + "),
     wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill",
     // Better Luck Next Time, p.189: a single boosting die on a skill check or save that rolls a natural 1 comes back.
     betterLuck: system.activeFeatNames?.includes("Better Luck Next Time") === true && ["skill", "save"].includes(kind)
@@ -115,7 +120,9 @@ export function actionDieBoostResult(check, plan, dieResults) {
   const resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
     cap,
     threat: check.threat ?? 0,
-    actionDieBonus: boostTotal
+    actionDieBonus: boostTotal,
+    triumphAt: triumphAt(check),
+    ceiling: check.resultCeiling ?? null
   });
   const naturalOne = plan.betterLuck === true && plan.count === 1 && plan.rolls === 1 && Number(dieResults[0]) === 1;
   return {
@@ -158,7 +165,7 @@ export function generousBoostPlan(
   const plan = actionDieBoostPlan(donor, check, { count: 1, errorDeclined, calculating });
   if (plan.blocked) return plan;
   // Generous explicitly uses one donor die; other doubled-die cores do not multiply it.
-  return { ...plan, rolls: 1, formula: `1d${plan.die}x>=${plan.explodeAt}`, wellRounded: false };
+  return { ...plan, rolls: 1, formula: actionDieTerm(plan.die, plan.explodeAt, donor.actionDice), wellRounded: false };
 }
 
 /** Pointman Improved Fortune, p.41: distinct teammates stack with self, maximum three starting dice. */
@@ -216,7 +223,8 @@ export function actionDieAwardPlan(
   if (!Number.isSafeInteger(value)) throw new Error(loc`The awarded action-die balance exceeds a safe whole number.`);
   const key = encodeURIComponent(String(mission)).replaceAll(".", "%2E"),
     before = system.actionDieAwards?.[key];
-  if (system.missionXPRewards?.[key])
+  // A settlement reopened by Resume mission takes further awards; the next settlement pays the difference.
+  if (system.missionXPRewards?.[key] && !system.missionXPRewards[key].reopened)
     throw new Error(
       loc`This mission’s XP was already settled. Start the next mission before recording further awards.`
     );
@@ -252,7 +260,7 @@ export function actionDieAwardSummary(system) {
     count,
     events: record?.events?.length ?? 0,
     baseXP: reward?.awardBaseBonus ?? 25 * Math.min(count, system.level ?? 0),
-    settled: !!reward,
+    settled: !!reward && !reward.reopened,
     totalXP: reward?.totalXP ?? 0
   };
 }
@@ -269,7 +277,8 @@ export function missionXPPlan(
     mission = "initial",
     actorUuid = system.actorUuid,
     additionalExcludesCrossroads = false,
-    at = 0
+    at = 0,
+    triumph = false
   } = {}
 ) {
   const level = system.level ?? 0;
@@ -286,7 +295,8 @@ export function missionXPPlan(
   if (additionalXP && !String(modifierReason).trim())
     throw new Error(loc`Record the source of additional post-multiplier XP.`);
   const key = encodeURIComponent(String(mission)).replaceAll(".", "%2E");
-  if (system.missionXPRewards?.[key]) throw new Error(loc`This mission’s XP was already settled.`);
+  const previous = system.missionXPRewards?.[key] ?? null;
+  if (previous && !previous.reopened) throw new Error(loc`This mission’s XP was already settled.`);
   const count = system.actionDieAwards?.[key]?.count ?? 0;
   if (!Number.isSafeInteger(count) || count < 0) throw new Error(loc`Review the mission’s action-die award ledger.`);
   const crossroads = crossroadsMissionXPPolicy(system, { mission, actorUuid });
@@ -297,8 +307,12 @@ export function missionXPPlan(
     multiplier = Math.min(level, threatLevel),
     coreXP = combinedBase * multiplier,
     crossroadsXP = crossroadsMissionXPBonus(coreXP, crossroads),
-    totalXP = coreXP + crossroadsXP + additionalXP,
-    xp = (system.xp ?? 0) + totalXP;
+    triumphPercent = triumph ? campaignTriumphXPPercent() : 0,
+    triumphXP = Math.ceil((coreXP * triumphPercent) / 100),
+    totalXP = coreXP + triumphXP + crossroadsXP + additionalXP,
+    previousTotalXP = previous ? Math.max(0, Number(previous.totalXP) || 0) : 0,
+    gainedXP = totalXP - previousTotalXP,
+    xp = (system.xp ?? 0) + gainedXP;
   if (![combinedBase, coreXP, totalXP, xp].every(Number.isSafeInteger))
     throw new Error(loc`The mission reward exceeds a safe whole number.`);
   if (crossroadsXP > 0 && additionalXP > 0 && additionalExcludesCrossroads !== true)
@@ -319,9 +333,13 @@ export function missionXPPlan(
       ...(crossroads.source !== "no-xp-difference"
         ? { crossroads: { ...crossroads, bonusXP: crossroadsXP, rounding: "up" } }
         : {}),
+      triumphPercent,
+      triumphXP,
+      crossroadsXP,
       additionalXP,
       modifierReason: String(modifierReason).trim(),
       totalXP,
+      ...(previous ? { previousTotalXP, gainedXP } : {}),
       at,
       source: "p.440 (user-confirmed)"
     }

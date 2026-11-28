@@ -5,8 +5,14 @@ import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, finalWeaponReady, postFinalAttack } from "./final-attack.mjs";
 import { loc } from "../i18n.mjs";
+import { isSpecialCharacter } from "../rules/campaign-rules.mjs";
 import { formDialog, raw } from "./dialog-kit.mjs";
-const targetData = t => ({ uuid: t.uuid, type: t.type, npcType: t.system.npcType });
+// A promoted NPC is special for this mission (p.398), so it cannot be a Contempt target.
+const targetData = t => ({
+  uuid: t.uuid,
+  type: t.type,
+  npcType: isSpecialCharacter(t.system) ? "special" : t.system.npcType
+});
 export async function takeContempt(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   finalAttackOptions(options);
@@ -17,7 +23,7 @@ export async function takeContempt(actor, options = {}) {
       rows = await Promise.all(
         damageTargetChoices().actors.map(async row => {
           const t = await resolveDamageTarget(row.uuid);
-          return t?.type === "npc" && ["standard", "animal"].includes(t.system.npcType) ? row : null;
+          return t?.type === "npc" && !isSpecialCharacter(t.system) ? row : null;
         })
       ),
       targets = rows

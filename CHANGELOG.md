@@ -81,6 +81,17 @@
 - Creation review now keeps invalid base attributes and unassigned attribute increases in the setup checklist.
   Later vitality gains must be whole results within the class die; invalid saved gains need review and no longer
   inflate maximum vitality. Saved choices remain available for correction.
+## 0.8.8
+
+- **Weapon years from the weapon tables (world update, schema 8).** Weapons in the compendium now carry the year
+  printed in the weapon tables (pp.250–271). A weapon in the world or on a character that still holds the year the
+  0.8.0 update gave it takes the corrected year; a year someone typed in is kept.
+- **Action dice on Initiative.** Under an agent's Initiative roll, a button spends one action die and raises the
+  Count, while the Count is still the one that roll left.
+- **Fire actions on the one attack button.** The attack dialog now offers a firearm's Burst, Autofire, Strafe,
+  Cover Fire and Suppressive Fire, so an NPC's attack and the Play tab reach them.
+- **Commander on the NPC sheet.** An unlinked Minion token's sheet can mark or clear it as the squad's Commander.
+- **Size and Blend.** An agent's Size now modifies its Blend Stealth checks as well as its Hide checks (p.349).
 
 ## 0.8.7 — 2026-11-25
 

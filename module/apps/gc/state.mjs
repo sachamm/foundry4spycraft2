@@ -1,8 +1,13 @@
-/** World state for the Game Control tools: the mission record, campaign qualities, scene state and Dramatic Conflicts. */
+/** World state for the Game Control tools: the mission record, campaign qualities, scene state, organizations and Dramatic Conflicts. */
 import { renderOpenSheet } from "../../services/refresh.mjs";
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
-import { missionCatalog } from "./mission-defaults.mjs";
+import { setCampaignRulesSource } from "../../rules/campaign-rules.mjs";
+import { setGearRestrictionSource, missionGearRestrictions } from "../../rules/gear-restrictions.mjs";
+import { GC_DATA } from "../../rules/gc-tables.mjs";
+import { setOrganizationToolsSource } from "../../rules/npc-organization.mjs";
+import { toolsCalibers } from "../../rules/gc/organization.mjs";
+import { missionCatalog } from "../../rules/gc/mission-catalog.mjs";
 import { loc, locKey } from "../../i18n.mjs";
 
 const SYSTEM = "spycraft2";
@@ -11,7 +16,16 @@ const refresh = () => {
     actor.reset();
     renderOpenSheet(actor);
   }
-  for (const token of globalThis.canvas?.tokens?.placeables ?? []) if (token.actor?.isToken) token.actor.reset();
+  // Unlinked tokens on every scene, not just the one in view: a fight elsewhere must read the new numbers too.
+  const seen = new Set();
+  const resetToken = actor => {
+    if (!actor?.isToken || seen.has(actor)) return;
+    seen.add(actor);
+    actor.reset();
+    renderOpenSheet(actor);
+  };
+  for (const scene of globalThis.game?.scenes ?? []) for (const token of scene.tokens ?? []) resetToken(token.actor);
+  for (const token of globalThis.canvas?.tokens?.placeables ?? []) resetToken(token.actor);
   globalThis.game?.spycraft2?.gc?.console?.render(false);
 };
 
@@ -34,12 +48,33 @@ export function registerGCSettings() {
     hidden({ scene: null, dramatic: false, source: null, dcBoosts: 0 }, refreshConsole)
   );
   game.settings.register(SYSTEM, "conflicts", hidden({}, refreshConsole));
+  // The Agency and the other enduring organizations (pp.389–395), by id. Their Tools cap affiliated NPCs' gear, so a
+  // change recomputes the characters too.
+  game.settings.register(SYSTEM, "organizations", hidden({}));
   // Which console sections this GC has opened or closed, kept in the browser rather than the world.
   game.settings.register(SYSTEM, "gcConsoleSections", { scope: "client", config: false, type: Object, default: {} });
   // The console view (Prep, Play or Wrap-up) this GC chose, with the state it was chosen in.
   game.settings.register(SYSTEM, "gcConsoleView", { scope: "client", config: false, type: Object, default: {} });
-  // Set once every first-session step has been done, so the list does not return with each new mission.
+  game.settings.register(SYSTEM, "gcConsoleWindow", {
+    name: locKey`GC Console in its own window`,
+    hint: locKey`Alt+G opens the GC Console as a window beside the chat log, instead of in the chat's place in the sidebar.`,
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+  // Where this GC last left the console's window.
+  game.settings.register(SYSTEM, "gcConsolePosition", { scope: "client", config: false, type: Object, default: {} });
+  // Set once every first-session step has been done, so the list does not return with each new mission. Each GC
+  // keeps their own: a second GC joining a world still sees the list until they have done the steps.
   game.settings.register(SYSTEM, "gcFirstSessionDone", {
+    scope: "user",
+    config: false,
+    type: Boolean,
+    default: false
+  });
+  // Set once a fight in this world has begun, so the first-session list can tick its last step for good.
+  game.settings.register(SYSTEM, "gcFirstCombatSeen", {
     scope: "world",
     config: false,
     type: Boolean,
@@ -123,7 +158,15 @@ export async function fixThreatLevel() {
   const mission = getMission(),
     levels = teamLevels(mission),
     tl = threatLevel(mission, levels);
-  await setMission({ ...mission, threatLevel: tl.value, threatBase: tl.base, teamLevels: levels });
+  // The adjustment in the fixed level is kept beside it: the standing reward follows the level applied, not one
+  // typed into the record later and not yet applied.
+  await setMission({
+    ...mission,
+    threatLevel: tl.value,
+    threatBase: tl.base,
+    teamLevels: levels,
+    threatAdjustApplied: tl.override ? 0 : tl.adjust
+  });
   return { ...tl, bonusDice: threatBonusActionDice(tl.value, levels) };
 }
 
@@ -135,6 +178,18 @@ export async function setCampaign(campaign) {
 export const qualitiesInForce = () =>
   activeQualities(getCampaign().qualities, getMission().active ? getMission().qualities : []);
 export const currentCampaignEffects = () => campaignEffects(qualitiesInForce());
+// The rules read the qualities in force through this source (module/rules/campaign-rules.mjs).
+setCampaignRulesSource(() => currentCampaignEffects().effects);
+// Gear Restrictions scripted into the mission under way take picks from every agent (Table 7.8, p.437).
+setGearRestrictionSource(() => missionGearRestrictions(getMission(), GC_DATA.tables.gearRestrictions));
+setOrganizationToolsSource(() =>
+  Object.fromEntries(
+    Object.entries(getOrganizations()).map(([id, org]) => [
+      id,
+      { name: org?.name ?? "", calibers: toolsCalibers(org?.tools) }
+    ])
+  )
+);
 
 /** Mission XP including season-long campaign qualities (which modify every mission of the season, p.435). */
 export function missionXP({ planned = false } = {}) {
@@ -147,6 +202,13 @@ export function missionXP({ planned = false } = {}) {
 
 /** Scene state follows the system's scene usage period: a new scene is standard until made dramatic. */
 export const sceneEpoch = () => String(read("usagePeriods", {})?.scene ?? "initial");
+/** The current mission usage period, which names the mission a payout or other per-mission record belongs to. */
+// The usage period and the record's own id: planning the next mission is a new record before Start mission runs.
+export const missionEpoch = () => {
+  const period = String(read("usagePeriods", {})?.mission ?? "initial"),
+    record = read("mission", {})?.recordId;
+  return record ? `${period}:${record}` : period;
+};
 export function getSceneState() {
   const saved = read("sceneState", {}),
     scene = sceneEpoch();
@@ -161,6 +223,17 @@ export async function setSceneState(change) {
 }
 export const isDramaticScene = () => getSceneState().dramatic === true;
 
+export const getOrganizations = () => ({ ...read("organizations", {}) });
+export async function saveOrganization(id, organization) {
+  requireGC();
+  const all = getOrganizations();
+  if (organization === null) delete all[id];
+  else all[id] = organization;
+  await game.settings.set(SYSTEM, "organizations", all);
+  return organization;
+}
+/** The organization the GC marked as the team's Agency, if any. */
+export const agencyOrganization = () => Object.values(getOrganizations()).find(org => org?.agency) ?? null;
 export const getConflicts = () => ({ ...read("conflicts", {}) });
 export async function saveConflict(id, conflict) {
   requireGC();

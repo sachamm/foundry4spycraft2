@@ -55,6 +55,9 @@ import { evasionSaveContext, reflexDamagePlan } from "../rules/save-avoidance.mj
 import { damageResistanceSource, damageResistancePlan, subdualTypeSource } from "../rules/resistances.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
+import { recordFallingLanding } from "./falling-dispatch.mjs";
+export const sufferFall = (actor, input = {}) =>
+  recordFallingLanding(actor, { ...input, distanceFeet: input.distanceFeet ?? input.feet });
 import { ignoresSuccessfulHalfSave } from "../rules/campaign-combat.mjs";
 import { currentCampaignRules } from "../rules/gc/campaign.mjs";
 import {
@@ -68,7 +71,7 @@ import {
 import { rollAcidSourceInjury, markAcidSourceInjury, migrateAcidHistory, reviewAcidSource } from "./acid-sources.mjs";
 import { queueResources } from "../services/transactions.mjs";
 import { same } from "../rules/equal.mjs";
-import { snapshot, undoEntry, postUndo } from "./undo.mjs";
+import { snapshot, undoEntry, postUndo, withUndo } from "./undo.mjs";
 
 const halfSavePolicy = actor => ({
   ignoreSuccessfulHalfSave: ignoresSuccessfulHalfSave(actor, currentCampaignRules().effects)
@@ -228,7 +231,7 @@ async function sufferTypedLethal(
     points += flat.total;
   }
   if (resistance.resisted) lines.push(loc`Resistance prevents ${resistance.resisted} ${label} damage.`);
-  if (!resistance.negatesEffects) lines.push(await sufferStress(actor, points, label));
+  if (!resistance.negatesEffects) lines.push(await sufferStress(actor, points, label, undefined, { cause: type }));
   return {
     lines,
     rolls,
@@ -279,10 +282,11 @@ export async function sufferTypedDamage(actor, preset = {}) {
             Object.keys(DAMAGE_TYPES)
               .filter(type => !preset.allowed || preset.allowed.includes(type))
               .map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`])
+              .concat(preset.allowed ? [] : [["falling", loc`Falling (p.336): asks for the distance next`]])
           ),
           known.type
         )}</select></label>
-        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" required /></label>
+        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" /></label>
         <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
         <label>${loc`Armor worn (acid, heat)`} <select name="armor">${mark(options(ARMORS()), known.armor)}</select></label>
         <label>${loc`Acid: DR remaining without worn armor, after armor-piercing`} <input type="number" name="unarmoredReduction" min="0" step="1" value="${Number.isSafeInteger(known.unarmoredReduction) ? known.unarmoredReduction : ""}" /></label>
@@ -308,6 +312,9 @@ export async function sufferTypedDamage(actor, preset = {}) {
     });
     if (!input) return null;
   }
+  if (String(input.type) === "falling" && !preset.allowed) return sufferFall(actor, preset.fall ?? {});
+  if (String(input.amount ?? "").trim() === "" && String(input.type) !== "vacuum")
+    return refuse(loc`Enter the damage rolled for this type.`);
   const type = String(input.type),
     amount = Number(input.amount),
     reduction = Number(input.reduction ?? 0),
@@ -318,6 +325,12 @@ export async function sufferTypedDamage(actor, preset = {}) {
   if (!Number.isSafeInteger(reduction) || reduction < 0)
     return refuse(loc`Enter damage reduction as a nonnegative whole number.`);
   const label = DAMAGE_TYPE_LABELS[type];
+  // A damage card that routes its hit here keeps its own Undo (`undo: false`); otherwise this step leaves one.
+  const take = () => takeTypedDamage(actor, { input, type, amount, reduction, source, label, preset });
+  return preset.undo === false ? take() : withUndo([actor], loc`${label}: ${actor.name}`, take);
+}
+
+async function takeTypedDamage(actor, { input, type, amount, reduction, source, label, preset }) {
   try {
     const hitContext = typedHitContext(preset.hitContext);
     switch (type) {
@@ -694,10 +707,14 @@ async function sufferElectrical(actor, { amount, source, hitContext }) {
 }
 
 /* -------------------------------------------- */
-/*  Sheet buttons                                */
+/*  Falling                                      */
 /* -------------------------------------------- */
 
-/** Acid on a character: start of round, end of round, washing, the injury save. */
+/**
+ * A fall (p.336): roll the dice for the damage distance, take a made Acrobatics/Falling check off the damage, apply
+ * it as lethal or subdual after the fall's armor piercing, then the stress and the sprawl. Wire Fu halves it for a
+ * player or special character (p.408).
+ */
 export async function acidStep(actor, step, sourceId = "", options = {}) {
   if (!owned(actor)) return null;
   const migrated = await migrateAcidHistory(actor);
@@ -881,7 +898,11 @@ function acidStepSnapshot(actor, id, attempt = "") {
 }
 
 /** Cold, heat or electrical: the Fortitude save against its subdual damage failed. */
-export async function exposureFailedSave(actor) {
+export const exposureFailedSave = actor =>
+  owned(actor)
+    ? withUndo([actor], loc`Failed exposure save: ${actor.name}`, () => exposureFailedSaveWork(actor))
+    : null;
+async function exposureFailedSaveWork(actor) {
   if (!owned(actor)) return null;
   const exposure = hazardState(actor.system).exposure;
   if (!exposure) return null;
@@ -918,7 +939,9 @@ export async function exposureFailedSave(actor) {
 }
 
 /** The character leaves the source of cold, heat, vacuum or the shock. */
-export async function endTypedExposure(actor) {
+export const endTypedExposure = actor =>
+  owned(actor) ? withUndo([actor], loc`Clear of the source: ${actor.name}`, () => endTypedExposureWork(actor)) : null;
+async function endTypedExposureWork(actor) {
   if (!owned(actor)) return null;
   await writeHazards(actor, endExposure(hazardState(actor.system)));
   return post(actor, [loc`The character is clear of the source; its running total ends.`]);
@@ -958,7 +981,9 @@ export async function survivalSave(actor, preset = {}) {
 }
 
 /** The survival hazard has ended: the next save starts at its base DC. */
-export async function endSurvivalHazard(actor, kind) {
+export const endSurvivalHazard = (actor, kind) =>
+  owned(actor) ? withUndo([actor], loc`Hazard over: ${actor.name}`, () => endSurvivalHazardWork(actor, kind)) : null;
+async function endSurvivalHazardWork(actor, kind) {
   if (!owned(actor)) return null;
   await writeHazards(actor, survivalReset(hazardState(actor.system), kind));
   return post(actor, [loc`${SURVIVAL_LABELS[kind]}: over; the next save starts again at its base DC.`]);
@@ -969,6 +994,7 @@ export async function endSurvivalHazard(actor, kind) {
 /* -------------------------------------------- */
 
 const total = check => Number(check?.effectiveTotal);
+/** Blockbuster (p.406): an agent's successful save that would halve damage resists all of it. */
 
 function typedReflexDamage(save, succeeded, check, normalSuccessDamage) {
   if (!check?.evasionContext)
@@ -1034,7 +1060,7 @@ const resolvers = {
       lines.push(await condition(actor, "stun", outcome.stunned, loc`Stunned`));
       lines.push(await condition(actor, "deaf", outcome.deafened, loc`Deafened`));
       const stress = await rollTotal(outcome.stress);
-      lines.push(await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.bang));
+      lines.push(await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.bang, undefined, { cause: "bang" }));
       await post(actor, lines, [stress.roll]);
       lines.length = 0;
     }
@@ -1049,7 +1075,7 @@ const resolvers = {
       actor,
       [
         await condition(actor, "blind", outcome.blinded, loc`Blinded`),
-        await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.flash)
+        await sufferStress(actor, stress.total, DAMAGE_TYPE_LABELS.flash, undefined, { cause: "flash" })
       ],
       [stress.roll]
     );

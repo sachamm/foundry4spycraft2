@@ -3,8 +3,18 @@ import { underminedSpendBlock } from "./taunt.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { actionDiceGain, actionDieBoostPlan, allowsAdditionalActionDice } from "./action-dice.mjs";
 import { validFortunatePool } from "./fortunate.mjs";
+import { campaignActionDice } from "./campaign-rules.mjs";
 import { loc } from "../i18n.mjs";
 import { favoredGearPoolStatus } from "./favored-gear-session.mjs";
+
+/**
+ * The die a bonus pool rolls when spent: Spirited (p.408) raises every player character action die one type, bonus
+ * pools included (d12 at most). Pools keep their book die on record, so their shape checks are unchanged.
+ */
+export function spentPoolDie(system, die) {
+  const step = system?.npcType || system?.companionOf?.ownerUuid ? 0 : campaignActionDice().step;
+  return step > 0 ? Math.min(12, die + 2 * step) : die;
+}
 const epoch = (periods, key) => String(periods?.[key] ?? "initial");
 /** Bonus pools that may pay any action-die cost, each with its own expiry. */
 export const UNRESTRICTED_POOL_SOURCES = Object.freeze(["masterPlan", "strut", "adrenalineJunkie", "fortunate"]);
@@ -98,8 +108,9 @@ export function checkBonusBoostPlan(
   const pool = bonusPoolForCheck(system, bonusPoolId, message, { periods });
   if (!pool.available) return { blocked: true, reason: pool.reason };
   const ad = system.actionDice ?? {},
-    threshold = Math.max(2, pool.die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
-  const virtual = { ...system, actionDice: { ...ad, value: pool.available, die: pool.die, explodeAt: threshold } };
+    die = spentPoolDie(system, pool.die),
+    threshold = Math.max(2, die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
+  const virtual = { ...system, actionDice: { ...ad, value: pool.available, die, explodeAt: threshold } };
   // This class's compulsory die may boost its linked passive check; general dice stay prohibited.
   const plan = actionDieBoostPlan(
     virtual,
@@ -392,7 +403,8 @@ export function actionDiceFundingContext(
         })
       : unrestrictedBonusPoolStatus(system, bonusPoolId, { periods });
   if (!pool.available) return { blocked: true, reason: pool.reason };
-  const threshold = Math.max(2, pool.die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
+  const die = spentPoolDie(system, pool.die),
+    threshold = Math.max(2, die - Math.max(0, (ad.die ?? 4) - (ad.explodeAt ?? ad.die ?? 4)));
   return {
     blocked: false,
     bonusPoolId,
@@ -400,9 +412,9 @@ export function actionDiceFundingContext(
     label: pool.label,
     paymentPath: "system.bonusActionDice." + bonusPoolId + ".remaining",
     balance: pool.remaining,
-    die: pool.die,
+    die,
     poolFingerprint: actionDicePoolFingerprint(pool),
-    system: { ...system, actionDice: { ...ad, value: pool.remaining, die: pool.die, explodeAt: threshold } }
+    system: { ...system, actionDice: { ...ad, value: pool.remaining, die, explodeAt: threshold } }
   };
 }
 export function actionDicePaymentPlan(system, { count, bonusPoolId = "", periods = system.usagePeriods } = {}) {

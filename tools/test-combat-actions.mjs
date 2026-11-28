@@ -402,3 +402,29 @@ test("the quick attack dialog reads an optional distance for a ranged weapon", a
   );
   assert.equal(Object.hasOwn(melee, "distanceFeet"), false, "a melee weapon has no range modifier");
 });
+
+test("the ordinary attack dialog offers a firearm's fire actions and reads them (B-028)", async () => {
+  const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+  globalThis.foundry ??= { utils: { escapeHTML: String } };
+  globalThis.game ??= { user: { targets: new Set() }, actors: [], scenes: [], canvas: null };
+  const item = { name: "Carbine", system: { ammo: "30 box" } };
+  const actor = { system: { activeFeatNames: [] }, weaponAttack: () => ({ firearm: true, modes: ["single", "auto"] }) };
+  const piece = rollPipeline.dialog({ dialog: "attack", actor, item, options: {} });
+  assert.match(piece, /name="fireAction"/);
+  assert.match(piece, /value="autofire"/);
+  assert.doesNotMatch(piece, /value="burst"/);
+  const melee = rollPipeline.dialog({
+    dialog: "attack",
+    actor: { ...actor, weaponAttack: () => ({}) },
+    item,
+    options: {}
+  });
+  assert.doesNotMatch(melee, /name="fireAction"/);
+  const read = rollPipeline.read(
+    { dialog: "attack", actor, item, entered: { fireAction: "autofire", fireCount: "2", situationalModifier: "0" } },
+    {}
+  );
+  assert.equal(read.fireAction, "autofire");
+  assert.equal(read.fireVolleys, 2);
+  assert.equal(read.attackAction, "autofire");
+});

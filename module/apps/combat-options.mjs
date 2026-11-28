@@ -21,6 +21,7 @@ import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { formDialog, raw } from "./dialog-kit.mjs";
+import { withUndo } from "./undo.mjs";
 
 const owned = actor => actor?.isOwner === true;
 
@@ -152,15 +153,17 @@ export async function standOff(actor, options = {}) {
   if (input.step === "lost") {
     const roll = await rollTotal("1d6"),
       stress = standOffStress(roll.total, input.winnerWis);
-    const line = await sufferStress(actor, stress, loc`Stand off`);
-    return post(
-      actor,
-      [
-        line,
-        loc`If this crosses a stress threshold the character cracks: surrender, or take an automatic hit (a special character drops to –1 wounds; a standard one dies).`
-      ],
-      [roll.roll]
-    );
+    return withUndo([actor], loc`Stand Off: ${actor.name}`, async () => {
+      const line = await sufferStress(actor, stress, loc`Stand off`);
+      return post(
+        actor,
+        [
+          line,
+          loc`If this crosses a stress threshold the character cracks: surrender, or take an automatic hit (a special character drops to –1 wounds; a standard one dies).`
+        ],
+        [roll.roll]
+      );
+    });
   }
   const opponent = opponents(actor).find(o => o.uuid === input.opponentUuid);
   if (!opponent) return refuse(loc`Choose the attacker.`);
@@ -208,8 +211,12 @@ export async function tireResult(actor, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  const opponent = opponents(actor).find(o => o.uuid === input.opponentUuid) ?? null,
-    lines = [],
+  const opponent = opponents(actor).find(o => o.uuid === input.opponentUuid) ?? null;
+  return withUndo([actor, opponent], loc`Tire: ${actor.name}`, () => settleTire(actor, opponent, input, outcome));
+}
+
+async function settleTire(actor, opponent, input, outcome) {
+  const lines = [],
     rolls = [];
   if (outcome.flatFooted) lines.push(await flatFooted(actor));
   if (outcome.damage) {

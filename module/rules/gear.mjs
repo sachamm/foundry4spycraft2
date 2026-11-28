@@ -391,6 +391,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     grip,
     stance,
     firing,
+    rangeIncrement: effectiveRange,
     stableSurface: options.stableSurface === true || launcherOperation.usingIntegralTripod === true
   });
   const originalError =
@@ -684,6 +685,8 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
             terms.sum("threat")
         )
       : 0,
+    // A forward observer's relay caps the result (p.300); the lowest cap wins.
+    cap: terms.all("cap").length ? Math.min(...terms.all("cap")) : null,
     notes: notes.join(" "),
     range: effectiveRange
   };
@@ -864,6 +867,7 @@ export function weaponDamage(
     finesseBasic,
     effectiveQualities: meleeArmorPiercing.effectiveQualities,
     cqbRange,
+    laser,
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,
