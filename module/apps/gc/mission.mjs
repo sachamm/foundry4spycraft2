@@ -9,7 +9,8 @@ import {
   characterMissionXP,
   exposurePenalty,
   defaultMission,
-  sessionDiceApplied
+  sessionDiceApplied,
+  antagonistPreview
 } from "../../rules/gc/mission.mjs";
 import { qualityAddition, qualityClash, adjustedStartingDice } from "../../rules/gc/campaign.mjs";
 import { resolveDevice, SECURITY_DEVICES } from "../../rules/gc/security.mjs";
@@ -42,7 +43,8 @@ import { missionSettlementDefaults } from "./mission-defaults.mjs";
 import { qualityHandling } from "./console-view.mjs";
 
 const T = GC_DATA.tables;
-const ask = (title, content, ok, validate = null) => formDialog({ title, ok, validate, fields: [raw(content)] });
+const ask = (title, content, ok, validate = null, render = null) =>
+  formDialog({ title, ok, validate, fields: [raw(content)], ...(render ? { dialog: { render } } : {}) });
 const options = (rows, selected) =>
   rows
     .map(
@@ -789,13 +791,12 @@ export async function addAntagonist({ uuid = "", another = false, dropped = null
     edit ? loc`Edit ${edit.name} (p.452)` : loc`Add an antagonist (p.452)`,
     `
     <p>${loc`Each NPC type counts once per mission however many appear; a special NPC counts four times its reward; a ‘full’ special NPC built with the character rules earns 300 XP per scene instead.`}</p>
-    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${options(
-      npcs.map(actor => [
-        actor.uuid,
-        `${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : " (enter XP)"}`
-      ]),
-      uuid
-    )}</select></label>
+    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${npcs
+      .map(
+        actor =>
+          `<option value="${esc(actor.uuid)}" data-xp="${Number.isFinite(actor.system.npcBuild?.xp) ? actor.system.npcBuild.xp : ""}" data-special="${["special", "villain"].includes(actor.system.npcType)}"${actor.uuid === uuid ? " selected" : ""}>${esc(`${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : loc` (enter XP)`}`)}</option>`
+      )
+      .join("")}</select></label>
     <label>${loc`Name`} <input name="name" value="${esc(edit?.name ?? "")}" /></label>
     <label>${loc`XP reward if not read from the actor`} <input type="number" name="xp" min="0" value="${edit?.xp ?? 0}" /></label>
     <label>${loc`Type`} <select name="type">${options(
@@ -808,9 +809,30 @@ export async function addAntagonist({ uuid = "", another = false, dropped = null
     )}</select></label>
     <label><input type="checkbox" name="full"${edit?.full ? " checked" : ""} /> ${loc`‘Full’ special NPC (300 XP per scene)`}</label>
     <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="${edit?.scenes ?? 1}" /></label>
+    <p class="hint" data-antagonist-preview aria-live="polite"></p>
     ${edit ? "" : `<label><input type="checkbox" name="another"${another ? " checked" : ""} /> ${loc`Add another after this one`}</label>`}`,
     edit ? loc`Save antagonist` : loc`Record for XP`,
-    values => (!values.uuid && !String(values.name ?? "").trim() ? loc`Choose an NPC, or name the antagonist.` : "")
+    values => (!values.uuid && !String(values.name ?? "").trim() ? loc`Choose an NPC, or name the antagonist.` : ""),
+    // The line under the fields says what the row will add, as the fields change.
+    (event, app) => {
+      const root = app?.element ?? event?.target,
+        line = root?.querySelector?.("[data-antagonist-preview]");
+      if (!line) return;
+      const field = name => root.querySelector(`[name="${name}"]`);
+      const update = () => {
+        const picked = field("uuid")?.selectedOptions?.[0],
+          type = field("type")?.value;
+        line.textContent = antagonistPreview({
+          xp: picked?.dataset.xp ? Number(picked.dataset.xp) : Number(field("xp")?.value),
+          special: type ? type === "special" : picked?.dataset.special === "true",
+          full: !!field("full")?.checked,
+          scenes: Number(field("scenes")?.value)
+        });
+      };
+      root.addEventListener("input", update);
+      root.addEventListener("change", update);
+      update();
+    }
   );
   if (!input) return null;
   const actor = input.uuid ? await fromUuid(input.uuid) : null;

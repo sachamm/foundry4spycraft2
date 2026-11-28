@@ -877,3 +877,11 @@ test("Cakewalk and Comedy of Errors shift a device's skill DCs, not its Defense 
     setCampaignRulesSource(null);
   }
 });
+
+test("the antagonist dialog's line says what the row adds, by the report's own arithmetic (p.452)", async () => {
+  const { antagonistPreview } = await import("../module/rules/gc/mission.mjs");
+  assert.match(antagonistPreview({ xp: 30 }), /Adds 30 XP/);
+  assert.match(antagonistPreview({ xp: 30, special: true }), /Adds 120 XP: 30 × 4/);
+  assert.match(antagonistPreview({ xp: 30, full: true, scenes: 2 }), /Adds 600 XP: 300 for each of 2/);
+  assert.match(antagonistPreview({ xp: NaN }), /Enter the NPC's XP/);
+});

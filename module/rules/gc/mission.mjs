@@ -278,3 +278,18 @@ export function exposurePenalty(infraction, { preventing = false, halve = false,
   // Net Worth is in modern dollars; under Historical it follows Table 7.4 like every other amount.
   return { reputation: scale(infraction?.reputation), netWorth: periodMoney(scale(infraction?.netWorth)) };
 }
+
+/**
+ * What one antagonist row will add to the mission's XP, in words, for the Record for XP dialog: the same arithmetic as
+ * missionXP (p.452), so the line matches the report.
+ */
+export function antagonistPreview({ xp, special = false, full = false, scenes = 1 } = {}) {
+  if (full) {
+    const n = Math.max(1, Math.trunc(Number(scenes) || 1));
+    return loc`Adds ${M.fullSpecialXPPerScene * n} XP: ${M.fullSpecialXPPerScene} for each of ${n} scene(s).`;
+  }
+  if (!Number.isFinite(Number(xp)) || Number(xp) < 0) return loc`Enter the NPC's XP reward.`;
+  return special
+    ? loc`Adds ${Number(xp) * M.specialMultiplier} XP: ${Number(xp)} × ${M.specialMultiplier} for a special NPC, once per mission.`
+    : loc`Adds ${Number(xp)} XP, once per mission however many appear.`;
+}
