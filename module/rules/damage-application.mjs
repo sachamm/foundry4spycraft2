@@ -62,7 +62,11 @@ export function attackResolutionNote(check) {
     return r.hits > 1 ? loc`Against ${who}: a hit; ${r.hits} shots hit.` : loc`Against ${who}: a hit.`;
   }
   const base = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
-  const against = r.cover ? loc`${base} (with ${r.cover.label} cover, +${r.cover.bonus})` : base;
+  const against = r.cover
+    ? r.cover.measured
+      ? loc`${base} (with ${r.cover.label} cover measured from the map, +${r.cover.bonus})`
+      : loc`${base} (with ${r.cover.label} cover, +${r.cover.bonus})`
+    : base;
   if (!r.hit && r.hitsCover) return loc`Against ${against}: a miss by ${-r.margin}. The shot hits the cover.`;
   if (!r.hit) return loc`Against ${against}: a miss by ${-r.margin}.`;
   return r.hits > 1

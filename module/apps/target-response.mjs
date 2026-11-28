@@ -15,6 +15,7 @@ import {
   targetLabel
 } from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
+import { coverBetween } from "./map.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
 /** Whether a player who owns this agent is connected: the GC then leaves the response to that player. */
@@ -64,7 +65,20 @@ export function targetResponseControls({ message, check, user }) {
         label: loc`Check Defense for ${target.name}`,
         hint: loc`${target.name} is the target: work out Defense against this attack`,
         ...(ownsAttacker ? {} : { emphasis: "primary" }),
-        run: () => checkIncomingDefense(target, incomingFacts(check))
+        run: () => {
+          // The walls the map shows between the two tokens start as the scenery cover (p.345).
+          let sceneryCover = null;
+          try {
+            const attacker = check.actorUuid ? fromUuidSync(check.actorUuid) : null;
+            sceneryCover = coverBetween(attacker, target, { tokenId: message.speaker?.token });
+          } catch {
+            sceneryCover = null;
+          }
+          return checkIncomingDefense(target, {
+            ...incomingFacts(check),
+            ...(Number.isSafeInteger(sceneryCover) ? { sceneryCover } : {})
+          });
+        }
       }
     ];
   }

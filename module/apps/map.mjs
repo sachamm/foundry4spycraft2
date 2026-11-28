@@ -99,6 +99,22 @@ const sightBlocked = (from, to) => wallBetween(from, to, "sight");
 const boxCentre = box => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
 
 /**
+ * The cover from walls between an attacker's token and a target's token on this scene (p.345), as a grade 0–4, or null
+ * when the map cannot say. The attacker's token is the card's speaker token when it is on the scene.
+ */
+export function coverBetween(attackerActor, targetActor, { tokenId = null } = {}) {
+  if (!mapAvailable() || !attackerActor || !targetActor) return null;
+  const tokens = attackerActor.getActiveTokens?.(true) ?? [];
+  const attacker = tokens.find(token => token.id === tokenId) ?? actorToken(attackerActor),
+    targets = targetActor.getActiveTokens?.(true) ?? [],
+    target = targets.find(token => game.user?.targets?.has?.(token)) ?? targets[0];
+  if (!attacker || !target || attacker === target) return null;
+  const a = boxOf(attacker),
+    centre = { x: a.x + a.width / 2, y: a.y + a.height / 2 };
+  return coverGrade(coverPoints(boxOf(target)).filter(point => sightBlocked(centre, point)).length);
+}
+
+/**
  * What the scene shows about an attack by this character on the targeted token.
  * @returns {object|null} null when it cannot be measured
  */

@@ -49,7 +49,7 @@ import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
 import { sufferTypedDamage } from "./damage-types.mjs";
 import { rollCriticalInjury } from "./critical-injuries.mjs";
-import { blastCaught } from "./map.mjs";
+import { blastCaught, coverBetween } from "./map.mjs";
 import { rollObjectDamageSave } from "./vehicle-play.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { gunplayCountGain, juggernautConversion } from "../rules/class-combat.mjs";
@@ -201,6 +201,13 @@ export async function resolveAttack(message, options = {}) {
   if (input.defense === undefined && input.targetUuid === undefined) {
     const choices = targetChoices({ exclude: attacker.uuid, offScene: "fallback" }),
       selected = (declared !== attacker.uuid && declared) || choices.selected;
+    let mapCover = null;
+    try {
+      const chosen = selected ? fromUuidSync(selected) : null;
+      mapCover = chosen ? coverBetween(attacker, chosen, { tokenId: message.speaker?.token }) : null;
+    } catch {
+      mapCover = null;
+    }
     input = await systemDialog.input({
       window: { title: loc`Attack result ${check.effectiveTotal}: against Defense` },
       rejectClose: false,
@@ -212,11 +219,14 @@ export async function resolveAttack(message, options = {}) {
           const defense = actor.isOwner || game.user?.isGM || defenseVisibleToPlayers() ? defenseOf(actor) : null;
           return defense === null ? targetLabel(actor) : loc`${targetLabel(actor)} — Defense ${defense}`;
         }
-      )}</select></label><label>${loc`Cover between attacker and target`} <select name="cover">${COVER_GRADES.slice(
+      )}</select></label><label>${loc`Cover between attacker and target`}${Number.isSafeInteger(mapCover) ? ` <span class="hint">${loc`(measured from the map)`}</span>` : ""} <select name="cover">${COVER_GRADES.slice(
         0,
         4
       )
-        .map((label, grade) => `<option value="${grade}">${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`)
+        .map(
+          (label, grade) =>
+            `<option value="${grade}"${grade === Math.min(3, mapCover ?? 0) ? " selected" : ""}>${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`
+        )
         .join(
           ""
         )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Cover adds to the Defense used, and a miss that only the cover caused hits the cover (p.345). Enter a different Defense for a declared defense or another circumstance; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
@@ -230,7 +240,16 @@ export async function resolveAttack(message, options = {}) {
   const baseDefense = entered ? defenseOf(target) : Number(input.defense);
   if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
-  const cover = coverOnResolution(input.cover);
+  // With no cover chosen, the walls the map shows between the two tokens count (p.345); the card says so.
+  let measured = null;
+  if (input.cover === undefined && target)
+    try {
+      measured = coverBetween(attacker, target, { tokenId: message.speaker?.token });
+    } catch {
+      measured = null;
+    }
+  const cover = coverOnResolution(input.cover ?? (measured > 0 ? Math.min(3, measured) : undefined));
+  if (cover && input.cover === undefined) cover.measured = true;
   // Weapon Specialist Foibles (p.50): +1 dodge against the chosen proficiencies, on top of the sheet's Defense.
   const foibles = entered && target ? specialistDefense(target.system, check.weaponProficiency).dodge : 0;
   // Gladiators (p.407): +1 against ranged attacks for each Melee or Unarmed Combat feat the target holds.
