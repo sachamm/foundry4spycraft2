@@ -23,7 +23,7 @@ import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 import { campaignRules, campaignSkillPlan, omniPenalty } from "../../rules/campaign-rules.mjs";
 import { skillConditionCheckPenalty } from "../../rules/skill-conditions.mjs";
-import { isHideCheck } from "../../rules/check-identity.mjs";
+import { sizeStealthCheck } from "../../rules/check-identity.mjs";
 import { formatRange } from "../../rules/outcome-labels.mjs";
 import { breakdownRows } from "../../rules/bonus-breakdown.mjs";
 import { formDialog, raw } from "../dialog-kit.mjs";
@@ -91,9 +91,6 @@ export function npcSkillCheck(skillKey, checkId = "") {
 }
 
 /** Whether a check's result takes the Size table's Stealth/Hide modifier (p.349). */
-const sizeStealthCheck = (skillKey, check) =>
-  (skillKey === "blend" && check?.id === "stealth") || isHideCheck(skillKey, check);
-
 /**
  * The parts of an NPC skill check that come from its conditions, its Size and the campaign's qualities: labelled rows
  * and an error range change (pp.340–342, 349, 406–408). Omni-Competent halves the penalties.
